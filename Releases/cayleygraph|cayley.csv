@@ -1,0 +1,386 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+5949794,2017-04-12T19:21:03Z,2017-04-12T20:00:09Z,"v0.6.1 -- GraphQL, Gizmo, SQL flavors, Recursive and Gephi","This release marks community build number three. It includes all the pending features that can be merged before v0.7, which will be a major release to introduce Reification, and may cause breaking changes.
+
+The storage format was not changed for this release. Existing databases should work properly without any migration needed.
+
+Cayley now supports multiple SQL flavors, including MySQL and [CockroachDB](https://github.com/cockroachdb/cockroach).
+
+To avoid further confusion, our Gremlin-style query language was renamed to Gizmo to emphasize that it's not fully Gremlin-compliant. We also switched to the [Goja JavaScript VM](https://github.com/dop251/goja) for better performance and ES5.1 support. Error handling was also improved for our query language.
+
+This release introduces an experimental [GraphQL](http://graphql.org) implementation. Note that it only shares a similar syntax and does not support schema yet. It's a preview feature, so the implementation or API may change in following releases.
+
+The import and export formatter system is now modular and can be easily extended. Cayley now supports JSON-LD, Graphviz (aka DOT; export only) and custom binary formats for better import speed. The HTTP API was updated (v2) to support the new formatter system and allows for the streaming of large amounts of data in single request.
+
+The recursive iterator is finally available via the Go path library and Gizmo. It allows traversal of a path recursively to potentially unlimited depth.
+
+A new Schema library was implemented to allow developers to save and load complex Go objects with a single method call.
+
+**Highlights:**
+- Support for MySQL and CockroachDB.
+- Gizmo query language with faster ES5.1-complaint VM (supersedes Gremlin).
+- Experimental GraphQL-like query language.
+- Modular import/export formats system.
+- Support for JSON-LD, Graphviz (DOT) and Cayley-specific binary format.
+- HTTP API v2 with better import/export performance for large data files.
+- Recursive iterator support (FollowRecursive).
+- Schema lib (aka ORM or Object Persistence Layer).
+- IRI prefix registration.
+
+**Full changelog:**
+```
+dennwc: gizmo: expose recursive traversal and update docs
+dennwc: path: FollowRecursive traverses quad.Values
+barakmich: add FollowRecursive to the path lib
+barakmich: graph/iterator: Add Recursive iterator
+dennwc: graphql: close iterator properly; fixes #545
+dennwc: tests: require.NoError instead of Nil
+dennwc: gae: fix nop iterator optimization
+dennwc: sql: append WHERE only if constraints are present
+dennwc: http: CORS, API to get supported formats and RO mode fix
+dennwc: quads: add json stream format
+dennwc: mql: fix NPE
+dennwc: gephi: allow to filter quads in raw mode
+dennwc: gephi: inline primitive values automatically; inline schema:url
+dennwc: gephi: initial support for graph stream
+jtorvald: Updated documentation based on Issue #349 (#541)
+caosiyang: docs: fix a typo in Quickstart-As-Application.md (#542)
+jtorvald: Issue #286 init db and config documentation (#538)
+Yannic: graph: cleanup and more robust options handling (#536)
+dennwc: initial graphql support
+dennwc: cli: fix loading of data for non-persistent backend
+jtorvald: docs: replace broken MQL link, add quick-start cli usage example (#535)
+mikaelcabot: CockroachDB transaction retries (#534)
+dennwc: bolt: make bolt concurrent-safe as it should be
+dennwc: gizmo/gremlin: fix tags for Both traversal; fix #532
+dennwc: fix #530 and write errors as plain json
+dennwc: quad: support for graphviz format
+dennwc: memstore: close iterator properly
+dennwc: memstore: do not hash values in QuadDirection
+dennwc: memstore: no recursion in Next
+dennwc: http: use formats - implement write api v2; resolves #176
+dennwc: mongo: allow to pass full urls; fix #526
+dennwc: add missing build tags; find relative path of data files automatically
+dennwc: sql: support flavors: mysql, cockroachdb
+dennwc: mongo: remove nodes with no references; fix #517
+dennwc: gizmo: allow to register custom IRI prefixes; resolves #505
+barakmich: revert proto GetNativeValue and check for crashing nils on describe
+barakmich: Fill literal strings in MQL the same way we do results in Gremlin
+dennwc: gremlin: fix limit in ForEach; fixes #518
+barakmich: Fix non-persistent load, modernize MQL test
+barakmich: Fix -v option and debug error
+barakmich: Tidy up Optional iterator, and allow MQL to support JS-like string syntax
+dennwc: switch to goja (gizmo)
+barakmich: Fix dependencies, make Docker an optional dependency, add build tags for docker and appengine tests
+mzats: Updated examples so that they work in repl/http. (#499)
+barakmich: Remove IsNode() from the graph.Value definition.
+dennwc: schema: move well-known types package
+dennwc: graph: refactor interfaces
+dennwc: add example for schema library
+dennwc: ported schema lib
+dennwc: use vocabulary constants for value types, allow to shorten and expand IRIs
+dennwc: register known rdf vocabularies, add constants
+joostverdoorn: Add missing gojsonld dependency to glide (#502)
+dennwc: bolt/leveldb: stop complaining about existing quads even if ignore is set
+dennwc: http/repl: handle errors correctly
+dennwc: nquads: remove duplicated code
+dennwc: integrate quad formats, replace exporter, use quad helpers in tests
+dennwc: quad: readers, writers and formats.
+dennwc: Update minimal Go version
+dwhitena: Ability to pass the Mongo Backend an externally managed session. (#486)
+pbsladek: Update quickstart for 0.6.0 (#487)
+dennwc: add github issue template
+dennwc: sql: fix sqlNodeIterator size
+dennwc: fix count iterator
+dennwc: path: test both optimized and unoptimized case; few more test for gremlin
+kaneshin: Fix minor typos (#483)
+barakmich: Add arm64 support
+```",https://api.github.com/users/dennwc,676724,dennwc,https://api.github.com/repos/cayleygraph/cayley/releases/5949794/assets,https://api.github.com/repos/cayleygraph/cayley/releases/5949794,master,https://api.github.com/repos/cayleygraph/cayley/tarball/v0.6.1,https://github.com/cayleygraph/cayley/releases/tag/v0.6.1,https://api.github.com/repos/cayleygraph/cayley/zipball/v0.6.1,v0.6.1,False,False
+4245475,2016-09-27T21:26:46Z,2016-10-07T21:23:33Z,v0.6.0 -- Types,"Current release marks community build number two, introducing major change to data layout and bringing new features to Gremlin.
+
+Storage format changed slightly. We highly recommend to do a clean import of the database with a new binary.
+
+Cayley now honors types of nquad values. IRIs (`<name>`) were converted to untyped strings (`name`), so it was possible for nodes with different types to be loaded as a single node. Now Cayley preserves type information, making these nodes separate. Queries that used IRIs without `<>` quotes will break because of this change. Gremlin now requires IRI it to be in `""<follows>""` form and the path lib expect these values to be of `quad.IRI` Go type. The same stands for Strings (aka RDF literals) and BNodes (aka blank nodes, `_:name`).
+
+Data loader now recognizes few basic typed literals like `""10""^^<http://schema.org/Integer>` and converts them into corresponding native type (`Int` for this example). It may also affect existing queries. Gremlin will automatically convert basic types into corresponding RDF typed literals.
+
+**Highlights:**
+- Typed values support for all backends. Includes types: String, IRI, BNode, Int, Float, Bool, Time.
+- New traversals in path lib and Gremlin: HasReverse, Skip, Limit, Count, Unique, Comparison/Filter, Regex.
+- More consistent backends behavior thanks to unified tests.
+- Updated [docs](https://github.com/cayleygraph/cayley/tree/f03d046d906cc8e207609b4e43788023a669a39c/docs) and added [examples](https://github.com/cayleygraph/cayley/tree/f03d046d906cc8e207609b4e43788023a669a39c/examples).
+- Updated [Docker image](https://quay.io/repository/cayleygraph/cayley), and added [example](https://github.com/cayleygraph/cayley/blob/f03d046d906cc8e207609b4e43788023a669a39c/docs/Container.md) for it.
+- Many, many bugfixes and some optimizations.
+
+**Full changelog:**
+
+```
+gabrys: Fix link to GremlinAPI.md (#477)
+dennwc: expose Unique via path lib and gremlin; implement and expose Count iterator; resolve #240
+dennwc: gremlin: add regex support, make it harder to abuse regexps; add docs explaining why
+guycook: Implement regex filter as iterator (#474)
+dennwc: bolt,leveldb: fix AllQuads iterator not skipping deleted quads, add test
+dennwc: iterator: add variadic arguments to Add, Or and Fixed constructors
+dennwc: query: Refactor interfaces (#471)
+dennwc: fix lru panic
+wayeast: Clone receiver paths (#466)
+kenshaw: appengine: updating dependency paths and adding documentation (#464)
+dennwc: gremlin: handle string slice in via parameter
+kenshaw: appengine: add build constraint (#463)
+dennwc: Glide migration (#460)
+dwhitena: user/pass functionality for mongo backend
+allanino: Fix Docker building (#456)
+barakmich: gremlin: don't require a session to last as long as the timeout
+kris-runzer: graph: fix Is*(err error) checkers to properly compare against *DeltaError, add tests
+dennwc: optimize by default in Iterate helper
+dennwc: gremlin: clone path objects
+neonstalwart: simplify the signature of NextLogOut (manual merge of #264)
+dennwc: graph: add iteration helpers, update examples; resolves #446
+dennwc: http: fix json quads decoding
+dennwc: gremlin: fix ToArray without arguments
+dennwc: iterator: promote Next to main interface; make NoNext an optional interface
+oren: Example of BoltDB, update examples/README.md
+robertmeta: Just better quickstart + examples creation
+dennwc: query: check type assertions, recover properly in gremlin; fixes #450
+josephschorr: Add Clone() to Path for easier reuse of Path segments (#444)
+dennwc: Wire Skip and Limit to Gremlin. Also fixed #254.
+dennwc: postgres: store hashes as binary data instead of hex strings
+dennwc: postgres: prepare each statement in ApplyDeltas
+dennwc: postgres: generate distinct node insert statements only
+dennwc: cquads: convert TypedString values to native types automatically on loading
+dennwc: gremlin: allow to specify multiple conditions in Filter
+dennwc: mongo: optimize comparison iterator
+dennwc: Test for typed value comparison and optimization
+dennwc: gremlin: expose value comparison iterator via path lib, add tests
+dennwc: gremlin: support for typed values
+dennwc: gremlin: replace JS-based graph object with reflect-based (rewritten, now it's easier extend)
+dennwc: comparison: compare only values with the same type, add a test for mixed set
+dennwc: mongo: use native value types where possible, fix indexing, remove recursion in LinksTo, remove unnecessary roundtrip
+dennwc: postgres: new table structure, store typed values natively; fix iterators; separate LRU cache
+dennwc: Update value comparison iterator. Stop graph.Value madness.
+dennwc: cquads: recognize TypedString and LangString in parser
+dennwc: Add a test for Raw-to-typed values exchange. Fix memstore not using hashes in map.
+dennwc: GAE (untyped). More tests. Fixed handling of size and conflicts in postgres.
+dennwc: quad: add support for few basic types (int, float, bool, time)
+dennwc: Unify tests for QuadStore. Run Mongo/Postgres in Docker automatically.
+dennwc: leveldb: use protobuf instead of json, migration code
+dennwc: bolt: migration code
+dennwc: add typed fields to protobufs
+dennwc: graph,query,exporter,path: updated to use typed values
+dennwc: quad: directions are typed
+kortschak: graph: provide more meaningful errors for bad actions (#443)
+josephschorr: Don't iterate over all quads unless necessary (#440)
+kortschak: clog: fix comment typos and add package comment (#442)
+dennwc: Implement Skip and Limit iterators (#369)
+EntilZha: Delete node API (#158)
+dennwc: Updated Dockerfile (fixed #357)
+dennwc: fix Unique iterator for non-comparable tokens; fixes #437
+kortschak: clog: make nil Logger safe (#436)
+robertmeta: Sweep through docs update/cleanup
+oren: remove duplicate in readme (#435)
+dennwc: fix postgres error on import, fixes #429
+dennwc: Added HasReverse function to path lib (#351)
+drzippie: Added sync.RWMutex to mongo cache  (#380)
+robertmeta: Update docs (README, Locations, Quickstart-As-Lib, Quickstart-As-Application, HACKING, FAQ, Container)
+robertmeta Rerouting CONTRIBUTING to the discourse, updating CONTRIBUTORS to remove mention of CLA
+robertmeta: Moving Hacking from wiki to project
+dennwc: separate log package, resolves #221
+```
+",https://api.github.com/users/barakmich,98356,barakmich,https://api.github.com/repos/cayleygraph/cayley/releases/4245475/assets,https://api.github.com/repos/cayleygraph/cayley/releases/4245475,master,https://api.github.com/repos/cayleygraph/cayley/tarball/v0.6.0,https://github.com/cayleygraph/cayley/releases/tag/v0.6.0,https://api.github.com/repos/cayleygraph/cayley/zipball/v0.6.0,v0.6.0,False,False
+3576017,2016-03-23T20:15:00Z,2016-07-03T17:07:04Z,"v0.5.0 -- SQL, Labels, and Community","We've spun out of the `google` namespace, so this is community build number one. There's some good chatter in IRC and places, and expect some notes in the mailing list soon. The project isn't dead, it was just resting.
+
+Now that we can add contributors, it's time to tag and build a release as a baseline.  There may be some turbulence as some longstanding changes get merged over the next version or two, so before we do that, here are some binaries for people to try out the latest.
+
+**Highlights:**
+- Postgres/SQL backend support
+- Add support for LabelContext() to query the Label field across Quads
+- SaveOptional()
+- Many, many bugfixes
+
+**Full changelog:**
+
+```
+barakmich: Add SaveOptional() to save predicates if they exist, and add the
+dennwc: path: Added SaveOptional
+dennwc: Fix interface conversion in Gremlin
+barakmich: fix build on 1.6 -- more accurate interface conversion
+josephschorr: Make call to `Sprintf` lazy
+barakmich: query/gremlin, graph/path: Add support for querying with labels
+Quentin-M: Fix NPE in SQL initialization
+jzelinskie: dockerfile: fix go install command
+jzelinskie: initial Dockerfile
+barakmich: graph: make quadstore init functions idempotent
+barakmich: Update README to mention Postgres and remove unused trello board
+jzelinskie: add Triple function
+Quentin-M: Fix SLOW DELETEs
+Quentin-M: Fix a deadlock behavior with DELETE transactions
+Quentin-M: Ensure that quads in a transaction are applied in the desired order.
+Quentin-M: Use a Size() estimate for SQL Quadstore when noSizes is enabled.
+barakmich: sql: Combine AND(Fixed, SQL) and fix Save() roundtrips
+barakmich: graph/sql: Use an IN clause when optimizing a fixed iterator
+barakmich: query/gremlin: fix building Or iterator, add test
+barakmich: query/gremlin: Refactor in terms of graph/path
+Quentin-M: Fix NPE in SQL Quadstore
+Quentin-M: Improve Transaction: deduplicate quads, allow adding/removing a quad in the same tx
+barakmich: Fix corners after causing a couple merges
+ds--: Adds exporting capabilities
+barakmich: Add migration tool and use protos in Bolt store
+barakmich: graph: Postgres backend
+sayden: Typo fix when building cayley from scratch
+sayden: Order of parameters when using :a and :d are switched
+Kavec: Refactor for readability
+kortschak: graph/bolt: don't panic on unitialised store
+barakmich: Fixes memstore transaction semantics
+Quentin-M: Make the SQL connection fail-fast
+Quentin-M: Fix NPEs in SQL Next and Contains
+barakmich: Roll the Go version forward on Travis builds (new stable)
+barakmich: Add check for multiple all iterators
+kortschak: internal: move {config,db,http} into internal
+skynet: Update README.md
+neonstalwart: add string comparison to value comparison iterator
+tmlbl: Small REPL Improvements
+igm: Fixed multiplier for position of ""label"" in case of ""po"" key entry
+cayleydb: Update README.md
+barakmich: Docs update based on @KamiQuasi #280
+lytics: Use new import path for go-uuid
+jzelinskie: travis.yml: bump appengine dependency
+barakmich: Add transaction (a list of deltas) as a primitive for applying sets o…
+nii236: Widened visualisation box to 100%
+panamafrancis: Added myself to the A+C
+barakmich: Add Save and Has API functions
+Quentin-M: Allow opening a database (bolt, leveldb, mongo) through Go API
+barakmich: Clean up Linkage definition
+allonhadaya: In out predicates
+barakmich: Fix bug where first Bolt iteration ignores deletion
+barakmich: Fix describe in Or iterator
+neonstalwart: collapse 2 iterations into 1 in memstore
+op: Fix nil pointer panic when meta bucket is missing
+barakmich: Fix LevelDB deleted-triple iterator stack overflow bug
+neonstalwart: move cmp to where it's used
+kortschak: graph: remove redundant type
+barakmich: Go API
+heyalexej: update leveldb link and fix some https links in README
+andrew-d: Refactor packages
+andrew-d: Fix TravisCI tests
+andrew-d: Remove deprecated ResultTree API
+Dabaez: Update README.md
+barakmich: Implement the Unique iterator
+```
+",https://api.github.com/users/barakmich,98356,barakmich,https://api.github.com/repos/cayleygraph/cayley/releases/3576017/assets,https://api.github.com/repos/cayleygraph/cayley/releases/3576017,master,https://api.github.com/repos/cayleygraph/cayley/tarball/v0.5.0,https://github.com/cayleygraph/cayley/releases/tag/v0.5.0,https://api.github.com/repos/cayleygraph/cayley/zipball/v0.5.0,v0.5.0,False,False
+1216572,2015-04-25T23:13:08Z,2015-04-26T00:02:44Z,"Mongo speedups, Loading fixes, Except/Not Operator","Point release, to get a number of speedups and fixes out to the binary distribution channel.
+
+Roadmap for 0.5 includes a number of major open PRs.
+
+**Notable features:**
+- #236 Much faster Mongo support
+- #180 No Mongo empty values
+- #153 Gremlin Except() operator
+- #184 Fix Google Appengine Support
+- #235 Repeatable builds with Godep
+
+**Full changelist:**
+
+```
+    @jf87: added example n-quad file for gremlin api description
+    @barakmich: Mongo Indexed LinksTo
+    @jzelinskie: store dependencies' versions with godep
+    @barakmich: fix decompressing for http
+    @andrew-d: Add myself to AUTHORS + CONTRIBUTORS
+    @andrew-d: Add Err() and Close() methods to Iterators
+    @barakmich: Fix PrimaryKey Marshalling and add Bolt test
+    @alexwlchan: A couple of small spelling fixes in the docs
+    @barakmich: Rewrite keys into concrete types, remove key package
+    @barakmich: Clean up a little lint and some shadowed variables
+    @LAlbertalli: Add options to ignore duplicate or missing quad
+    @kortschak: Make query/... interfaces more idiomatic
+    @barakmich: bench: Add some grunty Not queries to the integration test (derived from...
+    @buley: Misspellings in Gremlin and Config docs
+    @mataevs: Except/Not Operator for Gremlin.
+    @barakmich: Minor doc fixes
+    @kortschak: Provide informative logging for dups/absences
+    @bkendall: Prevent empty values in cache (using mongo)
+    @kortschak: Make graph.Delta zero state invalid for use
+    @kortschak: Ensure callers get errors when they happen
+    @varadharajan: Allocate 82 bytes instead of 62 bytes in LevelDB's CreateKeyFor method
+    @bcleenders: Prevents repl panic, uses primary key generation for all writers                              
+    @panamafrancis: Implementation of the PrimaryKey type
+    @barakmich: mathutil is back in line
+    @barakmich: temporary travis fix
+    @kortschak: Fix leveldb change skew
+    @barakmich: Remove the news in the README, add Trello Link
+    @kortschak: Issue160
+    @kortschak: Don't retain results where the value is empty
+    @kortschak: Ensure we don't examine empty token
+    @kortschak: Replace DebugString with a well defined type returned by Describe
+    @kortschak: Delinting, deadcode removal and vetting                                                                  
+```
+",https://api.github.com/users/barakmich,98356,barakmich,https://api.github.com/repos/cayleygraph/cayley/releases/1216572/assets,https://api.github.com/repos/cayleygraph/cayley/releases/1216572,master,https://api.github.com/repos/cayleygraph/cayley/tarball/v0.4.1,https://github.com/cayleygraph/cayley/releases/tag/v0.4.1,https://api.github.com/repos/cayleygraph/cayley/zipball/v0.4.1,v0.4.1,False,False
+516077,2014-08-26T15:56:57Z,2014-08-26T23:13:37Z,"Bolt, Speedups and Fixes","Worth noting: you may have to reload your data in this version, as the database format has changed (hence the minor version bump). This is part of working with early software.
+
+On the plus side, you'll notice quite a few benefits, including the new features.
+
+For example, the memory benchmarks:
+
+```
+benchmark                                   old ns/op        new ns/op     delta     mult
+BenchmarkNamePredicate                      917680           1072457       +16.87%   +1.17x
+BenchmarkLargeSetsNoIntersection            176704664        48692651      -72.44%   -3.63x
+BenchmarkVeryLargeSetsSmallIntersection     32566448297      154770005     -99.52%   -208.33x
+BenchmarkHelplessContainsChecker            16041341849      40699233      -99.75%   -400.00x
+BenchmarkNetAndSpeed                        71710442         16658337      -76.77%   -4.30x
+BenchmarkKeanuAndNet                        13858313         12192151      -12.02%   -1.14x
+BenchmarkKeanuAndSpeed                      16161303         15231229      -5.75%    -1.06x
+BenchmarkKeanuOther                         3748121471       60429073      -98.39%   -62.11x
+BenchmarkKeanuBullockOther                  300796920802     99996852      -99.97%   -3333.33x
+```
+
+If you think those look good, they also get better with bigger backends. The big wins come from optimized iteration, which benefits all backends.
+
+**New in this release**:
+- [Bolt](http://github.com/boltdb/bolt) backend for persistence
+- Log-structure persistence
+- Materialize iterator and related speedups
+- Better memory backend (based on cznic/b)
+- Better Gremlin session handling
+- [Underscore.js](http://underscorejs.org) available in Gremlin
+
+**Shortlist of Bugfixes**:
+#9 Use boltdb in the backend
+#70 Write-log and as_of_time and replication preparation
+#93 Simplify the Nexter Interface
+#107 127.0.0.1 by default
+#106 #108 Use cquads in the web UI loader
+#114 Materializer regression sparking odd results
+#117 Data-race when handling many simultaneous queries
+#125 Underscore.js available in Gremlin environment
+#104 #129 Better REPL support (history, etc)
+#141 Parser conformance for IRIRef
+#145 Gremlin workers
+",https://api.github.com/users/barakmich,98356,barakmich,https://api.github.com/repos/cayleygraph/cayley/releases/516077/assets,https://api.github.com/repos/cayleygraph/cayley/releases/516077,master,https://api.github.com/repos/cayleygraph/cayley/tarball/v0.4.0,https://github.com/cayleygraph/cayley/releases/tag/v0.4.0,https://api.github.com/repos/cayleygraph/cayley/zipball/v0.4.0,v0.4.0,False,False
+461635,2014-07-31T20:58:53Z,2014-08-01T19:16:54Z,Better Loading,"New in this release:
+- Loading straight from compressed files
+- New, compilant NQuads parser (strict compliance variation compiled in, available in a future point release).
+- Linux/ARM release included (tried with tiny graphs on Raspberry Pi, though it's slow on the SD)
+
+Bugfixes:
+#3: Printing empty fixed iterator
+#21: Unexpected/incorrect MQL values
+#72: NQuads silently drops lines with quotes
+",https://api.github.com/users/barakmich,98356,barakmich,https://api.github.com/repos/cayleygraph/cayley/releases/461635/assets,https://api.github.com/repos/cayleygraph/cayley/releases/461635,master,https://api.github.com/repos/cayleygraph/cayley/tarball/v0.3.1,https://github.com/cayleygraph/cayley/releases/tag/v0.3.1,https://api.github.com/repos/cayleygraph/cayley/zipball/v0.3.1,v0.3.1,False,False
+399932,2014-06-28T02:38:13Z,2014-06-28T02:46:03Z,Initial Release,"This is the initial binary release for Cayley, having now become `go get` friendly. Current feature list from the README is:
+- Written in [Go](http://golang.org)
+- RESTful API
+  - or a REPL if you prefer
+- Built-in query editor and visualizer
+- Multiple query languages:
+  - Javascript, with a [Gremlin](http://gremlindocs.com/)-inspired* graph object.
+  - (simplified) [MQL](https://developers.google.com/freebase/v1/mql-overview), for Freebase fans
+- Plays well with multiple backend stores:
+  - [LevelDB](http://code.google.com/p/leveldb/) for single-machine storage
+  - [MongoDB](http://mongodb.org)
+  - In-memory, ephemeral
+- Modular design; easy to extend with new languages and backends
+- Decent test coverage
+- Speed, where possible.
+
+No changes, because initial release.
+",https://api.github.com/users/barakmich,98356,barakmich,https://api.github.com/repos/cayleygraph/cayley/releases/399932/assets,https://api.github.com/repos/cayleygraph/cayley/releases/399932,master,https://api.github.com/repos/cayleygraph/cayley/tarball/v0.3.0,https://github.com/cayleygraph/cayley/releases/tag/v0.3.0,https://api.github.com/repos/cayleygraph/cayley/zipball/v0.3.0,v0.3.0,False,False

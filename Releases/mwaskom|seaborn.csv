@@ -1,0 +1,588 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7618693,2017-09-03T16:21:52Z,2017-09-03T16:25:49Z,v0.8.1 (September 2017),"v0.8.1 (September 2017)
+-----------------------
+
+-  Added a warning in `FacetGrid` when passing a categorical plot function without specifying `order` (or `hue_order` when `hue` is used), which is likely to produce a plot that is incorrect.
+
+-  Improved compatibility between `FacetGrid` or `PairGrid` and interactive matplotlib backends so that the legend no longer remains inside the figure when using `legend_out=True`.
+
+-  Changed categorical plot functions with small plot elements to use `dark_palette` instead of `light_palette` when generating a sequential palette from a specified color.
+
+-  Improved robustness of `kdeplot` and `distplot` to data with fewer than two observations.
+
+-  Fixed a bug in `clustermap` when using `yticklabels=False`.
+
+-  Fixed a bug in `pointplot` where colors were wrong if exactly three points were being drawn.
+
+-  Fixed a bug in`pointplot` where legend entries for missing data appeared with empty markers.
+
+-  Fixed a bug in `clustermap` where an error was raised when annotating the main heatmap and showing category colors.
+
+-  Fixed a bug in `clustermap` where row labels were not being properly rotated when they overlapped.
+
+-  Fixed a bug in `kdeplot` where the maximum limit on the density axes was not being updated when multiple densities were drawn.
+
+-  Improved compatibility with future versions of pandas.
+",https://api.github.com/users/mwaskom,315810,mwaskom,https://api.github.com/repos/mwaskom/seaborn/releases/7618693/assets,https://api.github.com/repos/mwaskom/seaborn/releases/7618693,master,https://api.github.com/repos/mwaskom/seaborn/tarball/v0.8.1,https://github.com/mwaskom/seaborn/releases/tag/v0.8.1,https://api.github.com/repos/mwaskom/seaborn/zipball/v0.8.1,v0.8.1,False,False
+6975002,2017-07-08T22:41:05Z,2017-07-08T22:53:16Z,v0.8.0 (July 2017),"- The default style is no longer applied when seaborn is imported. It is now necessary to explicitly call `set` or one or more of `set_style`, `set_context`, and `set_palette`. Correspondingly, the `seaborn.apionly` module has been deprecated.
+
+- Changed the behavior of `heatmap` (and by extension `clustermap`) when plotting divergent dataesets (i.e. when the `center` parameter is used). Instead of extending the lower and upper limits of the colormap to be symettrical around the `center` value, the colormap is modified so that its middle color corresponds to `center`. This means that the full range of the colormap will not be used (unless the data or specified `vmin` and `vmax` are symettric), but the upper and lower limits of the colorbar will correspond to the range of the data. See the Github pull request [(\#1184)](https://github.com/mwaskom/seaborn/pull/1184) for examples of the behavior.
+
+- Removed automatic detection of diverging data in `heatmap` (and by extension `clustermap`). If you want the colormap to be treated as diverging (see above), it is now necessary to specify the `center` value. When no colormap is specified, specifying `center` will still change the default to be one that is more appropriate for displaying diverging data.
+
+- Added four new colormaps, created using [viscm](https://github.com/matplotlib/viscm) for perceptual uniformity. The new colormaps include two sequential colormaps (`""rocket""` and `""mako""`) and two diverging colormaps (`""icefire""` and `""vlag""`). These colormaps are registered with matplotlib on seaborn input and the colormap objects can be accessed in the `seaborn.cm` namespace.
+
+- Changed the default `heatmap` colormaps to be `""rocket""` (in the case of sequential data) or `""icefire""` (in the case of diverging data). Note that this change reverses the direction of the luminance ramp from the previous defaults. While potentially confusing and disruptive, this change better aligns the seaborn defaults with the new matplotlib default colormap (`""viridis""`) and arguably better aligns the semantics of a ""heat"" map with the appearance of the colormap.
+
+- Added `""auto""` as a (default) option for tick labels in `heatmap` and `clustermap`. This will try to estimate how many ticks can be labeled without the text objects overlapping, which should improve performance for larger matrices.
+
+- Added the `dodge` parameter to boxplot, violinplot, and barplot to allow use of `hue` without changing the position or width of the plot elements, as when the `hue` varible is not nested within the main categorical variable.
+
+- Correspondingly, the `split` parameter for stripplot and swarmplot has been renamed to `dodge` for consistency with the other categorical functions (and for differentiation from the meaning of `split` in violinplot).
+
+- Added the ability to draw a colorbar for a bivariate kdeplot with the `cbar` parameter (and related `cbar_ax` and `cbar_kws` parameters).
+
+- Added the ability to use error bars to show standard deviations rather than bootstrap confidence intervals in most statistical functions by putting `ci=""sd""`.
+
+- Allow side-specific offsets in `despine`.
+
+- Figure size is no longer part of the seaborn plotting context parameters.
+
+- Put a cap on the number of bins used in `jointplot` for `type==""hex""` to avoid hanging when the reference rule prescribes too many.
+
+- Turn off dendrogram axes in `clustermap` rather than setting the background color to white.
+
+- New matplotlib qualitative palettes (e.g. `""tab10""`) are now handled correctly.
+
+- Some modules and functions have been internally reorganized; there should be no effect on code that uses the `seaborn` namespace.
+
+- Added a deprecation warning to `tsplot` function to indicate that it will be removed or replaced with a substantially altered version in a future release.
+
+- The `interactplot` and `coefplot` functions are officially deprecated and will be removed in a future release.
+",https://api.github.com/users/mwaskom,315810,mwaskom,https://api.github.com/repos/mwaskom/seaborn/releases/6975002/assets,https://api.github.com/repos/mwaskom/seaborn/releases/6975002,master,https://api.github.com/repos/mwaskom/seaborn/tarball/v0.8.0,https://github.com/mwaskom/seaborn/releases/tag/v0.8.0,https://api.github.com/repos/mwaskom/seaborn/zipball/v0.8.0,v0.8.0,False,False
+3375080,2016-06-05T02:22:41Z,2016-06-05T02:38:48Z,v0.7.1 (June 2016),"-   Added the ability to put ""caps"" on the error bars that are drawn by `barplot` or `pointplot` (and, by extension, `factorplot`). Additionally, the line width of the error bars can now be controlled. These changes involve the new parameters `capsize` and `errwidth`. See the [github pull request](https://github.com/mwaskom/seaborn/pull/898) for examples of usage.
+-   Improved the row and column colors display in `clustermap`. It
+  is now possible to pass Pandas objects for these elements and, when possible, the semantic information in the Pandas objects will be used to add labels to the plot. When Pandas objects are used, the color data is matched against the main heatmap based on the index, not on position. This is more accurate, but it may lead to different results if current code assumed positional matching.
+-   Improved the luminance calculation that determines the annotation color in `heatmap`.
+-   The `annot` parameter of `heatmap` now accepts a rectangular dataset in addition to a boolean value. If a dataset is passed, its values will be used for the annotations, while the main dataset will be used for the heatmap cell colors.
+-   Fixed a bug in `FacetGrid` that appeared when using `col_wrap` with missing `col` levels.
+-   Made it possible to pass a tick locator object to the `heatmap` colorbar.
+-   Made it possible to use different styles (e.g., step) for `PairGrid` histograms when there are multiple hue levels.
+-   Fixed a bug in scipy-based univariate kernel density bandwidth calculation.
+-   The `reset_orig` function (and, by extension, importing `seaborn.apionly`) resets matplotlib rcParams to their values at the time seaborn itself was imported, which should work better with rcParams changed by the jupyter notebook backend.
+-   Removed some objects from the top-level `seaborn` namespace.
+-   Improved unicode compatibility in `FacetGrid`.
+",https://api.github.com/users/mwaskom,315810,mwaskom,https://api.github.com/repos/mwaskom/seaborn/releases/3375080/assets,https://api.github.com/repos/mwaskom/seaborn/releases/3375080,master,https://api.github.com/repos/mwaskom/seaborn/tarball/v0.7.1,https://github.com/mwaskom/seaborn/releases/tag/v0.7.1,https://api.github.com/repos/mwaskom/seaborn/zipball/v0.7.1,v0.7.1,False,False
+2484144,2016-01-25T03:54:39Z,2016-01-25T04:05:31Z,v0.7.0 (January 2016),"This is a major release from 0.6. The main new feature is swarmplot which implements the beeswarm approach for drawing categorical scatterplots. There are also some performance improvements, bug fixes, and updates for compatibility with new versions of dependencies.
+-   Added the swarmplot function, which draws beeswarm plots. These are
+  categorical scatterplots, similar to those produced by stripplot,
+  but position of the points on the categorical axis is chosen to
+  avoid overlapping points. See the
+  categorical plot tutorial for more
+  information.
+-   Added an additional rule when determining category order in
+  categorical plots. Now, when numeric variables are used in a
+  categorical role, the default behavior is to sort the unique levels
+  of the variable (i.e they will be in proper numerical order). This
+  can still be overridden by the appropriate `{*_}order` parameter,
+  and variables with a `category` datatype will still follow the
+  category order even if the levels are strictly numerical.
+-   Changed some of the stripplot defaults to be closer to swarmplot.
+  Points are somewhat smaller, have no outlines, and are not split by
+  default when using `hue`.
+-   Changed how stripplot draws points when using `hue` nesting with
+  `split=False` so that the different `hue` levels are not drawn
+  strictly on top of each other.
+-   Improve performance for large dendrograms in clustermap.
+-   Added `font.size` to the plotting context definition so that the
+  default output from `plt.text` will be scaled appropriately.
+-   Fixed a bug in clustermap when `fastcluster` is not installed.
+-   Fixed a bug in the zscore calculation in clustermap.
+-   Fixed a bug in distplot where sometimes the default number of bins
+  would not be an integer.
+-   Fixed a bug in stripplot where a legend item would not appear for a
+  `hue` level if there were no observations in the first group of
+  points.
+-   Heatmap colorbars are now rasterized for better performance in
+  vector plots.
+-   Added workarounds for some matplotlib boxplot issues, such as
+  strange colors of outlier points.
+-   Added workarounds for an issue where violinplot edges would be
+  missing or have random colors.
+-   Added a workaround for an issue where only one heatmap cell would be
+  annotated on some matplotlib backends.
+-   Fixed a bug on newer versions of matplotlib where a colormap would
+  be erroneously applied to scatterplots with only three observations.
+-   Updated seaborn for compatibility with matplotlib 1.5.
+-   Added compatibility for various IPython (and Jupyter) versions in
+  functions that use widgets.
+",https://api.github.com/users/mwaskom,315810,mwaskom,https://api.github.com/repos/mwaskom/seaborn/releases/2484144/assets,https://api.github.com/repos/mwaskom/seaborn/releases/2484144,master,https://api.github.com/repos/mwaskom/seaborn/tarball/v0.7.0,https://github.com/mwaskom/seaborn/releases/tag/v0.7.0,https://api.github.com/repos/mwaskom/seaborn/zipball/v0.7.0,v0.7.0,False,False
+1473551,2015-06-29T14:53:22Z,2015-06-29T15:05:56Z,v0.6.0 (June 2015),"This is a major release from 0.5. The main objective of this release was to unify the API for categorical plots, which means that there are some relatively large API changes in some of the older functions. See below for details of those changes, which may break code written for older versions of seaborn. There are also some new functions (stripplot, and countplot), numerous enhancements to existing functions, and bug fixes.
+
+Additionally, the documentation has been completely revamped and expanded for the 0.6 release. Now, the API docs page for each function has multiple examples with embedded plots showing how to use the various options. These pages should be considered the most comprehensive resource for examples, and the tutorial pages are now streamlined and oriented towards a higher-level overview of the various features.
+
+## Changes and updates to categorical plots
+
+In version 0.6, the ""categorical"" plots have been unified with a common API. This new category of functions groups together plots that show the relationship between one numeric variable and one or two categorical variables. This includes plots that show distribution of the numeric variable in each bin (boxplot, violinplot, and stripplot) and plots that apply a statistical estimation within each bin (pointplot, barplot, and countplot). There is a new tutorial chapter <categorical_tutorial> that introduces these functions.
+
+The categorical functions now each accept the same formats of input data and can be invoked in the same way. They can plot using long- or wide-form data, and can be drawn vertically or horizontally. When long-form data is used, the orientation of the plots is inferred from the types of the input data. Additionally, all functions natively take a `hue` variable to add a second layer of categorization.
+
+With the (in some cases new) API, these functions can all be drawn correctly by FacetGrid. However, factorplot can also now create faceted verisons of any of these kinds of plots, so in most cases it will be unnecessary to use FacetGrid directly. By default, factorplot draws a point plot, but this is controlled by the `kind` parameter.
+
+Here are details on what has changed in the process of unifying these APIs:
+-   Changes to boxplot and violinplot will probably be the most disruptive. Both functions maintain backwards-compatibility in terms of the kind of data they can accept, but the syntax has changed to be more similar to other seaborn functions. These functions are now invoked with `x` and/or `y` parameters that are either vectors of data or names of variables in a long-form DataFrame passed to the new `data` parameter. You can still pass wide-form DataFrames or arrays to `data`, but it is no longer the first positional argument. See the [github pull request](https://github.com/mwaskom/seaborn/pull/410) for more information on these changes and the logic behind them.
+-   As pointplot and barplot can now plot with the major categorical variable on the y axis, the `x_order` parameter has been renamed to `order`.
+-   Added a `hue` argument to boxplot and violinplot, which allows for nested grouping the plot elements by a third categorical variable. For violinplot, this nesting can also be accomplished by splitting the violins when there are two levels of the `hue` variable (using `split=True`). To make this functionality feasible, the ability to specify where the plots will be draw in data coordinates has been removed. These plots now are drawn at set positions, like (and identical to) barplot and pointplot.
+-   Added a `palette` parameter to boxplot/violinplot. The `color` parameter still exists, but no longer does double-duty in accepting the name of a seaborn palette. `palette` supersedes `color` so that it can be used with a FacetGrid.
+
+Along with these API changes, the following changes/enhancements were made to the plotting functions:
+-   The default rules for ordering the categories has changed. Instead of automatically sorting the category levels, the plots now show the levels in the order they appear in the input data (i.e., the order given by `Series.unique()`). Order can be specified when plotting with the `order` and `hue_order` parameters. Additionally, when variables are pandas objects with a ""categorical"" dtype, the category order is inferred from the data object. This change also affects FacetGrid and PairGrid.
+-   Added the `scale` and `scale_hue` parameters to violinplot. These control how the width of the violins are scaled. The default is `area`, which is different from how the violins used to be drawn. Use `scale='width'` to get the old behavior.
+-   Used a different style for the `box` kind of interior plot in violinplot, which shows the whisker range in addition to the quartiles. Use `inner='quartile'` to get the old style.
+
+## New plotting functions
+-   Added the stripplot function, which draws a scatterplot where one of the variables is categorical. This plot has the same API as boxplot and violinplot. It is useful both on its own and when composed with one of these other plot kinds to show both the observations and underlying distribution.
+-   Added the countplot function, which uses a bar plot representation to show counts of variables in one or more categorical bins. This replaces the old approach of calling barplot without a numeric variable.
+
+## Other additions and changes
+-   The corrplot and underlying symmatplot functions have been deprecated in favor of heatmap, which is much more flexible and robust. These two functions are still available in version 0.6, but they will be removed in a future version.
+-   Added the set_color_codes function and the `color_codes` argument to set and set_palette. This changes the interpretation of shorthand color codes (i.e. ""b"", ""g"", k"", etc.) within matplotlib to use the values from one of the named seaborn palettes (i.e. ""deep"", ""muted"", etc.). That makes it easier to have a more uniform look when using matplotlib functions directly with seaborn imported. This could be disruptive to existing plots, so it does not happen by default. It is possible this could change in the future.
+-   The color_palette function no longer trims palettes that are longer than 6 colors when passed into it.
+-   Added the `as_hex` method to color palette objects, to return a list of hex codes rather than rgb tuples.
+-   jointplot now passes additional keyword arguments to the function used to draw the plot on the joint axes.
+-   Changed the default `linewidths` in heatmap and clustermap to 0 so that larger matrices plot correctly. This parameter still exists and can be used to get the old effect of lines demarcating each cell in the heatmap (the old default `linewidths` was 0.5).
+-   heatmap and clustermap now automatically use a mask for missing values, which previously were shown with the ""under"" value of the colormap per default plt.pcolormesh behavior.
+-   Added the `seaborn.crayons` dictionary and the crayon_palette function to define colors from the 120 box (!) of [Crayola crayons](http://en.wikipedia.org/wiki/List_of_Crayola_crayon_colors).
+-   Added the `line_kws` parameter to residplot to change the style of the lowess line, when used.
+-   Added open-ended `**kwargs` to the `add_legend` method on FacetGrid and PairGrid, which will pass additional keyword arguments through when calling the legend function on the `Figure` or `Axes`.
+-   Added the `gridspec_kws` parameter to FacetGrid, which allows for control over the size of individual facets in the grid to emphasize certain plots or account for differences in variable ranges.
+-   The interactive palette widgets now show a continuous colorbar, rather than a discrete palette, when as_cmap is True.
+-   The default Axes size for pairplot and PairGrid is now slightly smaller.
+-   Added the `shade_lowest` parameter to kdeplot which will set the alpha for the lowest contour level to 0, making it easier to plot multiple bivariate distributions on the same axes.
+-   The `height` parameter of rugplot is now interpreted as a function of the axis size and is invariant to changes in the data scale on that axis. The rug lines are also slightly narrower by default.
+-   Added a catch in distplot when calculating a default number of bins. For highly skewed data it will now use sqrt(n) bins, where previously the reference rule would return ""infinite"" bins and cause an exception in matplotlib.
+-   Added a ceiling (50) to the default number of bins used for distplot histograms. This will help avoid confusing errors with certain kinds of datasets that heavily violate the assumptions of the reference rule used to get a default number of bins. The ceiling is not applied when passing a specific number of bins.
+-   The various property dictionaries that can be passed to `plt.boxplot` are now applied after the seaborn restyling to allow for full customizability.
+-   Added a `savefig` method to JointGrid that defaults to a tight bounding box to make it easier to save figures using this class, and set a tight bbox as the default for the `savefig` method on other Grid objects.
+-   You can now pass an integer to the `xticklabels` and `yticklabels` parameter of heatmap (and, by extension, clustermap). This will make the plot use the ticklabels inferred from the data, but only plot every `n` label, where `n` is the number you pass. This can help when visualizing larger matrices with some sensible ordering to the rows or columns of the dataframe.
+-   Added ""figure.facecolor"" to the style parameters and set the default to white.
+-   The load_dataset function now caches datasets locally after downloading them, and uses the local copy on subsequent calls.
+
+## Bug fixes
+-   Fixed bugs in clustermap where the mask and specified ticklabels were not being reorganized using the dendrograms.
+-   Fixed a bug in FacetGrid and PairGrid that lead to incorrect legend labels when levels of the `hue` variable appeared in `hue_order` but not in the data.
+-   Fixed a bug in FacetGrid.set_xticklabels or FacetGrid.set_yticklabels when `col_wrap` is being used.
+-   Fixed a bug in PairGrid where the `hue_order` parameter was ignored.
+-   Fixed two bugs in despine that caused errors when trying to trim the spines on plots that had inverted axes or no ticks.
+-   Improved support for the `margin_titles` option in FacetGrid, which can now be used with a legend.
+",https://api.github.com/users/mwaskom,315810,mwaskom,https://api.github.com/repos/mwaskom/seaborn/releases/1473551/assets,https://api.github.com/repos/mwaskom/seaborn/releases/1473551,master,https://api.github.com/repos/mwaskom/seaborn/tarball/v0.6.0,https://github.com/mwaskom/seaborn/releases/tag/v0.6.0,https://api.github.com/repos/mwaskom/seaborn/zipball/v0.6.0,v0.6.0,False,False
+726190,2014-11-22T20:52:15Z,2014-11-22T20:54:02Z,v0.5.1 (November 2014),"This is a bugfix release that includes a workaround for an issue in
+matplotlib 1.4.2 and fixes for two bugs in functions that were new in
+0.5.0.
+-   Implemented a workaround for a bug in matplotlib 1.4.2 that
+  prevented point markers from being drawn when the seaborn styles had
+  been set. See this [github
+  issue](https://github.com/mwaskom/seaborn/issues/344) for more
+  information.
+-   Fixed a bug in heatmap where the mask was vertically reversed
+  relative to the data.
+-   Fixed a bug in clustermap when using nested lists of side colors.
+",https://api.github.com/users/mwaskom,315810,mwaskom,https://api.github.com/repos/mwaskom/seaborn/releases/726190/assets,https://api.github.com/repos/mwaskom/seaborn/releases/726190,master,https://api.github.com/repos/mwaskom/seaborn/tarball/v0.5.1,https://github.com/mwaskom/seaborn/releases/tag/v0.5.1,https://api.github.com/repos/mwaskom/seaborn/zipball/v0.5.1,v0.5.1,False,False
+705516,2014-11-14T18:34:14Z,2014-11-14T18:39:37Z,v0.5.0 (November 2014),"This is a major release from 0.4. Highlights include new functions for plotting heatmaps, possibly while applying clustering algorithms to discover structured relationships. These functions are complemented by new custom colormap functions and a full set of IPython widgets that allow interactive selection of colormap parameters. The palette tutorial has been rewritten to cover these new tools and more generally provide guidance on how to use color in visualizations. There are also a number of smaller changes and bugfixes.
+
+## Plotting functions
+-   Added the heatmap function for visualizing a matrix of data by
+  color-encoding the values. See the docs for more
+  information.
+-   Added the clustermap function for clustering and visualizing a
+  matrix of data, with options to label individual rows and columns by
+  colors. See the docs for more information. This work
+  was lead by Olga Botvinnik.
+-   lmplot and pairplot get a new keyword argument, `markers`. This can
+  be a single kind of marker or a list of different markers for each
+  level of the `hue` variable. Using different markers for different
+  hues should let plots be more comprehensible when reproduced to
+  black-and-white (i.e. when printed). See the [github pull
+  request](https://github.com/mwaskom/seaborn/pull/323) for examples.
+-   More generally, there is a new keyword argument in FacetGrid and
+  PairGrid, `hue_kws`. This similarly lets plot aesthetics vary across
+  the levels of the hue variable, but more flexibily. `hue_kws` should
+  be a dictionary that maps the name of keyword arguments to lists of
+  values that are as long as the number of levels of the hue variable.
+-   The argument `subplot_kws` has been added to `FacetGrid`. This
+  allows for faceted plots with custom projections, including [maps
+  with
+  Cartopy](http://nbviewer.ipython.org/gist/shoyer/16db9cd187886a3effd8).
+
+## Color palettes
+-   Added two new functions to create custom color palettes. For
+  sequential palettes, you can use the light_palette function, which
+  takes a seed color and creates a ramp from a very light, desaturated
+  variant of it. For diverging palettes, you can use the
+  diverging_palette function to create a balanced ramp between two
+  endpoints to a light or dark midpoint. See the
+  palette tutorial <palette_tutorial> for more information.
+-   Added the ability to specify the seed color for light_palette and
+  dark_palette as a tuple of `husl` or `hls` space values or as a
+  named `xkcd` color. The interpretation of the seed color is now
+  provided by the new `input` parameter to these functions.
+-   Added several new interactive palette widgets:
+  choose_colorbrewer_palette, choose_light_palette,
+  choose_dark_palette, and choose_diverging_palette. For
+  consistency, renamed the cubehelix widget to
+  choose_cubehelix_palette (and fixed a bug where the cubehelix
+  palette was reversed). These functions also now return either a
+  color palette list or a matplotlib colormap when called, and that
+  object will be live-updated as you play with the widget. This should
+  make it easy to iterate over a plot until you find a good
+  representation for the data. See the [Github pull
+  request](https://github.com/mwaskom/seaborn/pull/286) or [this
+  notebook (download it to use the
+  widgets)](http://nbviewer.ipython.org/381a5f5f7e38f8e45bd6) for more
+  information.
+-   Overhauled the color palette tutorial to
+  organize the discussion by class of color palette and provide more
+  motivation behind the various choices one might make when choosing
+  colors for their data.
+
+## Bug fixes
+-   Fixed a bug in PairGrid that gave incorrect results (or a crash)
+  when the input DataFrame has a non-default index.
+-   Fixed a bug in PairGrid where passing columns with a date-like
+  datatype raised an exception.
+-   Fixed a bug where lmplot would show a legend when the hue variable
+  was also used on either the rows or columns (making the legend
+  redundant).
+-   Worked around a matplotlib bug that was forcing outliers in boxplot
+  to appear as blue.
+-   kdeplot now accepts pandas Series for the `data` and `data2`
+  arguments.
+-   Using a non-default correlation method in corrplot now implies
+  `sig_stars=False` as the permutation test used to significance
+  values for the correlations uses a pearson metric.
+-   Removed `pdf.fonttype` from the style definitions, as the value used
+  in version 0.4 resulted in very large PDF files.
+",https://api.github.com/users/mwaskom,315810,mwaskom,https://api.github.com/repos/mwaskom/seaborn/releases/705516/assets,https://api.github.com/repos/mwaskom/seaborn/releases/705516,master,https://api.github.com/repos/mwaskom/seaborn/tarball/v0.5.0,https://github.com/mwaskom/seaborn/releases/tag/v0.5.0,https://api.github.com/repos/mwaskom/seaborn/zipball/v0.5.0,v0.5.0,False,False
+531540,2014-09-03T04:35:08Z,2014-09-03T04:38:13Z,v0.4.0 (September 2014),"This is a major release from 0.3. Highlights include new approaches for quick, high-level dataset exploration (along with a more flexible interface and easy creation of perceptually-appropriate color palettes using the cubehelix system. Along with these additions, there are a number of smaller changes that make visualizing data with seaborn easier and more powerful.
+
+## Plotting functions
+-   A new object, PairGrid, and a corresponding function pairplot, for
+  drawing grids of pairwise relationships in a dataset. This style of
+  plot is sometimes called a ""scatterplot matrix"", but the
+  representation of the data in PairGrid is flexible and many styles
+  other than scatterplots can be used. See the docs for
+  more information. **Note:** due to a bug in older versions of
+  matplotlib, you will have best results if you use these functions
+  with matplotlib 1.4 or later.
+-   The rules for choosing default color palettes when variables are
+  mapped to different colors have been unified (and thus changed in
+  some cases). Now when no specific palette is requested, the current
+  global color palette will be used, unless the number of variables to
+  be mapped exceeds the number of unique colors in the palette, in
+  which case the `""husl""` palette will be used to avoid cycling.
+-   Added a keyword argument `hist_norm` to distplot. When a distplot is
+  now drawn without a KDE or parametric density, the histogram is
+  drawn as counts instead of a density. This can be overridden by by
+  setting `hist_norm` to `True`.
+-   When using FacetGrid with a `hue` variable, the legend is no longer
+  drawn by default when you call FacetGrid.map. Instead, you have to
+  call FacetGrid.add_legend manually. This should make it easier to
+  layer multiple plots onto the grid without having duplicated
+  legends.
+-   Made some changes to factorplot so that it behaves better when not
+  all levels of the `x` variable are represented in each facet.
+-   Added the `logx` option to regplot for fitting the regression in log
+  space.
+-   When violinplot encounters a bin with only a single observation, it
+  will now plot a horizontal line at that value instead of erroring
+  out.
+
+## Style and color palettes
+-   Added the cubehelix_palette function for generating sequential
+  palettes from the cubehelix system. See the
+  palette docs for more information on how
+  these palettes can be used. There is also the choose_cubehelix
+  which will launch an interactive app to select cubehelix parameters
+  in the notebook.
+-   Added the xkcd_palette and the `xkcd_rgb` dictionary so that colors
+  can be specified with names from the [xkcd
+  color
+  survey](http://blog.xkcd.com/2010/05/03/color-survey-results/).
+-   Added the `font_scale` option to plotting_context, set_context,
+  and set. `font_scale` can independently increase or decrease the
+  size of the font elements in the plot.
+-   Font-handling should work better on systems without Arial installed.
+  This is accomplished by adding the `font.sans-serif` field to the
+  `axes_style` definition with Arial and Liberation Sans prepended to
+  matplotlib defaults. The font family can also be set through the
+  `font` keyword argument in set. Due to matplotlib bugs, this might
+  not work as expected on matplotlib 1.3.
+-   The despine function gets a new keyword argument `offset`, which
+  replaces the deprecated offset_spines function. You no longer need
+  to offset the spines before plotting data.
+-   Added a default value for `pdf.fonttype` so that text in PDFs is
+  editable in Adobe Illustrator.
+
+## Other API Changes
+-   Removed the deprecated `set_color_palette` and `palette_context`
+  functions. These were replaced in version 0.3 by the set_palette
+  function and ability to use color_palette directly in a `with`
+  statement.
+-   Removed the ability to specify a `nogrid` style, which was renamed
+  to `white` in 0.3.
+",https://api.github.com/users/mwaskom,315810,mwaskom,https://api.github.com/repos/mwaskom/seaborn/releases/531540/assets,https://api.github.com/repos/mwaskom/seaborn/releases/531540,master,https://api.github.com/repos/mwaskom/seaborn/tarball/v0.4.0,https://github.com/mwaskom/seaborn/releases/tag/v0.4.0,https://api.github.com/repos/mwaskom/seaborn/zipball/v0.4.0,v0.4.0,False,False
+281311,2014-04-21T16:04:59Z,2014-04-21T16:07:04Z,0.3.1 (April 2014),"This is a minor release from 0.3 with fixes for several bugs.
+
+## Plotting functions
+- The size of the points in pointplot and factorplot is now scaled with the linewidth for better aesthetics across different plotting contexts.
+- The pointplot glyphs for different levels of the hue variable are drawn at different z-orders so that they appear uniform.
+
+## Bug Fixes
+- Fixed a bug in FacetGrid (and thus affecting lmplot and factorplot) that appeared when `col_wrap` was used with a number of facets that did not evenly divide into the column width.
+- Fixed an issue where the support for kernel density estimates was sometimes computed incorrectly.
+- Fixed a problem where `hue` variable levels that were not strings were missing in FacetGrid legends.
+- When passing a color palette list in a `with` statement, the entire palette is now used instead of the first six colors.
+",https://api.github.com/users/mwaskom,315810,mwaskom,https://api.github.com/repos/mwaskom/seaborn/releases/281311/assets,https://api.github.com/repos/mwaskom/seaborn/releases/281311,v0.3,https://api.github.com/repos/mwaskom/seaborn/tarball/v0.3.1,https://github.com/mwaskom/seaborn/releases/tag/v0.3.1,https://api.github.com/repos/mwaskom/seaborn/zipball/v0.3.1,v0.3.1,False,False
+236198,2014-03-23T00:51:02Z,2014-03-23T00:52:00Z,v0.3.0 (March 2014),"# v0.3.0 (March 2014)
+
+This is a major release from 0.2 with a number of enhancements to the
+plotting capabilities and styles. Highlights include FacetGrid,
+factorplot, jointplot, and an overhaul to
+style management. There is also lots of new
+documentation, including an example gallery and
+reorganized tutorial.
+
+## New plotting functions
+-   The FacetGrid class adds a new form of functionality to seaborn,
+  providing a way to abstractly structure a grid of plots
+  corresponding to subsets of a dataset. It can be used with a wide
+  variety of plotting functions (including most of the matplotlib and
+  seaborn APIs. See the tutorial for more information.
+-   Version 0.3 introduces the factorplot function, which is similar in
+  spirit to lmplot but intended for use when the main independent
+  variable is categorical instead of quantitative. factorplot can draw
+  a plot in either a point or bar representation using the
+  corresponding Axes-level functions pointplot and barplot (which are
+  also new). Additionally, the factorplot function can be used to draw
+  box plots on a faceted grid. For examples of how to use these
+  functions, you can refer to the tutorial.
+-   Another new function is jointplot, which is built using the new
+  JointGrid object. jointplot generalizes the behavior of regplot in
+  previous versions of seaborn (regplot has changed somewhat in 0.3;
+  see below for details) by drawing a bivariate plot of the
+  relationship between two variables with their marginal distributions
+  drawn on the side of the plot. With jointplot, you can draw a
+  scatterplot or regression plot as before, but you
+  can now also draw bivariate kernel densities or hexbin plots with
+  appropriate univariate graphs for the marginal distributions.
+  Additionally, it's easy to use JointGrid directly to build up more
+  complex plots when the default methods offered by jointplot are not
+  suitable for your visualization problem. The
+  tutorial or JointGrid has more examples of how this
+  object can be useful.
+-   The residplot function complements regplot and can be quickly used
+  to diagnose problems with a linear model by calculating and plotting
+  the residuals of a simple regression. There is also a `""resid""` kind
+  for jointplot.
+
+## API changes
+-   The most noticeable change will be that regplot no longer produces a
+  multi-component plot with distributions in marginal axes. Instead.
+  regplot is now an ""Axes-level"" function that can be plotted into any
+  existing figure on a specific set of axes. regplot and lmplot have
+  also been unified (the latter uses the former behind the scenes), so
+  all options for how to fit and represent the regression model can be
+  used for both functions. To get the old behavior
+  of regplot, use jointplot with `kind=""reg""`.
+-   As noted above, lmplot has been rewritten to exploit the FacetGrid
+  machinery. This involves a few changes. The `color` keyword argument
+  has been replaced with `hue`, for better consistency across the
+  package. The `hue` parameter will always take a variable _name_,
+  while `color` will take a color name or (in some cases) a palette.
+  The lmplot function now returns the FacetGrid used to draw the plot
+  instance.
+-   The functions that interact with matplotlib rc parameters have been
+  updated and standardized. There are now three pairs of functions,
+  axes_style and set_style, plotting_context and set_context, and
+  color_palette and set_palette. In each case, the pairs take the
+  exact same arguments. The first function defines and returns the
+  parameters, and the second sets the matplotlib defaults.
+  Additionally, the first function in each pair can be used in a
+  `with` statement to temporarily change the defaults. Both the style
+  and context functions also now accept a dictionary of matplotlib rc
+  parameters to override the seaborn defaults, and set now also takes
+  a dictionary to update any of the matplotlib defaults. See the
+  tutorial for more information.
+-   The `nogrid` style has been deprecated and changed to `white` for
+  more uniformity (i.e. there are now `darkgrid`, `dark`, `whitegrid`,
+  and `white` styles).
+
+## Other changes
+
+### Using the package
+-   If you want to use plotting functions provided by the package
+  without setting the matplotlib style to a seaborn theme, you can now
+  do `import seaborn.apionly as sns` or
+  `from seaborn.apionly import lmplot`, etc. This is using the (also
+  new) reset_orig function, which returns the rc parameters to what
+  they are at matplotlib import time — i.e. they will respect any
+  custom matplotlibrc settings on top of the matplotlib defaults.
+-   The dependency load of the package has been reduced. It can now be
+  installed and used with only `numpy`, `scipy`, `matplotlib`, and
+  `pandas`. Although `statsmodels` is still recommended for full
+  functionality, it is not required.
+
+### Plotting functions
+-   lmplot (and regplot) have two new options for fitting regression
+  models: `lowess` and `robust`. The former fits a nonparametric
+  smoother, while the latter fits a regression using methods that are
+  less sensitive to outliers.
+-   The regression uncertainty in lmplot and regplot is now estimated
+  with fewer bootstrap iterations, so plotting should be faster.
+-   The univariate kdeplot can now be drawn as a _cumulative_ density
+  plot.
+-   Changed interactplot to use a robust calculation of the data range
+  when finding default limits for the contour colormap to work better
+  when there are outliers in the data.
+
+### Style
+-   There is a new style, `dark`, which shares most features with
+  `darkgrid` but does not draw a grid by default.
+-   There is a new function, offset_spines, and a corresponding option
+  in despine called `trim`. Together, these can be used to make plots
+  where the axis spines are offset from the main part of the figure
+  and limited within the range of the ticks. This is recommended for
+  use with the `ticks` style.
+-   Other aspects of the seaborn styles have been tweaked for more
+  attractive plots.
+",https://api.github.com/users/mwaskom,315810,mwaskom,https://api.github.com/repos/mwaskom/seaborn/releases/236198/assets,https://api.github.com/repos/mwaskom/seaborn/releases/236198,master,https://api.github.com/repos/mwaskom/seaborn/tarball/v0.3.0,https://github.com/mwaskom/seaborn/releases/tag/v0.3.0,https://api.github.com/repos/mwaskom/seaborn/zipball/v0.3.0,v0.3.0,False,False
+149255,2014-01-15T16:30:13Z,2014-01-15T16:31:10Z,v0.2.1 (January 2014),"This is a bugfix release, with no new features.
+
+## Bug fixes
+- Changed the mechanics of `violinplot()` and `boxplot()` when using a
+  `Series` object as data and performing a `groupby` to assign data to
+  bins to address a problem that arises in Pandas 0.13.
+- Additionally fixed the `groupby` code to work with all styles of group
+  specification (specifically, using a dictionary or a function now works).
+- Fixed a bug where artifacts from the kde fitting could undershoot and create
+  a plot where the density axis starts below 0.
+- Ensured that data used for kde fitting is double-typed to avoid a low-level
+  statsmodels error.
+- Changed the implementation of the histogram bin-width reference rule to
+  take a ceiling of the estimated number of bins.
+",https://api.github.com/users/mwaskom,315810,mwaskom,https://api.github.com/repos/mwaskom/seaborn/releases/149255/assets,https://api.github.com/repos/mwaskom/seaborn/releases/149255,v0.2,https://api.github.com/repos/mwaskom/seaborn/tarball/v0.2.1,https://github.com/mwaskom/seaborn/releases/tag/v0.2.1,https://api.github.com/repos/mwaskom/seaborn/zipball/v0.2.1,v0.2.1,False,False
+130494,2013-12-23T19:50:05Z,2013-12-23T19:54:08Z,v0.2.0 (December 2013),"This is a major release from 0.1 with a number of API changes,
+enhancements, and bug fixes.
+
+Highlights include an overhaul of timeseries plotting to work
+intelligently with dataframes, the new function `interactplot()` for
+visualizing continuous interactions, bivariate kernel density estimates
+in `kdeplot()`, and significant improvements to color palette handling.
+
+Version 0.2 also introduces experimental support for Python 3.
+
+In addition to the library enhancements, the documentation has been
+substantially rewritten to reflect the new features and improve the
+presentation of the ideas behind the package.
+
+## API changes
+-   The `tsplot()` function was rewritten to accept data in a long-form
+  `DataFrame` and to plot different traces by condition. This
+  introduced a relatively minor but unavoidable API change, where
+  instead of doing `sns.tsplot(time, heights)`, you now must do
+  `sns.tsplot(heights, time=time)` (the `time` parameter is now
+  optional, for quicker specification of simple plots). Additionally,
+  the `""obs_traces""` and `""obs_points""` error styles in `tsplot()`
+  have been renamed to `""unit_traces""` and `""unit_points""`,
+  respectively.
+-   Functions that fit kernel density estimates (`kdeplot()` and
+  `violinplot()`) now use `statsmodels` instead of `scipy`, and the
+  parameters that influence the density estimate have changed
+  accordingly. This allows for increased flexibility in specifying the
+  bandwidth and kernel, and smarter choices for defining the range of
+  the support. Default options should produce plots that are very
+  close to the old defaults.
+-   The `kdeplot()` function now takes a second positional argument of
+  data for drawing bivariate densities.
+-   The `violin()` function has been changed to `violinplot()`, for
+  consistency. In 0.2, `violin` will still work, but it will fire a
+  `UserWarning`.
+
+## New plotting functions
+-   The `interactplot()` function draws a contour plot for an
+  interactive linear model (i.e., the contour shows `y-hat` from the
+  model `y ~ x1 * x2`) over a scatterplot between the two predictor
+  variables. This plot should aid the understanding of an interaction
+  between two continuous variables.
+-   The `kdeplot()` function can now draw a bivariate density estimate
+  as a contour plot if provided with two-dimensional input data.
+-   The `palplot()` function provides a simple grid-based visualization
+  of a color palette.
+
+## Other changes
+
+### Plotting functions
+-   The `corrplot()` function can be drawn without the correlation
+  coefficient annotation and with variable names on the side of the
+  plot to work with large datasets.
+-   Additionally, `corrplot()` sets the color palette intelligently
+  based on the direction of the specified test.
+-   The `distplot()` histogram uses a reference rule to choose the bin
+  size if it is not provided.
+-   Added the `x_bins` option in `lmplot()` for binning a continuous
+  predictor variable, allowing for clearer trends with many
+  datapoints.
+-   Enhanced support for labeling plot elements and axes based on `name`
+  attributes in several distribution plot functions and `tsplot()` for
+  smarter Pandas integration.
+-   Scatter points in `lmplot()` are slightly transparent so it is easy
+  to see where observations overlap.
+-   Added the `order` parameter to `boxplot()` and `violinplot()` to
+  control the order of the bins when using a Pandas object.
+-   When an `ax` argument is not provided to a plotting function, it
+  grabs the currently active axis instead of drawing a new one.
+
+### Color palettes
+-   Added the `dark_palette()` and `blend_palette()` for on-the-fly
+  creation of blended color palettes.
+-   The color palette machinery is now intelligent about qualitative
+  ColorBrewer palettes (`Set1`, `Paired`, etc.), which are properly
+  treated as discrete.
+-   Seaborn color palettes (`deep`, `muted`, etc.) have been
+  standardized in terms of basic hue sequence, and all palettes now
+  have 6 colors.
+-   Introduced `{mpl_palette}_d` palettes, which make a palette with the
+  basic color scheme of the source palette, but with a sequential
+  blend from dark instead of light colors for use with
+  line/scatter/contour plots.
+-   Added the `palette_context()` function for blockwise color palettes
+  controlled by a `with` statement.
+
+### Plot styling
+-   Added the `despine()` function for easily removing plot spines.
+-   A new plot style, `""ticks""` has been added.
+-   Tick labels are padded a bit farther from the axis in all styles,
+  avoiding collisions at (0, 0).
+
+### General package issues
+-   Reorganized the package by breaking up the monolithic `plotobjs`
+  module into smaller modules grouped by general objective of the
+  constituent plots.
+-   Removed the `scikits-learn` dependency in `moss`.
+-   Installing with `pip` should automatically install most missing
+  dependencies.
+-   The example notebooks are now used as an automated test suite.
+
+## Bug fixes
+-   Fixed a bug where labels did not match data for `boxplot()` and
+  `violinplot()` when using a groupby.
+-   Fixed a bug in the `desaturate()` function.
+-   Fixed a bug in the `coefplot()` figure size calculation.
+-   Fixed a bug where `regplot()` choked on list input.
+-   Fixed buggy behavior when drawing horizontal boxplots.
+-   Specifying bins for the `distplot()` histogram now works.
+-   Fixed a bug where `kdeplot()` would reset the axis height and cut
+  off existing data.
+-   All axis styling has been moved out of the top-level `seaborn.set()`
+  function, so context or color palette can be cleanly changed.
+",https://api.github.com/users/mwaskom,315810,mwaskom,https://api.github.com/repos/mwaskom/seaborn/releases/130494/assets,https://api.github.com/repos/mwaskom/seaborn/releases/130494,v0.2.0,https://api.github.com/repos/mwaskom/seaborn/tarball/v0.2.0,https://github.com/mwaskom/seaborn/releases/tag/v0.2.0,https://api.github.com/repos/mwaskom/seaborn/zipball/v0.2.0,v0.2.0,False,False

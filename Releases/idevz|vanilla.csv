@@ -1,0 +1,189 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+5426989,2017-02-09T16:00:17Z,2017-02-11T01:14:16Z,V0.1.0-rc6.2,"#### Features add
+- Add Vanilla page_cache as an proxycache or fastcgicache similar caching for high performance
+- Add sysconf for convenience configuration such as sys resource like MC, DB etc.
+- Update resty-template to the orgin version
+- Add Vanilla cache libs like `vanilla.v.libs.cache`,`vanilla.v.cache.mc`,`vanilla.v.cache.lru` etc.
+- Add the [Chinese Docs](https://idevz.gitbooks.io/vanilla-zh/content/quick_learning/hello_world.html) for Vanilla
+",https://api.github.com/users/idevz,2113827,idevz,https://api.github.com/repos/idevz/vanilla/releases/5426989/assets,https://api.github.com/repos/idevz/vanilla/releases/5426989,master,https://api.github.com/repos/idevz/vanilla/tarball/V0.1.0-rc6.2,https://github.com/idevz/vanilla/releases/tag/V0.1.0-rc6.2,https://api.github.com/repos/idevz/vanilla/zipball/V0.1.0-rc6.2,V0.1.0-rc6.2,False,False
+3171016,2016-05-06T09:19:36Z,2016-05-06T09:22:00Z,V0.1.0-rc6.1,"New Features
+- A sequence of lib Loader(like LoadLibrary,LoadController,LoadModel,LoadPlugin,LoadApplication,LoadApp,LoadV) instead of require for Multi App.
+- Add framework/init.lua and framework/registry.lua As Vanilla base lib
+- Save ngx.var\* to VANILLA_REGISTRY for performance improve.
+- Add Class function for good OO practice.
+- Update controllers for OO design.
+
+1.install vanilla 0.1.--rc6.0 is same to rc5.
+
+2.Loaders useage.
+
+``` lua
+-- LoadLibrary to load application's Library.
+LoadLibrary('aa')       -- ~/data/vanilla/ok/application/library/aa.lua
+-- LoadController to load application's Controller.
+LoadController('index')     -- ~/data/vanilla/ok/application/controllers/index.lua
+-- LoadModel to load application's Model.
+LoadModel('service.user')       -- ~/data/vanilla/ok/application/models/service/user.lua
+-- LoadPlugin to load application's Plugin.
+-- LoadApplication to load application's Application dir.
+LoadApplication('controller.index')     -- ~/data/vanilla/ok/application/controllers/index.lua
+-- LoadApp to load libs from Application root.
+LoadApp 'application.bootstrap'     -- ~/data/vanilla/ok/application/bootstrap.lua
+-- LoadV to load Vanilla FrameWork libs.
+LoadV 'vanilla.v.error'     -- ~/data/vanilla/framework/0_1_0_rc6/vanilla/v/error.lua
+```
+
+3.OO practice
+
+``` lua
+-- ~/data/vanilla/ok/application/library/bb.lua
+local LibBb = Class(""bb"")
+
+function LibBb:idevzDo(params)
+    local params = params or { lib_bb = 'idevzDo LibBb'}
+    return params
+end
+
+function LibBb:__construct( data )
+    print_r('===============init bbb=========')
+    self.lib = 'LibBb---------------xxx' .. data.info
+    -- self.a = 'ppp'
+end
+
+function LibBb:idevzDobb(params)
+    local params = params or { lib_bb = 'idevzDo idevzDobb'}
+    return params
+end
+
+return LibBb
+
+-- ~/data/vanilla/ok/application/library/aa.lua
+local LibAa = Class(""aa"", LoadLibrary('bb'))
+
+function LibAa:idevzDo(params)
+    local params = params or { lib_aa = 'idevzDo LibAa'}
+    return params
+end
+
+function LibAa:__construct( data )
+ print_r('===============init==aaa=======' .. data.info)
+ -- self.parent:init()
+ self.lib = 'LibAa----------------------------aaaa'
+end
+
+return LibAa
+
+-- ~/data/vanilla/ok/application/controllers/index.lua
+local IndexController = Class('controllers.index')
+local aa = LoadLibrary('aa')
+
+function IndexController:__construct()
+     self.aa = aa({info='ppppp'})
+    local get = self:getRequest():getParams()
+    self.d = '===============index===============' .. get.act
+end
+
+function IndexController:index()
+    -- self.parent:fff()
+    do return user_service:get() 
+              .. sprint_r(aa:idevzDobb()) 
+              .. sprint_r(self.aa:idevzDobb()) 
+              -- .. sprint_r(self.parent.aaa) 
+              .. Registry['APP_NAME']
+              .. self.d
+    end
+    local view = self:getView()
+    local p = {}
+    p['vanilla'] = 'Welcome To Vanilla...' .. service:get()
+    p['zhoujing'] = 'Power by Openresty'
+    view:assign(p)
+    return view:display()
+end
+
+return IndexController
+```
+",https://api.github.com/users/idevz,2113827,idevz,https://api.github.com/repos/idevz/vanilla/releases/3171016/assets,https://api.github.com/repos/idevz/vanilla/releases/3171016,vanilla-0.1.0.rc6,https://api.github.com/repos/idevz/vanilla/tarball/V0.1.0-rc6.1,https://github.com/idevz/vanilla/releases/tag/V0.1.0-rc6.1,https://api.github.com/repos/idevz/vanilla/zipball/V0.1.0-rc6.1,V0.1.0-rc6.1,False,True
+3008167,2016-04-13T04:48:01Z,2016-04-13T06:35:05Z,V0.1.0-rc5.0,"New Features
+- Multi applications deployment.
+- Multi version of framework coexistence, easier framwork upgrade.
+- Auto complete the Nginx configration.
+- A convenient way to manage Services.
+
+1.install vanilla with its version, thus for easier updating.
+
+``` bash
+$ git clone git@github.com:idevz/vanilla.git
+$ cd vanilla
+$ ./setup-framework -v $VANILLA_PROJ_ROOT -o $OPENRESTY_ROOT        #see ./setup-framework -h for more details
+```
+
+after installation you can got two commands `vanilla-` and `v-console` which with a version number.
+
+2.Vanilla apps use thire own vhost conf both in development and production environment. You shoud give a full path(-a $VANILLA_APP_ROOT) to setup a Vanilla app.
+
+``` bash
+$ ./setup-vanilal-demoapp  [-a $VANILLA_APP_ROOT -u $VANILLA_APP_USER -g $VANILLA_APP_GROUP -e $VANILLA_RUNNING_ENV]    #see ./setup-vanilal-demoapp -h for more details
+```
+
+3.You can use va-{{vanilla app name}}-service script to manage each service.
+
+``` bash
+$ ./$VANILLA_APP_ROOT/va-appname-service start
+```
+",https://api.github.com/users/idevz,2113827,idevz,https://api.github.com/repos/idevz/vanilla/releases/3008167/assets,https://api.github.com/repos/idevz/vanilla/releases/3008167,master,https://api.github.com/repos/idevz/vanilla/tarball/v0.1.0-rc5.0,https://github.com/idevz/vanilla/releases/tag/v0.1.0-rc5.0,https://api.github.com/repos/idevz/vanilla/zipball/v0.1.0-rc5.0,v0.1.0-rc5.0,False,True
+2860912,2016-03-21T10:47:01Z,2016-03-22T07:42:29Z,V0.1.0-rc4.1,"1.fix a bug about restful route,when get params from request
+2.add a way to parse request params
+3.The most important thing is V0.1.0-rc5.0 is coming, create this tag for this milepost.
+",https://api.github.com/users/idevz,2113827,idevz,https://api.github.com/repos/idevz/vanilla/releases/2860912/assets,https://api.github.com/repos/idevz/vanilla/releases/2860912,master,https://api.github.com/repos/idevz/vanilla/tarball/V0.1.0-rc4.1,https://github.com/idevz/vanilla/releases/tag/V0.1.0-rc4.1,https://api.github.com/repos/idevz/vanilla/zipball/V0.1.0-rc4.1,V0.1.0-rc4.1,False,False
+2450737,2016-01-18T02:08:41Z,2016-01-19T07:53:57Z,V0.1.0-rc4.0,"1. LUA_PACKAGE_PATH Is not must
+2. update function buildconf to a instance method for multiple APP support
+3. update dispatcher when remove init operation, More segmentation request stage
+4. Add busted for unit test
+5. Add restful route 'vanilla.v.routes.restful'
+6. Add vanilla restar, reload commands
+",https://api.github.com/users/idevz,2113827,idevz,https://api.github.com/repos/idevz/vanilla/releases/2450737/assets,https://api.github.com/repos/idevz/vanilla/releases/2450737,master,https://api.github.com/repos/idevz/vanilla/tarball/V0.1.0-rc4.0,https://github.com/idevz/vanilla/releases/tag/V0.1.0-rc4.0,https://api.github.com/repos/idevz/vanilla/zipball/V0.1.0-rc4.0,V0.1.0-rc4.0,False,False
+2331876,2015-12-23T08:55:07Z,2015-12-23T09:07:01Z,V0.1.0-rc3.2,"fix some bugs:
+1.Waf bug about ""attempt to yield across C-call boundary""
+2.change lua file permissions to 644
+3.add BSD installnations 
+4.update luarocks installnations
+5.update errinfo ""Vanilla Inner Lpcall Err."" and ""Plugins Err""
+",https://api.github.com/users/idevz,2113827,idevz,https://api.github.com/repos/idevz/vanilla/releases/2331876/assets,https://api.github.com/repos/idevz/vanilla/releases/2331876,master,https://api.github.com/repos/idevz/vanilla/tarball/V0.1.0-rc3.2,https://github.com/idevz/vanilla/releases/tag/V0.1.0-rc3.2,https://api.github.com/repos/idevz/vanilla/zipball/V0.1.0-rc3.2,V0.1.0-rc3.2,False,False
+2309422,2015-12-18T03:22:13Z,2015-12-18T04:58:45Z,V0.1.0-rc3,"Use ""make"" instead luarocks to install vanilla, make vanilla more easy to ues.
+Reduce package dependency.
+Implements a router and a set of pluggable routing protocol.
+Specifies nginx bin PATH for vanilla start or stop, Specifies lua or luajit bin PATH for vanilla command.
+Pcall call local static functions instead of dynamic functions.
+Ning conf file can use {{NGX_PATH}} as a config params.
+",https://api.github.com/users/idevz,2113827,idevz,https://api.github.com/repos/idevz/vanilla/releases/2309422/assets,https://api.github.com/repos/idevz/vanilla/releases/2309422,master,https://api.github.com/repos/idevz/vanilla/tarball/V0.1.0-rc3,https://github.com/idevz/vanilla/releases/tag/V0.1.0-rc3,https://api.github.com/repos/idevz/vanilla/zipball/V0.1.0-rc3,V0.1.0-rc3,False,True
+2197530,2015-11-27T14:49:56Z,2015-11-27T15:35:28Z,V0.1.0-rc2,"This version includes specification request process, perfect routing, plug-ins, request distribution, view and controller, the bootstrap components.Vanilla's infrastructure has been completed
+",https://api.github.com/users/idevz,2113827,idevz,https://api.github.com/repos/idevz/vanilla/releases/2197530/assets,https://api.github.com/repos/idevz/vanilla/releases/2197530,master,https://api.github.com/repos/idevz/vanilla/tarball/v0.1.0-rc2,https://github.com/idevz/vanilla/releases/tag/v0.1.0-rc2,https://api.github.com/repos/idevz/vanilla/zipball/v0.1.0-rc2,v0.1.0-rc2,False,True
+1828294,2015-09-17T13:52:28Z,2015-09-17T13:57:50Z,base rc0 for vanilla,"just contain the base feature 
+
+```
+--vanilla system settings
+
+sys/application
+sys/vanilla
+sys/application
+sys/config
+sys/nginx/handle
+sys/nginx/directive
+sys/nginx/config
+
+--a vanilla app
+v/application
+v/bootstrap
+v/controller
+v/dispatcher
+v/error
+v/libs/utils
+v/libs/http
+v/registry
+v/request
+v/response
+v/routes/simple
+v/view
+v/views/rtpl
+```
+",https://api.github.com/users/idevz,2113827,idevz,https://api.github.com/repos/idevz/vanilla/releases/1828294/assets,https://api.github.com/repos/idevz/vanilla/releases/1828294,master,https://api.github.com/repos/idevz/vanilla/tarball/v0.0.1-rc0,https://github.com/idevz/vanilla/releases/tag/v0.0.1-rc0,https://api.github.com/repos/idevz/vanilla/zipball/v0.0.1-rc0,v0.0.1-rc0,False,True

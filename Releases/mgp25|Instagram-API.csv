@@ -1,0 +1,181 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7785241,2017-09-17T20:49:35Z,2017-09-17T20:56:53Z,Stable version v3.1,"This release adds new features.
+
+- Business: Added a new function for getting account statistics.
+- Some very minor fixes for the Push and Realtime clients.
+- (Developers) The codestyle fixer has been updated to work with the newly released PHP-CS-Fixer 2.6+.",https://api.github.com/users/SteveJobzniak,22373193,SteveJobzniak,https://api.github.com/repos/mgp25/Instagram-API/releases/7785241/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/7785241,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/3.1,https://github.com/mgp25/Instagram-API/releases/tag/3.1,https://api.github.com/repos/mgp25/Instagram-API/zipball/3.1,3.1,False,False
+7651497,2017-09-06T11:01:26Z,2017-09-06T11:17:17Z,Stable version v3.0.1,"This is a minor maintenance release.
+
+- Attaching locations to media uploads now explicitly validates that you have properly given it a `Location::search()` object. The Facebook-based location objects cannot be used as media locations, and an exception will now be thrown if you attempt to do so.",https://api.github.com/users/SteveJobzniak,22373193,SteveJobzniak,https://api.github.com/repos/mgp25/Instagram-API/releases/7651497/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/7651497,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/v3.0.1,https://github.com/mgp25/Instagram-API/releases/tag/v3.0.1,https://api.github.com/repos/mgp25/Instagram-API/zipball/v3.0.1,v3.0.1,False,False
+7630490,2017-09-04T16:17:16Z,2017-09-04T21:06:58Z,Stable version v3.0.0,"🎉 🎉 🎉 🎉 🎉 🎉 🎉 🎉
+
+# Instagram-API v3
+
+Almost 700 code commits have happened since version 2.0!! :scream: This new version has been tons of hard work for everyone involved, and we hope that you are going to love it!
+
+## New features
+
+- All requests have now been organized into collections of related functions, which makes them much easier to find. Instead of painfully searching through hundreds of functions in the ""huge main class"" to find what you're looking for, you now simply have to look for the specific collection that seems to be the most likely one for your needs. And when we grouped all of these functions, we also took the opportunity to rename many of them to much cleaner, easier and more logical names! For example, if you now want to find hashtags, you would simply look in the `Hashtag` collection (`src/Request/Hashtag.php`), and there you would find the `search()` function, and your final function call would be `$ig->hashtag->search()`, which is very easy and clear to read. You can find all of the function groups [here](https://github.com/mgp25/Instagram-API/tree/master/src/Request).
+- Full implementation of the Realtime communication client protocol, which allows you to send and receive Direct chat messages in realtime, among other things.
+- Push notification listener (FBNS-based), which lets you get realtime notifications of things such as people liking your media or commenting on it or following you.
+- Fully documented ""magic methods"" in all Response and Model classes, which now lets your smart IDEs auto-complete and find the magic ""get/set/is""-methods for all properties. (These docs are automatically kept up-to-date by our new automatic class documentation generator.)
+- Added support for Live Broadcasts, so that you can now get other people's livestream information and even create your own streams (however, the actual streaming will have to be done via other software).
+- Added support for Instagram's resumable video uploader feature. This gives you huge speed improvements for video uploading when Instagram's server is overloaded at peak hours. We now only retry the data that was lost by their server, instead of the whole file.
+- Ability to get the full server API responses from exceptions, via `$e->hasResponse()` and `$e->getResponse()`. See `src/examples/exceptionDetailsExample.php` for more information.
+- We now have a SQLite settings database backend, in addition to the existing File, MySQL and Memcached backends. You can read usage-examples for that and other backends in `src/examples/customSettings.php`.
+- New `Item::isAd()` function to easily check if an item is an advertisement or a real media item.
+- The `ImageAutoResizer` class has been renamed to `MediaAutoResizer`, and now has a lot of new features and fixes: It now optionally supports _expanding_ images by adding borders instead of cropping, which is great if you want to preserve the whole image! You now specify the constructor parameters via an array, for much easier usage. Added support for specifying the background/border color of your final image. Now supports resizing non-timeline media to instead enforce the aspect ratios used by stories (see the constructor parameters for more info about that). And lastly, we've fixed the aspect ratio calculations, since the previous code could still create illegal aspect ratios in a few cases.
+- Brand new and completely rewritten Direct messaging system, which now works perfectly and supports all messaging features of the official app.
+- Support for performing two-factor logins.
+
+
+## Improvements and updates
+
+- [New project license! Important information for all users! :warning:](https://github.com/mgp25/Instagram-API#license)
+- Updated the Instagram app version to 10.33.0.
+- All endpoint calls have been verified and updated to match Instagram's latest app parameters.
+- Lower memory usage while uploading files, by streaming them from disk instead of loading them completely into memory.
+- Big improvements to `Timeline::backup()`. It now timestamps files properly, gives them better names, and supports downloading albums.
+- The Memcached settings backend now supports SASL authentication.
+- Massively improved cookie efficiency. They're no longer constantly saved to the database after every API call. Instead, the saving happens at periodic intervals and after certain important calls such as `login()` and `logout()`.
+- Support for specifying custom paths to FFmpeg and FFprobe, if your server doesn't have them in the PATH environment. See the `src/Utils.php` comments.
+- Improved performance for the API object mapping, by re-using the JsonMapper instance so that it caches all class mappings.
+- Simplified the login system: The `setUser()` function has been removed, and the username and password parameters must now be given directly to `login()` instead.
+- Improved the exception system, with new exceptions such as `NotFoundException` when the user/content cannot be found (error code 404), and `BadRequestException` when the server rejected the request.
+- Big performance boost for all function calls to the get/set/is-functions on Instagram API response objects and model objects. Those calls are now ~6x faster.
+- You can now rename your account via `Account::editProfile()`.
+- Massive, internal core code rewrites for improved stability and error-checking everywhere.
+
+## Backwards-incompatible changes
+
+This is a new, major version, which improves the library and makes it much easier to use. That means that some changes listed above aren't backwards-compatible. Most notably, you need to be aware of the following changes if you are upgrading from an old library version (such as v2.x or earlier):
+
+- The functions have now been grouped and renamed. So for example, if your previous v2.x code said something like `$ig->getHashtagFeed()`, it would now be `$ig->hashtag->getFeed()` in v3.x. These groupings were necessary for development of the library, since the main class file had become too large and was actually slowing down our code editors. And it makes it much easier for all users to find the functions they want.
+- Many functions have been updated to take more parameters or to change their parameter orders to match Instagram's latest API changes. You should therefore carefully read through all of your function calls to ensure that you're still sending the correct function parameters for this new version. The change that is most likely to affect people, is the fact that `getFollowing()` and `getFollowers()` (and their related functions) have been updated to take a new parameter named `$searchQuery` in the middle of the argument list. It allows you to limit the userlist to just the people whose usernames/real names match your query. Previously, the `$maxId` parameter used to be in that location, so be careful when upgrading your old code.
+- The login system was simplified, and the old `setUser()` function was removed. You now give the username and password directly to `login()` instead.
+- If you've been using the v3.0 beta, you may have used the new `twoFactorLogin()` function. Well, it has now been renamed to `finishTwoFactorLogin()` in this final release, to make its purpose a bit clearer!
+
+## Credits
+
+Thanks to [@valga](https://github.com/valga) and [@stevejobzniak](https://github.com/stevejobzniak) for the countless hours of work they have put into this project and the almost 700 code commits that have happened since version 2.0. If you appreciate all of our generous and hard work, then you may want to consider sending us a donation as thanks, or at least _saying_ thanks which would also be very appreciated. ;)
+
+**valga**
+
+- [@valga](https://github.com/valga) does not have any donation link, so tell him a HUGE thanks for his awesome work when you see him! :)
+
+
+**stevejobzniak**
+
+- ![Paypal](https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/paypal.png) Paypal: [Donate](https://www.paypal.me/Armindale/0usd)
+- ![btc](https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/bitcoin.png) Bitcoin: 18XF1EmrkpYi4fqkR2XcHkcJxuTMYG4bcv
+
+**mgp25**
+
+- ![Paypal](https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/paypal.png) Paypal: [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5ATYY8H9MC96E)
+- ![btc](https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/bitcoin.png) Bitcoin: 1DCEpC9wYXeUGXS58qSsqKzyy7HLTTXNYe
+
+
+
+_Instagram API Team_
+",https://api.github.com/users/mgp25,5390120,mgp25,https://api.github.com/repos/mgp25/Instagram-API/releases/7630490/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/7630490,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/v3.0.0,https://github.com/mgp25/Instagram-API/releases/tag/v3.0.0,https://api.github.com/repos/mgp25/Instagram-API/zipball/v3.0.0,v3.0.0,False,False
+5872282,2017-03-26T18:12:43Z,2017-03-26T18:29:08Z,Stable version v2.0,":tada::tada::tada::tada:
+
+- Hundreds of bugs are completely fixed. Many very serious ones, including one which was getting you silently blacklisted by Instagram, and another very serious and _silent_ one which meant you were never getting any high-quality video URLs (now you are guaranteed to always get the highest quality media URLs in all video-related API feed items, every time).
+
+- The project code is now rock-solid, modernized, well-architected and fully documented.
+
+- The code finally _makes sense_ and has been rewritten in a way so that it's easier for people to avoid adding new bugs again.
+
+- The API is now _much_ easier to use! All of the API endpoint functions are still here but have been fully reviewed, renamed to much more logical and consistent names in many cases, and had their function arguments fully revised to be sure that people can easily use them and understand them. There's no more `uploadVideo($videoFilename, null, null, null, null, $hashTags);` calls. Everything now takes just 1-3 parameters, and all metadata is handled via an array instead of a huge argument list. So you'd instead do something like `uploadTimelineVideo($videoFilename, ['hashtags'=>$hashTags]);`. This ensures that the library is _much_ easier for people to use, and ensures that we can extend its capabilities at any time without constantly adding tons of extra parameters and without breaking backwards-compatibility! :-)
+
+- Performance and reliability has gone up _massively_. Thanks to a total rewrite to a modern HTTP communication layer with persistent connections and socket re-use, you now _save_ 200-800 milliseconds of real-world time on _every_ API request you make to Instagram's server! :open_mouth:
+
+- There's tons of validation everywhere which ensures that your app won't waste time trying to upload invalid data to Instagram. This library detects invalid data early before even trying, as opposed to letting you try uploading bad data and then wasting time waiting for the server to tell you that it failed. We catch bad data immediately instead!
+
+- Everything is now modern and Exception-based. There are a total of 18 exceptions, one for every error, letting you catch _just the errors you want to handle_, such as `IncorrectPasswordException` or `ThrottledException` (when Instagram's server throttles you due to you spamming them with queries too fast) or `EndpointException` (whenever their server tells you that an API endpoint you called has failed to process your request, normally due to you giving it invalid parameters).
+
+- The settings and cookie storage system is completely rewritten. It is not backwards-compatible. But it is future-compatible, which is much more important. See the `examples/customSettings.php` for how to use the new settings system.
+
+- The new settings system is modular and extremely powerful. You can now easily write your own storage backends and plug them into this system (by simply implementing the `src/Settings/StorageInterface.php` interface properly). Which means that **you** can store your account-data **any** way you want, if none of the built-in backends suit your particular needs. Please contribute your own (properly implemented, of course) backends if they are of use to the rest of the community! :smile:
+
+- Now you can look for, rename and delete users from the settings backends! This is for advanced users only. Read the documentation in `examples/customSettings.php` and in `src/Settings/StorageHandler.php`.
+
+- There are two brand new classes for library users. `InstagramID` which lets you convert media IDs to/from Instagram's shortcodes (see `examples/shortcodeConverter.php`), and `ImageAutoResizer` which lets you auto-resize and auto-crop images to ensure that they will fit Instagram's requirements and won't be rejected by the server (see `src/ImageAutoResizer.php` for documentation and usage).
+
+- All examples in the `examples/` folder have been rewritten to demonstrate the new version of this library.
+
+
+This release has been possible thanks to @SteveJobzniak, who has spent three weeks in rewriting the whole library, making improvements in API performance and tons of bug fixing, so if you are happy with all this work, please think about sending a donation to him as thanks:
+
+- ![Paypal](https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/paypal.png) Paypal: [Donate](https://www.paypal.me/Armindale/0usd)
+- ![btc](https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/bitcoin.png) Bitcoin: 18XF1EmrkpYi4fqkR2XcHkcJxuTMYG4bcv 
+
+Hope you all like this release, and we'll keep working for future updates.
+
+Regards",https://api.github.com/users/mgp25,5390120,mgp25,https://api.github.com/repos/mgp25/Instagram-API/releases/5872282/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/5872282,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/v2.0,https://github.com/mgp25/Instagram-API/releases/tag/v2.0,https://api.github.com/repos/mgp25/Instagram-API/zipball/v2.0,v2.0,False,False
+5043250,2016-12-31T11:03:14Z,2016-12-31T11:22:52Z,Stable version v1.6.1,"- New endpoints
+- Code improvements
+- More examples
+- Code Fixes
+- Instagram version update
+
+Update is recommended
+",https://api.github.com/users/mgp25,5390120,mgp25,https://api.github.com/repos/mgp25/Instagram-API/releases/5043250/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/5043250,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/v1.6.1,https://github.com/mgp25/Instagram-API/releases/tag/v1.6.1,https://api.github.com/repos/mgp25/Instagram-API/zipball/v1.6.1,v1.6.1,False,False
+4708866,2016-11-20T11:44:38Z,2016-11-20T12:01:57Z,Stable version v1.6.0.2,"- Video upload fix
+- Follower response fix
+",https://api.github.com/users/mgp25,5390120,mgp25,https://api.github.com/repos/mgp25/Instagram-API/releases/4708866/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/4708866,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/v1.6.0.2,https://github.com/mgp25/Instagram-API/releases/tag/v1.6.0.2,https://api.github.com/repos/mgp25/Instagram-API/zipball/v1.6.0.2,v1.6.0.2,False,False
+4707082,2016-11-19T20:05:08Z,2016-11-19T20:08:22Z,Stable version v1.6.0.1,"- Fix photo upload issue
+- Minor fixes
+",https://api.github.com/users/mgp25,5390120,mgp25,https://api.github.com/repos/mgp25/Instagram-API/releases/4707082/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/4707082,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/v1.6.0.1,https://github.com/mgp25/Instagram-API/releases/tag/v1.6.0.1,https://api.github.com/repos/mgp25/Instagram-API/zipball/v1.6.0.1,v1.6.0.1,False,False
+4698732,2016-11-18T13:59:35Z,2016-11-18T14:17:17Z,Stable version v1.6,"- Code enhancement
+- Bug fixes
+- Added settings to support databases. See `SettingsAdapter`
+",https://api.github.com/users/mgp25,5390120,mgp25,https://api.github.com/repos/mgp25/Instagram-API/releases/4698732/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/4698732,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/v1.6,https://github.com/mgp25/Instagram-API/releases/tag/v1.6,https://api.github.com/repos/mgp25/Instagram-API/zipball/v1.6,v1.6,False,False
+4565485,2016-11-03T23:10:46Z,2016-11-03T23:12:38Z,Stable version v1.5.1,"- New features
+- Bug fixes
+- Version update
+",https://api.github.com/users/mgp25,5390120,mgp25,https://api.github.com/repos/mgp25/Instagram-API/releases/4565485/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/4565485,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/v1.5.1,https://github.com/mgp25/Instagram-API/releases/tag/v1.5.1,https://api.github.com/repos/mgp25/Instagram-API/zipball/v1.5.1,v1.5.1,False,False
+4237626,2016-09-27T08:11:47Z,2016-09-27T08:12:30Z,Stable version v1.5.0.1,"- Fixes minor issue https://github.com/mgp25/Instagram-API/commit/0ed721c8ea28e860ecc89d1e7f4d1644491a15f7
+",https://api.github.com/users/mgp25,5390120,mgp25,https://api.github.com/repos/mgp25/Instagram-API/releases/4237626/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/4237626,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/v1.5.0.1,https://github.com/mgp25/Instagram-API/releases/tag/v1.5.0.1,https://api.github.com/repos/mgp25/Instagram-API/zipball/v1.5.0.1,v1.5.0.1,False,False
+4234830,2016-09-26T07:32:10Z,2016-09-26T22:08:52Z,Stable version v1.5,"Lots of new responses are added, still a few more to add, hopefully in next release eveything is done.
+- Better debug (still needs to be improved)
+- IG_SIG_KEY update to version 9.4.0
+",https://api.github.com/users/mgp25,5390120,mgp25,https://api.github.com/repos/mgp25/Instagram-API/releases/4234830/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/4234830,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/v1.5,https://github.com/mgp25/Instagram-API/releases/tag/v1.5,https://api.github.com/repos/mgp25/Instagram-API/zipball/v1.5,v1.5,False,False
+4100502,2016-09-11T19:33:33Z,2016-09-11T19:35:16Z,Stable version v1.4.2,"Lots of improvements + signature update
+",https://api.github.com/users/mgp25,5390120,mgp25,https://api.github.com/repos/mgp25/Instagram-API/releases/4100502/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/4100502,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/v1.4.2,https://github.com/mgp25/Instagram-API/releases/tag/v1.4.2,https://api.github.com/repos/mgp25/Instagram-API/zipball/v1.4.2,v1.4.2,False,False
+3931688,2016-08-20T08:16:59Z,2016-08-20T08:18:27Z, Stable version v1.4,"Registration update, fixes and more updates.
+",https://api.github.com/users/mgp25,5390120,mgp25,https://api.github.com/repos/mgp25/Instagram-API/releases/3931688/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/3931688,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/v1.4,https://github.com/mgp25/Instagram-API/releases/tag/v1.4,https://api.github.com/repos/mgp25/Instagram-API/zipball/v1.4,v1.4,False,False
+3761724,2016-07-28T15:05:16Z,2016-07-28T15:13:56Z,Stable version v1.3,"- Composer support
+- Constants and versions updated
+
+Lots of fixes and improvements.
+",https://api.github.com/users/mgp25,5390120,mgp25,https://api.github.com/repos/mgp25/Instagram-API/releases/3761724/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/3761724,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/1.3,https://github.com/mgp25/Instagram-API/releases/tag/1.3,https://api.github.com/repos/mgp25/Instagram-API/zipball/1.3,1.3,False,False
+3353859,2016-06-01T18:21:10Z,2016-06-01T22:43:31Z,Stable version,"Fixes and improvements
+",https://api.github.com/users/mgp25,5390120,mgp25,https://api.github.com/repos/mgp25/Instagram-API/releases/3353859/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/3353859,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/v1.2.2,https://github.com/mgp25/Instagram-API/releases/tag/v1.2.2,https://api.github.com/repos/mgp25/Instagram-API/zipball/v1.2.2,v1.2.2,False,False
+3170470,2016-05-06T07:41:12Z,2016-05-06T07:42:34Z,Stable version,"- Video upload (requires ffmpeg in order to work)
+- Upload_id typo fix for uploading photos
+
+Some improvements and fixes.
+
+Update is recommended
+",https://api.github.com/users/mgp25,5390120,mgp25,https://api.github.com/repos/mgp25/Instagram-API/releases/3170470/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/3170470,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/v1.2.1,https://github.com/mgp25/Instagram-API/releases/tag/v1.2.1,https://api.github.com/repos/mgp25/Instagram-API/zipball/v1.2.1,v1.2.1,False,False
+3147872,2016-05-03T13:05:26Z,2016-05-03T13:09:05Z,Stable version,"- Video upload (requires ffmpeg in order to work)
+
+Some improvements and fixes.
+
+Update is recommended
+",https://api.github.com/users/mgp25,5390120,mgp25,https://api.github.com/repos/mgp25/Instagram-API/releases/3147872/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/3147872,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/v1.2.0,https://github.com/mgp25/Instagram-API/releases/tag/v1.2.0,https://api.github.com/repos/mgp25/Instagram-API/zipball/v1.2.0,v1.2.0,False,False
+2675023,2016-02-23T15:11:16Z,2016-02-23T23:10:53Z,Stable version,"Some improvements and fixes.
+
+Update is recommended
+",https://api.github.com/users/mgp25,5390120,mgp25,https://api.github.com/repos/mgp25/Instagram-API/releases/2675023/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/2675023,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/v1.1.0,https://github.com/mgp25/Instagram-API/releases/tag/v1.1.0,https://api.github.com/repos/mgp25/Instagram-API/zipball/v1.1.0,v1.1.0,False,False
+2187950,2015-11-26T00:43:36Z,2015-11-26T00:46:54Z,Stable version,"**Features:**
+- Upload photo
+- Change profile picture
+- Remove profile picture
+- Set account public/private
+- Get recent activity
+- Get user information
+
+More coming soon!
+",https://api.github.com/users/mgp25,5390120,mgp25,https://api.github.com/repos/mgp25/Instagram-API/releases/2187950/assets,https://api.github.com/repos/mgp25/Instagram-API/releases/2187950,master,https://api.github.com/repos/mgp25/Instagram-API/tarball/v1.0.0,https://github.com/mgp25/Instagram-API/releases/tag/v1.0.0,https://api.github.com/repos/mgp25/Instagram-API/zipball/v1.0.0,v1.0.0,False,False

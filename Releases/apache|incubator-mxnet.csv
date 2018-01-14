@@ -1,0 +1,339 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8201508,2017-10-18T15:15:58Z,2017-10-20T23:38:16Z,MXNet 0.12.0 Release Candidate 0,"MXNet Change Log
+================
+## 0.12.0
+### Performance
+  - Added full support for NVIDIA Volta GPU Architecture and CUDA 9. Training is up to 3.5x faster than Pascal when using float16.
+  - Enabled JIT compilation. Autograd and Gluon hybridize now use less memory and has faster speed. Performance is almost the same with old symbolic style code.
+  - Improved ImageRecordIO image loading performance and added indexed RecordIO support.
+  - Added better openmp thread management to improve CPU performance.
+### New Features - Gluon
+  - Added enhancements to the Gluon package, a high-level interface designed to be easy to use while keeping most of the flexibility of low level API. Gluon supports both imperative and symbolic programming, making it easy to train complex models imperatively with minimal impact on performance. Neural networks (and other machine learning models) can be defined and trained with `gluon.nn` and `gluon.rnn` packages. 
+  - Added new loss functions - `SigmoidBinaryCrossEntropyLoss`, `CTCLoss`, `HuberLoss`, `HingeLoss`, `SquaredHingeLoss`, `LogisticLoss`, `TripletLoss`.
+  - `gluon.Trainer` now allows reading and setting learning rate with `trainer.learning_rate` property.
+  - Added API `HybridBlock.export` for exporting gluon models to MXNet format.
+  - Added `gluon.contrib` package.
+    - Convolutional recurrent network cells for RNN, LSTM and GRU.
+    - `VariationalDropoutCell`
+### New Features - Autograd
+  - Added enhancements to `autograd` package, which enables automatic differentiation of NDArray operations.
+  - `autograd.Function` allows defining both forward and backward computation for custom operators.
+  - Added `mx.autograd.grad` and experimental second order gradient support (most operators don't support second order gradient yet).
+  - Autograd now supports cross-device graphs. Use `x.copyto(mx.gpu(i))` and `x.copyto(mx.cpu())` to do computation on multiple devices.
+### New Features - Sparse Tensor Support
+  - Added support for sparse matrices. 
+  - Added limited cpu support for two sparse formats in `Symbol` and `NDArray` - `CSRNDArray` and `RowSparseNDArray`.
+  - Added a sparse dot product operator and many element-wise sparse operators.
+  - Added a data iterator for sparse data input - `LibSVMIter`.
+  - Added three optimizers for sparse gradient updates: `Ftrl`, `SGD` and `Adam`.
+  - Added `push` and `row_sparse_pull` with `RowSparseNDArray` in distributed kvstore.
+### Other New Features
+  - Added limited support for fancy indexing, which allows you to very quickly access and modify complicated subsets of an array's values. `x[idx_arr0, idx_arr1, ..., idx_arrn]` is now supported. Features such as combining and slicing are planned for the next release. Checkout master to get a preview.
+  - Random number generators in `mx.nd.random.*` and `mx.sym.random.*` now support both CPU and GPU.
+  - `NDArray` and `Symbol` now supports ""fluent"" methods. You can now use `x.exp()` etc instead of `mx.nd.exp(x)` or `mx.sym.exp(x)`.
+  - Added `mx.rtc.CudaModule` for writing and running CUDA kernels from python. 
+  - Added `multi_precision` option to optimizer for easier float16 training.
+  - Better support for IDE auto-completion. IDEs like PyCharm can now correctly parse mxnet operators.
+### API Changes
+  - Operators like `mx.sym.linalg_*` and `mx.sym.random_*` are now moved to `mx.sym.linalg.*` and `mx.sym.random.*`. The old names are still available but deprecated.
+  - `sample_*` and `random_*` are now merged as `random.*`, which supports both scalar and  `NDArray` distribution parameters.
+### Bug-fixes
+  - Fixed a bug that causes `argsort` operator to fail on large tensors.
+  - Fixed numerical stability issues when summing large tensors.
+  - Fixed a bug that causes arange operator to output wrong results for large ranges.
+  - Improved numerical precision for unary and binary operators on `float64` inputs.
+
+For more information and examples, see [full release notes](https://cwiki.apache.org/confluence/display/MXNET/MXNet+0.12.0+Release+Notes)
+",https://api.github.com/users/cjolivier01,11234557,cjolivier01,https://api.github.com/repos/apache/incubator-mxnet/releases/8201508/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/8201508,v0.12.0,https://api.github.com/repos/apache/incubator-mxnet/tarball/0.12.0.rc0,https://github.com/apache/incubator-mxnet/releases/tag/0.12.0.rc0,https://api.github.com/repos/apache/incubator-mxnet/zipball/0.12.0.rc0,0.12.0.rc0,False,True
+7642680,2017-09-05T18:49:21Z,2017-09-05T18:56:18Z,MXNet 0.11.0,"## 0.11.0
+### Major Features
+  - [Apple Core ML model converter](https://github.com/apache/incubator-mxnet/blob/master/tools/coreml/README.md)
+  - Support for [Keras v1.2.2](https://github.com/dmlc/keras/wiki/Installation)
+  - [Gluon Interface (experimental)](https://mxnet.incubator.apache.org/versions/master/api/python/gluon.html) 
+  - Updated [LICENSE](https://raw.githubusercontent.com/apache/incubator-mxnet/v0.11.0/LICENSE) and [NOTICE](https://raw.githubusercontent.com/apache/incubator-mxnet/v0.11.0/NOTICE) files.
+  - For more information see [full release notes](https://cwiki.apache.org/confluence/display/MXNET/v0.11.0+Release+Notes+-+MXNet+v0.11+Release+Candidate)
+### API Changes
+  - Added `CachedOp`. You can now cache the operators that’s called frequently with the same set of arguments to reduce overhead.
+  - Added sample_multinomial for sampling from multinomial distributions.
+  - Added `trunc` operator for rounding towards zero.
+  - Added linalg_gemm, linalg_potrf, ... operators for lapack support.
+  - Added verbose option to Initializer for printing out initialization details.
+  - Added DeformableConvolution to contrib from the Deformable Convolutional Networks paper.
+  - Added float64 support for dot and batch_dot operator.
+  - `allow_extra` is added to Module.set_params to ignore extra parameters.
+  - Added `mod` operator for modulo.
+  - Added `multi_precision` option to SGD optimizer to improve training with float16. Resnet50 now achieves the same accuracy when trained with float16 and gives 50% speedup on Titan XP.
+### Performance Improvements
+  - ImageRecordIter now stores data in pinned memory to improve GPU memcopy speed.
+### Bugfixes
+  - Fixed a bug in Adam that causes weight decay to be handled incorrectly. If you are using Adam, you may need to tune learning rate a little to get the same performance as previous versions.
+  - [Remove WaitToRead in dist-kvstore](https://github.com/apache/incubator-mxnet/pull/7489): Improves performance 20-30% for distributed training.
+  - Cython interface is fixed. `make cython` and `python setup.py install --with-cython` should install the cython interface and reduce overhead in applications that use imperative/bucketing.
+  - Fixed various bugs in Faster-RCNN example: https://github.com/dmlc/mxnet/pull/6486
+  - Fixed various bugs in SSD example.
+  - Fixed `out` argument not working for `zeros`, `ones`, `full`, etc.
+  - `expand_dims` now supports backward shape inference.
+  - Fixed a bug in rnn. BucketingSentenceIter that causes incorrect layout handling on multi-GPU.
+  - Fixed context mismatch when loading optimizer states.
+  - Fixed a bug in ReLU activation when using MKL.
+  - Fixed a few race conditions that causes crashes on shutdown.
+  - Fixed [image-classification example code](https://github.com/apache/incubator-mxnet/pull/7545).
+### Refactors
+  - Refactored TShape/TBlob to use int64 dimensions and DLTensor as internal storage. Getting ready for migration to DLPack. As a result TBlob::dev_mask_ and TBlob::stride_ are removed.
+### Known Issues
+  - Inception-V3 model can be converted into CoreML format but is unable to run on Xcode.",https://api.github.com/users/nswamy,1208642,nswamy,https://api.github.com/repos/apache/incubator-mxnet/releases/7642680/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/7642680,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/0.11.0,https://github.com/apache/incubator-mxnet/releases/tag/0.11.0,https://api.github.com/repos/apache/incubator-mxnet/zipball/0.11.0,0.11.0,False,False
+7513425,2017-08-24T18:08:38Z,2017-08-30T17:47:28Z,MXNet 0.11.0 Release Candidate 3,"## 0.11.0.rc3
+### Major Features
+  - [Apple Core ML model converter](https://github.com/apache/incubator-mxnet/blob/master/tools/coreml/README.md)
+  - Support for [Keras v1.2.2](https://github.com/dmlc/keras/wiki/Installation)
+  - [Gluon Interface (experimental)](https://mxnet.incubator.apache.org/versions/master/api/python/gluon.html) 
+  - Updated [LICENSE](https://raw.githubusercontent.com/apache/incubator-mxnet/v0.11.0/LICENSE) and [NOTICE](https://raw.githubusercontent.com/apache/incubator-mxnet/v0.11.0/NOTICE) files.
+  - For more information see [full release notes](https://cwiki.apache.org/confluence/display/MXNET/v0.11.0+Release+Notes+-+MXNet+v0.11+Release+Candidate)
+### API Changes
+  - Added `CachedOp`. You can now cache the operators that’s called frequently with the same set of arguments to reduce overhead.
+  - Added sample_multinomial for sampling from multinomial distributions.
+  - Added `trunc` operator for rounding towards zero.
+  - Added linalg_gemm, linalg_potrf, ... operators for lapack support.
+  - Added verbose option to Initializer for printing out initialization details.
+  - Added DeformableConvolution to contrib from the Deformable Convolutional Networks paper.
+  - Added float64 support for dot and batch_dot operator.
+  - `allow_extra` is added to Module.set_params to ignore extra parameters.
+  - Added `mod` operator for modulo.
+  - Added `multi_precision` option to SGD optimizer to improve training with float16. Resnet50 now achieves the same accuracy when trained with float16 and gives 50% speedup on Titan XP.
+### Performance Improvements
+  - ImageRecordIter now stores data in pinned memory to improve GPU memcopy speed.
+### Bugfixes
+  - Fixed a bug in Adam that causes weight decay to be handled incorrectly. If you are using Adam, you may need to tune learning rate a little to get the same performance as previous versions.
+  - [Remove WaitToRead in dist-kvstore](https://github.com/apache/incubator-mxnet/pull/7489): Improves performance 20-30% for distributed training.
+  - Cython interface is fixed. `make cython` and `python setup.py install --with-cython` should install the cython interface and reduce overhead in applications that use imperative/bucketing.
+  - Fixed various bugs in Faster-RCNN example: https://github.com/dmlc/mxnet/pull/6486
+  - Fixed various bugs in SSD example.
+  - Fixed `out` argument not working for `zeros`, `ones`, `full`, etc.
+  - `expand_dims` now supports backward shape inference.
+  - Fixed a bug in rnn. BucketingSentenceIter that causes incorrect layout handling on multi-GPU.
+  - Fixed context mismatch when loading optimizer states.
+  - Fixed a bug in ReLU activation when using MKL.
+  - Fixed a few race conditions that causes crashes on shutdown.
+  - Fixed [image-classification example code](https://github.com/apache/incubator-mxnet/pull/7545).
+### Refactors
+  - Refactored TShape/TBlob to use int64 dimensions and DLTensor as internal storage. Getting ready for migration to DLPack. As a result TBlob::dev_mask_ and TBlob::stride_ are removed.
+### Known Issues
+  - Inception-V3 model can be converted into CoreML format but is unable to run on Xcode.",https://api.github.com/users/nswamy,1208642,nswamy,https://api.github.com/repos/apache/incubator-mxnet/releases/7513425/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/7513425,v0.11.0,https://api.github.com/repos/apache/incubator-mxnet/tarball/0.11.0.rc3,https://github.com/apache/incubator-mxnet/releases/tag/0.11.0.rc3,https://api.github.com/repos/apache/incubator-mxnet/zipball/0.11.0.rc3,0.11.0.rc3,False,True
+7418656,2017-08-16T22:12:46Z,2017-08-16T23:12:57Z,MXNet 0.11.0 Release Candidate 2,"## 0.11.0.rc2
+### Major Features
+  - [Apple Core ML model converter](https://github.com/apache/incubator-mxnet/blob/master/tools/coreml/README.md)
+  - Support for [Keras v1.2.2](https://github.com/dmlc/keras/wiki/Installation)
+  - For more information see [full release notes](https://cwiki.apache.org/confluence/display/MXNET/v0.11.0+Release+Notes+-+MXNet+v0.11+Release+Candidate)
+### API Changes
+  - Added `CachedOp`. You can now cache the operators that’s called frequently with the same set of arguments to reduce overhead.
+  - Added sample_multinomial for sampling from multinomial distributions.
+  - Added `trunc` operator for rounding towards zero.
+  - Added linalg_gemm, linalg_potrf, ... operators for lapack support.
+  - Added verbose option to Initializer for printing out initialization details.
+  - Added DeformableConvolution to contrib from the Deformable Convolutional Networks paper.
+  - Added float64 support for dot and batch_dot operator.
+  - `allow_extra` is added to Module.set_params to ignore extra parameters.
+  - Added `mod` operator for modulo.
+  - Added `multi_precision` option to SGD optimizer to improve training with float16. Resnet50 now achieves the same accuracy when trained with float16 and gives 50% speedup on Titan XP.
+### Performance Improvements
+  - ImageRecordIter now stores data in pinned memory to improve GPU memcopy speed.
+### Bugfixes
+  - [Remove WaitToRead in dist-kvstore](https://github.com/apache/incubator-mxnet/pull/7489): Improves performance 20-30% 
+  - Cython interface is fixed. `make cython` and `python setup.py install --with-cython` should install the cython interface and reduce overhead in applications that use imperative/bucketing.
+  - Fixed various bugs in Faster-RCNN example: https://github.com/dmlc/mxnet/pull/6486
+  - Fixed various bugs in SSD example.
+  - Fixed `out` argument not working for `zeros`, `ones`, `full`, etc.
+  - `expand_dims` now supports backward shape inference.
+  - Fixed a bug in rnn. BucketingSentenceIter that causes incorrect layout handling on multi-GPU.
+  - Fixed context mismatch when loading optimizer states.
+  - Fixed a bug in ReLU activation when using MKL.
+  - Fixed a few race conditions that causes crashes on shutdown.
+### Refactors
+  - Refactored TShape/TBlob to use int64 dimensions and DLTensor as internal storage. Getting ready for migration to DLPack. As a result TBlob::dev_mask_ and TBlob::stride_ are removed.
+### Known Issues
+  - Inception-V3 model can be converted into CoreML format but is unable to run on Xcode.",https://api.github.com/users/nswamy,1208642,nswamy,https://api.github.com/repos/apache/incubator-mxnet/releases/7418656/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/7418656,v0.11.0,https://api.github.com/repos/apache/incubator-mxnet/tarball/0.11.0.rc2,https://github.com/apache/incubator-mxnet/releases/tag/0.11.0.rc2,https://api.github.com/repos/apache/incubator-mxnet/zipball/0.11.0.rc2,0.11.0.rc2,False,True
+7391406,2017-08-14T23:43:26Z,2017-08-15T02:13:32Z,MXNet 0.11.0 Release Candidate 1,"## 0.11.0.rc1
+### Major Features
+  - [Apple Core ML model converter](https://github.com/apache/incubator-mxnet/blob/master/tools/coreml/README.md)
+  - Support for [Keras v1.2.2](https://github.com/dmlc/keras/wiki/Installation)
+  - For more information see [full release notes](https://cwiki.apache.org/confluence/display/MXNET/v0.11.0+Release+Notes+-+MXNet+v0.11+Release+Candidate)
+### API Changes
+  - Added `CachedOp`. You can now cache the operators that’s called frequently with the same set of arguments to reduce overhead.
+  - Added sample_multinomial for sampling from multinomial distributions.
+  - Added `trunc` operator for rounding towards zero.
+  - Added linalg_gemm, linalg_potrf, ... operators for lapack support.
+  - Added verbose option to Initializer for printing out initialization details.
+  - Added DeformableConvolution to contrib from the Deformable Convolutional Networks paper.
+  - Added float64 support for dot and batch_dot operator.
+  - `allow_extra` is added to Module.set_params to ignore extra parameters.
+  - Added `mod` operator for modulo.
+  - Added `multi_precision` option to SGD optimizer to improve training with float16. Resnet50 now achieves the same accuracy when trained with float16 and gives 50% speedup on Titan XP.
+### Performance Improvements
+  - ImageRecordIter now stores data in pinned memory to improve GPU memcopy speed.
+### Bugfixes
+  - Cython interface is fixed. `make cython` and `python setup.py install --with-cython` should install the cython interface and reduce overhead in applications that use imperative/bucketing.
+  - Fixed various bugs in Faster-RCNN example: https://github.com/dmlc/mxnet/pull/6486
+  - Fixed various bugs in SSD example.
+  - Fixed `out` argument not working for `zeros`, `ones`, `full`, etc.
+  - `expand_dims` now supports backward shape inference.
+  - Fixed a bug in rnn. BucketingSentenceIter that causes incorrect layout handling on multi-GPU.
+  - Fixed context mismatch when loading optimizer states.
+  - Fixed a bug in ReLU activation when using MKL.
+  - Fixed a few race conditions that causes crashes on shutdown.
+### Refactors
+  - Refactored TShape/TBlob to use int64 dimensions and DLTensor as internal storage. Getting ready for migration to DLPack. As a result TBlob::dev_mask_ and TBlob::stride_ are removed.
+### Known Issues
+  - Inception-V3 model can be converted into CoreML format but is unable to run on Xcode.",https://api.github.com/users/lxn2,1652951,lxn2,https://api.github.com/repos/apache/incubator-mxnet/releases/7391406/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/7391406,v0.11.0,https://api.github.com/repos/apache/incubator-mxnet/tarball/0.11.0.rc1,https://github.com/apache/incubator-mxnet/releases/tag/0.11.0.rc1,https://api.github.com/repos/apache/incubator-mxnet/zipball/0.11.0.rc1,0.11.0.rc1,False,True
+7369222,2017-08-12T06:58:17Z,2017-08-12T07:23:53Z,MXNet 0.11.0 Release Candidate 0,"## 0.11.0-rc0
+### - Major Features
+  - Apple Core ML model converter
+  - Support for Keras v1.2.2
+  - For more information see [full release notes](https://cwiki.apache.org/confluence/display/MXNET/v0.11.0+Release+Notes)
+### - API Changes
+  - Added `CachedOp`. You can now cache the operators that’s called frequently with the same set of arguments to reduce overhead.
+  - Added sample_multinomial for sampling from multinomial distributions.
+  - Added `trunc` operator for rounding towards zero.
+  - Added linalg_gemm, linalg_potrf, ... operators for lapack support.
+  - Added verbose option to Initializer for printing out initialization details.
+  - Added DeformableConvolution to contrib from the Deformable Convolutional Networks paper.
+  - Added float64 support for dot and batch_dot operator.
+  - `allow_extra` is added to Module.set_params to ignore extra parameters.
+  - Added `mod` operator for modulo.
+  - Added `multi_precision` option to SGD optimizer to improve training with float16. Resnet50 now achieves the same accuracy when trained with float16 and gives 50% speedup on Titan XP.
+### - Performance Improvements
+  - ImageRecordIter now stores data in pinned memory to improve GPU memcopy speed.
+### - Bugfixes
+  - Cython interface is fixed. `make cython` and `python setup.py install --with-cython` should install the cython interface and reduce overhead in applications that use imperative/bucketing.
+  - Fixed various bugs in Faster-RCNN example: https://github.com/dmlc/mxnet/pull/6486
+  - Fixed various bugs in SSD example.
+  - Fixed `out` argument not working for `zeros`, `ones`, `full`, etc.
+  - `expand_dims` now supports backward shape inference.
+  - Fixed a bug in rnn. BucketingSentenceIter that causes incorrect layout handling on multi-GPU.
+  - Fixed context mismatch when loading optimizer states.
+  - Fixed a bug in ReLU activation when using MKL.
+  - Fixed a few race conditions that causes crashes on shutdown.
+### - Refactors
+  - Refactored TShape/TBlob to use int64 dimensions and DLTensor as internal storage. Getting ready for migration to DLPack. As a result TBlob::dev_mask_ and TBlob::stride_ are removed.",https://api.github.com/users/lxn2,1652951,lxn2,https://api.github.com/repos/apache/incubator-mxnet/releases/7369222/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/7369222,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/0.11.0.rc0,https://github.com/apache/incubator-mxnet/releases/tag/0.11.0.rc0,https://api.github.com/repos/apache/incubator-mxnet/zipball/0.11.0.rc0,0.11.0.rc0,False,True
+7068114,2017-07-17T23:25:49Z,2017-07-17T23:26:15Z,MXNet 0.10.0 Post 2,"Fixed an issue that causes dropout to crash on gpu when mxnet is built with mkl
+Fixed an issue that causes random crash on shutdown",https://api.github.com/users/piiswrong,568948,piiswrong,https://api.github.com/repos/apache/incubator-mxnet/releases/7068114/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/7068114,v0.10.0-support,https://api.github.com/repos/apache/incubator-mxnet/tarball/0.10.0.post2,https://github.com/apache/incubator-mxnet/releases/tag/0.10.0.post2,https://api.github.com/repos/apache/incubator-mxnet/zipball/0.10.0.post2,0.10.0.post2,False,False
+6520926,2017-05-26T22:51:55Z,2017-05-26T22:58:24Z,MXNet 0.10.0 Release,"1. Overhauled documentation for commonly used Python APIs, Installation instructions, Tutorials, HowTos and MXNet Architecture.
+2. Updated mxnet.io for improved readability.
+3. Pad operator now support reflection padding.
+4. Fixed a memory corruption error in threadedengine.
+5. Added CTC loss layer to contrib package. See mx.contrib.sym.ctc_loss.
+6. Added new sampling operators for several distributions (normal,uniform,gamma,exponential,negative binomial).
+7. Added documentation for experimental RNN APIs. ",https://api.github.com/users/piiswrong,568948,piiswrong,https://api.github.com/repos/apache/incubator-mxnet/releases/6520926/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/6520926,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/v0.10.0,https://github.com/apache/incubator-mxnet/releases/tag/v0.10.0,https://api.github.com/repos/apache/incubator-mxnet/zipball/v0.10.0,v0.10.0,False,False
+6453934,2017-05-21T04:57:29Z,2017-05-21T06:30:23Z,MXNet 0.10.0 Release Candidate 0,"1. Overhauled documentation for commonly used Python APIs, Installation instructions, Tutorials, HowTos and MXNet Architecture.
+2. Updated mxnet.io for improved readability.
+3. Pad operator now support reflection padding.
+4. Fixed a memory corruption error in threadedengine.
+5. Added CTC loss layer to contrib package. See mx.contrib.sym.ctc_loss.",https://api.github.com/users/piiswrong,568948,piiswrong,https://api.github.com/repos/apache/incubator-mxnet/releases/6453934/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/6453934,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/v0.10.0-rc0,https://github.com/apache/incubator-mxnet/releases/tag/v0.10.0-rc0,https://api.github.com/repos/apache/incubator-mxnet/zipball/v0.10.0-rc0,v0.10.0-rc0,False,True
+6247811,2017-05-02T06:35:42Z,2017-05-02T07:16:46Z,V0.9.5 release,,https://api.github.com/users/piiswrong,568948,piiswrong,https://api.github.com/repos/apache/incubator-mxnet/releases/6247811/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/6247811,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/v0.9.5,https://github.com/apache/incubator-mxnet/releases/tag/v0.9.5,https://api.github.com/repos/apache/incubator-mxnet/zipball/v0.9.5,v0.9.5,False,True
+5232404,2017-01-22T19:07:09Z,2017-01-22T19:09:43Z,v0.9.3 Official Release,"- Move symbolic API to NNVM @tqchen
+  - Most front-end C API are backward  compatible
+  - Removed symbolic api in MXNet and relies on NNVM
+- New features:
+  - MXNet profiler for profiling operator level executions
+  - mxnet.image package for fast image loading and processing
+- Change of JSON format
+  - param and attr field are merged to attr
+  - New code is backward compatible can load old json format
+- OpProperty registration now is deprecated
+  - New operators are encouraged to register their property to NNVM op registry attribute
+- Known features removed limitations to be fixed
+  - Bulk segment execution not yet added.
+- Miscellaneous
+  - sgd and adam optimizer are now implemented with a single imperative call. They should be as fast and memory efficient as cc optimizers. ccsgd is now deprecated and redirects to sgd.
+  - Layout support is added. Use `mx.io.DataDesc(..., layout='NHWC')` in provide_data to specify data layout. use `mx.sym.YourSymbol(..., __layout__='NHWC')` to specify output layout. `layout` option is now available for Convolution layer.
+  - element_mask is removed. Please use src*mask.reshape((mask.size, 1, 1, ..., 1)) directly as binary ops now support broadcasting.
+  - sum_axis, max_axis, and min_axis are deprecated. Please use mx.nd.max(src, axis=n) instead.
+  - symbol attributes are now limited to ctx_group, lr_mult, wd_mult, force_mirroring. All other custom attributes need to be in **xxx** format (start and end with double underscore) or error will be triggered during attribute parsing.
+",https://api.github.com/users/piiswrong,568948,piiswrong,https://api.github.com/repos/apache/incubator-mxnet/releases/5232404/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/5232404,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/v0.9.3,https://github.com/apache/incubator-mxnet/releases/tag/v0.9.3,https://api.github.com/repos/apache/incubator-mxnet/zipball/v0.9.3,v0.9.3,False,False
+5028743,2016-12-28T23:27:27Z,2016-12-28T23:27:47Z,Version 0.8.0 Release,"This is the last release before the NNVM refactor.
+- CaffeOp and CaffeIter for interfacing with Caffe by @HrWangChengdu @cjolivier01
+- WrapCTC plugin for sequence learning by @xlvector
+- Improved Multi-GPU performance by @mli
+- CuDNN RNN support by @sbodenstein
+- OpenCV plugin for parallel image IO by @piiswrong
+- More operators as simple op
+  - Simple OP @tqchen
+  - element wise op with axis and broadcast @mli @sxjscience
+- Cudnn auto tuning for faster convolution by @piiswrong
+- More applications
+  - Faster RCNN by @precedenceguo
+",https://api.github.com/users/piiswrong,568948,piiswrong,https://api.github.com/repos/apache/incubator-mxnet/releases/5028743/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/5028743,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/v0.8.0,https://github.com/apache/incubator-mxnet/releases/tag/v0.8.0,https://api.github.com/repos/apache/incubator-mxnet/zipball/v0.8.0,v0.8.0,False,False
+4485009,2016-10-26T03:04:35Z,2016-10-26T04:28:14Z,Nightly Windows Release,"Nightly Windows releases are moved to https://github.com/yajiedesign/mxnet/releases
+",https://api.github.com/users/piiswrong,568948,piiswrong,https://api.github.com/repos/apache/incubator-mxnet/releases/4485009/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/4485009,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/nightly,https://github.com/apache/incubator-mxnet/releases/tag/nightly,https://api.github.com/repos/apache/incubator-mxnet/zipball/nightly,nightly,False,False
+3337126,2016-05-30T16:47:10Z,2016-05-31T06:44:55Z,windows binary build 20160531,"This is the latest build of MxNet on Windows 64. Please refer to the README.txt file included in the zip files for more information.
+",https://api.github.com/users/hjk41,1132769,hjk41,https://api.github.com/repos/apache/incubator-mxnet/releases/3337126/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/3337126,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/20160531,https://github.com/apache/incubator-mxnet/releases/tag/20160531,https://api.github.com/repos/apache/incubator-mxnet/zipball/20160531,20160531,False,False
+3315676,2016-05-26T16:07:36Z,2016-05-26T19:48:02Z,v0.7.0,"This is an incomplete list among the many features added
+-  0.6 is skipped because there are a lot of improvements since initial release
+- More math operators
+  - elementwise ops and binary ops
+- Attribute support in computation graph
+  - Now user can use attributes to give various hints about specific learning rate, allocation plans etc
+- MXNet is more memory efficient
+  - Support user defined memory optimization with attributes, see https://github.com/dmlc/mxnet-memonger
+- Support mobile applications by @antinucleon
+- Refreshed update of new documents
+- Model parallel training of LSTM by @tqchen
+- Simple operator refactor by @tqchen
+  - add operator_util.h to enable quick registration of both ndarray and symbolic ops
+- Distributed training by @mli
+- Support Torch Module by @piiswrong
+  - MXNet now can use any of the modules from Torch.
+- Support custom native operator by @piiswrong
+- Support data types including fp16, fp32, fp64, int32, and uint8 by @piiswrong
+- Support monitor for easy printing and debugging by @piiswrong
+- Support new module API by @pluskid
+  - Module API is a middle level API that can be used in imperative manner like Torch-Module
+- Support bucketing API for variable length input by @pluskid
+- Support CuDNN v5 by @antinucleon
+- More applications
+  - Speech recoginition by @yzhang87
+  - [Neural art](https://github.com/dmlc/mxnet/tree/master/example/neural-style) by @antinucleon
+  - [Detection](https://github.com/dmlc/mxnet/tree/master/example/rcnn), RCNN bt @precedenceguo
+  - [Segmentation](https://github.com/dmlc/mxnet/tree/master/example/fcn-xs), FCN by @tornadomeet
+  - [Face identification](https://github.com/tornadomeet/mxnet-face) by @tornadomeet
+  - More on the example
+",https://api.github.com/users/tqchen,2577440,tqchen,https://api.github.com/repos/apache/incubator-mxnet/releases/3315676/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/3315676,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/v0.7.0,https://github.com/apache/incubator-mxnet/releases/tag/v0.7.0,https://api.github.com/repos/apache/incubator-mxnet/zipball/v0.7.0,v0.7.0,False,False
+3049582,2016-04-19T04:38:03Z,2016-04-19T09:42:56Z,windows binary build 20160419,"This is the latest build of MxNet on Windows 64. Please refer to the README.txt file included in the zip files for more information.
+",https://api.github.com/users/hjk41,1132769,hjk41,https://api.github.com/repos/apache/incubator-mxnet/releases/3049582/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/3049582,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/20160419,https://github.com/apache/incubator-mxnet/releases/tag/20160419,https://api.github.com/repos/apache/incubator-mxnet/zipball/20160419,20160419,False,False
+2851549,2016-03-20T23:45:59Z,2016-03-21T03:03:53Z,windows binary build 20160321,"This is the latest build of MxNet on Windows 64. Please refer to the README.txt file included in the zip files for more information.
+",https://api.github.com/users/hjk41,1132769,hjk41,https://api.github.com/repos/apache/incubator-mxnet/releases/2851549/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/2851549,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/20160321,https://github.com/apache/incubator-mxnet/releases/tag/20160321,https://api.github.com/repos/apache/incubator-mxnet/zipball/20160321,20160321,False,False
+2773862,2016-03-09T01:01:54Z,2016-03-09T07:42:34Z,windows binary build 20160309,"This is the latest build of MxNet on Windows 64. Please refer to the README.txt file included in the zip files for more information.
+",https://api.github.com/users/hjk41,1132769,hjk41,https://api.github.com/repos/apache/incubator-mxnet/releases/2773862/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/2773862,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/20160309,https://github.com/apache/incubator-mxnet/releases/tag/20160309,https://api.github.com/repos/apache/incubator-mxnet/zipball/20160309,20160309,False,False
+2707481,2016-02-29T05:32:57Z,2016-02-29T06:10:28Z,windows binary build 20160229,"This is the latest build of MxNet on Windows 64. Please refer to the README.txt file included in the zip files for more information.
+",https://api.github.com/users/hjk41,1132769,hjk41,https://api.github.com/repos/apache/incubator-mxnet/releases/2707481/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/2707481,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/20160229,https://github.com/apache/incubator-mxnet/releases/tag/20160229,https://api.github.com/repos/apache/incubator-mxnet/zipball/20160229,20160229,False,False
+2667921,2016-02-22T04:03:25Z,2016-02-23T05:10:14Z,windows binary build 20160223,"This is the latest build of MxNet on Windows 64. Please refer to the README.txt file included in the zip files for more information.
+",https://api.github.com/users/hjk41,1132769,hjk41,https://api.github.com/repos/apache/incubator-mxnet/releases/2667921/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/2667921,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/20160223,https://github.com/apache/incubator-mxnet/releases/tag/20160223,https://api.github.com/repos/apache/incubator-mxnet/zipball/20160223,20160223,False,False
+2621248,2016-02-16T01:27:31Z,2016-02-16T06:05:47Z,windows binary build 20160216,"This is the latest build of MxNet on Windows 64. Please refer to the README.txt file included in the zip files for more information.
+",https://api.github.com/users/hjk41,1132769,hjk41,https://api.github.com/repos/apache/incubator-mxnet/releases/2621248/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/2621248,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/20160216,https://github.com/apache/incubator-mxnet/releases/tag/20160216,https://api.github.com/repos/apache/incubator-mxnet/zipball/20160216,20160216,False,False
+2534427,2016-02-02T04:13:46Z,2016-02-02T04:40:55Z,windows binary build 20160202,"This is the latest build of MxNet on Windows 64. Please refer to the README.txt file included in the zip files for more information.
+",https://api.github.com/users/hjk41,1132769,hjk41,https://api.github.com/repos/apache/incubator-mxnet/releases/2534427/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/2534427,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/20160202,https://github.com/apache/incubator-mxnet/releases/tag/20160202,https://api.github.com/repos/apache/incubator-mxnet/zipball/20160202,20160202,False,False
+2458385,2016-01-20T08:47:08Z,2016-01-20T09:07:22Z,windows binary build 20160120,"This is the latest build of MxNet on Windows 64. Please refer to the README.txt file included in the zip files for more information.
+",https://api.github.com/users/hjk41,1132769,hjk41,https://api.github.com/repos/apache/incubator-mxnet/releases/2458385/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/2458385,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/20160120,https://github.com/apache/incubator-mxnet/releases/tag/20160120,https://api.github.com/repos/apache/incubator-mxnet/zipball/20160120,20160120,False,False
+2417268,2016-01-13T01:42:41Z,2016-01-13T03:40:11Z,windows binary build 20160113,"This is the latest build of MxNet on Windows 64. Please refer to the README.txt file included in the zip files for more information.
+",https://api.github.com/users/hjk41,1132769,hjk41,https://api.github.com/repos/apache/incubator-mxnet/releases/2417268/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/2417268,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/20160113,https://github.com/apache/incubator-mxnet/releases/tag/20160113,https://api.github.com/repos/apache/incubator-mxnet/zipball/20160113,20160113,False,False
+2379009,2016-01-05T16:43:11Z,2016-01-06T06:20:32Z,windows binary build 20160106,"This is the latest build of MxNet on Windows 64. Please refer to the README.txt file included in the zip files for more information.
+",https://api.github.com/users/hjk41,1132769,hjk41,https://api.github.com/repos/apache/incubator-mxnet/releases/2379009/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/2379009,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/20160106,https://github.com/apache/incubator-mxnet/releases/tag/20160106,https://api.github.com/repos/apache/incubator-mxnet/zipball/20160106,20160106,False,False
+2344809,2015-12-27T23:11:01Z,2015-12-28T01:53:34Z,windows binary build 20151228,"This is the latest build of MxNet on Windows 64. You can use it to build C++ programs or install Python interface.
+
+There are two versions: CPU-only version and GPU version.
+
+The CPU version is self-contained, meaning that you should be able to use it without downloading other packages.
+
+The GPU version, however, depends on cuDNN, which due to license issues, cannot be included in the package. Please download cuDNN v3 and unpack it into 3rdparty\cudnn.
+
+Before using, you need to run **setupenv.cmd** to setup necessary environmental variables. Refer to the README.txt file included in the zip files for more information.
+",https://api.github.com/users/hjk41,1132769,hjk41,https://api.github.com/repos/apache/incubator-mxnet/releases/2344809/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/2344809,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/20151228,https://github.com/apache/incubator-mxnet/releases/tag/20151228,https://api.github.com/repos/apache/incubator-mxnet/zipball/20151228,20151228,False,False
+1970899,2015-11-02T00:11:09Z,2015-11-10T06:18:55Z,windows binary build 20151209,"This is the latest build of MxNet on Windows 64. You can use it to build C++ programs or install Python interface.
+
+There are two versions: CPU-only version and GPU version. 
+
+The CPU version is self-contained, meaning that you should be able to use it without downloading other packages. 
+
+The GPU version, however, depends on cuDNN, which due to license issues, cannot be included in the package. **Please download cuDNN v3** and unpack it into 3rdparty\cudnn.
+
+Before using, you need to run setupenv.cmd to setup necessary environmental variables. Refer to the README.txt file included in the zip files for more information.
+",https://api.github.com/users/hjk41,1132769,hjk41,https://api.github.com/repos/apache/incubator-mxnet/releases/1970899/assets,https://api.github.com/repos/apache/incubator-mxnet/releases/1970899,master,https://api.github.com/repos/apache/incubator-mxnet/tarball/weekly_binary_build,https://github.com/apache/incubator-mxnet/releases/tag/weekly_binary_build,https://api.github.com/repos/apache/incubator-mxnet/zipball/weekly_binary_build,weekly_binary_build,False,False

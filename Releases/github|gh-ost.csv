@@ -1,0 +1,241 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7749052,2017-09-14T06:51:12Z,2017-09-14T06:59:53Z,GA release v1.0.42,"
+Changes since `1.0.40`: https://github.com/github/gh-ost/compare/v1.0.40...v1.0.42
+
+Notable:
+
+- Support for 5.7 `JSON` data type
+- Write optimization: client side prepares statements, reduce network traffic overhead, https://github.com/github/gh-ost/pull/459
+- Read optimization: avoid generating temporary tables in read query, https://github.com/github/gh-ost/pull/471 thanks @ggunson 
+- Using `autocommit=1`, fixes https://github.com/github/gh-ost/issues/480, thanks @renecannao
+- Added `--force-table-names` controlling, see https://github.com/github/gh-ost/pull/457, thanks @arthurnn 
+- Validating password length (capped at 32, see https://github.com/github/gh-ost/pull/489)
+- Stricter data type validation pre-migration
+- more...
+
+Thank you kindly to all contributors!
+
+```shell
+$ md5sum *
+07617a0058396336d0d0686253ae602d  gh-ost-binary-linux-20170914095800.tar.gz
+673574c92bf18921625758a05e0bed98  gh-ost-binary-osx-20170914095800.tar.gz
+```
+
+```shell
+$ sha1sum *
+444589e9417653a8636838cb6ecbe7fb908e7609  gh-ost-binary-linux-20170914095800.tar.gz
+9a79e741ea28e1f55d7cf49b9813f151d4b52362  gh-ost-binary-osx-20170914095800.tar.gz
+```
+
+```shell
+$ sha256sum *
+297b14ed1efe9b894e27e63f7aff36ceded7334c174f5a8602af9e74beb2f512  gh-ost-binary-linux-20170914095800.tar.gz
+0fd2497b21305dbd420f94d61703a33a70fcf2b0b54bbfb55e178691d061ff2d  gh-ost-binary-osx-20170914095800.tar.gz
+```
+
+
+[![downloads](https://img.shields.io/github/downloads/github/gh-ost/v1.0.42/total.svg)](https://github.com/github/gh-ost/releases/tag/v1.0.42)",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/7749052/assets,https://api.github.com/repos/github/gh-ost/releases/7749052,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.42,https://github.com/github/gh-ost/releases/tag/v1.0.42,https://api.github.com/repos/github/gh-ost/zipball/v1.0.42,v1.0.42,False,False
+7117824,2017-07-21T03:37:27Z,2017-07-21T03:55:13Z,GA release v1.0.40,"
+Changes since `1.0.36`: https://github.com/github/gh-ost/compare/v1.0.36...v1.0.40
+
+Notable:
+
+- Fix to **data integrity issue**: corruption in `timestamp(6)` and `datetime(6)` microsecond values when smaller than `0.1sec`, https://github.com/github/gh-ost/pull/452
+- Fix to **data integrity issue**: `kill` on the master connection could cause a premature cut-over without all the rows being copied, https://github.com/github/gh-ost/pull/445
+- Fix to **data integrity issue**: support for `alter table .. change column X` where X is a different letter case than original column, https://github.com/github/gh-ost/pull/447
+- supporting tables that reach up to and including max length (`64` characters), https://github.com/github/gh-ost/pull/451
+- Hibernate on critical load: when `critical-load-hibernate-seconds > 0`, then the behavior of `critical-load` changes. Instead of panicking and bailing out with error, `gh-ost` enters hibernation. https://github.com/github/gh-ost/pull/424
+- `dml-batch-size` is dynamic, supported up to `1000`
+- `http-throttle` outputs clearer throttle messahes
+- `http-throttle` is freno aware and outputs clearer throttle messahes
+- fix to `critical-load` hibernation check
+- support for `drop + add` a column of same name (`gh-ost` will recognize the before/after columns to be unrelated)
+- RDS documentation, thanks @jacobbednarz
+- improved documentation, thanks @jessbreckenridge 
+- more...
+
+```
+md5sum
+55079a0ea0f72bfccf32658f4c6de894  gh-ost-binary-linux-1.0.40-20170721063804.tar.gz
+715309fcd4cd85f974b4ac648f849fa3  gh-ost-binary-osx-1.0.40-20170721063804.tar.gz
+
+sha1sum
+b19b8af996cef57d117a961cdf2c27865e9c5ff6  gh-ost-binary-linux-1.0.40-20170721063804.tar.gz
+d8b3d862e815319ba62c6f55502cdd670f0b4028  gh-ost-binary-osx-1.0.40-20170721063804.tar.gz
+```
+
+[![downloads](https://img.shields.io/github/downloads/github/gh-ost/v1.0.40/total.svg)](https://github.com/github/gh-ost/releases/tag/v1.0.40)",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/7117824/assets,https://api.github.com/repos/github/gh-ost/releases/7117824,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.40,https://github.com/github/gh-ost/releases/tag/v1.0.40,https://api.github.com/repos/github/gh-ost/zipball/v1.0.40,v1.0.40,False,False
+5954390,2017-04-03T09:58:26Z,2017-04-03T10:05:02Z,GA release v1.0.36,"changes since 1.0.35: https://github.com/github/gh-ost/compare/v1.0.35...v1.0.36
+
+Notable:
+
+- supporting `--throttle-http=<url>`: routinely check given URL, throttle when response code is not `200`.
+- fixed ""close sync with err: sync is been closing..."" message
+
+`gh-ost` now supports and uses [TravisCI](https://travis-ci.org/). The community will now have visibility into CI tests on both external and internal PRs.
+
+
+[![downloads](https://img.shields.io/github/downloads/github/gh-ost/v1.0.36/total.svg)](https://github.com/github/gh-ost/releases/tag/v1.0.36)",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/5954390/assets,https://api.github.com/repos/github/gh-ost/releases/5954390,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.36,https://github.com/github/gh-ost/releases/tag/v1.0.36,https://api.github.com/repos/github/gh-ost/zipball/v1.0.36,v1.0.36,False,False
+5719265,2017-03-12T05:34:32Z,2017-03-13T04:45:53Z,GA release v1.0.35,"changes since 1.0.34: https://github.com/github/gh-ost/compare/v1.0.34...v1.0.35
+
+notable:
+
+- updated go-mysql library
+- supporting `--timestamp-old-table`
+- mitigating cut-over/write race condition
+- fixed mediumint unsigned problem
+- added various tests
+- proper documentation for shared key and unique keys requirements -- thanks @ggunson 
+- interactive command support question mark (`?`) as argument, in which case this is a Get operation, `gh-ost` prints out current value
+- fix to `throttle-control-replicas` dynamic setting; showing number of throttle control replicas in status
+- added ""common questions"" doc page
+- cut-over failure on test-on-replica kicks replication running again before reattempt
+- collecting and presenting MySQL versions of applier and inspector
+- migration only starting after first replication lag metric collected
+- more...
+
+[![downloads](https://img.shields.io/github/downloads/github/gh-ost/v1.0.35/total.svg)](https://github.com/github/gh-ost/releases/tag/v1.0.35)",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/5719265/assets,https://api.github.com/repos/github/gh-ost/releases/5719265,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.35,https://github.com/github/gh-ost/releases/tag/v1.0.35,https://api.github.com/repos/github/gh-ost/zipball/v1.0.35,v1.0.35,False,False
+5101851,2017-01-09T06:12:48Z,2017-01-09T06:23:37Z,GA release v1.0.34,"changes since 1.0.32: https://github.com/github/gh-ost/compare/v1.0.32...v1.0.34
+
+notable:
+- Batched writes for applying binlog events onto _ghost_ table: solving https://github.com/github/gh-ost/issues/348, this increases write capacity for `gh-ost` without introducing delays or stalls. See https://github.com/github/gh-ost/issues/352
+- Only using internal heartbeat mechanism.  `--replication-lag-query` is now deprecated and unused. `gh-ost` has its own subsecond resolution replication lag measurement which it uses both on the connected server as well as on the control-replicas. See https://github.com/github/gh-ost/pull/347
+- support for `--master-user` and `--master-password`, for when master and replicas have different credentials.
+- Add possibility to set `server-id` as command line flag - contribution by @cypiszzz, see https://github.com/github/gh-ost/pull/349
+- `--check-flag` is a flag with which one can check if other flags are supported. Used for scripting and testing in lieu of evolving and changing versions. See https://github.com/github/gh-ost/pull/351
+
+[![downloads](https://img.shields.io/github/downloads/github/gh-ost/v1.0.34/total.svg)](https://github.com/github/gh-ost/releases/tag/v1.0.34)",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/5101851/assets,https://api.github.com/repos/github/gh-ost/releases/5101851,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.34,https://github.com/github/gh-ost/releases/tag/v1.0.34,https://api.github.com/repos/github/gh-ost/zipball/v1.0.34,v1.0.34,False,False
+4915721,2016-12-14T09:39:37Z,2016-12-14T09:43:39Z,GA release v1.0.32,"changes since 1.0.30: https://github.com/github/gh-ost/compare/v1.0.30...v1.0.32
+
+notable:
+- support for `--ask-pass`: interactive password input
+- fixed `PRIMARY KEY`/`UNIQUE KEY` check
+
+[![downloads](https://img.shields.io/github/downloads/github/gh-ost/v1.0.32/total.svg)](https://github.com/github/gh-ost/releases/tag/v1.0.32)",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/4915721/assets,https://api.github.com/repos/github/gh-ost/releases/4915721,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.32,https://github.com/github/gh-ost/releases/tag/v1.0.32,https://api.github.com/repos/github/gh-ost/zipball/v1.0.32,v1.0.32,False,False
+4843535,2016-12-06T12:12:23Z,2016-12-06T12:21:06Z,GA release v1.0.30,"Many additions since `1.0.28`. The ultimate breakdown is https://github.com/github/gh-ost/compare/v1.0.28...v1.0.30
+
+Notable:
+- Fixed cut-over stall: when cut-over happened to start executing even as lag or otherwise a throttling condition also emerged, a race condition would make the cut-over stall until throttling reason went away. The fix is that cut-over _does not wait_, and at worst, rolls back.
+- fix to cut-over retries -- it didn't throttle properly in between and did not cleanup properly in between.
+- cut-over timeout on ""unknown"" stalls. An example to ""unknown"" was the throttling problem described above. I don't know what other unknowns there are, but cut-over is now generically resilient to them.
+- support for `--skip-foreign-key-checks` - can save inspection time, when one is _certain_ no FKs actually exist
+- Made column-rename detection heuristic more robust (it could wrongly infer a rename by some unfortunate comment or column-name)
+- Reading and reporting replication lag before waiting on initial replication event -- this adds visibility in seemingly-hanging operations where the replica is lagging in the first place
+- changelog table uses same engine as original table
+- on startup, verifying replication works all all the way up to the master.
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/4843535/assets,https://api.github.com/repos/github/gh-ost/releases/4843535,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.30,https://github.com/github/gh-ost/releases/tag/v1.0.30,https://api.github.com/repos/github/gh-ost/zipball/v1.0.30,v1.0.30,False,False
+4536009,2016-11-01T11:23:10Z,2016-11-01T11:58:27Z,GA release v1.0.28,"Many additions since `1.0.21`. The ultimate breakdown is https://github.com/github/gh-ost/compare/v1.0.21...v1.0.28
+
+Notable:
+- support for `DATETIME` subsecond resolution
+- user-commanded throttling implies complete silence, not even `heartbeat` is written
+- fixed `log_slave_updates` check on `--test-on-replica` and `--migrate-on-replica`
+- cleanly closing streamer connection (connection that imposes as a replica) upon completion
+- on `--exact-rowcount`, `--concurrent-rowcount` now defaults `true`
+- added validation to confirm table structure on master & replica is identical (yes, the counter case happened)
+- correct (though suboptimal) behavior on `enum` being part of the migration key
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/4536009/assets,https://api.github.com/repos/github/gh-ost/releases/4536009,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.28,https://github.com/github/gh-ost/releases/tag/v1.0.28,https://api.github.com/repos/github/gh-ost/zipball/v1.0.28,v1.0.28,False,False
+4379193,2016-10-12T06:16:50Z,2016-10-13T12:44:41Z,GA release v1.0.21,"Many additions since `1.0.20`. The ultimate breakdown is https://github.com/github/gh-ost/compare/v1.0.20...v1.0.21
+
+Notable:
+-  [support for --critical-load-interval-millis](https://github.com/github/gh-ost/pull/266) -- a 2nd threshold sample to allows for graceful recovery from sudden and immediate spike.
+- [better](https://github.com/github/gh-ost/pull/236) support for [non-utf](https://github.com/github/gh-ost/pull/227) charsets; help [requested](https://github.com/github/gh-ost/issues/228). 
+- support for [dropping foreign keys](https://github.com/github/gh-ost/pull/264). Watch out! This will _drop your foreign keys_. That's what it does.
+- Better support for tungsten. [Read the story](https://github.com/github/gh-ost/issues/258)
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/4379193/assets,https://api.github.com/repos/github/gh-ost/releases/4379193,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.21,https://github.com/github/gh-ost/releases/tag/v1.0.21,https://api.github.com/repos/github/gh-ost/zipball/v1.0.21,v1.0.21,False,False
+4119278,2016-09-13T15:23:00Z,2016-09-13T15:27:30Z,GA release v1.0.20,"Notable:
+- Support for `latin1` (but for other character sets, please see https://github.com/github/gh-ost/issues/228). `utf8` and `utf8md4` supported out of the box.
+- named cut-over: a configurable protection mechanism to require table name when commanding `postpone` on interactive commands. `--force-named-cut-over` is introduced.
+
+Other minor enhancements.
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/4119278/assets,https://api.github.com/repos/github/gh-ost/releases/4119278,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.20,https://github.com/github/gh-ost/releases/tag/v1.0.20,https://api.github.com/repos/github/gh-ost/zipball/v1.0.20,v1.0.20,False,False
+4077560,2016-09-07T12:24:11Z,2016-09-08T07:08:13Z,experimental release,"## EXPERIMENTAL RELEASE
+
+This includes https://github.com/github/gh-ost/pull/227, solving https://github.com/github/gh-ost/issues/226: non-UTF8 characters sets.
+
+This particular release only addresses `latin1`, and if all goes well we can expand to all character sets.
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/4077560/assets,https://api.github.com/repos/github/gh-ost/releases/4077560,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.18-experimental,https://github.com/github/gh-ost/releases/tag/v1.0.18-experimental,https://api.github.com/repos/github/gh-ost/zipball/v1.0.18-experimental,v1.0.18-experimental,False,True
+4050831,2016-09-05T07:58:35Z,2016-09-05T08:50:08Z,GA release v1.0.17,"Notable:
+- Support [hooks](https://github.com/github/gh-ost/blob/master/doc/hooks.md): external processes invoked by `gh-ost` at specific points in execution
+- [Sub-second lag resolution](https://github.com/github/gh-ost/blob/master/doc/subsecond-lag.md): if you require your replicas to lag within subsecond threshold, this is now supported
+- RDS: this release should work with RDS, see [discussion](https://github.com/github/gh-ost/issues/163) -- we will formalize documentation once behavior is tested more
+- Tungsten: supply `--tungsten --assume-master-host=the.master.com`
+- master-master improved support: explictly specify the master via `--allow-master-master --assume-master-host=the.master.com`. See [cheatsheet](https://github.com/github/gh-ost/blob/master/doc/cheatsheet.md)
+- Improved status report (`ETA` shows estimate even while throttling)
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/4050831/assets,https://api.github.com/repos/github/gh-ost/releases/4050831,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.17,https://github.com/github/gh-ost/releases/tag/v1.0.17,https://api.github.com/repos/github/gh-ost/zipball/v1.0.17,v1.0.17,False,False
+3979708,2016-08-26T06:30:00Z,2016-08-26T06:38:03Z,GA release v1.0.14,"Notable:
+- `--concurrent-rowcount` (https://github.com/github/gh-ost/issues/194): with `--exact-rowcount`, issue the `count(*)` concurrently even as row copy takes place (row count gets updated throughout the migration)
+- Using `STRICT_ALL_TABLES` for all operations, as safety net ()
+- Fixed support for `5.5` (https://github.com/github/gh-ost/issues/184)
+- Relaxed config file parser (https://github.com/github/gh-ost/issues/198)
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3979708/assets,https://api.github.com/repos/github/gh-ost/releases/3979708,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.14,https://github.com/github/gh-ost/releases/tag/v1.0.14,https://api.github.com/repos/github/gh-ost/zipball/v1.0.14,v1.0.14,False,False
+3958926,2016-08-24T07:12:21Z,2016-08-24T07:32:28Z,GA release v1.0.13,"Notable:
+- Last fixes to time-size related issue (`gh-ost` is now fully `UTC`)
+- Fixed column `rename` DML apply failure
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3958926/assets,https://api.github.com/repos/github/gh-ost/releases/3958926,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.13,https://github.com/github/gh-ost/releases/tag/v1.0.13,https://api.github.com/repos/github/gh-ost/zipball/v1.0.13,v1.0.13,False,False
+3939029,2016-08-22T06:01:50Z,2016-08-22T09:53:41Z,GA release v1.0.11,"Notable:
+- Fix to timezone issue https://github.com/github/gh-ost/issues/161
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3939029/assets,https://api.github.com/repos/github/gh-ost/releases/3939029,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.11,https://github.com/github/gh-ost/releases/tag/v1.0.11,https://api.github.com/repos/github/gh-ost/zipball/v1.0.11,v1.0.11,False,True
+3914482,2016-08-18T08:11:35Z,2016-08-18T08:15:33Z,GA release v1.0.10,"Notable:
+- Fixed integrity issue https://github.com/github/gh-ost/issues/157 (unsigned int values)
+- Remove `SUPER` requirement when running with RBR: https://github.com/github/gh-ost/pull/156, introducing `--assume-rbr`
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3914482/assets,https://api.github.com/repos/github/gh-ost/releases/3914482,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.10,https://github.com/github/gh-ost/releases/tag/v1.0.10,https://api.github.com/repos/github/gh-ost/zipball/v1.0.10,v1.0.10,False,False
+3886698,2016-08-15T08:53:36Z,2016-08-15T08:59:59Z,GA release v1.0.9,"Various PR merges and fixes:
+- relaxed check for `log_slave_updates` (closes #135)
+- bailing out when triggers exist (closes #141), but also note #153 
+- cleanup socket file
+- ipv6 support in MySQL connection
+- More user friendly error reporting for privileges 
+  and more.
+
+Thank you kindly to all contributors!
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3886698/assets,https://api.github.com/repos/github/gh-ost/releases/3886698,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.9,https://github.com/github/gh-ost/releases/tag/v1.0.9,https://api.github.com/repos/github/gh-ost/zipball/v1.0.9,v1.0.9,False,False
+3782077,2016-08-01T08:37:31Z,2016-08-01T08:39:47Z,GA release v1.0.8,"Generally available
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3782077/assets,https://api.github.com/repos/github/gh-ost/releases/3782077,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.8,https://github.com/github/gh-ost/releases/tag/v1.0.8,https://api.github.com/repos/github/gh-ost/zipball/v1.0.8,v1.0.8,False,False
+3755139,2016-07-27T08:57:59Z,2016-07-27T21:11:00Z,GA release v1.0.6,"Generally available
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3755139/assets,https://api.github.com/repos/github/gh-ost/releases/3755139,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.6,https://github.com/github/gh-ost/releases/tag/v1.0.6,https://api.github.com/repos/github/gh-ost/zipball/v1.0.6,v1.0.6,False,False
+3695326,2016-07-19T23:00:46Z,2016-07-19T23:06:58Z,GA release v1.0.2,,https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3695326/assets,https://api.github.com/repos/github/gh-ost/releases/3695326,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.2,https://github.com/github/gh-ost/releases/tag/v1.0.2,https://api.github.com/repos/github/gh-ost/zipball/v1.0.2,v1.0.2,False,False
+3636109,2016-07-08T08:16:40Z,2016-07-12T08:34:06Z,GA release v1.0.1,"This is the first GA release of `gh-ost`, now that it's being used in production.
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3636109/assets,https://api.github.com/repos/github/gh-ost/releases/3636109,master,https://api.github.com/repos/github/gh-ost/tarball/v1.0.1,https://github.com/github/gh-ost/releases/tag/v1.0.1,https://api.github.com/repos/github/gh-ost/zipball/v1.0.1,v1.0.1,False,False
+3581648,2016-07-04T12:30:14Z,2016-07-04T12:31:55Z,"v0.9.9, pre-production","Pre-production, use at your own risk
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3581648/assets,https://api.github.com/repos/github/gh-ost/releases/3581648,master,https://api.github.com/repos/github/gh-ost/tarball/v0.9.9,https://github.com/github/gh-ost/releases/tag/v0.9.9,https://api.github.com/repos/github/gh-ost/zipball/v0.9.9,v0.9.9,False,True
+3547943,2016-06-28T11:01:05Z,2016-06-29T09:50:43Z,"v0.9.8, pre-production","Pre-production, use at your own risk
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3547943/assets,https://api.github.com/repos/github/gh-ost/releases/3547943,master,https://api.github.com/repos/github/gh-ost/tarball/v0.9.8,https://github.com/github/gh-ost/releases/tag/v0.9.8,https://api.github.com/repos/github/gh-ost/zipball/v0.9.8,v0.9.8,False,True
+3488640,2016-06-21T10:56:53Z,2016-06-21T12:03:44Z,"v0.9.7, pre-production","Pre-release, use at your own risk
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3488640/assets,https://api.github.com/repos/github/gh-ost/releases/3488640,master,https://api.github.com/repos/github/gh-ost/tarball/v0.9.7,https://github.com/github/gh-ost/releases/tag/v0.9.7,https://api.github.com/repos/github/gh-ost/zipball/v0.9.7,v0.9.7,False,True
+3479813,2016-06-20T10:10:03Z,2016-06-20T10:12:08Z,"v0.9.6, pre-production","Pre production. Use at your own risk.
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3479813/assets,https://api.github.com/repos/github/gh-ost/releases/3479813,master,https://api.github.com/repos/github/gh-ost/tarball/v0.9.6,https://github.com/github/gh-ost/releases/tag/v0.9.6,https://api.github.com/repos/github/gh-ost/zipball/v0.9.6,v0.9.6,False,True
+3449473,2016-06-15T10:32:32Z,2016-06-15T13:06:09Z,"v0.9.2, pre-production","Pre production. Use at your own risk.
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3449473/assets,https://api.github.com/repos/github/gh-ost/releases/3449473,master,https://api.github.com/repos/github/gh-ost/tarball/v0.9.2,https://github.com/github/gh-ost/releases/tag/v0.9.2,https://api.github.com/repos/github/gh-ost/zipball/v0.9.2,v0.9.2,False,True
+3407187,2016-06-09T09:25:54Z,2016-06-09T09:41:44Z,"v0.8.8, pre-production","Pre-production! Use at your own risk.
+
+Insofar, only tested on production servers via `--test-on-replica`
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3407187/assets,https://api.github.com/repos/github/gh-ost/releases/3407187,master,https://api.github.com/repos/github/gh-ost/tarball/v0.8.8,https://github.com/github/gh-ost/releases/tag/v0.8.8,https://api.github.com/repos/github/gh-ost/zipball/v0.8.8,v0.8.8,False,True
+3389889,2016-06-07T12:26:15Z,2016-06-07T12:29:18Z,"v0.8.7, pre-production","Pre-production! Use at your own risk.
+
+Insofar, only tested on production servers via `--test-on-replica`
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3389889/assets,https://api.github.com/repos/github/gh-ost/releases/3389889,master,https://api.github.com/repos/github/gh-ost/tarball/v0.8.7,https://github.com/github/gh-ost/releases/tag/v0.8.7,https://api.github.com/repos/github/gh-ost/zipball/v0.8.7,v0.8.7,False,True
+3380392,2016-06-06T11:01:47Z,2016-06-06T11:05:56Z,"v0.8.3, pre-production","Pre-production! Use at your own risk.
+
+Insofar, only tested on production servers via `--test-on-replica`
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3380392/assets,https://api.github.com/repos/github/gh-ost/releases/3380392,master,https://api.github.com/repos/github/gh-ost/tarball/v0.8.3,https://github.com/github/gh-ost/releases/tag/v0.8.3,https://api.github.com/repos/github/gh-ost/zipball/v0.8.3,v0.8.3,False,True
+3347324,2016-06-01T08:41:52Z,2016-06-01T08:47:49Z,"v0.8.2, pre-production","Pre-production! Use at your own risk.
+
+Insofar, only tested on production servers via `--test-on-replica`
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3347324/assets,https://api.github.com/repos/github/gh-ost/releases/3347324,master,https://api.github.com/repos/github/gh-ost/tarball/v0.8.2,https://github.com/github/gh-ost/releases/tag/v0.8.2,https://api.github.com/repos/github/gh-ost/zipball/v0.8.2,v0.8.2,False,True
+3269443,2016-05-20T10:53:34Z,2016-05-20T10:55:55Z,"v0.7.16, pre-production","Pre-production! Use at your own risk.
+
+Insofar, only tested on production servers via `--test-on-replica`
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3269443/assets,https://api.github.com/repos/github/gh-ost/releases/3269443,master,https://api.github.com/repos/github/gh-ost/tarball/v0.7.16,https://github.com/github/gh-ost/releases/tag/v0.7.16,https://api.github.com/repos/github/gh-ost/zipball/v0.7.16,v0.7.16,False,True
+3241580,2016-05-17T12:42:12Z,2016-05-17T12:51:27Z,"v0.7.2, pre-production","Pre-production! Use at your own risk.
+
+Insofar, only tested on production servers via `--test-on-replica`
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3241580/assets,https://api.github.com/repos/github/gh-ost/releases/3241580,master,https://api.github.com/repos/github/gh-ost/tarball/v0.7.2,https://github.com/github/gh-ost/releases/tag/v0.7.2,https://api.github.com/repos/github/gh-ost/zipball/v0.7.2,v0.7.2,False,True
+3232063,2016-05-16T09:11:55Z,2016-05-16T09:14:39Z,"v0.7.1, pre-production","Pre-production! Use at your own risk.
+
+Insofar, only tested on production servers via `--test-on-replica`
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3232063/assets,https://api.github.com/repos/github/gh-ost/releases/3232063,master,https://api.github.com/repos/github/gh-ost/tarball/v0.7.1,https://github.com/github/gh-ost/releases/tag/v0.7.1,https://api.github.com/repos/github/gh-ost/zipball/v0.7.1,v0.7.1,False,True
+3163122,2016-05-05T06:19:11Z,2016-05-05T08:12:03Z,"v0.7, pre-production","Pre-production! Use at your own risk.
+
+Insofar, only tested on production servers via `--test-on-replica`
+",https://api.github.com/users/shlomi-noach,2607934,shlomi-noach,https://api.github.com/repos/github/gh-ost/releases/3163122/assets,https://api.github.com/repos/github/gh-ost/releases/3163122,master,https://api.github.com/repos/github/gh-ost/tarball/v0.7,https://github.com/github/gh-ost/releases/tag/v0.7,https://api.github.com/repos/github/gh-ost/zipball/v0.7,v0.7,False,True

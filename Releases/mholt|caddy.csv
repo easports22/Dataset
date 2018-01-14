@@ -1,0 +1,693 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8041891,2017-10-09T04:47:07Z,2017-10-09T04:57:54Z,0.10.10,"With this release, we also launch our updated pricing structure. [Read the blog post for details!](https://caddyserver.com/blog/caddy-0_10_10-and-pricing)
+
+Caddy 0.10.10 removes the Caddy-Sponsors header for all builds as well as featuring a number of incremental improvements and bug fixes. This version has one notable, possibly-breaking change, but it is for security reasons.
+
+The new default of the `CASE_SENSITIVE_PATH` environment variable (if not set) is now `false`, meaning that matching a base path (using `Path.Matches()`) to a directive will be a case-insensitive comparison by default. This helps avoid common misconfigurations with security-related directives like `basicauth` (and similar auth-related third-party plugins) which protect resources by a base path. As far as static files go, this mainly affects Windows and macOS that have case-insensitive file systems. (Thanks to @magikstm for bringing this common misconfiguration caused by non-obvious documentation to our attention.)
+
+Another notable change is that `startup` and `shutdown` have been deprecated in favor of `on`. You should use `on` soon as we will eventually remove `startup` and `shutdown` directives.
+
+All changes:
+
+- Built with Go 1.9.1
+- Removed Caddy-Sponsors header
+- New 'on' directive that deprecates 'startup' and 'shutdown'
+- Changed CASE_SENSITIVE_PATH default to false
+- fastcgi: Support for SRV upstreams
+- redir: Rules with if statements are not checked for duplicates
+- Several minor bug fixes
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/8041891/assets,https://api.github.com/repos/mholt/caddy/releases/8041891,master,https://api.github.com/repos/mholt/caddy/tarball/v0.10.10,https://github.com/mholt/caddy/releases/tag/v0.10.10,https://api.github.com/repos/mholt/caddy/zipball/v0.10.10,v0.10.10,False,False
+7726675,2017-09-12T17:24:55Z,2017-09-12T17:25:10Z,0.10.9,"This release introduces our new EULA for binaries distributed through our website, as well as the Caddy-Sponsors header as a thank you to our sponsors for keeping Caddy free for personal use. We're very happy to have them on board, and invite others to [sponsor the project](https://caddyserver.com/sponsor) to give the gift of privacy to site owners and Web users everywhere.
+
+In this version we've also fixed a bug related to certificate renewals, where the renewed certificate wouldn't be loaded and used. The bug was introduced in v0.10.6, so **everyone using v0.10.6, v0.10.7, or v0.10.8 should upgrade.** This version also includes a fix for using `templates` + `proxy` together so that templates now sends the right status code in the response.
+
+One new feature: Caddy can now act as a QUIC reverse proxy by using `quic://` to specify a backend! This is experimental, but where you'd like, feel free to give it a try.
+
+- EULA bundled with official binaries
+- Caddy-Sponsors header to indicate personal-use license
+- proxy: Support for QUIC backends
+- templates: Write proper status code if proxied
+- tls: Fix bug related to cert renewals",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/7726675/assets,https://api.github.com/repos/mholt/caddy/releases/7726675,master,https://api.github.com/repos/mholt/caddy/tarball/v0.10.9,https://github.com/mholt/caddy/releases/tag/v0.10.9,https://api.github.com/repos/mholt/caddy/zipball/v0.10.9,v0.10.9,False,False
+7688488,2017-09-08T17:21:14Z,2017-09-08T17:21:26Z,0.10.8,"This is mainly a security release, with a couple other bug fixes (see commit history for details on those).
+
+This release fixes issue #1859. Previously, Caddy would not compress/merge multiple consecutive forward slashes in the URL for comparisons, causing certain comparisons to fail falsely not because of technical correctness, but rather semantic correctness (i.e. it depends on what is using the path, but most often, file systems will annoyingly collapse multiple slashes). Now, Caddy's path matching behaves similar to NGINX's `location` block if [`merge_slashes`](http://nginx.org/en/docs/http/ngx_http_core_module.html#merge_slashes) is enabled. Caddy now merges slashes by default when comparing paths using Go's [`path.Clean()`](https://golang.org/pkg/path/#Clean), which also evaluates `..` in paths to ensure equivalence on a _semantic_ level.
+
+We recommend installing this update right away if you use middleware (including plugins) that rely on matching paths to protect resources. All the relevant, standard (built-in) directives should be remedied with this (including basicauth), but third-party plugins that do not use [`Path.Matches()`](https://godoc.org/github.com/mholt/caddy/caddyhttp/httpserver#Path.Matches) will have to ensure that they are properly sanitizing the path before doing a comparison.
+
+You can use [getcaddy.com](https://getcaddy.com) to automate updates, then send SIGUSR2 to gracefully upgrade the binary with no downtime.",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/7688488/assets,https://api.github.com/repos/mholt/caddy/releases/7688488,master,https://api.github.com/repos/mholt/caddy/tarball/v0.10.8,https://github.com/mholt/caddy/releases/tag/v0.10.8,https://api.github.com/repos/mholt/caddy/zipball/v0.10.8,v0.10.8,False,False
+7529907,2017-08-25T23:51:59Z,2017-08-25T23:52:11Z,0.10.7,"This release introduces 3 new HTTP plugins: awses, jekyll, and forwardproxy, and supports SIGUSR2 for graceful binary upgrades. Read [the release blog post](https://caddyserver.com/blog/caddy-0_10_7-released) for more information.
+
+A huge thanks to our sponsors for making continued development possible, and for keeping this release of Caddy free for everyone to use: [Minio](https://minio.io/), [Uptime Robot](https://uptimerobot.com/), and [Sourcegraph](https://about.sourcegraph.com/)!
+
+Change list:
+
+- Built with Go 1.9
+- New 3rd-party plugin HTTP directives: jekyll, awses, forwardproxy
+- Different exit codes
+- Plan 9 support
+- Graceful binary upgrades with SIGUSR2
+- internal: Support X-Accel-Redir without paths to protect
+- templates: Can execute templates loaded by other middleware
+- A few really good bug fixes
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/7529907/assets,https://api.github.com/repos/mholt/caddy/releases/7529907,master,https://api.github.com/repos/mholt/caddy/tarball/v0.10.7,https://github.com/mholt/caddy/releases/tag/v0.10.7,https://api.github.com/repos/mholt/caddy/zipball/v0.10.7,v0.10.7,False,False
+7211195,2017-07-28T18:23:03Z,2017-07-28T18:23:16Z,0.10.6,"This is a hotfix for [0.10.5](https://github.com/mholt/caddy/releases/tag/v0.10.5)'s `fastcgi` directive which [invokes a runtime error](https://github.com/mholt/caddy/issues/1788) on 32-bit and ARM architectures, due to a known, documented bug in Go. We don't run tests on 32-bit or ARM (yet) which would have been the only way to catch this error in an automated fashion. Sorry about that. Enjoy this release! It's the best one yet.",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/7211195/assets,https://api.github.com/repos/mholt/caddy/releases/7211195,master,https://api.github.com/repos/mholt/caddy/tarball/v0.10.6,https://github.com/mholt/caddy/releases/tag/v0.10.6,https://api.github.com/repos/mholt/caddy/zipball/v0.10.6,v0.10.6,False,False
+7199480,2017-07-27T22:24:33Z,2017-07-27T22:24:44Z,0.10.5,"It's been kind of a crummy week for a lot of people, but here's some good news: Caddy 0.10.5 is out! This release fixes subtle issues that were present in proxying WebSockets or FastCGI connections. We've also improved MITM detection for iOS clients. There is a new header-based load balancing policy. On top of these changes, of note are these:
+
+- The `requestid` directive has been renamed to `request_id` to be more consistent with other directives and subdirectives.
+
+- There is a new default timeout in town: the `idle` timeout now has a default value of 5 minutes. Unlike the previous default timeouts, we don't expect this will negatively impact anyone. There is generally no good use for idle connections, and if you have a good use for them, you can disable this timeout in your Caddyfile. (We've tested this timeout on several kinds of sites for months and have had zero problems, only improvements in memory and FD usage.)
+
+- **This release is compatible with three new 3rd-party plugins!** The [`http.cache` plugin](https://caddyserver.com/docs/http.cache) acts as a caching layer of middleware, which can drastically improve performance of serving your site. [`http.nobots`](https://caddyserver.com/docs/http.nobots) attempts to dissuade bots from accessing your site. [`http.webdav`](https://caddyserver.com/docs/http.webdav) was extracted from the filemanager plugin and enables webdav serving.
+
+**As usual, a HUGE thanks to contributors who made this possible!** Most of these changes were implemented by contributors to the project, while the maintainers have been busy working on improved proxy middleware and other things (that hopefully we can reveal soon). Our community is fantastic, and we and all Caddy users appreciate you. Thank you!
+
+Full change log:
+
+- Renamed requestid directive to request_id
+- Set default idle timeout of 5 minutes
+- New 3rd-party plugin directives: cache, nobots, webdav
+- New Unix timestamp placeholder {when_unix}
+- Improved MITM detection on iOS clients
+- errors, log: Fix log rolling parsing
+- gzip: Convert any ETag header to weak etag
+- fastcgi: Reverted persistent connections (issue #1736)
+- proxy: Added header loaded balancing policy
+- proxy: Fix hang on chunked WebSockets (e.g. with HomeAssistant)
+- Several other bug fixes and minor internal improvements",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/7199480/assets,https://api.github.com/repos/mholt/caddy/releases/7199480,master,https://api.github.com/repos/mholt/caddy/tarball/v0.10.5,https://github.com/mholt/caddy/releases/tag/v0.10.5,https://api.github.com/repos/mholt/caddy/zipball/v0.10.5,v0.10.5,False,False
+6871488,2017-06-28T22:40:34Z,2017-06-28T22:40:45Z,0.10.4,"This release is our first with vendored dependencies. Together with an updated build command, these builds should be fully reproducible, byte-for-byte (without plugins).
+
+A huge thank-you to our sponsors for making this possible! We hope you enjoy this release!
+
+Change list:
+
+- Vendor all dependencies
+- Improve MITM detection, add experimental Tor browser support
+- New request_id directive to add request IDs to each request
+- New HTTP plugins supported: authz, grpc, gopkg, reauth, restic
+- browse: Refreshed default UI and added symlink indicators
+- errors, log: Added rotate_compress directive to compress rolled logs
+- markdown: Template files loaded at each request instead of just once
+- proxy: Allow multiple Server header fields on downstream response
+- proxy: Perform health checks by body substring
+- rewrite,redir: Added 'not_starts_with' and 'not_ends_with' operators
+- tls: New ca subdirective to specify CA endpoint per-site
+- Several bug fixes",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/6871488/assets,https://api.github.com/repos/mholt/caddy/releases/6871488,master,https://api.github.com/repos/mholt/caddy/tarball/v0.10.4,https://github.com/mholt/caddy/releases/tag/v0.10.4,https://api.github.com/repos/mholt/caddy/zipball/v0.10.4,v0.10.4,False,False
+6443657,2017-05-19T14:42:21Z,2017-05-19T14:42:31Z,0.10.3,"Caddy 0.10.3 includes support for new plugins (`datadog` and `login`) as well as a few minor fixes or changes, with one notable change: the `maxrequestbody` directive has been changed to the [`limits`](https://caddyserver.com/docs/limits) directive. You will need to change that in your Caddyfile.
+
+Full change list:
+
+- Replace 'maxrequestbody' directive with 'limits' directive
+- proxy: Configurable port for health check
+- proxy: New load balance policy: uri_hash
+- templates: Renamed .Push context action to .AddLink
+- tls: Allow narrower certificate renewal window at startup (#1680)
+- tls: Prefer ChaCha20 if hardware does not have AES-NI
+- A few other bug fixes",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/6443657/assets,https://api.github.com/repos/mholt/caddy/releases/6443657,master,https://api.github.com/repos/mholt/caddy/tarball/v0.10.3,https://github.com/mholt/caddy/releases/tag/v0.10.3,https://api.github.com/repos/mholt/caddy/zipball/v0.10.3,v0.10.3,False,False
+6259093,2017-05-02T23:09:56Z,2017-05-02T23:10:11Z,0.10.2,"This is a hot fix release for the `rewrite` directive. If you are already using 0.10.1 and do not use `rewrite` at all, you probably don't need to upgrade. But as usual, we encourage all users to stay up to date!
+
+Changes:
+
+- Hot fix for rule paths of ""/"" so that they match every request
+- fastcgi: Match request paths that don't start with ""/"" even if rule does
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/6259093/assets,https://api.github.com/repos/mholt/caddy/releases/6259093,master,https://api.github.com/repos/mholt/caddy/tarball/v0.10.2,https://github.com/mholt/caddy/releases/tag/v0.10.2,https://api.github.com/repos/mholt/caddy/zipball/v0.10.2,v0.10.2,False,False
+6247632,2017-05-02T06:46:56Z,2017-05-02T06:47:10Z,0.10.1,"Bug fix release. We've reduced memory usage in some areas and changed how internal rewrites work a bit. If you notice any new quirks about `rewrite` or similar, please open an issue with clear instructions to repeat the bug. Thanks!
+
+- Reduced memory usage for gzip, templates, and MITM detection
+- Fixed automatic HTTP->HTTPS redirects for sites with wildcard labels
+- proxy: Fix 'without' subdirective
+- A few other minor bug fixes and improvements",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/6247632/assets,https://api.github.com/repos/mholt/caddy/releases/6247632,master,https://api.github.com/repos/mholt/caddy/tarball/v0.10.1,https://github.com/mholt/caddy/releases/tag/v0.10.1,https://api.github.com/repos/mholt/caddy/zipball/v0.10.1,v0.10.1,False,False
+6139320,2017-04-20T17:50:09Z,2017-04-20T17:50:22Z,0.10,"We're very excited to bring you Caddy 0.10! There are a bunch of changes in this release. Many of them small enhancements or bug fixes, but we also have some significant new features: HTTP/2 server push, new plugin types, updates to the TLS stack and directive, etc. [Read the blog post.](https://caddyserver.com/blog/caddy-0_10-released)
+
+**Default timeouts have been _disabled_ in this release.** You won't need `timeouts none` any more in your Caddyfile. Take note, too, that a few directives have changed syntax slightly. You can use `caddy -validate` to check your syntax before reloading Caddy.
+
+_Note: This is the first release produced by our automated deployment system. Some release assets failed to upload due to network errors. We've fixed this by putting the upload logic into a loop to try again if it fails._
+
+Full change list:
+
+- Built on Go 1.8.1
+- HTTPS interception detection
+- Updated QUIC
+- SIGUSR1 (reload) now works with QUIC servers
+- New 'push' directive for HTTP/2 server push
+- New 'index' directive to change the names of index files
+- New -http-port and -https-port flags to change protocol ports
+- New -disable-http-challenge and -disable-tls-sni-challenge flags
+- New event hook plugin type
+- New listener middleware plugin type
+- New placeholders for cookie, query, and rewritten URI values
+- basicauth: Ability to customize realm
+- browse: Default template now sorts by name with directories first
+- errors, log: Roll all logs by default
+- errors, log: Ability to write to remote syslog
+- errors, log: Standardized, simplified directive syntax
+- log: Patched common log format by adding missing ""-""
+- proxy: New 'max_conns' setting to limit connections to upstreams
+- proxy: New 'first' load balancing policy for first available host
+- proxy: Health checks respect Host and insecure_skip_verify settings
+- templates: New .RandomString action to add random padding to page
+- timeouts: Disabled default HTTP timeouts
+- tls: Settings now apply per-site rather than for entire listener
+- tls: New 'alpn' setting to disable either HTTP/2 or HTTP/1.1 on per-site basis
+- tls: Added curve X25519
+- tls: Added ChaCha20-Poly1305 cipher suites
+- tls: Renamed muststaple to must_staple
+- tls: Setting max_certs obtains certs during handshakes for all hostnames
+- Dozens of miscellaneous bug fixes and improvements
+- New website
+- New build infrastructure
+- New deployment system",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/6139320/assets,https://api.github.com/repos/mholt/caddy/releases/6139320,master,https://api.github.com/repos/mholt/caddy/tarball/v0.10.0,https://github.com/mholt/caddy/releases/tag/v0.10.0,https://api.github.com/repos/mholt/caddy/zipball/v0.10.0,v0.10.0,False,False
+5247089,2017-01-24T15:29:13Z,2017-01-24T15:34:21Z,0.9.5,"Caddy 0.9.5 contains several critical fixes and we recommend applying the update right away. **Please read these notes first, though!**
+
+Thank you to the collaborators and contributors for all your hard work (especially @tw4452852 and @lhecker - among many others, see the commit history) while I've been busy working on the new website and build infrastructure!
+
+## [HTTP Timeouts](https://blog.cloudflare.com/exposing-go-on-the-internet/) Enabled by Default
+
+Caddy aims to be secure right out of the box. In order to prevent faulty or malicious clients from seeping resources away with [slowloris](https://blog.qualys.com/tag/slow-http-attack) behavior, Caddy now enables timeouts by default. In general, this will not affect most users. However, you may need to [raise or disable these timeouts](https://caddyserver.com/docs/timeouts) depending on your legitimate visitors' needs and your server's configuration. If your visitors have legitimately slow networks or you need to hold requests for a long time (e.g. long polling or proxying long requests to a trusted backend), consider raising these timeouts.
+
+Default timeout values:
+- **read:** 10s (time spent reading request headers and body)
+- **header:** 10s (time spent reading just headers; not used until Go 1.8 is released)
+- **write:** 20s (starts at reading request body, ends when finished writing response body)
+- **idle:** 2m (time to hold connection between requests; not used until Go 1.8 is released)
+
+As you can see, a couple of the timeout values will begin functioning when Caddy is built on Go 1.8, expected within about a month. Go ahead and set them now; they will just start working when supported. See the timeouts [pull request](https://github.com/mholt/caddy/pull/1368) and [docs](https://caddyserver.com/docs/timeouts).
+
+## Critical Uptime/Connectivity Fix
+
+This is a little embarrassing, but if conditions were just right, Caddy would initiate a certificate renewal using the TLS-SNI-01 challenge, which would cause a deadlock. Subsequent TLS handshakes would block forever until the server stopped responding to requests. It took months to find and fix this because it only happened when very specific conditions are met: certificate needs renewal (once every 60 days), TLS-SNI-01 challenge is chosen (by roll of dice), renewal is trigged from background maintenance goroutine (not on-demand or during startup), and Let's Encrypt did not have a cached authz for that domain. [Now it's fixed.](https://github.com/mholt/caddy/commit/0e34c7c97025e1d3570de291b603aed334377dd5)
+
+A _huge_ thanks to Bradley Falzon (@bradleyfalzon), Miek Gieben (@miekg), and  Sebestian Erhart (@xenolf) for spending considerable time to help me debug this. It wasn't possible without their hours of help.
+
+## Proxy performance improvements
+
+We continue to iterate on Caddy's `proxy` functionality. Caddy was never designed to be a reverse proxy except as a very simple one, just to say that it can do it. But it turns out that `proxy` is one of the most popular directives. So with this release, [we've improved](https://github.com/mholt/caddy/pull/1314) on a recent regression that buffered request bodies. Proxy configurations with a single upstream or with try_duration unset (0) will be much faster and use less memory. We're still improving upon failure conditions and retry behavior; we had a rich discussion in #1314 about it. You should also see better HTTPS+websockets support.
+
+Also, the deprecated `proxy_header` subdirective is no longer accepted; use `header_upstream` instead.
+
+## Minor security fixes in browse
+
+The `browse` middleware was improved a bit. First, a filter textbox was added to instantly filter the listings by file name. We also now sanitize the file names and links in case, for some reason, you are not already doing that with untrusted files. I want to thank Kevin Froman (@beardog108) for the responsible reporting of this as a precaution. I also went ahead and made sure the browse directive will hide the active Caddyfile if it is within your site's root, no matter the current working directory.
+
+## Other things
+
+There's a new `-validate` flag to load and parse your Caddyfile, then terminate. It will tell you if the Caddyfile is syntactically valid or not. There's also new placeholders: `{when_iso}` gives you the UTC timestamp in ISO 8601 format, and `{rewrite_path}` gives you the URI path after a rewrite (`{path}` gives the path as it originally was on the request before any rewrites).
+
+Full change list:
+- New -validate flag to only check a Caddyfile, then exit
+- New {when_iso} placeholder for timestamp ISO 8601 in UTC
+- New {rewrite_path} and {rewrite_path_escaped} placeholders
+- New 'timeouts' directive to configure or disable HTTP timeouts
+- HTTP-level timeouts enabled by default
+- browse: Added textbox to filter listing in default template
+- browse: Sanitize file names and links in default template
+- browse: Ensure active Caddyfile is hidden regardless of cwd
+- fastcgi: New 'root' property, mainly for use with containers
+- markdown: Apply some front matter fields as <meta> tags
+- proxy: Fixed HTTP/2 upstream to backend; honors -http CLI flag
+- proxy: Fixed websockets over HTTPS
+- proxy: Reduced memory usage and improved performance
+- proxy: Added support for HTTP trailers
+- tls: Fixed deadlock that affected some background renewals
+- Several other smaller bugs squashed and improvements made
+
+Thanks for continuing to use Caddy!
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/5247089/assets,https://api.github.com/repos/mholt/caddy/releases/5247089,master,https://api.github.com/repos/mholt/caddy/tarball/v0.9.5,https://github.com/mholt/caddy/releases/tag/v0.9.5,https://api.github.com/repos/mholt/caddy/zipball/v0.9.5,v0.9.5,False,False
+4984462,2016-12-21T20:49:11Z,2016-12-21T21:28:28Z,0.9.4,"Just in time for Christmas, the long-awaited patches in 0.9.4 are finally here! This release spans 83 commits, mostly of minor changes and improvements, but also some nice bug fixes and a few new features.
+
+See [the blog post](https://caddyserver.com/blog/caddy-0_9_4-released) for more information and highlights.
+
+Full change list:
+- Updated QUIC
+- New maxrequestbody directive to limit size of request body
+- New {latency_ms} placeholder for latency always in ms
+- Serve statically compressed .gz and .br files
+- fastcgi: Support for multiple backends with basic load balancing
+- fastcgi: Customize connect, read, and send timeouts.
+- proxy: Fixed handling of encoded 'without' paths
+- proxy: Preserve trailing slash if present in request
+- proxy: Fix HTTP/2 upstreams
+- templates: New .Files action to list files in a directory
+- templates: .Include can now pass arguments to included file
+- tls: Added ability to customize preferred curves
+- tls: Added support for Must-Staple on managed certificates
+- tls: Fixed subtle edge case bug with TLS-SNI challenge
+- Lots of minor fixes and improvements
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/4984462/assets,https://api.github.com/repos/mholt/caddy/releases/4984462,master,https://api.github.com/repos/mholt/caddy/tarball/v0.9.4,https://github.com/mholt/caddy/releases/tag/v0.9.4,https://api.github.com/repos/mholt/caddy/zipball/v0.9.4,v0.9.4,False,False
+4255564,2016-09-28T18:43:41Z,2016-09-28T19:00:53Z,0.9.3,"This release contains bug fixes, including patches and more tests for bugs introduced in 0.9.2.
+
+If you use `proxy` for load balancing in failure scenarios, pay attention to a few changes. We've made improvements that will help debug and eliminate sporadic, long-lasting 502 errors, but changed the way the failure logic works in order to do this.
+
+Summarized change list:
+- Updated QUIC to newer version
+- import: Glob pattern matching 0 files is no longer an error
+- fastcgi: Fixed persistent connections (disabled by default)
+- fastcgi: Configurable connection pool size parameter
+- proxy: Improved failover load balancing logic
+- proxy: Avoids duplicating header fields that would be confusing
+- proxy: New try_duration and try_interval parameters
+- proxy: Fix for IP hash policy when downed hosts come back up
+- Several other bug fixes and new tests
+
+Changes specific to proxy (see PR #1135):
+- `fail_timeout` now defaults to 0. This means that requests which fail will not count against that host's availability. With a value > 0, request failure counting is enabled, and proxy will remember a failed request for this long. If the number of remembered failures accumulates to `max_fails`, the backend will be considered down (for _everyone_) until the failed requests begin to be forgotten.
+- `max_fails` defaults to 1 as before, but cannot be set to 0. If your network is flaky (almost all are), try a more reasonable value like 5. Remember, once the number of failed requests to a backend reaches this number within the window of `fail_timeout`, the host will be considered down for _all clients_ until the window shifts ahead.
+- `try_duration` is a new parameter that specifies how long proxy will check for available hosts. So if a host becomes available within this duration, the request may still succeed. The default is 0, meaning that proxy will not retry when a host initially goes down or no hosts are available. You must set this to a reasonable value > 0 (e.g. `30s`) if you want robust redundancy.
+- `try_interval` specifies how long to wait between attempts to reach an upstream host. This defaults to 250ms. The idea is to avoid spinning the CPU, so if you set this to 0 along with a non-zero fail_timeout, your CPU may spin until hosts become available again.
+
+Basically: If you want to have proper, redundant load balancing, you **must** set `fail_timeout` and `try_duration` to durations > 0.
+
+We may continue to tweak this logic in the future to get the best defaults for as many users as possible.
+
+Thank you to all who contributed for this release!
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/4255564/assets,https://api.github.com/repos/mholt/caddy/releases/4255564,master,https://api.github.com/repos/mholt/caddy/tarball/v0.9.3,https://github.com/mholt/caddy/releases/tag/v0.9.3,https://api.github.com/repos/mholt/caddy/zipball/v0.9.3,v0.9.3,False,False
+4186893,2016-09-20T22:35:27Z,2016-09-21T00:28:36Z,0.9.2,"Caddy 0.9.2 contains delicious bug fixes and improvements; the only real external change is the addition of the `-catimeout` option which can be used in some cases where network latency to the ACME CA is exceptionally high.
+
+This release is vital for Caddyfiles that use the wildcard site address syntax with on-demand TLS. For example, if you have:
+
+``` plain
+*.mysite.com
+tls {
+     max_certs 10
+}
+```
+
+Then this release is critical for you; it fixes a bug that would prevent certificate renewal. However, everyone should consider upgrading anyway to get the latest improvements!
+
+This release is built on Go 1.7.1 (which has some http/2 fixes in it as well).
+
+Known issues (already fixed on master): Site addresses in the Caddyfile that are not lowercased cause duplicate site configs.
+
+Change list:
+- New -catimeout option to customize ACME CA HTTP timeout
+- import: Fix nested import absolute/relative paths
+- log: Fix multiple log outputs
+- proxy: Fix for keepalive in certain cases
+- tls: Fix for PreferServerCipherSuites
+- Numerous other bug fixes and internal improvements
+
+Two new plugins were published as well: awslambda and multipass.
+
+(No blog post this time, because notable changes are few and I've also been really busy.)
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/4186893/assets,https://api.github.com/repos/mholt/caddy/releases/4186893,master,https://api.github.com/repos/mholt/caddy/tarball/v0.9.2,https://github.com/mholt/caddy/releases/tag/v0.9.2,https://api.github.com/repos/mholt/caddy/zipball/v0.9.2,v0.9.2,False,False
+3910688,2016-08-17T20:09:21Z,2016-08-17T20:48:33Z,0.9.1,"This patch release fixes many of the bugs introduced in 0.9 including a few other enhancements and minor features. Caddy is now built on Go 1.7. This update is recommended for all Caddy users.
+
+For more information, read [the announcement blog post](https://caddyserver.com/blog/caddy-0_9_1-released).
+
+Change log:
+- New {request_body} placeholder to log request body
+- {remote} placeholder no longer uses X-Forwarded-For header
+- {latency} placeholder rounds to nice looking number
+- Add support for ratelimit plugin
+- basicauth: Declaring realm named ""Restricted""
+- errors: Define catch-all/default error page with \* character
+- header: More control to add, set, or remove headers
+- proxy: New keepalive setting to help accommodate busy servers
+- proxy: New load balancing policy ip_hash
+- proxy: Fixed WebSocket connections
+- proxy: Fixed broken header logic
+- proxy: Reuse existing connection for Upgrade requests
+- proxy: Support for basic auth from header or upstream address
+- templates: New .Env action to access environment variables
+- tls: OCSP staples persisted to disk
+- tls: ACME challenges honor bind directive
+- tls: Fix default protocol version (minimum TLS 1.1)
+- tls: Consume challenge requests only for names Caddy is solving for
+- tls: The protocol syntax allows just one value if desired
+- tls: Scoped max_certs limit to site instead of global maximum
+- Many other bug fixes and minor enhancements
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/3910688/assets,https://api.github.com/repos/mholt/caddy/releases/3910688,master,https://api.github.com/repos/mholt/caddy/tarball/v0.9.1,https://github.com/mholt/caddy/releases/tag/v0.9.1,https://api.github.com/repos/mholt/caddy/zipball/v0.9.1,v0.9.1,False,False
+3685915,2016-07-19T03:50:55Z,2016-07-19T05:57:57Z,0.9,"After more than 6 months since 0.8, I'm very pleased to release Caddy 0.9! We've got a whole lot of improvements here, including some breaking changes, so pay attention before pushing into production. Please see [the blog post](https://caddyserver.com/blog/caddy-0_9-released) for more information.
+
+Notable changes are an entirely new core, new plugin model, ACME DNS challenge support, experimental QUIC support, in-process graceful restarts, easy self-signed certificates, and major code refactoring.
+
+Hope you like it. Stay tuned for any patch releases and please report bugs! Also, a huge thanks to all contributors who made this possible.
+
+_Note:_ Some plugins that were available for earlier versions of Caddy are not yet available with Caddy 0.9 because they have not been updated to be compatible with version 0.9. We have [a wiki page for plugin authors](https://github.com/mholt/caddy/wiki/Converting-Add-ons-to-Plugins) about how to do this. I know that's annoying; sorry for the inconvenience.
+
+Known issues: #941 is about a deadlock when calling `caddy.Stop()` and #943 is about setting TLS protocol versions. #916 relates to headers not being set properly in proxy situations. All are already fixed on master.
+
+**Full change log:**
+- New core
+- New experimental QUIC support with -quic flag (HTTPS only)
+- New -type option to specify other server types
+- Moved ~/.caddy/letsencrypt to ~/.caddy/acme and reorganized assets
+- Moved caddy package to top level folder, and pushed main to subfolder
+- New {request} placeholder to dump entire request (without body)
+- New {hostonly} placeholder for only hostname portion of host value
+- Site addresses can have paths
+- Site addresses can make some use of wildcards in domains
+- Renamed -directives flag to -plugins
+- Restarting no longer requires spawning a new process
+- Removed -restart option
+- fastcgi: Env variables now support placeholders
+- import: Import paths now relative to Caddyfile, not current working dir
+- markdown: Overhauled; removed site generation features
+- proxy: More control of headers; deprecating proxy_header subdirective
+- proxy: Specify multiple upstreams with optional port ranges
+- proxy: New preset 'transparent' to simplify common pass-thru headers
+- proxy: Chooses longest matching path; order declared is irrelevant
+- redir: Added if and if_op subdirectives to make conditional redirects
+- rewrite: Support for if_op to change how conditions are evaluated
+- tls: Generate self-signed certificates in memory
+- tls: Support for ACME DNS challenge with 10 providers
+- tls: Support for TLS-SNI challenge during restarts
+- Various bug fixes and enhancements
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/3685915/assets,https://api.github.com/repos/mholt/caddy/releases/3685915,master,https://api.github.com/repos/mholt/caddy/tarball/v0.9.0,https://github.com/mholt/caddy/releases/tag/v0.9.0,https://api.github.com/repos/mholt/caddy/zipball/v0.9.0,v0.9.0,False,False
+3101056,2016-04-26T15:28:17Z,2016-04-26T15:43:03Z,0.8.3," Caddy 0.8.3 introduces TLS session ticket key rotation and a number of bug fixes and other internal improvements. There are also two new middlewares: expvar and pprof, mostly useful for debugging purposes.
+
+All users are encouraged to upgrade as soon as possible with proper testing. Thank you to all who made this possible!
+
+Change list:
+- Built with Go 1.6.2
+- New pprof middleware for exposing process profiling endpoints
+- New expvar middleware for exposing memory/GC performance
+- New -restart option to force in-process restarts on Unix systems
+- Only fail to start if managed certificate is expired (issue #642)
+- Toggle case-sensitive path matching with environment variable
+- File server now adds ETag header for static files
+- browse: Replace .LinkedPath action with .BreadcrumbMap
+- fastcgi: New except clause to exclude paths
+- proxy: New max_conns setting to limit max connections per upstream
+- proxy: New replaceable value for name of upstream host
+- templates: New utility actions for dealing with strings
+- tls: Customize certificate key with key_type (+ECC)
+- tls: Session ticket keys are now rotated
+- Many other minor internal improvements and bug fixes
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/3101056/assets,https://api.github.com/repos/mholt/caddy/releases/3101056,master,https://api.github.com/repos/mholt/caddy/tarball/v0.8.3,https://github.com/mholt/caddy/releases/tag/v0.8.3,https://api.github.com/repos/mholt/caddy/zipball/v0.8.3,v0.8.3,False,False
+2690080,2016-02-25T17:27:17Z,2016-02-25T18:04:45Z,0.8.2,"With 0.8.2, Caddy gets On-Demand TLS, which means it can obtain certificates during TLS handshakes; it does not need to know all the names when you start the server. Caddy is now built on Go 1.6, meaning faster crypto and highly-optimized garbage collection. Caddy no longer restarts on its own; only if signaled with USR1 (all certificate maintenance is done in-process now). We've also added support for SHA384 cipher suites and the ability to load certificates in bulk from a folder.
+
+On-Demand TLS is currently under tight rate limits to mitigate abuse. When you enable it, you have to set a hard limit of how many certificates it is allowed to issue using the `max_certs` property of the `tls` directive.
+- At most one certificate challenge happens at a time.
+- After 10 certificates are successfully obtained, new certificate challenges will not happen until 10 minutes after the last successful challenge.
+- A name that fails a challenge will not be allowed to be attempted again for 5 minutes.
+
+This feature -- as well as all automatic HTTPS, even at startup -- is not guaranteed to be supported in the future if ACME CAs are not able to issue certificates in a reasonable timeframe (quicker than 10 minutes). Please speak with your CA if this is of interest to you.
+
+See the [relevant](https://caddyserver.com/docs/automatic-https#on-demand) [documentation](https://caddyserver.com/docs/tls) and [release announcement](https://caddyserver.com/blog/caddy-0_8_2-released) for more details.
+
+All notable changes:
+- On-demand TLS can obtain certificates during handshakes
+- Built with Go 1.6
+- Process log (-log) is rotated when it gets large
+- Managed certificates get renewed 30 days early instead of just 14
+- fastcgi: Allow scheme prefix before address
+- markdown: Support for definition lists
+- proxy: Allow proxy to insecure HTTPS backends
+- proxy: Support proxy to unix socket
+- rewrite: Status code can be 2xx or 4xx
+- templates: New .Markdown action to interpret included file as Markdown
+- templates: .Truncate now truncates from end of string when length is negative
+- tls: Set hard limit for certificates obtained with on-demand TLS
+- tls: Load certificates from directory
+- tls: Add SHA384 cipher suites
+- Multiple bug fixes and internal changes
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/2690080/assets,https://api.github.com/repos/mholt/caddy/releases/2690080,master,https://api.github.com/repos/mholt/caddy/tarball/v0.8.2,https://github.com/mholt/caddy/releases/tag/v0.8.2,https://api.github.com/repos/mholt/caddy/zipball/v0.8.2,v0.8.2,False,False
+2407236,2016-01-12T17:02:06Z,2016-01-12T19:18:03Z,0.8.1,"This is a patch release with few new features but with many significant, internal improvements and bug fixes.
+
+All known issues introduced by 0.8 are fixed in this patch. The [browse](https://caddyserver.com/docs/browse) middleware gets a shiny new template that looks better on all screens and is easier to use. The [rewrite](https://caddyserver.com/docs/rewrite) directive was upgraded to implement powerful rewrite rules with conditions, regex captures, and status code responses. The [import](https://caddyserver.com/docs/import) directive can import multiple files at once with glob matching.
+
+Detailed change log:
+- Improved OCSP stapling
+- Better graceful reload when new hosts need certificates from Let's Encrypt
+- Current pidfile is now deleted when Caddy exits
+- browse: New default template
+- gzip: Added min_length setting
+- import: Support for glob patterns (*) to import multiple files
+- rewrite: New complex rules with conditions, regex captures, and status code
+- tls: Removed DES ciphers from default cipher suite list
+- tls: All supported certificates are OCSP-stapled
+- tls: Allow custom configuration without specifying certificate and key
+- tls: No longer allow HTTPS over port 80
+- Dozens of bug fixes, improvements, and more tests across the board
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/2407236/assets,https://api.github.com/repos/mholt/caddy/releases/2407236,master,https://api.github.com/repos/mholt/caddy/tarball/v0.8.1,https://github.com/mholt/caddy/releases/tag/v0.8.1,https://api.github.com/repos/mholt/caddy/zipball/v0.8.1,v0.8.1,False,False
+2224067,2015-12-04T02:52:26Z,2015-12-04T17:08:45Z,0.8,"Caddy 0.8 is the most progressive update we've ever released. We hope you'll enjoy this new version!
+
+# New Features
+
+### Automatic HTTPS via Let's Encrypt
+
+All live sites are [served over HTTPS automatically for free](https://caddyserver.com/docs/automatic-https). Caddy works with any [ACME](https://letsencrypt.github.io/acme-spec/)-capable certificate authority but uses [Let's Encrypt](https://letsencrypt.org) by default. A Caddyfile like this, for example:
+
+```
+mysite.com
+
+root /www/mysite.com
+gzip
+```
+
+will serve your site over HTTPS and redirect HTTP to HTTPS. Caddy will **not** automatically enable HTTPS for addresses that look like localhost or have `tls off` in their configuration.
+
+Caddy stores the generated keys and certificates in the ~/.caddy folder on your system.  If these assets are already available on the file system from a previous run, Caddy will use those when it starts.
+
+With managed TLS, Caddy staples OCSP information and also keeps certificates renewed for you. This will cause Caddy to restart on occasion, so be aware of that if using a process manager.
+
+The first time automatic HTTPS is triggered, Caddy will prompt for an email address and/or agreement to CA terms. This only happens once, and the email address is optional (but recommended for account recovery purposes). You can bypass the prompt by using the `-email` and `-agree` [flags](https://caddyserver.com/docs/cli).
+
+##### Known Issues
+1. Specifying an address like `http://example.com` disables automatic HTTPS (because of explicit HTTP scheme) but `http://example.com:8080` does not (because the explicit port overwrites the scheme) even though it should.
+2. Gracefully reloading Caddy with a new host in the Caddyfile that qualifies for automatic HTTPS and needs a certificate fails (because the ports needed to issue the cert are already in use) but it should use existing listeners like renewals do.
+3. If even one certificate fails to be obtained, none of the certificates are saved to disk. This is most notable with LE rate limiting. If a certificate fails, it should save what certificates it obtained to disk.
+
+These will be addressed in a patch release coming soon, unless another more serious bug is discovered.
+
+### Graceful Reload
+
+On POSIX-compliant systems, SIGUSR1 will cause Caddy to gracefully reload the Caddyfile (with zero downtime). This restarts the process, spinning up a new process with a new process ID. Make sure to use the `-pidfile` flag if you're using Caddy with a process manager that needs to keep track of the pid. Caddy will reload on its own if managing SSL certificates. There are also [other new signals and flags](https://caddyserver.com/docs/cli) you can use.
+
+### Caddy as a Library
+
+You can use now Caddy as a library in your own Go programs.
+
+``` go
+import ""github.com/mholt/caddy/caddy""
+
+// You can start...
+err := caddy.Start(caddyfile)
+if err != nil {
+    log.Fatal(err)
+}
+
+// restart...
+err = caddy.Restart(newCaddyfile)
+if err != nil {
+    log.Fatal(err)
+}
+
+//  and stop Caddy services...
+err = caddy.Stop()
+if err != nil {
+    log.Fatal(err)
+}
+
+// or just wait for them to close.
+caddy.Wait()
+```
+
+See the [godoc](https://godoc.org/github.com/mholt/caddy/caddy) for more information.
+
+# Full Change List
+- HTTPS by default via Let's Encrypt (certs & keys are fully managed)
+- Graceful restarts (on POSIX-compliant systems)
+- Major internal refactoring to allow use of Caddy as library
+- New directive 'mime' to customize Content-Type based on file extension
+- New -accept flag to accept Let's Encrypt SA without prompt
+- New -email flag to customize default email used for ACME transactions
+- New -ca flag to customize ACME CA server URL
+- New -revoke flag to revoke a certificate
+- New -log flag to enable process log
+- New -pidfile flag to enable writing pidfile
+- New -grace flag to customize the graceful shutdown timeout
+- New support for SIGHUP, SIGTERM, and SIGQUIT signals
+- browse: Render filenames with multiple whitespace properly
+- core: Use environment variables in Caddyfile
+- markdown: Include Last-Modified header in response
+- markdown: Render tables, strikethrough, and fenced code blocks
+- proxy: Ability to exclude/ignore paths from proxying
+- startup, shutdown: Better Windows support
+- templates: Bug fix for .Host when port is absent
+- templates: Include Last-Modified header in response
+- templates: Support for custom delimiters
+- tls: For non-local hosts, default port is now 443 unless specified
+- tls: Force-disable HTTPS
+- tls: Specify Let's Encrypt email address
+- Many, many more tests and numerous bug fixes and improvements
+
+# Credits and More Information
+
+Many thanks to the dozens of contributors and testers who made this possible!
+
+Please see the [announcement blog post](https://caddyserver.com/blog/caddy-0_8-released) for the rest of the story. For more instructions about how to use this new Caddy version, see the [docs](https://caddyserver.com/docs).
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/2224067/assets,https://api.github.com/repos/mholt/caddy/releases/2224067,master,https://api.github.com/repos/mholt/caddy/tarball/v0.8.0,https://github.com/mholt/caddy/releases/tag/v0.8.0,https://api.github.com/repos/mholt/caddy/zipball/v0.8.0,v0.8.0,False,False
+1875197,2015-09-28T20:57:13Z,2015-09-29T13:42:18Z,0.7.6,"This release contains bug fixes, security patches via [new Go versions](https://groups.google.com/d/msg/golang-nuts/iSIyW4lM4hY/6fBh73GXBQAJ), and a few new features:
+- Pass in simple Caddyfile as command line arguments
+- basicauth: Support for legacy htpasswd files
+- browse: JSON response with file listing
+- core: Caddyfile as command line argument
+- errors: Can write full stack trace to HTTP response for debugging
+- errors, log: Roll log files after certain size or age
+- proxy: Fix for 32-bit architectures
+- rewrite: Better compatibility with fastcgi and PHP apps
+- templates: Added .StripExt and .StripHTML methods
+- Internal improvements and minor bug fixes
+
+Along with this release we're pleased to welcome three new, very useful add-ons to the Caddy middleware family: [jsonp](https://caddyserver.com/docs/jsonp), [search](https://caddyserver.com/docs/search), and [hugo](https://caddyserver.com/docs/hugo).
+
+Please see [the announcement blog post](https://caddyserver.com/blog/caddy-0_7_6-released) for more information about the changes and new add-ons.
+
+Given that we've been sprinting ahead with a lot of new features and functionality lately, we'll be focusing a lot on polish, bug fixes, tests, the deployment process, etc., to lay a more solid foundation going forward.
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/1875197/assets,https://api.github.com/repos/mholt/caddy/releases/1875197,master,https://api.github.com/repos/mholt/caddy/tarball/v0.7.6,https://github.com/mholt/caddy/releases/tag/v0.7.6,https://api.github.com/repos/mholt/caddy/zipball/v0.7.6,v0.7.6,False,False
+1633360,2015-08-05T19:26:22Z,2015-08-05T19:37:55Z,0.7.5,"Several significant refinements are introduced in 0.7.5, as well as fixes for bugs that were exposed from changes made in 0.7.4.
+- core: All listeners bind to 0.0.0.0 unless 'bind' directive is used
+- fastcgi: Set HTTPS env variable if connection is secure
+- log: Output to system log (except Windows)
+- markdown: Added dev command to disable caching during development
+- markdown: Fixed error reporting during initial site generation
+- markdown: Fixed crash if path does not exist when server starts
+- markdown: Fixed site generation and link indexing when files change
+- templates: Added .NowDate for use in date-related functions
+- Several bug fixes related to startup and shutdown functions
+
+Most notably, startup and shutdown functions now only execute _once_ even if the server block is defined for more than one host. So where the following Caddyfile used to echo ""Hello world"" twice, it now echoes only once:
+
+```
+host1, host2 {
+    startup ""echo Hello world""
+}
+```
+
+The fix in fastcgi should be good for any WordPress sites (or other PHP sites) served over HTTPS. Lots of effort went into improving Markdown features to make it easier to build sites with Markdown using only Caddy.
+
+In earlier versions, every listener would bind to the IP address resolved by the hostname from the Caddyfile. This is no longer the case. Now, every listener always binds to the empty/wildcard host (0.0.0.0). This was done by request, but if it causes problems, please report them.
+
+Finally, non-Windows users may output to the system log with the `log` and `errors` directives by specifying `syslog` as the log filename.
+
+From here on out to version 1.0, most changes will be bug fixes, refinements, and enhancements to existing features with a focus on stability and usability.
+
+We hope you enjoy this release, and thank you to all contributors who made it possible!
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/1633360/assets,https://api.github.com/repos/mholt/caddy/releases/1633360,master,https://api.github.com/repos/mholt/caddy/tarball/v0.7.5,https://github.com/mholt/caddy/releases/tag/v0.7.5,https://api.github.com/repos/mholt/caddy/zipball/v0.7.5,v0.7.5,False,False
+1608484,2015-07-30T16:29:38Z,2015-08-05T19:29:09Z,0.7.4,"This release brings lots of improvements to markdown, browse, and redir directives, but some of the changes are breaking in some situations.
+
+Breaking changes:
+- If you used catch-all redirects (`redir http://other-domain.com`), it used to preserve the request URI. To give you more flexibility, this is no longer the case. Please use {uri} (`redir http://other-domain.com{uri}`) to preserve request URI.
+- Markdown is quite a bit different. The structure of front matter was flattened, so instead of creating `[variables]` and indenting variables, all variables are defined without indentation. Also, markdown template actions are different. All values related to the Markdown document, including front matter variables, are in {{.Doc}}, so {{.Doc.body}} shows the rendered content instead of {{.markdown}}, and the title is now {{.Doc.title}} instead of {{.title}}.
+- The template action .Date was renamed to .Now.
+
+Full change list:
+- browse: Sorting preference persisted in cookie
+- browse: Added index.txt and default.txt to list of default files
+- browse: Template files may now use Caddy template actions
+- markdown: Template files may now use Caddy template actions
+- markdown: Several bug fixes, especially for large and empty Markdown files
+- markdown: Generate index pages to link to markdown pages (sitegen only)
+- markdown: Flatten structure of front matter, changed template variables
+- redir: Can use variables (placeholders) like log formats can
+- redir: Catch-all redirects no longer preserve path; use {uri} instead
+- redir: Syntax supports redirect tables by opening a block
+- templates: Renamed .Date to .Now and added .Truncate, .Replace actions
+- Other minor internal improvements and more tests
+
+In addition, the build process was improved so that Linux and BSD downloads are in the .tar.gz file format. Windows and Mac downloads are still .zip.
+
+The Caddy website also gets a [blog](https://caddyserver.com/blog) with this release. We hope you like it, and we welcome guest contributions!
+
+Note: This release introduced several bugs which are fixed in 0.7.5; it's highly recommended to use the newer version instead.
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/1608484/assets,https://api.github.com/repos/mholt/caddy/releases/1608484,master,https://api.github.com/repos/mholt/caddy/tarball/v0.7.4,https://github.com/mholt/caddy/releases/tag/v0.7.4,https://api.github.com/repos/mholt/caddy/zipball/v0.7.4,v0.7.4,False,False
+1541334,2015-07-15T15:53:57Z,2015-07-15T15:55:22Z,0.7.3,"This patch release fixes bugs introduced in recent versions and refines some working features. Full change list:
+- errors: Error log now shows timestamp with each entry
+- gzip: Fixed; Default filtering is by extension; removed MIME type filter
+- import: Fixed; works inside and outside server blocks
+- redir: Query string preserved on catch-all redirects
+- templates: Proper 403 or 404 errors for restricted or missing files
+
+Also, the build server was updated so that it produces only purely static binaries. This may break Caddy in subtle ways on some platforms, but in our testing we were not able to see any problems. Please let us know if you think the static compilation has broken Caddy in your environment.
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/1541334/assets,https://api.github.com/repos/mholt/caddy/releases/1541334,master,https://api.github.com/repos/mholt/caddy/tarball/v0.7.3,https://github.com/mholt/caddy/releases/tag/v0.7.3,https://api.github.com/repos/mholt/caddy/zipball/v0.7.3,v0.7.3,False,False
+1484943,2015-07-01T18:09:40Z,2015-07-01T18:33:13Z,0.7.2,"Version 0.7.2 is mostly small changes and fixes, with one breaking change - the git directive was removed. (It is still available as an add-on; keep reading.)
+
+This version also pilots the new Caddy build server which is used to generate custom builds of Caddy for you on-the-fly via the [download page](https://caddyserver.com/download) or from your automated environments. With it, Caddy becomes a platform on which web services can be produced and consumed. Caddy can continue to grow its feature set without the burden of a growing code base or binary size. If you experience trouble with the build server, please let us know; it needs lots more development in the long term.
+
+The git directive is now available as an add-on feature, which you can select from the Caddy website. Here is the full change list:
+- Custom builds through caddyserver.com - extend Caddy by writing addons
+- browse: Sort by clicking column heading or using query string
+- core: Serving hostname that doesn't resolve issues warning then listens on 0.0.0.0
+- errors: Missing error page during parse time is warning, not error
+- ext: Extension only appended if request path does not end in /
+- fastcgi: Fix for backend responding without status text
+- fastcgi: Fix PATH_TRANSLATED when PATH_INFO is empty (RFC 3875)
+- git: Removed from core (available as add-on)
+- gzip: Enable by file path and/or extension
+- gzip: Customize compression level
+- log: Fix for missing status in log entry when error unhandled
+- proxy: Strip prefix from path for proxy to path
+- redir: Meta tag redirects
+- templates: Support for nested includes
+- Internal improvements and more tests
+
+This version also sports faster SSL on 64-bit architecture thanks to [Cloudflare's crypto enhancements](https://blog.cloudflare.com/go-crypto-bridging-the-performance-gap/). AES and ECDSA should see speedups of over ~20x. The RSA speed is roughly doubled as well. These changes are not directly related to Caddy, since it depends on compiling with their [fork of Go](https://github.com/cloudflare/go).
+
+Note: There's a bug in this release that breaks gzip. The next patch release fixes this.
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/1484943/assets,https://api.github.com/repos/mholt/caddy/releases/1484943,master,https://api.github.com/repos/mholt/caddy/tarball/v0.7.2,https://github.com/mholt/caddy/releases/tag/v0.7.2,https://api.github.com/repos/mholt/caddy/zipball/v0.7.2,v0.7.2,False,False
+1367839,2015-06-02T18:19:17Z,2015-06-02T18:39:03Z,0.7.1,"This patch release fixes a timing vulnerability in the basicauth middleware, so any users who rely on it should upgrade. Version 0.7.1 also introduces upgrades to the tls and proxy directives. Full change list:
+- basicauth: Patched timing vulnerability
+- proxy: Support for WebSocket backends
+- tls: Client authentication
+
+We would like to thank Jonathan Hanks for reporting the vulnerability in basicauth.
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/1367839/assets,https://api.github.com/repos/mholt/caddy/releases/1367839,master,https://api.github.com/repos/mholt/caddy/tarball/v0.7.1,https://github.com/mholt/caddy/releases/tag/v0.7.1,https://api.github.com/repos/mholt/caddy/zipball/v0.7.1,v0.7.1,False,False
+1331044,2015-05-25T21:58:59Z,2015-05-25T22:46:28Z,0.7.0,"The main improvements in this release involve HTTPS, Markdown, and usability. Websites running Caddy 0.7.0 will [score an 'A' grade at Qualys SSL Labs](https://www.ssllabs.com/ssltest/analyze.html?d=caddyserver.com), assuming the certificate chain is good. Static websites can be generated from Markdown files. Caddy will warn you if a non-localhost domain resolves to loopback or if your `ulimit -n` (file descriptor limit) is too low for a production (public-facing) site.
+
+Full change list:
+- New directive 'internal' to protect resources with X-Accel-Redirect
+- New -version flag to show program name and version
+- core: Fixed escaped backslash characters inside quoted strings
+- core: Fixed parsing Caddyfile for IPv6 addresses missing ports
+- core: A notice is shown when non-local address resolves to loopback interface
+- core: Warns if file descriptor limit is too low for production site (Mac/Linux)
+- fastcgi: Support for Unix sockets
+- git: Fixed issue that prevented pulling at designated interval
+- header: Remove a header field by prefixing field name with ""-""
+- markdown: Simple static site generation
+- markdown: Support for metadata (""front matter"") at beginning of files
+- rewrite: Experimental support for regular expressions
+- tls: Customize cipher suites and protocols
+- tls: Removed RC4 ciphers
+- Other internal improvements that are not user-facing (more tests, etc.)
+
+Good work team! :+1: Lots of exciting things are still on the way.
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/1331044/assets,https://api.github.com/repos/mholt/caddy/releases/1331044,master,https://api.github.com/repos/mholt/caddy/tarball/v0.7.0,https://github.com/mholt/caddy/releases/tag/v0.7.0,https://api.github.com/repos/mholt/caddy/zipball/v0.7.0,v0.7.0,False,False
+1270114,2015-05-07T12:56:05Z,2015-05-07T12:56:34Z,0.6.0,"It's been a busy week! Thanks to many contributions and tight feedback loops, Caddy has made significant progress in the last seven days. Notable new features are `git push` to deploy your site; multiple-backend proxying with load balancing, health checks, and failovers; and quite a few bug fixes and improvements. Full change list:
+- New git directive to automatically pull changes
+- New bind directive to override host server binds to
+- New -root flag to specify root path to default site
+- Ability to receive config data piped through stdin
+- core: Warning if root directory doesn't exist at startup
+- core: Entire process dies if any server fails to start
+- gzip: Fixed Content-Length value when proxying requests
+- errors: Error log now includes file and line number of panics
+- fastcgi: Pass custom environment variables
+- fastcgi: Support for HEAD, OPTIONS, PUT, PATCH, and DELETE methods
+- fastcgi: Fixed SERVER_SOFTWARE variables
+- markdown: Support for index files when URL points to a directory
+- proxy: Load balancing with multiple backends, health checks, failovers, and multiple policies
+- proxy: Add custom headers
+- startup/shutdown: Run command in background with with '&' at end
+- templates: Added .tpl and .tmpl as default extensions
+- templates: Support for index files when URL points to a directory
+- templates: Changed .RemoteAddr to .IP and stripped out remote port
+- tls: TLS disabled (with warning) for servers that are explicitly http://
+- websocket: Fixed SERVER_SOFTWARE and GATEWAY_INTERFACE variables
+- Many internal improvements
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/1270114/assets,https://api.github.com/repos/mholt/caddy/releases/1270114,master,https://api.github.com/repos/mholt/caddy/tarball/v0.6.0,https://github.com/mholt/caddy/releases/tag/v0.6.0,https://api.github.com/repos/mholt/caddy/zipball/v0.6.0,v0.6.0,False,False
+1240295,2015-04-30T17:59:41Z,2015-04-30T18:25:51Z,0.5.1,"This point release has several significant improvements. Changes are:
+- Default host is now 0.0.0.0 (wildcard)
+- New -host and -port flags to override default host and port
+- core: Support for binding to 0.0.0.0
+- core: Graceful error handling during heavy load; proper error responses
+- errors: Fixed file path handling
+- errors: Fixed panic due to nil Log file
+- fastcgi: Support for index files
+- fastcgi: Fix for handling errors that come from responder
+
+Your feedback and contributions have been invaluable - keep 'em coming!
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/1240295/assets,https://api.github.com/repos/mholt/caddy/releases/1240295,master,https://api.github.com/repos/mholt/caddy/tarball/v0.5.1,https://github.com/mholt/caddy/releases/tag/v0.5.1,https://api.github.com/repos/mholt/caddy/zipball/v0.5.1,v0.5.1,False,False
+1225778,2015-04-28T05:28:34Z,2015-04-28T06:04:01Z,0.5.0,"The first release of Caddy into the wild. Use it. Give feedback. Get involved. And enjoy.
+",https://api.github.com/users/mholt,1128849,mholt,https://api.github.com/repos/mholt/caddy/releases/1225778/assets,https://api.github.com/repos/mholt/caddy/releases/1225778,master,https://api.github.com/repos/mholt/caddy/tarball/v0.5.0,https://github.com/mholt/caddy/releases/tag/v0.5.0,https://api.github.com/repos/mholt/caddy/zipball/v0.5.0,v0.5.0,False,False

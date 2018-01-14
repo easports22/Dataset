@@ -1,0 +1,886 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7021816,2017-07-13T00:12:31Z,2017-07-13T00:15:13Z,v3.7.2,"## [Changes](https://github.com/reactjs/redux/compare/v3.7.1...v3.7.2)
+
+- Fixed the definition of 'Reducer' for TypeScript 2.4. (#2467 by @DanielRosenwasser)",https://api.github.com/users/timdorr,17882,timdorr,https://api.github.com/repos/reactjs/redux/releases/7021816/assets,https://api.github.com/repos/reactjs/redux/releases/7021816,master,https://api.github.com/repos/reactjs/redux/tarball/v3.7.2,https://github.com/reactjs/redux/releases/tag/v3.7.2,https://api.github.com/repos/reactjs/redux/zipball/v3.7.2,v3.7.2,False,False
+6830467,2017-06-26T02:49:51Z,2017-06-26T03:04:59Z,v3.7.1,"This reverts the `console.error` on `bindActionCreators()` coming from #2279. 
+
+While well-intentioned, when star importing all exports from a module (`import * as actions from './actions'`), transpilation by Babel defaults to adding a `default` and `__esModule` property to the import, which are not functions. [While it can be disabled](https://babeljs.io/docs/plugins/transform-es2015-modules-commonjs/#optionsstrict), this isn't common to do and leads to a lot of confusion. So, we're reverting the change. 
+
+Thanks for the feedback from everyone and the civility and healthy discourse on the issue!",https://api.github.com/users/timdorr,17882,timdorr,https://api.github.com/repos/reactjs/redux/releases/6830467/assets,https://api.github.com/repos/reactjs/redux/releases/6830467,master,https://api.github.com/repos/reactjs/redux/tarball/v3.7.1,https://github.com/reactjs/redux/releases/tag/v3.7.1,https://api.github.com/repos/reactjs/redux/zipball/v3.7.1,v3.7.1,False,False
+6745140,2017-06-17T01:53:40Z,2017-06-17T02:43:44Z,v3.7.0,"### Another long break!
+
+Oh, hey! I didn't see you sitting there. You look bored. How about a Redux release to spice things up?
+
+Not a huge set of changes to report here. The biggest change, and the reason for the minor bump, is the UMD build is now done via [Rollup](https://rollupjs.org/). One big advantage is more readable code in the bundle. Rollup does ""scope hoisting"", which is a fancy term for putting every module at the top level of the file. Other than a surrounding [IIFE](https://en.wikipedia.org/wiki/Immediately-invoked_function_expression), all of the code in Redux all lives together. You can compare the two here:
+
+[Rollup UMD build](https://unpkg.com/redux@3.7.0/dist/redux.js)    
+vs   
+[Webpack UMD build](https://unpkg.com/redux@3.6.0/dist/redux.js)
+
+There is also a cost savings of 30,811 vs 26,880 bytes, and 6,999 vs 5,995 bytes minified. Redux is already a small library, and this helps shave some extra bytes for our UMD users. 
+
+One thing to note is that Webpack has introduced it's own scope hoisting feature in 3.0 beta. So, this isn't intended as an indictment of Webpack. You should continue to use it in your own apps. The adage of ""Webpack is for apps, Rollup is for libraries"" definitely holds true. It still has a superior developer experience with hot module reloading and webpack-dev-server. But use whatever makes sense for your project, not just whatever we use. 😄 
+
+We're also looking at applying this to the NPM bundle. The main motivation is again more readable code in your bundles. Instead of [transpilation oddities from Babel](https://unpkg.com/redux@3.6.0/lib/index.js), you will end up with [a single clean file](https://gist.githubusercontent.com/TrySound/987213f06dd9b29ca2cecbdea55d8047/raw/89f48440cb847fba62afb6074d876f419c68102e/redux.js), which should be easier to read through and debug. It's currently scheduled for the big, mythical 4.0 release and you can follow along in #2358
+
+### [Changes](https://github.com/reactjs/redux/compare/v3.6.0...v3.7.0)
+- Build UMD with rollup (#2283 by @TrySound)
+- Warn when bindActionCreators encounters non-function property (#2279 by @artgillespie)
+- Update variables to ES6 (#2169 by @dfrownfelter)
+- Remove filtering inside compose (#2167 by @istarkov)
+- Simplify compose (#2147 by @JoeCortopassi)",https://api.github.com/users/timdorr,17882,timdorr,https://api.github.com/repos/reactjs/redux/releases/6745140/assets,https://api.github.com/repos/reactjs/redux/releases/6745140,master,https://api.github.com/repos/reactjs/redux/tarball/v3.7.0,https://github.com/reactjs/redux/releases/tag/v3.7.0,https://api.github.com/repos/reactjs/redux/zipball/v3.7.0,v3.7.0,False,False
+4048291,2016-09-04T18:23:14Z,2016-09-04T18:23:59Z,v3.6.0,"### Hey, it's been a while!
+
+How's everyone doing? Enjoying your summer (or winter for the Southern Hemisphere folks)?
+
+This is a bugfix release for Redux. We're working towards a 4.0 with more substantial changes. Please see #1342 to pitch in!
+
+Dan also ported all the examples (except the universal one) in #1883 to use the excellent [Create React App](https://github.com/facebookincubator/create-react-app). This means the changes in #1800 have been lost. If you'd like to help out, we would love PRs on the examples to modernize and clean them up. 
+
+### Changes
+- Updated symbol-observable to 1.0.2 (#1663 and #1877) 
+- Added a Redux logo (#1671)
+- Replace es3ify with Babel ES3 transforms (#1688)
+- Run tests on Node 6 (#1673)
+- Optimize one function case in compose (#1701)
+- Check ES3 syntax compatibility (#1720)
+- TypeScript: preloadedState is optional (#1806)
+- Add a warning for undefined properties passed to combineReducers (#1789)
+- Add module entry point for webpack 2 (#1871)
+- TypeScript: Improve typings for compose function (#1868)
+",https://api.github.com/users/timdorr,17882,timdorr,https://api.github.com/repos/reactjs/redux/releases/4048291/assets,https://api.github.com/repos/reactjs/redux/releases/4048291,master,https://api.github.com/repos/reactjs/redux/tarball/v3.6.0,https://github.com/reactjs/redux/releases/tag/v3.6.0,https://api.github.com/repos/reactjs/redux/zipball/v3.6.0,v3.6.0,False,False
+3085914,2016-04-24T12:18:39Z,2016-04-24T12:27:50Z,v3.5.2,"- Enforces a newer version of `symbol-observable` that works in IE8 (#1659)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/3085914/assets,https://api.github.com/repos/reactjs/redux/releases/3085914,master,https://api.github.com/repos/reactjs/redux/tarball/v3.5.2,https://github.com/reactjs/redux/releases/tag/v3.5.2,https://api.github.com/repos/reactjs/redux/zipball/v3.5.2,v3.5.2,False,False
+3058857,2016-04-20T10:30:13Z,2016-04-20T10:31:07Z,v3.5.1,"- Fixes a regression introduced in 3.5.0 that caused `dispatch` to not be available while middleware is initializing. (#1644, #1647)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/3058857/assets,https://api.github.com/repos/reactjs/redux/releases/3058857,master,https://api.github.com/repos/reactjs/redux/tarball/v3.5.1,https://github.com/reactjs/redux/releases/tag/v3.5.1,https://api.github.com/repos/reactjs/redux/zipball/v3.5.1,v3.5.1,False,False
+3056174,2016-04-20T00:01:12Z,2016-04-20T00:05:27Z,v3.5.0,"- Adds interop with observable libraries (#1632)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/3056174/assets,https://api.github.com/repos/reactjs/redux/releases/3056174,master,https://api.github.com/repos/reactjs/redux/tarball/v3.5.0,https://github.com/reactjs/redux/releases/tag/v3.5.0,https://api.github.com/repos/reactjs/redux/zipball/v3.5.0,v3.5.0,False,False
+2984810,2016-04-08T22:56:48Z,2016-04-08T22:58:53Z,v3.4.0,"- Adds official TypeScript definitions (#1413, #1526, #1537, #1545)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/2984810/assets,https://api.github.com/repos/reactjs/redux/releases/2984810,master,https://api.github.com/repos/reactjs/redux/tarball/v3.4.0,https://github.com/reactjs/redux/releases/tag/v3.4.0,https://api.github.com/repos/reactjs/redux/zipball/v3.4.0,v3.4.0,False,False
+2566918,2016-02-06T22:08:19Z,2016-02-06T22:08:59Z,v3.3.1,"- ES Modules build now uses the ES Modules build of Lodash. This makes vanilla Redux code include zero CommonJS interop for Rollup users. (#1372)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/2566918/assets,https://api.github.com/repos/reactjs/redux/releases/2566918,master,https://api.github.com/repos/reactjs/redux/tarball/v3.3.1,https://github.com/reactjs/redux/releases/tag/v3.3.1,https://api.github.com/repos/reactjs/redux/zipball/v3.3.1,v3.3.1,False,False
+2563413,2016-02-05T22:02:20Z,2016-02-05T22:05:46Z,v3.3.0,"- Fixes `jsnext:main` to point to a Rollup-friendly ES Modules build in `redux/es`. It still depends on Lodash so you can’t use without `rollup-plugin-commonjs`, but importing individual functions like `import { createStore } from 'redux'` should now work, and you shouldn’t be getting an error when you use `npm({ jsnext: true })` anymore due to a broken `jsnext:main`. (https://github.com/rackt/redux/pull/1369, https://github.com/rackt/redux/issues/1042, https://github.com/rackt/redux/pull/1327)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/2563413/assets,https://api.github.com/repos/reactjs/redux/releases/2563413,master,https://api.github.com/repos/reactjs/redux/tarball/v3.3.0,https://github.com/reactjs/redux/releases/tag/v3.3.0,https://api.github.com/repos/reactjs/redux/zipball/v3.3.0,v3.3.0,False,False
+2536498,2016-02-02T11:53:30Z,2016-02-02T11:54:32Z,v3.2.1,"- Force Lodash to be >= 4.2.0 to avoid `global` issues that were fixed in it (#1346, #1349)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/2536498/assets,https://api.github.com/repos/reactjs/redux/releases/2536498,master,https://api.github.com/repos/reactjs/redux/tarball/v3.2.1,https://github.com/reactjs/redux/releases/tag/v3.2.1,https://api.github.com/repos/reactjs/redux/zipball/v3.2.1,v3.2.1,False,False
+2531075,2016-02-01T17:28:36Z,2016-02-01T17:38:21Z,v3.2.0,"- `isPlainObject` that we use internally is now outsourced to Lodash 4.1 (#1339). Note that this does not mean we depend on Lodash itself. We only use a tiny module from it. We will be able to reuse the same module in React Redux.
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/2531075/assets,https://api.github.com/repos/reactjs/redux/releases/2531075,master,https://api.github.com/repos/reactjs/redux/tarball/v3.2.0,https://github.com/reactjs/redux/releases/tag/v3.2.0,https://api.github.com/repos/reactjs/redux/zipball/v3.2.0,v3.2.0,False,False
+2526038,2016-01-31T23:13:30Z,2016-01-31T23:15:42Z,v3.1.7,"- Fix an issue with `setInterval` unavailable in certain environments (#1335)
+- Performance and memory usage optimizations (5b586080b43ca233f78d56cbadf706c933fefd19, c031c0a8d900e0e95a4915ecc0f96c6fe2d6e92b)
+- Slightly more aggressive minification (6e8d9d430cb2602e3ee1203d4507d671f4e5b259)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/2526038/assets,https://api.github.com/repos/reactjs/redux/releases/2526038,master,https://api.github.com/repos/reactjs/redux/tarball/v3.1.7,https://github.com/reactjs/redux/releases/tag/v3.1.7,https://api.github.com/repos/reactjs/redux/zipball/v3.1.7,v3.1.7,False,False
+2523755,2016-01-31T01:51:50Z,2016-01-31T02:01:29Z,v3.1.6,"- `subscribe()` now throws a descriptive error when the `listener` argument is not a function (#1325)
+- `bindActionCreators()` now ignores anything but functions on the input object (#1329)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/2523755/assets,https://api.github.com/repos/reactjs/redux/releases/2523755,master,https://api.github.com/repos/reactjs/redux/tarball/v3.1.6,https://github.com/reactjs/redux/releases/tag/v3.1.6,https://api.github.com/repos/reactjs/redux/zipball/v3.1.6,v3.1.6,False,False
+2521901,2016-01-30T09:39:16Z,2016-01-30T09:40:13Z,v3.1.5,"- `replaceReducer()` now throws a meaningful error rather than crashes if argument is not a function (#1318, #1321)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/2521901/assets,https://api.github.com/repos/reactjs/redux/releases/2521901,master,https://api.github.com/repos/reactjs/redux/tarball/v3.1.5,https://github.com/reactjs/redux/releases/tag/v3.1.5,https://api.github.com/repos/reactjs/redux/zipball/v3.1.5,v3.1.5,False,False
+2518009,2016-01-29T17:47:00Z,2016-01-29T17:47:58Z,v3.1.4,"- Fixes false positive for the envification check in IE because it doesn’t support `Function.name` (https://github.com/rackt/redux/issues/1311)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/2518009/assets,https://api.github.com/repos/reactjs/redux/releases/2518009,master,https://api.github.com/repos/reactjs/redux/tarball/v3.1.4,https://github.com/reactjs/redux/releases/tag/v3.1.4,https://api.github.com/repos/reactjs/redux/zipball/v3.1.4,v3.1.4,False,False
+2517831,2016-01-29T17:17:04Z,2016-01-29T17:18:31Z,v3.1.3,"- Don’t crash when `console` or `console.error` is unavailable (#1311)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/2517831/assets,https://api.github.com/repos/reactjs/redux/releases/2517831,master,https://api.github.com/repos/reactjs/redux/tarball/v3.1.3,https://github.com/reactjs/redux/releases/tag/v3.1.3,https://api.github.com/repos/reactjs/redux/zipball/v3.1.3,v3.1.3,False,False
+2511258,2016-01-28T19:52:32Z,2016-01-28T19:56:52Z,v3.1.2,"- Adds `loose-envify` as a dependency to fix builds for Browserify users. (#1304 & #1306)
+",https://api.github.com/users/timdorr,17882,timdorr,https://api.github.com/repos/reactjs/redux/releases/2511258/assets,https://api.github.com/repos/reactjs/redux/releases/2511258,master,https://api.github.com/repos/reactjs/redux/tarball/v3.1.2,https://github.com/reactjs/redux/releases/tag/v3.1.2,https://api.github.com/repos/reactjs/redux/zipball/v3.1.2,v3.1.2,False,False
+2510855,2016-01-28T18:49:32Z,2016-01-28T18:50:45Z,v3.1.1,"- Fixes `applyMiddleware()` to forward the enhancer if you mix the old and the new styles of specifying enhancers—there is no point to doing this though. (https://github.com/rackt/redux/pull/1302)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/2510855/assets,https://api.github.com/repos/reactjs/redux/releases/2510855,master,https://api.github.com/repos/reactjs/redux/tarball/v3.1.1,https://github.com/reactjs/redux/releases/tag/v3.1.1,https://api.github.com/repos/reactjs/redux/zipball/v3.1.1,v3.1.1,False,False
+2510598,2016-01-28T18:03:14Z,2016-01-28T18:11:01Z,v3.1.0,"- For Browserify users, Redux should now be properly envified without extra configuration (#1301)
+- `createStore()` now receives an enhancer such as `applyMiddleware()` as the last optional argument (#1294)
+
+### Wait, what?
+
+You don’t have to change anything. However if you use store enhancers such as `applyMiddleware()` or Redux DevTools you might like that you can now express the same code in a more JavaScript-friendly way:
+
+``` diff
+- const createStoreWithMiddleware = applyMiddleware(
+-   thunk,
+-   logger
+- )(createStore)
+- const store = createStoreWithMiddleware(
+-   rootReducer,
+-   initialState
+- )
++ const store = createStore(
++   rootReducer,
++   initialState,
++   applyMiddleware(thunk, logger)
++ )
+```
+
+For multiple store enhancers you can still use `compose()` but in a similar more straightforward fashion:
+
+``` diff
+- const finalCreateStore = compose(
+-   applyMiddleware(thunk, logger),
+-   DevTools.instrument()
+- )(createStore)
+- const store = finalCreateStore(reducer, initialState)
++ const store = createStore(
++   reducer,
++   initialState,
++   compose(
++     applyMiddleware(thunk, logger),
++     DevTools.instrument()
++   )
++ )
+```
+
+The second `initialState` argument stays optional so you can skip it when specifying the enhancer.
+
+The old way of doing things still works, too.
+We’re just adding a nicer way to apply enhancers, that’s all.
+
+Happy reducing!
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/2510598/assets,https://api.github.com/repos/reactjs/redux/releases/2510598,master,https://api.github.com/repos/reactjs/redux/tarball/v3.1.0,https://github.com/reactjs/redux/releases/tag/v3.1.0,https://api.github.com/repos/reactjs/redux/zipball/v3.1.0,v3.1.0,False,False
+2483803,2016-01-25T01:26:32Z,2016-01-25T01:37:38Z,v3.0.6,"- `compose()` now aligns more closely with Underscore/Lodash behavior by allowing multiple arguments to be passed to the last function. This is not changing the existing behavior for the single argument call which has been the only possible use case before. (https://github.com/rackt/redux/issues/632#issuecomment-157298480, https://github.com/rackt/redux/pull/1050)
+- The dev-only state shape sanity check warning in `combineReducers()` now runs faster. (https://github.com/rackt/redux/pull/1118)
+- Now we warn if you’re running an unenvified build of Redux in production as it is slower. We determine this by checking whether you have uglified Redux code, and if you did, we check that `process.env.NODE_ENV` polyfill (which we require anyway) is set to `'production'`. This does not affect the UMD builds. This is also a warning and not a hard error so it isn't a breaking change. (https://github.com/rackt/redux/issues/1029, https://github.com/rackt/redux/pull/1075)
+- We now officially support importing individual modules from `redux/lib/*.js`. This is _only_ true for top-level directory—we do not supporting reaching into `redux/lib/utils`, for example. To support this, we moved all top-level exports to be in `redux/lib`, for example, `redux/lib/applyMiddleware.js`. (https://github.com/rackt/redux/issues/1223, https://github.com/rackt/redux/pull/1224)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/2483803/assets,https://api.github.com/repos/reactjs/redux/releases/2483803,master,https://api.github.com/repos/reactjs/redux/tarball/v3.0.6,https://github.com/reactjs/redux/releases/tag/v3.0.6,https://api.github.com/repos/reactjs/redux/zipball/v3.0.6,v3.0.6,False,False
+2277787,2015-12-12T17:43:41Z,2015-12-12T17:45:40Z,v3.0.5,"- Removes `.babelrc` in the compiled package because it is irrelevant (we ship ES5 code) and breaks React Native 0.16 and some consumers who use Babel 6 forgetting to exclude `node_modules` from transformations. (https://github.com/rackt/redux/issues/1033, https://github.com/rackt/redux/issues/1039, https://github.com/rackt/redux/issues/1127)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/2277787/assets,https://api.github.com/repos/reactjs/redux/releases/2277787,master,https://api.github.com/repos/reactjs/redux/tarball/v3.0.5,https://github.com/reactjs/redux/releases/tag/v3.0.5,https://api.github.com/repos/reactjs/redux/zipball/v3.0.5,v3.0.5,False,False
+2007946,2015-10-23T11:48:43Z,2015-10-23T11:50:19Z,v3.0.4,"- Unsubscribing a store listener is now a no-op when called twice instead of a bug (#938, #939, b7031ce3acb23b6ecadbd977b1cfa32486447904)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/2007946/assets,https://api.github.com/repos/reactjs/redux/releases/2007946,master,https://api.github.com/repos/reactjs/redux/tarball/v3.0.4,https://github.com/reactjs/redux/releases/tag/v3.0.4,https://api.github.com/repos/reactjs/redux/zipball/v3.0.4,v3.0.4,False,False
+1988756,2015-10-21T22:57:19Z,2015-10-21T22:58:28Z,v3.0.3,"- `combineReducers()` now returns the same object if none of the child states have changed. (#853, #856)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1988756/assets,https://api.github.com/repos/reactjs/redux/releases/1988756,master,https://api.github.com/repos/reactjs/redux/tarball/v3.0.3,https://github.com/reactjs/redux/releases/tag/v3.0.3,https://api.github.com/repos/reactjs/redux/zipball/v3.0.3,v3.0.3,False,False
+1871320,2015-09-26T08:53:08Z,2015-09-26T09:02:00Z,v3.0.2,"One of the problems [v3.0.1](https://github.com/rackt/redux/releases/tag/v3.0.1) was intended to solve [was not completely fixed in 3.0.1](https://github.com/rackt/redux/issues/717#issuecomment-143403628).
+This release amends that.
+- An error thrown inside reducer during the `combineReducer()` sanity check will be delayed until the first dispatch. This lets Redux DevTools correctly handle it and recover from the error. (#717, #761, #807, gaearon/redux-devtools#106, gaearon/redux-devtools#120)
+
+To enjoy this, you’ll need at least `redux-devtools@2.1.4`.
+
+![](http://i.imgur.com/skmH0uC.gif)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1871320/assets,https://api.github.com/repos/reactjs/redux/releases/1871320,master,https://api.github.com/repos/reactjs/redux/tarball/v3.0.2,https://github.com/reactjs/redux/releases/tag/v3.0.2,https://api.github.com/repos/reactjs/redux/zipball/v3.0.2,v3.0.2,False,False
+1870491,2015-09-25T22:25:38Z,2015-09-25T22:26:00Z,v3.0.1,"This release brings a few changes that, while aimed at making the developer experience better, should have no noticeable impact on your apps.
+- In development, `combineReducers()` now checks the state shape on every invocation instead of just once. This makes it easy to discover issues like #715 where you post-process the state from `combineReducers()` and then wonder why something you added to it has disappeared after the next action. This change has no effect in production, and you’re unlikely to hit it in development either, as post-processing state from `combineReducers()` isn't a very common pattern. (#715, #720)
+- The reducer probing performed by `combineReducers()` as a sanity check has been moved from the `combineReducers()` call to the first reducer invocation. Technically the check is still performed during the `combineReducers()` call, but the error is only thrown after during the initial dispatch. (Usually that would correspond to the `createStore()`call.) This reason for this is that otherwise an error thrown inside a reducer used to blow up `combineReducers()` and thus the whole module definition, and hot reloading used to fail in this case instead of showing the error in Redux DevTools. With this change and a corresponding fix in Redux DevTools, an error thrown inside a reducer that was later wrapped in `combineReducers()` will be displayed correctly, and once you fix the error, it will hot reload. (#717, #761, https://github.com/gaearon/redux-devtools/issues/106, https://github.com/gaearon/redux-devtools/pull/120)
+- The reducer probing performed by `combineReducers()` as a sanity check now uses `@@redux/PROBE_UNKNOWN_ACTION_` prefix in the action type. Previously, action type was a random string. The reason for this change is to make it easier for type-checking libraries like [redux-tcomb](https://github.com/gcanti/redux-tcomb) ignore such actions. This change does not affect application developers: just like before, you should never attempt to handle `@@redux/*` actions directly in your code. (#792, #796)
+
+Happy reducing!
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1870491/assets,https://api.github.com/repos/reactjs/redux/releases/1870491,master,https://api.github.com/repos/reactjs/redux/tarball/v3.0.1,https://github.com/reactjs/redux/releases/tag/v3.0.1,https://api.github.com/repos/reactjs/redux/zipball/v3.0.1,v3.0.1,False,False
+1805040,2015-09-12T23:47:35Z,2015-09-12T23:49:54Z,v3.0.0,"### Breaking Changes
+- Action objects now must have a `type` property other than `undefined` ([#541](https://github.com/rackt/redux/issues/541), [#564](https://github.com/rackt/redux/pull/564))
+
+### Other Changes
+- `replaceReducer()` is un-deprecated.
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1805040/assets,https://api.github.com/repos/reactjs/redux/releases/1805040,master,https://api.github.com/repos/reactjs/redux/tarball/v3.0.0,https://github.com/reactjs/redux/releases/tag/v3.0.0,https://api.github.com/repos/reactjs/redux/zipball/v3.0.0,v3.0.0,False,False
+1748324,2015-09-01T01:15:11Z,2015-09-01T01:25:54Z,v2.0.0,"## Breaking Changes
+
+### `getReducer()` is removed from Store public API (https://github.com/rackt/redux/pull/668)
+
+It was only needed because React Redux used it to magically allow reducer hot reloading. This magic used to cause problems (https://github.com/rackt/redux/issues/301, https://github.com/rackt/redux/issues/340), so we made the usage of `replaceReducer()` for hot reloading explicit (https://github.com/rackt/redux/pull/667).
+
+It is likely that you never used `getReducer()`. However, if you used hot reloading of reducers, you'll need to add `module.hot` API calls to the place where you create the store. (Of course, assuming that you use Webpack.)
+
+#### Before
+
+``` js
+import { createStore } from 'redux';
+import rootReducer from '../reducers/index';
+
+export default function configureStore(initialState) {
+  return createStore(rootReducer, initialState);
+}
+```
+
+#### After
+
+``` js
+import { createStore } from 'redux';
+import rootReducer from '../reducers/index';
+
+export default function configureStore(initialState) {
+  const store = createStore(rootReducer, initialState);
+
+  if (module.hot) {
+    // Enable Webpack hot module replacement for reducers
+    module.hot.accept('../reducers', () => {
+      const nextRootReducer = require('../reducers/index');
+      store.replaceReducer(nextRootReducer);
+    });
+  }
+
+  return store;
+}
+```
+
+This is more code, but what's happening is now explicit, and this also lets you do this right in `index.js` instead of creating a separate `<Root>` component. See https://github.com/rackt/redux/pull/667 for a migration example.
+
+### `compose()` now acts like a proper `compose()` (#669)
+
+This fixes the [embarrassing mishap that `compose()` API was](https://github.com/rackt/redux/issues/632).
+As suggested by @jlongster, now it is a proper `compose()` you'd find in Lodash or Underscore:
+
+``` js
+it('composes from right to left', () => {
+  const double = x => x * 2;
+  const square = x => x * x;
+  expect(compose(square)(5)).toBe(25);
+  expect(compose(square, double)(5)).toBe(100);
+  expect(compose(double, square, double)(5)).toBe(200);
+});
+```
+
+In terms of usage, you just need to remove `createStore` from the chain, and add it as a function application instead.
+
+#### Before
+
+``` js
+const finalCreateStore = compose(
+  applyMiddleware(stuff),
+  devTools(),
+  somethingElse(),
+  createStore
+);
+```
+
+#### After
+
+``` js
+const finalCreateStore = compose(
+  applyMiddleware(stuff),
+  devTools(),
+  somethingElse()
+)(createStore);
+```
+
+### `process.env.NODE_ENV` is required for CommonJS build (https://github.com/rackt/redux/pull/671)
+
+In 1.0.1, we temporarily removed the dependency on it to support React Native, but now that RN 0.10 is out with `process.env.NODE_ENV` polyfill, we again demand it to be defined. If you're not ready to use RN 0.10, or are in a different environment, either use a browser build, or shim it yourself.
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1748324/assets,https://api.github.com/repos/reactjs/redux/releases/1748324,master,https://api.github.com/repos/reactjs/redux/tarball/v2.0.0,https://github.com/reactjs/redux/releases/tag/v2.0.0,https://api.github.com/repos/reactjs/redux/zipball/v2.0.0,v2.0.0,False,False
+1676517,2015-08-15T10:19:53Z,2015-08-15T10:21:01Z,v1.0.1,"- Fixes “process is not defined” on React Native ([#525](https://github.com/rackt/redux/issues/525), [#526](https://github.com/rackt/redux/pull/526))
+- Removes dependencies on `invariant` and `warning` ([#528](https://github.com/rackt/redux/pull/528))
+- Fixes TodoMVC example ([#524](https://github.com/rackt/redux/issues/524), [#529](https://github.com/rackt/redux/pull/529))
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1676517/assets,https://api.github.com/repos/reactjs/redux/releases/1676517,master,https://api.github.com/repos/reactjs/redux/tarball/v1.0.1,https://github.com/reactjs/redux/releases/tag/v1.0.1,https://api.github.com/repos/reactjs/redux/zipball/v1.0.1,v1.0.1,False,False
+1674151,2015-08-14T16:07:01Z,2015-08-14T16:11:24Z,v1.0.0,"![](http://i.imgur.com/73u79JT.gif)
+
+### Breaking Changes
+
+If you're migrating from 0.12, apply [0.12 -> 1.0.0-alpha](https://github.com/rackt/redux/releases/tag/v1.0.0-alpha) migration first, and then [1.0.0-alpha -> 1.0.0-rc](https://github.com/rackt/redux/releases/tag/v1.0.0-rc). 1.0 only has a single breaking change since 1.0.0-rc:
+- If `dispatch` is attempted while reducer is executing, an error is thrown. Note that you can dispatch from lifecycle hooks just fine. It's only reducers that are not allowed to dispatch. (https://github.com/rackt/redux/issues/368) 
+
+### New Home
+
+We moved under [rackt](https://github.com/rackt) Github org. This won't affect you, but the new official URL is https://github.com/rackt/redux. We did this because we share values, and we want to collaborate on creating better tools, libraries, documentation, and examples. Redux stays independent of React, but we will work closely with React Router community to figure out a better integration.
+
+### Docs!
+
+[We have real docs now.](http://rackt.github.io/redux/) There are a few missing pieces, but it's a terrific effort, so thanks to everybody who contributed in the past month to get this shipped. Thanks to [Gitbook](https://github.com/GitbookIO/gitbook) for providing great tooling, too.
+
+### Examples!
+
+There's been no shortage of great examples in [Awesome Redux](https://github.com/xgrommx/awesome-redux), but we're shipping two new built-in examples in 1.0. One of them is a [very simple async application](https://github.com/rackt/redux/tree/master/examples/async). Creating it is covered in [async tutorial](http://rackt.github.io/redux/docs/advanced/AsyncActions.html). Another example we ship is a [“real-world” example](https://github.com/rackt/redux/tree/master/examples/real-world). It's a port of somewhat well-known [flux-react-router-example](https://github.com/gaearon/flux-react-router-example) to Redux, and shows advanced techniques such as caching, data normalization, custom API middleware, and pagination. Hopefully this example will help answer some commonly asked questions.
+
+### Other Improvements
+- Unsubscribing during a dispatch is now fixed: https://github.com/rackt/redux/pull/462
+- `bindActionCreators` now can also accept a function as the first argument: https://github.com/rackt/redux/pull/352
+- Dispatching from iframe now works: https://github.com/rackt/redux/issues/304
+- Symbols can be used as action types: https://github.com/rackt/redux/pull/295 (Note: we don't recommend you to do this, because they're not serializable, so you can't record/replay user sessions.)
+
+### Patrons
+
+The work on Redux was [funded by the community](https://www.patreon.com/reactdx).  
+Meet some of the outstanding companies and individuals that made it possible:
+- [Webflow](https://webflow.com/)
+- [Chess iX](http://www.chess-ix.com/)
+- [Herman J. Radtke III](http://hermanradtke.com)
+- [Ken Wheeler](http://kenwheeler.github.io/)
+- Chung Yen Li
+- [Sunil Pai](https://twitter.com/threepointone)
+- [Charlie Cheever](https://twitter.com/ccheever)
+- [Eugene G](https://twitter.com/e1g)
+- [Matt Apperson](https://twitter.com/mattapperson)
+- [Jed Watson](https://twitter.com/jedwatson)
+- [Sasha Aickin](https://twitter.com/xander76)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1674151/assets,https://api.github.com/repos/reactjs/redux/releases/1674151,master,https://api.github.com/repos/reactjs/redux/tarball/v1.0.0,https://github.com/reactjs/redux/releases/tag/v1.0.0,https://api.github.com/repos/reactjs/redux/zipball/v1.0.0,v1.0.0,False,False
+1531057,2015-07-13T16:42:57Z,2015-07-13T18:32:22Z,v1.0.0-rc,"**NOTE: THIS IS A PRE-RELEASE WITH SOME BREAKING CHANGES.**
+**THE README IS NOT UPDATED TO ITS API, SEE EXAMPLES AND TESTS INSTEAD.**
+
+Compatible example code: https://github.com/gaearon/redux/tree/v1.0.0-rc/examples
+Compatible test code: https://github.com/gaearon/redux/tree/v1.0.0-rc/test
+
+**Changes in these release build on top of [changes in 1.0 alpha release](https://github.com/gaearon/redux/pull/195#issue-92206321), so check them out first.**
+
+## Big Changes
+
+### React-specific code has been moved to [react-redux](https://github.com/gaearon/react-redux) and will be versioned separately
+
+This means that `<Provider>`, `@provide`, `<Connector>`, `@connect` are all there. This means you need to replace `'redux/react'` with `react-redux` and `redux/react-native` with `react-redux/native` in your dependency tree, as well as add `react-redux` as an explicit dependency if you use React. For global builds, you'll get `Redux` from this library and `ReactRedux` from the other library. They should work together well.
+
+> Link: #230
+
+#### 1.0 alpha
+
+``` js
+import { createStore } from 'redux';
+import { Provider } from 'redux/react'; // React
+import { Provider } from 'redux/react-native'; // React Native
+```
+
+#### 1.0 RC
+
+``` js
+import { createStore } from 'redux';
+import { Provider } from 'react-redux'; // React
+import { Provider } from 'react-redux/native'; // React Native
+```
+
+### `createStore` no longer implicitly combines reducers
+
+Now you have to use `combineReducers` explicitly to combine several reducer functions into a single reducer.
+
+> Link: #257
+
+#### 1.0 alpha
+
+``` js
+import { createStore } from 'redux';
+import * as reducers from '../reducers';
+
+const store = createStore(reducers);
+```
+
+#### 1.0 RC
+
+``` js
+import { createStore, combineReducers } from 'redux';
+import * as reducers from '../reducers';
+
+const reducer = combineReducers(reducers)
+const store = createStore(reducer);
+```
+
+### All middleware is now “smart” middleware
+
+All middleware now accepts `{ getState, dispatch }` as the first parameter. This means that, if your middleware already accepted `({ dispatch, getState })`, you don't need to change anything, but otherwise you need to wrap your middleware into one more function.
+
+> Link: #213
+
+#### 1.0 alpha
+
+``` js
+// “Dumb” middleware
+export function log(next) {
+  return (action) => {
+    console.log(action);
+    return next(action);
+  };
+}
+
+// “Smart” middleware
+export function thunk({ dispatch, getState }) {
+  return next => action =>
+    typeof action === 'function' ?
+      action(dispatch, getState) :
+      next(action);
+}
+```
+
+#### 1.0 RC
+
+``` js
+// “Dumb” middleware is wrapped in one more function
+export function log(/* { dispatch, getState } */) {
+  return next => action => {
+    console.log(action);
+    return next(action);
+  };
+}
+
+// “Smart” middleware stays the same
+export function thunk({ dispatch, getState }) {
+  return (next) => (action) =>
+    typeof action === 'function' ?
+      action(dispatch, getState) :
+      next(action);
+}
+```
+
+### `createStore` no longer accepts middleware
+
+You need to use a dedicated `applyMiddleware(...middlewares)` function that turns a vanilla `createStore` into a middleware-capable `createStore`.
+
+> Link: #213
+
+#### 1.0 alpha
+
+``` js
+import { createStore } from 'redux';
+import * as reducers from '../reducers';
+
+const store = createStore(
+  reducers,
+  initialState,
+  ({ getState, dispatch }) => [thunk({ getState, dispatch }), logger]
+);
+```
+
+#### 1.0 RC
+
+``` js
+import { createStore, combineReducers, applyMiddleware } from 'redux';
+import * as reducers from '../reducers';
+
+const reducer = combineReducers(reducers);
+const finalCreateStore = applyMiddleware(thunk, logger)(createStore);
+const store = finalCreateStore(reducer, initialState);
+```
+
+### The thunk middleware is no longer included by default
+
+If you use “async action creator” form where an action creator returns a function with `dispatch, getState => ...` signature, now you need to add `redux-thunk` as a dependency and explicitly pass it to `applyMiddleware`.
+
+> Link: #256
+
+#### 1.0 alpha
+
+``` js
+import { createStore } from 'redux';
+import * as reducers from '../reducers';
+
+const store = createStore(reducers, initialState);
+
+store.dispatch(incrementAsync());
+```
+
+#### 1.0 RC
+
+``` js
+import { createStore, combineReducers, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
+import * as reducers from '../reducers';
+
+const reducer = combineReducers(reducers);
+const finalCreateStore = applyMiddleware(thunk)(createStore);
+const store = finalCreateStore(reducer, initialState);
+
+store.dispatch(incrementAsync());
+```
+
+## Correctness Changes
+
+### `combineReducers` now throws if you return `undefined` state
+
+Previously, reducers could return `undefined` as a valid value. Unfortunately it's too easy to do this by mistake by putting an early `return` into a reducer, or by forgetting to specify a `default` case inside the `switch` statement. The new behavior is to throw in `combineReducers` if you return `undefined` while handling an action or initializing. If `undefined` is a valid state for your reducer, consider using `null` instead.
+
+> Links: #173, #191, #193, #197, #259
+
+#### 1.0 alpha
+
+``` js
+function toggle(state, action) {
+  switch (action.type) {
+  case SET_ON:
+    return true;
+  case SET_OFF:
+    return undefined;
+  }
+}
+```
+
+#### 1.0 RC
+
+``` js
+function toggle(state = false, action) {
+  switch (action.type) {
+  case SET_ON:
+    return true;
+  case SET_OFF:
+    return false;
+  default:
+    return state;
+  }
+}
+```
+
+### `combineReducers` throws if you have no `default` case
+
+Handling `@@INIT` action is an anti-pattern. It's internal to Redux, and you should never handle it directly. It is renamed to `@@redux/INIT` in Redux 1.0 RC. In addition, Redux now throws if your reducer does not return an initial state in response to a randomized action type.
+
+If you used `@@INIT` action to return the initial state, you should instead return it when the `state` passed as the first argument is `undefined`, regardless of the action type. **You should remove any reference to `@@INIT` action type from your code.**
+
+If you used `@@INIT` action to transform rehydrated state from server (for example, to turn plain objects into immutable maps), you need to do this by inspecting `state` instead. For example, [see how `redux-example` fixed this problem](https://github.com/quangbuule/redux-example/commit/920a11852785098fa7a448e7c79c9c1b5bf12a14).
+
+> Links: #186, #259
+
+#### 1.0 alpha
+
+``` js
+function counter(state, action) {
+  switch (action.type) {
+  case '@@INIT': // You could get away with this in alpha
+    return 0;
+  case INCREMENT:
+    return state + 1;
+  case DECREMENT:
+    return state - 1;
+  }
+}
+
+function immutable(state = Immutable.fromJS({}), action) {
+  switch (action.type) {
+  case '@@INIT': // You could get away with this in alpha
+    return Immutable.fromJS(state);
+  case DO_SOMETHING:
+    return state.merge(something);
+  }  
+}
+```
+
+#### 1.0 RC
+
+``` js
+function counter(state = 0, action) {
+  switch (action.type) {
+  case INCREMENT:
+    return state + 1;
+  case DECREMENT:
+    return state - 1;
+  default:
+    return state; // Will be probed by a random action
+  }
+}
+
+function immutable(state = {}, action) {
+  if (!Map.isMap(state) && !List.isList(state)) {
+    state = Immutable.fromJS(state);
+  }
+
+  switch (action.type) {
+  case DO_SOMETHING:
+    return state.merge(something);
+  default:
+    return state; // Will be probed by a random action
+  }  
+}
+```
+
+### (React) Components now update correctly in response to the actions fired in `componentDidMount`
+
+> Link: #208
+
+### Dispatch from the middleware sends the dispatch through the whole middleware chain
+
+> Link: #250
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1531057/assets,https://api.github.com/repos/reactjs/redux/releases/1531057,breaking-changes-1.0,https://api.github.com/repos/reactjs/redux/tarball/v1.0.0-rc,https://github.com/reactjs/redux/releases/tag/v1.0.0-rc,https://api.github.com/repos/reactjs/redux/zipball/v1.0.0-rc,v1.0.0-rc,False,False
+1480850,2015-06-30T18:55:07Z,2015-06-30T21:58:16Z,v1.0.0-alpha,"**NOTE: THIS IS A PRE-RELEASE WITH SOME BREAKING CHANGES.**
+**THE README IS NOT UPDATED TO ITS API, SEE EXAMPLES AND TESTS INSTEAD.**
+
+**Compatible example code: https://github.com/gaearon/redux/tree/v1.0.0-alpha/examples**
+**Compatible test code: https://github.com/gaearon/redux/tree/v1.0.0-alpha/test**
+
+**Full diff (includes changes to the examples, tests and implementation):
+https://github.com/rackt/redux/compare/v0.12.0...v1.0.0-alpha?diff=unified**
+
+### Naming
+- “Stateless Stores” are now called reducers. (https://github.com/gaearon/redux/issues/137#issuecomment-114178411)
+- The “Redux instance” is now called “The Store”. (https://github.com/gaearon/redux/issues/137#issuecomment-113252359)
+- The dispatcher is removed completely. (https://github.com/gaearon/redux/pull/166#issue-90113962)
+
+### API changes
+- <s>`composeStores`</s> is now `composeReducers`.
+- <s>`createDispatcher`</s> is gone.
+- <s>`createRedux`</s> is now `createStore`.
+- `<Provider>` now accepts `store` prop instead of <s>`redux`</s>.
+- The new `createStore` signature is `createStore(reducer: Function | Object, initialState: any, middlewares: Array | ({ getState, dispatch }) => Array)`.
+- If the first argument to `createStore` is an object, `composeReducers` is automatically applied to it.
+- The “smart” middleware signature changed. It now accepts an object instead of a single `getState` function. The `dispatch` function lets you “recurse” the middleware chain and is useful for async: #113 (comment).
+
+### Correctness changes
+- The `dispatch` provided by the default thunk middleware now walks the whole middleware chain.
+- It is enforced now that raw Actions at the end of the middleware chain have to be plain objects.
+- Nested dispatches are now handled gracefully. (#110, #119)
+
+### Internal changes
+- The object in React context is renamed from <s>`redux`</s> to `store`.
+- Some tests are rewritten for clarity, focus and edge cases.
+- Redux in examples is now aliased to the source code for easier work on master.
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1480850/assets,https://api.github.com/repos/reactjs/redux/releases/1480850,master,https://api.github.com/repos/reactjs/redux/tarball/v1.0.0-alpha,https://github.com/reactjs/redux/releases/tag/v1.0.0-alpha,https://api.github.com/repos/reactjs/redux/zipball/v1.0.0-alpha,v1.0.0-alpha,False,True
+1435630,2015-06-19T00:32:34Z,2015-06-19T00:35:42Z,v0.12.0,"No breaking changes this time.
+- Classes returned by decorators now expose a static `DecoratedComponent` property for easier testing
+- Dependencies on `lodash` and `babel-runtime` are dropped
+- Now compatible with Babel loose mode
+- `composeStore` now ignores non-function values (useful in Babel loose mode)
+- A UMD build is added
+- The initial action dispatched to the stores now has a built-in `@@INIT` type (might be useful to devtools)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1435630/assets,https://api.github.com/repos/reactjs/redux/releases/1435630,master,https://api.github.com/repos/reactjs/redux/tarball/v0.12.0,https://github.com/reactjs/redux/releases/tag/v0.12.0,https://api.github.com/repos/reactjs/redux/zipball/v0.12.0,v0.12.0,False,True
+1422712,2015-06-16T15:23:20Z,2015-06-16T15:24:07Z,v0.11.1,"- Bugfix: when `Connector` `select` property changes, the state did not recalculate (#107)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1422712/assets,https://api.github.com/repos/reactjs/redux/releases/1422712,master,https://api.github.com/repos/reactjs/redux/tarball/v0.11.1,https://github.com/reactjs/redux/releases/tag/v0.11.1,https://api.github.com/repos/reactjs/redux/zipball/v0.11.1,v0.11.1,False,True
+1414666,2015-06-14T19:21:08Z,2015-06-14T19:23:40Z,v0.11.0,"- Renames `compose` root export to `composeMiddleware` to clarify the intent
+- Fixes a bug with `getState` returning stale state after a hot reload (#90)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1414666/assets,https://api.github.com/repos/reactjs/redux/releases/1414666,master,https://api.github.com/repos/reactjs/redux/tarball/v0.11.0,https://github.com/reactjs/redux/releases/tag/v0.11.0,https://api.github.com/repos/reactjs/redux/zipball/v0.11.0,v0.11.0,False,True
+1412699,2015-06-13T20:06:38Z,2015-06-13T20:12:47Z,v0.10.1,"Missing from the 0.10 release notes: **React Native is now supported!**
+(And that's actually a breaking change.) 
+
+Now, to import React-specific parts (containers or decorators), you need to either import from `redux/react` or `redux/react-native`:
+
+``` js
+// Import utilities and functions from redux
+import { createRedux, bindActionCreators } from 'redux';
+
+// Import components and decorators from redux/react
+import { provide, Connector } from 'redux/react';
+
+// React Native: Import components and decorators from redux/react-native
+import { provide, Connector } from 'redux/react-native';
+```
+
+0.10 release also had a problem with ES6 code inside `redux/react` and `redux/react-native` entry points, which is now fixed. Please upgrade if you had problems with 0.10.
+
+Changes introduced in 0.10.1:
+- `Connector` now throws if `select` returns something other than a plain object (https://github.com/gaearon/redux/pull/85)
+- The custom dispatcher API is tweaked so `setState` now returns the state that was actually set. This makes custom dispatchers more composable. (https://github.com/gaearon/redux/pull/77)
+
+Happy reducing!
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1412699/assets,https://api.github.com/repos/reactjs/redux/releases/1412699,master,https://api.github.com/repos/reactjs/redux/tarball/v0.10.1,https://github.com/reactjs/redux/releases/tag/v0.10.1,https://api.github.com/repos/reactjs/redux/zipball/v0.10.1,v0.10.1,False,True
+1411662,2015-06-13T04:34:24Z,2015-06-13T04:37:46Z,v0.10.0,"## Middleware
+
+Redux 1.0 is within striking distance! Can you believe how quickly Redux has matured? @gaearon made the first commit only [14 days ago](https://github.com/gaearon/redux/commit/8bc14659780c044baac1432845fe1e4ca5123a8d).
+
+The 0.10 release is a follow-up to 0.9, with a focus on what we're calling (at least for now) **middleware**.
+
+You can read all about middleware [here](https://github.com/gaearon/redux/blob/master/docs/middleware.md). We plan to release some official middleware soon, but of course we'd also love to see middleware created by the community.
+
+### Breaking changes
+
+Just a small one: Redux includes a feature that enables you to return a function from an action creator to perform asynchronous dispatches. The function receives a callback and `getState()` as parameters. This has behavior has been re-implemented as middleware and moved into a separate module called [`thunkMiddleware()`](https://github.com/gaearon/redux/blob/master/src/middleware/thunk.js). It is included automatically when using the `createRedux(stores)` shortcut, but not when using `createDispatcher()`.
+
+### Tests
+
+We have tests! Still need to improve coverage in a few areas, but we're currently at ~93%. Not bad! Big thanks to @emmenko for setting these up.
+",https://api.github.com/users/acdlite,3624098,acdlite,https://api.github.com/repos/reactjs/redux/releases/1411662/assets,https://api.github.com/repos/reactjs/redux/releases/1411662,master,https://api.github.com/repos/reactjs/redux/tarball/v0.10.0,https://github.com/reactjs/redux/releases/tag/v0.10.0,https://api.github.com/repos/reactjs/redux/zipball/v0.10.0,v0.10.0,False,True
+1392862,2015-06-09T09:35:44Z,2015-06-09T09:50:55Z,v0.9.0,"### Internal Refactoring & Custom Dispatchers
+
+This release brings breaking changes necessary to start experimenting with middleware and extensibility (#6, #55). It does _not_ bring any support for middleware _per se_, but it untangles “Dispatcher” (a function that tells how actions turn into state updates) from “Redux” (an instance holding the current state and managing subscriptions). It is now possible to specify your own Dispatcher if you want to experiment with ideas like middleware, time travel, action creators returning Promises or Observables, etc.
+- `createDispatcher` now returns a function you need to give to `createRedux`
+- `createRedux` is the primary API you'll use for initialization
+- Instead of `dispatcher` prop, a `dispatch` function prop is injected by the `<Connector>` and `@connect`
+- Instead of `dispatcher` prop, `<Provider>` and `@provide` accept a `redux` prop
+- Instead of `dispatcher.getAtom()`, use `redux.getState()`
+- Instead of `dispatcher.setAtom()`, you may pass a second `initialState` argument to `createRedux`
+- Instead of `dispatcher.perfrorm()` or `dispatcher.dispatch()`, use `redux.dispatch()`
+- `bindActions` is renamed to `bindActionCreators` and accepts `dispatch` as the second parameter
+- You may skip `composeStores` and `createDispatcher` completely and just use `createRedux(stores)` as a shortcut
+
+### How It Looks Like Now
+
+#### Initialization
+
+##### Short Way
+
+This is a shortcut for the most common use case.
+
+``` js
+import { createRedux, Provider } from 'redux';
+import * as stores from '../stores/index';
+
+const redux = createRedux(stores);
+
+export default class App {
+  render() {
+    return (
+      <Provider redux={redux}>
+        {() =>
+          <CounterApp />
+        }
+      </Provider>
+    );
+  }
+}
+```
+
+###### Long Way
+
+This way of writing lets you use compose Stores differently, or even pass a custom Dispatcher function. Its signature is `(initialState, setState) => (action) => ()`.
+
+``` js
+import { createRedux, createDispatcher, composeStores } from 'redux';
+import * as stores from '../stores/index';
+
+// Compose all your Stores into a single Store function with `composeStores`:
+const store = composeStores(stores);
+
+// Create a default Dispatcher function for your composite Store:
+const dispatcher = createDispatcher(store); // You may use your custom function here
+
+// Create a Redux instance using the dispatcher function:
+const redux = createRedux(dispatcher);
+
+export default class App {
+  render() {
+    return (
+      <Provider redux={redux}>
+        {() =>
+          <CounterApp />
+        }
+      </Provider>
+    );
+  }
+}
+```
+
+### Hydration and dehydration
+
+``` js
+// server
+const redux = createRedux(stores);
+redux.dispatch(MyActionCreators.doSomething()); // fire action creators to fill the state
+const state = redux.getState(); // somehow pass this state to the client
+
+// client
+const initialState = window.STATE_FROM_SERVER;
+const redux = createRedux(stores, initialState);
+```
+
+### Binding actions
+
+``` js
+import React from 'react';
+import { connect, bindActionCreators } from 'redux';
+import Counter from '../components/Counter';
+import * as CounterActions from '../actions/CounterActions';
+
+@connect(state => ({
+  counter: state.counter
+}))
+export default class CounterApp {
+  render() {
+    const { counter, dispatch } = this.props;
+    return (
+      <Counter counter={counter}
+               {...bindActionCreators(CounterActions, dispatch)} />
+    );
+  }
+}
+```
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1392862/assets,https://api.github.com/repos/reactjs/redux/releases/1392862,master,https://api.github.com/repos/reactjs/redux/tarball/v0.9.0,https://github.com/reactjs/redux/releases/tag/v0.9.0,https://api.github.com/repos/reactjs/redux/zipball/v0.9.0,v0.9.0,False,True
+1384832,2015-06-06T20:52:02Z,2015-06-06T20:55:51Z,v0.8.1,"- `hydrate()` and `dehydrate()` are gone, welcome `getAtom()` and `setAtom()` instead
+- `initialize()` and `dispose()` are added for advanced use cases
+- changing `select` function now updates the `Connector` state
+- the bug with action creators accepting `dispatch` instead of `perform` is fixed
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1384832/assets,https://api.github.com/repos/reactjs/redux/releases/1384832,master,https://api.github.com/repos/reactjs/redux/tarball/v0.8.1,https://github.com/reactjs/redux/releases/tag/v0.8.1,https://api.github.com/repos/reactjs/redux/zipball/v0.8.1,v0.8.1,False,True
+1384543,2015-06-06T16:38:44Z,2015-06-06T16:41:35Z,v0.8.0,"### The Big Rewrite!
+
+This release wouldn't have happened without [this @acdlite's wonderful gist](https://gist.github.com/acdlite/9f1b5883d132ad242323).
+
+New:
+- Now there is just one top Store, _but_ you may compose your Stores using `composeStores` higher-order Store (seriously.)
+- Dispatcher is now part of the public API and offers (de)hydration for isomorphic apps.
+- Fine-grained subscriptions via the new `<Connector select={fn}>` prop
+- Less surprising, more consistent API
+
+Read the discussion: https://github.com/gaearon/redux/pull/46
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1384543/assets,https://api.github.com/repos/reactjs/redux/releases/1384543,master,https://api.github.com/repos/reactjs/redux/tarball/v0.8.0,https://github.com/reactjs/redux/releases/tag/v0.8.0,https://api.github.com/repos/reactjs/redux/zipball/v0.8.0,v0.8.0,False,True
+1383445,2015-06-05T23:27:03Z,2015-06-05T23:28:55Z,v0.7.0,"- Change second parameter in callback-style action creator from `state` to `read: (Store) => state` (#44)
+- Rename: `Container -> Injector, @container -> @inject, Root -> Dispatcher, @root -> @dispatch` (#20)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1383445/assets,https://api.github.com/repos/reactjs/redux/releases/1383445,master,https://api.github.com/repos/reactjs/redux/tarball/v0.7.0,https://github.com/reactjs/redux/releases/tag/v0.7.0,https://api.github.com/repos/reactjs/redux/zipball/v0.7.0,v0.7.0,False,True
+1376646,2015-06-04T14:00:13Z,2015-06-04T14:01:55Z,v0.6.2,"- `@container`'s second parameter now also accepts the `props` passed to it (#36)
+- `<Container />` and `<Root />` invoke their `this.props.children` functions without `this.props` context
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1376646/assets,https://api.github.com/repos/reactjs/redux/releases/1376646,master,https://api.github.com/repos/reactjs/redux/tarball/v0.6.2,https://github.com/reactjs/redux/releases/tag/v0.6.2,https://api.github.com/repos/reactjs/redux/zipball/v0.6.2,v0.6.2,False,True
+1376561,2015-06-04T13:41:25Z,2015-06-04T13:42:25Z,v0.6.1,"- Fix incorrect ES6 Map usage (#35)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1376561/assets,https://api.github.com/repos/reactjs/redux/releases/1376561,master,https://api.github.com/repos/reactjs/redux/tarball/v0.6.1,https://github.com/reactjs/redux/releases/tag/v0.6.1,https://api.github.com/repos/reactjs/redux/zipball/v0.6.1,v0.6.1,False,True
+1376284,2015-06-04T12:15:20Z,2015-06-04T12:22:58Z,v0.6.0,"- Breaking change: `stores` now accepts an object, just like `actions`
+- Breaking change: `Container` children function signature is now `({ actions, state }) => ...`
+- More fine-grained `Container` props validation
+
+This fixes #22. There is no more prop shape difference between subscribing to a single or to many stores.
+Your container may now look like this:
+
+``` js
+<Container stores={{ counter: stores.counterStore }}
+           actions={{ increment, decrement }}>
+  {({ state, actions }) => <Counter {...state} {...actions} />}
+</Container>
+```
+
+Note that you can change the `state` shape by giving arbitrary keys to your stores. It's also easier to choose what exactly you want to pass to the component. For example, you could write `actions={actions}` instead of `{...actions}`, and get all actions in `this.props.actions`.
+
+The decorator version is changed the same way:
+
+``` js
+@container({
+  actions: { increment, decrement },
+  stores: { counter: counterStore }
+})
+export default class Counter {
+```
+
+It also now accepts a second `transformProps` argument to be just as expressive as the component version:
+
+``` js
+@container({
+  actions: { increment, decrement },
+  stores: { counter: counterStore }
+}, ({ actions, state}) => { ...actions, ...state })) // default shape; you can write your own
+```
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1376284/assets,https://api.github.com/repos/reactjs/redux/releases/1376284,master,https://api.github.com/repos/reactjs/redux/tarball/v0.6.0,https://github.com/reactjs/redux/releases/tag/v0.6.0,https://api.github.com/repos/reactjs/redux/zipball/v0.6.0,v0.6.0,False,True
+1371205,2015-06-03T12:05:37Z,2015-06-03T12:06:12Z,v0.5.1,"- Fix the remaining dependency on the function name (#16)
+- Add a few early invariants
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1371205/assets,https://api.github.com/repos/reactjs/redux/releases/1371205,master,https://api.github.com/repos/reactjs/redux/tarball/v0.5.1,https://github.com/reactjs/redux/releases/tag/v0.5.1,https://api.github.com/repos/reactjs/redux/zipball/v0.5.1,v0.5.1,False,True
+1371086,2015-06-03T11:30:50Z,2015-06-03T11:32:55Z,v0.5.0,"- Store function names are no longer significant, but you have to pass an object with all your Stores to the `root` (or `Root`). Fixes https://github.com/gaearon/redux/issues/16
+
+``` js
+import { root } from 'redux';
+import * as stores from './stores/index';
+
+@root(stores)
+export default class TodoApp {
+```
+
+``` js
+import { root } from 'redux';
+import * as stores from './stores/index';
+
+export default class TodoApp {
+  render() {
+    return (
+      <Root stores={stores}>
+```
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1371086/assets,https://api.github.com/repos/reactjs/redux/releases/1371086,master,https://api.github.com/repos/reactjs/redux/tarball/v0.5.0,https://github.com/reactjs/redux/releases/tag/v0.5.0,https://api.github.com/repos/reactjs/redux/zipball/v0.5.0,v0.5.0,False,True
+1370994,2015-06-03T11:03:56Z,2015-06-03T11:04:27Z,v0.4.0,"- Bring decorators back, now on top of the lower-level container components (https://github.com/gaearon/redux/pull/15, thanks Florent)
+- Require `stores` passed to `Container` to be an array
+- Fix build on Windows (https://github.com/gaearon/redux/pull/11, thanks Mike)
+- Reduce context footprint (https://github.com/gaearon/redux/pull/12, thanks Florent again!)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1370994/assets,https://api.github.com/repos/reactjs/redux/releases/1370994,master,https://api.github.com/repos/reactjs/redux/tarball/v0.4.0,https://github.com/reactjs/redux/releases/tag/v0.4.0,https://api.github.com/repos/reactjs/redux/zipball/v0.4.0,v0.4.0,False,True
+1369350,2015-06-03T00:52:39Z,2015-06-03T00:52:57Z,v0.3.1,"- Remove old files from build
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1369350/assets,https://api.github.com/repos/reactjs/redux/releases/1369350,master,https://api.github.com/repos/reactjs/redux/tarball/v0.3.1,https://github.com/reactjs/redux/releases/tag/v0.3.1,https://api.github.com/repos/reactjs/redux/zipball/v0.3.1,v0.3.1,False,True
+1369347,2015-06-03T00:48:24Z,2015-06-03T00:51:33Z,v0.3.0,"Complete rewrite.
+- **No more strings,** now using module bindings for injecting stores and actions
+- Only use decorator for top-level component, keep dumb components pure and testable (https://github.com/gaearon/redux/issues/5)
+- Remove transaction logic (will be re-implemented on top of https://github.com/gaearon/redux/issues/6)
+
+``` js
+// The smart component may inject actions
+// and observe stores using <Container />:
+
+import React, { Component } from 'react';
+import { Root, Container } from 'redux';
+import { increment, decrement } from './actions/CounterActions';
+import counterStore from './stores/counterStore';
+import Counter from './Counter';
+
+export default class CounterContainer {
+  render() {
+    // stores can be a single store or an array.
+    // actions can only be a string -> function map.
+    // props passed to children will combine these actions and state.
+    return (
+      <Container stores={counterStore}
+                 actions={{ increment, decrement }}>
+        {props => <Counter {...props} />}
+      </Container>
+    );
+  }
+}
+```
+
+Minor caveat: Store function names are now significant.
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1369347/assets,https://api.github.com/repos/reactjs/redux/releases/1369347,master,https://api.github.com/repos/reactjs/redux/tarball/v0.3.0,https://github.com/reactjs/redux/releases/tag/v0.3.0,https://api.github.com/repos/reactjs/redux/zipball/v0.3.0,v0.3.0,False,True
+1367931,2015-06-02T18:42:18Z,2015-06-02T18:42:45Z,v0.2.2,"- Pass `state` as a second argument to callback-style action creators
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1367931/assets,https://api.github.com/repos/reactjs/redux/releases/1367931,master,https://api.github.com/repos/reactjs/redux/tarball/v0.2.2,https://github.com/reactjs/redux/releases/tag/v0.2.2,https://api.github.com/repos/reactjs/redux/zipball/v0.2.2,v0.2.2,False,True
+1366730,2015-06-02T14:35:23Z,2015-06-02T14:36:30Z,v0.2.1,"- Fix `@provides` not passing its props down
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1366730/assets,https://api.github.com/repos/reactjs/redux/releases/1366730,master,https://api.github.com/repos/reactjs/redux/tarball/v0.2.1,https://github.com/reactjs/redux/releases/tag/v0.2.1,https://api.github.com/repos/reactjs/redux/zipball/v0.2.1,v0.2.1,False,True
+1366674,2015-06-02T14:28:30Z,2015-06-02T14:29:40Z,v0.2.0,"Initial public release.
+
+See examples in [README](https://github.com/gaearon/redux/blob/master/README.md) and the [examples](https://github.com/gaearon/redux/tree/master/examples) folder.
+
+Alpha quality :-)
+",https://api.github.com/users/gaearon,810438,gaearon,https://api.github.com/repos/reactjs/redux/releases/1366674/assets,https://api.github.com/repos/reactjs/redux/releases/1366674,master,https://api.github.com/repos/reactjs/redux/tarball/v0.2.0,https://github.com/reactjs/redux/releases/tag/v0.2.0,https://api.github.com/repos/reactjs/redux/zipball/v0.2.0,v0.2.0,False,True

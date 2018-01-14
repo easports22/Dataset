@@ -1,0 +1,1101 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7810527,2017-09-19T15:51:23Z,2017-09-19T15:54:47Z,1.6.17,"### Release Notes
+
+**Hangfire.SqlServer**
+
+* **Added** – `SqlServerStorageOptions.CommandBatchMaxTimeout` parameter to enable batching in transactions.
+* **Fixed** – Timeout exceptions when there are a lot of large concurrent transactions by using the new batching method.
+* **Fixed** – Distributed locks are safe now even in very unreliable networks and after network blips.
+* **Performance** – Greatly decreased the number of connections required to process background jobs.
+* **Performance** – Significantly decrease the number of roundtrips required to commit a transaction.",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/7810527/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/7810527,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.17,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.17,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.17,v1.6.17,False,False
+7613975,2017-09-02T11:28:25Z,2017-09-02T11:33:31Z,1.6.16,"### Release Notes
+
+This is yet another maintenance release that fixes a bunch of non-critical bugs in `Hangfire.Core` and `Hangfire.SqlServer` packages.
+
+**Hangfire.Core**
+
+* **Fixed** – Unexpected `DateTime` and `DateTime?` serialization issues in background job arguments (#971 by @plaisted, #970, #972).
+* **Fixed** – `DistributedLockTimeoutException` in some background processes now logged with ""DEBUG"" level instead of ""ERROR"" (#789).
+* **Fixed** – `ElmahLogProvider` to show errors when using SQL log (#867 by @francnuec).
+* **Fixed** – Last execution field isn't shown on recurring jobs page, when background job has already expired (#930).
+* **Fixed** – `Hangfire.SqlServer` assembly doesn't include version in the `netstandard` target (#951).
+
+**Hangfire.SqlServer**
+
+* **Fixed** – Lower the number of requests, when trying to acquire a distributed lock.
+* **Fixed** – Problems with continuations and batch continuations, when using existing `SqlConnection` instance.
+* **Fixed** – Distributed locks were silently released, when passing explicit closed connection to a storage.
+* **Fixed** – `KeyNotFoundException` errors on various dashboard pages don't appear anymore (#948 by @benjymous, #945, #946).
+* **Fixed** – ""Cannot release the application lock because it is not currently held"" exceptions, when connection was closed.
+* **Fixed** – Allow to use zero timeout for SQL Server-based distributed locks (#967).",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/7613975/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/7613975,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.16,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.16,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.16,v1.6.16,False,False
+7320184,2017-08-08T15:04:25Z,2017-08-08T15:13:03Z,1.6.15,"### Release Notes
+
+This release contains important fixes for the Hangfire.SqlServer package, which is actively using the [`sp_getapplock`](https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-getapplock-transact-sql) stored procedure to synchronize work between different servers. I've realized that locks shouldn't be awaited on SQL Server's side, because this may lead to SQL Server's connection pool starvation, because each blocked request will block a single worker thread. 
+
+When you are using a lot of workers, and there's a contention on few lock resources (like when using the `DisableConcurrentExecutionAttribute`, batches or many continuations on a single job), all worker threads can be blocked in SQL Server, causing its unresponsiveness and lead to huge amount of timeout exceptions.
+
+**Hangfire.SqlServer**
+
+* **Fixed** – Timeout exceptions that's caused by SQL Server's thread pool starvation, caused by `sp_getapplock`&nbsp;(fbe756ee71ccb6bd20ee9f9167981d4574c773d4).
+* **Fixed** – Antecedent background job is constantly failing, when its continuation hasn't been fully created&nbsp;(8bece534517cd5cdfea35f49eb1b046e14d1f16e).",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/7320184/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/7320184,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.15,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.15,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.15,v1.6.15,False,False
+6735917,2017-06-16T09:07:22Z,2017-06-16T09:45:56Z,1.6.14,"### Release Notes
+
+This versions adds possibility to use non-transactional message fetching algorithm when using Hangfire.SqlServer package. This is especially helpful, if you have a lot of long-running background jobs, since they may prevent you from taking transaction log backups, leading to the *Transaction log is full due to 'ACTIVE_TRANSACTION'* error.
+
+The new implementation is based on the old invisibility timeout, but workers are now periodically renewing that timeout, so you can forget about setting too high timeout just to allow your long-running background jobs to run smoothly. Non-transactional fetch is not enabled by default in this version (but will be in 1.7.0), to configure it use the `SlidingInvisibilityTimeout` option. 
+
+Lower values will stress your database (for example, if it is set to 5 minutes, each worker will run a keep-alive query each minute when processing a job), higher values will add a corresponding delay, when processing is terminated ungracefully.
+
+```csharp
+GlobalConfiguration.Configuration.UseSqlServerStorage(
+    ""connection_string"", 
+    new SqlServerStorageOptions { SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5) });
+```
+
+**Hangfire.SqlServer**
+
+* **Added** – `SqlServerStorageOptions.SlidingInvisibilityTimeout` to fetch jobs without using transaction.
+* **Fixed** – Transaction log is full due to 'ACTIVE_TRANSACTION' by allowing to use new non-transactional fetch.
+* **Fixed** – `SqlServerJobQueueMonitoringApi` can't cause READ UNCOMMITTED isolation level to leak on SQL Server 2012 or earlier. 
+* **Fixed** – Add missing `SqlServerStorage(DbConnection, SqlServerStorageOptions)` constructor.",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/6735917/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/6735917,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.14,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.14,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.14,v1.6.14,False,False
+6635419,2017-06-07T15:50:59Z,2017-06-07T15:55:14Z,1.6.13,"### Release Notes
+
+This release contains a bunch of fixes for core and integration packages. The most important updates are fix for SQL connection leaks when we failed to acquire a distributed lock, and wrong queue selection, when continuation is created after antecedent job is finished. So upgrade is recommended.
+
+**Hangfire.Core**
+
+* **Fixed** – Continuation is fired on a wrong queue, when parent job is finished before the creation.
+* **Fixed** – Impossible to intercept failed state transition before `AutomaticRetryAttribute`.
+* **Fixed** – Fixed translation in Chinese localization on home page (by @JustinChia).
+* **Fixed** – Don't throw `NullReferenceException`, when state has changed during query on Processing page.
+* **Fixed** – `CreateBatchFailedException`, when batch creation takes longer than 1 hour.
+
+**Hangfire.AspNetCore**
+
+* **Fixed** – Types are resolved using the `GetServiceOrCreateInstance` method (by @Tsabo).
+
+**Hangfire.SqlServer**
+
+* **Fixed** – `SqlServerDistributedLock` leaks connections, when lock acquisition is failed.
+* **Fixed** – Don't hide errors occurred while running SQL migrations.
+* **Fixed** – `KeyNotFoundException` when accessing Deleted Jobs page in Dashboard.",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/6635419/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/6635419,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.13,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.13,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.13,v1.6.13,False,False
+5831628,2017-03-22T13:44:23Z,2017-03-22T14:01:58Z,1.6.12,"### Release Notes
+
+This release brings better exception handling policy for state changing pipeline. Previously, non-transient exception in a state filter could cause a worker to perform retries for affected background job infinitely. And a large number of such background jobs could stall the processing.
+
+The new logic makes 10 attempts to perform a state change using state filters. When all the attempts failed, it moves background job to the Failed state without calling any state filters.
+
+**Hangfire.Core**
+
+* **Fixed** – Buggy state filters may cause background job to be infinitely retried.
+* **Fixed** – Transient exception during Processing-Succeeded state transition may cause unexpected retry.",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/5831628/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/5831628,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.12,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.12,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.12,v1.6.12,False,False
+5735484,2017-03-14T09:37:49Z,2017-03-14T09:39:51Z,1.6.11,"This release fixes a problem with CSS and JS files in dashboard appeared in 1.6.10, as well as corrects the authorization behavior, when the `User` property is `null`.
+
+**Hangfire.Core**
+
+* **Fixed** – `NullReferenceException` in dashboard when OWIN's or ASP.NET Core's `User` is `null`.
+* **Fixed** – Bug related to missing CSS and JS resources in dashboard appeared in [1.6.10](https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.10).",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/5735484/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/5735484,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.11,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.11,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.11,v1.6.11,False,False
+5727689,2017-03-13T17:45:48Z,2017-03-13T17:50:44Z,1.6.10,"This is a maintenance release that contains fixes for job continuations and some dashboard issues related to Content Security Policy and recurring jobs page. It's highly recommended to upgrade to prevent problems with continuations. They are rare, but lead to significant headache.
+
+**Hangfire.Core**
+
+* **Fixed** – Duplicate job continuations aren't added anymore, when outer transaction has failed.
+* **Fixed** – Existing duplicate continuations don't lead to `ArgumentException`: the same key already added.
+* **Fixed** – Replace inline script, because it may violate the Content Security Policy (by @Beczka).
+* **Fixed** – Don't skip records in RecurringJobsPage (by @reaction1989).",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/5727689/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/5727689,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.10,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.10,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.10,v1.6.10,False,False
+5621522,2017-03-02T16:05:35Z,2017-03-02T16:30:10Z,1.6.9,"### Release Notes
+
+This is a small correcting release that make it possible to have a workaround for `TimeoutException` exceptions when using **SQL Server** with huge arguments or batches. The `SqlServerOptions.CommandTimeout` option was added to allow to override the default timeout of 30 seconds.
+
+**Fixed** – `TimeoutException` on large arguments or large batches via `SqlServerOptions.CommandTimeout`.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/5621522/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/5621522,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.9,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.9,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.9,v1.6.9,False,False
+4980314,2016-12-21T13:14:01Z,2016-12-21T14:25:18Z,1.6.8,"### Release Notes
+
+This release contains a bunch of minor fixes, mostly for Dashboard UI.
+
+**Hangfire.Core**
+- **Fixed** – `Cron.MonthInterval` now returns correct CRON expression.
+- **Fixed** – Throw `NotSupportedException` early, when arguments contain delegate or expression.
+- **Fixed** – Connection and distributed lock kept longer than necessary in `RecurringJobScheduler`.
+- **Fixed** – Use local date/times everywhere in Dashboard UI (#702, #761).
+- **Fixed** – Call chart update only when it exists in Dashboard UI to prevent JavaScript errors (#745).
+- **Fixed** – Scheduled column title is now displaying correctly in Dashboard UI (#765).
+- **Fixed** – Typo ""Nexts jobs"" should be ""Next jobs"" in Dashboard UI (#754 by @danielabbatt).
+
+**Hangfire.SqlServer**
+- **Fixed** – Use `long` where possible instead of `int` for background job identifiers, full support will be in 1.7.0 (#749).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/4980314/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/4980314,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.8,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.8,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.8,v1.6.8,False,False
+4757044,2016-11-25T08:58:21Z,2016-11-25T09:03:32Z,1.6.7,"### Release Notes
+
+This is a correcting release that brings fixes to fully support generic methods, whose generic arguments are defined in their parameters, including `List<T>` and `T[]`. A lot of issues with Dashboard UI that cause exceptions and other errors, like uncontrolled growth of event listeners on resize, were also fixed. Please see the full delails below.
+
+**Hangfire.Core**
+- **Fixed** – `ArgumentException` when using complex arguments in generic methods like `IList<T>` (#719 by @aidmsu).
+- **Fixed** – Generic arrays like `T[]` aren't supported in background job arguments (#740 by @aidmsu).
+- **Fixed** – Wrong choice of the overload when multiple methods match the given arguments (#713 by @aidmsu).
+- **Fixed** – Null values for arguments when there are errors during the JSON deserialization (#731).
+- **Fixed** – Window resize cause errors and uncontrolled growth of event and poll listeners (#711 by @Yarmonov).
+- **Fixed** – `HtmlHelper.ToHumanDuration` incorrectly formats fractional seconds (#708 by @pieceofsummer).
+- **Fixed** – Dashboard UI shows wrong description for CRON that contain trailing spaces (#727, #729 by @aidmsu).
+- **Fixed** – Exception in Dashboard UI when CRON expression is null by an accident (#692, #730 by @aidmsu).
+- **Fixed** – Error in Dashboard UI when rendering an array that contains a null element (#734, #741 by @djfoz).
+- **Fixed** – Inconsistent constructors' accessibility for different context classes (#703, #710 by @pieceofsummer).
+- **Fixed** – Decrease the max default workers count to ""20"" in tests (#701 by @patrykpiotrmarek).
+- **Fixed** – Inconsistent EOL characters in some files of a project (#721 by @aidmsu).
+- **Fixed** – Make Queue name accessible from `RecurringJobDto` (#737 by @swordfish6975).
+
+**Hangfire.SqlServer**
+- **Fixed** – Validation added to avoid ""An invalid application lock time-out"" exceptions (#686 by @t0mburton).
+
+**Hangfire.AspNetCore**
+- **Fixed** – Parameterless `AspNetCoreJobActivator.BeginScope` method now returns a correct instance (#706, #709 by @pieceofsummer).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/4757044/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/4757044,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.7,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.7,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.7,v1.6.7,False,False
+4380061,2016-10-13T13:49:57Z,2016-10-13T13:53:43Z,1.6.6,"### Release Notes
+
+This is a correcting release that fixes a regression, when using generic methods of a scoped variable in expression when creating a background job, as well as some minor optimizations for SQL Server. It also adds CLS compliance for basic packages, since public API is already compliant.
+
+**Hangfire.Core**
+- **Fixed** – `Hangfire.Core`, `Hangfire.SqlServer` and `Hangfire.SqlServer.Msmq` marked as CLS-compliant.
+- **Fixed** – Generic methods cause `ArgumentNullException` when scoped variable is used in expression.
+
+**Hangfire.SqlServer**
+- **Fixed** – `SqlServerJobQueue` class doesn't use obsolete `InvisibilityTimeout` parameter anymore.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/4380061/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/4380061,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.6,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.6,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.6,v1.6.6,False,False
+4220445,2016-09-24T10:44:57Z,2016-09-24T10:49:22Z,1.6.5,"### Release Notes
+
+This correcting release contains a **lot of stability improvements** for Hangfire.SqlServer, especially for SQL Azure Database environments. Processing is now more predictable even in Basic pricing tier, there is a special harness application that's running 24/7 to ensure everything is fine. Some problems related to I18N, authorisation and continuations were also fixed.
+
+**Hangfire.Core**
+- **Added** – Chinese language to Dashboard UI (#653 by @andy-zhouyou).
+- **Changed** – Default upper limit of worker number is 20.
+- **Changed** – Default value for DashboardJobListLimit is now 10000.
+- **Fixed** – Deserialization exception in continuations, when `TypeNameHandling.All` option is used (#666, #674 by @MaksimSimkin).
+- **Fixed** – I18N is not working, because there are no localized resources in NuGet packages (#668).
+- **Fixed** – Infinite redirect loops, when authenticated, but not authorized user accesses Dashboard UI (#638).
+- **Fixed** – ""The type ... exists in both..."" issue when building Hangfire, related to `Newtonsoft.Json`.
+- **Fixed** – Use the given type's method, when scope variable is passed to a job expression (#656).
+- **Fixed** – Very rare resource leaks detected by Coverity Scan.
+
+**Hangfire.SqlServer**
+- **Fixed** – Different timeout issues after making performance optimisations (#489, #515, #628, #643).
+- **Fixed** – SQL timeouts while getting a connection, when using default settings and &ge; 8 CPU cores.
+- **Fixed** – `ExpirationManager` is bloated by `SqlError` instances, when there are a lot of messages from server.
+- **Fixed** – Counters query returned inconsistent results during `CountersAggregator` executions.
+- **Performance** – Added missing `NOLOCK` hint for monitoring queries when using SqlServer-based queues.
+- **Performance** – `ExpirationManager` is forced to use index seek operations for cascade deletions.
+- **Performance** – `CountersAggregator` now uses clustered index scan to issue less logical reads.
+- **Performance** – Paging queries in dashboard now use CTEs to utilize less logical reads.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/4220445/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/4220445,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.5,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.5,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.5,v1.6.5,False,False
+4010622,2016-08-30T17:00:35Z,2016-08-30T17:16:32Z,1.6.4,"### Release Notes
+
+This release fixes a problem that caused `SqlConnection` instance to leak when nested distributed locks are acquired for the same resource. If you are using batches, or continuations, and SQL Server as a storage, it is highly recommended to upgrade to prevent connection pool starvation and timeout exceptions.
+
+**Hangfire.SqlServer**
+- **Fixed** – `SqlConnection` object leaks when using nested distributed locks (in batches and continuations).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/4010622/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/4010622,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.4,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.4,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.4,v1.6.4,False,False
+3927840,2016-08-19T16:23:40Z,2016-08-19T16:27:29Z,1.6.3,"### Release Notes
+
+This is a maintenance release that contains fixes for several bugs. It is highly recommended to upgrade to this version, if you are using `Hangfire.SqlServer`.
+
+**Hangfire.Core**
+- **Fixed** – Add missing `RecurringJob.AddOrUpdate` method overloads to prevent CS4014 warnings.
+- **Fixed** – `ToGenericTypeString` method now handles types with no namespace correctly.
+
+**Hangfire.SqlServer**
+- **Fixed** – Prevent `ExpirationManager`'s command from timing out, when there are a lot of records.
+- **Fixed** – `CountersAggregator` issue introduced in 1.6.2, that causes slow record aggregation.
+- **Fixed** – Add `XLOCK` hint for `CountersAggregator` query to prevent deadlocks on lock escalation.
+
+**Hangfire.SqlServer.Msmq**
+- **Fixed** – Prevent MSMQ transactions from timing out after 1 minute of processing.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/3927840/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/3927840,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.3,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.3,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.3,v1.6.3,False,False
+3821250,2016-08-05T11:00:26Z,2016-08-05T11:03:59Z,1.6.2,"### Release Notes
+
+Hangfire.Core
+- **Changed** – Recurring job page displays now raw cron strings, descriptions are in tooltips&nbsp;(#596).
+- **Fixed** – Return non-highlighted stack trace, when parsing takes too long, instead of throwing an exception&nbsp;(#616).
+- **Fixed** – Dashboard UI works correctly again, when IE 11 is in the Compatibility Mode&nbsp;(#630).
+- **Fixed** – Long method names now don't push tables out of the boundaries now&nbsp;(#596).
+
+Hangfire.SqlServer
+- **Changed** – `JobExpirationCheckInterval` property value now defaults to 30 minutes&nbsp;(#628).
+- **Fixed** – Excessive blocking when expiring records in `State` and `JobParameters` tables&nbsp;(#628).
+- **Fixed** – Migration script `Install.sql` was deadlocked by itself, leading to errors on startup&nbsp;(#636).
+
+Hangfire.SqlServer.Msmq
+- **Fixed** – Public MSMQ queue paths are parsed correctly now, when determining the queue length&nbsp;(#637).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/3821250/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/3821250,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.2,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.2,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.2,v1.6.2,False,False
+3748386,2016-07-27T08:52:50Z,2016-07-27T08:54:32Z,1.6.1,"### Release Notes
+
+Hangfire.Core
+- **Added** – Automatic unit tests execution for .NET Core on Windows, Linux and OS X using AppVeyor and Travis&nbsp;CI.
+- **Fixed** – `DateTime` deserialization issues on .NET Core platform.
+- **Fixed** – Fixed UI command behaviour, buttons can only be pressed once per command (#626 by @mahoneyj2).
+- **Fixed** – `TypeInitializationException` when using Serilog appeared in version 1.6.0 (#606).
+- **Fixed** – Cron format strings for intervals are specified correctly now (#618 by @stevetsang).
+- **Fixed** – `NullReference` on Job Details page when background job has null value for `IEnumerable` argument (#566).
+- **Fixed** – Don't skip symbols when publishing NuGet packages.
+- **Fixed** – Use GUID identifier when can't determine the host name.
+
+Hangfire.AspNetCore
+- **Fixed** – Add missing `GetHttpContext` extension method for the .NET Core platform (#613).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/3748386/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/3748386,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.1,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.1,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.1,v1.6.1,False,False
+3666449,2016-07-15T12:41:48Z,2016-07-15T12:45:23Z,1.6.0,"### Release Notes
+
+Hangfire.Core
+- **Added** – .NET Core support for Hangfire.Core and Hangfire.SqlServer packages (`netstandard1.3` target, #604).
+- **Added** – Ability to create jobs based on async methods, they are awaited by a worker (#540 by @tuespetre).
+- **Added** – Access to background job context from the `JobActivator.BeginScope` method (#523).
+- **Added** – Add LatencyTimeoutAttribute To delete jobs if timeout is exceeded (#188 by @Excommunicated).
+- **Added** – Ability to change statistics polling interval in dashboard (#484 by @tristal).
+- **Added** – Non-blocking `BackgroundJobServer.SendStop` method, that requests for a shutdown.
+- **Added** – `BackgroundJobServerOptions.ServerName` option is back.
+- **Added** – `IDashboardAuthorizationFilter` interface that makes `IAuthorizationFilter` obsolete.
+- **Added** – Show background job continuations on Job Details page.
+- **Added** – Multilanguage support in Dashboard via resource files (#521 by @Elph).
+- **Added** – Spanish localization for the Dashboard UI (#574 by @Elph).
+- **Added** – Enable backtracking from background job to recurrent job (#555 by @teodimache).
+- **Added** – Cron expressions for regular intervals for the `Cron` class (#174 by @geirsagberg).
+- **Added** – `IRecurringJobManager` interface for the `RecurringJobManager` class (#491 by @arnoldasgudas).
+- **Added** – Abstractions for Dashboard UI to decouple it from OWIN.
+- **Changed** – Make the realtime/history graph to use localized dates on hover (by @Elph).
+- **Changed** – Make graph tooltip also localized using data-attributes (by @Elph).
+- **Changed** – Dashboard metric's title now contains the ResourceKey instead the title (by @Elph).
+- **Changed** – Job Details page was redesigned to be more clean with less colors.
+- **Changed** – Update jQuery to 2.1.4 and rickshaw.js to 1.5.1.
+- **Changed** – Update NCrontab to 3.1.0.
+- **Changed** – Update CronExpressionDescriptor to 1.17.
+- **Fixed** – `ToGenericTypeString` method now supports nested classes (#522 by @patrykpiotrmarek).
+- **Fixed** – Dashboard Errors in Chrome and IE - Cannot read property 'removeChild' of null (#137).
+- **Fixed** – /hangfire/js outputs (unintended) UTF-8 BOM (#229).
+
+Hangfire.AspNetCore
+- **Added** – Deep integration with ASP.NET Core via Hangfire.AspNetCore package.
+
+Hangfire.SqlServer
+- **Added** – .NET Core support for Hangfire.Core and Hangfire.SqlServer packages (`netstandard1.3` target, #604).
+- **Added** – Zero latency processing when client and server reside in the same process (#520 by @bgurmendi).
+- **Changed** – `SqlServerStorage` class constructor now takes `DbConnection` instances (#539 by @tystol).
+- **Changed** – `SqlServerObjectsInstaller` class is public now (#485 by @vbfox).
+- **Changed** – Update Dapper to 1.50.1 version.
+- **Fixed** – Drop constraints on Server.Id prior to altering it to avoid conflicts (#603 by @ranieuwe).
+
+Hangfire.SqlServer.Msmq
+- **Fixed** – Package now depends on the latest Hangfire.SqlServer instead of version 1.2.2 (#509).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/3666449/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/3666449,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.0,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.0,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.0,v1.6.0,False,False
+3630142,2016-07-11T14:27:36Z,2016-07-11T15:05:27Z,1.5.9,"### Release Notes
+
+This release contains major bug fixes, and is **very recommended to upgrade**. In short, `OperationCanceledException` doesn't cause background processing to stop now. Dashboard UI doesn't leak `READ UNCOMMITTED` isolation level, and `READ_COMMITTED_SNAPSHOT` option doesn't lead background jobs to stuck in Enqueued state.
+
+The first problem appears, when `OperationCanceledException` is thrown by a user code – workers considered it as a signal that shutdown request was initiated. This lead to a chain reaction, where one worker facing with an exception, re-queues a job and stops; then other worker picks up the same job, re-queues it and stops; etc, ending with all the workers are stopped. There's now additional check whether server is going to shutdown, and this exception has special meaning only if it's true. So methods, filters and processes can throw this exception without any side effects now.
+
+The second exception is related to possible `READ UNCOMMITTED` transaction [isolation level leaks](http://www.levibotelho.com/development/plugging-isolation-leaks-in-sql-server). This is an old well-known problem (I even don't understand why it wasn't fixed yet) that exists in SQL Server&nbsp;&le;&nbsp;2012 (yep, it was fixed in 2014). This level is used in Dashboard UI to prevent blocking operations. Now all the dashboard queries are using `NOLOCK` table hint instead of transactions.
+
+**Hangfire.Core**
+- **Fixed** – `OperationCanceledException` exceptions don't cause background processing to stop.
+
+**Hangfire.SqlServer**
+- **Fixed** – Don't leak Dashboard UI's `READ UNCOMMITTED` isolation level to other parts of an application.
+- **Fixed** – `READ_COMMITTED_SNAPSHOT` option doesn't prevent background jobs from being processed.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/3630142/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/3630142,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.5.9,https://github.com/HangfireIO/Hangfire/releases/tag/v1.5.9,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.5.9,v1.5.9,False,False
+3467782,2016-06-17T13:15:38Z,2016-06-17T13:18:28Z,1.5.8,"### Release Notes
+
+This release fixes a bug appeared in version [1.5.6](https://github.com/HangfireIO/Hangfire/releases/tag/v1.5.6) of the `Hangfire.SqlServer` package. There was a race condition between the `Timer` and `Worker` threads, that causes the following problems, especially when small background jobs are processed.
+
+**Hangfire.SqlServer**
+- **Changed** – Disable immediate execution of a keep-alive query in queue and distributed locks.
+- **Fixed** – Background jobs may be processed multiple times (#590).
+- **Fixed** – Keep-alive queries sometimes failing to execute (#592).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/3467782/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/3467782,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.5.8,https://github.com/HangfireIO/Hangfire/releases/tag/v1.5.8,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.5.8,v1.5.8,False,False
+3340623,2016-05-31T13:50:44Z,2016-05-31T14:10:19Z,1.6.0-beta3,"### Release Notes
+- **Added** – Spanish localization for the Dashboard UI (#574 by @Elph).
+- **Added** – Enable backtracking from background job to recurrent job (#555 by @teodimache).
+- **Changed** – Make the realtime/history graph to use localized dates on hover (#574 by @Elph).
+- **Changed** – Make graph tooltip also localized using data-attributes (#574 by @Elph).
+- **Changed** – Dashboard metric's title now contains the ResourceKey instead the title (#574 by @Elph).
+- **Fixed** – Beta2 is not allowing for adding filters to the `GlobalJobFilters` collection (#563).
+
+**From [1.5.7](https://github.com/HangfireIO/Hangfire/releases/tag/v1.5.7)**
+- **Fixed** – Dashboard crashing when trying to get the MSMQ queue length (by @yangman).
+- **Fixed** – Add queue name validation to the `RecurringJobScheduler` class (by @pzielinski86).
+- **Fixed** – Add missing transaction to `KeepAliveQuery` (by @maxhauser).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/3340623/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/3340623,dev,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.0-beta3,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.0-beta3,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.0-beta3,v1.6.0-beta3,False,True
+3333317,2016-05-30T13:29:22Z,2016-05-30T13:30:40Z,1.5.7,"### Release Notes
+
+This is a correcting release that contains a fix for Dashboard UI crashes when using MSMQ (finally!), as well as some other minor fixes.
+- **Fixed** – Dashboard crashing when trying to get the MSMQ queue length (#581 by @yangman).
+- **Fixed** – Add queue name validation to the `RecurringJobScheduler` class (#561 by @pzielinski86).
+- **Fixed** – Add missing transaction to `KeepAliveQuery` (#573 by @maxhauser).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/3333317/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/3333317,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.5.7,https://github.com/HangfireIO/Hangfire/releases/tag/v1.5.7,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.5.7,v1.5.7,False,False
+3106966,2016-04-27T08:44:15Z,2016-04-27T08:55:48Z,1.6.0-beta2,"### Release Notes
+
+This is the second beta of upcoming the 1.6 release. It contains some new features, but most importantly, it incorporates bug fixes released with recent [1.5.5](https://github.com/HangfireIO/Hangfire/releases/tag/v1.5.5) and [1.5.6](https://github.com/HangfireIO/Hangfire/releases/tag/v1.5.6) versions related to SQL Azure and recurring jobs, please click the links for more details.
+
+**Hangfire.Core**
+- **Added** – Ability to change statistics polling interval in dashboard (#484 by @tristal).
+- **Added** – Cron expressions for regular intervals for the `Cron` class (#174 by @geirsagberg).
+- **Added** – `IRecurringJobManager` interface for the `RecurringJobManager` class (#491 by @arnoldasgudas).
+
+**Hangfire.SqlServer**
+- **Changed** – `SqlServerObjectsInstaller` class is public now (#485 by @vbfox).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/3106966/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/3106966,dev,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.0-beta2,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.0-beta2,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.0-beta2,v1.6.0-beta2,False,True
+3078623,2016-04-22T14:58:00Z,2016-04-22T15:05:28Z,1.5.6,"### Release Notes
+
+**Hangfire.SqlServer**
+- **Fixed** – Use keep-alive queries to prevent SQL Azure from killing a connection after 30 minute timeout (#514).
+- **Fixed** – Convert lock timeout value from double to int.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/3078623/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/3078623,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.5.6,https://github.com/HangfireIO/Hangfire/releases/tag/v1.5.6,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.5.6,v1.5.6,False,False
+3024137,2016-04-14T23:06:49Z,2016-04-14T23:11:44Z,1.5.5,"### Release Notes
+
+This is a correcting release that fixes a problem with recurring jobs. It is related to a possible misfire on the first run, if a background processing server was inactive during the scheduled time.
+- **Fixed** – Missed recurring jobs sometimes aren't triggered for the first time (#552).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/3024137/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/3024137,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.5.5,https://github.com/HangfireIO/Hangfire/releases/tag/v1.5.5,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.5.5,v1.5.5,False,False
+2925088,2016-03-31T15:01:44Z,2016-03-31T15:02:24Z,1.6.0-beta1,"### Release Notes
+
+This is the first beta of an upcoming 1.6 release. Added support for async background job methods, ability to access context when creating an IoC container scope, dashboard with i18n support, redesigned Job Details page and zero latency for simple setup with SQL Server.
+
+**Hangfire.Core**
+- **Added** – Ability to create jobs based on `async` methods, they are awaited by a worker (#540 by @tuespetre).
+- **Added** – Multilanguage support in Dashboard via resource files (#521 by @Elph).
+- **Added** – Show background job continuations on Job Details page.
+- **Added** – Access to background job context from the `JobActivator.BeginScope` method (#523).
+- **Changed** – Job Details page was redesigned to be more clean with less colors.
+- **Changed** – Update jQuery to 2.1.4 and rickshaw.js to 1.5.1.
+- **Changed** – Update NCrontab to 3.1.0.
+- **Changed** – Update CronExpressionDescriptor to 1.17.
+- **Fixed** – `ToGenericTypeString` method now supports nested classes (#522 by @patrykpiotrmarek).
+
+**Hangfire.SqlServer**
+- **Added** – Zero latency processing when client and server reside in the same process (#520 by @bgurmendi).
+- **Changed** – `SqlServerStorage` class constructor now takes `DbConnection` instances (#539 by @tystol).
+
+**Hangfire.SqlServer.Msmq**
+- **Fixed** – Package now depends on the latest Hangfire.SqlServer instead of version 1.2.2 (#509).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/2925088/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/2925088,dev,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.6.0-beta1,https://github.com/HangfireIO/Hangfire/releases/tag/v1.6.0-beta1,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.6.0-beta1,v1.6.0-beta1,False,True
+2865432,2016-03-22T17:27:21Z,2016-03-22T17:34:55Z,1.5.4,"### Release Notes
+- **Changed** – C# 6.0 is now required to compile the solution (#531).
+- **Fixed** – Recurring jobs failing after moving clock forward for daylight saving time (#529).
+- **Fixed** – Infinite loops when trying to change state of a background job that doesn't exist (#469 by @mkravchuk7).
+- **Fixed** – Update StackTraceParser and StackTraceFormatter to prevent critical flaw (#532, #533 by @atifaziz and @lukerogers).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/2865432/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/2865432,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.5.4,https://github.com/HangfireIO/Hangfire/releases/tag/v1.5.4,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.5.4,v1.5.4,False,False
+2085259,2015-11-06T16:27:14Z,2015-11-06T16:28:18Z,1.5.3,"### Release Notes
+
+**Hangfire.SqlServer**
+- **Fixed** – ""Cannot release the application lock"" exception when using distributed locks (#471).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/2085259/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/2085259,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.5.3,https://github.com/HangfireIO/Hangfire/releases/tag/v1.5.3,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.5.3,v1.5.3,False,False
+1965997,2015-10-15T14:26:39Z,2015-10-15T14:28:08Z,1.5.2,"### Release Notes
+
+This is a hotfix for Hangfire 1.5.1 users. Previous releases are unaffected by this bug.
+- **Fixed** – `JobLoadException` when using interface method as a background job, appeared in 1.5.1.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/1965997/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/1965997,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.5.2,https://github.com/HangfireIO/Hangfire/releases/tag/v1.5.2,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.5.2,v1.5.2,False,False
+1958991,2015-10-14T12:48:39Z,2015-10-14T12:53:55Z,1.5.1,"### Release Notes
+- **Fixed** – `JobLoadException` during deserialization when a method defined in an inherited interface (#455).
+- **Fixed** – Unable to see enqueued jobs in Dashboard UI when using SQL Server queues (#459).
+- **Fixed** – Show alert box instead of an exception on Awaiting Jobs page.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/1958991/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/1958991,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.5.1,https://github.com/HangfireIO/Hangfire/releases/tag/v1.5.1,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.5.1,v1.5.1,False,False
+1896743,2015-10-01T14:11:38Z,2015-10-01T14:15:12Z,1.5.0,"### Release Notes
+
+Finally after 4 months of development and after 4 betas, Hangfire 1.5.0 released. Now you are able to customize your background processing pipeline even more, by using many types that were internal in previous versions. More responsive dashboard, IoC container scopes, support for remote MSMQ queues and other cool features are waiting for you!
+
+Please see the [Hangfire 1.5.0](http://hangfire.io/blog/2015/10/01/hangfire-1.5.0.html) post on the official blog for details.
+
+**Hangfire.Core**
+- **Added** – `IBackgroundProcess` interface that allows to implement custom background processes.
+- **Added** – `BackgroundProcessingServer` class for creating a server instance with completely custom background processes.
+- **Added** – Support for running multiple `BackgroundJobServer` instances in the same AppDomain without explicit server names.
+- **Added** – `JobActivatorScope` class to support custom IoC scopes/lifetimes.
+- **Added** – Allow to specify a custom queue for recurring jobs (by @maleet).
+- **Added** – Allow to use CancellationToken type as a job method parameter.
+- **Added** – It is now possible to query the storage in state applying filters.
+- **Added** – Allow to pass custom filters to `BackgroundJobServer` via options.
+- **Added** – Option to hide the ""Back to site"" link (by @dradovic).
+- **Changed** – Server components and background processes now use `Task` with `TaskCreationOptions.LongRunning`.
+- **Changed** – ServerIds are now generated without ServerName, server names are deprecated.
+- **Changed** – Arguments Renderer now supports TimeSpan and DateTime (by @yngndrw).
+- **Changed** – Minor improvements for Dashboard navigation (by @pwelter34).
+- **Changed** – Worker does not process a job when a transition to the Processing state failed (by @yngndrw).
+- **Changed** – `BackgroundJobClientException` is thrown instead of `CreateJobFailedException`.
+- **Changed** – WorkerId is now auto-generated and based on a GUID.
+- **Changed** – Use StackTraceFormatter package for marking-up stack traces (by @atifaziz).
+- **Changed** – Updated Dashboard CSS to Twitter Bootstrap 3.3.5.
+- **Fixed** – Prevent worker from fetching and processing a job on shutdown.
+- **Fixed** – `TaskCanceledException` thrown from a job method leads to failed job as expected.
+- **Fixed** – Make `DelayedJobScheduler` resilient to empty background job ids.
+- **Fixed** – Logical error in SqlServerDistributedLockTimeout value check (by @Tom-Kelly).
+- **Fixed** – `OverflowException` in Dashboard when job duration exceeds int.MaxValue (by @mavenius).
+- **Fixed** – ""More details"" button in Dashboard changes to ""Less details"" when collapsed (by @pascalberger).
+
+**Hangfire.SqlServer**
+- **Added** – Ability to specify the schema for SQL Server job storage (by @ryanmwright).
+- **Added** – `TransactionTimeout` option for configuring the `TransactionScope` timeout.
+- **Added** – `DashboardJobListLimit` option to prevent full table scans in Dashboard.
+- **Changed** – `SqlServerDistributedLock` class is now public.
+- **Changed** – Use `rowlock` table hint in job fetch query to prevent escalation.
+- **Changed** – Dramatically improved page load times in Dashboard.
+- **Changed** – Instant re-queue for background jobs even after ungraceful shutdown.
+- **Changed** – `JobQueue.Queue` and `Server.Id` column length increased to 50 and 100 respectively (by @maleet).
+
+**Hangfire.SqlServer.Msmq**
+- **Added** – Support for remote MSMQ queues through DTC transactions.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/1896743/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/1896743,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.5.0,https://github.com/HangfireIO/Hangfire/releases/tag/v1.5.0,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.5.0,v1.5.0,False,False
+1895953,2015-10-01T11:57:23Z,2015-10-01T12:01:31Z,1.4.7,"### Release Notes
+- **Fixed** – TaskCanceledException causes the job to be Processing state indefinitely (#453).
+- **Fixed** – Child job isn't executed when created in a TransactionScope with MSMQ (#452).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/1895953/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/1895953,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.4.7,https://github.com/HangfireIO/Hangfire/releases/tag/v1.4.7,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.4.7,v1.4.7,False,False
+1884207,2015-09-29T15:13:15Z,2015-09-29T15:16:15Z,1.5.0-beta4,"### Release Notes
+- **Added** – Ability to specify the schema for SQL Server job storage (by @ryanmwright).
+- **Changed** – `ServerHeartbeat` and `ServerWatchdog` background processes are internal now.
+- **Changed** – Use `rowlock` table hint in job fetch query to prevent escalation.
+- **Changed** – Remove processes from server options, add filter provider and activator instead.
+- **Changed** – `BackgroundServer` class renamed to `BackgroundProcessingServer`.
+- **Changed** – `SchedulePoller` class renamed to `DelayedJobScheduler`.
+- **Changed** – `IJobCreationProcess` interface renamed to `IBackgroundJobFactory`.
+- **Changed** – `IJobPerformanceProcess` interface renamed to `IBackgroundJobPerformer`.
+- **Changed** – `IStateChangeProcess` interface renamed to `IBackgroundJobStateChanger`.
+- **Changed** – `BackgroundJobClientException` is thrown instead of `CreateJobFailedException`.
+- **Fixed** – Logger names now include the `Hangfire.` namespace as expected.
+- **Fixed** – `TaskCanceledException` thrown from a job method leads to failed job as expected.
+- **Fixed** – Specified queue is now considered when triggering a recurring job.
+- **Fixed** – Distributed locks are reentrant in SQL Server job storage (relates to 1.5.0-beta1).
+- **Fixed** – Same Worker instance in multiple servers caused cancellation token to work improperly.
+- **Fixed** – Make `DelayedJobScheduler` resilient to empty background job ids.
+- **Fixed** – Logical error in SqlServerDistributedLockTimeout value check (by @Tom-Kelly).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/1884207/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/1884207,dev,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.5.0-beta4,https://github.com/HangfireIO/Hangfire/releases/tag/v1.5.0-beta4,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.5.0-beta4,v1.5.0-beta4,False,True
+1740536,2015-08-29T16:42:43Z,2015-08-29T16:44:30Z,1.5.0-beta3,"### Release Notes
+- **Added** – Allow to use `CancellationToken` type as a job method parameter.
+- **Added** – It is now possible to query the storage in state applying filters.
+- **Changed** – Worker does not process a job when a transition to the Processing state failed (#422 by @yngndrw).
+- **Changed** – WorkerId is now auto-generated and based on a GUID.
+- **Changed** – Worker constructor now takes only queues collection instead of `WorkerContext`.
+- **Changed** – `DefaultJobCreationProcess` renamed to `JobCreationProcess`.
+- **Changed** – `DefaultJobPerformanceProcess` renamed to `JobPerformanceProcess`.
+- **Changed** – `IStateMachine` and `IStateChangeProcess` methods swapped with each other.
+- **Changed** – Use StackTraceFormatter package for marking-up stack traces (#419 by @atifaziz).
+- **Fixed** – _The index 'IX_HangFire_JobQueue_QueueAndFetchedAt' is dependent on column 'Queue'_ exception.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/1740536/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/1740536,dev,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.5.0-beta3,https://github.com/HangfireIO/Hangfire/releases/tag/v1.5.0-beta3,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.5.0-beta3,v1.5.0-beta3,False,True
+1740243,2015-08-29T12:35:02Z,2015-08-29T12:39:25Z,1.4.6,"### Release Notes
+- **Fixed** – SQL command timeout in `DisableConcurrentExecution` filter (#428 by @Tom-Kelly).
+- **Fixed** – SQL deadlocks in `ExpirationManager` background process (#429).
+- **Fixed** – Too many queries in `SchedulePoller` when background job is missing or in another state (#425).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/1740243/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/1740243,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.4.6,https://github.com/HangfireIO/Hangfire/releases/tag/v1.4.6,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.4.6,v1.4.6,False,False
+1616682,2015-08-01T15:44:44Z,2015-08-01T15:48:16Z,1.5.0-beta2,"### Release Notes
+
+**Hangfire.Core**
+- **Added** – Allow to specify a custom queue for recurring jobs (#228, #379, #383 by @maleet).
+- **Added** – Allow to pass custom creation/performance processes to `BackgroundJobServer` via options.
+- **Added** – Missing `UseHangfireServer` overloads with additional background processes.
+- **Changed** – Updated Dashboard CSS to Twitter Bootstrap 3.3.5.
+- **Fixed** – `OverflowException` in Dashboard when job duration exceeds int.MaxValue (#384 by @mavenius).
+- **Fixed** – ""More details"" button in Dashboard changes to ""Less details"" when collapsed (#389 by @pascalberger).
+
+**Hangfire.SqlServer**
+- **Changed** – `SqlServerDistributedLock` class is now public.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/1616682/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/1616682,dev,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.5.0-beta2,https://github.com/HangfireIO/Hangfire/releases/tag/v1.5.0-beta2,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.5.0-beta2,v1.5.0-beta2,False,True
+1581825,2015-07-24T12:20:01Z,2015-07-24T12:22:33Z,1.4.5,"### Release Notes
+
+Fixed `NotSupportException` ""This stream does not support seek operations."" in Dashboard buttons and stats. This bug was added in [1.4.4](https://github.com/HangfireIO/Hangfire/releases/tag/v1.4.4), relates to all non-buffered HTTP requests.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/1581825/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/1581825,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.4.5,https://github.com/HangfireIO/Hangfire/releases/tag/v1.4.5,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.4.5,v1.4.5,False,False
+1576562,2015-07-23T14:53:22Z,2015-07-23T14:55:34Z,1.4.4,"### Release Notes
+- **Fixed** – `InvalidCastException` in Dashboard when using Microsoft.Owin 3.0.1 package (#386, #399).
+- **Fixed** – Non-working buttons and counter updates in Dashboard when a body stream isn't at the start position.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/1576562/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/1576562,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.4.4,https://github.com/HangfireIO/Hangfire/releases/tag/v1.4.4,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.4.4,v1.4.4,False,False
+1564389,2015-07-21T10:31:08Z,2015-07-21T11:00:10Z,1.5.0-beta1,"### Release Notes
+
+**Hangfire.Core**
+- **Added** – `IBackgroundProcess` interface that allows to implement custom background processes&nbsp;(relates to #167, #368, #379).
+- **Added** – `BackgroundServer` class for creating a server instance with completely custom background processes (relates to #263, #373, #374).
+- **Added** – `JobActivatorScope` class to support custom IoC scopes/lifetimes (relates to #198, #204, #329, #330).
+- **Added** – Support for running multiple `BackgroundJobServer` instances in the same AppDomain without explicit server names (relates to #223).
+- **Added** – Option to hide the ""Back to site"" link (#349 by @dradovic).
+- **Changed** – Server components and background processes now use `Task` with `TaskCreationOptions.LongRunning`.
+- **Changed** – ServerIds are now generated without ServerName, server names are deprecated.
+- **Changed** – Arguments Renderer now supports TimeSpan and DateTime (#358 by @yngndrw).
+- **Changed** – Minor improvements for Dashboard navigation (#352 by @pwelter34).
+- **Fixed** – Prevent worker from fetching and processing a job on shutdown.
+
+**Hangfire.SqlServer**
+- **Added** – `TransactionTimeout` option for configuring the `TransactionScope` timeout (relates to #381).
+- **Added** – `DashboardJobListLimit` option to prevent full table scans in Dashboard.
+- **Changed** – Dramatically improved page load times in Dashboard.
+- **Changed** – Instant re-queue for background jobs even after ungraceful shutdown (relates to #227).
+- **Changed** – `JobQueue.Queue` and `Server.Id` column length increased to 50 and 100 respectively (#314, #369, #376 by @maleet).
+
+**Hangfire.SqlServer.Msmq**
+- **Added** – Support for remote MSMQ queues through DTC transactions (relates to #333).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/1564389/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/1564389,dev,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.5.0-beta1,https://github.com/HangfireIO/Hangfire/releases/tag/v1.5.0-beta1,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.5.0-beta1,v1.5.0-beta1,False,True
+1343652,2015-05-27T16:00:44Z,2015-05-27T16:08:00Z,1.4.3,"### Release Notes
+
+**Hangfire.Core**
+- **Fixed** – `OverflowException` on Job Details page when latency is too high (#372, #367 by @schulz3000).
+- **Fixed** – Job serialization fix when using `TypeNameHandling.All` option (#363 by @tystol).
+
+**Hangfire.SqlServer**
+- **Fixed** – SQL Server storage does not work with case-sensitive and binary collations (#378, #371 by @ilessa).
+- **Fixed** – ""Incorrect syntax near 'MERGE'"" error in `CountersAggregator` component (#362).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/1343652/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/1343652,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.4.3,https://github.com/HangfireIO/Hangfire/releases/tag/v1.4.3,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.4.3,v1.4.3,False,False
+1265141,2015-05-06T14:48:09Z,2015-05-06T14:52:21Z,1.4.2,"### Release Notes
+- **Added** – Missing generic methods for continuations&nbsp;(#357 by @yngndrw).
+- **Fixed** – MSMQ extension does not work without explicit queue names in `UseMsmqQueues`&nbsp;(#360).
+- **Fixed** – Missing null-check in Retries page after casting connection to `JobStorageConnection`&nbsp;(#345).
+- **Fixed** – Enqueued jobs cannot be deleted from the Dashboard&nbsp;(#342).
+- **Fixed** – Error when building the project using `build.bat` on a machine with VS 2013 only&nbsp;(#339 by @Cussa).
+- **Fixed** – Incompatibility issue with RabbitMQ.Client >= 3.4.0&nbsp;(#340 by @justmara).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/1265141/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/1265141,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.4.2,https://github.com/HangfireIO/Hangfire/releases/tag/v1.4.2,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.4.2,v1.4.2,False,False
+1164910,2015-04-14T14:49:21Z,2015-04-14T14:51:39Z,1.4.1,"- **Fixed** – 1.4.0 ignores `BackgroundJobServerOptions` settings in `UseHangfireServer` method (#336).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/1164910/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/1164910,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.4.1,https://github.com/HangfireIO/Hangfire/releases/tag/v1.4.1,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.4.1,v1.4.1,False,False
+1159943,2015-04-13T16:26:10Z,2015-04-13T16:27:41Z,1.4.0,"This is the next major release for Hangfire. Please check the blog post to see what's new: http://hangfire.io/blog/2015/04/13/hangfire-1.4.0.html.
+
+### Release Notes
+
+> **Hangfire.SqlServer schema changed** to version 4. Please update it first if you disabled automatic migrations.
+- **Added** – Extension methods related to `LogProvider` implementation for `IGlobalConfiguration`.
+- **Changed** – Continuations do not require configuration now.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/1159943/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/1159943,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.4.0,https://github.com/HangfireIO/Hangfire/releases/tag/v1.4.0,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.4.0,v1.4.0,False,False
+1153651,2015-04-11T16:23:56Z,2015-04-11T16:27:28Z,1.4.0-rc2,"## Release Notes
+
+This is a pre-release version of Hangfire 1.4.0 that is considered to be stable (and it is more stable than 1.3.x). Final version will be released after documentation changes (some awesome features added, please [see 1.4.0-beta1](https://github.com/HangfireIO/Hangfire/releases/tag/v1.4.0-beta1)). 
+
+### Hangfire.Core:
+- **Changed** – Retry a job when there was an exception during state transition instead of moving it to the Failed state.
+- **Fixed** – Don't leak foreground colors in ColouredConsoleLogger.
+- **Obsolete** – `BackgroundJobServer`'s `Start` and `Stop` methods are obsolete.
+
+### Hangfire.SqlServer
+- **Changed** – Don't pass IsolationLevel to TransactionScope by default.
+- **Changed** – Coarse grained locks for Hash, List and Set tables to prevent deadlocks.
+
+## Links
+- [Hangfire Official Site](http://hangfire.io)
+- [Hangfire Packages](https://www.nuget.org/packages?q=hangfire)
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/1153651/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/1153651,dev,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.4.0-rc2,https://github.com/HangfireIO/Hangfire/releases/tag/v1.4.0-rc2,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.4.0-rc2,v1.4.0-rc2,False,True
+1144706,2015-04-09T15:37:07Z,2015-04-09T15:39:01Z,1.4.0-rc1,"## Release Notes
+
+This is a pre-release version of Hangfire 1.4.0 that is considered to be stable (and it is more stable than 1.3.x). Final version will be released after documentation changes (some awesome features added, please [see 1.4.0-beta1](https://github.com/HangfireIO/Hangfire/releases/tag/v1.4.0-beta1)). 
+
+### Hangfire.Core:
+- **Added** – Add a notice about failed jobs expiration time.
+- **Added** – Show warnings in Dashboard for jobs processing by inactive servers.
+- **Fixed** – Hangfire stops processing when storage outage was too long (#335).
+
+### Hangfire.SqlServer
+- **Added** – Ability to pass isolation level to use in transactions, default is `serializable` (original – #213).
+- **Fixed** – Retry on deadlocks during automatic migration on server restart (#334).
+
+## Links
+- [Hangfire Official Site](http://hangfire.io)
+- [Hangfire Packages](https://www.nuget.org/packages?q=hangfire)
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/1144706/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/1144706,dev,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.4.0-rc1,https://github.com/HangfireIO/Hangfire/releases/tag/v1.4.0-rc1,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.4.0-rc1,v1.4.0-rc1,False,True
+1068886,2015-03-19T14:30:42Z,2015-03-19T15:07:28Z,1.4.0-beta1,"## Release Notes
+
+### Hangfire.Core
+- **Added** – Job continuations, please see new `BackgroundJob.ContinueWith` methods.
+- **Added** – Time zone support for recurring jobs using `TimeZoneInfo` class.
+- **Added** – Single place for global configuration, please see `GlobalConfiguration` class.
+- **Added** – Made configurable the 'Back to Site' path in the dashboard (by @ysasaki1985).
+- **Added** – Ability to plug in custom dashboard pages and modify navigation.
+- **Added** – Ability to add custom metrics to the Home page in Dashboard.
+- **Added** – Test coverage badge from Coveralls application.
+- **Added** – Dedicated page for retrying jobs to distinguish them from other scheduled jobs.
+- **Added** – Show expiration time on Job Details page.
+- **Added** – More methods for build-in storage through `JobStorageConnection` and `JobStorageTransaction` classes.
+- **Added** – Paging support for Recurring Jobs page.
+- **Added** – New OWIN's `IAppBuilder` extension methods: `UseHangfireDashboard` and `UseHangfireServer`.
+- **Changed** – New look and feel for Dashboard. New navigation, less colors, more accents.
+- **Changed** – Determine job type of a current object when `MethodCallExpression` has `Object` property set.
+- **Changed** – Making Product Version and File Version on the dll match the Assembly Version (by @fire-eagle).
+- **Changed** – Use different log level for exceptions occured within automatic retry wrapper.
+- **Fixed** – Recurring Page throws exception from CronExpressionDescriptor library.
+
+### Hangfire.SqlServer
+- **Added** – Make the expiration check interval configurable (by @travisblakeney).
+- **Changed** – Use read committed or parent transaction isolation level instead of `serializable`.
+- **Changed** – Automatically aggregate records in `Hangfire.Counter` table.
+- **Changed** – Add indexes to prevent blocking rows by Expiration Manager.
+- **Changed** – Remove the `with tablock` hint from the expiration cleanup (by @travisblakeney).
+
+### Hangfire.SqlServer.Msmq
+- **Changed** – Speed up `GetCount` method with native implementation.
+- **Fixed** – Incorrect order of fetching when multiple queues used.
+
+### Hangfire.RabbitMQ
+- **Added** – Allow a URI to be used for `RabbitMQConnectionConfiguration` (by @dennyferra).
+
+## Links
+- [Hangfire Official Site](http://hangfire.io)
+- [Hangfire Packages](https://www.nuget.org/packages?q=hangfire)
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/1068886/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/1068886,dev,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.4.0-beta1,https://github.com/HangfireIO/Hangfire/releases/tag/v1.4.0-beta1,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.4.0-beta1,v1.4.0-beta1,False,True
+917449,2015-02-04T18:25:56Z,2015-02-04T18:34:46Z,1.3.4,"### Release Notes
+
+This is a correcting release that fixes hourly/weekly statistics display in Dashboard, and a rare issue when we trying to cancel a recurring job from a client filter.
+- **Fixed** – Incorrect behavior of `RecurringJobScheduler` when job creation has canceled (#300).
+- **Fixed** – Fix GetTimelineStats / GetHourlyTimelineStats incorrect order (#297 by @Dresel).
+
+### Links
+- [Hangfire Official Site](http://hangfire.io)
+- [Hangfire Packages](https://www.nuget.org/packages?q=hangfire)
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/917449/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/917449,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.3.4,https://github.com/HangfireIO/Hangfire/releases/tag/v1.3.4,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.3.4,v1.3.4,False,False
+894727,2015-01-28T21:55:29Z,2015-01-28T21:56:33Z,1.3.3,"This is a correcting release. Fixed a bug related to MSMQ or RabbitMQ extensions, when enqueued job is not being processed and ""stucked"" in the _Enqueued_ state indefinitely until we retry it manually.
+
+### Release Notes
+- **Fixed** – Enqueued job is not being processed with MSMQ or RabbitMQ (#294).
+
+### Links
+- [Hangfire Official Site](http://hangfire.io)
+- [Hangfire Packages](https://www.nuget.org/packages?q=hangfire)
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/894727/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/894727,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.3.3,https://github.com/HangfireIO/Hangfire/releases/tag/v1.3.3,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.3.3,v1.3.3,False,False
+888768,2015-01-27T12:25:13Z,2015-01-27T12:26:50Z,1.3.2,"This is a correcting release. Expiration manager does not attempt to remove all the records at once now. Instead, it removes them by 1000 at a time, so you won't experience timeout exceptions anymore. If you had problems with recurring jobs, they were fixed also.
+
+### Release Notes
+- **Fixed** – Fatal error occurred during execution of 'Server Core' component (#291).
+- **Fixed** – Hangfire version freezes at 1.0.0.0 on Dashboard (#291).
+- **Fixed** – Recurring job does not trigger (#247).
+- **Fixed** – Sql Timeouts in ExpirationManager.cs (#287).
+- **Fixed** – `KeyNotFoundException` on `/hangfire/succeeded` page (#286).
+
+### Links
+- [Hangfire Official Site](http://hangfire.io)
+- [Hangfire Packages](https://www.nuget.org/packages?q=hangfire)
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/888768/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/888768,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.3.2,https://github.com/HangfireIO/Hangfire/releases/tag/v1.3.2,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.3.2,v1.3.2,False,False
+848157,2015-01-13T17:12:20Z,2015-01-13T17:13:53Z,1.3.1,"### Release Notes
+
+This is a recommended upgrade unless you want to manually restart your application after temporal storage outages.
+- **Fixed** – Worker stops processing on storage exceptions (#284).
+
+### Links
+- [Hangfire Official Site](http://hangfire.io)
+- [Hangfire Packages](https://www.nuget.org/packages?q=hangfire)
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/848157/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/848157,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.3.1,https://github.com/HangfireIO/Hangfire/releases/tag/v1.3.1,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.3.1,v1.3.1,False,False
+771285,2014-12-10T13:58:06Z,2014-12-10T15:13:56Z,1.3.0,"Please see the corresponding [blog post](http://odinserj.net/2014/12/10/hangfire-1.3.0-released/) for the details.
+
+### Release Notes
+- **Added** – Generation of NuGet symbol packages with `*.pdb` and source files (#271).
+- **Added** – Allow to customize serialization settings of Json.NET (#262 by @fpellet).
+- **Added** – Ability to configure `ServerTimeout` option (#276).
+- **Breaking** – Use `LibLog` package instead of `Common.Logging` for logging (#265).
+- **Changed** – `Hangfire.SqlServer` is now merged with `Dapper` package (#266).
+- **Changed** – `Dapper` package updated to 1.38 (#272).
+- **Changed** – Use ILMerge instead of ILRepack (#271).
+- **Changed** – Update `Microsoft.Owin.Host.SystemWeb` to the latest version (#268).
+- **Fixed** – Dashboard not crash if a scheduling task is cancelled (#261 by @fpellet).
+- **Other** – Use psake instead of MSBuild for project build automation (#271).
+
+### Links
+- [Hangfire Official Site](http://hangfire.io)
+- [Hangfire GitHub Project](https://github.com/HangfireIO/Hangfire)
+- [Hangfire Packages](https://www.nuget.org/packages?q=hangfire)
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/771285/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/771285,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.3.0,https://github.com/HangfireIO/Hangfire/releases/tag/v1.3.0,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.3.0,v1.3.0,False,False
+728964,2014-11-24T13:46:13Z,2014-11-24T13:54:57Z,1.2.2,"### Release Notes
+- **Changed** – Add constraint for Common.Logging package to support only versions 2.2.0 and below (#257).
+- **Fixed** – QueuePollInterval option for SQL Server storage do not work (#256).
+
+### Links
+- [Hangfire Official Site](http://hangfire.io)
+- [Hangfire GitHub Project](https://github.com/HangfireIO/Hangfire)
+- [Hangfire Packages](https://www.nuget.org/packages?q=hangfire)
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/728964/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/728964,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.2.2,https://github.com/HangfireIO/Hangfire/releases/tag/v1.2.2,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.2.2,v1.2.2,False,False
+725983,2014-11-22T18:03:14Z,2014-11-22T18:24:14Z,1.2.1,"### Using `TransactionScope`? Say goodbye to MSDTC!
+
+If you are using `Hangfire.SqlServer` storage and tried to place the `BackgroundJob.Enqueue` method call inside a `TransactionScope` transaction, you have probably noticed that the transaction is being escalated to the distributed one. 
+
+If you faced with the _MSDTC on server 'XXX' is unavailable_ exception and turned on the _Distributed Transaction Coordinator_ service, this post is for you either. **You are not required to use slow distributed transactions and MSDTC service anymore.**
+
+To forget about distributed transactions, you should: 
+1. Forget about using `BackgroundJob` class and start to use `BackgroundJobClient` class instance for creating background jobs.
+2. Pass an explicit instance of the `SqlConection` class to the `SqlServerStorage` constructor.
+3. Use the resulting storage in your `BackgroundJobClient` instance.
+4. **Do not use this constructor overload for `BackgroundJobServer` class!**
+
+``` csharp
+using (var transaction = new TransactionScope())
+{
+    using (var connection = new SqlConnection(connectionString))
+    {
+        connection.Open();
+
+        /* ... other SQL statements ... */
+
+        var storage = new SqlServerStorage(connection);
+        var client = new BackgroundJobClient(storage);
+
+        client.Enqueue(() => Console.WriteLine(""MSDTC is not required for these lines!""));
+    }
+
+    transaction.Complete();
+}
+```
+
+### Release Notes
+- **Added** – Ability to pass existing `SqlConnection` to `SqlServerStorage` (#253).
+- **Changed** – Throw `NotSupportedException` for methods returning `Task` (#255).
+- **Fixed** – Dashboard throws exception for deleted job in 1.2 (#254).
+- **Fixed** – SqlServerStorage.ToString() uses case sensitive checks (#230).
+
+### Links
+- [Hangfire Official Site](http://hangfire.io)
+- [Hangfire GitHub Project](https://github.com/HangfireIO/Hangfire)
+- [Hangfire Packages](https://www.nuget.org/packages?q=hangfire)
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/725983/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/725983,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.2.1,https://github.com/HangfireIO/Hangfire/releases/tag/v1.2.1,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.2.1,v1.2.1,False,False
+694965,2014-11-17T19:05:19Z,2014-11-17T20:16:49Z,1.2.0,"### Introducing Hangfire Pro
+
+I want to keep Hangfire project as free as possible, but eliminate the most dangerous risk – the absence of time. There are many things to be done, including problems, new features, documentation, and I want to do them in a reasonable time.
+
+I'm introducing a new stage of Hangfire development – [Hangfire Pro](http://hangfire.io/pro/). It is a set of paid libraries that extend Hangfire functionality by providing features to improve performance and simplifying maintenance of background job processing in larger applications.
+
+**Hangfire.Redis package moved to the Pro version**. You can read more about these changes in the corresponding [blog post](http://odinserj.net/2014/11/15/hangfire-pro/).
+
+### Generic methods and types support
+
+You can now use generic methods in your background jobs. As always, the usage is very simple:
+
+``` csharp
+// Just define a class...
+public class GenericServices<TType>
+{
+    public void Method<TMethod>(TType arg1, TMethod arg2)
+    {
+        Console.WriteLine(""Arg1: {0}, Arg2: {1}"", arg1, arg2);
+    }
+}
+
+// ...and create a background job
+BackgroundJob.Enqueue<GenericServices<string>>(x => x.Method(""hello"", 1));
+```
+
+### Release Notes
+- **Added** – Support for **generic types and methods** for background jobs&nbsp;(#222 by @gorbach).
+- **Added** – GetDescription method to Cron&nbsp;(#210 by @djrineh).
+- **Added** – Support for System.Threading.CancellationToken&nbsp;(#211).
+- **Added** – Make Job(Type, MethodInfo, string[]) ctor public&nbsp;(#241).
+- **Changed** – Provide a ceiling value for `WorkerCount` setting&nbsp;(#246).
+- **Fixed** – Call `Dispose` method instead of `Stop` for graceful shutdown&nbsp;(#244).
+- **Fixed** – ArgumentException: No conversion available between `Func` and `OwinMiddleware`&nbsp;(#242).
+- **Fixed** – Updated UseRabbitMq extension method to actually use the VirtualHost property&nbsp;(#248 by @gaiazov).
+- **Removed** – Hangfire.Redis package was moved to Hangfire Pro.
+
+### Links
+- [Hangfire Official Site](http://hangfire.io)
+- [Hangfire GitHub Project](https://github.com/HangfireIO/Hangfire)
+- [Hangfire Packages](https://www.nuget.org/packages?q=hangfire)
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/694965/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/694965,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.2.0,https://github.com/HangfireIO/Hangfire/releases/tag/v1.2.0,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.2.0,v1.2.0,False,False
+538091,2014-09-05T10:36:41Z,2014-09-05T13:57:51Z,1.1.1,"### Release Notes
+
+This release fixes the problem added with [Hangfire 1.1.0](https://github.com/HangfireIO/Hangfire/releases/tag/v1.1.0) release related with unability to use dashboard authorization filters. It contains minor breaking change, please see the linked issue for the details.
+- **Fixed** – **Breaking:** `IAuthorizationFilter.Authorize` method issues with `IOwinContext` interface (#202).
+
+### Upgrading
+
+If you use the [Hangfire.Dashboard.Authorization](https://www.nuget.org/packages/Hangfire.Dashboard.Authorization/) package, please update it first, its version 2.0.0 uses new `IAuthorizationFilter.Authorize` method definition.
+
+If you have custom authentication filters, please update their signature to the following one:
+
+``` csharp
+public void Authorize(IDictionary<string, object> owinEnvironment)
+{
+    // In case you need an OWIN context, use the next line.
+    var context = new OwinContext(owinEnvironment);
+
+    /* ... */
+}
+```
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/538091/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/538091,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.1.1,https://github.com/HangfireIO/Hangfire/releases/tag/v1.1.1,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.1.1,v1.1.1,False,False
+533030,2014-09-03T17:31:44Z,2014-09-03T17:38:59Z,1.1.0,"This release introduced JSON serialization for background job arguments. All constraints caused by using `TypeConverter` were eliminated - you can use arrays, collections and custom classes/structs (see [Newtonsoft.Json documentation](http://james.newtonking.com/json/help/index.html) for the details). JSON serialization **does not introduce a breaking change** - your old jobs will be handled gracefully using corresponding `TypeConverter`.
+
+Major step was made to kick off dependency burden. To simplify the development and maintanance, Hangfire uses some external packages available on [NuGet](http://nuget.org) to perform serialization, logging, scheduling, etc. In [earlier versions](https://www.nuget.org/packages/HangFire.Core/1.0.2) all of these packages installed together with the `Hangfire.Core` assembly, but in [this release](https://www.nuget.org/packages/HangFire.Core/) half of them (`Microsoft.Owin`, `NCrontab`, `CronExpressionDescriptor`) are being merged internally to the core assembly using ILMerge tool with `/internalize` switch. This change allows Hangfire to support more project environments.
+
+Please see linked issues to learn more about other changes in this release.
+
+### Release Notes
+- **Added** – Serializing job arguments to JSON: **arrays, collections and custom objects are fully supported now** (#155)!
+- **Added** – Add ability to automatically delete job when retry attempts exceeded (#182). Thanks to @sgrassie!
+- **Added** – Job filters can access method's return value. You can also see it in the Dashboard (#161). Thanks to @gius!
+- **Added** – Ability to plug in multiple dashboards with different storages (#168).
+- **Added** – Method to query recurring jobs to the Storage API (#156).
+- **Changed** – `NCrontab`, `CronExpressionDescriptor` and `Microsoft.Owin` dependencies merged with `Hangfire.Core` and internalized (#194).
+- **Fixed** – NextExecution values are only updated upon execution (#158).
+- **Fixed** – Force IE compatibility to edge for Intranet sites (#191). Thanks to @jeremycook!
+- **Fixed** – Added missing event argument in Dashboard UI (#189). Thanks to @jeremycook!
+- **Fixed** – `ArgumentNullException` is being thrown on job completion (#180).
+- **Fixed** – CPU bursts every 0th minute caused by the `RecurringJobScheduler` class (#176).
+- **Fixed** – Redis.FetchedJobsWatcher prohibits jobs from running longer than 15 minutes (#164).
+
+### Links
+- [Hangfire Official Site](http://hangfire.io)
+- [Hangfire GitHub Project](https://github.com/HangfireIO/Hangfire)
+- [Hangfire Packages](https://www.nuget.org/packages?q=hangfire)
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/533030/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/533030,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.1.0,https://github.com/HangfireIO/Hangfire/releases/tag/v1.1.0,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.1.0,v1.1.0,False,False
+405896,2014-07-01T19:51:02Z,2014-07-01T20:13:04Z,1.0.2,"### Release Notes
+- **Fixed** – Dashboard pages: missing ContentType header (#154).
+- **Fixed** – CSS and JS resources throw ArgumentOutOfRangeException (#153).
+
+### Links
+- [Hangfire Official Site](http://hangfire.io)
+- [Hangfire GitHub Project](https://github.com/HangfireIO/Hangfire)
+- [Hangfire Packages](https://www.nuget.org/packages?q=hangfire)
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/405896/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/405896,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.0.2,https://github.com/HangfireIO/Hangfire/releases/tag/v1.0.2,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.0.2,v1.0.2,False,False
+401934,2014-06-30T00:47:08Z,2014-06-30T08:07:42Z,1.0.0,"[Hangfire](http://hangfire.io) has finally reached the `1.0` milestone! This means that public API is frozen and considered to be stable. Starting from now, the [SemVer 2.0](http://semver.org) specification will be used for versioning every package (but there may be exceptions, follow the README for each package).
+
+I want to thank everyone who helped me to reach this milestone, without your participation I would not be able to finish the work. Special thanks:
+- @devmondo – for endless optimism that helped me a lot in difficult times.
+- @dennyferra – for awesome [Hangfire.RabbitMQ](https://www.nuget.org/packages/Hangfire.SqlServer.RabbitMQ/) extension.
+
+### Release Notes
+- **Added** – OWIN implementation for Hangfire Dashboard (#128).
+- **Added** – Custom authorization filters support for dashboard.
+- **Added** – Unified bootstrapper to start Hangfire in web applications.
+- **Added** – Descriptive names for background jobs in Dashboard (#144).
+- **Added** – RabbitMQ support for SQL Server storage (#135). Thanks to @dennyferra!
+- **Changed** – Hangfire now requires .NET Framework 4.5.
+- **Changed** – Namespaces, assemblies and packages now start with `Hangfire` (not `HangFire`, #147).
+- **Changed** – `Hangfire.Core` now contains the dashboard. There is no more `Hangfire.Web`.
+- **Changed** – Common.Logging dependency package updated to 2.2.0 (#151).
+- **Changed** – Default dashboard url is now `/hangfire` (without `.axd` suffix).
+- **Removed** – Removed `Enqueue` method overloads with queue parameter (#140).
+- **Removed** – Removed `AspNetBackgroundJobServer` class.
+- **Fixed** – Russian language in Dashboard replaced with English (#146, #133).
+- **Fixed** – Recurring jobs reported to be executed 44 years ago (#134).
+
+### Upgrading from 0.x
+
+If you have only `Hangfire` package installed, package update is very simple. Just type in your Package Manager Console window:
+
+```
+PM> Update-Package Hangfire
+```
+
+For custom installations, first update each package, and then remove the `Hangfire.Web`:
+
+```
+PM> Update-Package Hangfire.Core
+PM> Uninstall-Package Hangfire.Web
+```
+
+### Breaking Changes
+- [Target your project](http://msdn.microsoft.com/en-us/library/bb398202.aspx) to .NET Framework 4.5 or later.
+- Replace all occurrences of `HangFire` (case-sensitive) to `Hangfire` (lowercased `f` letter) in your projects.
+- Use the [`UseHangfire`](http://docs.hangfire.io/en/latest/users-guide/getting-started/owin-bootstrapper.html) extension method for OWIN app builder instead of `AspNetBackgroundJobServer`.
+- Change all links to Dashboard from `/hangfire.axd` to `/hangfire`.
+- Change your authorization rules as [described here](http://docs.hangfire.io/en/latest/users-guide/deployment-to-production/configuring-authorization.html).
+
+### Links
+- [Hangfire Official Site](http://hangfire.io)
+- [Hangfire GitHub Project](https://github.com/HangfireIO/Hangfire)
+- [Hangfire Packages](https://www.nuget.org/packages?q=hangfire)
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/401934/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/401934,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v1.0,https://github.com/HangfireIO/Hangfire/releases/tag/v1.0,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v1.0,v1.0,False,False
+370381,2014-06-12T09:41:27Z,2014-06-12T09:55:32Z,0.9.1,"### Release Notes
+- **Changed** – Improve resolution of metrics to milliseconds (#100).
+- **Fixed** – `ArgumentNullException` on Recurring Jobs page (#118).
+- **Fixed** – Theoretical `FormatException` when parsing `DateTime` arguments (#119).
+- **Fixed** – MSDTC on server 'XXX' is unavailable exception when trying to open Queues page (#120). Thanks to @henningst for bug report!
+- **Fixed** – Modified sql scripts to the accent sensitivity of the SQL Server for the Turkish collation (#123). Thanks to @lando-calrissian for PR!
+
+### Links
+- [Hangfire Official Site](http://hangfire.io)
+- [Hangfire GitHub Project](https://github.com/HangfireIO/Hangfire)
+- [Hangfire Packages](https://www.nuget.org/packages?q=hangfire)
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/370381/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/370381,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v0.9.1,https://github.com/HangfireIO/Hangfire/releases/tag/v0.9.1,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v0.9.1,v0.9.1,False,False
+362337,2014-06-07T14:16:46Z,2014-06-07T14:46:36Z,0.9,"### Release Notes
+
+Please see the [blog post](http://odinserj.net/2014/06/07/hangfire-0.9-released/) for more details.
+- **Added** – Out-of-the-box support for running recurring jobs (#115). It's incredibly simple!
+- **Added** – `SqlServerStorage` now also accepts connection string names (#51). Thanks&nbsp;to&nbsp;@dlongest!
+- **Changed** – `IBackgroundJobClient` does not implement the `IDisposable` interface anymore (#98).
+- **Changed** – `IMonitoringApi` does not implement the `IDisposable` interface anymore (#110). Thanks&nbsp;to&nbsp;@sgwill!
+- **Changed** – Improve `DateTime` resolution for job arguments by including milliseconds (#109). Thanks&nbsp;to&nbsp;@dennyferra!
+- **Changed** – Removed deprecated `RetryAttribute` class. Please, use `AutomaticRetryAttribute` (#97).
+- **Fixed** – `KeyNotFoundException` when accessing job cancellation token with Redis (#116).
+- **Fixed** – Theoretical race condition that makes HangFire Server invisible from Monitor (#112).
+
+### Upgrading
+
+Version 0.9 brings some breaking changes. Please, do the following steps to perform the upgrade.
+- Replace the `RetryAttribute` with `AutomaticRetryAttribute`.
+- Remove the calls to `Dispose` method of `IBackgroundJobClient` interface (or `BackgroundJobClient` class).
+- Remove the invocations of `IMonitoringApi.Dispose` method.
+
+### Links
+- [Hangfire Official Site](http://hangfire.io)
+- [Hangfire GitHub Project](https://github.com/HangfireIO/Hangfire)
+- [Hangfire Packages](https://www.nuget.org/packages?q=hangfire)
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/362337/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/362337,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v0.9.0,https://github.com/HangfireIO/Hangfire/releases/tag/v0.9.0,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v0.9.0,v0.9.0,False,False
+337330,2014-05-23T18:24:49Z,2014-05-23T18:32:48Z,0.8.3,"### Release Notes
+
+**Update urgency: HIGH**, especially if you want to delete old failed jobs with absent target methods, or have long-running jobs and experience ""thread aborted"" message in logs.
+- **Added** – Cancellation token for job methods that throws on server shutdown and job aborts (#103).
+- **Added** – Place interrupted job back to its queue if possible (#50).
+- **Fixed** – Can not delete jobs when method or class was removed (#101).
+- **Fixed** – NullReferenceException in Monitor (#106).
+- **Fixed** – SqlException when changing state of a job with absent target method (#107).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/337330/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/337330,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v0.8.3,https://github.com/HangfireIO/Hangfire/releases/tag/v0.8.3,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v0.8.3,v0.8.3,False,False
+331016,2014-05-20T21:19:52Z,2014-05-21T08:36:22Z,0.8.2,"### Release Notes
+
+This release contains only new features that improve job management operations, upgrade is not required.
+- **Added** - Batch operations on jobs for HangFire Monitor (#92).
+- **Added** - Retry and delete buttons for almost every page of HangFire Monitor.
+- **Added** - Duration and latency metrics for succeeded jobs (#95).
+- **Added** - Display state transition latencies on job details page (#94).
+- **Added** - DisableConcurrentExecution filter (#96).
+- **Misc** - Tables in HangFire Monitor received some love (#93).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/331016/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/331016,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v0.8.2,https://github.com/HangfireIO/Hangfire/releases/tag/v0.8.2,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v0.8.2,v0.8.2,False,False
+325054,2014-05-16T21:06:26Z,2014-05-17T05:23:41Z,0.8.1,"### Release Notes
+
+This release contains great new features, but upgrade is not required. Please, see the [blog post](http://odinserj.net/2014/05/17/hangfire-0.8.1-released/) for details.
+- **Added** - MSMQ queues support for SQL Server job storage (#85).
+- **Added** - ""Deleted"" state for jobs, when we don't want to process them anymore (#89).
+- **Added** - ""Requeue"" and ""Delete"" buttons on a job page in HF Monitor (#55).
+- **Added** - Logging job failures: warning - there is a retry, error - no attempts left (#87).
+- **Added** - `BackgroundJob.Requeue` and `BackgroundJob.Delete` methods.
+- **Changed** - Set `InvisibleTimeout` back from 5 to 30 minutes (#90).
+- **Changed** - `RetryAttribute` is deprecated. Use `AutomaticRetryAttribute` instead.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/325054/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/325054,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v0.8.1,https://github.com/HangfireIO/Hangfire/releases/tag/v0.8.1,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v0.8.1,v0.8.1,False,False
+299891,2014-05-02T12:38:03Z,2014-05-02T13:10:50Z,0.8,"### Release Notes
+
+**Update urgency: HIGH**. This release contains features related to security.
+- **Added** – New server component subsystem - more reliability, more logging, less blocking on stop.
+- **Added** – Added monitor access authorization using ASP.NET RoleProvider (#42).
+- **Removed** – Deprecated job format based on classes **is not supported anymore** (#81).
+- **Changed** – Monitor access restricted to local requests only by default (#42).
+- **Changed** – Some breaking changes for public API. See the next section for details.
+- **Changed** – Default automatic retry attempts count set to 10 (#71).
+- **Changed** – Namespace optimization to reduce number of needed `using` statements.
+- **Fixed** – PreserveCultureAttribute does not work (#77).
+- **Fixed** – `SqlServerStorageOptions.QueuePollInterval` is not working.
+- **Fixed** – Rare 'arithmetic overflow error for data type tinyint, value = -1' exception (#83).
+- **Fixed** – Numerous minor issues catched with new unit tests.
+
+### Breaking Changes
+- Changed constructor of [`BackgroundJobServer`](https://github.com/odinserj/HangFire/blob/master/src/HangFire.Core/BackgroundJobServer.cs#L42) and [`AspNetBackgroundJobServer`](https://github.com/odinserj/HangFire/blob/master/src/HangFire.Web/AspNetBackgroundJobServer.cs#L42) classes. You should pass options through the [`BackgroundJobServerOptions`](https://github.com/odinserj/HangFire/blob/master/src/HangFire.Core/BackgroundJobServerOptions.cs) class.
+- `JobActivator.SetCurrent` method replaced with [`JobActivator.Current`](https://github.com/odinserj/HangFire/blob/master/src/HangFire.Core/JobActivator.cs) property setter.
+- `RetryAttribute`, `StatisticsHistoryAttribute`, `PreserveCultureAttribute` (now `CaptureCultureAttribute`) moved from `HangFire.Filters` namespace to the `HangFire` namespace.
+- `RedisStorageOptions.PollInterval` option moved to `BackgroundJobServerOptions.SchedulePollingInterval`.
+- `BackgroundJob.ClientFactory` property made internal. Please, use [`IBackgroundJobClient`](https://github.com/odinserj/HangFire/blob/master/src/HangFire.Core/IBackgroundJobClient.cs) interface for unit tests, and [`BackgroundJobClient`](https://github.com/odinserj/HangFire/blob/master/src/HangFire.Core/BackgroundJobClient.cs) class as default implementation.
+
+### Upgrading from 0.5
+
+If you are still using HangFire 0.5, you can not upgrade to version 0.8 directly, because there is probability that you lose some of your jobs. This version drops support for jobs based on `BackgroundJob` subclassing, so you need to do the following three-step process:
+1. Upgrade to version 0.7.5 first (see also [release notes for 0.7](https://github.com/odinserj/HangFire/releases/tag/v0.7.0)).
+2. Add different implementation for your jobs using plain methods (see [the guide](https://github.com/odinserj/HangFire/wiki/Upgrading-from-0.5)) and wait until all old format jobs performed, don't forget to check scheduled jobs.
+3. Upgrade to version 0.8 or latest and remove old job classes.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/299891/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/299891,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v0.8,https://github.com/HangfireIO/Hangfire/releases/tag/v0.8,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v0.8,v0.8,False,False
+266123,2014-04-09T23:25:31Z,2014-04-10T15:55:01Z,0.7.5,"### Release notes
+
+**Update urgency: LOW.**
+- #66 – Added possibility to change the job expiration time through extension filters (thanks to @hahmed).
+- #64 – Clarified common exception message (thanks to @devmondo).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/266123/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/266123,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v0.7.5,https://github.com/HangfireIO/Hangfire/releases/tag/v0.7.5,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v0.7.5,v0.7.5,False,False
+260165,2014-04-07T13:32:59Z,2014-04-07T13:34:08Z,0.7.4,"### Release Notes
+
+**Update urgency: HIGH**. This release contains fix for serious problem.
+- #60 – Removed `BackgroundJobServer.MachineName` validation. It caused exceptions with valid NetBIOS names. Thanks to @hahmed for reporting!
+- #61 – Opened `IBackgroundJobClient` and `BackgroundJobClient` types. You can use them instead of static `BackgroundJob` class.
+- Ability to specify target queue in `BackgroundJob.Enqueue` method.
+- Fixed theoretical `IClientFilter` issue (`CreateContext` ctor did not copy the JobId).
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/260165/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/260165,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v0.7.4,https://github.com/HangfireIO/Hangfire/releases/tag/v0.7.4,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v0.7.4,v0.7.4,False,False
+257596,2014-04-04T19:17:57Z,2014-04-04T20:01:03Z,0.7.3,"### Release notes
+
+**Update urgency: LOW**. You need to install this version only if you are planning to use HangFire.Redis and don't want to experience issue #53.
+- #53 – Fixed TypeLoadException: Method 'get_Db' not found.
+- #58 – Added RedisStorage ctor overloads with default host, port and db.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/257596/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/257596,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v0.7.3,https://github.com/HangfireIO/Hangfire/releases/tag/v0.7.3,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v0.7.3,v0.7.3,False,False
+251132,2014-04-01T14:36:32Z,2014-04-01T14:39:34Z,0.7.1,"### Release Notes
+
+This release contains some minor fixes and link updates, **upgrade is not required**.
+- Added [HangFire.Autofac](https://github.com/odinserj/HangFire.Autofac) package.
+- Added [HangFire.Ninject](https://github.com/odinserj/HangFire.Ninject) package.
+- Added some Sphinx-based docs.
+- New [project site](http://hangfire.io/) and [docs site](http://docs.hangfire.io/).
+- Some minor fixes.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/251132/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/251132,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v0.7.1,https://github.com/HangfireIO/Hangfire/releases/tag/v0.7.1,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v0.7.1,v0.7.1,False,False
+222181,2014-03-22T09:30:20Z,2014-03-13T16:09:19Z,0.7,"### Release Notes
+
+Dear 0.7-alpha users! Please, **DROP ALL HangFire tables** before using this release!
+- #43 – Changed NuGet package structure.
+- #33 – Persistent storage abstraction.
+- #34 – SQL Server job storage implementation.
+- #41 – Using [Common.Logging](http://netcommon.sourceforge.net/) for logging and [Json.NET](http://james.newtonking.com/json) for json encoding.
+- #39 – Improved job fetching implementation.
+- #47 – Increased default worker count.
+- #35 – Removed obsolete `Perform` class. Please, see [how to update](https://github.com/odinserj/HangFire/wiki/Upgrading-from-0.5) your old jobs.
+- #44 – Fixed empty MVC 5 project Internal Server Error.
+- #45 – Short exception stack traces, they contain only your code.
+- #46 – Apply the Failed state when state filters/handlers cause an exception.
+- Started work on restoration of the broken tests.
+- Clarified some type names, state subsystem was greatly simplified.
+
+### Upgrading Guide
+
+NuGet package structure has been changed. SQL Server job storage implementation now installed by default with the **HangFire** package. If you are using **Redis** as a storage and don't want to change anything, please, do the following steps:
+1. `Uninstall-Package HangFire`
+2. `Uninstall-Package HangFire.Core`
+3. `Install-Package HangFire.Redis`
+4. `Install-Package HangFire.Web`
+5. Update your HangFireConfig.cs file as described below.
+6. If your jobs are still based on the BackgroundJob class, [upgrade them](https://github.com/odinserj/HangFire/wiki/Upgrading-from-0.5).
+
+``` csharp
+public static void Start()
+{
+      // Place this line in the top of the Start method.
+      JobStorage.Current = new RedisStorage(""localhost:6379"", 0);
+      // ...
+      var server = /* ... */
+```
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/222181/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/222181,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v0.7.0,https://github.com/HangfireIO/Hangfire/releases/tag/v0.7.0,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v0.7.0,v0.7.0,False,False
+163576,2014-01-28T11:21:22Z,2014-01-28T11:24:47Z,0.6.2,"#32: Fixed NullReferenceException when trying to create a job using the Old API.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/163576/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/163576,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v0.6.2,https://github.com/HangfireIO/Hangfire/releases/tag/v0.6.2,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v0.6.2,v0.6.2,False,False
+119096,2014-01-27T14:16:11Z,2013-12-26T12:04:56Z,0.6,"## What's new?
+
+### New Client API
+
+Brand new Client API, based on lambda expressions. With this change, you don't even need to define custom job classes. You are able to invoke your existing methods asynchronously while maintaining persistence and transparency.
+
+Two types of methods are supported: static and instance. Static methods will be simply called on the server side (without instance activation). To call instance methods, server will create an instance of the method's class first using the `JobActivator` class.
+
+``` csharp
+public class CommentController : Controller
+{
+    /* Other actions */
+
+    public ActionResult PostComment(string text)
+    {
+        var id = CommentService.Create(User, text);
+
+        // Static method
+        BackgroundJob.Enqueue(() => CheckForSpam(id));
+        // Instance method
+        BackgroundJob.Enqueue<CommentController>(x => x.SendToModerator(id));
+
+        return RedirectToAction(/* Some action */);
+    }
+
+    [NonAction]
+    public void SendToModerator(int commentId)
+    {
+        /* Implementation logic */
+    }
+
+    public static void CheckForSpam(int commentId)
+    {
+        /* Implementation logic (Akismet, etc.) */
+    }
+}
+```
+
+## Breaking changes
+- Lifecycle of the `JobActivator` class has been changed. Use the `JobActivator.SetCurrent` method to change it.
+- The signature of the `JobActivator.ActivateJob` method was changed. It now returns an instance of `object` instead of an instance of the `BackgroundJob` class.
+- The `JobDescriptor` class was removed. You can see all its properties in the `*Context` classes.
+- The signature of all filter interfaces was changed. Affected `IStateChangingFilter`, `IStateChangedFilter`, `IClientFilter`, `IServerFilter`.
+- The signature of `JobState` methods was changed also.
+
+You'll need to change a bit your `JobActivator`-based and `JobFilterAttribute`-based classes.
+
+## Transition to the new API
+
+The structure of those jobs, that were created with the new API, was changed. Since new API is more flexible, the old one will be deleted to not to confuse new users with several methods of doing the same things. This version does not contain breaking changes related to the Client API, but it was made obsolete and its usage is prohibited.
+
+To make sure that the storage does not contain jobs in the old format, the transition to the new API will be implemented in two stages.
+1. `v0.7`: Remove the `Perform` class to prohibit the use of the Old Client API. After removal of the `Perform` class, you'll need to [convert your existing job classes](https://github.com/odinserj/HangFire/wiki/Upgrading-from-0.5) to correspond to the new API. If your storage is still contains old jobs, they will be processed anyway.
+2. `Before v1.0`: Remove the `BackgroundJob.Perform` method. All old jobs will be failed during their processing. You'll need to ensure that all old jobs were processing before proceeding to the version 1.0.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/119096/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/119096,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v0.6,https://github.com/HangfireIO/Hangfire/releases/tag/v0.6,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v0.6,v0.6,False,False
+89699,2013-11-10T12:57:10Z,2013-11-10T13:09:07Z,0.5,"This is the first public release. Please, see the [Getting Started](http://hangfire.io) guide.
+",https://api.github.com/users/odinserj,1078718,odinserj,https://api.github.com/repos/HangfireIO/Hangfire/releases/89699/assets,https://api.github.com/repos/HangfireIO/Hangfire/releases/89699,master,https://api.github.com/repos/HangfireIO/Hangfire/tarball/v0.5,https://github.com/HangfireIO/Hangfire/releases/tag/v0.5,https://api.github.com/repos/HangfireIO/Hangfire/zipball/v0.5,v0.5,False,False

@@ -1,0 +1,923 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8237173,2017-10-24T16:06:10Z,2017-10-24T16:07:29Z,0.23.0,"## Highlights 🕴
+
+### `NODE_ENV=test` ✨
+
+AVA will now set `process.env.NODE_ENV` to `'test'`, as long as the `NODE_ENV` environment variable has not already been set. 42e7c74
+
+### Improved snapshot storage location 🗃
+
+Snapshots are stored alongside your test files. This is great when your test file is executed directly but say if you're using TypeScript to precompile your test file AVA would store the snapshots in your build directory. In this release, if source maps are available, AVA determines the original test file location and uses that to store the snapshots.
+
+You can also specify where snapshots are stored through the `snapshotLocation` option in the `package.json` file. 7fadc34
+
+### Matching anonymous tests 🕵️
+
+`--match='*'` now matches all tests, including those without a title. 1df502d
+
+## Miscellaneous 🎒
+
+* The verbose logger now only displays the timestamp when in watch mode 1ea758f
+* Anonymous functions are now included in stack traces c72f4f2
+* Concurrency is now capped at `2` in CI environments 3f81fc4
+* AVA no longer calls `Bluebird.longStackTraces()`. If you're using [Bluebird](http://bluebirdjs.com/) you may want to call this yourself using a `require` script. ebf78b3 61101d9
+* There's a new recipe for [endpoint testing using Mongoose](https://github.com/avajs/ava/blob/master/docs/recipes/endpoint-testing-with-mongoose.md) c9fe8db
+* The [browser testing](https://github.com/avajs/ava/blob/master/docs/recipes/browser-testing.md) recipe has been updated with an example of exposing global variables, such as jQuery f43d5ae
+* `t.log()` is now supported in the Flow and TypeScript type definitions 64b7755
+* `t.title` is now supported in the TypeScript type definitions 3c8b1be
+* `t.snapshot()` now has a better Flow type definition ded7ab8
+
+## All changes 🛋
+
+[`v0.22.0...v0.23.0`](https://github.com/avajs/ava/compare/v0.22.0...v0.23.0)
+
+## Thanks 💌
+
+💖 Huge thanks to @anshulwadhawan, @mliou8, @dehbmarques, @forivall, @forresst, @Couto, @impaler, @kristianmandrup, @lukechilds, @neoeno, @jugglinmike, @P-Seebauer, @philippotto, @ptim, @rhendric, @ntwb, @tdeschryver, @timothyjellison and @zellwk for helping us with this release. We couldn’t have done it without you!
+
+## Get involved ✌️
+
+We welcome new contributors. AVA is a friendly place to get started in open source. We have a [great article](https://medium.com/@vadimdemedes/making-your-first-contribution-de6576ddb190#.umxr7id07) on getting started contributing and a comprehensive [contributing guide](https://github.com/avajs/ava/blob/master/contributing.md).
+
+
+",https://api.github.com/users/novemberborn,33538,novemberborn,https://api.github.com/repos/avajs/ava/releases/8237173/assets,https://api.github.com/repos/avajs/ava/releases/8237173,master,https://api.github.com/repos/avajs/ava/tarball/v0.23.0,https://github.com/avajs/ava/releases/tag/v0.23.0,https://api.github.com/repos/avajs/ava/zipball/v0.23.0,v0.23.0,False,False
+7373977,2017-08-15T07:37:36Z,2017-08-15T07:40:33Z,0.22.0,"There's but a few commits in this release, but we've made a big change to how AVA manages its test workers 👩🏼‍🔬👨🏼‍🏭👨🏿‍🚀👨🏻‍⚕️👩🏽‍💼.
+
+## Highlights
+
+### Default concurrency
+
+We now cap the number of concurrent workers to the number of CPU cores on your machine. Previously AVA started workers for each test file, so if you had many test files this could actually bring things to a halt. 465fcecc9ae0d3274d4d41d3baaca241d6a40130
+
+You can still customize the concurrency by setting the `concurrency` option in AVA's `package.json` configuration, or by passing the `--concurrency` flag. We've also beefed up input validation on that flag. b6eef5ac30e7839371a420f17060f62f971717aa
+
+Unfortunately this does change how `test.only()` behaves. AVA can no longer guarantee that normal tests won't run. For now, if you want to use `test.only()`, you should run tests from just that file. We have an open issue to add an `--only` flag, which will ensure that AVA runs just the `test.only()` tests. If you'd like to help us with that please head on over to #1472.
+
+### `t.log()`
+
+We've also added `t.log()`, which lets you print a log message contextually alongside the test result, instead of immediately printing it to `stdout` like `console.log`. 14f7095d25abc5ffbff7efd7db962eaf5e86daab
+
+### Miscellaneous
+
+* The [WebStorm recipe](https://github.com/avajs/ava/blob/master/docs/recipes/debugging-with-webstorm.md) has been updated with instructions on how to enable the Node.js inspector. d8c21a6b8102bcc11daacba2ea6af6f9b9713959
+* The app setup in the [endpoint testing recipe](https://github.com/avajs/ava/blob/master/docs/recipes/endpoint-testing.md) has been fixed e28be05788b50b0ad81c889fa5fb6c4032c4201b
+* The `t.notThrows()` example has been clarified 57f50072ac37dcc62eeed391c547bf841efb6f85
+
+## All changes
+
+[`v0.21.0...v0.22.0`](https://github.com/avajs/ava/compare/v0.21.0...v0.22.0)
+
+## Thanks
+
+💖 Huge thanks to @abouthiroppy, @ydaniv, @nowells, @melisoner2006, @clayzermk1 and @tdeschryver for helping us with this release. We couldn’t have done it without you!
+
+## Get involved
+
+We welcome new contributors. AVA is a friendly place to get started in open source. We have a [great article](https://medium.com/@vadimdemedes/making-your-first-contribution-de6576ddb190#.umxr7id07) on getting started contributing and a comprehensive [contributing guide](https://github.com/avajs/ava/blob/master/contributing.md).
+
+
+",https://api.github.com/users/novemberborn,33538,novemberborn,https://api.github.com/repos/avajs/ava/releases/7373977/assets,https://api.github.com/repos/avajs/ava/releases/7373977,master,https://api.github.com/repos/avajs/ava/tarball/v0.22.0,https://github.com/avajs/ava/releases/tag/v0.22.0,https://api.github.com/repos/avajs/ava/zipball/v0.22.0,v0.22.0,False,False
+7029006,2017-07-13T14:25:38Z,2017-07-13T14:26:10Z,0.21.0,"This is primarily a bug fix release, but some features did sneak in:
+
+- Additional arguments can be passed when profiling 05bfafeff4137e25c97f175eed1ab45d4137396d
+- Though not officially supported, AVA now works better with Wallaby.js’ diff view 3f6e134af754d5e33609e7e28ce6609b57497f13
+- Expanded the Webstorm recipe to include setup instructions using `npm` 2b4e35d446c2d6299c8de106a5251daaef14956c
+
+This release includes the following patches:
+
+- Fixes for `t.deepEqual()` and magic assert diffs 9e4ee3fe690f015193e10066ec779b20fd3302f0
+- Ensure AVA doesn’t use `Buffer` APIs that are unavailable in Node.js releases older than 4.5 d0fc8c9c4cff6ee2728a33dd05ca7358042c51c8
+- Changed Flow typing of the `t.throws()` promise return value to be `any` 4a769f8f506638fe7ec244797a8dc3f596ac424f
+- Update Flow typing of `test()` so macros are compatible with the latest `flow-bin`  e794e73e5e2588e1dd51d4638cfa9573835d7ffd
+
+## Thanks
+
+💖 Huge thanks to @wprater, @HippoDippo, @roperzh, @ArtemGovorov, @dancoates, @suchmaske, @ajtorres9 and @guillaumevincent for helping us with this release. We couldn’t have done it without you!
+
+## Get involved
+
+We welcome new contributors. AVA is a friendly place to get started in open source. We have a [great article](https://medium.com/@vadimdemedes/making-your-first-contribution-de6576ddb190#.umxr7id07) on getting started contributing and a comprehensive [contributing guide](https://github.com/avajs/ava/blob/master/contributing.md).
+
+",https://api.github.com/users/novemberborn,33538,novemberborn,https://api.github.com/repos/avajs/ava/releases/7029006/assets,https://api.github.com/repos/avajs/ava/releases/7029006,master,https://api.github.com/repos/avajs/ava/tarball/v0.21.0,https://github.com/avajs/ava/releases/tag/v0.21.0,https://api.github.com/repos/avajs/ava/zipball/v0.21.0,v0.21.0,False,False
+6863656,2017-06-28T14:04:43Z,2017-06-28T14:05:04Z,0.20.0,"Today’s release is very exciting. After adding [magic assert](https://github.com/avajs/ava/#magic-assert) and [snapshot testing](https://github.com/avajs/ava/#snapshot-testing) we found that these features sometimes disagreed with each other. `t.deepEqual()` would return `false`, yet AVA wouldn’t show a diff. Snapshot tests cared about `Set` order but `t.deepEqual()` didn’t. @novemberborn came to the realization that comparing and diffing object trees, and doing so over time with snapshots, are variations on the same problem. Thus he started [ConcordanceJS](https://github.com/concordancejs), a new project that lets you compare, format, diff and serialize any JavaScript value. This AVA release reaps the fruits of his labor.
+
+## Highlights
+
+### More magical asserts
+
+Magic assert will now always show the difference between actual and expected values. If an unexpected error occurs it’ll print all (enumerable) properties of the error which can make it easier to debug your program.
+
+![Example of a formatted exception](https://d2mxuefqeaa7sj.cloudfront.net/s_175CE21AB04CD43514E95D82F85BEF2470C159EA6B7ACAB772F04105747B8EC3_1498645982254_Screen+Shot+2017-06-28+at+11.29.59.png)
+
+More details of an object are printed, like the constructor name and the string tag. Buffers are hex-encoded with line breaks so they’re easy to read:
+
+![Example of diffed Buffers](https://d2mxuefqeaa7sj.cloudfront.net/s_175CE21AB04CD43514E95D82F85BEF2470C159EA6B7ACAB772F04105747B8EC3_1498648050196_Screen+Shot+2017-06-28+at+12.05.45.png)
+
+
+### `t.deepEqual()` improvements
+
+`t.deepEqual()` and `t.notDeepEqual()` now use [`concordance`](https://github.com/concordancejs/concordance), rather than [`lodash.isequal`](https://lodash.com/docs/#isEqual). This changes what values AVA considers to be equal, making the `t.deepEqual()` assertion more predictable. You can now trust that all aspects of your objects are compared.
+
+[Object wrappers](https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch3.md#boxing-wrappers) are no longer equal. The following assertion will now fail:
+
+```js
+t.deepEqual(Object(1), 1); // fails
+```
+
+For `Map` and `Set` objects to be equal, their elements must now be in the same order:
+
+```js
+const actual = new Set(['hello', 'world']);
+t.deepEqual(actual, new Set(['hello', 'world'])); // passes
+t.deepEqual(actual, new Set(['world', 'hello']) // fails
+```
+
+With this release AVA will compare all enumerable properties of an object. For an array this means that the comparison considers not just the array elements. The following are no longer considered equal:
+
+```js
+const actual = [1, 2, 3];
+const expected = [1, 2, 3];
+expected.also = 'a property';
+t.deepEqual(actual, expected); // fails
+```
+
+The same goes for `Map` and `Set` objects, errors, and so forth:
+
+```js
+const actual = new TypeError('Bad value');
+const expected = new TypeError('Bad value');
+expected.value = 41;
+t.deepEqual(actual, expected); // fails
+```
+
+You used to be able to compare `Arguments` object to an object literal:
+
+```js
+const args = (function() { return arguments; })('hello', 'world');
+t.deepEqual(args, {0: 'hello', 1: 'world'}); // now fails
+```
+
+Instead you must now use:
+
+```js
+const args = (function() { return arguments; })('hello', 'world');
+t.deepEqual(args, ['hello', 'world']); // passes
+```
+
+(Of course you can still compare `Arguments` objects to each other.)
+
+New in this release is the ability to compare [React](https://facebook.github.io/react/) elements:
+
+```js
+t.deepEqual(<HelloWorld/>, <HelloWorld/>);
+
+const renderer = require('react-test-renderer');
+t.deepEqual(renderer.create(<HelloWorld/>).toJSON(), <h1>Hello World</h1>);
+```
+
+### Snapshot improvements
+
+Snapshots too now use [`concordance`](https://github.com/concordancejs/concordance). This means values are compared with the snapshot according to the same rules as `t.deepEqual()`, albeit with some minor differences:
+
+
+- `Argument` objects can only be compared to `Argument` objects
+- Functions are compared by name and other enumerable properties
+- Promises are compared by their constructor and additional enumerable properties
+- Symbols are compared by their string serialization. [Registered](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Symbol#Shared_symbols_in_the_global_symbol_registry) and [well-known symbols](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Symbol#Well-known_symbols) will never equal symbols with similar descriptions
+
+Note that Node.js versions before 6.5 [cannot infer names of all functions ](http://node.green/#ES2015-built-in-extensions-function--name--property). AVA will pass a snapshot assertion if it determines the name information is unreliable.
+
+AVA now saves two files when snapshotting. One, ending in the `.snap` extension, contains a compressed serialization of the expected value. The other is a readable Markdown file that contains the snapshot report. You should commit both to source control. The report file can be used to see what is in your snapshots and to compare snapshot changes over time.
+
+Try it out with our [snapshot example](https://github.com/avajs/ava-snapshot-example)! Or check out an [example snapshot report](https://gist.github.com/novemberborn/9b2607f2fa29e4c03cfd64e3315c5070).
+
+The snapshot file location now follows your test layout. If you use a `test` folder, they’ll be placed in `test/snapshots`. With `__tests__` they’ll be placed in `__tests__/__snapshots__`. And if you just have a `test.js` in your project root the snapshot files will be written to `test.js.snap` and `test.js.md`. You may have to manually remove old snapshot files after installing this new AVA version. ebd572a02debe8e17802f795e6cd618073c8d787
+
+**Improved snapshot support in watch mode**
+
+In watch mode, AVA now watches for changes to snapshot files. This is handy when you revert changes while the watcher is running. Snapshot files are correctly tracked as test dependencies, so the right tests are rerun. Typing  `u`, followed by `Enter`  updates the snapshots in the tests that just ran. (And the watcher won’t rerun tests when snapshots are updated.) 87eef846392d04b727b57981a16f7e8429a04195 dbc78dc19cb759b6b72946bc1b833abc284cfab2 f507e364c4be8ac0f5702b9fd31ac634b9ec35cb 50b60a11aecf9bc6945b7e836a9ec8855bbcd86e
+
+### Node.js 8 support
+
+AVA 0.19 already worked great with Node.js 8, and we’ve made it even better by removing unnecessary Babel transpilations in our [`stage-4` preset](https://github.com/avajs/babel-preset-stage-4). We’re now also forwarding the `--inspect-brk` flag for debugging purposes. e45695197c8ba5d0ec7df7a7fe38f00f9a5f5fb0 a868b02f7cdee89d82bd22b3f4f47da2e1cba6ac
+
+### New and improved recipes
+
+We’ve added new recipes and improved others:
+
+- Learn how to [debug tests with Visual Studio Code](https://github.com/avajs/ava/blob/master/docs/recipes/debugging-with-vscode.md) 1d041531900f88fede3d006730efb40f8f7dae07 140c0e03c93bf5fcbda3d913bfca43e0217918b9
+- Test [MongoDB integrations with per-test isolation](https://github.com/avajs/ava/blob/master/docs/recipes/isolated-mongodb-integration-tests.md) 970872cceb9b99fb5ce4519d729ed1597ed2a88c
+- [Using AVA with Vue.js](https://github.com/avajs/ava/blob/master/docs/recipes/vue.md) ff3bba95fa82b812328176bb490a252e11827a21
+- There’s several ways of [using webpack to precompile tests and sources](https://github.com/avajs/ava/blob/master/docs/recipes/precompiling-with-webpack.md). We’ve broken down the pros and cons f228401a5a91200639fb6e8598605e0e9e781ba6
+- We’ve added a note to the [browser testing recipe](https://github.com/avajs/ava/blob/master/docs/recipes/browser-testing.md), discouraging the use of `browser-env` c01ac05ef610c87f5c264b1a3eb80f89b4fc0832
+
+### Miscellaneous
+
+- Specifying `--concurrency` without a value now causes AVA to exit with an error 8c35a1a4b61c3f91d8c7b61e185dd5b450402bc0
+- Using `t.throws()` with a resolved promise now prints a helpful error message dfca2d9a24e7ee4a12102a8976b89380dde74d4b
+- The `t.title` accessor has been documented. 549e99b2bd13d88fa44306919fd66abe808e791c
+
+## All changes
+
+[`v0.19.1...v0.20.0`](https://github.com/avajs/ava/compare/v0.19.1...v0.20.0)
+
+## Thanks
+
+💖 Huge thanks to @lukechilds, @alexrussell, @zs-zs, @cncolder, @JPeer264, @CImrie, @blake-newman, @yatharthk, @bfred-it, @tdeschryver, @sudo-suhas, @dohomi, @efegurkan and @forresst for helping us with this release. We couldn’t have done it without you!
+
+## Get involved
+
+We welcome new contributors. AVA is a friendly place to get started in open source. We have a [great article](https://medium.com/@vadimdemedes/making-your-first-contribution-de6576ddb190#.umxr7id07) on getting started contributing and a comprehensive [contributing guide](https://github.com/avajs/ava/blob/master/contributing.md).
+",https://api.github.com/users/novemberborn,33538,novemberborn,https://api.github.com/repos/avajs/ava/releases/6863656/assets,https://api.github.com/repos/avajs/ava/releases/6863656,master,https://api.github.com/repos/avajs/ava/tarball/v0.20.0,https://github.com/avajs/ava/releases/tag/v0.20.0,https://api.github.com/repos/avajs/ava/zipball/v0.20.0,v0.20.0,False,False
+6029225,2017-04-10T08:33:53Z,2017-04-10T08:34:41Z,0.19.1,"A bugfix release. See [`0.19.0`](https://github.com/avajs/ava/releases/tag/v0.19.0) for full release notes.
+
+* Prevent `MaxListenersExceededWarning` from being emitted if a test file contains more than 10 tests d27bc8ffbb060fa73dbcc42d548d0f95c1bc0541
+* Fix `t.end()` not being available in the TypeScript definition for callback tests bd81ef4a995edcf37f8f2199ac8b83c1463e3a4a
+* Fix `t.context` not being available in the Flow definition for `beforeEach()` and `afterEach()` hooks d169f0e7c25e861fe9221af96b883156a1749ae4",https://api.github.com/users/novemberborn,33538,novemberborn,https://api.github.com/repos/avajs/ava/releases/6029225/assets,https://api.github.com/repos/avajs/ava/releases/6029225,master,https://api.github.com/repos/avajs/ava/tarball/v0.19.1,https://github.com/avajs/ava/releases/tag/v0.19.1,https://api.github.com/repos/avajs/ava/zipball/v0.19.1,v0.19.1,False,False
+5987806,2017-04-05T16:32:11Z,2017-04-05T16:37:40Z,0.19.0,"Since our last minor release, @novemberborn has worked tirelessly on refactoring big parts of the codebase to be more correct and readable, while squashing many bugs. We've also added multiple detections that will prevent user mistakes.
+
+## Highlights
+
+### Working snapshots
+
+We released snapshot support with [`v0.18.0`](https://github.com/avajs/ava/releases/tag/v0.18.0), but unfortunately it didn’t work. That’s fixed now. Since we’re using `jest-snapshot` the output will look a little different from AVA’s other assertions. Most notably the output will not be colored.
+
+57fd051
+
+### Tests fail if no assertions are run (BREAKING)
+
+Sometimes you write a test that accidentally passes, because your assertion was never run. For example, the following test passes if `getAnimals()` returns an empty array:
+
+```js
+test('unicorn', t => {
+  for (const animal of getAnimals()) {
+    t.is(animal, 'unicorn');
+  }
+});
+```
+
+AVA now fails your test if no assertions were run. This can be a problem if you use third-party assertion libraries, since AVA cannot detect when those assertions pass. You can disable this behavior by setting the `failWithoutAssertions` option to `false` in AVA's [`package.json` configuration](https://github.com/avajs/ava/blob/v0.19.0/readme.md#configuration).
+
+3a4553c
+
+### Improved `t.throws()` and `t.notThrows()` assertions (BREAKING)
+
+Various improvements have been made to these assertions. Unfortunately this does include some breaking changes.
+
+Calling these assertions with an observable or promise makes them asynchronous. You now need to `await` them:
+
+```js
+const promise = Promise.reject(new TypeError('🦄'));
+
+test('rejects', async t => {
+  await t.throws(promise);
+});
+```
+
+Previously, these would return a promise that was rejected if the assertion failed. This leaked AVA’s internal assertion error. Now they’ll fulfill their returned promise with `undefined` instead (d56db75). You typically won’t notice this in your test.
+
+We’ve improved how we detect when `t.throws()` and `t.notThrows()` are used incorrectly (d924045). This might be when, rather than passing a function, you call it:
+
+```js
+test('throws', t => {
+  t.throws(throwingFunction());
+});
+```
+
+You can now use `await` and `yield` in the argument expressions (e.g. `t.throws(await createThrowingFunction())`. The instructions on how to use these assertions correctly are now shown with the test failure, instead of being written to the console as your tests run.
+
+Incorrectly using these assertions now always causes your test to fail.
+
+Stack traces are now correct, even if used asynchronously (f6a42ba). The error messages have been improved for when `t.throws()` fails to encounter an error, or if `t.notThrows()` does (4463f38). If `t.notThrows()` fails, the encountered error is shown (22c93ed).
+
+### Improved magic assert output
+
+Actual and/or expected values are now included in the [magic assert](https://github.com/avajs/ava#magic-assert) output, with helpful labels that are relevant to the failing assertion.
+
+4f87f32
+
+### Detect hanging tests
+
+AVA can now detect when an asynchronous test is hanging (880e87e).
+
+Note that this may not work if your code is listening on a socket or is using a timer or interval.
+
+### Better Babel option resolution
+
+We’re now resolving Babel options ahead of time, using [`hullabaloo-config-manager`](https://github.com/novemberborn/hullabaloo-config-manager). This fixes long-standing issues with relative paths in AVA’s `""babel""` options in `package.json` files (#707). It also means we’re better at recompiling test and helper files if your Babel config changes or you update plugins or presets.
+
+0464b14
+
+### Miscellaneous
+
+- There is a [new recipe for precompiling source files with webpack](https://github.com/avajs/ava/blob/v0.19.0/docs/recipes/precompiling-with-webpack.md). a49f66b
+- You can now [type the test context](https://github.com/avajs/ava/blob/v0.19.0/docs/recipes/typescript.md#working-with-context) when using TypeScript. 50ad213
+- The color of text diff output has been fixed. 9f2ff09
+- Text diffs are now faster. bd5ed60
+- Values are no longer highlighted if colors are disabled. b581983
+- AVA no longer crashes if tests fail with non-errors. 157ef25
+- YAML blocks in the TAP output have been improved. 3279336
+- We’re now printing assertion statements with less depth. 0510d80
+- Arguments to `t.regex()` and `t.notRegex()` are now validated. f062981
+
+
+## All changes
+
+[`v0.18.2…v0.19.0`](https://github.com/avajs/ava/compare/v0.18.2...v0.19.0)
+
+
+## Thanks
+
+💖 Huge thanks to @Wp1987, @lukechilds, @jakwuh, @danny-andrews, @mmkal, @yatharthk, @klauscfhq, @screendriver, @jhnns, @danez and @florianb for helping us with this release. We couldn’t have done it without you!
+
+
+## Get involved
+
+We welcome new contributors. AVA is a friendly place to get started in open source. We have a [great article](https://medium.com/@vadimdemedes/making-your-first-contribution-de6576ddb190#.umxr7id07) on getting started contributing and a comprehensive [contributing guide](https://github.com/avajs/ava/blob/master/contributing.md).
+",https://api.github.com/users/novemberborn,33538,novemberborn,https://api.github.com/repos/avajs/ava/releases/5987806/assets,https://api.github.com/repos/avajs/ava/releases/5987806,master,https://api.github.com/repos/avajs/ava/tarball/v0.19.0,https://github.com/avajs/ava/releases/tag/v0.19.0,https://api.github.com/repos/avajs/ava/zipball/v0.19.0,v0.19.0,False,False
+5499416,2017-02-18T17:14:16Z,2017-02-18T17:16:31Z,0.18.2,"Many bug fixes for snapshot testing, magic assert, and the type definitions: https://github.com/avajs/ava/compare/v0.18.1...v0.18.2
+",https://api.github.com/users/sindresorhus,170270,sindresorhus,https://api.github.com/repos/avajs/ava/releases/5499416/assets,https://api.github.com/repos/avajs/ava/releases/5499416,master,https://api.github.com/repos/avajs/ava/tarball/v0.18.2,https://github.com/avajs/ava/releases/tag/v0.18.2,https://api.github.com/repos/avajs/ava/zipball/v0.18.2,v0.18.2,False,False
+5357487,2017-02-03T22:53:05Z,2017-02-03T22:57:12Z,0.18.1,"Quick bug fix: Remove `t.is` and `t.not` from enhanced assertion patterns to provide correct output on assertion failure.
+",https://api.github.com/users/vadimdemedes,697676,vadimdemedes,https://api.github.com/repos/avajs/ava/releases/5357487/assets,https://api.github.com/repos/avajs/ava/releases/5357487,master,https://api.github.com/repos/avajs/ava/tarball/v0.18.1,https://github.com/avajs/ava/releases/tag/v0.18.1,https://api.github.com/repos/avajs/ava/zipball/v0.18.1,v0.18.1,False,False
+5342118,2017-02-02T16:24:07Z,2017-02-02T16:33:51Z,0.18.0,"This release is one of the biggest, most feature-packed release we’ve had in a long time. We have prepared lots of tasty things for you - snapshot testing, magic assert, precompiling test helpers, improvements to Babel transpilation, and more. Our team and contributors have been working hard to deliver all this goodness. We can’t wait to hear your feedback and don’t hesitate to suggest new ideas and [report bugs](https://github.com/avajs/ava/blob/master/contributing.md#submitting-an-issue)!
+
+## Highlights
+
+### Dropped support for Node.js 0.10 and 0.12
+
+As mentioned in the [0.17.0 release notes](https://github.com/avajs/ava/releases/tag/v0.17.0), we’re dropping support for Node.js 0.10 and 0.12 in this release. They’re both out of maintenance mode. Time to upgrade!
+
+### Magic assert
+
+![magic-assert-combined2](https://cloud.githubusercontent.com/assets/170270/22558318/d782e9a4-e99f-11e6-889e-62fd4ad36e66.png)
+
+We completely overhauled the error output to make it as easy and fast as possible to detect the source of the failure. [Magic assert](https://github.com/avajs/ava#magic-assert), as we call it internally, adds code excerpts and clean diffs for actual and expected values. If values in the assertion are objects or arrays, only a difference is displayed to remove the noise and focus on the problem. Oh, and the diff is syntax-highlighted too! If you are comparing strings, both single and multi line, AVA displays a different kind of output, highlighting the added or missing characters. Last but not least, you don’t have to update any of your tests to take advantage of this! Third-party assertion libraries, like expect, chai and others, are supported out-of-the-box as well.
+
+https://github.com/avajs/ava/commit/c9e6e6fafacad3f54536dc9122555e939d13aa21
+
+### Snapshot testing
+
+We now have [snapshot testing](https://github.com/avajs/ava#snapshot-testing), thanks to @lithin ✨
+
+![snapshot-testing](https://cloud.githubusercontent.com/assets/170270/22558118/2eccb1e6-e99f-11e6-8557-5d46a80b475e.png)
+
+Snapshot testing simply saves a stringified state of some data structure and compares it on the next run. It was popularized with React component testing, but you can use it with anything that can be stringified. For example, ensuring API responses stay the same.
+https://github.com/avajs/ava/commit/ee65b6dbbb187eb8dd2dfb929febb9df161cf6e9
+
+### Precompile helper files
+
+Previously, AVA transpiled your test files, but not your test helpers. Now we [transpile helper files](https://github.com/avajs/ava#transpiling-imported-modules) too! Helpers are files starting with `_` or any files in a `helpers` directory inside the test directory. These are usually used for utilities and shared logic between test files.
+https://github.com/avajs/ava/commit/410cb8d3b1bb70b48dd305b0bc69843579f9205d
+
+### Improving language support
+
+We’ve come up with a specification for how AVA handles Babel projects and may better support other languages like TypeScript. Customizing transpilation of test and helper files will be easier, and AVA will start transpiling source files too. We’ve started work on this, but there are no user-facing changes yet.
+https://github.com/avajs/ava/commit/076eb81cf579a49b02fd1f31b7123274ef88007b
+
+### Miscellaneous
+- Removed deprecated assertions (`t.ok`, `t.notOk`, `t.same`, `t.notSame`). If you haven’t migrated yet, you can do so automagically with our [codemod](https://github.com/avajs/ava-codemods#upgrade-ava-version). https://github.com/avajs/ava/commit/c010fd7f7be1c8ac51e56f98375470819e6a7e44
+- Removed the `--source` flag. Use the [package.json config](https://github.com/avajs/ava#configuration) instead. https://github.com/avajs/ava/commit/34bebc450d7ee6fef99684a5a7c0aea67695b772
+- Support symlinked test files. https://github.com/avajs/ava/commit/033d4dcdcbdadbf665c740ff450c2a775a8373dc
+- No longer using `babel-runtime`. Built-ins like `Map` and `Promise` are no longer replaced with polyfills. https://github.com/avajs/ava/commit/ad5122d507bfaa044fc3a2e51e467238e16dba11
+- Prints a warning when `test.only()` is used, so you don’t mistakenly think you’re running all the tests. https://github.com/avajs/ava/commit/22a60818afe6f5f7ae09979e148a9ce7ea37a90c
+- Prints a warning when `--fail-fast` is enabled, so you’re aware AVA didn’t run all your tests. https://github.com/avajs/ava/commit/09d23f56c099c78129a7d32aa9f9a2394278dd32
+- Exits with an error when `--watch` is used in CI, as otherwise the process would never exit, since watch mode is persistent. https://github.com/avajs/ava/commit/0606ff708fc24f868ad3280e984c8807f47533b7
+- Only transpile what’s needed on Node.js 6. We already did that for Node.js 4. https://github.com/avajs/ava/commit/5158ac8bb0d0a79acde12c1bf6dfc1bbf32fd71e
+- Flow type definition improvements: https://github.com/avajs/ava/commit/ce42fcb7741039eeb26f0a167b27fd5923936a1b https://github.com/avajs/ava/commit/314f7a05bfa0f20b97192654885750237d133a18
+- TypeScript type definition improvement: https://github.com/avajs/ava/commit/0603edcbfbcee4cca7cf3a150d8899ef80b66840 
+
+## All changes
+
+https://github.com/avajs/ava/compare/v0.17.0...v0.18.0
+
+## Thanks
+
+💖 Huge thanks to @lithin, @ThomasBem, @leebyron, @rnkdev, @sebald, @gconaty, @jarlehansen, @LasaleFamine, @asafigan, for helping us with this release. We couldn’t have done it without you!
+
+## Get involved
+
+We welcome new contributors. AVA is a friendly place to get started in open source. We have a [great article](https://medium.com/@vadimdemedes/making-your-first-contribution-de6576ddb190#.umxr7id07) on getting started contributing and a comprehensive [contributing guide](https://github.com/avajs/ava/blob/master/contributing.md).
+",https://api.github.com/users/sindresorhus,170270,sindresorhus,https://api.github.com/repos/avajs/ava/releases/5342118/assets,https://api.github.com/repos/avajs/ava/releases/5342118,master,https://api.github.com/repos/avajs/ava/tarball/v0.18.0,https://github.com/avajs/ava/releases/tag/v0.18.0,https://api.github.com/repos/avajs/ava/zipball/v0.18.0,v0.18.0,False,False
+4684517,2016-11-17T08:52:01Z,2016-11-17T08:59:25Z,0.17.0,"## The current working directory in test files changed (BREAKING)
+
+We made the hard decision of changing the current working directory (`process.cwd()`) in test files to be the same directory as `package.json`. It was previously the same as `__dirname` (the directory of the test file). Having `process.cwd()` equal `__dirname` [felt like a good idea](https://github.com/avajs/ava/issues/32) at the time, but as the popularity of AVA grew, people started hitting issues with it.
+
+This affects users that have test files in a sub-folder and are using relative paths. If you have your test files in the same directory as `package.json`, you're fine.
+
+The fix is to wrap all relative paths in `path.join(__dirname, 'relative-path')` to make them absolute.
+
+Here's an example of what needs changing. The below file and `unicorn.txt` are both in `./test/`.
+
+``` diff
+-t.true(fs.existsSync('unicorn.txt'));
++t.true(fs.existsSync(path.join(__dirname, 'unicorn.txt')));
+```
+
+[Let us know if anything is unclear or if you're having problems.](https://gitter.im/sindresorhus/ava)
+
+Commit: https://github.com/avajs/ava/commit/476c65396155a7d16fbdd55c65863ecaabd873de
+
+## Node.js version support
+
+The next minor version of AVA, 0.18.0, will drop support for Node.js v0.10 and v0.12. We'll continue fixing critical issues for this version until the end of the year. Time to upgrade if you haven't. (Discussion: https://github.com/avajs/ava/issues/1051)
+
+## Highlights
+- We now have a [script](https://github.com/avajs/ava-codemods#migrating-to-ava) to automatically migrate from [tape](https://github.com/substack/tape) to AVA.
+- Our [ESLint plugin](https://github.com/avajs/eslint-plugin-ava) received two new rules:
+  - https://github.com/avajs/eslint-plugin-ava/commit/7cfdf3444ad3567ab40644953e754a49cd5fce78
+  - https://github.com/avajs/eslint-plugin-ava/commit/a443d7a9c94165f42749938e6b491a7c10749b6c
+- Reduced transpilation on Node.js >=4. AVA now only transpiles what's needed for Node.js 4 when on it or higher, which should result in better performance and stacktraces. https://github.com/avajs/ava/commit/4025d81b26b4ed9b8772cd7d3264199e11a7d8c5
+- Removed the `--require` CLI flag. Configure it in package.json instead. https://github.com/avajs/ava/commit/17119bcfd822854b0b3bb99e8c14830f9cea50d4
+- Switched to [`lodash.isEqual`](https://lodash.com/docs/#isEqual) for deep equality checking (`t.deepEqual()` & `t.notDeepEqual()`). This might make your test fail if our previous deep equality check was too loose. https://github.com/avajs/ava/commit/885668428a165274685763840b3ca06cf91a467d
+- Improvements to the test failure output. https://github.com/avajs/ava/commit/e4f90e0f7a9e2597d4375aa6a925dbeb02b26ecf (We're currently working on many more improvements in this area. Stay tuned.)
+- Added option to disable `power-assert`. https://github.com/avajs/ava/commit/24a38acc5b1b3e3deb77af54d90dda4677bd7749
+- Correctly clean up stacktraces on Node.js 6 and higher. https://github.com/avajs/ava/commit/26bcab0273323fcdb04f1409abe913fe030dee77
+- Removed `t.doesNotThrow()` as it was renamed to `t.notThrows()`. It was deprecated far back in AVA 0.12.0. https://github.com/avajs/ava/commit/e4487986cd6fefa442124ef3b03cfd91cccdd66f
+- Deprecated `t.error()` alias for `t.ifError()`. It will be removed in AVA 1.0.0. Just use `t.ifError()`. https://github.com/avajs/ava/commit/28bb0d5cb2907282d61e224acdf621ce3c1abdfd **(We have an [automatic migration script](https://github.com/avajs/ava-codemods#upgrading-to-017x) if you're using `t.error()`)**
+- Ensures test files load correct AVA installation. This means you can now run AVA with an absolute path and it will still use the local AVA installation at that path if available. https://github.com/avajs/ava/commit/3ea2ba11329141c095093e25b5f0de2ecf7fac79
+- Added support for debugging tests with WebStorm and added a [recipe](https://github.com/avajs/ava/blob/master/docs/recipes/debugging-with-webstorm.md). https://github.com/avajs/ava/commit/c268c8dfce325010f84dd4097ba8696c5f3a47c1
+- Added [Flow](https://flowtype.org) type defintion. https://github.com/avajs/ava/commit/6458454951a595bc1fd93a6ae7f1c6ef57df56ff
+- Improvements to the TypeScript type definition. https://github.com/avajs/ava/commit/4baa17038451f07ebe5d81a0ed42590e69913394 https://github.com/avajs/ava/commit/8816faf6bee675213c5bfe32f628a0a683708484 https://github.com/avajs/ava/commit/c40477a0f34d5a6efb8cd28fd5201c30427905e8
+- We started exploring browser support. https://github.com/avajs/ava/commit/204f2be2e8f174f698a56d504a0a6c76a1e0b60f
+
+## All Changes
+
+https://github.com/avajs/ava/compare/v0.16.0...v0.17.0
+",https://api.github.com/users/sindresorhus,170270,sindresorhus,https://api.github.com/repos/avajs/ava/releases/4684517/assets,https://api.github.com/repos/avajs/ava/releases/4684517,master,https://api.github.com/repos/avajs/ava/tarball/v0.17.0,https://github.com/avajs/ava/releases/tag/v0.17.0,https://api.github.com/repos/avajs/ava/zipball/v0.17.0,v0.17.0,False,False
+3828473,2016-08-06T15:10:20Z,2016-08-06T15:14:40Z,0.16.0,"Hope you all are having a great summer! 😎
+
+## Highlights
+- Add [`t.notRegex()`](https://github.com/avajs/ava#notregexcontents-regex-message). https://github.com/avajs/ava/commit/c7402023d6a3a6b7a03abf2d52d948d0964683c8
+- Provide clear error message when users attempt nested or async calls to `test()`. https://github.com/avajs/ava/commit/8edd9c2ed169909bf19a3f9229143d8fc87d5284
+- TypeScript definition improvements. https://github.com/avajs/ava/commit/1dd6d5b9127a6850d9a03c242e677ea359d67053 https://github.com/avajs/ava/commit/2e984380c4df2bfe5a0af2ec37a970f4001c9f53
+- Document [common pitfalls](https://github.com/avajs/ava/blob/master/docs/common-pitfalls.md) when using AVA. https://github.com/avajs/ava/commit/187b8b49b0f0cedbeb2ba3a833b110a72e658fa8
+- New [JSPM and SystemJS recipe](https://github.com/avajs/ava/blob/master/docs/recipes/jspm-systemjs.md). https://github.com/avajs/ava/commit/c3539c1701aba896bfb088ec838e60b34913168d
+
+## All Changes
+
+https://github.com/avajs/ava/compare/v0.15.2...v0.16.0
+",https://api.github.com/users/sindresorhus,170270,sindresorhus,https://api.github.com/repos/avajs/ava/releases/3828473/assets,https://api.github.com/repos/avajs/ava/releases/3828473,master,https://api.github.com/repos/avajs/ava/tarball/v0.16.0,https://github.com/avajs/ava/releases/tag/v0.16.0,https://api.github.com/repos/avajs/ava/zipball/v0.16.0,v0.16.0,False,False
+3375132,2016-06-04T09:06:22Z,2016-06-05T03:20:49Z,0.15.2,"Avoids deprecation warning from `loud-rejection`.
+",https://api.github.com/users/jamestalmage,4082216,jamestalmage,https://api.github.com/repos/avajs/ava/releases/3375132/assets,https://api.github.com/repos/avajs/ava/releases/3375132,master,https://api.github.com/repos/avajs/ava/tarball/v0.15.2,https://github.com/avajs/ava/releases/tag/v0.15.2,https://api.github.com/repos/avajs/ava/zipball/v0.15.2,v0.15.2,False,False
+3308445,2016-05-26T00:43:49Z,2016-05-26T00:50:34Z,0.15.1,"Bug fix: The new test naming conventions introduced in [`0.15.0`](https://github.com/avajs/ava/releases/tag/v0.15.0) were not being honored.
+",https://api.github.com/users/jamestalmage,4082216,jamestalmage,https://api.github.com/repos/avajs/ava/releases/3308445/assets,https://api.github.com/repos/avajs/ava/releases/3308445,master,https://api.github.com/repos/avajs/ava/tarball/v0.15.1,https://github.com/avajs/ava/releases/tag/v0.15.1,https://api.github.com/repos/avajs/ava/zipball/v0.15.1,v0.15.1,False,False
+3299193,2016-05-25T03:41:20Z,2016-05-25T03:49:35Z,0.15.0,"In this release we've added some very useful features we think you'll like. There are no known breaking changes. We have worked hard on fixing bugs and improving performance. Going forward stability and performance will be our top priority as we're progressing towards a stable release. Finally, we're delighted to welcome @sotojuan to the team! 🎉
+
+## Test file conventions
+
+When you run AVA without any arguments, it tries to find your test files based on some conventions. The previous release had the following default patterns:
+
+```
+test.js test-*.js test/**/*.js
+```
+
+In this release we added additional default patterns based on community conventions:
+
+```
+test.js test-*.js test/**/*.js **/__tests__/**/*.js **/*.test.js
+```
+
+This means AVA will now also run test files in `__tests__` directories and test files ending in `.test.js` anywhere in your project.
+
+9ceeb115e75172c01e86bce8e94c2d2fcd8d094a
+
+## Known failing tests
+
+A big part of open source maintenance is triaging issues. This can be a tedious task, involving a lot of back and forth with the person reporting the issue. Submitting a PR with a failing test makes the whole process much more efficient. It helps maintainers by providing a quality reproduction, allowing them to focus on code over triaging. Users benefit as their [bugs get fixed faster](https://twitter.com/sindresorhus/status/579306280495357953).
+
+To make it easier to submit failing tests, we're introducing a new test modifier: [`test.failing()`](https://github.com/avajs/ava#failing-tests). These tests are run just like normal ones, but they are expected to fail, and will not break your build when they do. If a test marked as failing actually passes, the build **will break** with a helpful message instructing you to remove the `.failing` modifier.
+
+``` js
+test.failing('demonstrate some bug', t => {
+    t.fail(); // test will count as passed
+});
+```
+
+This allows you to merge `.failing` tests before a fix is implemented without breaking CI. It is also a great way to recognize good bug reports with a commit credit, even if the reporter is unable to fix the problem.
+
+0410a03b0db6ecffa39c1c113cf769910e51f214
+
+## Test macros
+
+Sometimes you want to run a series of very similar tests, each with different inputs and expected results. The traditional solution is to use [test generator functions](https://github.com/avajs/ava-codemods/blob/47073b5b58aa6f3fb24f98757be5d3f56218d160/test/ok-to-truthy.js#L7-L9). However, this makes it difficult to perform static analysis on the tests, which is especially important for [linting](https://github.com/avajs/eslint-plugin-ava). In this release, we are introducing test macros as the official way to create reusable tests.
+
+Test macros let you reuse test implementations. Additional arguments passed in the test declaration are forwarded to the macro:
+
+``` js
+function macro(t, input, expected) {
+    t.is(eval(input), expected);
+}
+
+test('2 + 2 === 4', macro, '2 + 2', 4);
+test('2 * 3 === 6', macro, '2 * 3', 6);
+```
+
+If you are generating lots of tests from a single macro, you may want to generate the test title programmatically:
+
+``` js
+macro.title = (providedTitle, input, expected) => {
+ return `${input} === ${expected}`
+};
+```
+
+a4541289491e7f839e7c9417fa0f01a76af42946
+
+## Always modifiers for after and afterEach hooks
+
+By default `after` and `afterEach` hooks will not be run if the preceding test fails. This is undesirable if the hooks contain cleanup code that you want run regardless. You can change that behavior using the `.always` chaining modifier.
+
+``` js
+test.after.always(t => {
+  // always runs at the end. Regardless of test pass/fail state.
+});
+
+test.afterEach.always(t => {
+  // always runs after each test. Regardless of test pass/fail state.
+});
+```
+
+Note that the `--fail-fast` switch will disable this behavior, and AVA will exit at the first encountered failure without waiting for the `always` hooks.
+
+61f09584ce3b1b0ae088cc8b47446028f71ae812
+
+## Limited concurrency _[EXPERIMENTAL]_
+
+Concurrency is awesome! It's what makes AVA so fast. Our default behavior is to spin up an isolated process for every test file immediately, and then run all your tests. However, for users with lots of test files, this was eating up too many system resources, causing memory and IO thrashing. We are experimenting with an option to let you limit how many tests files AVA runs at the same time. If you have a _lot_ of test files, try running AVA with the `--concurrency` flag. For example, run `$ ava --concurrency=5` and see if the performance improves. Please [let us know](https://gitter.im/avajs/ava) how it works for you! We need feedback on the feature.
+
+_Note: This is an experimental feature and might change or be removed in the future._
+
+1c3c86c06c03ac86ee38679d25c72c954d75eb6f
+
+## Highlights
+- Improve `t.deepEqual()`. 973624d0d13f291901c9bd324eddc4a380629505
+- Improve watch logging. 95a5c979d4f5825706cad17377e2bdf9fd54596b
+- Disable TAP-reporter in watch mode. 02b0aaebb7d3299abe733730fc6cd70cb31ea40f
+- Throwing synchronously inside a callback-style test now fail it immediately. d6acdde056238d5e7403e63413b63a39dd61ff6a
+- Detect improper use of `t.throws`. 3201b1b4ff80ff75f0e1c288ca7da22f92c9b814
+- Protect against bad argument passed to `t.throws`. 60bd8a5ee4c4c61d9488e677d17298505e6bec09
+- Improve `power-assert` output. 84c05fe98ee5887e49262d48f1134cdf19118a7f
+- Add spinner fallback for Windows. c4e58e3e7eeb6b966a32a964445ac5ced813793a
+- Warn about `npm link` usage on Node.js 6. https://github.com/avajs/ava/commit/a543b9f7c21a84ed4091e0c30587941152c3a4d2
+- Remember failures from previous tests in watch mode. aab22072f736f2f1a1304f4a122fd7d4962a478d
+- Fix crash in 'fake' browser environment. 0fa229e385232011acf15bec91f1eaa99e16a343
+- Fix warning when no files are found. ee76aa9f4f0b6f1e2b838ca2aef2f3e8a30f4493
+- Strip ANSI escape codes in the TAP output. 3c4babd0efed2ddd9cfe6e2dc23952338f0c9879
+- React recipe. 4c69c796d53f56b20de0d2c75d90366b7a32e029
+- Italian translation of the docs. 195390ec1db90cf7d394407c846a69fbaa08806d
+
+## All Changes
+
+We’ve merged [92 commits from 23 contributors](https://github.com/avajs/ava/compare/v0.14.0...v0.15.0) since `0.14.0`.  This only scratches the surface, as lots of additional work has gone into our [linter](https://github.com/avajs/eslint-plugin-ava), [localized docs](https://github.com/avajs/ava-docs) and countless other projects that make AVA possible. To everyone who’s reported bugs, contributed to design discussions, and filed PR’s with documentation or code - **Thank You!**  
+
+https://github.com/avajs/ava/compare/v0.14.0...v0.15.0
+",https://api.github.com/users/jamestalmage,4082216,jamestalmage,https://api.github.com/repos/avajs/ava/releases/3299193/assets,https://api.github.com/repos/avajs/ava/releases/3299193,master,https://api.github.com/repos/avajs/ava/tarball/v0.15.0,https://github.com/avajs/ava/releases/tag/v0.15.0,https://api.github.com/repos/avajs/ava/zipball/v0.15.0,v0.15.0,False,False
+2968734,2016-04-07T01:56:49Z,2016-04-07T01:59:30Z,0.14.0,"The biggest change in this release is the deprecation of `t.ok`, `t.notOk`, `t.same`, and `t.notSame` assertions. We have published a [codemod](https://github.com/jamestalmage/ava-codemods) (automatic migration script) which should make switching to the new assertion methods very easy.
+
+Also, we've added a [`--timeout`](https://github.com/sindresorhus/ava#global-timeout) flag that will stop test execution after a certain period of inactivity.
+
+### Highlights
+- A number of [assertion methods](https://github.com/sindresorhus/ava#assertions) have been renamed for clarity. The old methods still exist, but have been deprecated, and will be removed in a future release (e9c6cc2843e9ee6127aebb2843eafec86cb39bfc, a7f50eb82d8dae4f9a7e70ae33ef71712a8fd69b). We have published [`ava-codemods`](https://github.com/jamestalmage/ava-codemods) to assist in automatically renaming these assertions in your tests.
+  - `t.ok()` → `t.truthy()`
+  - `t.notOk()` → `t.falsy()`
+  - `t.same()` → `t.deepEqual()` 
+  - `t.notSame()` → `t.notDeepEqual()` 
+- Added an [idle timeout option](https://github.com/sindresorhus/ava#global-timeout) to prevent test runs from hanging indefinitely. The test run is considered timed out when no test results have been received for the specified interval. d1a3669ed25919a5aba2316e12da02f2584666ae
+- Published a recipe on [various ways to configure Babel](https://github.com/sindresorhus/ava/blob/master/docs/recipes/babelrc.md). bcda7537dda7eeb38bef3405e1265226ba6d69ae
+- Updated Russian, Chinese, and Spanish translations. Big thanks to our [translation team](https://github.com/sindresorhus/ava-docs/graphs/contributors)!
+
+### Of Note
+- `t.deepEqual()` (formerly `t.same()`) no longer compares constructors. a7826cf1c81a38eaa0908c8ae37525e82a43c192
+- Truncate test titles in the mini reporter. 6d5f3225cc712f10e7a0a8a9c6e40d574fd4b251
+- Fix `t.throws()` not returning error for synchronous methods. 26d2291c9f72097e49f19533a4b55875f1d62134
+- Now throws a meaningful error if `--require` dependency is not found. c78e7367d07ea1a27158a35972184de266d04230
+- Watch mode will now rerun all `.only` tests regardless of dependency graph. e57908a91aad0e875c8a2ca9157edc7c4e0840b5
+- Print the planned and actual assertion count when there is a plan failure. 07febb2c53b61e8774ff41062e84a4a60f70f40e
+- Workaround for Node.js bug which could kill main process. cd6961a63ba08cf3bf5d912f0b80838e9c713736
+- Mini reporter no longer flashes test titles for `skip`/`todo` tests. ecc87cbd202fd8f4df8db9dd38657647fb379993
+- Display a helpful error message for invalid Babel config. febbaa2adbc97be32088d9196552c5810b84ad30
+- Switch from `serialize-error` to `clean-yaml-object` (better compatibility with `node-tap`). cd5767e1881173ffd8a65646bd5d5a1445bb17ab
+- Rewrite `require(""babel-runtime"")` in tests to absolute path (allows module resolution for `npm@2` without modifying `NODE_PATHS`). 382e50dc4274971ca1da0dfc5f79728787f60957
+- Ensure source maps can be resolved from cached code. 592ff138580e1aca6b7506b94bed7603cd2f39e4
+- Produces a helpful failure method when users incorrectly provide an implementation method to `test.todo()`. 8d6490a21de0ef4ff02b9ff361b91c7b91f586db
+
+### All Changes
+
+https://github.com/sindresorhus/ava/compare/v0.13.0...v0.14.0 
+
+## 
+
+Shout-out to @kentcdodds @sotojuan @SamVerschueren @mattkrick for their awesome contributions to this release! ✨🎉
+",https://api.github.com/users/jamestalmage,4082216,jamestalmage,https://api.github.com/repos/avajs/ava/releases/2968734/assets,https://api.github.com/repos/avajs/ava/releases/2968734,master,https://api.github.com/repos/avajs/ava/tarball/v0.14.0,https://github.com/avajs/ava/releases/tag/v0.14.0,https://api.github.com/repos/avajs/ava/zipball/v0.14.0,v0.14.0,False,False
+2785567,2016-03-10T15:35:26Z,2016-03-10T15:39:27Z,0.13.0,"The most exciting changes in this release are support for [using your own Babel config with AVA](https://github.com/sindresorhus/ava#es2015-support) and an [intelligent watch mode](https://github.com/sindresorhus/ava/blob/master/docs/recipes/watch-mode.md) that watches for test and source changes and runs only tests that are affected.
+
+We now have an [awesome list](https://github.com/sindresorhus/awesome-ava). Our ESLint plugin got some [new rules](https://github.com/sindresorhus/eslint-plugin-ava#rules). And @novemberborn is a [team member!](https://github.com/sindresorhus/ava/commit/11f4362b8fa0f3e87ddaeb56c4bd35cae5fa69a3)
+
+### Highlights
+- Added support for [Babel config in the `ava` config package.json](https://github.com/sindresorhus/ava#es2015-support). This will let you configure AVA to use your own Babel config (.babelrc or `babel` in package.json). a03f8264edbd99d9c6a86827106ad40dfdc42b10
+- Added [intelligent watch mode](https://github.com/sindresorhus/ava/blob/master/docs/recipes/watch-mode.md). f0f4f34438624f3b49c4ffe602de4f261ac66474
+- Added [`todo` test modifier](https://github.com/sindresorhus/ava#test-placeholders-todo). e697629a77b511e069eb0a2991c8ee72cd09034c
+- Added ability to [run only tests with matching titles](https://github.com/sindresorhus/ava#running-tests-with-matching-titles). c928cb59b6d2c3ed9aa3df05bc922b885ca5e985
+- `t.throws()` now returns error or rejection reason of promise. e03b82c97486056f5152fba796f9e443078522c5
+- Don't coerce non-Error promise rejection to an error. 5e02387a5dfd9ab5c475716f0f1e4f268aff694d
+- `test.only()` now works across all test files. 6b1617a9ed84244235e5034ffc0d3e4d2cb4c554
+- Fixed AVA hanging when `test` is used incorrectly. 94c03f6f692e36bad7db30f5870ec0b952fe9412
+- Added TypeScript typings. 0e1886582833986b896c31859aa61d8da404e996
+- Added [TypeScript recipe](https://github.com/sindresorhus/ava/blob/master/docs/recipes/typescript.md). 20c66fe0acfac306cea31a3448776a6eeb0af1be
+- Added [browser testing recipe](https://github.com/sindresorhus/ava/blob/master/docs/recipes/browser-testing.md). 2f104486f18c520ae2641fd563bcb48da3964618
+
+### Changes
+
+https://github.com/sindresorhus/ava/compare/v0.12.0...v0.13.0
+
+## 
+
+Huge thanks to @sotojuan @naptowncode @kasperlewau @BarryThePenguin @spudly @Carnubak @ivogabe @forresst @SamVerschueren @bachstatter!
+",https://api.github.com/users/sindresorhus,170270,sindresorhus,https://api.github.com/repos/avajs/ava/releases/2785567/assets,https://api.github.com/repos/avajs/ava/releases/2785567,master,https://api.github.com/repos/avajs/ava/tarball/v0.13.0,https://github.com/avajs/ava/releases/tag/v0.13.0,https://api.github.com/repos/avajs/ava/zipball/v0.13.0,v0.13.0,False,False
+2639098,2016-02-18T10:18:47Z,2016-02-18T10:39:39Z,0.12.0,"This release is mostly focused on improving performance and doing some hopefully final breaking changes. We've also started work on an [ESLint plugin](https://github.com/sindresorhus/eslint-plugin-ava) and [editor plugins](https://github.com/sindresorhus/ava/issues/554) for AVA, where we could use some help and feedback.
+
+### Highlights
+- **[breaking]** `t.doesNotThrow()` is renamed to `t.notThrows()` to be consistent with the other assert methods. `t.doesNotThrow()` will be removed in AVA 1.0.0. https://github.com/sindresorhus/ava/commit/a35d13084288c314915994c661cce8a48691af99
+- **[maybe breaking]** We removed the undocumented `t.regexTest()` assert method and added `t.regex()`. `t.regexTest()` had the wrong argument order. `t.regex()` follows the same argument order as other assert methods. https://github.com/sindresorhus/ava/commit/a10b9e8bab1544fbb966f80beacb7b7e43ff0d24
+- More performance improvements! (∩｀-´)⊃━☆ﾟ.*･｡ﾟ https://github.com/sindresorhus/ava/commit/e010816afb2d471b696db6af2cc4de32557ca5d4 https://github.com/sindresorhus/ava/commit/341c84b7e26f1110f2dbf1ebaeb6bc806cf941fc https://github.com/sindresorhus/ava/commit/9b0d5f79324966210ebbdc361c2b781ab7d5d075
+- Add recipe ""When to use `t.plan()`"". https://github.com/sindresorhus/ava/commit/39982a5c12b90c31ef3e0dea8c0e3499c47a7bc9
+- Improve error determination, which fixes some issues with the output when non-errors or errors without a message are thrown. https://github.com/sindresorhus/ava/pull/555
+- Reporter tweaks. https://github.com/sindresorhus/ava/commit/e38c56ab2313486901cf7f46ef47726d654b1e39 https://github.com/sindresorhus/ava/commit/308b09e61c852cb033d22bcc52181832340f62ac https://github.com/sindresorhus/ava/commit/e9cb25dfb7faa6247b2b1437c4e81c64a7034aa9
+- Support `NODE_PATH` _(Please don't use `NODE_PATH` unless you really have to!)_ https://github.com/sindresorhus/ava/commit/0675d3444da6958b54c7e5eada91034e516bc97c
+
+### Changes
+
+https://github.com/sindresorhus/ava/compare/v0.11.0...v0.12.0
+",https://api.github.com/users/sindresorhus,170270,sindresorhus,https://api.github.com/repos/avajs/ava/releases/2639098/assets,https://api.github.com/repos/avajs/ava/releases/2639098,master,https://api.github.com/repos/avajs/ava/tarball/v0.12.0,https://github.com/avajs/ava/releases/tag/v0.12.0,https://api.github.com/repos/avajs/ava/zipball/v0.12.0,v0.12.0,False,False
+2479402,2016-01-23T12:33:04Z,2016-01-23T12:38:24Z,0.11.0,"### Highlights
+- Performance improvements (つ◕౪◕)つ━☆ﾟ.*･｡ﾟhttps://github.com/sindresorhus/ava/pull/461
+- Default to the verbose reporter on CI servers. https://github.com/sindresorhus/ava/commit/21a60f9a9da6074b7a4ef1b465f5a9e1e77828dd
+- Add shortflags to the CLI. https://github.com/sindresorhus/ava/commit/5d36a8045d5f124b63b0b287091f8efc0ef732a4
+- Fix undefined skip count. https://github.com/sindresorhus/ava/commit/24b234d1aec5afb60bb384d575fa5bc1234413d1
+- Allow files with only skipped tests. https://github.com/sindresorhus/ava/commit/3739d4bf4e649e19cbbab0e9199d9d868ef64930
+- Remove Bluebird deprecation notice. https://github.com/sindresorhus/ava/commit/385c48d0714da3cff73a07dd648a0f337467661a
+
+### Changes
+
+https://github.com/sindresorhus/ava/compare/v0.10.0...v0.11.0
+",https://api.github.com/users/sindresorhus,170270,sindresorhus,https://api.github.com/repos/avajs/ava/releases/2479402/assets,https://api.github.com/repos/avajs/ava/releases/2479402,master,https://api.github.com/repos/avajs/ava/tarball/v0.11.0,https://github.com/avajs/ava/releases/tag/v0.11.0,https://api.github.com/repos/avajs/ava/zipball/v0.11.0,v0.11.0,False,False
+2432771,2016-01-15T05:30:01Z,2016-01-15T06:19:38Z,0.10.0,"## Highlights
+
+### Customize the default behavior in `package.json`
+
+All of the CLI options can be configured in the AVA section of your package.json. This allows you to modify the default behavior of the AVA command, so you don't have to repeatedly type the same options on the command prompt.
+
+``` json
+{
+  ""ava"": {
+    ""files"": [
+      ""my-test-folder/*.js"",
+      ""!**/not-this-file.js""
+    ],
+    ""failFast"": true,
+    ""serial"": true,
+    ""tap"": true,
+    ""verbose"": true,
+    ""require"": [""babel-core/register"", ""coffee-script/register""]
+  }
+}
+```
+
+16c7282
+
+### Clean stack traces
+
+Unrelated lines are now removed from stack traces, allowing you to find the source of an error much faster.
+
+<img src=""https://github.com/sindresorhus/ava/raw/master/media/stack-traces.png"" width=""300"">
+
+af37305
+
+### Improved performance
+
+Babel transpilation of test files now happens in the main process. This avoids requiring Babel in every child process and greatly improves performance. This is an especially important improvement for people still running `npm@2`.
+
+614eb12
+
+New `power-assert` updates reduce the size of it's dependency graph. Offering improvements to both download times and performance.
+
+70dd2a7
+
+### Clean `console.log` output.
+
+The test status output and `console.log` statements from within your own code will no longer interfere with each other. The test status remains fixed at the bottom of the output.
+
+<img src=""https://cloud.githubusercontent.com/assets/4082216/12228884/3d289326-b80f-11e5-9e61-82d8cba8a19f.gif"" width=""626"">
+
+3d7f036
+
+## Other Changes
+- New Spanish translation of the documentation. 37cd685
+- Started a collection of `recipes` for common scenarios / best practices. 4d96a3e
+- All assertion methods now return a promise. 821436a
+- Long stack traces are turned on in forked processes. da6a2f4
+- Skippable assertions are now documented. 879e036
+- [Breaking] `.babelrc` files will now be ignored when transpiling tests. This will be a breaking change for some, and fix major problems for others. The ability to configure test transpilation will be restored in a future update. 5f5be31
+- Multiple tweaks of test reporter output. a2b282e 7b764ea
+- Added a Code of Conduct b76f3d5
+
+## Changes
+
+https://github.com/sindresorhus/ava/compare/v0.9.1...v0.10.0
+",https://api.github.com/users/jamestalmage,4082216,jamestalmage,https://api.github.com/repos/avajs/ava/releases/2432771/assets,https://api.github.com/repos/avajs/ava/releases/2432771,master,https://api.github.com/repos/avajs/ava/tarball/v0.10.0,https://github.com/avajs/ava/releases/tag/v0.10.0,https://api.github.com/repos/avajs/ava/zipball/v0.10.0,v0.10.0,False,False
+2430864,2016-01-14T21:56:44Z,2016-01-14T22:00:15Z,0.9.2,"Work around broken Babel release. See https://github.com/sindresorhus/ava/issues/425.
+
+https://github.com/sindresorhus/ava/commit/08c3285c3897dde404d698e5f5038edc3f786ca7
+",https://api.github.com/users/sindresorhus,170270,sindresorhus,https://api.github.com/repos/avajs/ava/releases/2430864/assets,https://api.github.com/repos/avajs/ava/releases/2430864,master,https://api.github.com/repos/avajs/ava/tarball/v0.9.2,https://github.com/avajs/ava/releases/tag/v0.9.2,https://api.github.com/repos/avajs/ava/zipball/v0.9.2,v0.9.2,False,False
+2350430,2015-12-29T13:36:52Z,2015-12-29T13:38:23Z,0.9.1,"Correctly handle promises rejected with non-errors. https://github.com/sindresorhus/ava/commit/bef1dfb8646e75c8da661a6f2348847c13858858
+",https://api.github.com/users/sindresorhus,170270,sindresorhus,https://api.github.com/repos/avajs/ava/releases/2350430/assets,https://api.github.com/repos/avajs/ava/releases/2350430,master,https://api.github.com/repos/avajs/ava/tarball/v0.9.1,https://github.com/avajs/ava/releases/tag/v0.9.1,https://api.github.com/repos/avajs/ava/zipball/v0.9.1,v0.9.1,False,False
+2350081,2015-12-29T11:58:39Z,2015-12-29T12:08:24Z,0.9.0,"### Babel 6
+
+We were finally able to upgrade to Babel 6.
+
+We strongly recommend using npm@3 as Babel 6 is very modular and the npm@3 default deduplication is important for performance and size reasons.
+
+_This change has no effect on what Babel version you use in your own project. We bundle our own Babel version._
+
+https://github.com/sindresorhus/ava/commit/9e6d9724d52582714804bf7c8ec71bcd7c4af2ed
+
+### TAP support
+
+<img src=""https://github.com/sindresorhus/ava/blob/a5e63c0d43bfc13b820b3d52727830c3c2354793/media/tap-output.png"" width=""398"">
+
+You can now get [TAP](https://en.wikipedia.org/wiki/Test_Anything_Protocol) output instead of our builtin reporter by using the `--tap` flag.
+
+Use any of the myriad of [TAP reporters](https://github.com/sindresorhus/awesome-tap#reporters). Like the [tap-nyan](https://github.com/calvinmetcalf/tap-nyan) reporter as seen above.
+
+This is how we'll support custom reporters in AVA. Write a TAP reporter. We're not interested in creating another silo of test runner specific reporters.
+
+https://github.com/sindresorhus/ava/commit/a5e63c0d43bfc13b820b3d52727830c3c2354793
+
+## New default reporter
+
+<img src=""https://cloud.githubusercontent.com/assets/170270/12034055/ed00e502-ae2b-11e5-8370-c9b10b5bd192.gif"" width=""494"">
+
+We built a new minimal reporter that's now the default. You can get back the old verbose reporter with the `--verbose` flag.
+
+https://github.com/sindresorhus/ava/commit/2c77314f9334ffaccf08b6796dcb5350e557de87
+
+### Other
+- [BREAKING] Deeply recurse directories. Previously AVA only looked for test files in the immediate subdirectory. Now it will look in subdirectories at any level. https://github.com/sindresorhus/ava/commit/72e87d9466a3a6f7b035a61cb526f25c32b414bf
+- Ignore files in directories named `fixtures` and `helpers`. https://github.com/sindresorhus/ava/commit/f6cef7fcf361a33d22a6eeefdf067c41c0fbdc98
+- Cache Babel transpiled code. This will improve startup performance considerably. https://github.com/sindresorhus/ava/commit/0daec3e2e1014cf4452b16129d93a4c4fa41b47b
+- Make `--require` relative to where the command is run. https://github.com/sindresorhus/ava/commit/ae446f074131e2b1b1c74593c631e5989991cd51
+- Show full stack trace for non-assert errors. https://github.com/sindresorhus/ava/commit/cbea003517c4e8aad30a081c2a414be4083415df
+- Fix promise assertions. https://github.com/sindresorhus/ava/commit/e52db69261d9b15dd1b69c76d82875b66d024e6b
+- [French translation](https://github.com/sindresorhus/ava-docs/blob/master/fr_FR/readme.md) of the docs. _Thanks to @forresst :)_ https://github.com/sindresorhus/ava/commit/8346d35584878dab70318aa37b8a27937c39bcd2
+
+### Changes
+
+https://github.com/sindresorhus/ava/compare/v0.8.0...v0.9.0
+
+## 
+
+🎄 Happy holidays from James, Vadim, and Sindre! 🎉
+",https://api.github.com/users/sindresorhus,170270,sindresorhus,https://api.github.com/repos/avajs/ava/releases/2350081/assets,https://api.github.com/repos/avajs/ava/releases/2350081,master,https://api.github.com/repos/avajs/ava/tarball/v0.9.0,https://github.com/avajs/ava/releases/tag/v0.9.0,https://api.github.com/repos/avajs/ava/zipball/v0.9.0,v0.9.0,False,False
+2286569,2015-12-14T21:24:55Z,2015-12-14T21:37:39Z,0.8.0,"### Highlights
+- Don't use the user local Babel when available. Instead always use the the built-in Babel. This will let you use Babel 6 in your project even though we don't yet support Babel 6. https://github.com/sindresorhus/ava/commit/d0c370a1c00db8c02e9d7c4bcbac835b1a6c8a08
+- Add ability to skip individual assertions with `t.skip()`. https://github.com/sindresorhus/ava/commit/357622c2834fbd53a0dac6a155f07532b21a3b96
+- Node.js-style `--require` CLI argument. https://github.com/sindresorhus/ava/commit/6081389d00221217d39115601cc4dfa485618f90
+- Forward all test file output to `stderr` on the main process. https://github.com/sindresorhus/ava/commit/3f2e67a45b4cc348ffa33ad7bfc37e9844a48bfd
+- Allow deep equality comparison of values with circular references in assertions. https://github.com/sindresorhus/ava/commit/56cd65265e301a7457369df5e3fe15a158ff487a
+- Allow destructuring of the `t` parameter. https://github.com/sindresorhus/ava/commit/e0f31e84090a62439296f12f1643741be55aa9b7
+- Use `empower-core` for better assertion tracking and performance. https://github.com/sindresorhus/ava/commit/072ab8576f8b5a9d62994e59312dc5a49ebedd4c
+- Stop hiding source of syntax errors. https://github.com/sindresorhus/ava/commit/ad7ae194ef60e99b56575dbbf2bc2a45493b096b
+- Add filename to failed test title. https://github.com/sindresorhus/ava/commit/8a6770423dd69c700826fbd5a43c3a85b427808f
+- Add default message to the output of `t.fail()`. https://github.com/sindresorhus/ava/commit/da3c7a83592852a3dca0c7578558951c7d70a945
+
+### Changes
+
+https://github.com/sindresorhus/ava/compare/v0.7.0...v0.8.0
+",https://api.github.com/users/sindresorhus,170270,sindresorhus,https://api.github.com/repos/avajs/ava/releases/2286569/assets,https://api.github.com/repos/avajs/ava/releases/2286569,master,https://api.github.com/repos/avajs/ava/tarball/v0.8.0,https://github.com/avajs/ava/releases/tag/v0.8.0,https://api.github.com/repos/avajs/ava/zipball/v0.8.0,v0.8.0,False,False
+2204355,2015-11-30T06:41:33Z,2015-11-30T06:44:18Z,0.7.0,"![](https://cloud.githubusercontent.com/assets/170270/11463805/259d0956-975a-11e5-9852-b95206af7e79.gif)
+
+### Breaking changes
+
+There are some breaking changes in this release that significantly improves the test interface.
+
+#### `test()` is now only for synchronous or promise/observable returning tests
+
+The main `test()` interface is now synchronous by default and can be made asynchronous by returning a promise/observable or using a async/generator function (which implicitly returns a promise).
+
+You no longer have to call `t.end()` in synchronous tests:
+
+``` diff
+ test(t => {
+    t.pass();
+-   t.end();
+})
+```
+
+You can no longer use `test()` for callback-style APIs, so we've introduced a new [""callback mode"" `test.cb()`](https://github.com/sindresorhus/ava#testcbtitle-body).
+
+``` diff
+-test(t => {
++test.cb(t => {
+    fn(err => {
+        t.ifError(err);
+        t.end();
+    });
+ });
+```
+
+https://github.com/sindresorhus/ava/commit/387c30a056cdd3ef8510262ce2119031c8d18361 https://github.com/sindresorhus/ava/commit/717030813a51d349830e28a7b77b4014837d6eac
+
+#### `t.plan()` will no longer auto-end tests
+
+You will now have to explicitly end tests with callback-style APIs. Previously, `t.plan()` doubled as both an assert counter and ending the test when the assertion count was reached. This was a mistake. It's now only an assert counter. We are now able to warn on too many async assertion which were previously not possible. Note that `t.end()` only works in ""callback mode"" `test.cb()`.
+
+``` diff
+-test(t => {
++test.cb(t => {
+    t.plan(1);
+
+    fn(err => {
+        t.ifError(err);
++       t.end();
+    });
+ });
+```
+
+More info here: https://github.com/sindresorhus/ava#warning-recent-breaking-change
+
+https://github.com/sindresorhus/ava/commit/f8168153c798fd07e33d120d2a7448c4b8408db0
+
+### Highlights
+- Test methods are now [chainable](https://github.com/sindresorhus/ava#chaining-test-modifiers). You can for example do `test.serial.skip()`. https://github.com/sindresorhus/ava/commit/d874ec9642a08492d3dc01ff311c23ddfeaa0797
+- Use the local AVA version if available when running `$ ava` from the CLI. https://github.com/sindresorhus/ava/commit/2f7ac92d8ccfd5763e83d5a4050ee0ed23e46a87
+- Guard against time manipulation by mocking modules like Sinon. https://github.com/sindresorhus/ava/commit/b88c2baf399a4b09a76cdb6402b0e02669759e42
+- Improve the behavior of the `--serial` flag. https://github.com/sindresorhus/ava/commit/7ad7501db2f836cb9200ee018ed8a867119f3113
+
+### Changes
+
+https://github.com/sindresorhus/ava/compare/v0.6.1...v0.7.0
+",https://api.github.com/users/sindresorhus,170270,sindresorhus,https://api.github.com/repos/avajs/ava/releases/2204355/assets,https://api.github.com/repos/avajs/ava/releases/2204355,master,https://api.github.com/repos/avajs/ava/tarball/v0.7.0,https://github.com/avajs/ava/releases/tag/v0.7.0,https://api.github.com/repos/avajs/ava/zipball/v0.7.0,v0.7.0,False,False
+2180821,2015-11-24T22:33:15Z,2015-11-24T22:46:59Z,0.6.1,"### Highlights
+- Removes git dependency for more [reliable installs](https://github.com/sindresorhus/ava/issues/246). https://github.com/sindresorhus/ava/commit/588ab18a1749128c74de5d67a18c51adf32c15e0
+
+### Changes
+
+https://github.com/sindresorhus/ava/compare/v0.6.0...v0.6.1
+",https://api.github.com/users/jamestalmage,4082216,jamestalmage,https://api.github.com/repos/avajs/ava/releases/2180821/assets,https://api.github.com/repos/avajs/ava/releases/2180821,master,https://api.github.com/repos/avajs/ava/tarball/v0.6.1,https://github.com/avajs/ava/releases/tag/v0.6.1,https://api.github.com/repos/avajs/ava/zipball/v0.6.1,v0.6.1,False,False
+2176227,2015-11-24T09:41:45Z,2015-11-24T09:43:37Z,0.6.0,"![](https://cloud.githubusercontent.com/assets/170270/11362943/72254b66-92c9-11e5-81e7-17db6e3eff99.gif)
+
+### Highlights
+- Add [`test.only()`](https://github.com/sindresorhus/ava#only-tests). https://github.com/sindresorhus/ava/commit/93f733c4cf47a95f0b8806bd4daf5069f977043e
+- Show the first assertion failure instead of the last. https://github.com/sindresorhus/ava/commit/eb9b3390292cc5c7d3ea82ee0828c1b8578d3890
+- Add source map support. Test failures now show the correct lines & columns. https://github.com/sindresorhus/ava/commit/25a3cfd98bc430674a2598e63c43b01e0c69edb1
+- Ignore the `node_modules` folder. https://github.com/sindresorhus/ava/commit/a4f8e241f6adefe6308ca2a0f66f796e50d45eae
+- Fix failure stack output on Windows. https://github.com/sindresorhus/ava/commit/33b7918243c9dd9c865744d85bbe9996685ed476
+- Happy to welcome @jamestalmage to the project! ✨ https://github.com/sindresorhus/ava/commit/812589a90310d368df07601422651dae03fd204f
+
+### Changes
+
+https://github.com/sindresorhus/ava/compare/v0.5.0...v0.6.0
+",https://api.github.com/users/sindresorhus,170270,sindresorhus,https://api.github.com/repos/avajs/ava/releases/2176227/assets,https://api.github.com/repos/avajs/ava/releases/2176227,master,https://api.github.com/repos/avajs/ava/tarball/v0.6.0,https://github.com/avajs/ava/releases/tag/v0.6.0,https://api.github.com/repos/avajs/ava/zipball/v0.6.0,v0.6.0,False,False
+2132182,2015-11-16T13:04:36Z,2015-11-16T13:09:37Z,0.5.0,"<img src=""https://cloud.githubusercontent.com/assets/170270/11185643/4a1f82b8-8cb0-11e5-8244-40a5ff1f6fac.gif"">
+
+### Highlights
+- Add [`test.skip()`](https://github.com/sindresorhus/ava#skip-tests). https://github.com/sindresorhus/ava/commit/41fd96f907b311724071ae0232da37af51cc0019
+- Add support for [Observable](https://github.com/sindresorhus/ava#observable-support). https://github.com/sindresorhus/ava/commit/05bee73b520d740aadc89e6bb1724aceac7e23ac _Thanks to @BarryThePenguin_
+- Support use of `t.end` as callback. https://github.com/sindresorhus/ava/commit/403a28c8cebf9a8ff736aaaf2c4cb79ca30c5a47
+- Prevent using `test()` without a callback. https://github.com/sindresorhus/ava/commit/0dad4552cb752d32bcc8381f25fa78c88344dc4b
+- Report unhandled promise rejections. https://github.com/sindresorhus/ava/commit/862edb85264fe0c1aebcfa966da7d08af96866a4
+- Report uncaught exceptions. https://github.com/sindresorhus/ava/commit/c5d02f1f3c8ba7dabbdb53fdc9710f0cd117a9d3
+- Handle non-test files with a user-friendly error message. https://github.com/sindresorhus/ava/commit/a3308d229765ef6e7305ce5c7752d1a41e2d008d
+- Display only failed hooks. https://github.com/sindresorhus/ava/commit/55d3613bed36d07f9c5453e5f1e58d11ff5ae013
+- Fix logger throwing on files with both passing and failing tests. https://github.com/sindresorhus/ava/commit/d6fed1c7c4e0639208d1cd366e03e695a28c925a
+- Lots of stability fixes! _Huge thanks to @jamestalmage for tirelessly working on this._
+
+### Changes
+
+https://github.com/sindresorhus/ava/compare/v0.4.2...v0.5.0
+",https://api.github.com/users/sindresorhus,170270,sindresorhus,https://api.github.com/repos/avajs/ava/releases/2132182/assets,https://api.github.com/repos/avajs/ava/releases/2132182,master,https://api.github.com/repos/avajs/ava/tarball/v0.5.0,https://github.com/avajs/ava/releases/tag/v0.5.0,https://api.github.com/repos/avajs/ava/zipball/v0.5.0,v0.5.0,False,False
+2091088,2015-11-08T14:44:05Z,2015-11-08T14:48:37Z,0.4.2,"### Highlights
+- Fix issue with the CLI throwing on Windows. https://github.com/sindresorhus/ava/commit/560c6f898dbc0d68cac726d0bcfbfa894b6eed9d
+
+### Changes
+
+https://github.com/sindresorhus/ava/compare/v0.4.1...v0.4.2
+",https://api.github.com/users/sindresorhus,170270,sindresorhus,https://api.github.com/repos/avajs/ava/releases/2091088/assets,https://api.github.com/repos/avajs/ava/releases/2091088,master,https://api.github.com/repos/avajs/ava/tarball/v0.4.2,https://github.com/avajs/ava/releases/tag/v0.4.2,https://api.github.com/repos/avajs/ava/zipball/v0.4.2,v0.4.2,False,False
+2090370,2015-11-08T06:19:50Z,2015-11-08T06:22:56Z,0.4.1,"### Highlights
+- Fix use of absolute paths in the CLI. https://github.com/sindresorhus/ava/commit/e57b99d84b3ef2cb9e549a68bafc7740850c4e0a
+- Work around weird Node.js 0.10 exit bug. https://github.com/sindresorhus/ava/commit/04c687bc6d068c2fa0a4a7516996fd6cf36f0b77
+
+### Changes
+
+https://github.com/sindresorhus/ava/compare/v0.4.0...v0.4.1
+",https://api.github.com/users/sindresorhus,170270,sindresorhus,https://api.github.com/repos/avajs/ava/releases/2090370/assets,https://api.github.com/repos/avajs/ava/releases/2090370,master,https://api.github.com/repos/avajs/ava/tarball/v0.4.1,https://github.com/avajs/ava/releases/tag/v0.4.1,https://api.github.com/repos/avajs/ava/zipball/v0.4.1,v0.4.1,False,False
+2088797,2015-11-07T13:07:13Z,2015-11-07T13:15:00Z,0.4.0,"### Highlights
+- Shared context between tests and beforeEach/afterEach hooks. a76ced627922523beb22aaef97d3a02f35aea7ad
+- Don't display test title if there's only one anonymous test. https://github.com/sindresorhus/ava/commit/bb1304c5be056689c39211d89c673f2f732e4c4a
+- Add string support to the `throws` assertion. https://github.com/sindresorhus/ava/commit/257c4148a38c1f534924e0850dce0c67378ce534
+- Use the Babel API instead of the require hook. We no longer interfere with custom use of the require hook. https://github.com/sindresorhus/ava/commit/1d5ef4c5f6fcb70f9e90e584dfd08865db1e93b4
+- Fix compatibility problems with [`nyc`](https://github.com/bcoe/nyc). https://github.com/sindresorhus/ava/commit/7087a08dda47b5d7549d4b93f90fe22d49816acf
+
+### Changes
+
+https://github.com/sindresorhus/ava/compare/v0.3.0...v0.4.0
+",https://api.github.com/users/sindresorhus,170270,sindresorhus,https://api.github.com/repos/avajs/ava/releases/2088797/assets,https://api.github.com/repos/avajs/ava/releases/2088797,master,https://api.github.com/repos/avajs/ava/tarball/v0.4.0,https://github.com/avajs/ava/releases/tag/v0.4.0,https://api.github.com/repos/avajs/ava/zipball/v0.4.0,v0.4.0,False,False

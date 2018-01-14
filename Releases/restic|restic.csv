@@ -1,0 +1,981 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7829307,2017-09-20T18:50:07Z,2017-09-20T19:01:39Z,restic 0.7.3,"We're very pleased to announce restic 0.7.3! restic is distributed as a standalone binary: download the correct file for your operating system and architecture, extract the file and just run it. If you run into any issues, please report them at [the GitHub issue tracker](https://github.com/restic/restic/issues/new) or visit [the forum](https://forum.restic.net).
+
+The binaries released with each restic version are [reproducible](https://reproducible-builds.org/), which means that you can easily reproduce a byte identical version from the source code for that release. Instructions on how to do that are contained in the [builder repository](https://github.com/restic/builder).
+
+This is a bugfix release that corrects the following bugs:
+
+Important Changes in 0.7.3
+==========================
+
+ * For large backups stored in Google Cloud Storage, the `prune` command fails because listing only returns the first 1000 files. This has been corrected, no data is lost in the process. In addition, a plausibility check was added to `prune`.
+   https://github.com/restic/restic/issues/1246
+   https://github.com/restic/restic/pull/1247
+",https://api.github.com/users/fd0,123276,fd0,https://api.github.com/repos/restic/restic/releases/7829307/assets,https://api.github.com/repos/restic/restic/releases/7829307,master,https://api.github.com/repos/restic/restic/tarball/v0.7.3,https://github.com/restic/restic/releases/tag/v0.7.3,https://api.github.com/repos/restic/restic/zipball/v0.7.3,v0.7.3,False,False
+7740366,2017-09-13T15:14:53Z,2017-09-13T15:24:28Z,restic 0.7.2,"We're very pleased to announce restic 0.7.2! restic is distributed as a standalone binary: download the correct file for your operating system and architecture, extract the file and just run it. If you run into any issues, please report them at [the GitHub issue tracker](https://github.com/restic/restic/issues/new) or visit [the forum](https://forum.restic.net).
+
+The binaries released with each restic version are [reproducible](https://reproducible-builds.org/), which means that you can easily reproduce a byte identical version from the source code for that release. Instructions on how to do that are contained in the [builder repository](https://github.com/restic/builder).
+
+This release contains the following changes:
+
+Important Changes in 0.7.2
+==========================
+
+ * We've added an official docker image and a Dockerfile to build this image in
+   `docker/`.
+   https://github.com/restic/restic/pull/1061
+
+ * The git repository layout was changed to resemble the layout typically used
+   in Go projects, we're not using `gb` for building restic any more and
+   vendoring the dependencies is now taken care of by `dep`.
+   https://github.com/restic/restic/pull/1126
+
+ * We now support saving backups on Google Cloud Storage.
+   https://github.com/restic/restic/pull/1134
+   https://github.com/restic/restic/pull/1052
+   https://github.com/restic/restic/issues/211
+
+ * We've added support for Microsoft Azure Blob Storage as a restic backend.
+   https://github.com/restic/restic/pull/1149
+   https://github.com/restic/restic/pull/1059
+   https://github.com/restic/restic/issues/609
+
+ * In the course of supporting Microsoft Azure Blobe Storage Go 1.8 is now a
+   requirement to build restic.
+
+ * The `restore` command has been improved: When dirs are excluded (or not
+   included) in a restore, they are not loaded from the repo any more.
+   https://github.com/restic/restic/pull/1044
+
+ * Name collisions are now resolved by appending a counter.
+   https://github.com/restic/restic/issues/1179
+   https://github.com/restic/restic/pull/1209
+
+
+Small changes
+-------------
+
+ * The `key` command now prompts for a password even if the original password
+   to access a repo has been specified via the `RESTIC_PASSWORD` environment
+   variable or a password file.
+   https://github.com/restic/restic/issues/1132
+   https://github.com/restic/restic/pull/1133
+
+ * Properly report errors when reading files with exclude patterns.
+   https://github.com/restic/restic/pull/1144
+
+ * We now automatically generate man pages for all restic commands, see the
+   subdir `doc/man`.
+   https://github.com/restic/restic/issues/697
+   https://github.com/restic/restic/pull/1147
+
+ * The `key remove` command was corrected and now works as documented.
+   https://github.com/restic/restic/pull/1164
+
+ * When a restic command other than `init` is used with a local repository and
+   the repository directory does not exist, restic creates the directory
+   structure. That's an error, only the `init` command should create the dir.
+   https://github.com/restic/restic/issues/1167
+   https://github.com/restic/restic/pull/1182
+
+ * Restic now prints stats on all BSD systems (not only on darwin) when SIGINFO
+   is received (usually when ctrl+t is pressed).
+   https://github.com/restic/restic/pull/1203
+   https://github.com/restic/restic/pull/1082#issuecomment-326279920
+
+ * Since a few releases restic had the ability to write profiling files for
+   memory and CPU usage when `debug` is enabled. It was discovered that when
+   restic is interrupted (ctrl+c is pressed), the proper shutdown hook is not
+   run. This is now corrected.
+   https://github.com/restic/restic/pull/1191
+
+ * A new option `--exclude-caches` was added that allows excluding cache
+   directories (that are tagged as such). This is a special case of a more
+   generic option `--exclude-if-present` which excludes a directory if a file
+   with a specific name (and contents) is present.
+   https://github.com/restic/restic/issues/317
+   https://github.com/restic/restic/pull/1170
+   https://github.com/restic/restic/pull/1224
+
+ * The `forget` command now has an option `--group-by` that allows flexible
+   grouping policies.
+   https://github.com/restic/restic/pull/1196
+
+ * The date and time restic records for a new backup can now be specified
+   externally by passing `--time` to the `backup` command.
+   https://github.com/restic/restic/pull/1205
+
+ * The option `--compact` was added to the `snapshots` command to get a better
+   overview of the snapshots in a repo. It limits each snapshot to a single
+   line.
+   https://github.com/restic/restic/issues/1218
+   https://github.com/restic/restic/pull/1223
+
+",https://api.github.com/users/fd0,123276,fd0,https://api.github.com/repos/restic/restic/releases/7740366/assets,https://api.github.com/repos/restic/restic/releases/7740366,master,https://api.github.com/repos/restic/restic/tarball/v0.7.2,https://github.com/restic/restic/releases/tag/v0.7.2,https://api.github.com/repos/restic/restic/zipball/v0.7.2,v0.7.2,False,False
+7131789,2017-07-22T09:04:32Z,2017-07-22T09:17:10Z,restic 0.7.1,"UPDATE
+======
+
+After releasing restic 0.7.1, we've discovered a serious bug that was more or less accidentally corrected in 0.7.1, the background story is described [in our blog](https://restic.github.io/blog/2017-07-25/please-upgrade-to-0.7.1). **Do not use restic 0.7.0, upgrade to at least 0.7.1**
+
+And now the original release notes text:
+
+
+----------
+
+
+We're proud to present restic 0.7.1. The binaries released with each restic version starting are [reproducible](https://reproducible-builds.org/), which means that you can easily reproduce a byte identical version from the source code for that release. Instructions on how to do that are contained in the [builder repository](https://github.com/restic/builder).
+
+Important Changes in 0.7.1
+==========================
+
+ * The `migrate` command for chaning the `s3legacy` layout to the `default` layout for s3 backends has been improved: It can now be restarted with `restic migrate --force s3_layout` and automatically retries operations on error. https://github.com/restic/restic/issues/1073 https://github.com/restic/restic/pull/1075
+
+Small changes
+-------------
+
+ * The local and sftp backends now create the subdirs below `data/` on open/init. This way, restic makes sure that they always exist. This is connected to an issue for the sftp server: https://github.com/restic/rest-server/pull/11#issuecomment-309879710 https://github.com/restic/restic/issues/1055 https://github.com/restic/restic/pull/1077 https://github.com/restic/restic/pull/1105
+
+ * When no S3 credentials are specified in the environment variables, restic now tries to load credentials from an IAM instance profile when the s3 backend is used. https://github.com/restic/restic/issues/1067 https://github.com/restic/restic/pull/1086
+
+ * On Darwin and FreeBSD, restic now prints stats when SIGINFO is received (usually when ctrl+t is pressed). https://github.com/restic/restic/pull/1082
+
+ * The dependencies have been updated. https://github.com/restic/restic/pull/1108 https://github.com/restic/restic/pull/1124
+
+ * A bug was found (and corrected) in the index rebuilding after prune, which led to indexes which include blobs that were not present in the repo any more. There were already checks in place which detected this situation and aborted with an error message. A new run of either `prune` or `rebuild-index` corrected the index files. This is now fixed and a test has been added to detect this. https://github.com/restic/restic/pull/1115
+
+ * Errors for chmod() on Unix for filesystems which do not support it (e.g. smb mounted via gvfs) are now ignored. https://github.com/restic/restic/pull/1080 https://github.com/restic/restic/pull/1112
+
+ * The semantic for the `--tags` option to `forget` and `snapshots` was clarified: https://github.com/restic/restic/issues/1081 https://github.com/restic/restic/pull/1090
+",https://api.github.com/users/fd0,123276,fd0,https://api.github.com/repos/restic/restic/releases/7131789/assets,https://api.github.com/repos/restic/restic/releases/7131789,master,https://api.github.com/repos/restic/restic/tarball/v0.7.1,https://github.com/restic/restic/releases/tag/v0.7.1,https://api.github.com/repos/restic/restic/zipball/v0.7.1,v0.7.1,False,False
+6901377,2017-07-01T12:12:07Z,2017-07-01T12:46:02Z,restic 0.7.0,"After weeks of work we're proud to release restic 0.7.0!
+
+
+Important Changes in 0.7.0
+==========================
+
+ * New ""swift"" backend: A new backend for the OpenStack Swift cloud storage protocol has been added, https://wiki.openstack.org/wiki/Swift https://github.com/restic/restic/pull/975 https://github.com/restic/restic/pull/648
+
+ * New ""b2"" backend: A new backend for Backblaze B2 cloud storage service has been added, https://www.backblaze.com https://github.com/restic/restic/issues/512 https://github.com/restic/restic/pull/978
+
+ * Improved performance for the `find` command: Restic recognizes paths it has already checked for the files in question, so the number of backend requests is reduced a lot. https://github.com/restic/restic/issues/989 https://github.com/restic/restic/pull/993
+
+ * Improved performance for the fuse mount: Listing directories which contain large files now is significantly faster. https://github.com/restic/restic/pull/998
+
+ * The default layout for the s3 backend is now `default` (instead of `s3legacy`). Also, there's a new `migrate` command to convert an existing repo, it can be run like this: `restic migrate s3_layout` https://github.com/restic/restic/issues/965 https://github.com/restic/restic/pull/1004
+
+ * The fuse mount now has two more directories: `tags` contains a subdir for each tag, which in turn contains only the snapshots that have this tag. The subdir `hosts` contains a subdir for each host that has a snapshot, and the subdir contains the snapshots for that host. https://github.com/restic/restic/issues/636 https://github.com/restic/restic/pull/1050
+
+Small changes
+-------------
+
+ * For the s3 backend we're back to using the high-level API the s3 client library for uploading data, a few users reported dropped connections (which the library will automatically retry now). https://github.com/restic/restic/issues/1013 https://github.com/restic/restic/issues/1023 https://github.com/restic/restic/pull/1025
+
+ * The `prune` command has been improved and will now remove invalid pack files, for example files that have not been uploaded completely because a backup was interrupted. https://github.com/restic/restic/issues/1029 https://github.com/restic/restic/pull/1036
+
+ * restic now tries to detect when an invalid/unknown backend is used and returns an error message. https://github.com/restic/restic/issues/1021 https://github.com/restic/restic/pull/1070
+",https://api.github.com/users/fd0,123276,fd0,https://api.github.com/repos/restic/restic/releases/6901377/assets,https://api.github.com/repos/restic/restic/releases/6901377,master,https://api.github.com/repos/restic/restic/tarball/v0.7.0,https://github.com/restic/restic/releases/tag/v0.7.0,https://api.github.com/repos/restic/restic/zipball/v0.7.0,v0.7.0,False,False
+6564589,2017-05-31T22:14:18Z,2017-05-31T22:09:15Z,restic 0.6.1,"This is mostly a bugfix release and only contains small changes:
+
+ * The release binaries are now built in a reproducible way, see https://github.com/restic/builder
+
+ * We've fixed a bug where `rebuild-index` would corrupt the index when used with the s3 backend together with the `default` layout. This is not the default setting.
+
+ * Backends based on HTTP now allow several idle connections in parallel. This is especially important for the REST backend, which (when used with a local server) may create a lot connections and exhaust available ports quickly. https://github.com/restic/restic/issues/985 https://github.com/restic/restic/pull/986
+
+ * Regular status report: We've removed the status report that was printed every 10 seconds when restic is run non-interactively. You can still force reporting the current status by sending a `USR1` signal to the process. https://github.com/restic/restic/pull/974
+
+ * The `build.go` now strips the temporary directory used for compilation from the binary. This is the first step in enabling reproducible builds. https://github.com/restic/restic/pull/981
+
+# Change Log
+
+## [v0.6.1](https://github.com/restic/restic/tree/v0.6.1) (2017-05-31)
+[Full Changelog](https://github.com/restic/restic/compare/v0.6.0...v0.6.1)
+
+**Fixed bugs:**
+
+- ""restic check"" with rest-backend is using up too many fd's on rest-server. [\#985](https://github.com/restic/restic/issues/985)
+- Running rebuild-index on s3 with new default layout corrupts index [\#984](https://github.com/restic/restic/issues/984)
+- AWS credentials ending in ""="" don't work [\#970](https://github.com/restic/restic/issues/970)
+
+**Closed issues:**
+
+- Slow ""restic prune"" on Amazon s3 bucket [\#973](https://github.com/restic/restic/issues/973)
+
+**Merged pull requests:**
+
+- \[docs\] Fix paragraph not indented correctly in \#Autocomplete [\#987](https://github.com/restic/restic/pull/987) ([Thor77](https://github.com/Thor77))
+- Allow many idle connections per host [\#986](https://github.com/restic/restic/pull/986) ([fd0](https://github.com/fd0))
+- build.go: Strip temporary path, allow reproducible builds [\#981](https://github.com/restic/restic/pull/981) ([fd0](https://github.com/fd0))
+
+",https://api.github.com/users/fd0,123276,fd0,https://api.github.com/repos/restic/restic/releases/6564589/assets,https://api.github.com/repos/restic/restic/releases/6564589,master,https://api.github.com/repos/restic/restic/tarball/v0.6.1,https://github.com/restic/restic/releases/tag/v0.6.1,https://api.github.com/repos/restic/restic/zipball/v0.6.1,v0.6.1,False,False
+6537047,2017-05-29T19:13:12Z,2017-05-29T19:30:11Z,restic 0.6.0,"After two months of work we're proud to announce restic v0.6.0. This release contains many bug fixes and several improvements for the user interface, the most important changes are listed below (and also contained in the `CHANGELOG.md`.
+
+Important Changes in 0.6.0
+==========================
+
+Consistent forget policy
+------------------------
+
+The `forget` command was corrected to be more consistent in which snapshots are to be forgotten. It is possible that the new code removes more snapshots than before, so please review what would be deleted by using the `--dry-run` option. https://github.com/restic/restic/pull/957 https://github.com/restic/restic/issues/953
+
+Unified repository layout
+-------------------------
+
+Up to now the s3 backend used a special repository layout. We've decided to unify the repository layout and implemented the default layout also for the s3 backend. For creating a new repository on s3 with the default layout, use `restic -o s3.layout=default init`. For further commands the option is not necessary any more, restic will automatically detect the correct layout to use. A future version will switch to the default layout for new repositories. https://github.com/restic/restic/pull/966 https://github.com/restic/restic/issues/965
+
+Memory and time improvements for the s3 backend
+-----------------------------------------------
+
+We've updated the library used for accessing s3, switched to using a lower level API and added caching for some requests. This lead to a decrease in memory usage and a great speedup. In addition, we added benchmark functions for all backends, so we can track improvements over time. The Continuous Integration test service we're using (Travis) now runs the s3 backend tests not only against a Minio server, but also against the Amazon s3 live service, so we should be notified of any regressions much sooner. https://github.com/restic/restic/pull/962 https://github.com/restic/restic/pull/960 https://github.com/restic/restic/pull/946 https://github.com/restic/restic/pull/938 https://github.com/restic/restic/pull/883
+
+## [v0.6.0](https://github.com/restic/restic/tree/v0.6.0) (2017-05-25)
+[Full Changelog](https://github.com/restic/restic/compare/v0.5.0...v0.6.0)
+
+**Implemented enhancements:**
+
+- \[RFC\] Implement consistent backup/forget policy [\#953](https://github.com/restic/restic/issues/953)
+- Temporary files not cleaned up [\#948](https://github.com/restic/restic/issues/948)
+- Check for config file before requesting password [\#925](https://github.com/restic/restic/issues/925)
+- use newer xattr [\#921](https://github.com/restic/restic/issues/921)
+- support plink as SSH/SFTP client on Windows [\#818](https://github.com/restic/restic/issues/818)
+- Handle filesystems mounted several times with --one-file-system [\#645](https://github.com/restic/restic/issues/645)
+- Backend: use AttemptGet instead of Test + Get to reduce latency impact [\#457](https://github.com/restic/restic/issues/457)
+
+**Fixed bugs:**
+
+- panic: store new item in finalized index [\#969](https://github.com/restic/restic/issues/969)
+- PKGBUILD broken [\#963](https://github.com/restic/restic/issues/963)
+- SFTP Upload Stops and does not recover [\#937](https://github.com/restic/restic/issues/937)
+- Restoring from different host saying `wrong password or no key found` [\#923](https://github.com/restic/restic/issues/923)
+- unable to open repo: wrong password or no key found [\#917](https://github.com/restic/restic/issues/917)
+- Empty lines in exclude-file result in empty snapshot [\#915](https://github.com/restic/restic/issues/915)
+- Design.md: Tree section has inconsistent blob IDs [\#914](https://github.com/restic/restic/issues/914)
+- Nested Backups Become Unnested [\#910](https://github.com/restic/restic/issues/910)
+- one-file-system does not correctly handle sub-paths [\#907](https://github.com/restic/restic/issues/907)
+- Backup fails after about 2GB [\#904](https://github.com/restic/restic/issues/904)
+- restic init doesn't work anymore with REST backend [\#899](https://github.com/restic/restic/issues/899)
+- device id is not saved for files [\#893](https://github.com/restic/restic/issues/893)
+- \[S3\] \[EMC-ECS\] client.BucketExists: Invalid Argument [\#765](https://github.com/restic/restic/issues/765)
+- Init error on windows when repo path begins with drive letter [\#735](https://github.com/restic/restic/issues/735)
+- backup --one-file-system and 'nested' mount points. [\#702](https://github.com/restic/restic/issues/702)
+- Incremental backups of the same \(small\) directory very slow [\#684](https://github.com/restic/restic/issues/684)
+- error for restore: lchown operation not permitted [\#655](https://github.com/restic/restic/issues/655)
+- fuse mount broken for snapshots read from stdin [\#621](https://github.com/restic/restic/issues/621)
+- Restic panics on connection reset when backing up to S3 [\#560](https://github.com/restic/restic/issues/560)
+- restore doesn't restore changed files [\#547](https://github.com/restic/restic/issues/547)
+- panic after SIGCONT [\#504](https://github.com/restic/restic/issues/504)
+- Differences b/w processed and expected values given in progress information after completion of backup may be confusing to users [\#486](https://github.com/restic/restic/issues/486)
+
+**Closed issues:**
+
+- Backup strategy \(2\): pull/remote/add-only [\#959](https://github.com/restic/restic/issues/959)
+- backup size should not include excluded dirs [\#958](https://github.com/restic/restic/issues/958)
+- \[FEATURE\] print state of repo [\#955](https://github.com/restic/restic/issues/955)
+- sftp backends timeouts quietly [\#954](https://github.com/restic/restic/issues/954)
+- Dead link to ""usage"" in README [\#950](https://github.com/restic/restic/issues/950)
+- bash autocompletion [\#942](https://github.com/restic/restic/issues/942)
+- Please provide a docker container that's empty besides a restic binary with the latest version [\#931](https://github.com/restic/restic/issues/931)
+- b2 backblaze [\#924](https://github.com/restic/restic/issues/924)
+- Restore all available versions of a file [\#906](https://github.com/restic/restic/issues/906)
+- Cannot specify port for sftp backend [\#895](https://github.com/restic/restic/issues/895)
+- Restore fail in windows [\#891](https://github.com/restic/restic/issues/891)
+- Support for custom user ID ""--cid"" \(feature\) [\#888](https://github.com/restic/restic/issues/888)
+- Compilation on Android and termux not possible [\#886](https://github.com/restic/restic/issues/886)
+- Question about restore behavior in Linux [\#561](https://github.com/restic/restic/issues/561)
+- Report progress on SIGUSR1 \(when scripted\) [\#453](https://github.com/restic/restic/issues/453)
+- Allow reading backup items from file [\#417](https://github.com/restic/restic/issues/417)
+- Add CLI [\#64](https://github.com/restic/restic/issues/64)
+- Document differences to other backup systems [\#57](https://github.com/restic/restic/issues/57)
+
+**Merged pull requests:**
+
+- build.go: Add --enable-cgo [\#971](https://github.com/restic/restic/pull/971) ([fd0](https://github.com/fd0))
+- Fixing CPUProfile [\#968](https://github.com/restic/restic/pull/968) ([mcastilho](https://github.com/mcastilho))
+- Fix a number of warnings from go report [\#967](https://github.com/restic/restic/pull/967) ([middelink](https://github.com/middelink))
+- Unify repository layout [\#966](https://github.com/restic/restic/pull/966) ([fd0](https://github.com/fd0))
+- Update github.com/minio/minio-go [\#964](https://github.com/restic/restic/pull/964) ([fd0](https://github.com/fd0))
+- Improve s3 backend [\#962](https://github.com/restic/restic/pull/962) ([fd0](https://github.com/fd0))
+- Add backend benchmarks [\#961](https://github.com/restic/restic/pull/961) ([fd0](https://github.com/fd0))
+- Enable CI tests against AWS S3 [\#960](https://github.com/restic/restic/pull/960) ([fd0](https://github.com/fd0))
+- Change backup policy to be inclusive [\#957](https://github.com/restic/restic/pull/957) ([middelink](https://github.com/middelink))
+- Unlink tempfiles before using them [\#952](https://github.com/restic/restic/pull/952) ([fd0](https://github.com/fd0))
+- codecov.io: Add path fixes [\#947](https://github.com/restic/restic/pull/947) ([fd0](https://github.com/fd0))
+- Update github.com/minio/minio-go [\#946](https://github.com/restic/restic/pull/946) ([fd0](https://github.com/fd0))
+- Add bash autocompletion generation [\#945](https://github.com/restic/restic/pull/945) ([middelink](https://github.com/middelink))
+- Small changes to cmd\_forget and snapshot\_filter [\#943](https://github.com/restic/restic/pull/943) ([middelink](https://github.com/middelink))
+- local/sftp: Auto create directories if needed [\#941](https://github.com/restic/restic/pull/941) ([fd0](https://github.com/fd0))
+- WIP: rework backend integration tests [\#938](https://github.com/restic/restic/pull/938) ([fd0](https://github.com/fd0))
+- Fix links broken during conversion to rst [\#936](https://github.com/restic/restic/pull/936) ([Thor77](https://github.com/Thor77))
+- CI: Add glyphcheck, rework REST server install [\#935](https://github.com/restic/restic/pull/935) ([fd0](https://github.com/fd0))
+- forget: don't sort flags [\#930](https://github.com/restic/restic/pull/930) ([fd0](https://github.com/fd0))
+- Test if a config file on open [\#927](https://github.com/restic/restic/pull/927) ([fd0](https://github.com/fd0))
+- Update vendored dependencies [\#922](https://github.com/restic/restic/pull/922) ([fd0](https://github.com/fd0))
+- Small typo in ""Frankfurt""  [\#920](https://github.com/restic/restic/pull/920) ([jpmens](https://github.com/jpmens))
+- Added AWS S3 tutorial. [\#919](https://github.com/restic/restic/pull/919) ([Phaeilo](https://github.com/Phaeilo))
+- s3: Correct layout prefix, reduce connections [\#918](https://github.com/restic/restic/pull/918) ([fd0](https://github.com/fd0))
+- Ignore empty lines in excludes file, allow multiple files [\#916](https://github.com/restic/restic/pull/916) ([fd0](https://github.com/fd0))
+- Switch documentation to Sphinx [\#913](https://github.com/restic/restic/pull/913) ([Thor77](https://github.com/Thor77))
+- Update Go [\#912](https://github.com/restic/restic/pull/912) ([fd0](https://github.com/fd0))
+- Implement MkdirAll\(\) for Windows [\#911](https://github.com/restic/restic/pull/911) ([fd0](https://github.com/fd0))
+- Check allowed devices per path [\#908](https://github.com/restic/restic/pull/908) ([fd0](https://github.com/fd0))
+- Remove short option conflict [\#905](https://github.com/restic/restic/pull/905) ([fd0](https://github.com/fd0))
+- Add new field DeviceID and tests [\#903](https://github.com/restic/restic/pull/903) ([fd0](https://github.com/fd0))
+- storage of device id of files [\#902](https://github.com/restic/restic/pull/902) ([jgfrm](https://github.com/jgfrm))
+- Prepare more cloud backends, add backend layouts [\#898](https://github.com/restic/restic/pull/898) ([fd0](https://github.com/fd0))
+- doc: Add section about how to change the sftp port [\#896](https://github.com/restic/restic/pull/896) ([fd0](https://github.com/fd0))
+- WIP: rest: Make backend honor the REST protocol [\#887](https://github.com/restic/restic/pull/887) ([fd0](https://github.com/fd0))
+- Cache size of last ReadAt on S3 for performance [\#883](https://github.com/restic/restic/pull/883) ([trbs](https://github.com/trbs))
+- Fix restoring files ownership as non-root user [\#878](https://github.com/restic/restic/pull/878) ([middelink](https://github.com/middelink))
+",https://api.github.com/users/fd0,123276,fd0,https://api.github.com/repos/restic/restic/releases/6537047/assets,https://api.github.com/repos/restic/restic/releases/6537047,master,https://api.github.com/repos/restic/restic/tarball/v0.6.0,https://github.com/restic/restic/releases/tag/v0.6.0,https://api.github.com/repos/restic/restic/zipball/v0.6.0,v0.6.0,False,False
+6503292,2017-05-25T13:42:56Z,2017-05-25T13:49:05Z,restic v0.6.0-rc.1,"After two months of work we're proud to announce restic v0.6.0. This is the Release Candidate version. If no grave bugs occur, it will be released as the final version in a few days. This release contains many bug fixes and several improvements for the user interface, the most important changes are listed below (and also contained in the `CHANGELOG.md`.
+
+Important Changes in 0.6.0
+==========================
+
+Consistent forget policy
+------------------------
+
+The `forget` command was corrected to be more consistent in which snapshots are to be forgotten. It is possible that the new code removes more snapshots than before, so please review what would be deleted by using the `--dry-run` option. https://github.com/restic/restic/pull/957 https://github.com/restic/restic/issues/953
+
+Unified repository layout
+-------------------------
+
+Up to now the s3 backend used a special repository layout. We've decided to unify the repository layout and implemented the default layout also for the s3 backend. For creating a new repository on s3 with the default layout, use `restic -o s3.layout=default init`. For further commands the option is not necessary any more, restic will automatically detect the correct layout to use. A future version will switch to the default layout for new repositories. https://github.com/restic/restic/pull/966 https://github.com/restic/restic/issues/965
+
+Memory and time improvements for the s3 backend
+-----------------------------------------------
+
+We've updated the library used for accessing s3, switched to using a lower level API and added caching for some requests. This lead to a decrease in memory usage and a great speedup. In addition, we added benchmark functions for all backends, so we can track improvements over time. The Continuous Integration test service we're using (Travis) now runs the s3 backend tests not only against a Minio server, but also against the Amazon s3 live service, so we should be notified of any regressions much sooner. https://github.com/restic/restic/pull/962 https://github.com/restic/restic/pull/960 https://github.com/restic/restic/pull/946 https://github.com/restic/restic/pull/938 https://github.com/restic/restic/pull/883
+
+## [v0.6.0-rc.1](https://github.com/restic/restic/tree/v0.6.0-rc.1) (2017-05-25)
+[Full Changelog](https://github.com/restic/restic/compare/v0.5.0...v0.6.0-rc.1)
+
+**Implemented enhancements:**
+
+- \[RFC\] Implement consistent backup/forget policy [\#953](https://github.com/restic/restic/issues/953)
+- Temporary files not cleaned up [\#948](https://github.com/restic/restic/issues/948)
+- Check for config file before requesting password [\#925](https://github.com/restic/restic/issues/925)
+- use newer xattr [\#921](https://github.com/restic/restic/issues/921)
+- support plink as SSH/SFTP client on Windows [\#818](https://github.com/restic/restic/issues/818)
+- Handle filesystems mounted several times with --one-file-system [\#645](https://github.com/restic/restic/issues/645)
+- Backend: use AttemptGet instead of Test + Get to reduce latency impact [\#457](https://github.com/restic/restic/issues/457)
+
+**Fixed bugs:**
+
+- panic: store new item in finalized index [\#969](https://github.com/restic/restic/issues/969)
+- PKGBUILD broken [\#963](https://github.com/restic/restic/issues/963)
+- SFTP Upload Stops and does not recover [\#937](https://github.com/restic/restic/issues/937)
+- Restoring from different host saying `wrong password or no key found` [\#923](https://github.com/restic/restic/issues/923)
+- unable to open repo: wrong password or no key found [\#917](https://github.com/restic/restic/issues/917)
+- Empty lines in exclude-file result in empty snapshot [\#915](https://github.com/restic/restic/issues/915)
+- Design.md: Tree section has inconsistent blob IDs [\#914](https://github.com/restic/restic/issues/914)
+- Nested Backups Become Unnested [\#910](https://github.com/restic/restic/issues/910)
+- one-file-system does not correctly handle sub-paths [\#907](https://github.com/restic/restic/issues/907)
+- Backup fails after about 2GB [\#904](https://github.com/restic/restic/issues/904)
+- restic init doesn't work anymore with REST backend [\#899](https://github.com/restic/restic/issues/899)
+- device id is not saved for files [\#893](https://github.com/restic/restic/issues/893)
+- \[S3\] \[EMC-ECS\] client.BucketExists: Invalid Argument [\#765](https://github.com/restic/restic/issues/765)
+- Init error on windows when repo path begins with drive letter [\#735](https://github.com/restic/restic/issues/735)
+- backup --one-file-system and 'nested' mount points. [\#702](https://github.com/restic/restic/issues/702)
+- Incremental backups of the same \(small\) directory very slow [\#684](https://github.com/restic/restic/issues/684)
+- error for restore: lchown operation not permitted [\#655](https://github.com/restic/restic/issues/655)
+- fuse mount broken for snapshots read from stdin [\#621](https://github.com/restic/restic/issues/621)
+- Restic panics on connection reset when backing up to S3 [\#560](https://github.com/restic/restic/issues/560)
+- restore doesn't restore changed files [\#547](https://github.com/restic/restic/issues/547)
+- panic after SIGCONT [\#504](https://github.com/restic/restic/issues/504)
+- Differences b/w processed and expected values given in progress information after completion of backup may be confusing to users [\#486](https://github.com/restic/restic/issues/486)
+
+**Closed issues:**
+
+- Backup strategy \(2\): pull/remote/add-only [\#959](https://github.com/restic/restic/issues/959)
+- backup size should not include excluded dirs [\#958](https://github.com/restic/restic/issues/958)
+- \[FEATURE\] print state of repo [\#955](https://github.com/restic/restic/issues/955)
+- sftp backends timeouts quietly [\#954](https://github.com/restic/restic/issues/954)
+- Dead link to ""usage"" in README [\#950](https://github.com/restic/restic/issues/950)
+- bash autocompletion [\#942](https://github.com/restic/restic/issues/942)
+- Please provide a docker container that's empty besides a restic binary with the latest version [\#931](https://github.com/restic/restic/issues/931)
+- b2 backblaze [\#924](https://github.com/restic/restic/issues/924)
+- Restore all available versions of a file [\#906](https://github.com/restic/restic/issues/906)
+- Cannot specify port for sftp backend [\#895](https://github.com/restic/restic/issues/895)
+- Restore fail in windows [\#891](https://github.com/restic/restic/issues/891)
+- Support for custom user ID ""--cid"" \(feature\) [\#888](https://github.com/restic/restic/issues/888)
+- Compilation on Android and termux not possible [\#886](https://github.com/restic/restic/issues/886)
+- Question about restore behavior in Linux [\#561](https://github.com/restic/restic/issues/561)
+- Report progress on SIGUSR1 \(when scripted\) [\#453](https://github.com/restic/restic/issues/453)
+- Allow reading backup items from file [\#417](https://github.com/restic/restic/issues/417)
+- Add CLI [\#64](https://github.com/restic/restic/issues/64)
+- Document differences to other backup systems [\#57](https://github.com/restic/restic/issues/57)
+
+**Merged pull requests:**
+
+- build.go: Add --enable-cgo [\#971](https://github.com/restic/restic/pull/971) ([fd0](https://github.com/fd0))
+- Fixing CPUProfile [\#968](https://github.com/restic/restic/pull/968) ([mcastilho](https://github.com/mcastilho))
+- Fix a number of warnings from go report [\#967](https://github.com/restic/restic/pull/967) ([middelink](https://github.com/middelink))
+- Unify repository layout [\#966](https://github.com/restic/restic/pull/966) ([fd0](https://github.com/fd0))
+- Update github.com/minio/minio-go [\#964](https://github.com/restic/restic/pull/964) ([fd0](https://github.com/fd0))
+- Improve s3 backend [\#962](https://github.com/restic/restic/pull/962) ([fd0](https://github.com/fd0))
+- Add backend benchmarks [\#961](https://github.com/restic/restic/pull/961) ([fd0](https://github.com/fd0))
+- Enable CI tests against AWS S3 [\#960](https://github.com/restic/restic/pull/960) ([fd0](https://github.com/fd0))
+- Change backup policy to be inclusive [\#957](https://github.com/restic/restic/pull/957) ([middelink](https://github.com/middelink))
+- Unlink tempfiles before using them [\#952](https://github.com/restic/restic/pull/952) ([fd0](https://github.com/fd0))
+- codecov.io: Add path fixes [\#947](https://github.com/restic/restic/pull/947) ([fd0](https://github.com/fd0))
+- Update github.com/minio/minio-go [\#946](https://github.com/restic/restic/pull/946) ([fd0](https://github.com/fd0))
+- Add bash autocompletion generation [\#945](https://github.com/restic/restic/pull/945) ([middelink](https://github.com/middelink))
+- Small changes to cmd\_forget and snapshot\_filter [\#943](https://github.com/restic/restic/pull/943) ([middelink](https://github.com/middelink))
+- local/sftp: Auto create directories if needed [\#941](https://github.com/restic/restic/pull/941) ([fd0](https://github.com/fd0))
+- WIP: rework backend integration tests [\#938](https://github.com/restic/restic/pull/938) ([fd0](https://github.com/fd0))
+- Fix links broken during conversion to rst [\#936](https://github.com/restic/restic/pull/936) ([Thor77](https://github.com/Thor77))
+- CI: Add glyphcheck, rework REST server install [\#935](https://github.com/restic/restic/pull/935) ([fd0](https://github.com/fd0))
+- forget: don't sort flags [\#930](https://github.com/restic/restic/pull/930) ([fd0](https://github.com/fd0))
+- Test if a config file on open [\#927](https://github.com/restic/restic/pull/927) ([fd0](https://github.com/fd0))
+- Update vendored dependencies [\#922](https://github.com/restic/restic/pull/922) ([fd0](https://github.com/fd0))
+- Small typo in ""Frankfurt""  [\#920](https://github.com/restic/restic/pull/920) ([jpmens](https://github.com/jpmens))
+- Added AWS S3 tutorial. [\#919](https://github.com/restic/restic/pull/919) ([Phaeilo](https://github.com/Phaeilo))
+- s3: Correct layout prefix, reduce connections [\#918](https://github.com/restic/restic/pull/918) ([fd0](https://github.com/fd0))
+- Ignore empty lines in excludes file, allow multiple files [\#916](https://github.com/restic/restic/pull/916) ([fd0](https://github.com/fd0))
+- Switch documentation to Sphinx [\#913](https://github.com/restic/restic/pull/913) ([Thor77](https://github.com/Thor77))
+- Update Go [\#912](https://github.com/restic/restic/pull/912) ([fd0](https://github.com/fd0))
+- Implement MkdirAll\(\) for Windows [\#911](https://github.com/restic/restic/pull/911) ([fd0](https://github.com/fd0))
+- Check allowed devices per path [\#908](https://github.com/restic/restic/pull/908) ([fd0](https://github.com/fd0))
+- Remove short option conflict [\#905](https://github.com/restic/restic/pull/905) ([fd0](https://github.com/fd0))
+- Add new field DeviceID and tests [\#903](https://github.com/restic/restic/pull/903) ([fd0](https://github.com/fd0))
+- storage of device id of files [\#902](https://github.com/restic/restic/pull/902) ([jgfrm](https://github.com/jgfrm))
+- Prepare more cloud backends, add backend layouts [\#898](https://github.com/restic/restic/pull/898) ([fd0](https://github.com/fd0))
+- doc: Add section about how to change the sftp port [\#896](https://github.com/restic/restic/pull/896) ([fd0](https://github.com/fd0))
+- WIP: rest: Make backend honor the REST protocol [\#887](https://github.com/restic/restic/pull/887) ([fd0](https://github.com/fd0))
+- Cache size of last ReadAt on S3 for performance [\#883](https://github.com/restic/restic/pull/883) ([trbs](https://github.com/trbs))
+- Fix restoring files ownership as non-root user [\#878](https://github.com/restic/restic/pull/878) ([middelink](https://github.com/middelink))
+",https://api.github.com/users/fd0,123276,fd0,https://api.github.com/repos/restic/restic/releases/6503292/assets,https://api.github.com/repos/restic/restic/releases/6503292,master,https://api.github.com/repos/restic/restic/tarball/v0.6.0-rc.1,https://github.com/restic/restic/releases/tag/v0.6.0-rc.1,https://api.github.com/repos/restic/restic/zipball/v0.6.0-rc.1,v0.6.0-rc.1,False,True
+5711170,2017-03-11T11:34:27Z,2017-03-11T11:47:32Z,restic 0.5.0,"We're proud to announce restic 0.5.0. In comparison with the release candidate we've just added a check for the Go version within `build.go` and documented cross-compilation in the `README.md`.
+
+This release contains many bug fixes and several improvements for the user interface.
+
+The binaries for this release have been compiled with Go 1.8. Please note that as of this version at least Go 1.7 is required for compiling restic.
+
+# Change Log
+
+## [v0.5.0](https://github.com/restic/restic/tree/v0.5.0) (2017-03-09)
+[Full Changelog](https://github.com/restic/restic/compare/v0.4.0...v0.5.0)
+
+**Implemented enhancements:**
+
+- Make cli filtering more consistent [\#863](https://github.com/restic/restic/issues/863)
+- Find case insensitive [\#859](https://github.com/restic/restic/issues/859)
+- The automatic parent selection of cmd\_backup is not smart enough. [\#856](https://github.com/restic/restic/issues/856)
+- Nit: As repacking \(from prune cmd\) can be a VERY time consuming, lets give it a progress bar as well. [\#848](https://github.com/restic/restic/issues/848)
+- Limit forget to specific path [\#841](https://github.com/restic/restic/issues/841)
+- Restic Prune: hash of data does not match ID [\#816](https://github.com/restic/restic/issues/816)
+- Don't use errors.Fatalf when not necessary [\#789](https://github.com/restic/restic/issues/789)
+- Add --host flag for backup command [\#788](https://github.com/restic/restic/issues/788)
+- Add --json option to ""restic snapshots"" \(feature\) [\#726](https://github.com/restic/restic/issues/726)
+
+**Fixed bugs:**
+
+- Backup a file owned by root [\#862](https://github.com/restic/restic/issues/862)
+- Nit: output of prune does not line up with what it does. [\#846](https://github.com/restic/restic/issues/846)
+- panic: runtime error: index out of range [\#843](https://github.com/restic/restic/issues/843)
+- Unable to anchor a file pattern in filter.List\(\). [\#834](https://github.com/restic/restic/issues/834)
+- empty line in files-from adds all [\#822](https://github.com/restic/restic/issues/822)
+- Restic 0.4.0: buffer is too small for data blob [\#807](https://github.com/restic/restic/issues/807)
+- Additional index files are not detected by `restic check` but result in restore errors [\#797](https://github.com/restic/restic/issues/797)
+- S3: TCP connections are not reused [\#791](https://github.com/restic/restic/issues/791)
+- prune failed with too many open files [\#777](https://github.com/restic/restic/issues/777)
+- Memory Consumption for check --read-data [\#776](https://github.com/restic/restic/issues/776)
+- Disable password reading when backup is used with `--stdin` [\#770](https://github.com/restic/restic/issues/770)
+- large prune fails [\#725](https://github.com/restic/restic/issues/725)
+- Files are read again, despite unchanged timestamp/size [\#513](https://github.com/restic/restic/issues/513)
+- include filter when restoring does not work for for absolute paths [\#374](https://github.com/restic/restic/issues/374)
+
+**Closed issues:**
+
+- ""--prune"" Appended To ""forget"" Command - Unknown Flag [\#870](https://github.com/restic/restic/issues/870)
+- \[FR\] Add a new command to manipulate tags on existing snapshots. [\#851](https://github.com/restic/restic/issues/851)
+- There are more commands where the path lacks the initial / err filepath.Separator [\#839](https://github.com/restic/restic/issues/839)
+- prune: Avoid running the ""find data that is still in use"" step when not needed [\#812](https://github.com/restic/restic/issues/812)
+- node.Subtree.IsNull\(\) panic [\#811](https://github.com/restic/restic/issues/811)
+- Allow --files-from to take a dash \(-\) for stdin [\#769](https://github.com/restic/restic/issues/769)
+- Fuse mount should have option ""allow\_others"" [\#767](https://github.com/restic/restic/issues/767)
+- golang is a dev requirement not a user one [\#755](https://github.com/restic/restic/issues/755)
+- Backup to S3 fills temporary directory [\#611](https://github.com/restic/restic/issues/611)
+- Save and restore extended attributes [\#25](https://github.com/restic/restic/issues/25)
+
+**Merged pull requests:**
+
+- Optimize List\(\) pipeline [\#867](https://github.com/restic/restic/pull/867) ([middelink](https://github.com/middelink))
+- Add --tag filtering to every command, where applicable [\#866](https://github.com/restic/restic/pull/866) ([middelink](https://github.com/middelink))
+- Refuse to create empty snapshots [\#865](https://github.com/restic/restic/pull/865) ([fd0](https://github.com/fd0))
+- find: Add option to ignore case [\#864](https://github.com/restic/restic/pull/864) ([fd0](https://github.com/fd0))
+- Refactor cmd\_forget [\#861](https://github.com/restic/restic/pull/861) ([middelink](https://github.com/middelink))
+- Create a helper function to get the terminal width [\#860](https://github.com/restic/restic/pull/860) ([middelink](https://github.com/middelink))
+- Fix layout issue in cmd\_snapshot ""ascii art"" [\#858](https://github.com/restic/restic/pull/858) ([middelink](https://github.com/middelink))
+- Fix SamePaths\(\) and make it into a receiver function [\#857](https://github.com/restic/restic/pull/857) ([middelink](https://github.com/middelink))
+- Add `tag` command to restic cli to manipulate tags on existing snapshots. [\#855](https://github.com/restic/restic/pull/855) ([middelink](https://github.com/middelink))
+- Dynamic host,tag columns widths in snapshots command [\#854](https://github.com/restic/restic/pull/854) ([middelink](https://github.com/middelink))
+- restic backup --tag integration test [\#853](https://github.com/restic/restic/pull/853) ([middelink](https://github.com/middelink))
+- Add progressbar to repack and blob remove phases of prune cmd. [\#850](https://github.com/restic/restic/pull/850) ([middelink](https://github.com/middelink))
+- Display the proper amount of bytes we will be pruning from the repo. [\#847](https://github.com/restic/restic/pull/847) ([middelink](https://github.com/middelink))
+- Update github.com/pkg/xattr [\#845](https://github.com/restic/restic/pull/845) ([fd0](https://github.com/fd0))
+- Fix Minio Server URL [\#844](https://github.com/restic/restic/pull/844) ([welpo](https://github.com/welpo))
+- Display absolute paths when displaying the output of ls and find. [\#840](https://github.com/restic/restic/pull/840) ([middelink](https://github.com/middelink))
+- Misc improvements [\#837](https://github.com/restic/restic/pull/837) ([fd0](https://github.com/fd0))
+- Allow filtering absolute paths [\#835](https://github.com/restic/restic/pull/835) ([fd0](https://github.com/fd0))
+- Ignore empty lines in --files-from [\#829](https://github.com/restic/restic/pull/829) ([fd0](https://github.com/fd0))
+- Add `--prune` switch to `forget` [\#817](https://github.com/restic/restic/pull/817) ([fd0](https://github.com/fd0))
+- Correct archiver behavior in case of errors [\#814](https://github.com/restic/restic/pull/814) ([fd0](https://github.com/fd0))
+- WIP: fix panic [\#809](https://github.com/restic/restic/pull/809) ([fd0](https://github.com/fd0))
+- restore: Make sure buffer is large enough [\#808](https://github.com/restic/restic/pull/808) ([fd0](https://github.com/fd0))
+- Fix inconsistencies in CLI [\#806](https://github.com/restic/restic/pull/806) ([oysols](https://github.com/oysols))
+- Adds JSON support for the snapshots command [\#803](https://github.com/restic/restic/pull/803) ([ibib](https://github.com/ibib))
+- fuse: correct nlink count for directories [\#800](https://github.com/restic/restic/pull/800) ([fd0](https://github.com/fd0))
+- Checker: Propagate errors properly [\#798](https://github.com/restic/restic/pull/798) ([fd0](https://github.com/fd0))
+- fuse: Add options --allow-other and --allow-root [\#795](https://github.com/restic/restic/pull/795) ([fd0](https://github.com/fd0))
+- Use non-formatting functions of errors for strings [\#794](https://github.com/restic/restic/pull/794) ([fd0](https://github.com/fd0))
+- backup: Add `--hostname` parameter [\#793](https://github.com/restic/restic/pull/793) ([fd0](https://github.com/fd0))
+- s3: Increase MaxIdleConnsPerHost [\#792](https://github.com/restic/restic/pull/792) ([fd0](https://github.com/fd0))
+- Fix some typos [\#783](https://github.com/restic/restic/pull/783) ([opennota](https://github.com/opennota))
+- Make sure backups read from stdin have a file name [\#782](https://github.com/restic/restic/pull/782) ([fd0](https://github.com/fd0))
+- checker: Reduce memory usage [\#779](https://github.com/restic/restic/pull/779) ([fd0](https://github.com/fd0))
+- prune: Close backend reader after download [\#778](https://github.com/restic/restic/pull/778) ([fd0](https://github.com/fd0))
+- Add more tests for reading backups from stdin [\#775](https://github.com/restic/restic/pull/775) ([fd0](https://github.com/fd0))
+- Allow --files-from to take a dash for stdin \(fixes \#769\) [\#773](https://github.com/restic/restic/pull/773) ([opennota](https://github.com/opennota))
+- Return an error if password is not set for stdin [\#771](https://github.com/restic/restic/pull/771) ([fd0](https://github.com/fd0))
+- Add note about pre-compiled binaries [\#768](https://github.com/restic/restic/pull/768) ([brikou](https://github.com/brikou))
+",https://api.github.com/users/fd0,123276,fd0,https://api.github.com/repos/restic/restic/releases/5711170/assets,https://api.github.com/repos/restic/restic/releases/5711170,master,https://api.github.com/repos/restic/restic/tarball/v0.5.0,https://github.com/restic/restic/releases/tag/v0.5.0,https://api.github.com/repos/restic/restic/zipball/v0.5.0,v0.5.0,False,False
+5687074,2017-03-09T09:28:33Z,2017-03-09T09:32:34Z,restic 0.5.0-rc.1,"We're proud to announce the first release candidate for restic 0.5.0. Please test this version thoroughly and report any bugs or other odd things you encounter, so that we can release the final version in a couple of days. The binaries for this release have been compiled with Go 1.8.
+
+Please note that as of this version at least Go 1.7 is required for compiling restic.
+
+# Change Log
+
+## [v0.5.0-rc.1](https://github.com/restic/restic/tree/v0.5.0-rc.1) (2017-03-09)
+[Full Changelog](https://github.com/restic/restic/compare/v0.4.0...v0.5.0-rc.1)
+
+**Implemented enhancements:**
+
+- Make cli filtering more consistent [\#863](https://github.com/restic/restic/issues/863)
+- Find case insensitive [\#859](https://github.com/restic/restic/issues/859)
+- The automatic parent selection of cmd\_backup is not smart enough. [\#856](https://github.com/restic/restic/issues/856)
+- Nit: As repacking \(from prune cmd\) can be a VERY time consuming, lets give it a progress bar as well. [\#848](https://github.com/restic/restic/issues/848)
+- Limit forget to specific path [\#841](https://github.com/restic/restic/issues/841)
+- Restic Prune: hash of data does not match ID [\#816](https://github.com/restic/restic/issues/816)
+- Don't use errors.Fatalf when not necessary [\#789](https://github.com/restic/restic/issues/789)
+- Add --host flag for backup command [\#788](https://github.com/restic/restic/issues/788)
+- Add --json option to ""restic snapshots"" \(feature\) [\#726](https://github.com/restic/restic/issues/726)
+
+**Fixed bugs:**
+
+- Backup a file owned by root [\#862](https://github.com/restic/restic/issues/862)
+- Nit: output of prune does not line up with what it does. [\#846](https://github.com/restic/restic/issues/846)
+- panic: runtime error: index out of range [\#843](https://github.com/restic/restic/issues/843)
+- Unable to anchor a file pattern in filter.List\(\). [\#834](https://github.com/restic/restic/issues/834)
+- empty line in files-from adds all [\#822](https://github.com/restic/restic/issues/822)
+- Restic 0.4.0: buffer is too small for data blob [\#807](https://github.com/restic/restic/issues/807)
+- Additional index files are not detected by `restic check` but result in restore errors [\#797](https://github.com/restic/restic/issues/797)
+- S3: TCP connections are not reused [\#791](https://github.com/restic/restic/issues/791)
+- prune failed with too many open files [\#777](https://github.com/restic/restic/issues/777)
+- Memory Consumption for check --read-data [\#776](https://github.com/restic/restic/issues/776)
+- Disable password reading when backup is used with `--stdin` [\#770](https://github.com/restic/restic/issues/770)
+- large prune fails [\#725](https://github.com/restic/restic/issues/725)
+- Files are read again, despite unchanged timestamp/size [\#513](https://github.com/restic/restic/issues/513)
+- include filter when restoring does not work for for absolute paths [\#374](https://github.com/restic/restic/issues/374)
+
+**Closed issues:**
+
+- ""--prune"" Appended To ""forget"" Command - Unknown Flag [\#870](https://github.com/restic/restic/issues/870)
+- \[FR\] Add a new command to manipulate tags on existing snapshots. [\#851](https://github.com/restic/restic/issues/851)
+- There are more commands where the path lacks the initial / err filepath.Separator [\#839](https://github.com/restic/restic/issues/839)
+- prune: Avoid running the ""find data that is still in use"" step when not needed [\#812](https://github.com/restic/restic/issues/812)
+- node.Subtree.IsNull\(\) panic [\#811](https://github.com/restic/restic/issues/811)
+- Allow --files-from to take a dash \(-\) for stdin [\#769](https://github.com/restic/restic/issues/769)
+- Fuse mount should have option ""allow\_others"" [\#767](https://github.com/restic/restic/issues/767)
+- golang is a dev requirement not a user one [\#755](https://github.com/restic/restic/issues/755)
+- Backup to S3 fills temporary directory [\#611](https://github.com/restic/restic/issues/611)
+- Save and restore extended attributes [\#25](https://github.com/restic/restic/issues/25)
+
+**Merged pull requests:**
+
+- Optimize List\(\) pipeline [\#867](https://github.com/restic/restic/pull/867) ([middelink](https://github.com/middelink))
+- Add --tag filtering to every command, where applicable [\#866](https://github.com/restic/restic/pull/866) ([middelink](https://github.com/middelink))
+- Refuse to create empty snapshots [\#865](https://github.com/restic/restic/pull/865) ([fd0](https://github.com/fd0))
+- find: Add option to ignore case [\#864](https://github.com/restic/restic/pull/864) ([fd0](https://github.com/fd0))
+- Refactor cmd\_forget [\#861](https://github.com/restic/restic/pull/861) ([middelink](https://github.com/middelink))
+- Create a helper function to get the terminal width [\#860](https://github.com/restic/restic/pull/860) ([middelink](https://github.com/middelink))
+- Fix layout issue in cmd\_snapshot ""ascii art"" [\#858](https://github.com/restic/restic/pull/858) ([middelink](https://github.com/middelink))
+- Fix SamePaths\(\) and make it into a receiver function [\#857](https://github.com/restic/restic/pull/857) ([middelink](https://github.com/middelink))
+- Add `tag` command to restic cli to manipulate tags on existing snapshots. [\#855](https://github.com/restic/restic/pull/855) ([middelink](https://github.com/middelink))
+- Dynamic host,tag columns widths in snapshots command [\#854](https://github.com/restic/restic/pull/854) ([middelink](https://github.com/middelink))
+- restic backup --tag integration test [\#853](https://github.com/restic/restic/pull/853) ([middelink](https://github.com/middelink))
+- Add progressbar to repack and blob remove phases of prune cmd. [\#850](https://github.com/restic/restic/pull/850) ([middelink](https://github.com/middelink))
+- Display the proper amount of bytes we will be pruning from the repo. [\#847](https://github.com/restic/restic/pull/847) ([middelink](https://github.com/middelink))
+- Update github.com/pkg/xattr [\#845](https://github.com/restic/restic/pull/845) ([fd0](https://github.com/fd0))
+- Fix Minio Server URL [\#844](https://github.com/restic/restic/pull/844) ([welpo](https://github.com/welpo))
+- Display absolute paths when displaying the output of ls and find. [\#840](https://github.com/restic/restic/pull/840) ([middelink](https://github.com/middelink))
+- Misc improvements [\#837](https://github.com/restic/restic/pull/837) ([fd0](https://github.com/fd0))
+- Allow filtering absolute paths [\#835](https://github.com/restic/restic/pull/835) ([fd0](https://github.com/fd0))
+- Ignore empty lines in --files-from [\#829](https://github.com/restic/restic/pull/829) ([fd0](https://github.com/fd0))
+- Add `--prune` switch to `forget` [\#817](https://github.com/restic/restic/pull/817) ([fd0](https://github.com/fd0))
+- Correct archiver behavior in case of errors [\#814](https://github.com/restic/restic/pull/814) ([fd0](https://github.com/fd0))
+- WIP: fix panic [\#809](https://github.com/restic/restic/pull/809) ([fd0](https://github.com/fd0))
+- restore: Make sure buffer is large enough [\#808](https://github.com/restic/restic/pull/808) ([fd0](https://github.com/fd0))
+- Fix inconsistencies in CLI [\#806](https://github.com/restic/restic/pull/806) ([oysols](https://github.com/oysols))
+- Adds JSON support for the snapshots command [\#803](https://github.com/restic/restic/pull/803) ([ibib](https://github.com/ibib))
+- fuse: correct nlink count for directories [\#800](https://github.com/restic/restic/pull/800) ([fd0](https://github.com/fd0))
+- Checker: Propagate errors properly [\#798](https://github.com/restic/restic/pull/798) ([fd0](https://github.com/fd0))
+- fuse: Add options --allow-other and --allow-root [\#795](https://github.com/restic/restic/pull/795) ([fd0](https://github.com/fd0))
+- Use non-formatting functions of errors for strings [\#794](https://github.com/restic/restic/pull/794) ([fd0](https://github.com/fd0))
+- backup: Add `--hostname` parameter [\#793](https://github.com/restic/restic/pull/793) ([fd0](https://github.com/fd0))
+- s3: Increase MaxIdleConnsPerHost [\#792](https://github.com/restic/restic/pull/792) ([fd0](https://github.com/fd0))
+- Fix some typos [\#783](https://github.com/restic/restic/pull/783) ([opennota](https://github.com/opennota))
+- Make sure backups read from stdin have a file name [\#782](https://github.com/restic/restic/pull/782) ([fd0](https://github.com/fd0))
+- checker: Reduce memory usage [\#779](https://github.com/restic/restic/pull/779) ([fd0](https://github.com/fd0))
+- prune: Close backend reader after download [\#778](https://github.com/restic/restic/pull/778) ([fd0](https://github.com/fd0))
+- Add more tests for reading backups from stdin [\#775](https://github.com/restic/restic/pull/775) ([fd0](https://github.com/fd0))
+- Allow --files-from to take a dash for stdin \(fixes \#769\) [\#773](https://github.com/restic/restic/pull/773) ([opennota](https://github.com/opennota))
+- Return an error if password is not set for stdin [\#771](https://github.com/restic/restic/pull/771) ([fd0](https://github.com/fd0))
+- Add note about pre-compiled binaries [\#768](https://github.com/restic/restic/pull/768) ([brikou](https://github.com/brikou))
+",https://api.github.com/users/fd0,123276,fd0,https://api.github.com/repos/restic/restic/releases/5687074/assets,https://api.github.com/repos/restic/restic/releases/5687074,master,https://api.github.com/repos/restic/restic/tarball/v0.5.0-rc.1,https://github.com/restic/restic/releases/tag/v0.5.0-rc.1,https://api.github.com/repos/restic/restic/zipball/v0.5.0-rc.1,v0.5.0-rc.1,False,True
+5337382,2017-02-02T09:21:29Z,2017-02-02T09:30:15Z,restic 0.4.0,"We're proud to release restic version 0.4.0. This release fixes a few bugs, among others a memory leak in the fuse mount module. Overall, the memory consumption during most operations is reduced. There have been some major changes internally, which will help reducing memory usage even more in future releases.
+
+Starting with this release, we will publish pre-compiled binaries for restic. For the last release (0.3.3), binaries have also been added.
+
+# Change Log
+
+## [v0.4.0](https://github.com/restic/restic/tree/v0.4.0) (2017-02-02)
+
+[Full Changelog](https://github.com/restic/restic/compare/v0.3.3...v0.4.0)
+
+**Fixed bugs:**
+- Undocumented feature `restic cat index` [#759](https://github.com/restic/restic/issues/759)
+- Inconsistent use of blob, data and tree [#758](https://github.com/restic/restic/issues/758)
+- Listing blobs not possible [#756](https://github.com/restic/restic/issues/756)
+- panic: close tempfile: invalid argument [#747](https://github.com/restic/restic/issues/747)
+- error loading blob wrong length returned [#743](https://github.com/restic/restic/issues/743)
+- Restore is failing with input/output error due to regression after 0.3.3 release [#742](https://github.com/restic/restic/issues/742)
+- Pack is unneeded, but not contained in rewritePacks [#734](https://github.com/restic/restic/issues/734)
+- Memory leak in fuse mount [#480](https://github.com/restic/restic/issues/480)
+
+**Closed issues:**
+- Repository mountpoint shows only one folder of two folders contained in backup [#753](https://github.com/restic/restic/issues/753)
+- Document creating a new REST backend [#736](https://github.com/restic/restic/issues/736)
+- Support for hard links [#733](https://github.com/restic/restic/issues/733)
+- support for acl's [#732](https://github.com/restic/restic/issues/732)
+- [FIXED] Windows binary [#724](https://github.com/restic/restic/issues/724)
+- Support Google Cloud Storage as Backend [#721](https://github.com/restic/restic/issues/721)
+- client.BucketExists: The access key ID you provided does not exist in our records [#712](https://github.com/restic/restic/issues/712)
+- Debian packaging (repository) [#355](https://github.com/restic/restic/issues/355)
+
+**Merged pull requests:**
+- Fix typo. [#764](https://github.com/restic/restic/pull/764) ([olgeni](https://github.com/olgeni))
+- Add 'index' to list of options for 'cat' command [#762](https://github.com/restic/restic/pull/762) ([fd0](https://github.com/fd0))
+- Remove inconsistencies regarding the `cat` command [#761](https://github.com/restic/restic/pull/761) ([fd0](https://github.com/fd0))
+- Allow listing blobs [#760](https://github.com/restic/restic/pull/760) ([fd0](https://github.com/fd0))
+- Document creating a new repo via REST [#750](https://github.com/restic/restic/pull/750) ([fd0](https://github.com/fd0))
+- Normalise the backend API [#749](https://github.com/restic/restic/pull/749) ([fd0](https://github.com/fd0))
+- rest backend: Do not close the reader [#748](https://github.com/restic/restic/pull/748) ([fd0](https://github.com/fd0))
+- fuse: Improve memory usage [#746](https://github.com/restic/restic/pull/746) ([fd0](https://github.com/fd0))
+- Fix restore/fuse with larger files [#745](https://github.com/restic/restic/pull/745) ([fd0](https://github.com/fd0))
+- Rework backend API [#741](https://github.com/restic/restic/pull/741) ([fd0](https://github.com/fd0))
+- Add debug memory/cpu profile options [#740](https://github.com/restic/restic/pull/740) ([fd0](https://github.com/fd0))
+- Fix Archiver test: Clean up temp files [#739](https://github.com/restic/restic/pull/739) ([fd0](https://github.com/fd0))
+- Index: Store pack ID [#737](https://github.com/restic/restic/pull/737) ([fd0](https://github.com/fd0))
+- Improve memory usage [#731](https://github.com/restic/restic/pull/731) ([fd0](https://github.com/fd0))
+- Add FAQ document [#729](https://github.com/restic/restic/pull/729) ([fd0](https://github.com/fd0))
+- Add box-drawing character to the snapshots command [#728](https://github.com/restic/restic/pull/728) ([cit](https://github.com/cit))
+- fix typo: outputcomprehensive [#727](https://github.com/restic/restic/pull/727) ([MirkoDziadzka](https://github.com/MirkoDziadzka))
+- Added latest keyword in ls command. [#723](https://github.com/restic/restic/pull/723) ([ulziibuyan](https://github.com/ulziibuyan))
+",https://api.github.com/users/fd0,123276,fd0,https://api.github.com/repos/restic/restic/releases/5337382/assets,https://api.github.com/repos/restic/restic/releases/5337382,master,https://api.github.com/repos/restic/restic/tarball/v0.4.0,https://github.com/restic/restic/releases/tag/v0.4.0,https://api.github.com/repos/restic/restic/zipball/v0.4.0,v0.4.0,False,False
+5098006,2017-01-08T09:46:43Z,2017-01-08T09:49:13Z,restic 0.3.3,"restic version 0.3.3 is a small maintenance release which mainly fixes bugs.
+
+# Change Log
+
+## [v0.3.3](https://github.com/restic/restic/tree/v0.3.3) (2017-01-08)
+
+[Full Changelog](https://github.com/restic/restic/compare/v0.3.2...v0.3.3)
+
+**Fixed bugs:**
+- Panic after 2 days into backup [#710](https://github.com/restic/restic/issues/710)
+- Lock doesn't appear to be released after failed restore [#708](https://github.com/restic/restic/issues/708)
+- Invalid Meta-Data seem to crash the backup process [#705](https://github.com/restic/restic/issues/705)
+- Restic panic(""store new item in finalized index"")s during backup.  [#367](https://github.com/restic/restic/issues/367)
+
+**Closed issues:**
+- Document REST backend [#644](https://github.com/restic/restic/issues/644)
+
+**Merged pull requests:**
+- CLI options now override env vars [#718](https://github.com/restic/restic/pull/718) ([mholt](https://github.com/mholt))
+- Only add entries to indexes inside PackerManager [#717](https://github.com/restic/restic/pull/717) ([fd0](https://github.com/fd0))
+- Rest server moved to https://github.com/restic/rest-server [#716](https://github.com/restic/restic/pull/716) ([zcalusic](https://github.com/zcalusic))
+- Document REST backend [#715](https://github.com/restic/restic/pull/715) ([zcalusic](https://github.com/zcalusic))
+- Update .travis.yml [#713](https://github.com/restic/restic/pull/713) ([fd0](https://github.com/fd0))
+- Make sure cleanup is executed before exiting [#709](https://github.com/restic/restic/pull/709) ([fd0](https://github.com/fd0))
+- Remove timestamp from `version` command [#704](https://github.com/restic/restic/pull/704) ([fd0](https://github.com/fd0))
+- Avoid duplicate backup paths [#703](https://github.com/restic/restic/pull/703) ([sjoerdsimons](https://github.com/sjoerdsimons))
+",https://api.github.com/users/fd0,123276,fd0,https://api.github.com/repos/restic/restic/releases/5098006/assets,https://api.github.com/repos/restic/restic/releases/5098006,master,https://api.github.com/repos/restic/restic/tarball/v0.3.3,https://github.com/restic/restic/releases/tag/v0.3.3,https://api.github.com/repos/restic/restic/zipball/v0.3.3,v0.3.3,False,False
+4951642,2016-12-18T17:53:03Z,2016-12-18T17:55:53Z,restic 0.3.2,"This is a bugfix release for issue #699 introduced in 0.3.1: A panic occurred when a file could not be saved.
+
+# Change Log
+
+## [v0.3.2](https://github.com/restic/restic/tree/v0.3.2) (2016-12-18)
+
+[Full Changelog](https://github.com/restic/restic/compare/v0.3.1...v0.3.2)
+
+**Fixed bugs:**
+- panic on error [#699](https://github.com/restic/restic/issues/699)
+
+**Merged pull requests:**
+- Make sure SaveFile always returns a node [#700](https://github.com/restic/restic/pull/700) ([fd0](https://github.com/fd0))
+",https://api.github.com/users/fd0,123276,fd0,https://api.github.com/repos/restic/restic/releases/4951642/assets,https://api.github.com/repos/restic/restic/releases/4951642,master,https://api.github.com/repos/restic/restic/tarball/v0.3.2,https://github.com/restic/restic/releases/tag/v0.3.2,https://api.github.com/repos/restic/restic/zipball/v0.3.2,v0.3.2,False,False
+4910965,2016-12-13T20:36:22Z,2016-12-13T20:47:46Z,restic 0.3.1,"# Introduction
+
+We're proud to present restic version 0.3.1. This release is a bugfix release. For details, please see the changelog below.
+
+# Change Log
+
+## [v0.3.1](https://github.com/restic/restic/tree/v0.3.1) (2016-12-13)
+
+[Full Changelog](https://github.com/restic/restic/compare/v0.3.0...v0.3.1)
+
+**Implemented enhancements:**
+- Clearing page cache on client machines [#666](https://github.com/restic/restic/issues/666)
+- Update poly1305 [#639](https://github.com/restic/restic/issues/639)
+- Optimization for Linux: Figure out if using posix_fadvise and posix_fallocate work [#117](https://github.com/restic/restic/issues/117)
+
+**Fixed bugs:**
+- ""error <f> has changed"", still ends in ""0 errors"" [#696](https://github.com/restic/restic/issues/696)
+- Files not backed up at all [#689](https://github.com/restic/restic/issues/689)
+- Snapshot commited while backup data is incomplete [#686](https://github.com/restic/restic/issues/686)
+- create key in backend at ""any local dir"" failed: Calibrate: scrypt.Calibrate: scrypt: the parameters provided are invalid [#676](https://github.com/restic/restic/issues/676)
+- `backup` ignores hostname when choosing parent snapshot [#674](https://github.com/restic/restic/issues/674)
+- connect: no buffer space available [#642](https://github.com/restic/restic/issues/642)
+- panic: close of closed channel in restic/repository test [#605](https://github.com/restic/restic/issues/605)
+- Nil blob list errors, zeroed files in backup [#604](https://github.com/restic/restic/issues/604)
+- Directory metadata is not restored for existing directories [#564](https://github.com/restic/restic/issues/564)
+
+**Closed issues:**
+- Can't compile with go1.8beta1 [#680](https://github.com/restic/restic/issues/680)
+- Omit snapshot creation if there was no change [#662](https://github.com/restic/restic/issues/662)
+- Inadequate build system [#660](https://github.com/restic/restic/issues/660)
+- no ID found / type not specified [#640](https://github.com/restic/restic/issues/640)
+- Do not output to terminal, if 'bg' [#381](https://github.com/restic/restic/issues/381)
+- Find file system boundaries [#47](https://github.com/restic/restic/issues/47)
+
+**Merged pull requests:**
+- Correctly save modified files [#691](https://github.com/restic/restic/pull/691) ([fd0](https://github.com/fd0))
+- Even if file changes size during backup, still save it [#690](https://github.com/restic/restic/pull/690) ([zcalusic](https://github.com/zcalusic))
+- Save snapshot after saving all pack files [#688](https://github.com/restic/restic/pull/688) ([fd0](https://github.com/fd0))
+- Update debug message [#685](https://github.com/restic/restic/pull/685) ([jannic](https://github.com/jannic))
+- Omit ""archived as %v"" messages in quiet mode. [#683](https://github.com/restic/restic/pull/683) ([jannic](https://github.com/jannic))
+- Small typo in dry-run of remove snapshot [#682](https://github.com/restic/restic/pull/682) ([jpmens](https://github.com/jpmens))
+- Stop trying to detect Go version [#681](https://github.com/restic/restic/pull/681) ([zcalusic](https://github.com/zcalusic))
+- Update github.com/elithrar/simple-scrypt [#678](https://github.com/restic/restic/pull/678) ([fd0](https://github.com/fd0))
+- Use the hostname filter to find a parent snasphot [#675](https://github.com/restic/restic/pull/675) ([fd0](https://github.com/fd0))
+- Don't consider a pre-existing directory in the restore path to be a failure [#673](https://github.com/restic/restic/pull/673) ([Novex](https://github.com/Novex))
+- Remove fadvise [#670](https://github.com/restic/restic/pull/670) ([fd0](https://github.com/fd0))
+- Fix REST backend HTTP keepalive [#669](https://github.com/restic/restic/pull/669) ([zcalusic](https://github.com/zcalusic))
+- fs.DeviceID(): Return errors whehn fi is nil [#659](https://github.com/restic/restic/pull/659) ([fd0](https://github.com/fd0))
+- Read files to backup from a file [#657](https://github.com/restic/restic/pull/657) ([AlexanderThaller](https://github.com/AlexanderThaller))
+- Remove redundant check of error var e [#651](https://github.com/restic/restic/pull/651) ([justinclift](https://github.com/justinclift))
+- forget: do not load index [#650](https://github.com/restic/restic/pull/650) ([fd0](https://github.com/fd0))
+- don't print status info when running in the background [#646](https://github.com/restic/restic/pull/646) ([stakewinner00](https://github.com/stakewinner00))
+- Update golang.org/x/crypto/poly1305 [#643](https://github.com/restic/restic/pull/643) ([fd0](https://github.com/fd0))
+- Improve error message for 'forget' [#641](https://github.com/restic/restic/pull/641) ([fd0](https://github.com/fd0))
+- Added long paths fix for samba network shares [#638](https://github.com/restic/restic/pull/638) ([hmsdao](https://github.com/hmsdao))
+",https://api.github.com/users/fd0,123276,fd0,https://api.github.com/repos/restic/restic/releases/4910965/assets,https://api.github.com/repos/restic/restic/releases/4910965,master,https://api.github.com/repos/restic/restic/tarball/v0.3.1,https://github.com/restic/restic/releases/tag/v0.3.1,https://api.github.com/repos/restic/restic/zipball/v0.3.1,v0.3.1,False,False
+4283434,2016-10-02T16:24:14Z,2016-10-02T16:32:23Z,restic 0.3.0,"# Introduction
+
+After two months development we're proud to release restic version 0.3.0. The most notable change is the addition of the `prune` and `forget` commands which allow removing backups from the repository according to configurable criteria.
+
+As always, thanks for reporting any issues you encounter!
+
+# Change Log
+
+## [v0.3.0](https://github.com/restic/restic/tree/v0.3.0) (2016-10-02)
+
+[Full Changelog](https://github.com/restic/restic/compare/v0.2.0...v0.3.0)
+
+**Implemented enhancements:**
+- Display amount of data deleted after prune [#581](https://github.com/restic/restic/issues/581)
+- Handle ""disk is full"" gracefully [#540](https://github.com/restic/restic/issues/540)
+- restic should respect GOMAXPROCS env var [#535](https://github.com/restic/restic/issues/535)
+- Better error logging for s3 [#388](https://github.com/restic/restic/issues/388)
+- Add command line option to read password from a file [#278](https://github.com/restic/restic/issues/278)
+- Optimization for Linux: Use openat() and opendirat() [#98](https://github.com/restic/restic/issues/98)
+- Write manpage [#31](https://github.com/restic/restic/issues/31)
+
+**Fixed bugs:**
+- panic: shorthand redefinition on restic restore [#633](https://github.com/restic/restic/issues/633)
+- Duplicate snapshots shown in FUSE mount [#624](https://github.com/restic/restic/issues/624)
+- Invalid -r value causes explosion [#622](https://github.com/restic/restic/issues/622)
+- kernel is oom-ing on first backup [#612](https://github.com/restic/restic/issues/612)
+- Multiple test failures with stack traces [#606](https://github.com/restic/restic/issues/606)
+- Panic during prune command to minio S3 repo [#603](https://github.com/restic/restic/issues/603)
+- restic reads too much data from the repository for an incremental backup [#582](https://github.com/restic/restic/issues/582)
+- Panic when trying to create backup [#574](https://github.com/restic/restic/issues/574)
+- sftp backend fails in path, if used from Windows [#568](https://github.com/restic/restic/issues/568)
+- Memory leak when backing up over http2 to minio behind Nginx [#565](https://github.com/restic/restic/issues/565)
+- restic check report errors after 1st backup [#546](https://github.com/restic/restic/issues/546)
+- Too many open files [#544](https://github.com/restic/restic/issues/544)
+- restic crash when backing up [#529](https://github.com/restic/restic/issues/529)
+- ""pack not referenced in any index"" after rebuild-index [#435](https://github.com/restic/restic/issues/435)
+- Restore from Backup in windows [#360](https://github.com/restic/restic/issues/360)
+- restic optimize does not delete unreferenced packs [#359](https://github.com/restic/restic/issues/359)
+- restic cannot handle Windows paths [#339](https://github.com/restic/restic/issues/339)
+- wrong Windows drive handling [#333](https://github.com/restic/restic/issues/333)
+- restic init password interaction fail on MSYS2 Windows bash [#330](https://github.com/restic/restic/issues/330)
+- Browsing in fuse mounted snapshot gives input/output error [#313](https://github.com/restic/restic/issues/313)
+- Extend the consistency and integrity check to the pack files [#258](https://github.com/restic/restic/issues/258)
+
+**Closed issues:**
+- No bug, just feedback [#634](https://github.com/restic/restic/issues/634)
+- panic in packet_write_wait when sftp connection terminated [#629](https://github.com/restic/restic/issues/629)
+- x [#617](https://github.com/restic/restic/issues/617)
+- restic scan is returning unexpectedly large result [#610](https://github.com/restic/restic/issues/610)
+- Cannot find a blob listed in ""list blobs"" [#590](https://github.com/restic/restic/issues/590)
+- id not found after prune [#589](https://github.com/restic/restic/issues/589)
+- Restore can fail for multiple directories in same snapshot [#588](https://github.com/restic/restic/issues/588)
+- sftp URL parsing bug [#587](https://github.com/restic/restic/issues/587)
+- Failure to remove broken packs < 2048 bytes [#586](https://github.com/restic/restic/issues/586)
+- User Interface: Snapshot Expire Options? [#572](https://github.com/restic/restic/issues/572)
+- Backup also files on windows with longer pathnames than 255 chars (e.g. from node). [#567](https://github.com/restic/restic/issues/567)
+- Restore hard links on *nix [#566](https://github.com/restic/restic/issues/566)
+- Key-value labelling support for snapshots [#557](https://github.com/restic/restic/issues/557)
+- Release strategy [#556](https://github.com/restic/restic/issues/556)
+- Add 'prune' command [#479](https://github.com/restic/restic/issues/479)
+- Add --exclude-other-filesystem support [#370](https://github.com/restic/restic/issues/370)
+- Refactor backend tests [#346](https://github.com/restic/restic/issues/346)
+- Introduce GPG-signed releases and commits [#134](https://github.com/restic/restic/issues/134)
+- Cleanup documentation [#124](https://github.com/restic/restic/issues/124)
+- Write documentation for reporting bugs [#110](https://github.com/restic/restic/issues/110)
+- Add error reporting facility [#109](https://github.com/restic/restic/issues/109)
+- Document Use Cases [#94](https://github.com/restic/restic/issues/94)
+- Implement ""optimize repository"" command [#92](https://github.com/restic/restic/issues/92)
+- restic check: improve output / output recommendation [#74](https://github.com/restic/restic/issues/74)
+- implement progress bar for: restic fsck --check-data [#73](https://github.com/restic/restic/issues/73)
+- error message should be more precise [#70](https://github.com/restic/restic/issues/70)
+- Add tags to snapshots [#55](https://github.com/restic/restic/issues/55)
+- Implement function to delete old snapshots according to a retention policy. [#51](https://github.com/restic/restic/issues/51)
+- Implement HTTP Server/Client and backend [#23](https://github.com/restic/restic/issues/23)
+- Delete Specific Snapshot [#18](https://github.com/restic/restic/issues/18)
+- Select scrypt parameter based on computing power and memory [#17](https://github.com/restic/restic/issues/17)
+
+**Merged pull requests:**
+- Fix short-hand option clash [#635](https://github.com/restic/restic/pull/635) ([fd0](https://github.com/fd0))
+- Rework debug message printing [#632](https://github.com/restic/restic/pull/632) ([fd0](https://github.com/fd0))
+- Switch to cobra/pflag for CLI [#631](https://github.com/restic/restic/pull/631) ([fd0](https://github.com/fd0))
+- Remove unused bits and pieces [#630](https://github.com/restic/restic/pull/630) ([fd0](https://github.com/fd0))
+- fuse: fix tests for snapshots with same timestamps [#627](https://github.com/restic/restic/pull/627) ([fd0](https://github.com/fd0))
+- Add ""-x"", ""--one-file-system"" option [#626](https://github.com/restic/restic/pull/626) ([rfjakob](https://github.com/rfjakob))
+- fuse: correctly handle snapshots [#625](https://github.com/restic/restic/pull/625) ([fd0](https://github.com/fd0))
+- Improve error messages for open repo [#623](https://github.com/restic/restic/pull/623) ([fd0](https://github.com/fd0))
+- Add verbose error when marshalling a node fails [#620](https://github.com/restic/restic/pull/620) ([fd0](https://github.com/fd0))
+- Update all vendored dependencies [#619](https://github.com/restic/restic/pull/619) ([fd0](https://github.com/fd0))
+- Cleanup CI tests for fuse [#618](https://github.com/restic/restic/pull/618) ([fd0](https://github.com/fd0))
+- Add tags to snapshots [#616](https://github.com/restic/restic/pull/616) ([fd0](https://github.com/fd0))
+- doc/Manual: Update usage help listing [#615](https://github.com/restic/restic/pull/615) ([kerel-fs](https://github.com/kerel-fs))
+- Improve statistics for `prune` [#614](https://github.com/restic/restic/pull/614) ([fd0](https://github.com/fd0))
+- Read password from file [#613](https://github.com/restic/restic/pull/613) ([fd0](https://github.com/fd0))
+- Fix a small typo in `stdin` example [#608](https://github.com/restic/restic/pull/608) ([rosetree](https://github.com/rosetree))
+- Update chunker [#602](https://github.com/restic/restic/pull/602) ([fd0](https://github.com/fd0))
+- Add codecov.io [#601](https://github.com/restic/restic/pull/601) ([fd0](https://github.com/fd0))
+- WIP: restructure code [#600](https://github.com/restic/restic/pull/600) ([fd0](https://github.com/fd0))
+- Replace lowlevel syscall to restore symlink times [#599](https://github.com/restic/restic/pull/599) ([fd0](https://github.com/fd0))
+- Update minio-go [#598](https://github.com/restic/restic/pull/598) ([fd0](https://github.com/fd0))
+- Fix panic for debug.Log() with empty string [#597](https://github.com/restic/restic/pull/597) ([fd0](https://github.com/fd0))
+- Fix the cat command [#595](https://github.com/restic/restic/pull/595) ([fd0](https://github.com/fd0))
+- Remove check for filemode 0 [#594](https://github.com/restic/restic/pull/594) ([fd0](https://github.com/fd0))
+- local/sftp: Fix broken error handling [#593](https://github.com/restic/restic/pull/593) ([fd0](https://github.com/fd0))
+- Fix panic when parsing sftp URIs [#592](https://github.com/restic/restic/pull/592) ([fd0](https://github.com/fd0))
+- On prune report, packs instead of files + fix counter [#591](https://github.com/restic/restic/pull/591) ([viric](https://github.com/viric))
+- show progress every second when run non interactively [#585](https://github.com/restic/restic/pull/585) ([trbs](https://github.com/trbs))
+- Add more safety checks for Unpacker [#584](https://github.com/restic/restic/pull/584) ([fd0](https://github.com/fd0))
+- Fix progress output on Windows [#583](https://github.com/restic/restic/pull/583) ([stuertz](https://github.com/stuertz))
+- Change errors library [#580](https://github.com/restic/restic/pull/580) ([fd0](https://github.com/fd0))
+- Properly close connections to s3 backend on Stat() [#579](https://github.com/restic/restic/pull/579) ([fd0](https://github.com/fd0))
+- Fix build on linux/arm [#578](https://github.com/restic/restic/pull/578) ([fd0](https://github.com/fd0))
+- Dynamically calibrate scrypt parameters [#577](https://github.com/restic/restic/pull/577) ([fd0](https://github.com/fd0))
+- Improve documentation, add explanation and weekly [#576](https://github.com/restic/restic/pull/576) ([fd0](https://github.com/fd0))
+- Remove POSIX constants, reduce code duplication [#575](https://github.com/restic/restic/pull/575) ([fd0](https://github.com/fd0))
+- Fix osxfuse on Travis/darwin [#573](https://github.com/restic/restic/pull/573) ([fd0](https://github.com/fd0))
+- Require Go 1.6 or greater [#571](https://github.com/restic/restic/pull/571) ([fd0](https://github.com/fd0))
+- Fix 567 [#570](https://github.com/restic/restic/pull/570) ([stuertz](https://github.com/stuertz))
+- Use the platform-independent function for joining [#569](https://github.com/restic/restic/pull/569) ([fd0](https://github.com/fd0))
+- Invert go version test for ldflags [#563](https://github.com/restic/restic/pull/563) ([fd0](https://github.com/fd0))
+- Issue-535: restic respect GOMAXPROCS env variable depending on go version [#562](https://github.com/restic/restic/pull/562) ([damekr](https://github.com/damekr))
+- Fix the debug environment variable name in the manual [#559](https://github.com/restic/restic/pull/559) ([vrischmann](https://github.com/vrischmann))
+- Detect a devel version correctly in LDFlags() [#558](https://github.com/restic/restic/pull/558) ([vrischmann](https://github.com/vrischmann))
+- Implement prune [#518](https://github.com/restic/restic/pull/518) ([fd0](https://github.com/fd0))
+",https://api.github.com/users/fd0,123276,fd0,https://api.github.com/repos/restic/restic/releases/4283434/assets,https://api.github.com/repos/restic/restic/releases/4283434,master,https://api.github.com/repos/restic/restic/tarball/v0.3.0,https://github.com/restic/restic/releases/tag/v0.3.0,https://api.github.com/repos/restic/restic/zipball/v0.3.0,v0.3.0,False,False
+3775766,2016-07-30T09:24:52Z,2016-07-30T09:48:00Z,restic 0.2.0,"This is the second public release of restic.
+
+## [v0.2.0](https://github.com/restic/restic/tree/v0.2.0) (2016-07-30)
+
+[Full Changelog](https://github.com/restic/restic/compare/v0.1.0-doc...v0.2.0)
+
+**Implemented enhancements:**
+- Allow reading exclude patterns from a file [#416](https://github.com/restic/restic/issues/416)
+- Archiver: Use directio to avoid caching data [#401](https://github.com/restic/restic/issues/401)
+
+**Fixed bugs:**
+- Building fails: import cycle not allowed [#534](https://github.com/restic/restic/issues/534)
+- restic -r check / error for tree [#528](https://github.com/restic/restic/issues/528)
+- minio update broke compatibility with Google Cloud Storage [#520](https://github.com/restic/restic/issues/520)
+- building restic on raspbian jessie with golang 1.3.3 fails [#501](https://github.com/restic/restic/issues/501)
+- --exclude seems confused by leading & trailing slashes [#499](https://github.com/restic/restic/issues/499)
+- minor: `gb test` leaves temporary `mount` behind [#494](https://github.com/restic/restic/issues/494)
+- restic backup into existing repository fails with error ""encoding/hex: invalid byte: U+002E '.'"" [#474](https://github.com/restic/restic/issues/474)
+- Repository broken after optimize [#434](https://github.com/restic/restic/issues/434)
+
+**Closed issues:**
+- Backend: Amazon Glacier [#541](https://github.com/restic/restic/issues/541)
+- Error during first backup [#538](https://github.com/restic/restic/issues/538)
+- AWS Access Keys [#521](https://github.com/restic/restic/issues/521)
+- Feature Request: Storage Backend ""Amazon Cloud Drive"" [#508](https://github.com/restic/restic/issues/508)
+- sftp on windows [#505](https://github.com/restic/restic/issues/505)
+- syncany could be a good inspiration software: plugins! [#492](https://github.com/restic/restic/issues/492)
+- Compilation on Fedora 23 fails [#491](https://github.com/restic/restic/issues/491)
+- Ignore index files with invalid names [#475](https://github.com/restic/restic/issues/475)
+- documentation: integrate manual into main repo [#452](https://github.com/restic/restic/issues/452)
+- Feature: Backup data read from stdin [#255](https://github.com/restic/restic/issues/255)
+- Add documentation to explain terminology [#42](https://github.com/restic/restic/issues/42)
+
+**Merged pull requests:**
+- Fix fuse panic with empty files [#554](https://github.com/restic/restic/pull/554) ([fd0](https://github.com/fd0))
+- Update minio-go [#553](https://github.com/restic/restic/pull/553) ([fd0](https://github.com/fd0))
+- Explicitly Close() obj after ReadFull() [#552](https://github.com/restic/restic/pull/552) ([benagricola](https://github.com/benagricola))
+- idset.go: micro-optimise away redundant scan [#548](https://github.com/restic/restic/pull/548) ([mappu](https://github.com/mappu))
+- Don't report valid types as invalid [#545](https://github.com/restic/restic/pull/545) ([fd0](https://github.com/fd0))
+- Updates for build.go [#543](https://github.com/restic/restic/pull/543) ([mappu](https://github.com/mappu))
+- Fix typo in Manual.md [#537](https://github.com/restic/restic/pull/537) ([xet7](https://github.com/xet7))
+- Update minio-go [#531](https://github.com/restic/restic/pull/531) ([fd0](https://github.com/fd0))
+- Added Minio.io configuration steps to run as backend for restic. [#525](https://github.com/restic/restic/pull/525) ([koolhead17](https://github.com/koolhead17))
+- Fix flaky worker cancel test [#516](https://github.com/restic/restic/pull/516) ([fd0](https://github.com/fd0))
+- Traverse paths in the same order as parent snapshot [#515](https://github.com/restic/restic/pull/515) ([viric](https://github.com/viric))
+- Better backup parent snapshot search. Part of #513 [#514](https://github.com/restic/restic/pull/514) ([viric](https://github.com/viric))
+- Cleanups and test functions [#511](https://github.com/restic/restic/pull/511) ([fd0](https://github.com/fd0))
+- Allow reading data from stdin [#509](https://github.com/restic/restic/pull/509) ([fd0](https://github.com/fd0))
+- Update minio-go [#507](https://github.com/restic/restic/pull/507) ([fd0](https://github.com/fd0))
+- Add option to restore latest snapshot with optional path and source filters [#503](https://github.com/restic/restic/pull/503) ([gerdus](https://github.com/gerdus))
+- Update crypto library [#502](https://github.com/restic/restic/pull/502) ([fd0](https://github.com/fd0))
+- Fix exclude filters with trailing slash [#500](https://github.com/restic/restic/pull/500) ([fd0](https://github.com/fd0))
+- Fix CI tests [#498](https://github.com/restic/restic/pull/498) ([fd0](https://github.com/fd0))
+- Expand environment-variables in exclude-files [#497](https://github.com/restic/restic/pull/497) ([Thor77](https://github.com/Thor77))
+- doc: point to correct `gb` arg for `go get` [#496](https://github.com/restic/restic/pull/496) ([jzacsh](https://github.com/jzacsh))
+- Umount fuse in tests [#495](https://github.com/restic/restic/pull/495) ([fd0](https://github.com/fd0))
+- add debian stable help [#489](https://github.com/restic/restic/pull/489) ([xmaka](https://github.com/xmaka))
+- Purge read and written data from OS cache [#487](https://github.com/restic/restic/pull/487) ([fd0](https://github.com/fd0))
+- Change ErrNoKeyFound message [#484](https://github.com/restic/restic/pull/484) ([mholt](https://github.com/mholt))
+- Update chunker [#482](https://github.com/restic/restic/pull/482) ([fd0](https://github.com/fd0))
+- Use tempfiles for not-yet-uploaded pack files [#481](https://github.com/restic/restic/pull/481) ([fd0](https://github.com/fd0))
+- rest backend: Remove indirection on http.Client [#477](https://github.com/restic/restic/pull/477) ([fd0](https://github.com/fd0))
+- Ignore invalid index files [#476](https://github.com/restic/restic/pull/476) ([fd0](https://github.com/fd0))
+- Fix coveralls.io service [#473](https://github.com/restic/restic/pull/473) ([fd0](https://github.com/fd0))
+- Update chunker [#472](https://github.com/restic/restic/pull/472) ([fd0](https://github.com/fd0))
+- Refactor src/restic/cmd to src/cmds [#471](https://github.com/restic/restic/pull/471) ([fawick](https://github.com/fawick))
+- Added missing handle to the s3.Stat log message output [#468](https://github.com/restic/restic/pull/468) ([ckemper67](https://github.com/ckemper67))
+- Merging restic-server [#467](https://github.com/restic/restic/pull/467) ([fawick](https://github.com/fawick))
+- Add REST backend [#464](https://github.com/restic/restic/pull/464) ([fd0](https://github.com/fd0))
+- doc: Reduce text in README, add to Manual [#462](https://github.com/restic/restic/pull/462) ([fd0](https://github.com/fd0))
+- Debug issue #434 [#459](https://github.com/restic/restic/pull/459) ([fd0](https://github.com/fd0))
+",https://api.github.com/users/fd0,123276,fd0,https://api.github.com/repos/restic/restic/releases/3775766/assets,https://api.github.com/repos/restic/restic/releases/3775766,master,https://api.github.com/repos/restic/restic/tarball/v0.2.0,https://github.com/restic/restic/releases/tag/v0.2.0,https://api.github.com/repos/restic/restic/zipball/v0.2.0,v0.2.0,False,False
+1811093,2015-08-21T20:20:57Z,2015-09-14T17:58:04Z,restic 0.1.0,"This is the first public release of restic.
+",https://api.github.com/users/fd0,123276,fd0,https://api.github.com/repos/restic/restic/releases/1811093/assets,https://api.github.com/repos/restic/restic/releases/1811093,master,https://api.github.com/repos/restic/restic/tarball/v0.1.0,https://github.com/restic/restic/releases/tag/v0.1.0,https://api.github.com/repos/restic/restic/zipball/v0.1.0,v0.1.0,False,False

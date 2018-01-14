@@ -1,0 +1,500 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8294769,2017-10-26T20:19:08Z,2017-10-27T22:15:26Z,Util 17.10.0,"Release Version Changes:
+  * From now on, release versions will be based on release date in the format of
+    YY.MM.x where x is a patch number. ``PHAB_ID=D101244``
+
+API Changes:
+
+  * util-app: c.t.app.Flag.let and letClear are now generic in their return type.
+    ``PHAB_ID=D93951``
+
+Bug Fixes:
+  * util-core: Fix Buf.ByteArray.Shared.apply(bytes,begin,end) constructor function.
+    ``PHAB_ID=D100648``
+",https://api.github.com/users/nepthar,359054,nepthar,https://api.github.com/repos/twitter/util/releases/8294769/assets,https://api.github.com/repos/twitter/util/releases/8294769,develop,https://api.github.com/repos/twitter/util/tarball/util-17.10.0,https://github.com/twitter/util/releases/tag/util-17.10.0,https://api.github.com/repos/twitter/util/zipball/util-17.10.0,util-17.10.0,False,False
+7660497,2017-09-06T18:49:55Z,2017-09-06T21:53:14Z,Util 7.1.0,"API Changes:
+
+  * util-events: Module has been removed. ``PHAB_ID=D82346``
+
+  * util-lint: Add GlobalRules#withRules for testing. Allow for the ability to 
+    specify a global rules set for use in testing. ``PHAB_ID=D83506``",https://api.github.com/users/kevinoliver,347229,kevinoliver,https://api.github.com/repos/twitter/util/releases/7660497/assets,https://api.github.com/repos/twitter/util/releases/7660497,develop,https://api.github.com/repos/twitter/util/tarball/util-7.1.0,https://github.com/twitter/util/releases/tag/util-7.1.0,https://api.github.com/repos/twitter/util/zipball/util-7.1.0,util-7.1.0,False,False
+7430092,2017-08-15T22:31:34Z,2017-08-17T18:12:08Z,Util 7.0.0,"New Features:
+
+  * util-core: Added `c.t.util.SlowProbeProxyTimer` for monitoring the duration
+    of execution for timer tasks. ``PHAB_ID=D70279``
+
+  * util-core: Introduced RootMonitor#set to set custom Monitor to RootMonitor.
+    ``PHAB_ID=D70876``
+
+  * util-jvm: `JvmStats` has been moved here from TwitterServer allowing broader
+    access to many metrics including GC, allocations, memory, and more.
+    ``PHAB_ID=D80883``
+
+  * util-stats: Introducing Verbosity Levels for StatsReceivers (see docs on `StatsReceiver`
+    for more info). ``PHAB_ID=D70112``
+
+  * util-tunable: `c.t.u.tunable.Tunable`, `c.t.u.tunable.TunableMap`,
+    `c.t.u.tunable.JsonTunableMapper`, and `c.t.u.tunable.ServiceLoadedTunableMap` are now public.
+    This allows users to create and use Tunables, a mechanism for accessing dynamically
+    configured values. See https://twitter.github.io/finagle/guide/Configuration.html#tunables 
+    for details on how these can be used in Finagle. ``PHAB_ID=D80751``.
+
+Bug Fixes:
+
+  * util-core: Fix some consistency issues with `c.t.util.ByteReaderImpl`. Advance its
+    cursor by the number of bytes consumed via `readBytes(Int)`, not the number specified
+    as a method argument. `readString` will now throw an UnderflowException if the number
+    of bytes specified exceeds the remaining buffer length instead of silently making due
+    with the rest of the buffer's contents. ``PHAB_ID=D78301``
+
+Runtime Behavior Changes:
+
+  * util-core: `c.t.util.Closable.sequence` now continues processing
+    the `Closables` should any of their closes result in a failed `Future`
+    and will return the first failure. Synchronous exceptions are now
+    handled by lifting them into failed `Futures`. ``PHAB_ID=D62418``
+
+  * util-events: `com.twitter.util.events.sinkEnabled` now defaults to false
+    in preparation for removal in an upcoming release. ``PHAB_ID=D64437``
+
+API Changes:
+
+  * util-core: ByteWriter has been transformed into a true trait which can now
+    be implemented outside of the com.twitter.io package. ``PHAB_ID=D59996``
+
+  * util-core: The method ByteWriter.owned() has been moved to a sub trait,
+    BufByteWriter, to separate the notion of the target buffer representation from the
+    writer methods in order to make it easier to target different buffer representations.
+    ``PHAB_ID=D61215``
+
+  * util-stats: ``PHAB_ID=D59762``
+
+   - `ProxyStatsReceiver.self` is now protected (was public before).
+   - `StatsReceiver.repr` is now `def` (was `val` before).
+
+  * util-stats: `Counter#add` now takes a `Long` instead of an `Integer` as an argument.
+    ``PHAB_ID=D69064``
+
+  * util-stats: `StatsReceiver#counter`, `StatsReceiver#stat`, and `StatsReceiver.addGauge`
+    now may optionally take `c.t.f.stats.Verbosity` as a first argument. ``PHAB_ID=D70112``
+
+
+Deprecations:
+
+  * util-events: This module is deprecated and will be removed in an upcoming
+    release. ``PHAB_ID=D64437``
+
+  * util-stats: ``PHAB_ID=D62611``
+
+    - `StatsReceiver.counter0` is deprecated in favour of vararg `StatsReceiver.counter`
+    - `StatsReceiver.stat0` is deprecated in favour of vararg `StatsReceiver.stat`",https://api.github.com/users/dschobel,58369,dschobel,https://api.github.com/repos/twitter/util/releases/7430092/assets,https://api.github.com/repos/twitter/util/releases/7430092,develop,https://api.github.com/repos/twitter/util/tarball/util-7.0.0,https://github.com/twitter/util/releases/tag/util-7.0.0,https://api.github.com/repos/twitter/util/zipball/util-7.0.0,util-7.0.0,False,False
+6667096,2017-06-07T22:35:45Z,2017-06-09T20:16:50Z,Util 6.45.0,"New Features:
+
+  * util-app: Optional resource shutdown sequencing for registered closables
+    via `c.t.app.App#closeOnExitLast`. See longer note there for usage.
+    ``RB_ID=916120``
+
+  * util-core: Added `writeBytes(Buf)` to the ByteWriter abstract class to allow
+    for efficient writing of the `c.t.io.Buf` type. ``RB_ID=917094``
+
+  * util-core: Added `ByteReader.readUnsignedLongBE` and `ByteReader.readUnsignedLongLE`.
+    ``RB_ID=917289``
+
+API Changes:
+
+  * util-collection: Removed deprecated `c.t.u.JMapWrapper`. Use
+    `scala.collection.JavaConverters` instead. ``RB_ID=915544``
+
+  * util-core: ByteReader extends the AutoClosable interface to provide
+    a notion of resource management. Users should ensure that instances
+    of the ByteReader interface are closed after they are no longer
+    needed. ``RB_ID=916086``
+
+  * util-core: Removed deprecated methods from `c.t.u.Future`:
+      - `rawException`; use `exception` instead
+      - `cancel`; use `raise` instead
+
+    Removed deprecated `c.t.u.Futures.select`; use `Future.select` instead.
+    Remove deprecated `flatten` method on `c.t.u.Future`; use `Futures.flatten` instead.
+    ``RB_ID=915500``
+  
+  * util-core: Removed deprecated `c.t.u.LongOverflowException`. Use
+    `java.lang.ArithmeticException` instead. Removed deprecated
+    `c.t.u.LongOverflowArith` and all methods on it:
+        - `add`; use Java 8's `Math.addExact` instead
+        - `sub`; use Java 8's `Math.subtractExact` instead
+        - `mul`; use Java 8's `Math.multiplyExact` instead
+    ``RB_ID=915545``
+
+  * util-core: Removed deprecated `c.t.concurrent.exp.AsyncStream`. Use
+    `c.t.concurrent.AsyncStream` instead. ``RB_ID=916422``
+
+  * util-eval: Removed from the project. ``RB_ID=915430``
+    https://finagle.github.io/blog/2017/04/06/announce-removals/
+
+Runtime Behavior Changes:
+
+  * util-core: All `Timers` now handle negative or undefined times/durations in uniform way:
+    treat them as zeros (i.e., `Time.epoch`, `Duration.Zero`). ``RB_ID=916008``",https://api.github.com/users/roanta,1617360,roanta,https://api.github.com/repos/twitter/util/releases/6667096/assets,https://api.github.com/repos/twitter/util/releases/6667096,develop,https://api.github.com/repos/twitter/util/tarball/util-6.45.0,https://github.com/twitter/util/releases/tag/util-6.45.0,https://api.github.com/repos/twitter/util/zipball/util-6.45.0,util-6.45.0,False,False
+6154015,2017-04-20T21:34:57Z,2017-04-21T21:11:50Z,Util 6.43.0,"Runtime Behavior Changes:
+
+  * util-core: `Closable.all(..)` will now catch synchronous exceptions thrown
+    by any `Closable.close(..)` invocations, and wrap them in a failed Future.
+    ``RB_ID=914859``
+
+  * util-stats: InMemoryStatsReceiver's `gauges` member is now safe for
+    concurrent iteration but now holds strong references to gauge instances.
+    ``RB_ID=911951``
+
+New Features:
+
+  * util-core: `c.t.f.u.BufReader` and `c.t.f.u.BufWriter` have been
+    moved from finagle-core to util-core and renamed to
+    `c.t.io.ByteReader` and `c.t.io.ByteWriter` respectively. They
+    are now also exposed publicly. ``RB_ID=911639``
+
+API Changes:
+
+  * util: util-zk-commons was removed, since it was only a connector between
+    util and commons, which was not widely used.  ``RB_Id=910721``
+
+  * util-core: AsyncQueue's `size` method is now final while `offer` and `fail`
+    are no longer final. ``RB_ID=914191``
+",https://api.github.com/users/ryanoneill,1393463,ryanoneill,https://api.github.com/repos/twitter/util/releases/6154015/assets,https://api.github.com/repos/twitter/util/releases/6154015,develop,https://api.github.com/repos/twitter/util/tarball/util-6.43.0,https://github.com/twitter/util/releases/tag/util-6.43.0,https://api.github.com/repos/twitter/util/zipball/util-6.43.0,util-6.43.0,False,False
+5709309,2017-03-10T23:37:47Z,2017-03-11T00:03:04Z,Util 6.42.0,"New Features:
+
+  * util-core: Promoted the positional `Buf.Indexed` API to be a first-class
+    part of `c.t.io.Buf`. If you have a custom implementation of `Buf` it
+    will require some effort to become compatible. ``RB_ID=907231``
+
+API Changes:
+
+  * util-app: Set failFastUntilParsed on created flag added to `c.t.app.Flags`
+    via `c.t.app.Flags#add`. ``RB_ID=908804``
+
+  * util-core: Remove deprecated `c.t.io.ConcatBuf` which is replaced by
+    `c.t.io.Buf.apply(Iterable[Buf])`. ``RB_ID=907180``
+
+  * util-core: Remove deprecated `c.t.util.RingBuffer`. Use Guava's
+    `EvictingQueue`. ``RB_ID=907516``
+
+  * util-core: Remove deprecated `c.t.concurrent.ConcurrentPool`. Prefer
+    Finagle's `c.t.f.pool.BufferingPool`. ``RB_ID=907516``
+
+  * util-core: Remove deprecated `c.t.concurrent.ConcurrentMultiMap`. Prefer
+    Guava's Multimap. ``RB_ID=907516``
+
+Dependencies:
+
+  * util: Bump guava to 19.0. ``RB_ID=907807``",https://api.github.com/users/mosesn,156562,mosesn,https://api.github.com/repos/twitter/util/releases/5709309/assets,https://api.github.com/repos/twitter/util/releases/5709309,develop,https://api.github.com/repos/twitter/util/tarball/util-6.42.0,https://github.com/twitter/util/releases/tag/util-6.42.0,https://api.github.com/repos/twitter/util/zipball/util-6.42.0,util-6.42.0,False,False
+5372709,2017-02-04T00:14:23Z,2017-02-06T16:52:02Z,Util 6.41.0,"## New Features
+- util-core: Add Java-friendly API to Scala.java for converting from
+  a Java 8 `Optional` to a Scala `Option`. `RB_ID=906512`
+- util-core: Introduced a positional `Buf` API, `Buf.Indexed`, and retrofitted
+  all existing implementations in util and finagle to adopt it. It is now used
+  throughout for a reductions in allocation and latency. In two services at
+  Twitter we saw a 1–2% reduction in allocations. We plan to open the API to
+  the public and make it a part of `Buf` once we are confident in the APIs.
+  `RB_ID=904559` `RB_ID=905253` `RB_ID=906201`
+- util-slf4j-api: Introduce slf4j-api support into util. This includes a
+  small scala wrapper over the `org.slf4j.Logger` and a scala-friendly
+  `Logging` trait. Changes also include the util-slf4j-jul-bridge module which
+  is a library that provides a utility to ""smartly"" install the
+  Slf4jBridgeHandler. `RB_ID=900815`
+
+## Runtime Behavior Changes
+- util-core: Improved performance and allocation rates of some ""random access""
+  `Buf` operations. `RB_ID=905253`
+- util-core: Standardized argument checking in implementations of
+  `c.t.io.Buf.write` and `c.t.io.Buf.slice`. `RB_ID=899935`
+
+## API Changes
+- util-core: Deprecated `c.t.io.ConcatBuf` which is replaced by
+  `c.t.io.Buf.apply(IndexedSeq[Buf])`. `RB_ID=899623`
+",https://api.github.com/users/bryce-anderson,2948506,bryce-anderson,https://api.github.com/repos/twitter/util/releases/5372709/assets,https://api.github.com/repos/twitter/util/releases/5372709,develop,https://api.github.com/repos/twitter/util/tarball/util-6.41.0,https://github.com/twitter/util/releases/tag/util-6.41.0,https://api.github.com/repos/twitter/util/zipball/util-6.41.0,util-6.41.0,False,False
+4975353,2016-12-20T23:30:58Z,2016-12-21T01:54:05Z,Util 6.40.0,"## Bug Fixes
+- util-core: Fix issue with `c.t.concurrent.AsyncStream.mapConcurrent` which
+  will cause the stream head to be held for life of operation. `RB_ID=896168`
+
+## API Changes
+- util-core: Deprecated charset constants in `c.t.io.Charsets` have been
+  removed. Use java.nio.charset.StandardCharsets instead. `RB_ID=893542`
+- util-core: `com.twitter.util.NonFatal` is deprecated, use
+  `scala.util.control.NonFatal` instead. `RB_ID=892475`
+- util-core: `FactoryPool`/`SimplePool` now inherits `scala.collection.mutable.Queue[A]`
+  not deprecated `scala.collection.mutable.QueueProxy[A]` `RB_ID=896485`
+- util-core: `Buf` has been promoted from a trait to an abstract class to facilitate
+  memoization of the `Buf` hash code. This also removes the need for the Java friendly
+  abstract class: `AbstractBuf`. `RB_ID=897476`
+",https://api.github.com/users/jcrossley,8378895,jcrossley,https://api.github.com/repos/twitter/util/releases/4975353/assets,https://api.github.com/repos/twitter/util/releases/4975353,develop,https://api.github.com/repos/twitter/util/tarball/util-6.40.0,https://github.com/twitter/util/releases/tag/util-6.40.0,https://api.github.com/repos/twitter/util/zipball/util-6.40.0,util-6.40.0,False,False
+4737097,2016-11-22T23:20:40Z,2016-11-23T03:10:58Z,Util 6.39.0,"No Changes.
+",https://api.github.com/users/jcrossley,8378895,jcrossley,https://api.github.com/repos/twitter/util/releases/4737097/assets,https://api.github.com/repos/twitter/util/releases/4737097,develop,https://api.github.com/repos/twitter/util/tarball/version-6.39.0,https://github.com/twitter/util/releases/tag/version-6.39.0,https://api.github.com/repos/twitter/util/zipball/version-6.39.0,version-6.39.0,False,False
+4364610,2016-10-11T02:02:56Z,2016-10-12T00:35:16Z,Util 6.38.0,"## New Features
+- util-app: Java developers can now declare instances of `GlobalFlag`
+  from Java. See `c.t.app.JavaGlobalFlag` for details. `RB_ID=874073`
+- util-logging: Allow users to override `c.t.util.logging.Logger` installation,
+  making it easier to work with SLF4J bridges. `RB_ID=870684`
+- util: No longer need to add an additional resolver that points to maven.twttr.com.
+  `RB_ID=878967`
+
+## Bug Fixes
+- util-core: `c.t.io.InputStreamReader` and `Readers` created by
+  `c.t.io.Reader.fromFile` and `fromStream` now close the underlying
+  `InputStream` on reading of EOF and on calls to `Reader.discard`.
+  `RB_ID=873319`
+
+## API Changes
+- util-core: `c.t.app.GlobalFlag` is now `abstract` to reflect how the class
+  is intended to be used. `RB_ID=875409`
+",https://api.github.com/users/jcrossley,8378895,jcrossley,https://api.github.com/repos/twitter/util/releases/4364610/assets,https://api.github.com/repos/twitter/util/releases/4364610,develop,https://api.github.com/repos/twitter/util/tarball/util-6.38.0,https://github.com/twitter/util/releases/tag/util-6.38.0,https://api.github.com/repos/twitter/util/zipball/util-6.38.0,util-6.38.0,False,False
+4076248,2016-09-07T17:54:06Z,2016-09-08T01:26:45Z,Util 6.37.0,"# New Features:
+- util-app: Introduce `c.t.app.Flag.letClear` allowing flags to be unset.
+  `RB_ID=868177`
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/util/releases/4076248/assets,https://api.github.com/repos/twitter/util/releases/4076248,develop,https://api.github.com/repos/twitter/util/tarball/util-6.37.0,https://github.com/twitter/util/releases/tag/util-6.37.0,https://api.github.com/repos/twitter/util/zipball/util-6.37.0,util-6.37.0,False,False
+3979075,2016-08-26T01:50:54Z,2016-08-26T03:50:49Z,Util 6.36.0,"# New Features:
+- util-core: `c.t.util.FuturePool` now optionally exposes metrics on
+  their internal state such as active tasks, and completed tasks.
+  `RB_ID=850652`
+- util-core: Add a system property
+  `com.twitter.concurrent.schedulerSampleBlockingFraction` that can be
+  set to a value between 0.0 and 1.0 (inclusive). When the Scheduler
+  runs blocking code, it will log the stacktrace for that fraction of
+  the calls. `RB_ID=861892`
+- util-core: Add Java-friendly API for `StorageUnit`. See `StorageUnit.fromX`
+  and `StorageUnit.{times, plus, minus, divide}` methods. `RB_ID=864546`
+
+# Changes in Runtime Behavior:
+- util-eval: The compiler reporter is now reset between code check invocations.
+  This means that when there is a failure that it is no longer required to reset
+  the entire state to recover and that already compiled and loaded classes can still
+  be used. `RB_ID=859878`
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/util/releases/3979075/assets,https://api.github.com/repos/twitter/util/releases/3979075,develop,https://api.github.com/repos/twitter/util/tarball/util-6.36.0,https://github.com/twitter/util/releases/tag/util-6.36.0,https://api.github.com/repos/twitter/util/zipball/util-6.36.0,util-6.36.0,False,False
+3618010,2016-07-07T22:47:19Z,2016-07-08T18:28:58Z,Util 6.35.0,"# Changes in Runtime Behavior:
+- util-codec: StringEncoder no longer depends on apache commons-codec, and
+  decode will now throw an exception when it fails to decode a byte, instead
+  of failing silently. `RB_ID=833478`
+- util-collection: LruMap is now backed by jdk LinkedHashMap instead of apache
+  collections LRUMap. `RB_ID=833515`
+- util-core: `com.twitter.util.NonFatal` is now implemented by Scala's
+  `scala.util.control.NonFatal`. This changes behavior such that
+  `java.lang.StackOverflowError` is considered fatal and
+  `java.lang.NoSuchMethodException` is considered non-fatal.
+  `RB_ID=835671`
+
+# New Features:
+- util-app: `com.twitter.finagle.util.LoadService` has been moved to
+  `c.t.app.LoadService` and can now be used without needing a finagle-core
+  dependency. `RB_ID=829897`
+- util-cache: Adds support for Caffeine-style caches. `RB_ID=833848`
+- util-core: Add `c.t.concurrent.Scheduler.blockingTimeNanos` which tracks time spent doing
+  blocking operations. `RB_ID=828289`
+- util-core: Reduced allocations by 40% and latency by 18% of satisfying `Promises`.
+  `RB_ID=832816`
+- util-core: `c.t.util.NoStacktrace` is removed. Use `scala.util.control.NoStackTrace` instead.
+  `RB_ID=833188`
+- util-core: Add `Future.joinWith` that also accepts a function `(A, B) => C` for mapping
+  a joined result. `RB_ID=838169`
+- util-core: Add `Future.by(Time)`, complementary to the existing `Future.within(Duration)`
+  `RB_ID=838169`
+- util-core: Add `c.t.util.ProxyTimer` which allows for creating proxy based
+  `Timers` outside of the `com.twitter.util` package. `RB_ID=846194`
+- util-core: Add `AsyncStream.merge` merge potentially inifite streams 
+  `RB_ID=846681`
+- util-security: Added new project. `RB_ID=843070`
+
+# API Changes:
+- Builds are now only for Java 8 and Scala 2.11. See the
+  `blog post <https://finagle.github.io/blog/2016/04/20/scala-210-and-java7/>`_
+  for details. `RB_ID=828898`
+- util-core: `c.t.u.Bijection` is removed. use `c.t.bijection.Bijection`
+  (https://github.com/twitter/bijection) instead. `RB_ID=834383`
+- util-core: Deprecated method `Future.get()` has been removed because it made it
+  too easy to hide blocking code. Replaced usage with the more explicit
+  `com.twitter.util.Await.result(Future)`. `RB_ID=833579`
+- util-core: Deprecated method `Future.get(Duration): Try` has been removed because it
+  made it too easy to hide blocking code. Replaced usage with the more explicit
+  `com.twitter.util.Await.result(Future.liftToTry)`. `RB_ID=836066`
+- util-core: Deprecated methods `Future.isReturn` and `Future.isThrow` have been
+  removed because they made it too easy to hide blocking code. Replaced usage with
+  the more explicit `Await.result(Future.liftToTry).isReturn` and
+  `Await.result(Future.liftToTry).isThrow`. `RB_ID=837329`
+- util-lint: Added methods `com.twitter.util.lint.Rules.removeById(String)` and
+  `com.twitter.util.lint.RulesImpl.removeById(String)` so that it is now possible
+  to remove a `com.twitter.util.lint.Rule` from the `com.twitter.util.lint.GlobalRules`
+  set. `RB_ID=840753`
+
+# Bug Fixes:
+- util-core: AsyncMeter had a bug where if the burst size was smaller than
+  the number of disbursed tokens, it would discard all of the tokens over
+  the disbursal limit.  Changed to instead process tokens in the wait queue
+  with leftover tokens.  This improves behavior where the actual period is
+  smaller than can actually be simulated with the given timer.  `RB_ID=836742`
+- util-core: Once didn't actually provide the guarantee it tried to, because
+  of an issue with the scala compiler,
+  https://issues.scala-lang.org/browse/SI-9814.  It should now actually be
+  synchronized. `RB_ID=842245`
+- util-zk: Fixed race when an existing permit is released between the time
+  the list was gotten and the data was checked. `RB_ID=835856`
+- util-core: Memoize apply now throws IllegalStateException if a thread
+  re-enters with identical input parameters instead of deadlocking.
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/util/releases/3618010/assets,https://api.github.com/repos/twitter/util/releases/3618010,develop,https://api.github.com/repos/twitter/util/tarball/util-6.35.0,https://github.com/twitter/util/releases/tag/util-6.35.0,https://api.github.com/repos/twitter/util/zipball/util-6.35.0,util-6.35.0,False,False
+3113910,2016-04-27T15:57:01Z,2016-04-27T23:03:17Z,Util 6.34.0,"### Note: This is the final release that will support Scala 2.10 and Java 7.
+
+### New Features:
+- util-core: Add `Throwables.unchecked` to help Java users deal with checked
+  exceptions. `RB_ID=811441`
+- util-stats: Can now get from a `com.twitter.finagle.stats.StatsReceiver` to all ""leaf""
+  StatsReceivers that don't delegate to another StatsReceiver with
+  `com.twitter.finagle.stats.DelegatingStatsReceiver.all`.  `RB_ID=819519`
+
+### API Changes:
+- util-core: Removed deprecated methods from Buf.scala `RB_ID=809948`
+  - Removed `c.t.io.Buf.ByteArray.apply`, replace usage with `Buf.ByteArray.Owned.apply`.
+  - Removed `c.t.io.Buf.ByteArray.unapply`, replace usage with `Buf.ByteArray.Owned.unapply`.
+  - Removed `c.t.io.Buf.ByteBuffer.apply`, replace usage with `Buf.ByteBuffer.Owned.apply`.
+  - Removed `c.t.io.Buf.toByteBuffer`, replace usage with `Buf.ByteBuffer.Owned.extract`.
+- util-core: Removed deprecated `Future.apply` methods `RB_ID=811617`
+- util-stats: Removed `com.twitter.finagle.stats.BroadcastStatsReceiver` marker trait in favor of
+  `com.twiter.finagle.stats.DelegatingStatsReceiver` marker trait, which lets us specify that we
+  only delegate to a single `com.twitter.finagle.stats.StatsReceiver`.  `RB_ID=819519`
+- util-zk-common: Removed `com.twitter.zk.ServerSet`. Use implementations of ServerSets in the
+  finagle-serversets project. `RB_ID=821355`
+
+### Bug Fixes:
+- util-core: Fix memory leak in `Var.apply(T, Event[T])` and `Var.patch`.
+  `RB_ID=809100`
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/util/releases/3113910/assets,https://api.github.com/repos/twitter/util/releases/3113910,develop,https://api.github.com/repos/twitter/util/tarball/util-6.34.0,https://github.com/twitter/util/releases/tag/util-6.34.0,https://api.github.com/repos/twitter/util/zipball/util-6.34.0,util-6.34.0,False,False
+2790614,2016-03-10T23:18:22Z,2016-03-11T06:57:30Z,Util 6.33.0,"### New Features:
+- util-core: AsyncSemaphore supports closing and draining of waiters via `fail`. `RB_ID=807590`
+- util-core: Add convenience methods `force`, `size`, `sum`, and `withEffect` to `AsyncStream`. 
+  `RB_ID=808411`
+
+### Bug Fixes:
+- util-core: Fix nested functions `AsyncStream.++` to avoid stack overflow. `RB_ID=804408` 
+
+### Deprecations:
+- util-core: `Future.rawException` is deprecated in favor of `Future.exception`.
+  `RB_ID=798223`
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/util/releases/2790614/assets,https://api.github.com/repos/twitter/util/releases/2790614,develop,https://api.github.com/repos/twitter/util/tarball/util-6.33.0,https://github.com/twitter/util/releases/tag/util-6.33.0,https://api.github.com/repos/twitter/util/zipball/util-6.33.0,util-6.33.0,False,False
+2764704,2016-02-04T00:56:25Z,2016-03-08T04:31:55Z,Util 6.32.0,"New Features:
+- util-core: Add `Future.traverseSequentially`. Take a sequence and sequentially apply a function
+  A => Future[B] to each item. `RB_ID=785091`
+",https://api.github.com/users/kevinoliver,347229,kevinoliver,https://api.github.com/repos/twitter/util/releases/2764704/assets,https://api.github.com/repos/twitter/util/releases/2764704,develop,https://api.github.com/repos/twitter/util/tarball/util-6.32.0,https://github.com/twitter/util/releases/tag/util-6.32.0,https://api.github.com/repos/twitter/util/zipball/util-6.32.0,util-6.32.0,False,False
+2764701,2015-12-03T23:48:10Z,2016-03-08T04:31:22Z,Util 6.30.0,"New Features:
+- util-core: Introduce an `AsyncMeter` for asynchronously rate limiting to a fixed rate over time.
+  It can be used for smoothing out bursty traffic, or for slowing down access to a
+  resource. `RB_ID=756333`
+- util-core: Introduce a `TokenBucket` for helping to control the relative rates of two processes,
+  or for smoothing out the rate of a single process. `RB_ID=756333`
+
+API Changes:
+- util-core: `Timer` now has final implementations for `schedule` which delegate
+  to new protected `scheduleOnce` and `schedulePeriodically` methods. This is
+  done to ensure that `Locals` are captured when the task is scheduled and
+  then used when the task is run. Existing `Timer` implementations should rename
+  their existing `schedule` methods to work with the new interface. `RB_ID=755387`
+- util-core: Remove deprecated `FuturePool.defaultPool`, callers should
+  use `FuturePool.unboundedPool` instead. `RB_ID=757499`
+- util-stats: Remove deprecated methods on `com.twitter.finagle.stats.StatsReceiver`.
+  `RB_ID=757414`
+- util-core: `AsyncStream` graduates out of `com.twitter.concurrent.exp` into
+  `com.twitter.concurrent`. Backwards compatibility aliases remain for Scala
+  users, but Java users will need to update their imports. `RB_ID=758061`
+- util-codec: Add a new encoder `com.twitter.util.Base64UrlSafeStringEncoder`
+  which extends from `com.twitter.util.Base64StringEncoder`. Both the url-safe
+  and non-url-safe encoders can decode all strings generated by either. `RB_ID=765189`
+- util-core: Remove unnecessary `invalidate` method from util-cache's
+  `com.twitter.cache.guava.LoadingFutureCache`, and change the `remove` semantic
+  to match the `com.twitter.cache.FutureCache` contract. `RB_ID=766988`
+- util-core: Remove protected `Timer.monitor` (overrides a monitor to use by a
+  timer implementation) because any possible implementation rather than `Monitor.get`
+  promotes memory leaks when timer is used to schedule recursive tasks (tasks that
+  reschedules themselves). `RB_ID=771736`
+",https://api.github.com/users/kevinoliver,347229,kevinoliver,https://api.github.com/repos/twitter/util/releases/2764701/assets,https://api.github.com/repos/twitter/util/releases/2764701,develop,https://api.github.com/repos/twitter/util/tarball/util-6.30.0,https://github.com/twitter/util/releases/tag/util-6.30.0,https://api.github.com/repos/twitter/util/zipball/util-6.30.0,util-6.30.0,False,False
+2764699,2015-10-15T22:23:48Z,2016-03-08T04:30:54Z,Util 6.29.0,"New Features:
+- util-core: Introduce an optional max capacity to `AsyncQueue`.
+  Modified `AsyncQueue.offer` to return a boolean indicating whether or not the
+  item was accepted. Added `AsyncQueue.drain(): Try[Queue]`. ``RB_ID=745567`
+
+API Changes:
+- util-core: Remove deprecated methods from `com.twitter.util.Time` and
+  `com.twitter.util.Duration`. `RB_ID=751771`
+- util-core: Provide methods on `Stopwatch` so that users can take advantage of
+  `Time` manipulation tools in latency-sensitive code when measuring elapsed
+  time. `RB_ID=75268`
+
+Changes in Runtime Behavior:
+- util-core: The Scheduler clock stats were decommissioned as they only make sense
+  relative to `wallTime` and the tracking error we have experienced `wallTime` and
+  `*Time` make it impossible to use them reliably. It is not worth the performance
+  and code complexity to support them. `RB_ID=750239`
+- util-core: `JavaTimer` and `ScheduledThreadPoolTimer` now capture the `Local`
+  state when scheduled and is used along with that `Monitor` when the `TimerTask`
+  is run. `RB_ID=755387`
+- util-logging: `QueueingHandler` does not create a separate thread per instance.
+  ``RB_ID=745567`
+",https://api.github.com/users/kevinoliver,347229,kevinoliver,https://api.github.com/repos/twitter/util/releases/2764699/assets,https://api.github.com/repos/twitter/util/releases/2764699,develop,https://api.github.com/repos/twitter/util/tarball/util-6.29.0,https://github.com/twitter/util/releases/tag/util-6.29.0,https://api.github.com/repos/twitter/util/zipball/util-6.29.0,util-6.29.0,False,False
+2764697,2015-09-28T17:59:32Z,2016-03-08T04:30:28Z,Util 6.28.0,"API Changes:
+- util-core: Remove deprecated methods from `com.twitter.util.Var`.
+  
+  To migrate `observe` and `foreach`, given `aVar.observe { t => somethingWith(t) }`
+  you would write `aVar.changes.register(Witness({ t => somethingWith(t) }))`.
+  
+  To migrate `observeUntil`, given `aVar.observeUntil(_ == something)`,
+  you would write `aVar.changes.filter(_ == something).toFuture()`.
+  
+  To migrate `observeTo`, given `aVar.observeTo(anAtomicReference)`,
+  you would write `aVar.changes.register(Witness(anAtomicReference))`.
+  
+  `RB_ID=744282`
+",https://api.github.com/users/kevinoliver,347229,kevinoliver,https://api.github.com/repos/twitter/util/releases/2764697/assets,https://api.github.com/repos/twitter/util/releases/2764697,develop,https://api.github.com/repos/twitter/util/tarball/util-6.28.0,https://github.com/twitter/util/releases/tag/util-6.28.0,https://api.github.com/repos/twitter/util/zipball/util-6.28.0,util-6.28.0,False,False
+2764696,2015-08-27T22:28:16Z,2016-03-08T04:30:04Z,Util 6.27.0,"API Changes:
+- util-core: `TimeFormat` optionally takes a `TimeZone` in the constructor.
+  If not provided, it uses UTC.
+",https://api.github.com/users/kevinoliver,347229,kevinoliver,https://api.github.com/repos/twitter/util/releases/2764696/assets,https://api.github.com/repos/twitter/util/releases/2764696,develop,https://api.github.com/repos/twitter/util/tarball/util-6.27.0,https://github.com/twitter/util/releases/tag/util-6.27.0,https://api.github.com/repos/twitter/util/zipball/util-6.27.0,util-6.27.0,False,False
+2764694,2015-07-27T23:17:26Z,2016-03-08T04:29:42Z,Util 6.26.0,"API Changes:
+- util-core: `Activity`, `BoundedStack`, `RingBuffer` and `Var` migrated
+  off of deprecated `ClassManifest` to `ClassTag`. `RB_ID=720455`
+- util-core: Added Spool#zip
+- util-core: Removed deprecated methods `Future.void` and `Future$.void()`.
+  Use `Future.voided` and `Future$.Void` instead. `RB_ID=720427`
+
+Changes in Runtime Behavior:
+- util-core: `Promise.forwardInterruptsTo(other)` is a no-op if the
+              other future is fulfilled. `RB_ID=714420`
+- util-events: Recording of events is disabled by default and can be updated
+               at runtime via TwitterServer's `/admin/events` page or
+               `/admin/events/{recordOn,recordOff}`. `RB_ID=715712`
+",https://api.github.com/users/kevinoliver,347229,kevinoliver,https://api.github.com/repos/twitter/util/releases/2764694/assets,https://api.github.com/repos/twitter/util/releases/2764694,develop,https://api.github.com/repos/twitter/util/tarball/util-6.26.0,https://github.com/twitter/util/releases/tag/util-6.26.0,https://api.github.com/repos/twitter/util/zipball/util-6.26.0,util-6.26.0,False,False
+2764692,2015-06-23T22:08:49Z,2016-03-08T04:29:10Z,Util 6.25.0,"Changes in Runtime Behavior:
+- util-events: Enable event sink by default.
+",https://api.github.com/users/kevinoliver,347229,kevinoliver,https://api.github.com/repos/twitter/util/releases/2764692/assets,https://api.github.com/repos/twitter/util/releases/2764692,develop,https://api.github.com/repos/twitter/util/tarball/util-6.25.0,https://github.com/twitter/util/releases/tag/util-6.25.0,https://api.github.com/repos/twitter/util/zipball/util-6.25.0,util-6.25.0,False,False
+2764691,2015-04-22T21:17:48Z,2016-03-08T04:28:47Z,Util 6.24.0,"New Features:
+- util-core: Introduce AsyncStream, an experimental replacement for Spool.
+
+API Changes:
+- util-core: `Future.willEqual()` now returns `Future[Boolean]` instead of
+             `Promise[Boolean]`.
+- util-core: rename VarSource to ActivitySource. remove
+             com.twitter.io.exp.VarSource.Result, return Activity[T]
+             instead of Var[VarSource.Result[T]]. Remove FailoverVarSource in
+             favor of ActivitySource.orElse.
+- util-core: `TimeFormat` now throws IllegalArgumentException if the pattern
+             uses the week year ('Y') without the week number ('w')
+- util-core: `Spool.++` used to force its argument, but now it is evaluated
+             only if `this` Spool is empty. To revert to existing behavior,
+             simply force the argument before passing it to ++.
+- util-core: `Reader.writable()` returns a new type, `Reader.Writable`, which
+             combines `Reader`, `Writer` and `Closable`.
+- util-core: `Reader.concat` and `Reader.copyMany` now take an AsyncStream
+             argument instead of Spool.
+
+Changes in Runtime Behavior:
+- util-core: Futures still rethrow on fatals, but now also Monitor.handle on
+             them.
+- util-core: `Future.onFailure` now only applies a `PartialFunction` if
+             `PartialFunction.isDefinedAt` returns true.
+- util-core: `AsyncSemaphore` now requires that `initialPermits` be positive.
+- util-core: The `Reader` and `Writer` from `Reader.Writable.close()` are now
+             synchronized on `close`.
+",https://api.github.com/users/kevinoliver,347229,kevinoliver,https://api.github.com/repos/twitter/util/releases/2764691/assets,https://api.github.com/repos/twitter/util/releases/2764691,develop,https://api.github.com/repos/twitter/util/tarball/util-6.24.0,https://github.com/twitter/util/releases/tag/util-6.24.0,https://api.github.com/repos/twitter/util/zipball/util-6.24.0,util-6.24.0,False,False

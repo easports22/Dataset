@@ -1,0 +1,354 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+664393,2014-10-02T04:35:31Z,2014-10-30T04:56:36Z,Shark 0.9.3,"Shark 0.9.3 is a maintenance release that bumps up Tachyon compatibility to 0.5.0.
+",https://api.github.com/users/haoyuan,1200956,haoyuan,https://api.github.com/repos/amplab/shark/releases/664393/assets,https://api.github.com/repos/amplab/shark/releases/664393,master,https://api.github.com/repos/amplab/shark/tarball/v0.9.3,https://github.com/amplab/shark/releases/tag/v0.9.3,https://api.github.com/repos/amplab/shark/zipball/v0.9.3,v0.9.3,False,False
+265906,2014-04-09T11:02:04Z,2014-04-10T22:43:58Z,Shark 0.9.1,"Release date: April 10, 2014
+
+Shark 0.9.1 is a maintenance release that stabilizes 0.9.0, which bumps up Scala compatibility to 2.10.3 and Hive compliance to 0.11. The core dependencies for this version are:
+- Scala 2.10.3
+- Spark 0.9.1
+- AMPLab’s Hive 0.9.0
+- (Optional) Tachyon 0.4.1
+
+### Hive Compatibility
+
+We’ve extensively upgraded the Shark codebase to be Hive 0.11 compliant. Existing users can now launch Shark as a drop-in replacement for operating with existing Hive 0.11 metastores.
+Two major components added during this upgrade process are support for new windowing and analytics functions, and SharkServer2. More detail is available in the respective sections below.
+
+### Analytics Functions
+
+#### Windowing functions
+
+Shark now supports the windowing functions added by [HIVE-896](https://issues.apache.org/jira/browse/HIVE-896).  All of the supported window functions operate based on the SQL standard.
+
+#### Rollups
+
+Shark also supports enhanced aggregation in the form of rollups.  This feature allows users to compute aggregations over multiple groups easily and efficiently.  For example, the following query uses the new `GROUPING SETS` clause:
+
+``` sql
+SELECT a, b, SUM( c ) FROM tab1 GROUP BY a, b GROUPING SETS ( (a,b), a)
+```
+
+The above query is equivalent to running multiple aggregations as follows:
+
+``` sql
+SELECT a, b, SUM( c ) FROM tab1 GROUP BY a, b
+UNION ALL
+SELECT a, null, SUM( c ) FROM tab1 GROUP BY a
+```
+
+### SharkServer2
+
+SharkServer2 is an improved Thrift server that’s compatible with the HiveServer2 developed in Hive 0.11. SharkServer2 allows for hosting concurrent client connections and query executions. Semantics are the same as for HiveServer2:
+To start a SharkServer2:
+
+```
+$ bin/shark -service sharkserver2
+```
+
+To connect to the server from remote clients, you can use JDBC with the network address and port that the server is listening on. For example, to use the Beeline CLI:
+
+```
+$ bin/beeline
+beeline > !connect jdbc:hive2://localhost:10000/default
+```
+
+### Usability
+- `<table name>_cached` now caches the table in the `MEMORY_ONLY` ephemeral layer (Spark block manager), which is consistent with pre-0.8.0 behavior. Previously, Shark was using `MEMORY`, which incurs added latency in DDL commands due to writes to both persistent and ephemeral storage.
+- `CACHE <table name> IN <cache type>` can be used to specify the cache layer for a table. This is equivalent to `ALTER TABLE <table name> TBLPROPERTIES('shark.cache'='<cache type>')`. `<cache type>` can be `MEMORY`, `MEMORY_ONLY`, or `TACHYON`.
+
+### Maven Central and Easier Deployment
+
+To simplify deployment and installation, we’ve uploaded all AMPLab Hive and Shark binaries to Maven Central under the `edu.berkeley.cs.shark` organization. `HIVE_HOME` is now obsolete, and Hive binary downloads are no longer required to begin running Shark. Instead, simply download the Shark binaries, and execute `SHARK_HOME/bin/shark`.
+
+To include Shark as a dependency in your application:
+For an sbt build file:
+
+```
+libraryDependencies ++= Seq(“edu.berkeley.cs.shark” %% “shark” % 0.9.1)
+```
+
+For Maven, in the `dependencies` section in `pom.xml`:
+
+```
+<dependency>
+  <groupId>edu.berkeley.cs.shark</groupId>
+  <artifactId>shark</artifactId>
+  <version>0.9.1</version>
+</dependency>
+```
+
+### Query Execution and Performance Improvements
+- Delta encoding for `int` and `long` primitives stored in columnar format. To save memory. we only store differences between consecutive values in each `int` or `long` column.
+- Table scans over Hive-partitioned tables (i.e., tables created using `PARTITIONED BY` clause) now broadcast a single configuration for each table scan, as opposed to broadcasts linear in the number of partitions for that table.
+
+### Download Links
+
+[Shark with Hadoop 1](https://s3.amazonaws.com/spark-related-packages/shark-0.9.1-bin-hadoop1.tgz)
+[Shark with Hadoop 2 (cdh5)](https://s3.amazonaws.com/spark-related-packages/shark-0.9.1-bin-hadoop2.tgz)
+
+### Credits
+
+Michael Armbrust - SharkServer bugfix, Scala 2.10 upgrade
+Oleg Danilov - Hive 0.11 upgrade, bug fixes
+Aaron Davidson - Tachyon API revamp, improved caching semantics
+Harvey Feng - Hive 0.11, Spark 0.9 upgrade, release manager
+Cheng Hao - Windowing functions, join refactor
+Nandu Jayakumar - Delta encoding
+Andy Konwinski - Build script fix
+Steven Leung - Bug fix for partitioned table stats
+ChengXiang Li - Yarn compatibility
+Antonio Lupher - Hive 0.11 upgrade, lateral view improvements
+Sundeep Narravula - Job cancellation using JDBC
+Brian O’Neill - Build fix
+Kay Ousterhout - Improved logging messages
+Ahir Reddy - Python support
+Sun Rui - Testing, analytic function support
+Sergey Soldatov - Hive 0.11 upgrade, serialization bug fix
+Henry Wang - SharkServer2 addition
+Reynold Xin - SparkConf integration
+Tian Yi - Combiner bug fix
+Yury Yudin - Hive 0.11 support
+
+Thanks to everyone who contributed!
+",https://api.github.com/users/harveyfeng,1581364,harveyfeng,https://api.github.com/repos/amplab/shark/releases/265906/assets,https://api.github.com/repos/amplab/shark/releases/265906,master,https://api.github.com/repos/amplab/shark/tarball/v0.9.1,https://github.com/amplab/shark/releases/tag/v0.9.1,https://api.github.com/repos/amplab/shark/zipball/v0.9.1,v0.9.1,False,False
+185401,2014-02-18T21:05:31Z,2014-04-10T22:03:50Z,Shark 0.9.0,"Release date: Feb 18, 2014
+
+<b><i> Please refer to Shark 0.9.1 release notes. </i></b>
+",https://api.github.com/users/harveyfeng,1581364,harveyfeng,https://api.github.com/repos/amplab/shark/releases/185401/assets,https://api.github.com/repos/amplab/shark/releases/185401,master,https://api.github.com/repos/amplab/shark/tarball/v0.9.0,https://github.com/amplab/shark/releases/tag/v0.9.0,https://api.github.com/repos/amplab/shark/zipball/v0.9.0,v0.9.0,False,False
+150061,2014-01-28T03:40:30Z,2014-02-03T19:29:16Z,Shark 0.8.1,"Release date: Jan 15, 2014
+
+Shark 0.8.1 introduces set of performance, maintenance and usability features, with emphasis on improved Hive compatibility, Tachyon support, Spark integration, and table generating functions. This release requires
+- Scala 2.9.3
+- Spark 0.8.1
+- AMPLab's Hive 0.9 distribution. Binaries are provided in the `hive-0.9.0-bin.tgz` shipped with this release.
+
+### Caching Semantics
+
+To simplify caching and table recovery semantics, we've implemented a write-through cache as the default for in-memory tables (i.e., tables created with `_cached` or with the `shark.cache` table property set to `MEMORY`).
+
+Any table data written to the in-memory, columnar cache is synchronized with the backing, fault-tolerant store specified by the Hive warehouse directory (e.g., HDFS). Since table metadata and in-memory data are both persistent, such tables can now be automatically recovered across Shark session restarts.
+
+Additional notes on table caching semantics:
+- You can now create a cached, `MEMORY` table by simply caching the underlying table:
+  `CACHE <table_name>`
+- Append operations (i.e., using `INSERT`, `LOAD`) on `MEMORY` tables may be slower due to the additional write to persistent store.
+- Tables targeted with the `CACHE` command and created with the `_cached` name suffix are always pinned at the `MEMORY` level. To revert to the ephemeral scheme offered in v0.8.0 and prior, create a table with `shark.cache` table property set to `MEMORY_ONLY` and a name that does not include the `_cached` suffix.
+
+### Partitioned Tables
+
+Users are now able to create and cache partitioned tables. Different from RDD partitions that correspond to Hadoop splits, Hive ""partitions"" are analogous to indexes. Each partition is represented by an RDD and identifiable by the set of runtimes values for virtual partitioning columns that specified at table creation.
+
+In-memory partitioned tables also adhere to partition-level cache policies, which can be toggled through the `shark.cache.policy` table property and customized by implementing the CachePolicy interface (an LRU implementation is provided).
+
+During query execution, Shark uses partitioning keys to automatically filter input partitions. This feature can is be combined with RDD-partition level pruning on non-partitioned columns to further decrease the amount of data that needs to be fetched and scanned.
+
+### Tachyon Support
+
+The complete set of commands supported for in-memory Shark tables stored in the Spark-managed heap are now supported for Tachyon-backed tables as well. This includes Hive-partitioned tables and table recovery features added in this 0.8.1 release.
+
+### Spark Integration
+
+Stability and usability improvements have been added to reduce friction in converting between native Spark RDDs and Shark tables. A key pair of features are `SharkContext`’s `sqlRdd()` functions and `rddToTable` implicit conversions, both of which can automatically deduce data types and update necessary metadata for transitions between RDDs and Shark tables. Both can be tested by launching a Shark shell (`SHARK_HOME/bin/shark-shell`).
+
+### Table Generating Functions (TGFs)
+
+Shark can now call into libraries that generate tables through TGFs. This enables Shark to easily access external libraries, such as Spark’s machine learning library (MLLIB).
+
+Calls can be made into TGFs by executing `GENERATE tgf_name(params)` or `GENERATE tgf_name(params) SAVE table_name`. TGFs are flexible and can take arbitrary tables and parameters as inputs and produce a new table with an accompanying schema.
+
+### Other improvements
+- To reduce the overhead for Hive-partitioned table scans, job configurations are only broadcasted once and shared throughout the entire read operation over a partitioned table. Previously, these configuration variables were broadcasted once per partition.
+- Commands that use `COUNT DISTINCT` operations, but don’t include grouping keys, are automatically rewritten to generate query plans that can take advantage of multiple reducers (set through the `mapred.reduce.tasks` property) and increased parallelism. This eliminates the previous single-reducer bottleneck.
+
+### Credits
+
+Michael Armbrust - test util improvements
+Harvey Feng - Tachyon support, caching semantics, partitioned table, release manager
+Ali Ghodsi - table generating functions
+Mark Hamstra - build fix
+Cheng Hao - work on removing Hive operator dependencies
+Nandu Jayakumar - code and style cleanup
+Andy Konwinski - build script fix
+Haoyuan Li - Tachyon integration
+Xi Liu - byte buffer overflow bug fix
+Sundeep Narravula - support for database namespaces for cached tables, code cleanup
+Patrick Wendell - bug fix
+Reynold Xin - caching semantics, Spark integration, miscellaneous bug fixes
+
+Thanks to everyone who contributed!
+",https://api.github.com/users/harveyfeng,1581364,harveyfeng,https://api.github.com/repos/amplab/shark/releases/150061/assets,https://api.github.com/repos/amplab/shark/releases/150061,branch-0.8,https://api.github.com/repos/amplab/shark/tarball/v0.8.1,https://github.com/amplab/shark/releases/tag/v0.8.1,https://api.github.com/repos/amplab/shark/zipball/v0.8.1,v0.8.1,False,False
+69880,2012-11-22T21:56:19Z,2013-10-17T23:26:34Z,Shark 0.2.1,"Release date: Nov 22, 2012 (Happy Thanksgiving!)
+
+Shark 0.2.1 is a minor release for bug fixing.
+- Spark 0.6.1: We upgraded the Spark version from 0.6 to 0.6.1.  The new version of Spark fixes a number of stability and reliability issues. See the Spark 0.6.1 changelog for more information.
+- Allow spilling large tables to disk: Shark 0.2.1 now allows spilling tables that are larger than the collective memory of a cluster to disk.
+",https://api.github.com/users/rxin,323388,rxin,https://api.github.com/repos/amplab/shark/releases/69880/assets,https://api.github.com/repos/amplab/shark/releases/69880,master,https://api.github.com/repos/amplab/shark/tarball/v0.2.1,https://github.com/amplab/shark/releases/tag/v0.2.1,https://api.github.com/repos/amplab/shark/zipball/v0.2.1,v0.2.1,False,False
+69878,2012-10-15T22:28:12Z,2013-10-17T23:25:54Z,Shark 0.2.0,"Release date: Oct 15, 2012
+
+Shark 0.2 is the first Shark release since the original 0.1 prototype release. The new version brings new features, performance improvements, and stability to Shark. See the documentation on the Github wiki to get started: https://github.com/amplab/shark/wiki
+
+Major changes are documented below:
+
+### Hive Compatibility
+- Shark now works with Hive 0.9, which introduces numerous features over the original Hive 0.7.
+- Hive UDFs and UDAFs are fully supported now.
+- Shark 0.2 also supports distributing resource files (e.g. jars) to the slaves using Hive's ADD FILE command.
+
+### Simpler Deployment
+- We have significantly simplified the deployment process.
+- For example, [[Running Shark Locally]] contains a guide to launch Shark 0.2 locally in ~ 5 mins.
+- In addition to running on Mesos, Shark now supports Spark's standalone deploy mode that lets you quickly launch a cluster without installing an external cluster manager. The standalone mode only needs Java installed on each machine, with Spark deployed to it.
+
+### Hive Thrift Server
+- Ram Sriharsha from Yahoo contributed a patch for the Shark Thrift server, which is compatible with Hive's Thrift server.
+- The Thrift server starts a long-running server and support multiple clients connecting to it. These clients can access the same warehouse, using the same set of cached tables.
+- To start the server on the default 10000 port, do
+  <pre>
+  $ bin/shark --service sharkserver
+  </pre>
+
+### Query Execution and Performance Improvements
+- Map side aggregation is now turned on by default and if not enough reduction is observed, Shark will turn off map side aggregation automatically. The user no longer needs to explitictly set `hive.map.aggr`.
+- We have rewritten Shark's join and group by code. For queries that have a large number of distinct keys, join and group by performance can increase by 2X.
+
+### Spark Compatibility
+- Shark 0.2 requires Spark 0.6 as it takes advantage of the new features and performance improvements from the new Spark release.
+
+### Miscellaneous
+- If you feel `_cached` is a hacky way to indicate whether a table should be cached in memory, Shark 0.2 supports specifying the boolean flag using table properties when the table is created. For example
+  <pre>
+  CREATE TABLE myTable TBLPROPERTIES (""shark.cache"" = ""true"") AS SELECT \* FROM myInput;
+  </pre>
+
+### Credits
+
+Shark 0.2 was the work of a large set of new contributors from Berkeley and outside.
+- Ram Sriharsha from Yahoo contributed a patch for the Shark Thrift server.
+- Harvey Feng contributed the Hive 0.9 upgrade and improved map join implementation.
+- Antonio Lupher contributed the map side aggregation tuning implementation.
+- Denny Britz contributed support for ADD FILE and UDF/UDAF dynamic class loading.
+- Patrick Wendell contributed the revamped documentation and extensive testing.
+- Paul Ruan helped with testing. 
+",https://api.github.com/users/rxin,323388,rxin,https://api.github.com/repos/amplab/shark/releases/69878/assets,https://api.github.com/repos/amplab/shark/releases/69878,master,https://api.github.com/repos/amplab/shark/tarball/v0.2.0,https://github.com/amplab/shark/releases/tag/v0.2.0,https://api.github.com/repos/amplab/shark/zipball/v0.2.0,v0.2.0,False,False
+69875,2013-06-06T18:56:31Z,2013-10-17T23:24:10Z,Shark 0.7.0,"Release date: June 6, 2013
+
+We are happy to announce Shark 0.7.0, a new release with a number of bug fixes and improvements. In particular, we have added experimental support for the Tachyon project. The current release requires:
+- Scala 2.9.3
+- Spark 0.7.2
+- OpenJDK 7 or Oracle HotSpot JDK7 or Oracle HotSpot JDK 6u23+ (because we are using certain Unsafe operations that are available only in the more recent JDKs)
+
+You can download the pre-packaged binary tarballs on our GitHub Wiki: https://github.com/amplab/shark/wiki
+
+### Release Versioning
+
+With this release, we are experimenting with a simplified versioning scheme for Shark. The major release number for Shark will synchronize with the major Spark release number.
+
+### Tachyon Integration
+
+Tachyon is a new project at UC Berkeley AMPLab that acts as a distributed in-memory storage layer on top of HDFS. Shark’s in-memory columnar storage engine has been rewritten to work with Tachyon, and users can choose to save an in-memory table into Tachyon. By decoupling the lifespan of the in-memory tables from the lifespan of the Shark processes, Tachyon provides a number of benefits:
+- In-memory tables can now be shared by multiple Shark / Spark instances.
+- JVM garbage collection times are shorter because of smaller JVM heap sizes for Shark processes. 
+- In-memory tables can survive when rogue applications crash Shark processes.
+
+To choose Tachyon as the storage system for in-memory tables, set the table property “shark.cache” to “tachyon”, e.g.
+
+```
+CREATE TABLE data TBLPROPERTIES(""shark.cache"" = ""tachyon"") AS
+SELECT a, b, c from data_on_disk WHERE month=""May"";
+```
+
+### Improved sql2rdd/sql2console API
+
+We have improved the reliability of `sql2rdd` and `sql2console` API. In particular, they are now used extensively in unit-tests.
+
+### New Data Types and Data Serialization/Deserialization Formats
+
+We added two new data types to the memory store: timestamp and binary. We also added Avro serialization and deserialization so Shark can read Avro files.
+
+### Improved LIMIT Support
+
+Shark now avoids launching any tasks if a query or a subquery uses `LIMIT 0`. For quick exploratory queries, Shark launches one task at a time when `LIMIT` is specified.
+
+### Appending Data Into In-Memory Tables
+
+You can now insert (with or without overwrite) additional data into in-memory tables.
+
+### Enhanced EC2/S3/EMR Support
+
+We have enhanced EC2/S3/EMR support in Shark. For example, the Shark CLI can now execute queries defined in an S3 file (`bin/shark -f s3://...`). Shark also picks up AWS credentials directly from the environmental variable settings (`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`).
+
+### Better Support for Hadoop2/CDH4
+
+The latest release of Spark and Shark includes pre-compiled binaries for both Hadoop1 and Hadoop2 storage API’s, eliminating the need for users to build themselves. We’ve also updated the documentation to point out major “gotchas” encountered when running on Hadoop2.
+
+### Better Memory Management and Cluster Resource UI
+
+Thanks to the new features in Spark, you can now monitor the status of in-memory storage and cluster nodes on Spark’s web UI.
+
+### Credits
+
+We would like to thank Mikhail Bautin, Tathagata Das, Harvey Feng, Mark Hamstra, Cheng Hao, Jon Hartlaub, Nandu Jayakumar, Jey Kottalam, Haoyuan Li, Josh Rosen, Ram Sriharsha, Patrick Wendell, and Reynold Xin for their contributions.
+",https://api.github.com/users/rxin,323388,rxin,https://api.github.com/repos/amplab/shark/releases/69875/assets,https://api.github.com/repos/amplab/shark/releases/69875,master,https://api.github.com/repos/amplab/shark/tarball/v0.7.0,https://github.com/amplab/shark/releases/tag/v0.7.0,https://api.github.com/repos/amplab/shark/zipball/v0.7.0,v0.7.0,False,False
+69759,2013-10-16T04:44:26Z,2013-10-21T02:32:08Z,Shark 0.8.0,"Release date: Oct 17, 2013
+
+We are happy to announce Shark 0.8.0, which is a major release the brings many new capabilities and performance improvements. 
+
+### Shuffle Performance for Large Aggregations and Joins
+
+We’ve implemented a new data serialization format that substantially improved shuffle performance in the case of large aggregations and joins. The new format is more CPU-efficient, while also reducing the size of the data sent across the network. This can improve performance by up to 3X for queries that have large aggregations or joins.
+
+### In-memory Columnar Compression
+
+Memory is precious. To enable you fitting more data into memory, Shark now implements CPU-efficient compression algorithms, including dictionary encoding and run-length encoding. In addition to using less space in-memory compression actually improves the response time of many queries. This is because it reduces GC pressure and improves locality leading to better CPU cache performance. The compression ratio is workload-dependent, however, we have seen anywhere from 2X to 30X compression in real-workloads. 
+
+There is also no need to worry about picking  the best compression scheme. When first loading the data into memory, Shark will automatically determine the best scheme to apply for the given dataset.
+
+### Partition Pruning aka Data Skipping for In-memory Tables
+
+A typical query usually only looks at a small subset of overall data. Partition pruning allows Shark to skip looking at partitions that it knows for sure does not contain any data satisfying the query predicates. For one early user of Shark, this allowed query processing to skip examining 98% of the data.
+
+Different from Hive's partitioning feature, partition pruning refers to Shark's usage of column statistics - collected during in-memory data materialization - to automatically reduce the number of RDD partitions that need to be scanned.
+
+### Spark 0.8.0 Support
+
+First and foremost, through its Spark 0.8.0 support, this new version of Shark supports a number of important features, including:
+- Web-based monitoring UI for cluster memory and job progress
+- Dropping a cached table releases its memory occupation
+- Improved scheduling support (including fair scheduling, topology-aware scheduling)
+
+### Fair Scheduling
+
+Spark’s internal job scheduler has been refactored and extended to include more sophisticated scheduling policies such as fair scheduling. The fair scheduler allows multiple users to share an instance of Spark, which helps users running shorter jobs to achieve good performance, even when longer-running jobs are running in parallel.
+
+Shark users can also take advantage of this new capability by setting the configuration variable `spark.scheduler.cluster.fair.pool` to a specific scheduling pool at runtime. For example:
+
+```
+set mapred.fairscheduler.pool=short_query_pool;
+select count(*) from my_shark_in_memory_table;
+```
+
+### Build and Development
+
+A continuous integration script has been added that would automatically fetch all the Shark dependencies (Scala, Hive, Spark) and execute both the Shark internal unit tests and the Hive compatibility unit tests. This has been used in various places as part of their Jenkins pipeline. 
+
+Users can now build Shark against specific versions of Hadoop without modifying the build file. Simply specify the Hadoop version using the `SHARK_HADOOP_VERSION` environmental variable before running the build.
+
+```
+SHARK_HADOOP_VERSION=1.0.5 sbt/sbt package
+```
+
+### Other Improvements
+- Reduced info level logging verbosity.
+- When connecting to a remote server, the Shark CLI no longer needs to launch a local SparkContext.
+- Various improvements to the experimental Tachyon support.
+- Stability improvement for map join.
+- Improved LIMIT performance for highly selective queries.
+
+We would like to thank Konstantin Boudnik, Jason Dai, Harvey Feng, Sarah Gerweck, Jason Giedymin, Cheng Hao, Mark Hamstra, Jon Hartlaub, Shane Huang, Nandu Jayakumar, Andy Konwinski, Haoyuan Li, Harold Lim, Raymond Liu, Antonio Lupher, Kay Ousterhout, Alexander Pivovarov, Sun Rui, Andre Schumacher, Mingfei Shi, Amir Shimoni, Ram Sriharsha, Patrick Wendell, Andrew Xia, Matei Zaharia, and Lin Zhao for their contributions to the release.
+",https://api.github.com/users/rxin,323388,rxin,https://api.github.com/repos/amplab/shark/releases/69759/assets,https://api.github.com/repos/amplab/shark/releases/69759,master,https://api.github.com/repos/amplab/shark/tarball/v0.8.0,https://github.com/amplab/shark/releases/tag/v0.8.0,https://api.github.com/repos/amplab/shark/zipball/v0.8.0,v0.8.0,False,False
+13770,2013-07-22T18:15:39Z,2013-07-22T19:29:45Z,Shark 0.7.1,"Shark 0.7.1 is a minor release that fixes two important bugs:
+- Shark Scala shell could throw NullPointerException
+- Query with limit could fail if the number of records are less than the user specified limit.
+
+In addition, we have also bumped up the Spark version to 0.7.3. You can download the corresponding Spark version at http://spark-project.org/downloads/
+",https://api.github.com/users/rxin,323388,rxin,https://api.github.com/repos/amplab/shark/releases/13770/assets,https://api.github.com/repos/amplab/shark/releases/13770,master,https://api.github.com/repos/amplab/shark/tarball/v0.7.1,https://github.com/amplab/shark/releases/tag/v0.7.1,https://api.github.com/repos/amplab/shark/zipball/v0.7.1,v0.7.1,False,False

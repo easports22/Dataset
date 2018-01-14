@@ -1,0 +1,181 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+2375826,2016-01-05T17:24:00Z,2016-01-05T17:27:14Z,2.0.0-beta3,"- New: All classes have been migrated to the `retrofit2.*` package name. The Maven groupId is now
+  `com.squareup.retrofit2`. This is in accordance with the
+  [Java Interoperability Policy for Major Version Updates](http://jakewharton.com/java-interoperability-policy-for-major-version-updates/).
+  With this change Retrofit 2.x can coexiest with Retrofit 1.x in the same project.
+- New: Update to use the OkHttp 3 API and OkHttp 3.0.0-RC1 or newer is now required. Similar to the previous
+  point, OkHttp has a new package name (`okhttp3.*`) and Maven groupId (`com.squareup.okhttp3`) which allow
+  it to coexist with OkHttp 2.x in the same project.
+- New: String converters allow for custom serialization of parameters that end up as strings (such as `@Path`,
+  `@Query`, `@Header`, etc.). `Converter.Factory` has a new `stringConverter` method which receives the
+  parameter type and annotations and can return a converter for that type. This allows providing custom
+  rendering of types like `Date`, `User`, etc. to a string before being used for its purpose. A default
+  converter will call `toString()` for any type which retains the mimics the previous behavior.
+- New: OkHttp's `Call.Factory` type is now used as the HTTP client rather than using the `OkHttpClient` type
+  directly (`OkHttpClient` does implement `Call.Factory`). A `callFactory` method has been added to both
+  `Retrofit.Builder` and `Retrofit` to allow supplying alternate implementations of an HTTP client. The
+  `client(OkHttpClient)` method on `Retrofit.Builder` still exists as a convenience.
+- New: `isExecuted()` method returns whether a `Call` has been synchronously or asynchronously executed.
+- New: `isCanceled()` method returns whether a `Call` has been canceled. Use this in `onFailure` to determine
+  whether the callback was invoked from cancelation or actual transport failure.
+- New: `converter-scalars` module provides a `Converter.Factory` for converting `String`, the 8 primitive
+  types, and the 8 boxed primitive types as `text/plain` bodies. Install this before your normal converter
+  to avoid passing these simple scalars through, for example, a JSON converter.
+- New: `Converter.Factory` methods now receive a `Retrofit` instance which also now has methods for querying
+  the next converter for a given type. This allows implementations to delegate to others and provide
+  additional behavior without complete reimplementation.
+- New: `@OPTIONS` annotation more easily allows for making OPTIONS requests.
+- New: `@Part` annotation now supports `List` and array types.
+- New: The `@Url` annotation now allows using `java.net.URI` or `android.net.Uri` (in addition to `String`)
+  as parameter types for providing relative or absolute endpoint URLs dynamically.
+- New: The `retrofit-mock` module has been rewritten with a new `BehaviorDelegate` class for implementing
+  fake network behavior in a local mock implementation of your service endpoints. Documentation and more
+  tests are forthcoming, but the `SimpleMockService` demonstrates its use for now.
+- Fix: Forbid Retrofit's `Response` type and OkHttp's `Response` type as the response body type given to
+  a `Call` (i.e., `Call<Response>`). OkHttp's `ResponseBody` type is the correct one to use when the raw
+  body contents are desired.
+- Fix: The Gson converter now respects settings on the supplied `Gson` instance (such as `serializeNulls`).
+  This requires Gson 2.4 or newer.
+- The Wire converter has been updated to the Wire 2.0 API.
+- The change in 2.0.0-beta2 which provided the `Retrofit` instance to the `onResponse` callback of `Callback`
+  has been reverted. There are too many edge cases around providing the `Retrofit` object in order to allow
+  deserialization of the error body. To accommodate this use case, pass around the `Retrofit` response
+  manually or implement a custom `CallAdapter.Factory` does so automatically.
+",https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/2375826/assets,https://api.github.com/repos/square/retrofit/releases/2375826,master,https://api.github.com/repos/square/retrofit/tarball/parent-2.0.0-beta3,https://github.com/square/retrofit/releases/tag/parent-2.0.0-beta3,https://api.github.com/repos/square/retrofit/zipball/parent-2.0.0-beta3,parent-2.0.0-beta3,False,True
+1877744,2015-09-28T15:15:31Z,2015-09-28T15:22:20Z,2.0.0-beta2,"- New: Using a response type of `Void` (e.g., `Call<Void>`) will ignore and discard the response body. This
+  can be used when there will be no response body (such as in a 201 response) or whenever the body is not
+  needed. `@Head` requests are now forced to use this as their response type.
+- New: `validateEagerly()` method on `Retrofit.Builder` will verify the correctness of all service methods
+  on calls to `create()` instead of lazily validating on first use.
+- New: `Converter` is now parameterized over both 'from' and 'to' types with a single `convert` method.
+  `Converter.Factory` is now an abstract class and has factory methods for both request body and response
+  body.
+- New: `Converter.Factory` and `CallAdapter.Factory` now receive the method annotations when being created
+  for a return/response type and the parameter annotations when being created for a parameter type.
+- New: `callAdapter()` method on `Retrofit` allows querying a `CallAdapter` for a given type. The
+  `nextCallAdapter()` method allows delegating to another `CallAdapter` from within a `CallAdapter.Factory`.
+  This is useful for composing call adapters to incrementally build up behavior.
+- New: `requestConverter()` and `responseConverter()` methods on `Retrofit` allow querying a `Converter` for
+  a given type.
+- New: `onResponse` method in `Callback` now receives the `Retrofit` instance. Combined with the
+  `responseConverter()` method on `Retrofit`, this provides a way of deserializing an error body on `Response`.
+  See the `DeserializeErrorBody` sample for an example.
+- New: The `MoshiConverterFactory` has been updated for its v1.0.0.
+- Fix: Using `ResponseBody` for the response type or `RequestBody` for a parameter type is now correctly
+  identified. Previously these types would erroneously be passed to the supplied converter.
+- Fix: The encoding of `@Path` values has been corrected to conform to OkHttp's `HttpUrl`.
+- Fix: Use form-data content disposition subtype for `@Multipart`.
+- Fix: `Observable` and `Single`-based execution of requests now behave synchronously (and thus requires
+  `subscribeOn()` for running in the background).
+- Fix: Correct `GsonConverterFactory` to honor the configuration of the `Gson` instances (such as not
+  serializing null values, the default).
+",https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/1877744/assets,https://api.github.com/repos/square/retrofit/releases/1877744,master,https://api.github.com/repos/square/retrofit/tarball/parent-2.0.0-beta2,https://github.com/square/retrofit/releases/tag/parent-2.0.0-beta2,https://api.github.com/repos/square/retrofit/zipball/parent-2.0.0-beta2,parent-2.0.0-beta2,False,True
+386281,2014-06-07T01:42:15Z,2014-06-20T18:13:14Z,1.6.0,"- New: `@Streaming` on a `Response` type will skip buffering the body to a `byte[]` before delivering.
+- When using OkHttp, version 1.6.0 or newer (including 2.0.0+) is now required.
+- The absence of a response body and an empty body are now differentiated in the log messages.
+- Fix: If set, the `RequestInterceptor` is now applied at the time of `Observable` subscription rather
+  than at the time of its creation.
+- Fix: `Callback` subtypes are now supported when using `MockRestAdapter`.
+- Fix: `RetrofitError` now contains a useful message indicating the reason for the failure.
+- Fix: Exceptions thrown when parsing the response type of the interface are now properly propagated.
+- Fix: Calling `Response#getBody` when `null` body now correctly returns instead of throwing an NPE.
+- Experimental RxJava support updated for v0.19.
+- The `Content-Type` and `Content-Length` headers are no longer automatically added to the header list
+  on the `Request` object. This reverts erroneous behavior added in v1.5.0. Custom `Client` implementations
+  should revert to adding these headers based on the `TypedInput` body of the `Request`.
+",https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/386281/assets,https://api.github.com/repos/square/retrofit/releases/386281,master,https://api.github.com/repos/square/retrofit/tarball/parent-1.6.0,https://github.com/square/retrofit/releases/tag/parent-1.6.0,https://api.github.com/repos/square/retrofit/zipball/parent-1.6.0,parent-1.6.0,False,False
+386280,2014-05-08T16:04:22Z,2014-06-20T18:12:58Z,1.5.1,"- New: `@PartMap` annotation accepts a `Map` of key/value pairs for multi-part.
+- Fix: `MockRestAdpater` uses the `ErrorHandler` from its parent `RestAdapter`.
+- Experimental RxJava support updated for v0.18 and is now lazily initialized.
+",https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/386280/assets,https://api.github.com/repos/square/retrofit/releases/386280,master,https://api.github.com/repos/square/retrofit/tarball/parent-1.5.1,https://github.com/square/retrofit/releases/tag/parent-1.5.1,https://api.github.com/repos/square/retrofit/zipball/parent-1.5.1,parent-1.5.1,False,False
+386279,2014-03-21T06:52:05Z,2014-06-20T18:12:43Z,1.5.0,"- New: Support for AppEngine's [URL Fetch](https://developers.google.com/appengine/docs/java/urlfetch/)
+  HTTP client.
+- New: Multipart requests of unknown length are now supported.
+- New: HTTP `Content-Type` can be overridden with a method-level or paramter header annotation.
+- New: Exceptions from malformed interface methods now include detailed information.
+- Fix: Support empty HTTP response status reason.
+- If an `ErrorHandler` is supplied it will be invoked for `Callback` and `Observable` methods.
+- HTTP `PATCH` method using `HttpUrlConnection` is no longer supported. Add the
+  [OkHttp](http://square.github.io/okhttp) jar to your project if you need this behavior.
+- Custom `Client` implementations should no longer set `Content-Type` or `Content-Length` headers
+  based on the `TypedInput` body of the `Request`. These headers will now be added automatically
+  as part of the standard `Request` header list.
+",https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/386279/assets,https://api.github.com/repos/square/retrofit/releases/386279,master,https://api.github.com/repos/square/retrofit/tarball/parent-1.5.0,https://github.com/square/retrofit/releases/tag/parent-1.5.0,https://api.github.com/repos/square/retrofit/zipball/parent-1.5.0,parent-1.5.0,False,False
+386278,2014-02-01T20:25:33Z,2014-06-20T18:12:28Z,1.4.1,"- Fix: `@QueryMap`, `@EncodedFieldMap`, and `@FieldMap` now correctly detect `Map`-based parameter
+  types.
+",https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/386278/assets,https://api.github.com/repos/square/retrofit/releases/386278,master,https://api.github.com/repos/square/retrofit/tarball/parent-1.4.1,https://github.com/square/retrofit/releases/tag/parent-1.4.1,https://api.github.com/repos/square/retrofit/zipball/parent-1.4.1,parent-1.4.1,False,False
+386277,2014-02-01T07:56:07Z,2014-06-20T18:12:10Z,1.4.0,"- New: `@Query` and `@EncodedQuery` now accept `List` or arrays for multiple values.
+- New: `@QueryMap` and `@EncodedQueryMap` accept a `Map` of key/value pairs for query parameters.
+- New: `@Field` now accepts `List` or arrays for multiple values.
+- New: `@FieldMap` accepts a `Map` of name/value pairs for form URL-encoded request bodies.
+- New: `Endpoint` replaces `Server` as the representation of the remote API root. The `Endpoints`
+  utility class contains factories methods for creating instances. `Server` and `ChangeableServer`
+  are now deprecated.
+- `SimpleXmlConverter` and `JacksonConverter` now have a default constructor.
+- `Response` now includes the URL.
+- Fix: Hide references to optional classes to prevent over-eager class verifiers from
+  complaining (e.g., Dalvik).
+- Fix: Properly detect and reject interfaces which extend from other interfaces.
+",https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/386277/assets,https://api.github.com/repos/square/retrofit/releases/386277,master,https://api.github.com/repos/square/retrofit/tarball/parent-1.4.0,https://github.com/square/retrofit/releases/tag/parent-1.4.0,https://api.github.com/repos/square/retrofit/zipball/parent-1.4.0,parent-1.4.0,False,False
+386276,2013-11-25T19:43:54Z,2014-06-20T18:11:44Z,1.3.0,"- New: Converter module for SimpleXML.
+- New: Mock module which allows simulating real network behavior for local service interface
+  implementations. See 'mock-github-client' example for a demo.
+- New: RxJava `Observable` support! Declare a return type of `Observable<Foo>` on your service
+  interfaces to automatically get an observable for that request. (Experimental API)
+- Fix: Use `ObjectMapper`'s type factory when deserializing (Jackson converter).
+- Multipart POST requests now stream their individual part bodies.
+- Log chunking to 4000 characters now only happens on the Android platform.
+",https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/386276/assets,https://api.github.com/repos/square/retrofit/releases/386276,master,https://api.github.com/repos/square/retrofit/tarball/parent-1.3.0,https://github.com/square/retrofit/releases/tag/parent-1.3.0,https://api.github.com/repos/square/retrofit/zipball/parent-1.3.0,parent-1.3.0,False,False
+48665,2013-09-13T02:56:44Z,2013-09-20T04:23:44Z,1.2.2,"- Fix: Respect connection and read timeouts on supplied `OkHttpClient` instances.
+- Fix: Ensure connection is closed on non-200 responses.
+",https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/48665/assets,https://api.github.com/repos/square/retrofit/releases/48665,master,https://api.github.com/repos/square/retrofit/tarball/parent-1.2.2,https://github.com/square/retrofit/releases/tag/parent-1.2.2,https://api.github.com/repos/square/retrofit/zipball/parent-1.2.2,parent-1.2.2,False,False
+36095,2013-08-30T21:44:12Z,2013-08-30T23:35:34Z,1.2.1,"- New: Converter for [Wire protocol buffers](http://github.com/square/wire)!
+",https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/36095/assets,https://api.github.com/repos/square/retrofit/releases/36095,master,https://api.github.com/repos/square/retrofit/tarball/parent-1.2.1,https://github.com/square/retrofit/releases/tag/parent-1.2.1,https://api.github.com/repos/square/retrofit/zipball/parent-1.2.1,parent-1.2.1,False,False
+36094,2013-08-23T16:27:11Z,2013-08-30T23:35:21Z,1.2.0,"- New: Additional first-party converters for Jackson and Protocol Buffers! These are provided
+  as separate modules that you can include and pass to `RestAdapter.Builder`'s `setConverter`.
+- New: `@EncodedPath` and `@EncodedQuery` annotations allow provided path and query params that
+  are already URL-encoded.
+- New: `@PATCH` HTTP method annotation.
+- Fix: Properly support custom HTTP method annotations in `UrlConnectionClient`.
+- Fix: Apply `RequestInterceptor` during method invocation rather than at request execution time.
+- Change `setDebug` to `setLogLevel` on `RestAdapter` and `RestAdapter.Builder` and provide
+  two levels of logging via `LogLevel`.
+- Query parameters can now be added in a request interceptor.
+",https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/36094/assets,https://api.github.com/repos/square/retrofit/releases/36094,master,https://api.github.com/repos/square/retrofit/tarball/parent-1.2.0,https://github.com/square/retrofit/releases/tag/parent-1.2.0,https://api.github.com/repos/square/retrofit/zipball/parent-1.2.0,parent-1.2.0,False,False
+36093,2013-06-25T20:28:22Z,2013-08-30T23:35:06Z,1.1.1,"- Fix: Ensure `@Headers`-defined headers are correctly added to requests.
+- Fix: Supply reasonable connection and read timeouts for default clients.
+- Fix: Allow passing `null` for a `@Part`-annotated argument to remove it from the multipart
+  request body.
+",https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/36093/assets,https://api.github.com/repos/square/retrofit/releases/36093,master,https://api.github.com/repos/square/retrofit/tarball/parent-1.1.1,https://github.com/square/retrofit/releases/tag/parent-1.1.1,https://api.github.com/repos/square/retrofit/zipball/parent-1.1.1,parent-1.1.1,False,False
+36092,2013-06-20T19:40:52Z,2013-08-30T23:34:51Z,1.1.0,"- Introduce `RequestInterceptor` to replace `RequestHeaders`. An interceptor provided to the
+  `RestAdapter.Builder` will be called for every request and allow setting both headers and
+  additional path parameter replacements.
+- Add `ErrorHandler` for customizing the exceptions which are thrown when synchronous methods
+  return non-200 error codes.
+- Properly parse responses which erroneously omit the ""Content-Type"" header.
+",https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/36092/assets,https://api.github.com/repos/square/retrofit/releases/36092,master,https://api.github.com/repos/square/retrofit/tarball/parent-1.1.0,https://github.com/square/retrofit/releases/tag/parent-1.1.0,https://api.github.com/repos/square/retrofit/zipball/parent-1.1.0,parent-1.1.0,False,False
+36091,2013-05-24T05:22:02Z,2013-08-30T23:34:33Z,1.0.2,"- Allow uppercase letters in path replacement identifiers.
+- Fix: Static query parameters in the URL are now correctly appended with a separating '?'.
+- Fix: Explicitly allow or forbid `null` as a value for method parameters.
+  - `@Path` - Forbidden
+  - `@Query` - Allowed
+  - `@Field` - Allowed
+  - `@Part` - Forbidden
+  - `@Body` - Forbidden
+  - `@Header` - Allowed
+",https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/36091/assets,https://api.github.com/repos/square/retrofit/releases/36091,master,https://api.github.com/repos/square/retrofit/tarball/parent-1.0.2,https://github.com/square/retrofit/releases/tag/parent-1.0.2,https://api.github.com/repos/square/retrofit/zipball/parent-1.0.2,parent-1.0.2,False,False
+36090,2013-05-13T21:27:21Z,2013-08-30T23:34:13Z,1.0.1,"- Fix: Correct bad regex behavior on Android.
+",https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/36090/assets,https://api.github.com/repos/square/retrofit/releases/36090,master,https://api.github.com/repos/square/retrofit/tarball/parent-1.0.1,https://github.com/square/retrofit/releases/tag/parent-1.0.1,https://api.github.com/repos/square/retrofit/zipball/parent-1.0.1,parent-1.0.1,False,False
+36089,2013-05-13T15:56:03Z,2013-08-30T23:33:56Z,1.0.0,"Initial release.
+",https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/36089/assets,https://api.github.com/repos/square/retrofit/releases/36089,master,https://api.github.com/repos/square/retrofit/tarball/parent-1.0.0,https://github.com/square/retrofit/releases/tag/parent-1.0.0,https://api.github.com/repos/square/retrofit/zipball/parent-1.0.0,parent-1.0.0,False,False
+36087,2012-08-30T16:56:36Z,2013-08-30T23:33:32Z,0.6.0 RC6,,https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/36087/assets,https://api.github.com/repos/square/retrofit/releases/36087,master,https://api.github.com/repos/square/retrofit/tarball/0.6.0-rc6,https://github.com/square/retrofit/releases/tag/0.6.0-rc6,https://api.github.com/repos/square/retrofit/zipball/0.6.0-rc6,0.6.0-rc6,False,True
+36086,2012-08-15T18:18:14Z,2013-08-30T23:33:17Z,0.6.0 RC5,,https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/36086/assets,https://api.github.com/repos/square/retrofit/releases/36086,master,https://api.github.com/repos/square/retrofit/tarball/0.6.0-rc5,https://github.com/square/retrofit/releases/tag/0.6.0-rc5,https://api.github.com/repos/square/retrofit/zipball/0.6.0-rc5,0.6.0-rc5,False,True
+36085,2012-08-08T21:46:32Z,2013-08-30T23:32:58Z,0.6.0 RC4,,https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/36085/assets,https://api.github.com/repos/square/retrofit/releases/36085,master,https://api.github.com/repos/square/retrofit/tarball/0.6.0-rc4,https://github.com/square/retrofit/releases/tag/0.6.0-rc4,https://api.github.com/repos/square/retrofit/zipball/0.6.0-rc4,0.6.0-rc4,False,True
+36084,2012-07-17T17:31:02Z,2013-08-30T23:32:38Z,0.6.0 RC3,,https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/36084/assets,https://api.github.com/repos/square/retrofit/releases/36084,master,https://api.github.com/repos/square/retrofit/tarball/0.6.0-rc3,https://github.com/square/retrofit/releases/tag/0.6.0-rc3,https://api.github.com/repos/square/retrofit/zipball/0.6.0-rc3,0.6.0-rc3,False,True
+36083,2012-06-22T20:15:14Z,2013-08-30T23:32:23Z,0.6.0 RC2,,https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/36083/assets,https://api.github.com/repos/square/retrofit/releases/36083,master,https://api.github.com/repos/square/retrofit/tarball/0.6.0-rc2,https://github.com/square/retrofit/releases/tag/0.6.0-rc2,https://api.github.com/repos/square/retrofit/zipball/0.6.0-rc2,0.6.0-rc2,False,True
+36082,2012-06-13T19:30:22Z,2013-08-30T23:32:06Z,0.6.0 RC1,,https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/36082/assets,https://api.github.com/repos/square/retrofit/releases/36082,master,https://api.github.com/repos/square/retrofit/tarball/0.6.0-rc1,https://github.com/square/retrofit/releases/tag/0.6.0-rc1,https://api.github.com/repos/square/retrofit/zipball/0.6.0-rc1,0.6.0-rc1,False,True
+36081,2012-08-31T21:10:23Z,2013-08-30T23:31:50Z,0.5.0,,https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/36081/assets,https://api.github.com/repos/square/retrofit/releases/36081,master,https://api.github.com/repos/square/retrofit/tarball/0.5,https://github.com/square/retrofit/releases/tag/0.5,https://api.github.com/repos/square/retrofit/zipball/0.5,0.5,False,True
+36080,2012-08-31T21:10:15Z,2013-08-30T23:31:33Z,0.4.0,,https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/36080/assets,https://api.github.com/repos/square/retrofit/releases/36080,master,https://api.github.com/repos/square/retrofit/tarball/0.4,https://github.com/square/retrofit/releases/tag/0.4,https://api.github.com/repos/square/retrofit/zipball/0.4,0.4,False,True
+36079,2012-08-31T21:10:04Z,2013-08-30T23:31:17Z,0.3.0,,https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/36079/assets,https://api.github.com/repos/square/retrofit/releases/36079,master,https://api.github.com/repos/square/retrofit/tarball/0.3,https://github.com/square/retrofit/releases/tag/0.3,https://api.github.com/repos/square/retrofit/zipball/0.3,0.3,False,True
+36078,2012-08-31T21:09:52Z,2013-08-30T23:30:59Z,0.2.0,,https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/36078/assets,https://api.github.com/repos/square/retrofit/releases/36078,master,https://api.github.com/repos/square/retrofit/tarball/0.2,https://github.com/square/retrofit/releases/tag/0.2,https://api.github.com/repos/square/retrofit/zipball/0.2,0.2,False,True
+36077,2012-08-31T21:09:19Z,2013-08-30T23:30:45Z,0.1.0,,https://api.github.com/users/JakeWharton,66577,JakeWharton,https://api.github.com/repos/square/retrofit/releases/36077/assets,https://api.github.com/repos/square/retrofit/releases/36077,master,https://api.github.com/repos/square/retrofit/tarball/0.1,https://github.com/square/retrofit/releases/tag/0.1,https://api.github.com/repos/square/retrofit/zipball/0.1,0.1,False,True

@@ -1,0 +1,753 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8246486,2017-10-24T23:38:54Z,2017-10-24T23:46:06Z,1.3.1,"## 1.3.1 2017-10-24
+* Kubernetes 
+  * Fixed a failure to update routing data after restarting watches (#1674).
+  * Ensured that Kubernetes API watch events earlier than the current state are ignored (#1681).
+* Added support for Istio Mixer precondition checks (#1606).
+* Removed spurious error message logging from Consul namer (#1682).
+* Changed DNS SRV record namer to use system DNS resolver configuration (#1679).
+* Added `timestampHeader` configuration to support New Relic request queue (#1672).
+",https://api.github.com/users/hawkw,2796466,hawkw,https://api.github.com/repos/linkerd/linkerd/releases/8246486/assets,https://api.github.com/repos/linkerd/linkerd/releases/8246486,master,https://api.github.com/repos/linkerd/linkerd/tarball/1.3.1,https://github.com/linkerd/linkerd/releases/tag/1.3.1,https://api.github.com/repos/linkerd/linkerd/zipball/1.3.1,1.3.1,False,False
+8189518,2017-10-19T21:28:33Z,2017-10-19T22:21:00Z,1.3.1-rc1,Release candidate with fixes for Kubernetes watch issues.,https://api.github.com/users/hawkw,2796466,hawkw,https://api.github.com/repos/linkerd/linkerd/releases/8189518/assets,https://api.github.com/repos/linkerd/linkerd/releases/8189518,master,https://api.github.com/repos/linkerd/linkerd/tarball/1.3.1-rc1,https://github.com/linkerd/linkerd/releases/tag/1.3.1-rc1,https://api.github.com/repos/linkerd/linkerd/zipball/1.3.1-rc1,1.3.1-rc1,False,True
+8031848,2017-10-06T22:14:21Z,2017-10-06T23:21:36Z,1.3.0,"## 1.3.0 2017-10-06
+
+* **Breaking Change**: All HTTP engines are now Netty 4; `engine:` configuration key is no longer valid.
+* Upgraded to Finagle 7.1
+* Kubernetes
+  * Added a workaround for an issue where Kubernetes namers fail to update because watches are not correctly restarted due to a regression in some versions of Kubernetes (#1636).
+  * Fixed `io.l5d.k8s.configMap` interpreter failing to update after receiving an invalid dtab (#1639).
+  * Performance improvements for Kubernetes namers.
+* Prometheus
+  * Added an optional `prefix:` configuration key to add a prefix to all metrics reported by Linkerd (#1655).
+* DNS SRV Record namer
+  * Ensured that DNS names in SRV queries are absolute (#1637).
+  * Added an optional `domain` config key for relative DNS lookups (#1637).
+  * Removed redundant `dnssrv` metrics scope from SRV record namer metrics (#1637).
+* Consul
+  * Consul namers no longer watch the entire list of services, improving performance significantly when there are large numbers of services (#1646).
+* Curator
+  * Added support for `ServiceInstance` objects with custom payloads (#1272).",https://api.github.com/users/hawkw,2796466,hawkw,https://api.github.com/repos/linkerd/linkerd/releases/8031848/assets,https://api.github.com/repos/linkerd/linkerd/releases/8031848,master,https://api.github.com/repos/linkerd/linkerd/tarball/1.3.0,https://github.com/linkerd/linkerd/releases/tag/1.3.0,https://api.github.com/repos/linkerd/linkerd/zipball/1.3.0,1.3.0,False,False
+7761557,2017-09-14T22:05:44Z,2017-09-14T23:19:58Z,1.2.1,"Fix for an issue where Kubernetes namers would continue to route to old
+endpoints after a service was deleted and re-created, or scaled down to 0 and
+then scaled back up.
+
+Also includes:
+* The path on which the Prometheus telemeter serves metrics can now be
+  set in the config file.
+* Minor documentation fixes.",https://api.github.com/users/hawkw,2796466,hawkw,https://api.github.com/repos/linkerd/linkerd/releases/7761557/assets,https://api.github.com/repos/linkerd/linkerd/releases/7761557,master,https://api.github.com/repos/linkerd/linkerd/tarball/1.2.1,https://github.com/linkerd/linkerd/releases/tag/1.2.1,https://api.github.com/repos/linkerd/linkerd/zipball/1.2.1,1.2.1,False,False
+7676899,2017-09-07T22:31:23Z,2017-09-07T23:07:28Z,1.2.0,"* **Breaking Change**: `io.l5d.mesh`, `io.l5d.thriftNameInterpreter`, linkerd
+  admin, and namerd admin now serve on 127.0.0.1 by default (instead of
+  0.0.0.0).
+* **Breaking Change**: Removed support for PKCS#1-formatted keys. PKCS#1 formatted keys must be converted to PKCS#8 format.
+* Added experimental `io.l5d.dnssrv` namer for DNS SRV records (#1611)
+* Kubernetes
+  * Added an experimental `io.l5d.k8s.configMap` interpreter for reading dtabs from a Kubernetes ConfigMap (#1603). This interpreter will respond to changes in the ConfigMap, allowing for dynamic dtab updates without the need to run Namerd.
+  * Made ingress controller's ingress class annotation configurable (#1584).
+  * Fixed an issue where Linkerd would continue routing traffic to endpoints of a service after that service was removed (#1622).
+  * Major refactoring and performance improvements to `io.l5d.k8s` and `io.l5d.k8s.ns` namers (#1603).
+  * Ingress controller now checks all available ingress resources before using a default backend (#1607).
+  * Ingress controller now correctly routes requests with host headers that contain ports (#1607).
+* HTTP/2
+  * Fixed an issue where long-running H2 streams would eventually hang (#1598).
+  * Fixed a memory leak on long-running H2 streams (#1598)
+  * Added a user-friendly error message when a HTTP/2 router receives a HTTP/1 request (#1618)
+* HTTP/1
+  * Removed spurious `ReaderDiscarded` exception logged on HTTP/1 retries (#1609)
+* Consul
+  * Added support for querying Consul by specific service health states (#1601)
+  * Consul namers and Dtab store now fall back to a last known good state on Consul observation errors (#1597)
+  * Improved log messages for Consul observation errors (#1597)
+* TLS
+  * Removed support for PKCS#1 keys (#1590)
+  * Added validation to prevent incompatible `disableValidation: true` and `clientAuth` settings in TLS client configurations (#1621)
+* Changed `io.l5d.mesh`, `io.l5d.thriftNameInterpreter`, linkerd
+  admin, and namerd admin to serve on 127.0.0.1 by default (instead of
+  0.0.0.0) (#1366)
+* Deprecated `io.l5d.statsd` telemeter.",https://api.github.com/users/hawkw,2796466,hawkw,https://api.github.com/repos/linkerd/linkerd/releases/7676899/assets,https://api.github.com/repos/linkerd/linkerd/releases/7676899,master,https://api.github.com/repos/linkerd/linkerd/tarball/1.2.0,https://github.com/linkerd/linkerd/releases/tag/1.2.0,https://api.github.com/repos/linkerd/linkerd/zipball/1.2.0,1.2.0,False,False
+7598966,2017-08-31T23:26:53Z,2017-09-01T00:27:25Z,1.2.0 Release Candidate 2,"+ Kubernetes
+  - Update default backend behavior and strip host ports (#1607)
++ H2
+  - Ensure frames are released after classification timeout (#1598) (fixes #1591)
+  - Fix memory leak in long-running H2 streams (#1613)",https://api.github.com/users/hawkw,2796466,hawkw,https://api.github.com/repos/linkerd/linkerd/releases/7598966/assets,https://api.github.com/repos/linkerd/linkerd/releases/7598966,master,https://api.github.com/repos/linkerd/linkerd/tarball/1.2.0-rc2,https://github.com/linkerd/linkerd/releases/tag/1.2.0-rc2,https://api.github.com/repos/linkerd/linkerd/zipball/1.2.0-rc2,1.2.0-rc2,False,True
+7527891,2017-08-25T16:30:39Z,2017-08-25T19:55:31Z,1.2.0 Release Candidate 1,Release candidate for testing Kubernetes changes.,https://api.github.com/users/hawkw,2796466,hawkw,https://api.github.com/repos/linkerd/linkerd/releases/7527891/assets,https://api.github.com/repos/linkerd/linkerd/releases/7527891,master,https://api.github.com/repos/linkerd/linkerd/tarball/1.2.0-rc1,https://github.com/linkerd/linkerd/releases/tag/1.2.0-rc1,https://api.github.com/repos/linkerd/linkerd/zipball/1.2.0-rc1,1.2.0-rc1,False,True
+7339237,2017-08-09T20:14:32Z,2017-08-09T20:51:57Z,1.1.3,"The 1.1.3 release of Linkerd is mostly focused on improving our HTTP/2 support,
+including better support for gRPC.  Linkerd now supports automatic retries in
+HTTP/2 for retryable requests.
+
+* HTTP/2
+  * Cleaned up spurious errors messages in the Linkerd log output.
+  * Added a number of gRPC response classifiers that use the `grpc-status` code
+    to determine if the response was successful and if it should be retried.
+    See [the docs](https://linkerd.io/config/1.1.3/linkerd/index.html#grpc-response-classifiers) for details.
+  * Added support for failure accrual and automatic retries to HTTP/2.
+  * Fixed a memory leak related to messages with only a headers frame.
+* Istio
+  * Added HTTP/2 support to the Istio integration: the `io.l5d.k8s.istio`
+    identifier can now be used in H2 router configs.
+  * Added support for HTTPRedirect Route Rules.
+* The Linkerd and Namerd admin sites can now be configured to require HTTPS.",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/7339237/assets,https://api.github.com/repos/linkerd/linkerd/releases/7339237,master,https://api.github.com/repos/linkerd/linkerd/tarball/1.1.3,https://github.com/linkerd/linkerd/releases/tag/1.1.3,https://api.github.com/repos/linkerd/linkerd/zipball/1.1.3,1.1.3,False,False
+7021333,2017-07-12T22:51:21Z,2017-07-12T23:01:34Z,1.1.2,"* Marathon Namer TLS support, for DC/OS strict mode.
+* We fixed an issue where requests that time out were not being retried.
+* HTTP 1.1 protocol fixes for chunked transfer encoding and `Content-Length`.
+* Improved memory allocation in InfluxDb and Prometheus telemeters.
+* Documentation fixes.",https://api.github.com/users/siggy,236915,siggy,https://api.github.com/repos/linkerd/linkerd/releases/7021333/assets,https://api.github.com/repos/linkerd/linkerd/releases/7021333,master,https://api.github.com/repos/linkerd/linkerd/tarball/1.1.2,https://github.com/linkerd/linkerd/releases/tag/1.1.2,https://api.github.com/repos/linkerd/linkerd/zipball/1.1.2,1.1.2,False,False
+6989385,2017-07-10T18:51:38Z,2017-07-10T19:06:06Z,1.1.1,"This is a big release with lots of fun stuff inside.
+
+We've added some new features!
+* Linkerd now features integration with Istio! (Beta.) This is a big feature. Blog post coming soon.
+* We've introduced a new request logger plugin interface, for plugins that take an action (such as logging) on each request. This is currently used by the Istio plugin to report metadata about each request.
+
+We’ve fixed some things!
+* We fixed a connection leak in HTTP/2 by properly multiplexing streams over a single connection.
+* The configured failure accrual backoff parameter was being ignored. Now it's not!
+* We fixed a TLS issue when no trust certs were specified.  As a result, using TLS with egress now works again.
+* We fixed an exception when a Kubernetes Service's `targetPort` value is returned as a name instead of a number.
+* The admin dashboard now displays server connections, standardizing client and server displays.
+
+We’ve made some internal changes to keep up with the latest and greatest:
+* Netty4 is now the default engine for HTTP.
+* We’ve upgrade to Finagle 6.45 under the hood.",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/6989385/assets,https://api.github.com/repos/linkerd/linkerd/releases/6989385,master,https://api.github.com/repos/linkerd/linkerd/tarball/1.1.1,https://github.com/linkerd/linkerd/releases/tag/1.1.1,https://api.github.com/repos/linkerd/linkerd/zipball/1.1.1,1.1.1,False,False
+6688719,2017-06-12T23:20:37Z,2017-06-12T23:29:58Z,1.1.0,"* TLS
+  * Add support for client auth TLS.
+  * Add TLS support for `io.l5d.httpController` and `io.l5d.mesh` namerd
+    interfaces.
+* HTTP/2
+  * Reset h2 remote streams that continue to send frames after the local stream
+    has been interrupted.  This fixes a bug that occationally caused the
+    io.l5d.mesh interpreter to hang.
+  * Add support for HTTP/2 tracing.
+* Kubernetes
+  * Fix exception when a loadBalancer object has a hostname instead of an ip.
+  * Fix connection leak when the daemonset transformer cannot connect to the k8s
+    API.
+* Metrics
+  * Improve scoping of metrics for namers and transformers.
+  * Fix rendering of top-level influx metrics.
+* Consul
+  * Cache dtab observations in the io.l5d.consul store.
+  * Fix bug causing consul queries to hang.
+* Expire idle services and clients.
+* **Breaking Change**: Convert `thriftProtocol` from a client/server param to a
+  router param.",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/6688719/assets,https://api.github.com/repos/linkerd/linkerd/releases/6688719,master,https://api.github.com/repos/linkerd/linkerd/tarball/1.1.0,https://github.com/linkerd/linkerd/releases/tag/1.1.0,https://api.github.com/repos/linkerd/linkerd/zipball/1.1.0,1.1.0,False,False
+6373632,2017-05-13T03:51:30Z,2017-05-13T04:02:09Z,1.0.2,"* Fix issue where TLS could not be used with H2.
+* Fix linkerd admin dashboard edge case.",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/6373632/assets,https://api.github.com/repos/linkerd/linkerd/releases/6373632,master,https://api.github.com/repos/linkerd/linkerd/tarball/1.0.2,https://github.com/linkerd/linkerd/releases/tag/1.0.2,https://api.github.com/repos/linkerd/linkerd/zipball/1.0.2,1.0.2,False,False
+6371471,2017-05-12T20:18:46Z,2017-05-12T20:28:38Z,1.0.1,"* Upgrade to scala 2.12.
+* Upgrade to finagle 6.44.
+* HTTP/1.1:
+  * Fix connection leak when retrying on responses with chunked bodies.
+  * Remove linkerd headers and body when clearContext is set.
+  * Add io.l5d.http.allSuccessful and io.l5d.h2.allSuccessful response classifiers.
+* HTTP/2:
+  * Fix race condition causing every request on a connection to deadline.
+  * Fix memory leak related to tracking closed streams.
+* Kubernetes:
+  * Port numbers in k8s names will now have the service's port mapping applied.
+  * Add `io.l5d.k8s.ns` namer for routing within a fixed namespace.
+* Consul:
+  * Fix issue where the Consul namer would fail to reconnect after ConnectionFailedException.
+* Promethus:
+  * Properly escape metrics labels in the Prometheus telemeter.
+* Namerd:
+  * Add support for telemeters.
+* Fail on duplicate config file properties instead of silently taking the last
+  value.
+* Add path stack registry for better visibility into how services are configured.",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/6371471/assets,https://api.github.com/repos/linkerd/linkerd/releases/6371471,master,https://api.github.com/repos/linkerd/linkerd/tarball/1.0.1,https://github.com/linkerd/linkerd/releases/tag/1.0.1,https://api.github.com/repos/linkerd/linkerd/zipball/1.0.1,1.0.1,False,False
+6177002,2017-04-25T05:52:42Z,2017-04-25T06:03:01Z,1.0.0,"* Configuration:
+  * Add support for per-client configuration.
+  * Add support for per-service configuration.
+  * Simplify TLS configuration.
+  * Split the timeoutMs router option into a requestAttemptTimeoutMs client option
+    and a totalTimeoutMs service option.
+  * Rename the ""dst/path"" metrics scope to ""service"".
+  * Rename the ""dst/id"" metrics scope to ""client"".
+  * Rename the ""namer.path"" trace annotation to ""service"".
+  * Rename the ""dst.id"" trace annotation to ""client"".
+  * Rename the ""dst.path"" trace annotation to ""residual"".
+  * Rename the ""l5d-dst-logical"" HTTP and H2 headers to ""l5d-dst-service"".
+  * Rename the ""l5d-dst-concrete"" HTTP and H2 headers to ""l5d-dst-client"".
+  * Rename the ""srv"" metrics scope to ""server"".
+  * Encode retryability on HTTP responses in the `l5d-retryable` header.
+  * Rename http response classifiers to be protocol specific:
+    * The `io.l5d.nonRetryable5XX` id has been renamed to `io.l5d.http.nonRetryable5XX`.
+    * The `io.l5d.retryableRead5XX` id has been renamed to `io.l5d.http.retryableRead5XX`.
+    * The `io.l5d.retryableIdempotent5XX` id has been renamed to `io.l5d.http.retryableIdempotent5XX`.
+  * Refactor http and h2 identifiers for consistency:
+    * The `io.l5d.headerToken` id has been renamed to `io.l5d.header.token`.
+    * The `io.l5d.headerPath` id has been renamed to `io.l5d.header.path`.
+    * The `io.l5d.h2.ingress` id has been renamed to `io.l5d.ingress`.
+    * The `io.l5d.http.ingress` id has been renamed to `io.l5d.ingress`.
+* The following plugins are no longer experimental:
+  * Marathon namer
+  * Consul dtab store
+  * K8s dtab store
+  * Zk dtab store
+* Fix h2 memory leak in Netty4DispatcherBase.
+* Greatly reduced docker image size.
+* Add `io.l5d.influxdb` LINE telemeter.
+* Experimental ThriftMux protocol support.
+* Automatically upgrade all HTTP/1.0 messages to HTTP/1.1.
+* Allow dtab fallback when consul returns an empty address set.
+* Fixed k8s namer to handle null endpoint subsets.
+* Add support for Marathon HTTP basic authentication.",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/6177002/assets,https://api.github.com/repos/linkerd/linkerd/releases/6177002,master,https://api.github.com/repos/linkerd/linkerd/tarball/1.0.0,https://github.com/linkerd/linkerd/releases/tag/1.0.0,https://api.github.com/repos/linkerd/linkerd/zipball/1.0.0,1.0.0,False,False
+5990996,2017-04-05T20:20:38Z,2017-04-05T20:49:27Z,1.0.0 RC2,"* Experimental ThriftMux protocol support
+* Add support for per-client configuration.
+* Simplify TLS configuration.
+* Allow dtab fallback when consul returns an empty address set.
+* Move timeoutMs from router section to client section in linkerd config.
+* Add timeoutMs option to server section in linkerd config.
+* Automatically upgrade all HTTP/1.0 messages to HTTP/1.1.",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/5990996/assets,https://api.github.com/repos/linkerd/linkerd/releases/5990996,master,https://api.github.com/repos/linkerd/linkerd/tarball/1.0.0-rc2,https://github.com/linkerd/linkerd/releases/tag/1.0.0-rc2,https://api.github.com/repos/linkerd/linkerd/zipball/1.0.0-rc2,1.0.0-rc2,False,True
+5915849,2017-03-28T17:47:30Z,2017-03-29T22:47:06Z,1.0.0 RC1,"* Experimental ThriftMux protocol support
+* Add support for per-client configuration.
+* Simplify TLS configuration.
+* Allow dtab fallback when consul returns an empty address set.",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/5915849/assets,https://api.github.com/repos/linkerd/linkerd/releases/5915849,master,https://api.github.com/repos/linkerd/linkerd/tarball/1.0.0-rc1,https://github.com/linkerd/linkerd/releases/tag/1.0.0-rc1,https://api.github.com/repos/linkerd/linkerd/zipball/1.0.0-rc1,1.0.0-rc1,False,True
+5759989,2017-03-15T22:05:42Z,2017-03-15T22:36:22Z,0.9.1,"* Admin dashboard:
+  * Fix display issues for long dtabs in the namerd tab.
+  * Indicate the primary path in the dtab tab.
+  * Add `tree` and `q` params to /admin/metrics.json.
+* Kubernetes:
+  * Allow k8s namer to accept port numbers.
+  * Make k8s namer case insensitive.
+  * Add k8s ingress identifiers to allow linkerd to act as an ingress controller.
+* Fix TTwitter thrift protocol upgrade bug.
+* Rewrite Location & Refresh HTTP response headers when Linkerd
+  rewrites request Host header.
+* Increase default binding cache size to reduce connection churn.
+* Fetch correct protoc version on demand.
+* Introduce the `io.l5d.mesh` linkerd interpreter and namerd iface. The mesh
+  iface exposes a gRPC API that can be used for multiplexed, streaming updates.
+  (*Experimental*)",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/5759989/assets,https://api.github.com/repos/linkerd/linkerd/releases/5759989,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.9.1,https://github.com/linkerd/linkerd/releases/tag/0.9.1,https://api.github.com/repos/linkerd/linkerd/zipball/0.9.1,0.9.1,False,False
+5540986,2017-02-22T21:41:34Z,2017-02-22T21:55:35Z,0.9.0,"For more information about this release and instructions for upgrading your linkerd configs, see: https://blog.buoyant.io/2017/02/22/linkerd-0.9.0-released/
+- Admin dashboard:
+  - Add retries stat, retry budget bar, and client pool bar.
+  - Add colored border to clients to make them easier to distinguish.
+  - Sorts clients and servers alphabetically.
+  - Displays routers in the order that they are defined.
+  - Namerd Admin now works with Dtabs of arbitrary size.
+- Naming and Routing:
+  - Rename `baseDtab` router property to `dtab`.
+  - Change the default `dstPrefix` from the protocol name to `/svc`.
+  - Change the default HTTP identifier to the `io.l5d.header.token` identifier.
+  - Add the ability to route basted on the `dest` request header when using the
+    TTwitter Thrift protocol.
+- Metrics and Tracing:
+  - Remove `io.l5d.commonMetrics` telemeter.
+  - Add `io.l5d.prometheus` telemeter.
+  - Remove the `tracers` router config in favor of the `io.l5d.zipkin` telemeter.
+  - Add opt-out usage data collection.
+- Namers:
+  - Update Marathon namer to evaluate an app's running state.
+  - Add `preferServiceAddress` option to `io.l5d.consul` namer
+  - Make `io.l5d.consul` case-insensitive
+- Add `roundRobin` as a load balancer option.
+- Add the `clearContext` server configuration option.
+- Fix query parameter decoding when rewriting proxied requests
+",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/5540986/assets,https://api.github.com/repos/linkerd/linkerd/releases/5540986,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.9.0,https://github.com/linkerd/linkerd/releases/tag/0.9.0,https://api.github.com/repos/linkerd/linkerd/zipball/0.9.0,0.9.0,False,False
+5210366,2017-01-19T19:48:04Z,2017-01-19T19:55:25Z,0.8.6,"## 0.8.6
+
+This release is an exciting one, especially for StatsD users and people getting started with the linkerd admin dashboard.  Changes include:
+- Add experimental StatsD telemeter, so now you can have linkerd metrics go straight into statsd by using systems like telegraf
+- Admin dashboard:
+  - Add a log of recent requests. See https://linkerd.io/config/0.8.6/linkerd/index.html#recent-requests
+  - Dashboard now works if served at a non-root url
+- HTTP:
+  - Support the RFC 7329 `Forwarded` header
+- HTTP/2:
+- H2 clients now properly advertise support for the “http2” protocol over ALPN
+  - Introduce `io.buoyant.hostportPfx` and `io.buoyant.porthostPfx` namers for splitting port numbers out of hostnames
+  - Add the `io.l5d.rewrite` namer for arbitrary reordering of path segments
+- Bug fixes:
+  - Fix path identifier bug when slash precedes uri params
+  - Fix subdomainOfPfx handling of hostnames with port numbers
+",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/5210366/assets,https://api.github.com/repos/linkerd/linkerd/releases/5210366,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.8.6,https://github.com/linkerd/linkerd/releases/tag/0.8.6,https://api.github.com/repos/linkerd/linkerd/zipball/0.8.6,0.8.6,False,False
+5092134,2017-01-06T21:31:31Z,2017-01-06T21:36:53Z,0.8.5,"The 0.8.5 release focused primarily on bugfixes, polish, and internal changes that set us up for future work. We did introduce one or two interesting new features, most notably better control of circuit breaking.
+
+New features:
+- The circuit breaking method is now configurable via the `failureAccrual` parameter. Setting this allows you to change the way that misbehaving instances are removed from the loadbalancing pool in new and exciting ways. (Look for a blog post about this soon!)
+- The default docker images now use a 64 bit JVM, allowing us to bring in boringssl extensions required for ALPN, etc. We continue to produce 32-bit images under a `-32b` suffix.
+- Marathon integration now includes ip-per-task support.
+
+Bugfixes:
+- http2 bugfix for request with URI parameters.
+- Sanity restored to the admin dashboard. Dashboard graphs should be usable again.
+- linkerd now writes the local dtab to the `l5d-ctx-dtab` header instead of `dtab-local`, as the docs have (correctly) suggested.
+- The localhost transformer now works on systems with unresolvable hostnames. CentOS DC/OS users, among others, will be happy. 
+
+Internal work that sets us up for future exciting features:
+- We've added the`io.l5d.namerd.http` interpreter which uses namerd's streaming HTTP api.
+- Transformers will now prepend a prefix to the id of the bound names they modify. 
+- We've introduce the grpc-gen and grpc-runtime projects, enabling code generation of gRPC clients and servers for Finagle. This means linkerd will be able to make use of gRPC APIs. Stay tuned for some of the exciting ways we are thinking of using this.
+",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/5092134/assets,https://api.github.com/repos/linkerd/linkerd/releases/5092134,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.8.5,https://github.com/linkerd/linkerd/releases/tag/0.8.5,https://api.github.com/repos/linkerd/linkerd/zipball/0.8.5,0.8.5,False,False
+4838979,2016-12-05T23:21:59Z,2016-12-05T23:37:28Z,0.8.4 🍕,"- Change default value of `attemptTTwitterUpgrade` to `false`
+- The `io.l5d.consul` and `io.l5d.k8s` namers are no longer experimental 🎉
+- H2 stabilization:
+  - Fix the `h2` protocol to gracefully handle connection loss and
+    stream interruption.
+  - RFC-compliant handling of connection-specific headers.
+  - Routing failures are now surfaced as REFUSED_STREAM resets.
+- Add per-logical-destination stats to each concrete client.
+- Add `io.l5d.static` identifier
+- Fix a config-serialization issue that prevented the Dtab Admin UI
+  from working properly with some configurations.
+",https://api.github.com/users/olix0r,240738,olix0r,https://api.github.com/repos/linkerd/linkerd/releases/4838979/assets,https://api.github.com/repos/linkerd/linkerd/releases/4838979,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.8.4,https://github.com/linkerd/linkerd/releases/tag/0.8.4,https://api.github.com/repos/linkerd/linkerd/zipball/0.8.4,0.8.4,False,False
+4593539,2016-11-07T18:03:27Z,2016-11-07T18:11:34Z,0.8.3,"- Make several namers available to namerd that were missing
+- Fix crash when viewing the dtab playground
+- Announce to all routable addresses when announcing 0.0.0.0
+- Add experimental Apache Curator namer
+- Marathon:
+  - Add authentication support to marathon namer
+  - Add `useHealthCheck` option to marathon namer
+- Transformers:
+  - Allow transformers to be applied to namers
+  - Add Const and Replace transformers
+  - Show transformers in the delegate UI
+- Kubernetes:
+  - Add `labelSelector` option to k8s and k8s.external namers
+  - Add `hostNetwork` option to k8s transformers to support CNI environments
+",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/4593539/assets,https://api.github.com/repos/linkerd/linkerd/releases/4593539,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.8.3,https://github.com/linkerd/linkerd/releases/tag/0.8.3,https://api.github.com/repos/linkerd/linkerd/zipball/0.8.3,0.8.3,False,False
+4411645,2016-10-17T19:59:39Z,2016-10-17T20:34:59Z,0.8.2,"- Consul namer can use `.local` to reference local agent's datacenter.
+- Add an `ip` option to admin configuration so that access to the
+  admin server may be constrained.
+- Kubernetes integration:
+  - Remove unused TLS options from the k8s storage plugin config.
+  - Add k8s external namer for routing to k8s ingress services.
+  - Improve error-handling behavior in k8s API clients.
+- Support serving the namerd namer interface over TLS.
+- Document namerd's HTTP API.
+- Improve retry metrics to include a total counter of all retry requests.
+- Fix a path-parsing bug in the io.l5d.path namer.
+- Provide a default log4j configuration so that netty logging is managed properly.
+- Improve HTTP server behavior with short-lived connections.
+- Add `io.buoyant.rinet` namer which is like `inet` but with the order
+  of host and port reversed
+- The `netty4` HTTP engine now works with TLS, supporting configurable
+  ciphers, backed by BoringSSL!
+- Introduce experimental support for the `h2` protocol, supporting gRPC! :balloon:
+",https://api.github.com/users/olix0r,240738,olix0r,https://api.github.com/repos/linkerd/linkerd/releases/4411645/assets,https://api.github.com/repos/linkerd/linkerd/releases/4411645,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.8.2,https://github.com/linkerd/linkerd/releases/tag/0.8.2,https://api.github.com/repos/linkerd/linkerd/zipball/0.8.2,0.8.2,False,False
+4341254,2016-10-08T23:42:20Z,2016-10-08T23:44:51Z,h2 pre-release 3,"# linkerd with h2, supporting gRPC
+
+This package contains a linkerd binary that has experimental support for an _h2_ protocol which can be used to route [gRPC](http://www.grpc.io) messages.
+
+To get up and running, simply run the `./demo.sh` script:
+
+```
+$ ./demo.sh
+running 'linkerd' h2 router on :4142 with tls (pid=97707)
+running 'gen' gRPC service on :8181 with tls (pid=97724)
+running 'word' gRPC service on :8282 with tls (pid=97725)
+running 'web' HTTP service on :8080 (pid=97727)
+
+Now you can run e.g:
+
+$ curl 'localhost:8080/gob?limit=10'
+cmon cmon cmon cmon cmon cmon cmon cmon cmon cmon
+
+Run ./kill.sh to stop the demo from running.
+```
+
+This script starts:
+- a linkerd process, serving H2 over TLS on port 4142 (and serving an
+  admin process on port 9990)
+- The world-famous demo application,
+  [Gob's Microservice](https://github.com/BuoyantIO/linkerd-examples/tree/a4908c3769415c16fde8961aa920939f911f1fc2), ported to use gRPC for inter-service communication.  This application consists of:
+  - a plain old http/1 web service on port 8080 (or WEB_PORT)
+  - a 'gen' service that exposes gRPC over TLS on 8181 (or GEN_PORT)
+  - a 'word' service that exposes gRPC over TLS on 8282 (or WORD_PORT)
+
+The [source code](https://github.com/BuoyantIO/linkerd-examples/tree/a4908c3769415c16fde8961aa920939f911f1fc2/gob) for this application is freely available, illustrating
+- how to configure gRPC clients to communicate (i.e. to linkerd) over TLS
+- and how to configure gRPC servers to serve over TLS
+
+This work is still experimental, so please please PLEASE [file an issue](https://github.com/BuoyantIO/linkerd/issues/new) if you see anything amiss!
+
+Thanks,
+
+the linkerd team
+
+<hr />
+
+### Disclaimer
+
+This example is bundled with a fully functional Certificate Authority and associated self-signed certificates. Under NO CIRCUMSTANCES should this key material be used outside of this trivial demo.
+
+Just don't do it.
+
+Please and thank you.
+",https://api.github.com/users/olix0r,240738,olix0r,https://api.github.com/repos/linkerd/linkerd/releases/4341254/assets,https://api.github.com/repos/linkerd/linkerd/releases/4341254,master,https://api.github.com/repos/linkerd/linkerd/tarball/h2-alpha-3,https://github.com/linkerd/linkerd/releases/tag/h2-alpha-3,https://api.github.com/repos/linkerd/linkerd/zipball/h2-alpha-3,h2-alpha-3,False,True
+4303344,2016-10-04T16:06:38Z,2016-10-04T20:41:44Z,"Experimental support for h2, including TLS","# linkerd + gRPC
+
+This package contains a linkerd binary that has experimental support for an _h2_ protocol which can be used to route [gRPC](http://www.grpc.io) messages.
+
+To get up and running, simply run the `./demo.sh` script:
+
+```
+$ ./demo.sh
+running 'linkerd' h2 router on :4142 with tls (pid=97707)
+running 'gen' gRPC service on :8181 with tls (pid=97724)
+running 'word' gRPC service on :8282 with tls (pid=97725)
+running 'web' HTTP service on :8080 (pid=97727)
+
+Now you can run e.g:
+
+$ curl 'localhost:8080/gob?limit=10'
+cmon cmon cmon cmon cmon cmon cmon cmon cmon cmon
+
+Run ./kill.sh to stop the demo from running.
+```
+
+This script starts:
+- a linkerd process, serving H2 over TLS on port 4142 (and serving an
+  admin process on port 9990)
+- The world-famous demo application,
+  [Gob's Microservice](https://github.com/BuoyantIO/linkerd-examples/tree/a4908c3769415c16fde8961aa920939f911f1fc2), ported to use gRPC for inter-service communication.  This application consists of:
+  - a plain old http/1 web service on port 8080 (or WEB_PORT)
+  - a 'gen' service that exposes gRPC over TLS on 8181 (or GEN_PORT)
+  - a 'word' service that exposes gRPC over TLS on 8282 (or WORD_PORT)
+
+The [source code](https://github.com/BuoyantIO/linkerd-examples/tree/a4908c3769415c16fde8961aa920939f911f1fc2/gob) for this application is freely available, illustrating
+- how to configure gRPC clients to communicate (i.e. to linkerd) over TLS
+- and how to configure gRPC servers to serve over TLS
+
+This work is still experimental, so please please PLEASE [file an issue](https://github.com/BuoyantIO/linkerd/issues/new) if you see anything amiss!
+
+Thanks,
+
+the linkerd team
+
+<hr />
+
+### Disclaimer
+
+This example is bundled with a fully functional Certificate Authority and associated self-signed certificates. Under NO CIRCUMSTANCES should this key material be used outside of this trivial demo.
+
+Just don't do it.
+
+Please and thank you.
+",https://api.github.com/users/olix0r,240738,olix0r,https://api.github.com/repos/linkerd/linkerd/releases/4303344/assets,https://api.github.com/repos/linkerd/linkerd/releases/4303344,ver/h2+h1up,https://api.github.com/repos/linkerd/linkerd/tarball/h2-alpha-2,https://github.com/linkerd/linkerd/releases/tag/h2-alpha-2,https://api.github.com/repos/linkerd/linkerd/zipball/h2-alpha-2,h2-alpha-2,False,True
+4284217,2016-10-02T20:38:45Z,2016-10-02T21:14:50Z,Experimental support for http/2,"# linkerd with experimental h2c support
+
+This package contains a linkerd binary that has experimental support
+for an _h2_ protocol which can be used to route plaintext gRPC
+messages.
+
+## Quickstart
+
+This directory should give you enough to get up and running with a
+local gRPC application with a few easy steps:
+1. Configure filesystem service discovery
+2. `./run.sh`
+3. Party.
+
+## Example application
+
+### protobuf
+
+Here's a trivial gRPC service:
+
+``` protobuf
+syntax = ""proto3"";
+
+package proto;
+
+service WordSvc {
+  rpc GetWord (WordRequest) returns (WordResponse) {}
+}
+
+message WordRequest {}
+
+message WordResponse {
+  string word = 1;
+}
+```
+
+### go
+
+A sketch of what's needed to connect & serve gRPC in go:
+
+``` go
+import (
+    ""fmt""
+    ""net""
+    ""os""
+
+    pb ""YOUR_REPO/proto""
+    ""google.golang.org/grpc""
+)
+
+func dieIf(err error) {
+    if err == nil {
+        return
+    }
+    fmt.Fprintf(os.Stderr, ""Error: %s. Try --help for help.\n"", err)
+    os.Exit(-1)
+}
+
+func Serve(svc proto.WordSvc, addr string) {
+    lis, err := net.Listen(""tcp"", *addr)
+    dieIf(err)
+    s := grpc.NewServer()
+    pb.RegisterWordSvcServer(s, svc)
+    s.Serve(lis)
+}
+
+func Connect(addr string) proto.WordSvc {
+    // Must disable TLS for now...
+    conn, err := grpc.Dial(addr, grpc.WithInsecure())
+    dieIf(err)
+    pb.NewWordSvcClient(conn)
+}
+```
+
+### discovery
+
+Assume we run our proto.WordSvc application on localhost:5151, we
+would create a service discovery entry like:
+
+``` sh
+echo 127.1 5151 >io.l5d.fs/proto.WordSvc
+```
+",https://api.github.com/users/olix0r,240738,olix0r,https://api.github.com/repos/linkerd/linkerd/releases/4284217/assets,https://api.github.com/repos/linkerd/linkerd/releases/4284217,ver/h2,https://api.github.com/repos/linkerd/linkerd/tarball/h2-alpha-1,https://github.com/linkerd/linkerd/releases/tag/h2-alpha-1,https://api.github.com/repos/linkerd/linkerd/zipball/h2-alpha-1,h2-alpha-1,False,True
+4198414,2016-09-21T23:37:15Z,2016-09-21T23:41:46Z,0.8.1,"- Fix missing data on the linkerd admin dashboard
+- Allow a non-default port to be specified for the etcd storage plugin
+",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/4198414/assets,https://api.github.com/repos/linkerd/linkerd/releases/4198414,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.8.1,https://github.com/linkerd/linkerd/releases/tag/0.8.1,https://api.github.com/repos/linkerd/linkerd/zipball/0.8.1,0.8.1,False,False
+4186204,2016-09-20T20:55:10Z,2016-09-20T21:14:14Z,0.8.0,"- Allow routers to be configured with a list of identifiers.  If an identifier
+  cannot assign a dest to a request, it falls back to the next one in the list.
+  - **Breaking Change**: Identifier plugins must now return a
+    `RequestIdentification` object.
+- Consul improvements:
+  - Improve performance by only watching services as necessary and tearing
+    down watches when they are no longer needed.
+  - Add `consistencyMode` option to `io.l5d.consul` namer
+  - Add `readConsistencyMode` and `writeConsistencyMode` options to
+    `io.l5d.consul` dtab storage
+  - Consul Namerd/DtabStore: `failFast` and `failureAccrual` is now
+    disabled by default but can be enabled with the `failFast` option
+- Improve shutdown ordering to facilitate graceful shutdown.
+  - Gracefully shutdown on SIGINT and SIGTERM.
+- Require tracer configuration instead of falling back to
+  defaults, reducing logging noise.
+- **Breaking Change**: The `debugTrace` tracer configuration flag has been
+  removed in favor of the `io.l5d.tracelog` telemeter.
+- Add `io.l5d.header` identifier for naming requests based on an HTTP header
+- Lowercase `Host` header value in `io.l5d.methodAndHost` identifier
+- Introduce transformers for post-processing the set of addresses returned by
+  an interpreter.
+  - Add k8s transformers to support linkerd-to-linkerd deployments when linkerd
+    is deployed as a k8s daemonset.
+- Remove hop-by-hop headers for better HTTP proxy compliance
+",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/4186204/assets,https://api.github.com/repos/linkerd/linkerd/releases/4186204,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.8.0,https://github.com/linkerd/linkerd/releases/tag/0.8.0,https://api.github.com/repos/linkerd/linkerd/zipball/0.8.0,0.8.0,False,False
+4083150,2016-09-08T17:38:47Z,2016-09-08T17:51:55Z,0.7.5,"- Beautiful new linkerd docs!!! :heart_eyes: https://linkerd.io/config/0.7.5/linkerd
+- HTTP response classifiers must not consider a request to be
+  retryable when it has a chunked request body.
+- Fix query paramater encoding when rewriting proxied requests
+- Improve error handling and retry behavior of consul plugins.
+- Add `useHealthCheck` parameter to Consul Namer #589
+- The k8s namer will now resume watches if the connection is closed.
+- Improved the performance of the namerd HTTP API.
+- Configured namers are now available to other plugins
+- `enableProbation` is now disabled by default on clients. It leads to
+  unexpected behavior in environments that reuse IP:PORT pairs across
+  services in a close time proximity.
+",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/4083150/assets,https://api.github.com/repos/linkerd/linkerd/releases/4083150,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.7.5,https://github.com/linkerd/linkerd/releases/tag/0.7.5,https://api.github.com/repos/linkerd/linkerd/zipball/0.7.5,0.7.5,False,False
+3955859,2016-08-23T20:45:02Z,2016-08-23T20:50:52Z,0.7.4,"- Dashboard: add toggling to the router clients to better handle large numbers of clients
+- namerd HTTP API:
+  - Add `resolve` endpoint
+  - All endpoints return json
+- Add `authority` metadata field to re-write HTTP host/:authority on demand
+- Consul improvements:
+  - Add `setHost` parameter for Consul CatalogNamer to set `authority` metadata
+  - Add auth `token` parameter to Consul Namer & Dtab Store
+  - Add `datacenter` parameter to Consul Dtab Store
+- Add file-system based name interpreter.
+- Path identifier should only parse as many segments as requested
+- Introduce the _telemetry_ plugin subsystem to support arbitrary stats
+  exporters and to eventually supplant the `tracers` subsystem.
+- Add announcer support! linkerd can now announce to service discovery backends!
+  - Add zk announcer.
+",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/3955859/assets,https://api.github.com/repos/linkerd/linkerd/releases/3955859,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.7.4,https://github.com/linkerd/linkerd/releases/tag/0.7.4,https://api.github.com/repos/linkerd/linkerd/zipball/0.7.4,0.7.4,False,False
+3860309,2016-08-10T21:07:04Z,2016-08-10T21:13:13Z,0.7.3,"- Allow protocol-specific parameters to be inherited on servers #561.
+- Don't clear addr on k8s service deletion #567.
+- Modify namerd's `/delegate` http endpoint to return bound names #569.
+- Memoize status stats components #547.
+",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/3860309/assets,https://api.github.com/repos/linkerd/linkerd/releases/3860309,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.7.3,https://github.com/linkerd/linkerd/releases/tag/0.7.3,https://api.github.com/repos/linkerd/linkerd/zipball/0.7.3,0.7.3,False,False
+3763982,2016-07-28T18:57:47Z,2016-07-28T19:13:16Z,0.7.2,"- Add support for tags in the io.l5d.consul namer.
+- Add an experimental io.l5d.consul storage backend for namerd.
+- linkerd should use last known good data if it get errors from namerd.
+- Fix exceptions when k8s namer encounters unexpected end of stream #551.
+- Expose HTTP codec parameters as configuration options.
+- Handle ""too old"" error when re-establishing Kubernetes watches.
+- Improve Java compatibility for Namers plugins.
+",https://api.github.com/users/olix0r,240738,olix0r,https://api.github.com/repos/linkerd/linkerd/releases/3763982/assets,https://api.github.com/repos/linkerd/linkerd/releases/3763982,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.7.2,https://github.com/linkerd/linkerd/releases/tag/0.7.2,https://api.github.com/repos/linkerd/linkerd/zipball/0.7.2,0.7.2,False,False
+3652198,2016-07-13T22:01:59Z,2016-07-13T22:09:56Z,0.7.1,"- Turn off HTTP decompression so that linkerd doesn't decompress and then
+  recompress bodies.
+- Various bug fixes in the dtab UI
+- Optional dtab query parameter for selected Namerd HTTP Control API endpoints
+- Fix an issue where streaming was unintentionally disabled
+- Fix an issue with the io.l5d.serversets namer and residuals
+- Add a `consume` option to the `io.l5d.path` identifier to strip off the path
+  segments that it reads from the URI.
+- Introduce a configurable Netty4 http implementation.
+",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/3652198/assets,https://api.github.com/repos/linkerd/linkerd/releases/3652198,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.7.1,https://github.com/linkerd/linkerd/releases/tag/0.7.1,https://api.github.com/repos/linkerd/linkerd/zipball/0.7.1,0.7.1,False,False
+3543672,2016-06-28T20:20:39Z,2016-06-28T20:28:34Z,0.7.0,"- New default JVM settings scale up with traffic levels.
+  - `JVM_HEAP` is now deprecated, you can now separately set `JVM_HEAP_MIN` and
+    `JVM_HEAP_MAX` but you shouldn't need to adjust them thanks to the new defaults.
+- Overhaul HTTP headers:
+  - `l5d-ctx` renamed to `l5d-ctx-trace`
+  - `l5d-ctx-deadline` now propagates deadlines
+  - `l5d-ctx-dtab` is now read, to replace `dtab-local` later.
+  - `l5d-dtab` now honored as a replacement for `dtab-local` as
+    specified by users.
+  - `l5d-dst-*` no longer set on responses
+- Fix graceful connection teardown on streaming HTTP responses #482.
+- linkerd routers' `timeoutMs` configuration now applies on the
+  server-side, so that the timeout acts as a global timeout rather
+  than an individual request timeout.
+- Binding cache size is now configurable in linkerd and namerd
+- Use :: as the zk host delimiter in the zk leader namer
+- Admin site/dashboard UI improvements:
+  - The linkerd dtab UI now works correctly with the namerd interpreter
+  - Added server success rate graphs to the dashboard, improved responsiveness
+  - Added the ability to navigate to a specific router's dashboard
+  - Standardized the look and feel of the admin pages
+",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/3543672/assets,https://api.github.com/repos/linkerd/linkerd/releases/3543672,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.7.0,https://github.com/linkerd/linkerd/releases/tag/0.7.0,https://api.github.com/repos/linkerd/linkerd/zipball/0.7.0,0.7.0,False,False
+3297417,2016-05-24T20:49:50Z,2016-05-24T20:57:47Z,0.6.0,"Due to the backwards incompatible changes to the config format in this release, we've put together an [upgrade guide](https://blog.buoyant.io/2016/05/24/upgrading-to-linkerd-0.6.0/) to help you get your existing configs working with 0.6.0.
+- Add zkLeader namer to allow discovery of services through ZooKeeper leader
+  election.
+- Add HTTP path request identifier, which builds destinations from a
+  configurable number of HTTP URI path segments.
+- **Breaking Change!** The path prefix `/#` now indicates that the path should
+  be processed by a namer.  A namer matches a path starting with `/#/<prefix>`.
+- **Breaking Change!** Rename many plugin kind names.
+- **Breaking Change!** Experimental plugins now require the `experimental: true`
+  property to be set.
+- **Breaking Change!** Change the format for ZooKeeper hosts in the ZK storage
+  config.
+",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/3297417/assets,https://api.github.com/repos/linkerd/linkerd/releases/3297417,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.6.0,https://github.com/linkerd/linkerd/releases/tag/0.6.0,https://api.github.com/repos/linkerd/linkerd/zipball/0.6.0,0.6.0,False,False
+3197435,2016-05-10T20:56:54Z,2016-05-10T21:06:29Z,0.5.0,"- Add a `debugTrace` parameter to the `tracers` config section, which enables
+  printing all traces to the console.
+- Add etcd backed dtab storage.
+- Introduce a default HTTP response classifier so that 5XX responses
+  are marked as failures.
+- Add a `retries` client config section supporting configurable retry
+  budgets and backoffs.
+- Automatically retry certain types of failures, as determined by
+  response classifiers.
+- Remove TLS support from the k8s namer in favor of using `kubectl proxy` for
+  securely communicating with the k8s cluster API.
+- Add an `/admin/metrics/prometheus` stats endpoint.
+",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/3197435/assets,https://api.github.com/repos/linkerd/linkerd/releases/3197435,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.5.0,https://github.com/linkerd/linkerd/releases/tag/0.5.0,https://api.github.com/repos/linkerd/linkerd/zipball/0.5.0,0.5.0,False,False
+3123212,2016-04-28T22:15:33Z,2016-04-28T22:28:15Z,0.4.0,"- Add a `bindingTimeoutMs` router parameter to configure the maximum amount of
+  time to spend binding a path.
+- Add experimental support for storing dtabs in Kubernetes via the
+  ThirdPartyResource API (which must be enabled in your cluster).
+- **Breaking api change** in namerd: dtabs are now string-encoded
+  rather than thrift-encoded.
+- Add `/api/1/bind`, `/api/1/addr`, and `/api/1/delegate` HTTP APIs to namerd
+  - Most HTTP APIs now support `?watch=true` for returning updates via a
+    streaming response.
+- Add ACL and authentication support to the ZooKeeper DtabStore.
+- Support wildcards in dtabs!
+- New linkerd dashboard is now enabled by default!! :chart_with_upwards_trend:
+",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/3123212/assets,https://api.github.com/repos/linkerd/linkerd/releases/3123212,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.4.0,https://github.com/linkerd/linkerd/releases/tag/0.4.0,https://api.github.com/repos/linkerd/linkerd/zipball/0.4.0,0.4.0,False,False
+3014764,2016-04-13T21:05:50Z,2016-04-13T21:10:55Z,0.3.1,"- Add beta version of linkerd dashboard version 2.0.  Try it out at
+  `/dashboard` on the linkerd admin site. :chart_with_upwards_trend:
+- Support Zipkin tracer configuration via config file, to enable automatic
+  export of tracing data from linkerd to a Zipkin collector.
+- namerd's HTTP dtab API now supports the HEAD and DELETE methods
+- Tear-down address observations in namerd if a service is deleted
+",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/3014764/assets,https://api.github.com/repos/linkerd/linkerd/releases/3014764,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.3.1,https://github.com/linkerd/linkerd/releases/tag/0.3.1,https://api.github.com/repos/linkerd/linkerd/zipball/0.3.1,0.3.1,False,False
+2920266,2016-03-30T22:22:04Z,2016-03-30T23:11:46Z,0.3.0,"- Added :sparkles: namerd :sparkles: : a service for managing linkerd (and finagle)
+  name delegation.
+- **Breaking change** to configs: `httpUriInDst` is now specified under the
+  `identifier` header (see linkerd/docs/config.md for add'l info)
+- Add a `ttlMs` marathon namer config option to configure the polling
+  timeout against the marathon API.
+- Add a `enableProbation` config option for configuring a client's load balancer
+  probation setting
+",https://api.github.com/users/gtcampbell,14003771,gtcampbell,https://api.github.com/repos/linkerd/linkerd/releases/2920266/assets,https://api.github.com/repos/linkerd/linkerd/releases/2920266,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.3.0,https://github.com/linkerd/linkerd/releases/tag/0.3.0,https://api.github.com/repos/linkerd/linkerd/zipball/0.3.0,0.3.0,False,False
+2809153,2016-03-11T23:12:05Z,2016-03-14T19:52:34Z,0.2.1,"- Configs may now include a `tracers` section with pluggable tracers (although
+  we don't provide any out of the box just yet)
+- `namers` configurations may now configure Namers or NameInterpreters
+  to support richer namer behavior.
+- Add a loadBalancer section to the client config where a load balancer can be
+  specified and configured.  The load balancers that are currently supported are
+  p2c, ewma, aperture, and heap.
+- Add a config.json admin endpoint which re-serializes the parsed linkerd config.
+- Add a `maxConcurrentRequests` config option to limit number of concurrent
+  requests accepted by a server.
+- Add a `hostConnectionPool` client config section to control the number of
+  connections maintained to destination hosts.
+- Add a `attemptTTwitterUpgrade` thrift client config option to control whether
+  thrift protocol upgrade should be attempted.
+",https://api.github.com/users/adleong,3979810,adleong,https://api.github.com/repos/linkerd/linkerd/releases/2809153/assets,https://api.github.com/repos/linkerd/linkerd/releases/2809153,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.2.1,https://github.com/linkerd/linkerd/releases/tag/0.2.1,https://api.github.com/repos/linkerd/linkerd/zipball/0.2.1,0.2.1,False,False
+2684369,2016-02-25T00:45:53Z,2016-02-25T00:55:45Z,0.2.0,"- This release contains **breaking changes** to the configuration file format.
+  linkerd config files are now a bit more explicit and less ""magical"",
+  in the following ways:
+  - Router configuration options can no longer be specified globally at the
+    root level of the config file, but must be specified per-router.
+  - All routers must now include a `servers` section; previously, a default
+    server port would be used if none was provided.
+- New `thriftProtocol` config option allows the thrift protocol to be
+  specified. We currently support `binary` (default) and `compact`.
+- Added traffic routing support for marathon apps with slashes in
+  their ids.
+- Resolved a browser-compatibility issue in the admin page for those not
+  using the latest-and-greatest Chrome/Firefox/Safari.
+",https://api.github.com/users/gtcampbell,14003771,gtcampbell,https://api.github.com/repos/linkerd/linkerd/releases/2684369/assets,https://api.github.com/repos/linkerd/linkerd/releases/2684369,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.2.0,https://github.com/linkerd/linkerd/releases/tag/0.2.0,https://api.github.com/repos/linkerd/linkerd/zipball/0.2.0,0.2.0,False,False
+2635837,2016-02-17T21:56:25Z,2016-02-17T21:59:46Z,0.1.0,"- Introduce Marathon-backed service discovery, for routing traffic in Mesos.
+- Add new boundPath client TLS module for per-service TLS authentication.
+- Upgrade to Finagle 6.33, the latest and greatest in Finagle-based technology.
+",https://api.github.com/users/klingerf,9226,klingerf,https://api.github.com/repos/linkerd/linkerd/releases/2635837/assets,https://api.github.com/repos/linkerd/linkerd/releases/2635837,master,https://api.github.com/repos/linkerd/linkerd/tarball/0.1.0,https://github.com/linkerd/linkerd/releases/tag/0.1.0,https://api.github.com/repos/linkerd/linkerd/zipball/0.1.0,0.1.0,False,False
+2598147,2016-02-11T21:24:29Z,2016-02-11T21:33:56Z,release-0.0.11,"- TLS, for real this time.
+- Configuration updates: config now includes a client section, where you can configure client-specific parameters.
+",https://api.github.com/users/rmars,549258,rmars,https://api.github.com/repos/linkerd/linkerd/releases/2598147/assets,https://api.github.com/repos/linkerd/linkerd/releases/2598147,master,https://api.github.com/repos/linkerd/linkerd/tarball/release-0.0.11,https://github.com/linkerd/linkerd/releases/tag/release-0.0.11,https://api.github.com/repos/linkerd/linkerd/zipball/release-0.0.11,release-0.0.11,False,False
+2582325,2016-02-08T22:25:03Z,2016-02-09T23:14:11Z,release-0.0.10,"- We now support end-to-end TLS! However, verification is currently limited to global certs. See  https://github.com/BuoyantIO/linkerd/issues/64 for more on the upcoming roadmap.
+- Prep work for ""transparent TLS"". Look for this in upcoming releases.
+- Prep work for being able to generate Docker images from the repo, in service of a glorious containerized future.
+- Dashboard improvements! Now harder, faster, better, and also stronger!
+",https://api.github.com/users/rmars,549258,rmars,https://api.github.com/repos/linkerd/linkerd/releases/2582325/assets,https://api.github.com/repos/linkerd/linkerd/releases/2582325,master,https://api.github.com/repos/linkerd/linkerd/tarball/release-0.0.10,https://github.com/linkerd/linkerd/releases/tag/release-0.0.10,https://api.github.com/repos/linkerd/linkerd/zipball/release-0.0.10,release-0.0.10,False,False
+2520199,2016-01-30T00:36:46Z,2016-01-30T00:43:00Z,release-0.0.9,"- Include ZooKeeper ServerSet support, for real this time.
+",https://api.github.com/users/siggy,236915,siggy,https://api.github.com/repos/linkerd/linkerd/releases/2520199/assets,https://api.github.com/repos/linkerd/linkerd/releases/2520199,master,https://api.github.com/repos/linkerd/linkerd/tarball/release-0.0.9,https://github.com/linkerd/linkerd/releases/tag/release-0.0.9,https://api.github.com/repos/linkerd/linkerd/zipball/release-0.0.9,release-0.0.9,False,False
+2518649,2016-01-29T19:26:48Z,2016-01-29T19:30:43Z,linkerd-0.0.8,"- Big new feature alert! We now have Zookeeper ServerSet support.
+- Server-side TLS support! Stay tuned for more security features coming in future releases...
+- Added CONTRIBUTING.md with Contributor License Agreement. We are ready to receive your honorable pull requests!
+- New `thriftMethodInDst` config option to allow for routing based on thrift method names.
+- Admin port now configurable via an `admin/port` config parameters, for those of you who have Opinions About Ports.
+- DTab explorer admin page now supports inspecting DTabs for all configured routers.
+- New `/routers.json` endpoint with runtime router state.
+- We now have a [slack channel](https://slack.linkerd.io)! Operators are standing by to field YOUR questions today.
+- Admin site redesign to match [linkerd.io](https://linkerd.io/), now with favicon!
+",https://api.github.com/users/olix0r,240738,olix0r,https://api.github.com/repos/linkerd/linkerd/releases/2518649/assets,https://api.github.com/repos/linkerd/linkerd/releases/2518649,master,https://api.github.com/repos/linkerd/linkerd/tarball/release-0.0.8,https://github.com/linkerd/linkerd/releases/tag/release-0.0.8,https://api.github.com/repos/linkerd/linkerd/zipball/release-0.0.8,release-0.0.8,False,False
+2430830,2016-01-14T21:44:59Z,2016-01-14T21:55:03Z,Introducing linkerd,"linkerd is a dynamic linker for distributed applications (aka
+""microservices"").  In the same way that `ld(1)` binds software
+components (libraries), linkerd binds services by mediating
+inter-service communication (RPC).
+
+linkerd builds upon finagle & netty--Twitter's JVM networking
+stack--and it exposes many of the advanced operational features
+developed by Twitter, Soundcloud, and other large internet
+applications.
+
+linkerd provides a minimal configuration structure that describes
+general rules for linking RPC requests to a service discovery system
+(i.e. _namers_).  This configuration system, built on Jackson, exposes
+a module system so that additional functionality may be instrumented
+at package- or deploy-time.
+
+This repository currently includes only _libraries_ for building
+linkerd.  The `linkerd-daemon` package provides a Main that is capable
+of initializing linkerd; however, because it does not depend on any of
+the protocol or namer modules, it is not suitable to execute this main
+without additional build configuration (TBD).
+
+Current protocol support:
+- http
+- thrift [experimental]
+- mux [experimental]
+
+Current namer support:
+- file-system based discovery
+- kubernetes master [experimental]
+
+linkerd is under active development, and so current APIs should not be
+considered stable until the project reaches version 1.0.0.
+",https://api.github.com/users/olix0r,240738,olix0r,https://api.github.com/repos/linkerd/linkerd/releases/2430830/assets,https://api.github.com/repos/linkerd/linkerd/releases/2430830,master,https://api.github.com/repos/linkerd/linkerd/tarball/release-0.0.7,https://github.com/linkerd/linkerd/releases/tag/release-0.0.7,https://api.github.com/repos/linkerd/linkerd/zipball/release-0.0.7,release-0.0.7,False,False

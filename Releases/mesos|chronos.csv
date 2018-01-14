@@ -1,0 +1,643 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+6871167,2017-06-28T18:23:05Z,2017-06-28T22:07:06Z,v2.5.0,"## Changes from 2.4.0 to 2.5.0
+
+### Overview
+The full changelog is available from GitHub at: https://github.com/mesos/chronos/compare/2.4.0...2.5.0
+
+#### Support for Mesos 1.3.0
+Chronos now uses `libmesos` 1.3.0, which should be compatible with at least Mesos 1.3.x and 1.2.x.
+
+#### Updated many dependencies
+The versions of many dependencies were bumped.
+
+#### Added support for periods in job names
+The job names can now contain letters (`[a-zA-Z]`), digits (`[0-9]`), dashes (`-`), underscores
+(`_`), number signs (`#`), periods (`.`), and whitespace (`[ \t\n\x0B\f\r]`). They must match the
+following regular expression: `([\w\s\.#_-]+)`
+
+#### Better support for custom executors
+When using a custom executor, Chronos will now set the executor id to the job name and also include
+the URIs in the CommandInfo proto.
+
+#### Added support for specifying Docker parameters
+It is now possible to specify arbitrary Docker parameters.
+Check the [REST API documentation](https://mesos.github.io/chronos/docs/api.html) for more details.
+
+#### Changed the default framework name
+The framework name doesn't include the version number anymore.
+
+#### New API endpoints
+The new `/scheduler/leader` endpoint makes it possible to get the current leader.
+
+It is now possible to mark a job as successful via the `/scheduler/job/success` API endpoint.
+
+If a job is marked successful, the success count +of the job is incremented, the latest successful
+run time is updated, and all downstream dependencies are handled as if the job had completed
+executing the code in a standard run.
+
+#### Improved constraints
+Chronos now supports the `UNLIKE` operator and it is possible to constraint jobs by hostname.
+
+#### Updates to the Dockerfile
+
+#### Various documentation improvements
+
+### Fixed Issues / Merged PRs
+- #497 - Don't allow proxying requests to self
+- #534 - Add framework ID to log
+- #535 - Allow periods in job names
+- #538 - Add support for Docker parameters
+- #539 - Fix Dockerfile so node works with Ubuntu base image
+- #540 - Extend documentation of `/scheduler/jobs` by the possibility to get a single job
+- #541 - Add info for `lastSuccess` and `lastError` to docs for listing jobs
+- #545 - Document the job name requirements
+- #550 - Add a warning to the README
+- #551 - Fixes #540 - Document Search Endpoint
+- #556 - [docs:api] Add clarity around values available for constraints
+- #562 - Fix #561, constraints are not activated with argument
+- #563 - Make it possible to constraint jobs by hostname
+- #566 - Bump specs2
+- #572 - Fix a formatting issue with the API documentation
+- #578 - Fix the job listing lastSuccess and error type
+- #583 - Add SCoverage for generating test coverage reports
+- #586 - Add Go client to docs
+- #587 - Cache maven artifacts with Travis
+- #589 - Add Chronos Shuttle to tools section
+- #595 - Add a `markJobSuccessful` API call
+- #602 - Set executor id to job name instead of static value
+- #603 - Add URIs to the CommandInfo when a custom executor is set
+- #606 - Prevent jobs list from collapsing in small screens
+- #621 - Log a hint that constraints are not met for a task
+- #626 - Allow Chronos jobs to override taskInfo data
+- #629 - Add a job's run time and attempt as environment variables exposed to the job
+- #635 - Remove schedules from jobs made dependent when previously scheduled
+- #637 - Support Mesos fetcher cache (and other options)
+- #687 - Drop level of biggest logging offenders
+- #689 - Dedup ScheduleStream by jobName
+- #711 - Add headers required for CORS
+- #717 - Add support for overriding or adding arguments to a job
+- #741 - Add an API endpoint for getting the current leader
+- #749 - Support for username/password credentials for Cassandra
+- #804 - Add missing `MESOS_TASK_ID` environment variable",https://api.github.com/users/gkleiman,146374,gkleiman,https://api.github.com/repos/mesos/chronos/releases/6871167/assets,https://api.github.com/repos/mesos/chronos/releases/6871167,master,https://api.github.com/repos/mesos/chronos/tarball/2.5.0,https://github.com/mesos/chronos/releases/tag/2.5.0,https://api.github.com/repos/mesos/chronos/zipball/2.5.0,2.5.0,False,False
+6793040,2017-06-14T20:14:36Z,2017-06-21T21:01:10Z,v2.5.0-RC1,"## Changes from 2.4.0 to 2.5.0-RC1
+
+### Overview
+The full changelog is available from GitHub at: https://github.com/mesos/chronos/compare/2.4.0...2.5.0-RC1
+
+#### Support for Mesos 1.3.0
+Chronos now uses `libmesos` 1.3.0, which should be compatible with at least Mesos 1.3.x and 1.2.x.
+
+#### Updated many dependencies
+The versions of many dependencies were bumped.
+
+#### Added support for periods in job names
+The job names can now contain letters (`[a-zA-Z]`), digits (`[0-9]`), dashes (`-`), underscores
+(`_`), number signs (`#`), periods (`.`), and whitespace (`[ \t\n\x0B\f\r]`). They must match the
+following regular expression: `([\w\s\.#_-]+)`
+
+#### Better support for custom executors
+When using a custom executor, Chronos will now set the executor id to the job name and also include
+the URIs in the CommandInfo proto.
+
+#### Added support for specifying Docker parameters
+It is now possible to specify arbitrary Docker parameters.
+Check the [REST API documentation](https://mesos.github.io/chronos/docs/api.html) for more details.
+
+#### Changed the default framework name
+The framework name doesn't include the version number anymore.
+
+#### New API endpoints
+The new `/scheduler/leader` endpoint makes it possible to get the current leader.
+
+It is now possible to mark a job as successful via the `/scheduler/job/success` API endpoint.
+
+If a job is marked successful, the success count +of the job is incremented, the latest successful
+run time is updated, and all downstream dependencies are handled as if the job had completed
+executing the code in a standard run.
+
+#### Improved constraints
+Chronos now supports the `UNLIKE` operator and it is possible to constraint jobs by hostname.
+
+#### Updates to the Dockerfile
+
+#### Various documentation improvements
+
+### Fixed Issues / Merged PRs
+- #497 - Don't allow proxying requests to self
+- #534 - Add framework ID to log
+- #535 - Allow periods in job names
+- #538 - Add support for Docker parameters
+- #539 - Fix Dockerfile so node works with Ubuntu base image
+- #540 - Extend documentation of `/scheduler/jobs` by the possibility to get a single job
+- #541 - Add info for `lastSuccess` and `lastError` to docs for listing jobs
+- #545 - Document the job name requirements
+- #550 - Add a warning to the README
+- #551 - Fixes #540 - Document Search Endpoint
+- #556 - [docs:api] Add clarity around values available for constraints
+- #562 - Fix #561, constraints are not activated with argument
+- #563 - Make it possible to constraint jobs by hostname
+- #566 - Bump specs2
+- #572 - Fix a formatting issue with the API documentation
+- #578 - Fix the job listing lastSuccess and error type
+- #583 - Add SCoverage for generating test coverage reports
+- #586 - Add Go client to docs
+- #587 - Cache maven artifacts with Travis
+- #589 - Add Chronos Shuttle to tools section
+- #595 - Add a `markJobSuccessful` API call
+- #602 - Set executor id to job name instead of static value
+- #603 - Add URIs to the CommandInfo when a custom executor is set
+- #606 - Prevent jobs list from collapsing in small screens
+- #621 - Log a hint that constraints are not met for a task
+- #626 - Allow Chronos jobs to override taskInfo data
+- #629 - Add a job's run time and attempt as environment variables exposed to the job
+- #635 - Remove schedules from jobs made dependent when previously scheduled
+- #637 - Support Mesos fetcher cache (and other options)
+- #687 - Drop level of biggest logging offenders
+- #689 - Dedup ScheduleStream by jobName
+- #711 - Add headers required for CORS
+- #717 - Add support for overriding or adding arguments to a job
+- #741 - Add an API endpoint for getting the current leader
+- #749 - Support for username/password credentials for Cassandra
+- #804 - Add missing `MESOS_TASK_ID` environment variable",https://api.github.com/users/gkleiman,146374,gkleiman,https://api.github.com/repos/mesos/chronos/releases/6793040/assets,https://api.github.com/repos/mesos/chronos/releases/6793040,master,https://api.github.com/repos/mesos/chronos/tarball/2.5.0-RC1,https://github.com/mesos/chronos/releases/tag/2.5.0-RC1,https://api.github.com/repos/mesos/chronos/zipball/2.5.0-RC1,2.5.0-RC1,False,True
+5557980,2017-02-24T02:57:27Z,2017-02-24T03:01:55Z,Chronos v3.0.2,"This is a maintenance release of Chronos, which only contains a few bug fixes. Notably, it fixes a bug in auth due to an API change in libmesos.
+
+## Changelog
+
+The full changelog is available from GitHub at: https://github.com/mesos/chronos/compare/v3.0.1...v3.0.2
+
+Shortlist:
+
+```
+in ~/dev/chronos
+± |master ✗| → git shortlog v3.0.1..HEAD | cat
+Brenden Matthews (7):
+      Remove note about IRC channel, as it's not staffed
+      Fix for exception w/ month+ periods. (#800)
+      Update README.md
+      Replace 'slave' with 'agent' in docs.
+      Set auth params as bytes, instead of string. (#802)
+      Update image regex in UI. (#806)
+      Fix for nanosUntilNextJob() edge case. (#808)
+
+Lionel Nicolas (1):
+      Add missing MESOS_TASK_ID environment variable (#804)
+```
+",https://api.github.com/users/brndnmtthws,3129093,brndnmtthws,https://api.github.com/repos/mesos/chronos/releases/5557980/assets,https://api.github.com/repos/mesos/chronos/releases/5557980,master,https://api.github.com/repos/mesos/chronos/tarball/v3.0.2,https://github.com/mesos/chronos/releases/tag/v3.0.2,https://api.github.com/repos/mesos/chronos/zipball/v3.0.2,v3.0.2,False,False
+5256084,2017-01-24T21:19:29Z,2017-01-24T21:23:43Z,Chronos v3.0.1,"# Notable changes
+- Numerous bug fixes (and regression fixes)
+- Added support for UCR, CNI, and external volumes
+- Support fetcher's `output_file` parameter
+- Stability improvements
+
+## Changelog
+
+The full changelog is available from GitHub at: https://github.com/mesos/chronos/compare/v3.0.0...v3.0.1
+
+Shortlist:
+
+```
+in ~/dev/chronos
+± |master ✗| → git shortlog v3.0.0..HEAD | cat
+Arnout Engelen (1):
+      Remove 'Asynchronous Jobs' section from ToC (#775)
+
+Balthazar Rouberol (1):
+      Make chronos the PID 1 (#795)
+
+Brenden Matthews (19):
+      Remove unused file.
+      Updated docs markdown engine.
+      Update doc highlighter.
+      Update docs on job name regex.
+      Fix mainLoop() link in docs.
+      How does markdown work ?
+      Remove remaining references to async jobs. (#761)
+      Bump version.
+      Don't double enqueue tasks. (#762)
+      Reformat redirect error. (#765)
+      Fetcher should extract by default, if not defined. (#766)
+      Add new network type to UI. (#768)
+      Properly handle `None` type. (#774)
+      Support fetcher output_file parameter. (#788)
+      Fix for regression of finite recurrence jobs. (#789)
+      Fix for overdue jobs with finite recurrences. (#790)
+      Allow start dates after 1970. (#791)
+      Less flaky tests (#796)
+      Don't persist additional job arguments. (#797)
+
+Craig Wickesser (1):
+      Update UI to allow periods in container image name (#786)
+
+Gastón Kleiman (1):
+      Made `changelog.md` point to the releases page. (#755)
+
+Romain Di Giorgio (1):
+      - job command is now optional (#778)
+
+vixns (2):
+      Unified containers, cni networks and external volume support (#763)
+      add missing ui build dependencies (#769)
+```
+",https://api.github.com/users/brndnmtthws,3129093,brndnmtthws,https://api.github.com/repos/mesos/chronos/releases/5256084/assets,https://api.github.com/repos/mesos/chronos/releases/5256084,master,https://api.github.com/repos/mesos/chronos/tarball/v3.0.1,https://github.com/mesos/chronos/releases/tag/v3.0.1,https://api.github.com/repos/mesos/chronos/zipball/v3.0.1,v3.0.1,False,False
+4839312,2016-12-06T00:04:20Z,2016-12-06T00:22:24Z,Chronos v3.0.0,"# Summary of Changes
+
+This is a brand new Chronos, and the first release in more than a year. There have been significant changes, particular with the core scheduling algorithm. Chronos is now built against the Mesos 1.0.1 API, and will work with Mesos 1.0+.
+
+**Please note**: that this is a significant release, and may include regressions. Please report new issues to the GitHub issue tracker at https://github.com/mesos/chronos/issues.
+
+## Internal scheduler rewrite
+
+The internal scheduler code has been rewritten to improve reliability. This rewrite includes new unit tests, and a set of integration tests.
+
+## A new web UI
+
+The old Chronos web UI was known to have severe limitations. A new React & ES6 based UI has been written to address this. The new UI is not yet at feature parity with the old UI, but it supports the basic features of adding, removing, editing, starting, and stopping jobs.
+
+## API changes
+
+The HTTP REST API has received some updates, including some more idiomatic error responses, and the API paths have changed (they are now prefixed with `/v1`). Async jobs have been dropped (no more `async` field) as well.
+
+## Packaging
+
+Chronos will now only be published as a single Docker image, at http://hub.docker.com/r/mesosphere/chronos. The distribution specific packages are no longer maintained.
+
+## Changelog
+
+The full changelog is available from GitHub at: https://github.com/mesos/chronos/compare/2.4.0...v3.0.0
+
+Shortlist:
+
+```
+in ~/dev/chronos
+± |master ✗| → git shortlog 2.4.0..HEAD | cat
+Brad Heller (1):
+      Drop level of biggest logging offenders. (#687)
+
+Brenden Matthews (99):
+      Merge pull request #535 from carroux/periods_in_job_names
+      Merge pull request #539 from potto007/fix-dockerfile-node
+      Merge pull request #545 from carroux/patch-3
+      Merge pull request #538 from m1k3/feature/docker-params
+      Cache maven artifacts with Travis.
+      Merge pull request #587 from mesos/cache-maven-artifacts
+      Merge pull request #602 from drexin/wip-drexin-fix-executor-id
+      Merge pull request #595 from Califax/add-mark-job-successful-api-call
+      Merge pull request #635 from Califax/remove-schedule-from-scheduled-job-made-dependent
+      Merge pull request #623 from leemunroe/patch-1
+      Merge pull request #592 from Rob-Johnson/unlike-constraint
+      Dependency & Chronos version bump. (#728)
+      Bump Cassandra driver to 3.1.x. (#729)
+      Updating chronos build. (#730)
+      Update build/release code. (#731)
+      Redo internal scheduling codes. (#734)
+      New ui (#736)
+      Minor README edit.
+      Fix for master build.
+      Try again with fixing build.
+      Add container image option to UI. (#737)
+      Clean up UI packaging. (#738)
+      Fix webpack config.
+      Fixes for container stuff in UI. (#739)
+      Update docs on C* usage. (#743)
+      Concurrent jobs, added ACE-based job editor. (#742)
+      Build fixes.
+      Bump node version.
+      Set explicit node version.
+      Add missing bootstrap package.
+      Fix URL paths.
+      Fix more paths.
+      Check status of driver when making Mesos API calls.
+      Fix for no such element.
+      Update unit tests.
+      Implement supervisor for actor system.
+      Build fix, cache modules.
+      Handle case of missing taskStatus.
+      Refactored internal task management.
+      Link to dcos-vagrant rather than playa-mesos.
+      Documentation updates.
+      Remove extra task accounting from JobStats.
+      Reformat source.
+      Add another ZK test, fix compiler warning.
+      Remove download link.
+      Remove extraneous provides method.
+      Handle errors w/ JSON editor in UI.
+      Remove flaky ZK test, fix circular dependency.
+      Allow more time for ZK test to finish.
+      Restart the test ZK nodes if they throw an exception.
+      Adjust ZK test timing.
+      Better state accounting.
+      Added JobStats unit test.
+      Update docs on C* usage. (#743)
+      Concurrent jobs, added ACE-based job editor. (#742)
+      Build fixes.
+      Bump node version.
+      Set explicit node version.
+      Add missing bootstrap package.
+      Fix URL paths.
+      Fix more paths.
+      Check status of driver when making Mesos API calls.
+      Fix for no such element.
+      Update unit tests.
+      Implement supervisor for actor system.
+      Build fix, cache modules.
+      Handle case of missing taskStatus.
+      Refactored internal task management.
+      Link to dcos-vagrant rather than playa-mesos.
+      Documentation updates.
+      Remove extra task accounting from JobStats.
+      Reformat source.
+      Add another ZK test, fix compiler warning.
+      Remove download link.
+      Remove extraneous provides method.
+      Handle errors w/ JSON editor in UI.
+      Remove flaky ZK test, fix circular dependency.
+      Allow more time for ZK test to finish.
+      Restart the test ZK nodes if they throw an exception.
+      Adjust ZK test timing.
+      Better state accounting.
+      Added JobStats unit test.
+      Fix build error, style.
+      Merge branch 'Rob-Johnson-cors-filter'
+      Use HTTP proxy cache, if available.
+      Don't allow schedules more than 1 year in the past. (#748)
+      Update README.md
+      Bump lz4 version.
+      Update faq.md
+      Make sure we don't double-launch jobs. (#750)
+      Set http_proxy for Docker build. (#751)
+      Doc updates.
+      Make sure we don't double-launch jobs. (#752)
+      Try to make flaky test less flaky.
+      Permit running tests in parallel.
+      Set page title, fix indentation.
+      Improve API error handling. (#753)
+      Add integration tests. (#754)
+
+Chaozhong Yang (1):
+      Dedup ScheduleStream by jobName. (#689)
+
+Chris Carroux (5):
+      Add support for periods in job names
+      Add test to ensure job names with periods are accepted
+      Add info for 'lastSuccess' and 'lastError' to docs for listing jobs
+      Document the job name criteria
+      Update documentation of job name requirements to include periods
+
+Dario Rexin (2):
+      Set executor id to job name instead of static value
+      Add uris to the CommandInfo when a custom executor is set
+
+Dennis (1):
+      Add support for Mattermost webhooks (#724)
+
+Elizabeth Lingg (1):
+      Merge pull request #626 from jamesmulcahy/executor-data
+
+Fatih Cetinkaya (1):
+      Add Chronos Shuttle to tools section
+
+Florian Leibert (2):
+      Merge pull request #562 from rapidoo/master
+      Update README.md
+
+Frederic Le Bris (1):
+      correction #561
+
+Gastón Kleiman (11):
+      Setting version to 2.5.0-SNAPSHOT
+      Merge pull request #534 from depay/idlog
+      Merge pull request #541 from carroux/patch-2
+      Fix version numbers in the changelog
+      Add a warning to the README
+      Merge pull request #572 from rji/fix-api-docs-formatting
+      Merge pull request #556 from tony-kerz/master
+      Merge pull request #578 from mesos/documentation/job-listing
+      Merge pull request #603 from drexin/wip-drexin-add-uris-to-executor
+      Merge pull request #621 from solarkennedy/constraints_hint
+      Update README.md to point to #chronos
+
+James Mulcahy (1):
+      Allow Chronos jobs to override taskInfo data
+
+Ken Sipe (1):
+      task arguments (#717)
+
+Kevin Johnstone (6):
+      add markJobSuccessful api call and logic for markJobSuccessAndFireOffDependencies in job scheduler to implement. Pull out logic for getting new job config with incremented success into method. Add unit tests
+      formatting
+      formatting
+      remove schedules from jobs made dependent when previously scheduled
+      update documentation for marking job successful
+      update successful call of job to reset dependencies as a job that started normally would
+
+Kyle Anderson (1):
+      Log a hint that constraints are not met for a task
+
+Lee Munroe (1):
+      Add link to UX Research capture form
+
+Lukas Loesche (1):
+      update downloads.mesosphere.io to .com
+
+Marcus Wasner (4):
+      Fixes #540 - Document Search Endpoint
+      Fixes #540 - Document Search Endpoint
+      Fixes #540 - Document Search Endpoint Update
+      Merge pull request #589 from cmfatih/patch-1
+
+Mateusz Moneta (1):
+      Allow to authorize with ZooKeepe by zooKeeperAuth. (#727)
+
+Matthew Mead-Briggs (2):
+      Change default framework name (#703)
+      Change default framework name (#703)
+
+Michal Olah (3):
+      adding the ability to specify docker parameters
+      adding documentation
+      dropping extra newlines
+
+Orlando Hohmeier (1):
+      Fix the job listing lastSuccess and error type
+
+Paul Otto (1):
+      Removed node package as it is a radio package in Debian/Ubuntu. Added symlink /usr/bin/node pointing at /usr/bin/nodejs.
+
+Pavel Martynov (1):
+      docs: chronos-python client lib (#740)
+
+Peter Kolloch (2):
+      Merge pull request #551 from mwasn/patch-1
+      Merge pull request #583 from spacejam/tyler_coverage
+
+Philip Norman (6):
+      Merge pull request #550 from mesos/gk/add-warning-to-readme
+      Merge pull request #606 from mesos/fix/597-small-screens
+      Merge pull request #637 from turb/master
+      Update changelog.md
+      Revert bad change to changelog
+      Merge pull request #644 from lloesche/master
+
+Pierluigi Cau (1):
+      Prevent jobs list from collapsing in small screens
+
+Rob Johnson (5):
+      add unlikeconstraint + unit tests
+      add some docs for unlike constrant
+      add headers required for CORS
+      add an api endpoint for getting the current leader (#741)
+      add an api endpoint for getting the current leader (#741)
+
+Roger Ignazio (1):
+      fix a formatting issue with api docs
+
+Ryan Eschinger (1):
+      don't allow proxying requests to self (#497)
+
+Sunil Shah (2):
+      Add Go client to docs
+      Merge pull request #586 from mesos/add-go-client
+
+Sylvain Veyrié (3):
+      Support Mesos fetcher cache (and other options). * Deprecates ""uri"" option. * Requires Mesos 0.23
+      Do not allow to have both ""uris"" (deprecated) and ""fetch"" (replacement), and return both for compatibility
+      Formatting (code review)
+
+Tony L. Kerz (1):
+      [docs:api] add clarity around values available for constraints
+
+Tyler Neely (2):
+      Add SCoverage for generating test coverage reports.
+      Document test coverage in contribution guide.
+
+Vineeth Varghese (1):
+      Added a job's run time and attempt as environment variables exposed to the job (#629)
+
+Vinod Kone (1):
+      Merge pull request #630 from mesos/gk/update-readme
+
+Yegor Andreenko (1):
+      Support for username / password credentials for Cassandra (#749)
+
+depay (1):
+      Add framework ID to log
+
+tony kerz (2):
+      [pom] bump specs2 (#566)
+      [constraints] by hostname (#563)
+```
+",https://api.github.com/users/brndnmtthws,3129093,brndnmtthws,https://api.github.com/repos/mesos/chronos/releases/4839312/assets,https://api.github.com/repos/mesos/chronos/releases/4839312,master,https://api.github.com/repos/mesos/chronos/tarball/v3.0.0,https://github.com/mesos/chronos/releases/tag/v3.0.0,https://api.github.com/repos/mesos/chronos/zipball/v3.0.0,v3.0.0,False,False
+1737246,2015-08-28T10:35:43Z,2015-08-28T15:33:23Z,v2.4.0,"## Changes from 2.3.4 to 2.4.0
+
+### Overview
+
+#### New `LIKE` constraint
+
+A new constraint called `LIKE` was introduced. It matches the value of an attribute of a slave against a regular expression.
+
+#### Added support for Docker `forcePullImage`
+
+Mesos 0.22.0 added support to forcably pulling the latest version of your Docker image before launching the task, and this behavious can be enabled in Chronos by adding the `forcePullImage` boolean to your container configuration.
+
+#### Added support for notifying job failures through an HTTP callback
+
+It is now possible to set a HTTP callback (using the new `--http_notification_url` flag). Which Chronos will call this endpoint in the case of job failures.
+
+#### Improve the way in which unused offers are declined, in order to avoid starvation in a multi-framework context
+
+We have observed that running a large number of frameworks could lead to starvation, in which some frameworks would not receive any offers from the Mesos master. This release includes changes to mitigate offer starvation.
+
+This is done by making the amount of time for which an offer will be declined configurable. This value defaults to 5 seconds (Mesos default), but should be set to a higher value in a multi-framework environment, in order to reduce starvation.
+
+If there is need for an offer (e.g., when a new job is added), then all already declined offers will be actively revived.
+
+New flags:
+- `--decline_offer_duration` allows configuring the duration for which unused offers are declined.
+- `--revive_offers_for_new_jobs` if specified, then revive offers will be called when a job is added or changed.
+- `--min_revive_offers_interval` if `--revive_offers_for_new_jobs` is specified, do not call reviveOffers more often than this interval.
+
+#### Updates to the Dockerfile
+
+Changed the default exported port to 8080, Chronos' default web port.
+
+It is now possible to override the binary executed by the ENTRYPOINT script, e.g.: `docker run -it chronos /bin/bash` and similar.
+
+#### Various documentation improvements
+
+### Fixed Issues / Merged PRs
+- #345 - Add support for new docker flag (`docker_force_pull`)
+- #487 - Specifying `--mesos_role` breaks resource allocation
+- #465 - Remove persistence task only after Mesos starts running it
+- #473 - Failure Callback
+- #525 - Fix JVM crashes when the hostname is not resolvable
+- #520 - Chronos sometimes registers using an empty frameworkId after a leader fail over
+- #509 - Chronos should set a non-default filter when declining offers
+",https://api.github.com/users/gkleiman,146374,gkleiman,https://api.github.com/repos/mesos/chronos/releases/1737246/assets,https://api.github.com/repos/mesos/chronos/releases/1737246,master,https://api.github.com/repos/mesos/chronos/tarball/2.4.0,https://github.com/mesos/chronos/releases/tag/2.4.0,https://api.github.com/repos/mesos/chronos/zipball/2.4.0,2.4.0,False,False
+1694895,2015-08-19T15:12:26Z,2015-08-19T17:58:49Z,v2.4.0-RC1,"## Changes from 2.3.4 to 2.4.0-RC1
+
+### Overview
+
+#### New `LIKE` constraint
+
+A new constraint called `LIKE` was introduced. It matches the value of an attribute of a slave against a regular expression.
+
+#### Added support for Docker `forcePullImage`
+
+Mesos 0.22.0 added support to forcably pulling the latest version of your Docker image before launching the task, and this behavious can be enabled in Chronos by adding the `forcePullImage` boolean to your container configuration.
+
+#### Added support for notifying job failures through an HTTP callback
+
+It is now possible to set a HTTP callback (using the new `--http_notification_url` flag). Which Chronos will call this endpoint in the case of job failures.
+
+#### Improve the way in which unused offers are declined, in order to avoid starvation in a multi-framework context
+
+We have observed that running a large number of frameworks could lead to starvation, in which some frameworks would not receive any offers from the Mesos master. This release includes changes to mitigate offer starvation.
+
+This is done by making the amount of time for which an offer will be declined configurable. This value defaults to 5 seconds (Mesos default), but should be set to a higher value in a multi-framework environment, in order to reduce starvation.
+
+If there is need for an offer (e.g., when a new job is added), then all already declined offers will be actively revived.
+
+New flags:
+- `--decline_offer_duration` allows configuring the duration for which unused offers are declined.
+- `--revive_offers_for_new_jobs` if specified, then revive offers will be called when a job is added or changed.
+- `--min_revive_offers_interval` if `--revive_offers_for_new_jobs` is specified, do not call reviveOffers more often than this interval.
+
+#### Updates to the Dockerfile
+
+Changed the default exported port to 8080, Chronos' default web port.
+
+It is now possible to override the binary executed by the ENTRYPOINT script, e.g.: `docker run -it chronos /bin/bash` and similar.
+
+#### Various documentation improvements
+
+### Fixed Issues / Merged PRs
+- #345 - Add support for new docker flag (`docker_force_pull`)
+- #487 - Specifying `--mesos_role` breaks resource allocation
+- #465 - Remove persistence task only after Mesos starts running it
+- #473 - Failure Callback
+- #525 - Fix JVM crashes when the hostname is not resolvable
+- #520 - Chronos sometimes registers using an empty frameworkId after a leader fail over
+- #509 - Chronos should set a non-default filter when declining offers
+",https://api.github.com/users/gkleiman,146374,gkleiman,https://api.github.com/repos/mesos/chronos/releases/1694895/assets,https://api.github.com/repos/mesos/chronos/releases/1694895,master,https://api.github.com/repos/mesos/chronos/tarball/2.4.0-RC1,https://github.com/mesos/chronos/releases/tag/2.4.0-RC1,https://api.github.com/repos/mesos/chronos/zipball/2.4.0-RC1,2.4.0-RC1,False,True
+1314212,2015-05-19T18:38:09Z,2015-05-19T18:46:26Z,Chronos Release 2.3.4,"-Updated documentation with a new docs site!
+-Support for Constraints
+-Clean up of Notifications and JobStats
+-Bug fixes and error checks
+-UI now supports traffic through proxies
+",https://api.github.com/users/elingg,8423887,elingg,https://api.github.com/repos/mesos/chronos/releases/1314212/assets,https://api.github.com/repos/mesos/chronos/releases/1314212,master,https://api.github.com/repos/mesos/chronos/tarball/2.3.4,https://github.com/mesos/chronos/releases/tag/2.3.4,https://api.github.com/repos/mesos/chronos/zipball/2.3.4,2.3.4,False,False
+1191502,2015-04-20T19:24:28Z,2015-04-20T19:56:54Z,Release 2.3.3 ,"-Job History
+-Improved UI
+-Additional Fields in the Job Definition
+-Framework Authentication
+-Update with latest version of Mesos and Chaos
+-Link to Web URL
+-Bug Fixes
+
+![job history](https://cloud.githubusercontent.com/assets/8423887/7239195/c3beea22-e75c-11e4-9fbb-3a9393e98199.png)
+",https://api.github.com/users/elingg,8423887,elingg,https://api.github.com/repos/mesos/chronos/releases/1191502/assets,https://api.github.com/repos/mesos/chronos/releases/1191502,master,https://api.github.com/repos/mesos/chronos/tarball/2.3.3,https://github.com/mesos/chronos/releases/tag/2.3.3,https://api.github.com/repos/mesos/chronos/zipball/2.3.3,2.3.3,False,False
+1099820,2015-03-24T16:50:52Z,2015-03-27T20:26:49Z,Latest Chronos with Docker Integration,"Docker Integration and Various Bug Fixes and Enhancements
+",https://api.github.com/users/elingg,8423887,elingg,https://api.github.com/repos/mesos/chronos/releases/1099820/assets,https://api.github.com/repos/mesos/chronos/releases/1099820,master,https://api.github.com/repos/mesos/chronos/tarball/2.3.2,https://github.com/mesos/chronos/releases/tag/2.3.2,https://api.github.com/repos/mesos/chronos/zipball/2.3.2,2.3.2,False,False
+125043,2013-12-16T19:02:05Z,2013-12-17T21:22:37Z,Chronos 2.1.0,"Major UI overhaul.
+
+![chronos-ui-tranquility-theme](https://f.cloud.github.com/assets/127912/1768357/572a42de-6761-11e3-9fcc-6c3b736b7c9b.jpg)
+",https://api.github.com/users/florianleibert,127912,florianleibert,https://api.github.com/repos/mesos/chronos/releases/125043/assets,https://api.github.com/repos/mesos/chronos/releases/125043,master,https://api.github.com/repos/mesos/chronos/tarball/2.1.0,https://github.com/mesos/chronos/releases/tag/2.1.0,https://api.github.com/repos/mesos/chronos/zipball/2.1.0,2.1.0,False,False

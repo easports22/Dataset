@@ -1,0 +1,380 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8052125,2017-10-09T18:34:56Z,2017-10-09T18:50:18Z,Quartz.NET 2.6.1,"This is a maintenance release fixing an issue where misfire handling is being too slow at times.
+
+__NEW FEATURE__
+
+* Allow performing misfire handling more frequently than misfireThreshold (#532)
+
+__FIXES__
+
+* Incomplete recovery of misfired jobs when using database-specific delegate types (#531)",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/8052125/assets,https://api.github.com/repos/quartznet/quartznet/releases/8052125,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.6.1,https://github.com/quartznet/quartznet/releases/tag/v2.6.1,https://api.github.com/repos/quartznet/quartznet/zipball/v2.6.1,v2.6.1,False,False
+8037895,2017-10-08T09:56:02Z,2017-10-08T11:01:42Z,Quartz.NET 3.0 Beta 1,"This is the first beta of v3. Stabilization and testing has been well underway.
+  
+**When using AdoJobStore: make sure to run both 2.6 and 3.0 SQL migration scripts if you are upgrading from 2.5, otherwise just 3.0 migration script**
+
+__NEW FEATURE__
+
+* returned .NET Framework 4.5.2 compatibility to better support library consumers like NServiceBus and MassTransit
+* netstandard 2.0 is now minimum for .NET Core
+* support for Microsoft.Data.Sqlite via provider name SQLite-Microsoft, the old provider SQLite also still works
+* Firebird is supported in .NET Core
+* Added preliminary support for SQL Server Memory-Optimized tables and Quartz.Impl.AdoJobStore.UpdateLockRowSemaphoreMOT
+
+__BREAKING CHANGES__
+
+* Jobs and plugins are now in a separate assemblies/NuGet packages Quartz.Jobs and Quartz.Plugins
+* ADO.NET provider names have been simplified, the provider names are without version, e.g. SqlServer-20 => SqlServer
+
+__KNOWN ISSUES__
+
+* Issues with time zone ids between Windows and Linux, they use different ids for the same zone
+* No remoting support for .NET Core
+* Documentation lacking
+
+Check NuGet for pre-release packages.",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/8037895/assets,https://api.github.com/repos/quartznet/quartznet/releases/8037895,master,https://api.github.com/repos/quartznet/quartznet/tarball/v3.0.0-beta1,https://github.com/quartznet/quartznet/releases/tag/v3.0.0-beta1,https://api.github.com/repos/quartznet/quartznet/zipball/v3.0.0-beta1,v3.0.0-beta1,False,True
+7219797,2017-07-30T11:27:00Z,2017-07-30T11:44:42Z,Quartz.NET 3.0 Alpha 3,"**NEW FEATURE**
+
+* support for .NET Standard 2.0 preview (#486)
+* support for MySQL on .NET Standard via provider 'MySql' (#493)
+* change SQL database IMAGE types to VARBINARY - requires migration schema_26_to_30.sql
+* add ISchedulerListener.JobInterrupted(JobKey jobKey, CancellationToken cancellationToken) (#467)
+
+**FIXES**
+
+* fix PosgreSQL db provider configuration for .NET Core (#449)
+* CancellationToken is now supported in async methods (#444)
+* fix regression with XML schema validation
+
+**BREAKING CHANGES**
+
+* possibly breaking, cron expression validation is now stricter (#315 #485)
+* .NET 4.6 required instead of old 4.5
+* API methods have been revisited to mainly use IReadOnlyCollection<T>, this hides both HashSet<T>s and List<T>s
+* LibLog has been hidden as internal (ILog etc), like it was originally intended to be",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/7219797/assets,https://api.github.com/repos/quartznet/quartznet/releases/7219797,master,https://api.github.com/repos/quartznet/quartznet/tarball/v3.0.0-alpha3,https://github.com/quartznet/quartznet/releases/tag/v3.0.0-alpha3,https://api.github.com/repos/quartznet/quartznet/zipball/v3.0.0-alpha3,v3.0.0-alpha3,False,True
+7219517,2017-07-30T09:59:02Z,2017-07-30T10:13:15Z,Quartz.NET 2.6,"**Addition of column required to database**
+
+* This release fixes a long standing issue, DailyTimeIntervalTrigger's time zone is now finally persisted to database
+* This requires running schema_25_to_26_upgrade.sql to add new column to QRTZ_SIMPROP_TRIGGERS table
+* https://github.com/quartznet/quartznet/blob/2.x/database/schema_25_to_26_upgrade.sql
+
+A slight performance boost can also be unlocked when using PostgreSQL by switching PostgreSqlDelegate.
+
+**NEW FEATURE**
+
+* Add support for eager validation of job scheduling XML file on plugin start (#492)
+* Add support for extra custom time zone resolver function in TimeZoneUtil (#290)
+
+**FIXES**
+
+* CalendarIntervalTrigger's first fire time doesn't consider time zone (#505)
+* QRTZ_FIRED_TRIGGERS.ENTRY_ID column length too small (#474)
+* Decrease log level for message when host name is too long (#471)
+* Quartz should not log transient faults related to azure db connection as errors (#470)
+* RemotingSchedulerExporter can't create remoting channel on Mono (#464)
+* Regression in 2.5, TriggerBuilder.UsingJobData(JobDataMap newJobDataMap) should ovewrite existing (#460)
+* QuartzScheduler.Clear does not clear QRTZ_FIRED_TRIGGERS table (#437)
+* No wait time between db connection failures with AcquireNextTriggers (#428)
+* DailyTimeIntervalTriggerImpl prevents altering EndTimeOfDay to a later time of day (#382)
+* Quartz.CronExpression.IsSatisfiedBy claims to ignore milliseconds but doesn't (#349)
+* Add back PostgreSqlDelegate to support database LIMIT in trigger acquiring (#318)
+* Bug in XSD schema: cannot set <misfire-instruction>IgnoreMisfirePolicy</misfire-instruction> (#280)
+* Quartz.Xml.XMLSchedulingDataProcessor uses GetType() instead of typeof(Quartz.Xml.XMLSchedulingDataProcessor) (#277)
+* With SQLite default isolation level should be set to serializable (#242)
+* DailyTimeIntervalTrigger's time zone is not persisted into database (#136)
+* XMLSchedulingDataProcessorPlugin incompatible with StdAdoDelegate when useProperties=true (#44)
+* Trigger loop encountered using DailyTimeIntervalTrigger across DST start boundary (#332)",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/7219517/assets,https://api.github.com/repos/quartznet/quartznet/releases/7219517,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.6.0,https://github.com/quartznet/quartznet/releases/tag/v2.6.0,https://api.github.com/repos/quartznet/quartznet/zipball/v2.6.0,v2.6.0,False,False
+5497997,2017-02-18T09:26:19Z,2017-02-18T09:35:03Z,Quartz.NET 2.5,"This release contains mainly bug fixes but because there's a behavioural change in
+DST handling (for the better) that warrants for a minor version number increment.
+
+See https://github.com/quartznet/quartznet/pull/317 for details.
+
+FIXES
+- Jobs get stuck in the Blocked state after the DB connection is lost in NotifyJobListenersComplete (#282)
+- Oracle rownum based queries can work wrong after Oracle SQL tuning task has ran (#413)
+- Handle DST better (#317)
+- RAMJobStore fails to resume when paused without triggers (#433)
+- CronExpression doesn't properly check the range when an ""/interval"" is specified (#432)
+- Fix JobDataMap dirty flag when constructing from existing map (#431)
+- Store triggers by job in RAMJobStore for better performance (#430)
+- Create WorkerThread in virtual method (#426)
+- SqlSelectJobForTrigger is not using primary key join and causes index scan (#407)
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/5497997/assets,https://api.github.com/repos/quartznet/quartznet/releases/5497997,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.5.0,https://github.com/quartznet/quartznet/releases/tag/v2.5.0,https://api.github.com/repos/quartznet/quartznet/zipball/v2.5.0,v2.5.0,False,False
+3964430,2016-08-24T06:00:51Z,2016-08-24T16:57:51Z,Quartz.NET 3.0 Alpha 2,"This is the second alpha of v3. This release fixes problems with schedule signaling when AdoJobStore is in use.
+This release removes the last bits of Quartz's usage of thread local storage and thus makes async-based operations a lot safer.
+
+**FIXES**
+- fix scheduler signaling not working with AdoJobStore due to thread local storage
+- thread local state removed altogether
+- quartz.serializer.type was required even though non-serializing RAMJobStore was in use
+- JSON serialization incorrectly called serialization callbacks
+
+**BREAKING CHANGES**
+- IStatefulJob was removed, been obsolete since 2.x
+- ISemaphore interface now passes Guid requestorId that defines lock owner instead of implicit thread name
+
+**KNOWN ISSUES**
+- Issues with time zone ids between Windows and Linux, they use different ids for the same zone
+- No remoting support
+- Documentation lacking
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/3964430/assets,https://api.github.com/repos/quartznet/quartznet/releases/3964430,master,https://api.github.com/repos/quartznet/quartznet/tarball/v3.0.0-alpha2,https://github.com/quartznet/quartznet/releases/tag/v3.0.0-alpha2,https://api.github.com/repos/quartznet/quartznet/zipball/v3.0.0-alpha2,v3.0.0-alpha2,False,True
+3964426,2016-08-24T05:37:29Z,2016-08-24T16:57:33Z,Quartz.NET 2.4.1,"Minor release that just makes Common.Logging 3.3.1 bound by compilation process
+and not just by NuGet version reference.
+
+**FIXES**
+- Fix Common.Logging version 3.3.1 to be a true binary reference instead of just NuGet dependency
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/3964426/assets,https://api.github.com/repos/quartznet/quartznet/releases/3964426,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.4.1,https://github.com/quartznet/quartznet/releases/tag/v2.4.1,https://api.github.com/repos/quartznet/quartznet/zipball/v2.4.1,v2.4.1,False,False
+3919174,2016-08-16T19:29:23Z,2016-08-18T17:32:23Z,Quartz.NET 3.0 Alpha 1,"First alpha release. There will be dragons.
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/3919174/assets,https://api.github.com/repos/quartznet/quartznet/releases/3919174,master,https://api.github.com/repos/quartznet/quartznet/tarball/v3.0.0-alpha1,https://github.com/quartznet/quartznet/releases/tag/v3.0.0-alpha1,https://api.github.com/repos/quartznet/quartznet/zipball/v3.0.0-alpha1,v3.0.0-alpha1,False,True
+3919167,2016-08-18T17:20:01Z,2016-08-18T17:31:15Z,Quartz.NET 2.4,"**NEW FEATURE**
+- Add SQL limit support for MySQLDelegate
+- Removed dbFailureRetryInterval since it is no longer used 
+- Update Common Logging to v3.3.1 
+
+**FIXES**
+- Batch acquisition can cause early firing of triggers
+- Should not rely on C5.TreeSet<T> on HolidayCalendar field serialization
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/3919167/assets,https://api.github.com/repos/quartznet/quartznet/releases/3919167,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.4.0,https://github.com/quartznet/quartznet/releases/tag/v2.4.0,https://api.github.com/repos/quartznet/quartznet/zipball/v2.4.0,v2.4.0,False,False
+1517799,2015-07-09T08:32:43Z,2015-07-09T21:01:46Z,Quartz.NET 2.3.3,"This is a minor release containing mostly bug fixes.
+
+NEW FEATURE
+- Support generic job types with AdoJobStore
+
+FIXES
+- AdoJobStore doesn't notify about removing orphaned job
+- Store null JobData in JobDetails if it's empty
+- Documentation error in SimpleTriggerImpl UpdateAfterMisfire
+- Ensure IDriverDelegate members in StdAdoDelegate are virtual
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/1517799/assets,https://api.github.com/repos/quartznet/quartznet/releases/1517799,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.3.3,https://github.com/quartznet/quartznet/releases/tag/v2.3.3,https://api.github.com/repos/quartznet/quartznet/zipball/v2.3.3,v2.3.3,False,False
+1106673,2015-03-30T16:23:17Z,2015-03-30T16:35:40Z,Quartz.NET 2.3.2,"This is a minor release containing mostly bug fixes.
+
+NEW FEATURE
+- Add mysql 6.9.5 provider support 
+
+FIXES
+- Avoid unnecessary object allocations in CronExpression
+- CalendarIntervalTrigger and DailyTimeIntervalTrigger produce incorrect schedule builders
+- Incorrect multiplication factor in DailyTimeIntervalScheduleBuilder.EndingDailyAfterCount()
+- AnnualCalendar SetDayExcluded does not update internal data structures if base calendar excludes date
+- Ensure IDriverDelegate members in StdAdoDelegate are virtual
+- Several XML documentation spelling error fixes
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/1106673/assets,https://api.github.com/repos/quartznet/quartznet/releases/1106673,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.3.2,https://github.com/quartznet/quartznet/releases/tag/v2.3.2,https://api.github.com/repos/quartznet/quartznet/zipball/v2.3.2,v2.3.2,False,False
+856244,2015-01-15T21:09:10Z,2015-01-15T21:09:23Z,Quartz.NET 2.3.1,"This is a bug fix release with upgraded Common.Logging dependency, also problems running
+under .NET 4.0 should now be finally fixed.
+
+NEW FEATURE
+- Upgrade to Common.Logging 3.0.0
+
+FIXES
+- JobDetailImpl members should be virtual
+- Triggers do not transition to error state in AdoJobStore when job retrieval fails during trigger acquisition
+- Quartz.Server.exe.config refers to wrong Common.Logging.Log4Net assembly
+- Incorrect NextFireTime when 'schedule-trigger-relative-to-replaced-trigger' = 'true'
+- Could not load type 'System.Runtime.CompilerServices.ExtensionAttribute' from assembly mscorlib
+- TriggerBuilder.UsingJobData(JobDataMap newJobDataMap) should ovewrite existing data
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/856244/assets,https://api.github.com/repos/quartznet/quartznet/releases/856244,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.3.1,https://github.com/quartznet/quartznet/releases/tag/v2.3.1,https://api.github.com/repos/quartznet/quartznet/zipball/v2.3.1,v2.3.1,False,False
+688473,2014-11-08T09:11:20Z,2014-11-08T12:30:59Z,Quartz.NET 2.3,"This is a bug fix release with some changes that warrant a minor version increment.
+
+NEW FEATURE
+- Upgrade to Common.Logging 2.3.1
+- Add ability to check if calendar exists in job store
+- Add FirebirdDelegate and update Firebird driver
+
+FIXES
+- DailyTimeIntervalTriggerImpl fires twice during daylight saving time day
+- No wait time between db connection failures with AcquireNextTriggers causes excessive logging
+- Configure the quartz server in the <quartz> section fails
+- CronExpression ctor incorrectly uses the non-uppercased string
+- Triggers fired milliseconds too early
+- Loading of Quartz 4.0 DLL fails on systems with no .NET 4.5 installed
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/688473/assets,https://api.github.com/repos/quartznet/quartznet/releases/688473,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.3,https://github.com/quartznet/quartznet/releases/tag/v2.3,https://api.github.com/repos/quartznet/quartznet/zipball/v2.3,v2.3,False,False
+468279,2014-07-27T07:54:41Z,2014-08-03T19:52:39Z,Quartz.NET 2.2.4,"This is a bug fix release addressing some minor issues.
+
+FIXES
+- Cannot register trigger persistence delegates with assembly qualified names
+- Set example server's current directory to the one where server.exe is
+- Fix TimeZoneInfo.GetUtcOffset(DateTimeOffset dateTimeOffset) not implemented in Mono
+- Gracefully handle mixed useProperties usage when reading from DB when useproperties value has changed
+- FindSystemTimeZoneById should work with both 'Coordinated Universal Time' and 'UTC'
+- Latest release (2.3) didn't include Dbprovider constant string in StdSchedulerFactory - running examples fails
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/468279/assets,https://api.github.com/repos/quartznet/quartznet/releases/468279,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.2.4,https://github.com/quartznet/quartznet/releases/tag/v2.2.4,https://api.github.com/repos/quartznet/quartznet/zipball/v2.2.4,v2.2.4,False,False
+247890,2014-03-30T17:14:14Z,2014-03-30T17:36:24Z,Quartz.NET 2.2.3,"This is a bug fix release which has some critical fixes, especially for CalendarIntevalTrigger
+future date calculation and trigger's next fires not being processed in a timely fashion when AdoJobStore is used
+with DisallowConcurrentExecutionAttribute and trigger has short repeat interval.
+
+FIXES
+- StdAdoConstants.SqlSelectSchedulerStates does not filter on the SCHED_NAME column
+- CalendarIntervalTrigger produces incorrect schedule
+- Trigger completion signaling from AdoJobStore does not work properly when DisallowConcurrentExecution is set
+
+NEW FEATURE
+- IDisposable jobs should be disposed after execution  
+- Support for defining DbMetadata via App.config's quartz section
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/247890/assets,https://api.github.com/repos/quartznet/quartznet/releases/247890,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.2.3,https://github.com/quartznet/quartznet/releases/tag/v2.2.3,https://api.github.com/repos/quartznet/quartznet/zipball/v2.2.3,v2.2.3,False,False
+178667,2014-02-09T07:51:56Z,2014-02-09T08:05:49Z,Quartz.NET 2.2.2,"This is a minor release fixing couple of minor bugs
+
+FIXES
+- long properties incorrectly read as int in SimplePropertiesTriggerPersistenceDelegateSupport
+- RecoveringTriggerKey in JobExecutionContext has group and name wrong way around
+- Make SQL Server table create script Azure SQL compliant
+- Add missing clustered index for QRTZ_BLOB_TRIGGERS table
+  *\* You need to manually add this to existing installation (tables created with old script),
+  see ALTER TABLE [dbo].QRTZ_BLOB_TRIGGERS WITH NOCHECK ADD... in script
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/178667/assets,https://api.github.com/repos/quartznet/quartznet/releases/178667,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.2.2,https://github.com/quartznet/quartznet/releases/tag/v2.2.2,https://api.github.com/repos/quartznet/quartznet/zipball/v2.2.2,v2.2.2,False,False
+102182,2013-11-24T14:58:43Z,2013-11-24T15:22:28Z,Quartz.NET 2.2.1,"This is a minor release containing mostly bug fixes.
+
+NEW FEATURES
+- GroupMatcher<T>.AnyGroup() support
+- Add network credential and SMTP port definition support to SendMailJob
+
+FIXES
+- SchedulerException constructor unnecessarily uses Exception.ToString as message
+- Thread name prefix for thread pool is not set
+- Triggers should not be excluded based on the fire time of the first selected trigger
+- Quarts server does not properly log possible exception when starting the service
+- DailyTimeIntervalTrigger GetFireTimeAfter produces incorrect result when date is in the past
+- batchTriggerAcquisitionMaxCount acquires one trigger unless batchTriggerAcquisitionFireAheadTimeWindow is also set
+- Oracle ODP Managed provider should set BindByName to true for OracleCommands
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/102182/assets,https://api.github.com/repos/quartznet/quartznet/releases/102182,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.2.1,https://github.com/quartznet/quartznet/releases/tag/v2.2.1,https://api.github.com/repos/quartznet/quartznet/zipball/v2.2.1,v2.2.1,False,False
+100615,2011-10-02T18:03:47Z,2013-11-22T09:47:56Z,Quartz.NET 2.0 beta 1,"BREAKING CHANGES
+- .NET 1.1 and 2.0 support is dropped
+- Quartz.NET now needs .NET version 3.5 SP1 or later to run due to use of new language features and classes
+- Many public interface methods have changed from returning arrays to generic IList or ISet interfaces
+- TriggerBuilder implementations and JobBuilder should now be used to create different job and trigger definitions
+- Introduced IJobDetail, IContrigger, ISimpleTrigger, ICalendarIntervalTrigger have far less members and especially mutators
+- When C5 collections were introduced as set-based implementation provider, ISet and ISortedSet interfaces were narrowed (IList inheritance removed)
+- string triggerName, string triggerGroup are now encapsulated in TriggerKey (has the same fields) 
+- string jobName, string jobGroup are now encapsulated in JobKey (has the same fields)
+- JobInitializationPlugin is now deprecated in favor of XMLSchedulingDataProcessorPlugin, JobInitializationPlugin no longer included
+- Microsoft's Oracle drivers are no longer supported, use 10g or 11g ODP.NET drivers
+- Database schema has changed, you need to convert your 1.x schema to new version, sample migration script available in database folder
+
+OTHER NOTABLE CHANGES
+- XMLSchedulingDataProcessorPlugin uses new XML format that allows more control over triggers but no support for calendars
+- There are extension methods for the new trigger builder that allow you to set trigger specifics
+- Client Profile is now supported and there are separate DLLs for client profile
+- PropertySettingJobFactory is now the default JobFactory
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/100615/assets,https://api.github.com/repos/quartznet/quartznet/releases/100615,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.0.0b1,https://github.com/quartznet/quartznet/releases/tag/v2.0.0b1,https://api.github.com/repos/quartznet/quartznet/zipball/v2.0.0b1,v2.0.0b1,False,True
+100613,2011-12-31T11:23:16Z,2013-11-22T09:47:31Z,Quartz.NET 2.0 beta 2,"This release contains some bug fixes and some compile time breaking changes.
+
+BREAKING CHANGES (since 2.0 beta 1)
+- DateBuilder TranslateTime method was removed as it's better done with TimeZoneInfo's ConvertTime
+- DateBuilder.IntervalUnit enumeration was replaced by usage of generic IntervalUnit enumeration in root namespace
+- DateBuilder now creates all dates in local time zone by default
+- ICommandAccessor was renamed IDbAccessor, this interface should normally not be used from client code
+- DailyTimeIntervalTrigger was changed to correctly assume start and end times are UTC times (calculation is based on local time)
+- DailyTimeIntervalTrigger properties StartTimeOfDayUtc and EndTimeOfDayUtc were renamed to StartTimeOfDay and EndTimeOfDay as they are local times without UTC notion
+
+FIXES
+
+Bug
+
+```
+* DailyTimeIntervalTriggerPersistenceDelegate does not store weekdays in correct format
+* DisallowConcurrentExecution decorated triggers not being updated after TriggerCompleted
+* DailyTimeIntervalTrigger does not work as expected
+```
+
+Improvement
+
+```
+* ADO.NET job store: force UTC ticks when storing datetimes
+```
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/100613/assets,https://api.github.com/repos/quartznet/quartznet/releases/100613,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.0.0b2,https://github.com/quartznet/quartznet/releases/tag/v2.0.0b2,https://api.github.com/repos/quartznet/quartznet/zipball/v2.0.0b2,v2.0.0b2,False,True
+100612,2012-08-18T07:19:37Z,2013-11-22T09:46:56Z,Quartz.NET 2.0.1,"This release contains some bug fixes.
+
+FIXES
+- Oracle database support broken
+- Incorrect .NET 4.5 requirement in 4.0 build (only NuGet affected)
+- XML validation fails as schema not embedded (only NuGet affected)
+- ObjectUtils.SetPropertyValue fails with explicitly implemented interface members
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/100612/assets,https://api.github.com/repos/quartznet/quartznet/releases/100612,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.0.1,https://github.com/quartznet/quartznet/releases/tag/v2.0.1,https://api.github.com/repos/quartznet/quartznet/zipball/v2.0.1,v2.0.1,False,False
+100611,2012-04-09T19:40:03Z,2013-11-22T09:46:09Z,Quartz.NET 2.0,"This release contains some bug fixes.
+
+POSSIBLE BREAKING CHANGES (since 2.0 beta 2)
+- DateBuilder now uses the UTC offset that is active for the date constructed (earlier it was always offset of DateOffset.Now)
+
+FIXES
+- Possible bug with triggers left/stuck in ACQUIRED state (QTZ-179)
+- More checks to CalendarIntevalTrigger for daylight savings
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/100611/assets,https://api.github.com/repos/quartznet/quartznet/releases/100611,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.0.0,https://github.com/quartznet/quartznet/releases/tag/v2.0.0,https://api.github.com/repos/quartznet/quartznet/zipball/v2.0.0,v2.0.0,False,False
+100608,2012-12-31T15:42:45Z,2013-11-22T09:45:24Z,Quartz.NET 2.1,"This release contains important bug fixes, new functionality and minor breaking changes.
+Custom IJobFactory implementations now need to implement new method void ReturnJob(IJob job) for container managed cleanup.
+NthIncludedDayTrigger was removed as it was accidentally left behind even though being legacy and replaced by DailyTimeIntervalTrigger.
+
+NEW FEATURES
+- TimeZone support for calendars / Andrew Smith
+- Allow scheduling relative to replaced trigger with XML configuration
+- Add method to IJobFactory to destroy a job instance created by the factory breaking / minor breaking, added new required method
+- Internalize C5 dependency
+- Support for Oracle ODP 11.2 Release 4
+- Upgrade SQLite dependency to version 1.0.83
+- Upgrade to Common.Logging 2.1.2
+
+FIXES
+- Scheduled Shutdown blocked even if waitForJobsToComplete is false
+- DailyTimeIntervalTriggerImpl should be serializable
+- InstanceID = ""AUTO"" may cause ""String or binary data would be truncated"" error on qrtz_fired_triggers.entry_id
+- PlugInExample doesn't execute any jobs
+- Recovering triggers have empty/incorrect JobDataMap
+- Make Quartz.NET work under medium trust when running .NET 3.5
+- tables_oracle.sql uses deprecated VARCHAR type
+- Improve error reporting for database connection failure
+- Scheduler Shutdown Freezes when There are Jobs Still Running
+- Use System.Version instead of FileVersionInfo to retive current Quartz version
+- DailyTimeIntervalTriggerImpl Validate broken
+
+BREAKING CHANGES
+- Remove NthIncludedDayTrigger that was supposed to be removed in 2.0 breaking
+- Remove Visual Studio 2008 solutions and projects breaking
+- Add support for DateTimeOffset and TimeSpan to JobDataMap / minor breaking - cleanup of API
+
+Special thanks to Andrew Smith for working hard on TimeZone support. 
+Credits go also to our vibrant community actively helping on mailing list and reportings issues and creating pull requests.
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/100608/assets,https://api.github.com/repos/quartznet/quartznet/releases/100608,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.1.0,https://github.com/quartznet/quartznet/releases/tag/v2.1.0,https://api.github.com/repos/quartznet/quartznet/zipball/v2.1.0,v2.1.0,False,False
+100580,2013-01-04T16:50:26Z,2013-11-22T09:04:00Z,Quartz.NET 2.1.1,"This is a maintenance release containing strongly singed dlls.
+
+Fixes
+- assemblies are missing strong name due to error in ilmerge parameters
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/100580/assets,https://api.github.com/repos/quartznet/quartznet/releases/100580,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.1.1,https://github.com/quartznet/quartznet/releases/tag/v2.1.1,https://api.github.com/repos/quartznet/quartznet/zipball/v2.1.1,v2.1.1,False,False
+100579,2013-09-09T19:57:13Z,2013-11-22T09:01:53Z,Quartz.NET 2.2,"This release contains important bug fixes, new functionality and minor breaking changes. 
+
+UPGRADING 
+
+Database schema upgrade is needed from 2.x series to 2.2: 
+- SQL Server: alter table QRTZ_FIRED_TRIGGERS add SCHED_TIME [BIGINT] NOT NULL; 
+- MySQL: alter table QRTZ_FIRED_TRIGGERS add SCHED_TIME BIGINT(19) NOT NULL 
+- Oracle: alter table QRTZ_FIRED_TRIGGERS add SCHED_TIME NUMBER(19) NOT NULL 
+- this adds a new column SCHED_TIME to table QRTZ_FIRED_TRIGGERS 
+
+BREAKING CHANGES 
+- database schema needs upgrade 
+- add SchedulerStarting() method to ISchedulerListener interface 
+- make the scheduler's TypeLoadHelper available to plugins when they are initialized 
+- dbFailureRetryInterval parameter was removed from DirectSchedulerFactory APIs 
+
+NEW FEATURES 
+- ability to override worker thread names (when using SimpleThreadPool) 
+- add new IScheduler method: ScheduleJob(IJobDetail job, ISet trigger) to schedule multiple triggers for a job all at once 
+- allow 'triggerless' initial storing of non-durable jobs. 
+- improvements for job recovery information 
+- package job_scheduling_data_2_0.xsd to nuget package's content folder 
+- allow scheduler exported with remoting to be used from local machine only 
+- support for Oracle managed ODP driver 
+
+FIXES 
+- job ending with exception and trigger not going to fire again, trigger is incorrectly not removed from job store 
+- XML schema supports multiple schedule elements but processor does not 
+- DailyTimeIntervalTriggerPersistenceDelegate does not handle empty time interval properly 
+- DailyTimeIntervalScheduleBuilder.EndingDailyAfterCount(...) doesn't pass validation 
+- trace throwing exception 
+- bug in QuartzSchedulerThread.GetRandomizedIdleWaitTime() 
+- can't delete or replace job without the referenced class 
+
+MISC 
+- Performance improvements, including improvements to some select statements in AdoJobStore
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/100579/assets,https://api.github.com/repos/quartznet/quartznet/releases/100579,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.2,https://github.com/quartznet/quartznet/releases/tag/v2.2,https://api.github.com/repos/quartznet/quartznet/zipball/v2.2,v2.2,False,False
+2038,2013-01-13T10:00:05Z,2013-07-03T08:42:14Z,Quartz.NET 2.1.2,"This is a maintenance release fixing issue where .NET 4.0 DLLs required 4.5 runtime due to ilmerge missing special framework parameter.
+
+Fixes
+- TypeLoadException: Could not load type 'System.Runtime.CompilerServices.ExtensionAttribute' with .NET 4.0
+",https://api.github.com/users/lahma,171892,lahma,https://api.github.com/repos/quartznet/quartznet/releases/2038/assets,https://api.github.com/repos/quartznet/quartznet/releases/2038,master,https://api.github.com/repos/quartznet/quartznet/tarball/v2.1.2,https://github.com/quartznet/quartznet/releases/tag/v2.1.2,https://api.github.com/repos/quartznet/quartznet/zipball/v2.1.2,v2.1.2,False,False

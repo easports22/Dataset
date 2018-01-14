@@ -1,0 +1,350 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+4978780,2016-12-22T14:24:04Z,2016-12-22T14:52:35Z,v1.0.0,"Release from tag v1.0.0, commit b8127afc0 (""Merge pull request #1719 from jonboulle/master""), as of 2016-12-22.
+
+Note that this is the final anticipated release of fleet and no future activity is planned. **CoreOS will no longer sponsorship any continued maintenance or development of the project.** If you are interested in the future of the project and wish to take over ownership, please contact fleet@coreos.com.
+
+This release includes new features, especially [gRPC communication](https://github.com/coreos/fleet/pull/1426), [basic etcd authentication](https://github.com/coreos/fleet/pull/1630), and [support for Install section](https://github.com/coreos/fleet/pull/1655). It also fixes numerous bugs that have been discovered recently. For details, please see the list below.
+
+## New Features
+- [#1393](https://github.com/coreos/fleet/pull/1393): fleetd: Support for targeting ""systemd --user""
+- [#1426](https://github.com/coreos/fleet/pull/1426): Use gRPC to communicate the engine and agents
+- [#1564](https://github.com/coreos/fleet/pull/1564): fleetd: get filtered list of units instead of all units
+- [#1571](https://github.com/coreos/fleet/pull/1571): fleetd: support conflict in global unit
+- [#1624](https://github.com/coreos/fleet/pull/1624): fleetctl: status and restart commands with global units
+- [#1630](https://github.com/coreos/fleet/pull/1630): config: add basic etcd authentication
+- [#1642](https://github.com/coreos/fleet/pull/1642): fleetd: support dynamic metadata (combined with [#1703](https://github.com/coreos/fleet/pull/1703): api,functional: dynamic metadata - fix bugs and add functional tests)
+- [#1655](https://github.com/coreos/fleet/pull/1655): fleetd: process dependencies in [Install] section
+- [#1673](https://github.com/coreos/fleet/pull/1673): registry/rpc: use simpleBalancer instead of ClientConn.State()
+- [#1679](https://github.com/coreos/fleet/pull/1679): api: support cAPI.UnitState() for a single unit
+- [#1681](https://github.com/coreos/fleet/pull/1681): fleetd,main: make github.com/coreos/fleet go-getable
+- [#1695](https://github.com/coreos/fleet/pull/1695): agent: allow HasConflict() to handle multiple values defined in Conflicts
+
+## Bugs fixed
+- [#1503](https://github.com/coreos/fleet/pull/1503): fleetctl: print error when units were not found in registry
+- [#1566](https://github.com/coreos/fleet/pull/1566): fleetctl: check also systemd states after starting units
+- [#1604](https://github.com/coreos/fleet/pull/1604): vendor: bump github.com/vishvananda/netlink to fix build error on Darwin
+- [#1623](https://github.com/coreos/fleet/pull/1623): fleetd: check that eStream is available before accessing to that
+- [#1633](https://github.com/coreos/fleet/pull/1633): fleetctl: reenable support for environment variables
+- [#1639](https://github.com/coreos/fleet/pull/1639): agent: reenable check for nil hash in unit state publisher
+- [#1646](https://github.com/coreos/fleet/pull/1646): systemd,agent: unload unit only when TriggerStop() runs successfully
+- [#1647](https://github.com/coreos/fleet/pull/1647): agent,unit: check errors from start/stop/unload-ing unit
+- [#1648](https://github.com/coreos/fleet/pull/1648): fleetctl: fix error message when fleetctl ssh fails
+- [#1651](https://github.com/coreos/fleet/pull/1651): agent: make TestUnitStatePublisher wait for each goroutine to finish
+- [#1653](https://github.com/coreos/fleet/pull/1653): api: reject templates for particular unit types
+- [#1666](https://github.com/coreos/fleet/pull/1666): fleetctl: support options --no-block, --block-attempts for destroy command
+- [#1667](https://github.com/coreos/fleet/pull/1667): fleetctl: check systemd active state via client API
+- [#1685](https://github.com/coreos/fleet/pull/1685): registry,fleetctl: fix bugs regarding shadowed error variables
+- [#1693](https://github.com/coreos/fleet/pull/1693): registry/rpc: re-enable error handling after NewSystemdUnitManager
+- [#1698](https://github.com/coreos/fleet/pull/1698): agent,engine: fix bugs in rescheduling for replaced units
+- [#1700](https://github.com/coreos/fleet/pull/1700): functional: fix error from message change from systemctl status
+- [#1701](https://github.com/coreos/fleet/pull/1701): fleetctl: take experimentalAPI into account in getClient
+- [#1706](https://github.com/coreos/fleet/pull/1706): functional: close DBUS connections after running systemd commands
+- [#1713](https://github.com/coreos/fleet/pull/1713): engine: fix a bug in engine being unreachable
+- [#1717](https://github.com/coreos/fleet/pull/1717): server: make Monitor shut down the process hard
+",https://api.github.com/users/dongsupark,10096906,dongsupark,https://api.github.com/repos/coreos/fleet/releases/4978780/assets,https://api.github.com/repos/coreos/fleet/releases/4978780,master,https://api.github.com/repos/coreos/fleet/tarball/v1.0.0,https://github.com/coreos/fleet/releases/tag/v1.0.0,https://api.github.com/repos/coreos/fleet/zipball/v1.0.0,v1.0.0,False,False
+4141921,2016-06-03T10:06:12Z,2016-10-07T10:13:52Z,v0.13.0,"Release from tag v0.13.0, commit 1d6e74a5 (""Merge pull request #1572""), as of 2016-05-30.
+
+## New Features
+- #1509: fleet: add replace unit support
+- #1560: fleetctl: inform the user about the '-replace' switch in case the units differ
+- #1524: metrics: added prometheus metrics for fleet
+- #1572: fleetd: introduce Replaces option in unit files
+- #1574: fleetctl: support truthy values in boolean unit options
+- #1577: fleetctl: print out result message explicitly
+- #1581: fleetctl: use cobra instead of cli
+  (NOTE: #1581 introduces another bug in supporting environment variables.
+  That was fixed by #1633, which is not included in v0.13.0.)
+
+## Bugs fixed
+- #1515: fleetd:registry: improve Units() performance when fetching Jobs list from etcd
+- #1540: ssh: Do not leak ssh sessions on errors
+- #1561: fleetd: detect the existing machine ID
+- #1580: registry: use etcd.Config.HeaderTimeoutPerRequest instead of internal timeout
+",https://api.github.com/users/dongsupark,10096906,dongsupark,https://api.github.com/repos/coreos/fleet/releases/4141921/assets,https://api.github.com/repos/coreos/fleet/releases/4141921,master,https://api.github.com/repos/coreos/fleet/tarball/v0.13.0,https://github.com/coreos/fleet/releases/tag/v0.13.0,https://api.github.com/repos/coreos/fleet/zipball/v0.13.0,v0.13.0,False,False
+4131904,2016-04-18T11:27:20Z,2016-10-07T10:13:21Z,v0.12.0,"Release from tag v0.12.0, commit e2a83700 (""Merge pull request #1544""), as of 2016-04-15.
+
+## New Features
+- #1263: Implement follow_only flag
+- #1265: Add flag to override tokenLimit
+- #1341: fleetctl: optimize status command
+- #1406: Add --disable_watches flag
+- #1416: fleetctl: add --output to journal
+- #1430: test: added test scripts for the functional tests
+
+## Bugs fixed
+- #1374: fleetd: fix argument handling
+- #1376: consolidate excessive Hash/Unit requests
+- #1417: fleetctl: on destroy command ignore units that do not exist
+- #1475: fleetctl: check for empty input unit strings
+- #1492: tests: added ""fleetctl --tunnel"" tests (fixes #1425)
+- #1496: server: fix panic on graceful shutdown
+- #1512: tests: added template + metadata functional test (fixes #1446)
+- #1517: fleetd: keep a list of listeners across reconfiguring fleetd
+- #1520: fixed broken template and metadata
+- #1529: ssh: define the list of Key Algorithms of remote hosts before handshake
+",https://api.github.com/users/dongsupark,10096906,dongsupark,https://api.github.com/repos/coreos/fleet/releases/4131904/assets,https://api.github.com/repos/coreos/fleet/releases/4131904,master,https://api.github.com/repos/coreos/fleet/tarball/v0.12.0,https://github.com/coreos/fleet/releases/tag/v0.12.0,https://api.github.com/repos/coreos/fleet/zipball/v0.12.0,v0.12.0,False,False
+3868119,2016-08-10T20:57:20Z,2016-09-16T10:00:33Z,v0.11.8,"## New Features
+- #1630: add support for etcd basic authentication
+",https://api.github.com/users/crawford,368848,crawford,https://api.github.com/repos/coreos/fleet/releases/3868119/assets,https://api.github.com/repos/coreos/fleet/releases/3868119,master,https://api.github.com/repos/coreos/fleet/tarball/v0.11.8,https://github.com/coreos/fleet/releases/tag/v0.11.8,https://api.github.com/repos/coreos/fleet/zipball/v0.11.8,v0.11.8,False,False
+2951615,2016-04-05T02:53:49Z,2016-04-05T00:59:57Z,v0.11.7,"# Bugs Fixed
+- prefer key algorithm from known_hosts over the server's (https://github.com/coreos/fleet/issues/1526)
+",https://api.github.com/users/crawford,368848,crawford,https://api.github.com/repos/coreos/fleet/releases/2951615/assets,https://api.github.com/repos/coreos/fleet/releases/2951615,master,https://api.github.com/repos/coreos/fleet/tarball/v0.11.7,https://github.com/coreos/fleet/releases/tag/v0.11.7,https://api.github.com/repos/coreos/fleet/zipball/v0.11.7,v0.11.7,False,False
+1700508,2015-08-20T17:00:17Z,2015-08-20T17:02:44Z,v0.11.5,"## Bugs fixed
+- do not block forever waiting for global unit creation (#1333)
+",https://api.github.com/users/mischief,1487996,mischief,https://api.github.com/repos/coreos/fleet/releases/1700508/assets,https://api.github.com/repos/coreos/fleet/releases/1700508,master,https://api.github.com/repos/coreos/fleet/tarball/v0.11.5,https://github.com/coreos/fleet/releases/tag/v0.11.5,https://api.github.com/repos/coreos/fleet/zipball/v0.11.5,v0.11.5,False,False
+1675489,2015-08-14T17:43:16Z,2015-08-14T21:54:46Z,v0.11.4,"## Bugs fixed
+- correctly block waiting for unit creation in `submit`/`load`/`start` before proceeding with other actions
+- block waiting for unit destruction in `destroy`
+",https://api.github.com/users/mischief,1487996,mischief,https://api.github.com/repos/coreos/fleet/releases/1675489/assets,https://api.github.com/repos/coreos/fleet/releases/1675489,master,https://api.github.com/repos/coreos/fleet/tarball/v0.11.4,https://github.com/coreos/fleet/releases/tag/v0.11.4,https://api.github.com/repos/coreos/fleet/zipball/v0.11.4,v0.11.4,False,False
+1664657,2015-08-12T22:07:55Z,2015-08-12T22:15:52Z,v0.11.3,"## Bugs fixed
+- reworked race condition fix included in the last release. using consistent reads in fleetd for etcd was deemed too demanding, but watches don't work as expected against etcd 0.4.x. instead we wait for unit creation in fleetctl before proceeding with other actions.
+
+## Known bugs
+- does not correctly wait for unit creation when the unit exists on the local disk but not in the remote registry. this is fixed in release [v0.11.4](../../releases/tag/v0.11.4).
+",https://api.github.com/users/mischief,1487996,mischief,https://api.github.com/repos/coreos/fleet/releases/1664657/assets,https://api.github.com/repos/coreos/fleet/releases/1664657,master,https://api.github.com/repos/coreos/fleet/tarball/v0.11.3,https://github.com/coreos/fleet/releases/tag/v0.11.3,https://api.github.com/repos/coreos/fleet/zipball/v0.11.3,v0.11.3,False,False
+1574359,2015-07-23T05:34:49Z,2015-07-23T05:40:52Z,v0.11.2,"## Bugs fixed
+- fix a race condition when creating units due to etcd reads without consistency
+",https://api.github.com/users/mischief,1487996,mischief,https://api.github.com/repos/coreos/fleet/releases/1574359/assets,https://api.github.com/repos/coreos/fleet/releases/1574359,master,https://api.github.com/repos/coreos/fleet/tarball/v0.11.2,https://github.com/coreos/fleet/releases/tag/v0.11.2,https://api.github.com/repos/coreos/fleet/zipball/v0.11.2,v0.11.2,False,False
+1522198,2015-07-10T18:07:04Z,2015-07-10T18:21:48Z,v0.11.1,"## Bugs fixed
+- #1301: fleetd 0.11.0 lacked default etcd endpoints. they have been restored, and defaults to `http://127.0.0.1:2379` and `http://127.0.0.1:4001`.
+",https://api.github.com/users/mischief,1487996,mischief,https://api.github.com/repos/coreos/fleet/releases/1522198/assets,https://api.github.com/repos/coreos/fleet/releases/1522198,master,https://api.github.com/repos/coreos/fleet/tarball/v0.11.1,https://github.com/coreos/fleet/releases/tag/v0.11.1,https://api.github.com/repos/coreos/fleet/zipball/v0.11.1,v0.11.1,False,False
+1494719,2015-07-03T23:12:51Z,2015-07-03T23:18:06Z,v0.11.0,"## Bugs Fixed
+- #1273: prevent load/start of templates
+",https://api.github.com/users/mischief,1487996,mischief,https://api.github.com/repos/coreos/fleet/releases/1494719/assets,https://api.github.com/repos/coreos/fleet/releases/1494719,master,https://api.github.com/repos/coreos/fleet/tarball/v0.11.0,https://github.com/coreos/fleet/releases/tag/v0.11.0,https://api.github.com/repos/coreos/fleet/zipball/v0.11.0,v0.11.0,False,False
+1430388,2015-06-18T02:36:54Z,2015-06-18T02:37:47Z,v0.10.2,"## Bugs Fixed
+- #1253: properly run local and remote commands
+
+Note that due to a change in the go version, the binaries for this release are not statically linked. Users in need of static fleetctl/fleetd binaries are recommended to upgrade to v0.11.0 or build fleet themselves.
+",https://api.github.com/users/crawford,368848,crawford,https://api.github.com/repos/coreos/fleet/releases/1430388/assets,https://api.github.com/repos/coreos/fleet/releases/1430388,master,https://api.github.com/repos/coreos/fleet/tarball/v0.10.2,https://github.com/coreos/fleet/releases/tag/v0.10.2,https://api.github.com/repos/coreos/fleet/zipball/v0.10.2,v0.10.2,False,False
+1233863,2015-04-29T15:43:00Z,2015-04-29T15:53:07Z,,"## Tweaks
+- #1205: set `fleetctl` flag `--driver` default to `etcd` is unset and `--endpoint` is etcd-like
+- #1204: communicate to end-user why fleet API unavailable when etcd is unreachable
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/1233863/assets,https://api.github.com/repos/coreos/fleet/releases/1233863,master,https://api.github.com/repos/coreos/fleet/tarball/v0.10.1,https://github.com/coreos/fleet/releases/tag/v0.10.1,https://api.github.com/repos/coreos/fleet/zipball/v0.10.1,v0.10.1,False,False
+1162542,2015-04-14T01:21:22Z,2015-04-14T01:28:39Z,,"## New Features
+- #1034: use fleet API instead of etcd by default under fleetctl
+- #1084: identify global units in `fleetctl list-unit-files`
+- #1092 #1148: allow user to configure username & port for SSH connections
+- #1171: attempt to access etcd over at IANA-assigned port
+
+## Bugs Fixed
+- #1021: use proper exit codes in `fleetctl status`
+- #1068: format WARN log messages correctly
+- #1155: quote unit names when calling `systemctl status`
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/1162542/assets,https://api.github.com/repos/coreos/fleet/releases/1162542,master,https://api.github.com/repos/coreos/fleet/tarball/v0.10.0,https://github.com/coreos/fleet/releases/tag/v0.10.0,https://api.github.com/repos/coreos/fleet/zipball/v0.10.0,v0.10.0,False,False
+1108347,2015-03-31T00:07:51Z,2015-03-31T00:23:07Z,,"## Bugs Fixed
+- #1158: lengthy deactivation prevents units from starting properly
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/1108347/assets,https://api.github.com/repos/coreos/fleet/releases/1108347,master,https://api.github.com/repos/coreos/fleet/tarball/v0.9.2,https://github.com/coreos/fleet/releases/tag/v0.9.2,https://api.github.com/repos/coreos/fleet/zipball/v0.9.2,v0.9.2,False,False
+997043,2015-02-27T22:09:23Z,2015-02-27T22:14:57Z,,"## Bugs Fixed
+- #900, #977, #1003, #1127:  failure of units to start due to ""No such file or directory"" error
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/997043/assets,https://api.github.com/repos/coreos/fleet/releases/997043,master,https://api.github.com/repos/coreos/fleet/tarball/v0.9.1,https://github.com/coreos/fleet/releases/tag/v0.9.1,https://api.github.com/repos/coreos/fleet/zipball/v0.9.1,v0.9.1,False,False
+751161,2014-12-03T03:08:45Z,2014-12-03T03:47:33Z,,"The highlight of v0.9.0 is the finalization of the [v1 API](https://github.com/coreos/fleet/blob/v0.9.0/Documentation/api-v1.md). From this point on, no backwards-incompatible changes will be made to the API specification. The fleetctl tool will continue to communicate directly with etcd until a later release, at which time all etcd communication will be routed through the API endpoint of the fleetd daemon.
+
+## New Features
+- #936: populate Server HTTP header w/ fleetd version
+- #983: drop alpha tag from v1 API
+- #984: support TLS authentication in fleetctl using `--ca-file`, `--key-file` and `--cert-file`
+- #1009: configurable SSH timeout in fleetctl through `--ssh-timeout`
+- #1039: support tunneling to unix domain socket
+
+## Bugs Fixed
+- #866: replace unit during reconciliation if hash changes
+- #944: reload systemd daemon only when necessary
+- #945: return HTTP 415 when Content-Type unusable
+- #966: print to stdout from `fleetctl unload`
+- #970: explicitly disable SSLv3 in etcd client
+- #977: fix handling of `fleetctl --help` flag
+- #982: require scheme in `fleetctl --endpoint` flag
+- #1012: remove `.json` extension from discovery schema endpoint
+- #1028: correctly lookup local unit files when file extension not present
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/751161/assets,https://api.github.com/repos/coreos/fleet/releases/751161,master,https://api.github.com/repos/coreos/fleet/tarball/v0.9.0,https://github.com/coreos/fleet/releases/tag/v0.9.0,https://api.github.com/repos/coreos/fleet/zipball/v0.9.0,v0.9.0,False,False
+599999,2014-10-02T21:09:58Z,2014-10-02T21:16:31Z,,"## Bugs Fixed
+- #933: prevent panic when attempting to steal engine lease
+- #937: lengthen lease on stolen lease to prevent racy handoff
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/599999/assets,https://api.github.com/repos/coreos/fleet/releases/599999,master,https://api.github.com/repos/coreos/fleet/tarball/v0.8.3,https://github.com/coreos/fleet/releases/tag/v0.8.3,https://api.github.com/repos/coreos/fleet/zipball/v0.8.3,v0.8.3,False,False
+594388,2014-09-30T21:00:45Z,2014-09-30T21:31:09Z,,"## Bugs Fixed
+- #903: No longer block on systemd jobs (major case of ""unkillable"" units)
+- #910: Return proper HTTP status code when creating vs modifying units
+- #924: Upgrades past v0.7.0 now proceed gracefully
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/594388/assets,https://api.github.com/repos/coreos/fleet/releases/594388,master,https://api.github.com/repos/coreos/fleet/tarball/v0.8.2,https://github.com/coreos/fleet/releases/tag/v0.8.2,https://api.github.com/repos/coreos/fleet/zipball/v0.8.2,v0.8.2,False,False
+565703,2014-09-18T04:04:30Z,2014-09-18T04:08:59Z,,"## Bugs Fixed
+- #833: address ""stuck"" unit state
+- #867: validate acceptable unit names in both fleetctl and the API based on systemd's rules
+- #879: consistent output from `fleetctl unload`
+- #895: clarify inability to use fleetctl `ssh`, `status` and `journal with global units
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/565703/assets,https://api.github.com/repos/coreos/fleet/releases/565703,master,https://api.github.com/repos/coreos/fleet/tarball/v0.8.1,https://github.com/coreos/fleet/releases/tag/v0.8.1,https://api.github.com/repos/coreos/fleet/zipball/v0.8.1,v0.8.1,False,False
+538816,2014-09-05T18:43:39Z,2014-09-05T18:46:22Z,,"The major new feature in this release is global units. These allow users to define units which will run on every agent in their fleet cluster. For full details, see the [unit files and scheduling](https://github.com/coreos/fleet/blob/master/Documentation/unit-files-and-scheduling.md) documentation.
+
+## New Features
+- #786: fleet now supports global units
+- #794: the API now serves its discovery document
+- #814: the API now supports query parameters when retrieving units
+
+## Changes
+- #621: the `X-` and `X-Condition` prefixes of certain unit options are now deprecated and should be removed from unit files
+- #802: fleet no longer depends on glog and instead uses its own simplified log package
+- #807: the `fleet` binary is now called `fleetd`. Users may need to adjust their init scripts appropriately.
+- #809: the documentation was significantly reworked, with many examples updated and similar documents combined
+- #810: resource reservation options are no longer parsed in unit files. These were never actually considered by fleet, so this is a no-op
+- #868: the `TMACHINE` field in `fleetctl` output has been renamed to `TARGET`. The old name will still function but is deprecated; users should migrate to TARGET
+
+## Bugs Fixed
+- #793: units with invalid names no longer cause issues with state publishing
+- #855: the schema ID for unit delete operations in the API is fixed
+- #861: when detecting the local IP address, fleetd only considers global unicast addresses
+- #862: the API returns clearer errors when invalid units are submitted
+",https://api.github.com/users/jonboulle,2601015,jonboulle,https://api.github.com/repos/coreos/fleet/releases/538816/assets,https://api.github.com/repos/coreos/fleet/releases/538816,master,https://api.github.com/repos/coreos/fleet/tarball/v0.8.0,https://github.com/coreos/fleet/releases/tag/v0.8.0,https://api.github.com/repos/coreos/fleet/zipball/v0.8.0,v0.8.0,False,False
+504700,2014-08-20T23:51:45Z,2014-08-20T23:56:58Z,,"## Bugs Fixed
+- #646: serialize systemd operations within a single fleet agent
+- #783: use TTLs to clean up stale state in etcd
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/504700/assets,https://api.github.com/repos/coreos/fleet/releases/504700,master,https://api.github.com/repos/coreos/fleet/tarball/v0.7.1,https://github.com/coreos/fleet/releases/tag/v0.7.1,https://api.github.com/repos/coreos/fleet/zipball/v0.7.1,v0.7.1,False,False
+498505,2014-08-18T17:18:57Z,2014-08-18T17:22:44Z,,"The fleet engine no longer uses bidding to schedule work to the cluster. This caused a lot of unnecessary stress on etcd and was not able to quickly schedule units into the cluster. This mechanism was replaced with a monolithic scheduler running in a single engine. Each engine master-elects this responsibility to provide quick failover in the event of a single machine going down.
+
+We made a great amount of progress on fleet’s HTTP API. Its current resource layout will likely be what is released as the official API.
+
+The relationship between unit state and the underlying fleet agents has been modified to allow multiple agents to report state under the same unit name. This change not only helps communicate what is actually happening in the cluster at any given time, but paves the way for global units (https://github.com/coreos/fleet/issues/681). This did have some consequences for fleetctl - the `state` and `dstate` fields moved from `list-units` to `list-unit-files`.
+
+Unit signing has been removed. The related flags and commands no longer function.
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/498505/assets,https://api.github.com/repos/coreos/fleet/releases/498505,master,https://api.github.com/repos/coreos/fleet/tarball/v0.7.0,https://github.com/coreos/fleet/releases/tag/v0.7.0,https://api.github.com/repos/coreos/fleet/zipball/v0.7.0,v0.7.0,False,False
+473307,2014-08-05T23:10:39Z,2014-08-05T23:21:24Z,,"## Bugs Fixed
+- #709: clarify fleetctl destroy activity
+- #729: limit amount of work done within a single engine reconciliation attempt
+- #733: remove unnecessary etcd traffic
+- #737: don't mask unit files when loading
+- #742: limit what events trigger engine & agent reconciliation
+- #743: raise default value of fleetctl's --request-timeout flag to 3s
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/473307/assets,https://api.github.com/repos/coreos/fleet/releases/473307,master,https://api.github.com/repos/coreos/fleet/tarball/v0.6.2,https://github.com/coreos/fleet/releases/tag/v0.6.2,https://api.github.com/repos/coreos/fleet/zipball/v0.6.2,v0.6.2,False,False
+457792,2014-07-29T14:11:50Z,2014-07-29T14:16:35Z,,"## Bugs Fixed
+- #726: make etcd timeouts configurable
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/457792/assets,https://api.github.com/repos/coreos/fleet/releases/457792,master,https://api.github.com/repos/coreos/fleet/tarball/v0.6.1,https://github.com/coreos/fleet/releases/tag/v0.6.1,https://api.github.com/repos/coreos/fleet/zipball/v0.6.1,v0.6.1,False,False
+455936,2014-07-28T19:08:16Z,2014-07-28T19:11:51Z,,"Both the Engine and the Agent have switched from an event-driven model to a periodic reconciliation model. This was done to ensure fleet is always making progress towards doing the Right Thing™. Unit state is also published at an interval, so stale data in etcd should be much less of a problem.
+
+The signed units feature is deprecated as of this release, primarily because the feature does not fit well with the coming HTTP API. Authentication and authorization are important to get right, and the way the signed units feature is designed just doesn't offer enough security.
+
+## New Features
+- #688: New list-unit-files command
+- #677: Allow configuration of etcd SSL certs in fleet and fleetctl
+- #663: New fields `TSTATE` and `DSTATE` added to `fleetctl list-units`, while `LOAD` and `SUB` were removed from default field list
+
+## Bugs Fixed
+- #697: Refuse to start up with empty machine-id
+- #652: Missing events from etcd no longer affects Agent
+- #628: Manual unit state changes are now propagated to etcd
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/455936/assets,https://api.github.com/repos/coreos/fleet/releases/455936,master,https://api.github.com/repos/coreos/fleet/tarball/v0.6.0,https://github.com/coreos/fleet/releases/tag/v0.6.0,https://api.github.com/repos/coreos/fleet/zipball/v0.6.0,v0.6.0,False,False
+429124,2014-07-14T22:14:35Z,2014-07-14T22:20:25Z,,"## Bugs Fixed
+- #660: fix panic when Job data not found in Registry
+- #639: lease engine role for extended period of time
+- #636: remove redundant etcd requests when listing machines
+- #630: asynchronously stop zombie jobs on startup
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/429124/assets,https://api.github.com/repos/coreos/fleet/releases/429124,master,https://api.github.com/repos/coreos/fleet/tarball/v0.5.4,https://github.com/coreos/fleet/releases/tag/v0.5.4,https://api.github.com/repos/coreos/fleet/zipball/v0.5.4,v0.5.4,False,False
+420615,2014-07-09T23:10:24Z,2014-07-09T23:16:53Z,,"## Bugs Fixed
+- #500, #624, #625, #629: switch to reconciler model in engine
+- #626: fix a race condition in go-systemd
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/420615/assets,https://api.github.com/repos/coreos/fleet/releases/420615,master,https://api.github.com/repos/coreos/fleet/tarball/v0.5.3,https://github.com/coreos/fleet/releases/tag/v0.5.3,https://api.github.com/repos/coreos/fleet/zipball/v0.5.3,v0.5.3,False,False
+416311,2014-07-08T04:53:49Z,2014-07-08T05:08:00Z,,"Like the previous release, the majority of effort was spent on the HTTP API (#545) and internal refactoring during this release cycle. While there weren't any new features released, there were a few notable changes:
+- switched from goven to godep
+- improved internal logging, dropping the `fleetctl --verbosity` flag
+
+## Bugs Fixed
+- #582: use consistent=true with etcd GET requests
+- #579: fix handling of unit names with underscores and other special characters
+- #620: plug file descriptor leak
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/416311/assets,https://api.github.com/repos/coreos/fleet/releases/416311,master,https://api.github.com/repos/coreos/fleet/tarball/v0.5.2,https://github.com/coreos/fleet/releases/tag/v0.5.2,https://api.github.com/repos/coreos/fleet/zipball/v0.5.2,v0.5.2,False,False
+390355,2014-06-23T19:55:58Z,2014-06-23T20:04:54Z,,"Lots of effort was spent on the new experimental HTTP API (#545) and internal refactoring this release cycle. While there weren't any new features released, there were two notable changes:
+- #537: Functional tests run twice as quickly and are much more reliable
+- #542: `fleetctl debug-info` was removed
+
+### Bugs
+- #530: Drop unnecessary tabwriter usage, prevent panic
+- #540: Manually fetch systemd state when starting units
+- #546: Parse malformed systemd unit file carefully, prevent panic
+- #553: Be careful about type assertions, prevent panic
+- #556: Propagate internal Registry initialization failures up
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/390355/assets,https://api.github.com/repos/coreos/fleet/releases/390355,master,https://api.github.com/repos/coreos/fleet/tarball/v0.5.1,https://github.com/coreos/fleet/releases/tag/v0.5.1,https://api.github.com/repos/coreos/fleet/zipball/v0.5.1,v0.5.1,False,False
+365122,2014-06-09T23:12:15Z,2014-06-09T23:16:33Z,,"### Features
+- #303: Richer template unit support
+- #485: Allow user to choose fields displayed by `fleetctl list-machines`
+
+### Bugs
+- #480: `fleetctl submit` no longer fails if units already exist
+- #511: Ensure go-etcd does not leak TCP connections
+- #526: Remove erroneous space in machine metadata formatting
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/365122/assets,https://api.github.com/repos/coreos/fleet/releases/365122,master,https://api.github.com/repos/coreos/fleet/tarball/v0.5.0,https://github.com/coreos/fleet/releases/tag/v0.5.0,https://api.github.com/repos/coreos/fleet/zipball/v0.5.0,v0.5.0,False,False
+352556,2014-05-29T22:58:38Z,2014-06-02T17:32:22Z,,"This release contains a backport of the fix for #511 
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/352556/assets,https://api.github.com/repos/coreos/fleet/releases/352556,master,https://api.github.com/repos/coreos/fleet/tarball/v0.3.3,https://github.com/coreos/fleet/releases/tag/v0.3.3,https://api.github.com/repos/coreos/fleet/zipball/v0.3.3,v0.3.3,False,False
+340647,2014-05-26T22:44:15Z,2014-05-26T22:51:08Z,,"### Features
+- #235: Add support for mount, auto mount, device unit types
+- #337: Allow user to choose fields displayed by `fleetctl list-units`
+- #179: Make available unit SHA1 field to `fleetctl list-units`
+- #428: Warn user when using fleetctl binary older than cluster
+- #455: Block forever in fleetctl load/unload/start/stop commands
+- #473: Sort output of `fleetctl list-machines` by ID
+
+### Bugs
+- #446: Publish state correctly when rescheduling units
+- #466: Asynchronously stop/start units to prevent blocking Agent operation
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/340647/assets,https://api.github.com/repos/coreos/fleet/releases/340647,master,https://api.github.com/repos/coreos/fleet/tarball/v0.4.0,https://github.com/coreos/fleet/releases/tag/v0.4.0,https://api.github.com/repos/coreos/fleet/zipball/v0.4.0,v0.4.0,False,False
+318813,2014-05-13T23:05:26Z,2014-05-13T23:09:56Z,,"### Bugs Fixed
+- #402: Expose more information through user on fleetctl failures
+- #447: Time out requests to etcd
+- #450: Call daemon-reload when loading/unloading units
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/318813/assets,https://api.github.com/repos/coreos/fleet/releases/318813,master,https://api.github.com/repos/coreos/fleet/tarball/v0.3.2,https://github.com/coreos/fleet/releases/tag/v0.3.2,https://api.github.com/repos/coreos/fleet/zipball/v0.3.2,v0.3.2,False,False
+316685,2014-05-12T22:18:31Z,2014-05-12T22:21:42Z,,"### Bugs Fixed
+- #373: check for jobs that have actionable work during engine startup
+- #407: agent destroys units it should not be running on startup
+- #410: fleetctl uses correct format for known_hosts file
+- #411: refactor event code to use a single etcd watcher
+- #414: units are no longer enabled when loading on a fleet agent
+- #420: refuse to start fleet daemon if /etc/machine-id unreadable or empty
+- #427: track necessary job state during agent initialization
+- #438: fleet no longer panics due to botched etcd lookup
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/316685/assets,https://api.github.com/repos/coreos/fleet/releases/316685,master,https://api.github.com/repos/coreos/fleet/tarball/v0.3.1,https://github.com/coreos/fleet/releases/tag/v0.3.1,https://api.github.com/repos/coreos/fleet/zipball/v0.3.1,v0.3.1,False,False
+309022,2014-05-07T22:16:49Z,2014-05-07T22:19:39Z,v0.3.0,"### New Features
+- Improved job state machine - see `fleetctl load/unload` and the `fleetctl list-units` STATE column
+- Support timer and path unit types
+- Add an `X-ConditionMachineMetadata` unit option (replaces `--require` flag)
+- Add an `X-ConditionMachineID` unit option (replaces `X-ConditionMachineBootID` option)
+- Add debug output to fleetctl
+- Assume `.service` extension if not provided in fleetctl commands
+
+### Major Bugs Fixed
+- #377: Cluster should not destroy itself during etcd leader election
+
+### Other Changes
+- Use machine ID instead of boot ID to identify Agents
+- Stop generating default peers of socket units
+- Stop publishing socket information with unit state
+- Stop calling 'enable' when starting unit under Agent
+
+### Upgrade Notes
+
+While fleet is still under heavy development it is not reasonable to expect a seamless rolling upgrade of a fleet cluster. Do not expect a cluster to be usable with mixed versions of fleet, and do not expect old versions of fleetctl to work after the cluster has been upgraded.
+
+An upgrade from v0.2 to v0.3 will not result in the loss of existing units, but any units that were active pre-upgrade may need to be be restarted post-upgrade. Using the new fleetctl binary, you can run `fleetctl start --no-block` on your units before beginning the upgrade to automatically transition them to a `launched` state once the upgrade is complete.
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/309022/assets,https://api.github.com/repos/coreos/fleet/releases/309022,master,https://api.github.com/repos/coreos/fleet/tarball/v0.3.0,https://github.com/coreos/fleet/releases/tag/v0.3.0,https://api.github.com/repos/coreos/fleet/zipball/v0.3.0,v0.3.0,False,False
+257936,2014-04-04T23:43:33Z,2014-04-05T00:06:10Z,v0.2.0,"Along with several bug-fixes, this release contains several new features:
+
+**Security**
+- signed payloads
+- host key verification
+
+**Usability**
+- `fleetctl ssh` attempts to autodetect argument as machine vs unit
+- `fleetctl journal --follow` will stream logs from systemd-journal back to the user
+- `fleetctl start` will block until unit is scheduled or timeout is reached - disable with --no-block
+- `fleetctl ssh --forward-agent` will forward the local ssh-agent through the established connection
+- fleetctl ssh, journal, and status commands will only establish SSH connections if necessary
+
+**Debuggability**
+- fleet agents publish version information to etcd
+- fleet agents dump state when SIGUSR1 received
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/257936/assets,https://api.github.com/repos/coreos/fleet/releases/257936,master,https://api.github.com/repos/coreos/fleet/tarball/v0.2.0,https://github.com/coreos/fleet/releases/tag/v0.2.0,https://api.github.com/repos/coreos/fleet/zipball/v0.2.0,v0.2.0,False,False
+209864,2014-03-04T21:52:26Z,2014-03-04T22:09:06Z,v0.1.4,"This release contains a single fix for compatibility with systemd > v207: fb02f68c9e1c61ab52688b49ead150b1a8d2c376
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/209864/assets,https://api.github.com/repos/coreos/fleet/releases/209864,master,https://api.github.com/repos/coreos/fleet/tarball/v0.1.4,https://github.com/coreos/fleet/releases/tag/v0.1.4,https://api.github.com/repos/coreos/fleet/zipball/v0.1.4,v0.1.4,False,False
+196344,2014-02-22T19:41:00Z,2014-02-22T20:06:27Z,v0.1.3,"In addition to numerous bug fixes, this release contains the following features:
+- [Environment-variable configuration](https://github.com/coreos/fleet/blob/v0.1.3/Documentation/configuration.md) of `fleet` and `fleetctl`
+- Better error-handling and [documentation](https://github.com/coreos/fleet/blob/v0.1.3/Documentation/remote-access.md) of SSH authentication in `fleetctl`
+- Documentation of how scheduling [decisions are made](https://github.com/coreos/fleet/blob/v0.1.3/Documentation/scheduling.md) and [may be influenced](https://github.com/coreos/fleet/blob/v0.1.3/Documentation/scheduling.md)
+- Unit descriptions now exposed in `fleetctl list-units` command
+",https://api.github.com/users/bcwaldon,548759,bcwaldon,https://api.github.com/repos/coreos/fleet/releases/196344/assets,https://api.github.com/repos/coreos/fleet/releases/196344,master,https://api.github.com/repos/coreos/fleet/tarball/v0.1.3,https://github.com/coreos/fleet/releases/tag/v0.1.3,https://api.github.com/repos/coreos/fleet/zipball/v0.1.3,v0.1.3,False,False
+189720,2014-02-18T00:40:03Z,2014-02-18T01:47:06Z,v0.1.2,"Initial release of fleet. The linux-amd64 artifact contains the `fleet` and `fleetctl` binaries, while the darwin-amd64 artifact only contains `fleetctl`.
+",https://api.github.com/users/philips,33544,philips,https://api.github.com/repos/coreos/fleet/releases/189720/assets,https://api.github.com/repos/coreos/fleet/releases/189720,master,https://api.github.com/repos/coreos/fleet/tarball/v0.1.2,https://github.com/coreos/fleet/releases/tag/v0.1.2,https://api.github.com/repos/coreos/fleet/zipball/v0.1.2,v0.1.2,False,False

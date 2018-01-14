@@ -1,0 +1,690 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8185950,2017-10-19T17:53:59Z,2017-10-19T17:55:39Z,3.0.0 alpha 1,"This is the first alpha release of ReactiveSwift 3.0. It supports Swift 3.2 and Swift 4.0, and requires either Xcode 9 or the Swift 4.0 OSS compiler toolchain.
+
+## Breaking Change
+
+1. `Signal` now uses `Lifetime` for resource management. (#404, kudos to @andersio)
+
+   The `Signal` initialzer now accepts a generator closure that is passed with the input `Observer` and the `Lifetime` as its arguments. The original variant accepting a single-argument generator closure is now obselete. This is a source breaking change.
+   
+   ```swift
+   // New: Add `Disposable`s to the `Lifetime`.
+   let candies = Signal<U, E> { (observer: Signal<U, E>.Observer, lifetime: Lifetime) in
+      lifetime += trickOrTreat.observe(observer)
+   }
+   
+   // Obsolete: Returning a `Disposable`.
+   let candies = Signal { (observer: Signal<U, E>.Observer) -> Disposable? in
+      return trickOrTreat.observe(observer)
+   }
+   ```
+
+## Bugfix
+
+1. Workaround an unexpected EGAGIN error being returned by pthread in 32-bit ARM debug builds. (#508)
+
+## Changes
+
+1. ReactiveSwift has been migrated to Swift 4.0. (#422, kudos to @andersio)
+
+1. `SignalProducer.startWithSignal` now returns the value of the setup closure. (#533, kudos to @Burgestrand)
+
+1. Disabled code coverage data to allow app submissions with Xcode 9.0 (see https://github.com/Carthage/Carthage/issues/2056, kudos to @NachoSoto)
+
+1. The `SignalProducer` internals have undergone a significant refactoring, which bootstraps the effort to reduce the overhead of constant producers and producer compositions. (#487, kudos to @andersio)
+
+## Deprecation
+
+1. `Signal.Observer.action` has been deprecated. Use `Signal.Observer.send` instead. (#515)",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/8185950/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/8185950,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/3.0.0-alpha.1,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/3.0.0-alpha.1,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/3.0.0-alpha.1,3.0.0-alpha.1,False,True
+7778264,2017-09-16T09:39:14Z,2017-09-16T09:48:11Z,2.1.0 alpha 2,"This is the second alpha release of ReactiveSwift 2.1. It targets Swift 3.1, Swift 3.2 and Swift 4.0.
+
+## Changes
+1. Disabled code coverage data to allow app submissions with Xcode 9.0 (see https://github.com/Carthage/Carthage/issues/2056, kudos to @NachoSoto)
+",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/7778264/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/7778264,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/2.1.0-alpha.2,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/2.1.0-alpha.2,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/2.1.0-alpha.2,2.1.0-alpha.2,False,True
+7772993,2017-09-15T17:49:48Z,2017-09-15T17:50:26Z,2.1.0 alpha 1,"This is the first alpha release of ReactiveSwift 2.1. It targets Swift 3.1, Swift 3.2 and Swift 4.0.
+
+## Changes
+1. `Signal.Observer.action` has been deprecated. Use `Signal.Observer.send` instead. (#515)
+
+1. Workaround an unexpected EGAGIN error being returned by pthread in 32-bit ARM debug builds. (#508)
+
+1. The `SignalProducer` internals have undergone a significant refactoring, which bootstraps the effort to reduce the overhead of constant producers and producer compositions. (#487, kudos to @andersio)",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/7772993/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/7772993,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/2.1.0-alpha.1,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/2.1.0-alpha.1,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/2.1.0-alpha.1,2.1.0-alpha.1,False,True
+7405718,2017-08-16T04:02:38Z,2017-08-16T04:04:29Z,2.0.1,"This is the first maintenance release of ReactiveSwift 2.0. It targets Swift 3.1 with preliminary support of Swift 3.2 and Swift 4.0.
+
+## Change
+1. Addressed the exceptionally high build time. (#495)
+
+## Addition
+1. New operator `retry(upTo:interval:on:)`. (#496, kudos to @tjnet)
+
+    This delays retrying on failure by interval until hitting the upTo limitation.",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/7405718/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/7405718,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/2.0.1,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/2.0.1,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/2.0.1,2.0.1,False,False
+7125524,2017-07-21T16:00:18Z,2017-07-21T16:00:40Z,2.0.0,"This is the second major release of ReactiveSwift. It requires Swift 3.1 (Xcode 8.3.x), and preliminarily supports Swift 3.2 and Swift 4.0 (Xcode 9).
+
+## Highlights
+### Safer `Signal` lifetime semantics (#355, #463)
+The `Signal` lifetime semantics have been updated to improve interoperability with memory debugging tools. ReactiveSwift 2.0 adopted a new `Signal` internal which does not exploit deliberate retain cycles that consequentially confuse memory debugging tools.
+
+ReactiveSwift 2.0 automatically terminates a `Signal`, when:
+
+1.  **(New)** its input observer of the `Signal` is not retained; OR
+1. the `Signal` is neither retained nor has any active observer;
+
+> **Input observer** refers to the `Observer` the `Signal` receives input from. It is created and passed to you by `Signal.init`, `Signal.pipe` and `SignalProducer.init`.
+
+Specifically, when an input `Observer` deinitializes, semantically it implies the associated `Signal` has no further event to be delivered. So ReactiveSwift would now interrupt the `Signal` automatically, and release all the associated resources.
+
+```swift
+func scopedSignal() -> Signal<Never, NoError> {
+    // Note that the `Observer` is discarded immediately.
+    let (signal, _) = Signal<Never, NoError>.pipe()
+    return signal
+}
+
+var isInterrupted = false
+
+withExtendedLifetime(scopedSignal()) { signal in
+    signal.observeInterrupted { isInterrupted = true }
+
+    // ReactiveSwift 1.x:
+    // The `Signal` is still alive, probably forever unless the observer is detached.
+    expect(isInterrupted) == false
+
+    // ReactiveSwift 2.0:
+    // The `Signal` is automatically interrupted, since the deinitialization of the
+    // input `Observer` implies no further event would be sent.
+    expect(isInterrupted) == true
+}
+```
+
+Similarly for a deinitialised `Signal`, since no further observation can ever be made, ReactiveSwift would dispose of it when it knows for certain it has no active observer. Note that this is already the case for ReactiveSwift 1.x.
+
+```swift
+let checkpoint = AnyDisposable()
+let escaped = CompositeDisposable()
+
+func scopedObserver() -> Signal<Never, NoError>.Observer {
+    // Note that the `Signal` does not escape the scope.
+    let (signal, observer) = Signal<Never, NoError>.pipe(disposable: checkpoint)
+    escaped += signal.observe(Observer())
+    return observer
+}
+
+withExtendedLifetime(scopedObserver()) {
+    escaped.dispose()
+
+    // ReactiveSwift 1.x and 2.0:
+    // Since no further observation can be made to the `Signal`, and it has no
+    // active observer at this point, the `Signal` is automatically disposed of.
+    expect(checkpoint.isDisposed) == true
+}
+```
+
+In short, the `Signal` terminates when either of its ends implicitly declare their lack of interest — derived from the deinitialization of the `Signal` or the input `Observer` — to send or receive events. This makes ReactiveSwift more ARC friendly than before.
+
+It is expected that memory debugging tools would no longer report irrelevant negative leaks that were once caused by the ReactiveSwift internals.
+
+### `SignalProducer` resource management (#334)
+`SignalProducer` now uses `Lifetime` for resource management. You may observe the `Lifetime` for the disposal of the produced `Signal`. You may also continue to use the `+=` convenience on `Lifetime` for adding `Disposable`s.
+
+
+```swift
+let producer = SignalProducer<Int, NoError> { observer, lifetime in
+    lifetime += numbers.observe(observer)
+}
+```
+
+If you need to interrupt the `SignalProducer`, you should now do it through the input `Observer`: 
+```swift
+let producer = SignalProducer<Int, NoError> { observer, _ in
+    observer.sendInterrupted()
+}
+```
+
+### Reduced overhead for all `SignalProducer` lifted operators. (#140)
+
+All `SignalProducer` lifted operators no longer yield an extra `Signal`. As a result, the cost of event delivery has been considerably reduced, and `SignalProducer` is generally as performant as `Signal`.
+
+### N-ary `SignalProducer` operators with generic operands (#410)
+
+N-ary `SignalProducer` operators are now generic and accept any type that can be expressed as `SignalProducer`. Types may conform to `SignalProducerConvertible` to become an eligible operand.
+
+For example:
+```swift
+let property = MutableProperty<Int>(0)
+let producer = SignalProducer<Int, NoError>.never
+let signal = Signal<Int, NoError>.never
+
+/// Valid in ReactiveSwift 2.0.
+_ = SignalProducer.combineLatest(property, producer, signal)
+```
+
+## Changes
+### Signal and SignalProducer 
+1. All `Signal` and `SignalProducer` operators now belongs to the respective concrete types. (#304)
+
+   Custom operators should extend the concrete types directly. `SignalProtocol` and `SignalProducerProtocol` should be used only for constraining associated types.
+
+1. `combineLatest` and `zip` are optimised to have a constant overhead regardless of arity, mitigating the possibility of stack overflow. (#345, #471, kudos to @stevebrambilla for catching a bug in the implementation) 
+
+1. When composing `Signal` and `SignalProducer` of inhabitable types, e.g. `Never` or `NoError`, ReactiveSwift now warns about operators that are illogical to use, and traps at runtime when such operators attempt to instantiate an instance. (#429, kudos to @andersio)
+
+1. `interrupted` now respects `observe(on:)`. (#140)
+
+   When a `SignalProducer` is interrupted, if `observe(on:)` is the last applied operator, `interrupted` would now be delivered on the `Scheduler` passed to `observe(on:)` just like other events.
+
+1. `flatMap(_:transform:)` is renamed to `flatMap(_:_:)`. (#339)
+
+1. `promoteErrors(_:)`is renamed to `promoteError(_:)`. (#408)
+
+1. `Event` is renamed to `Signal.Event`. (#376)
+
+1. `Observer` is renamed to `Signal.Observer`. (#376)
+
+### Action
+
+1. `Action(input:_:)`, `Action(_:)`, `Action(enabledIf:_:)` and `Action(state:enabledIf:_:)` are renamed to `Action(state:execute:)`, `Action(execute:)`, `Action(enabledIf:execute:)` and `Action(state:enabledIf:execute:)` respectively. (#325)
+
+1. Feedbacks from `isEnabled` and `isExecuting` to the state of the same `Action`, including all `enabledIf` convenience initializers, no longer deadlocks. (#400, kudos to @andersio)
+
+   Note that legitimate feedback loops would still deadlock.
+
+1. Added new convenience initialisers to `Action` that make creating actions with state input properties easier. When creating an `Action` that is conditionally enabled based on an optional property, use the renamed `Action.init(unwrapping:execute:)` initialisers. (#455, kudos to @sharplet)
+
+### Properties
+1. The memory overhead of property composition has been considerably reduced. (#340)
+
+1. `MutableProperty` now enforces exclusivity of access. (#419, kudos to @andersio)
+
+   In other words, nested modification in `MutableProperty.modify` is now prohibited. Generally speaking, it should have extremely limited impact as in most cases the `MutableProperty` would have been deadlocked already.
+
+1. `ValidationResult` and `ValidatorOutput` have been renamed to `ValidatingProperty.Result` and `ValidatingProperty.Decision`, respectively. (#443)
+
+### Bindings
+1. The `BindingSource` now requires only a producer representation of `self`. (#359)
+
+1. The `<~` operator overloads are now provided by `BindingTargetProvider`. (#359)
+
+### Disposables
+1. `SimpleDisposable` and `ActionDisposable` has been folded into `AnyDisposable`. (#412)
+
+1. `CompositeDisposable.DisposableHandle` is replaced by `Disposable?`. (#363)
+
+1. The `+=` operator overloads for `CompositeDisposable` are now hosted inside the concrete types. (#412)
+
+### Bag
+
+1. Improved the performance of `Bag`. (#354)
+
+1. `RemovalToken` is renamed to `Bag.Token`. (#354)
+
+### Schedulers
+
+1. `Scheduler` gains a class bound. (#333)
+
+### Lifetime
+
+1. `Lifetime.ended` now uses the inhabitable `Never` as its value type. (#392)
+
+### Atomic
+
+1. `Signal` and `Atomic` now use `os_unfair_lock` when it is available. (#342)
+
+## Additions
+1. `FlattenStrategy.race` is introduced. (#233, kudos to @inamiy)
+
+   `race` flattens whichever inner signal that first sends an event, and ignores the rest.
+
+1. `FlattenStrategy.concurrent` is introduced. (#298, kudos to @andersio)
+
+   `concurrent` starts and flattens inner signals according to the specified concurrency limit. If an inner signal is received after the limit is reached, it would be queued and drained later as the in-flight inner signals terminate.
+
+1. New operators: `reduce(into:)` and `scan(into:)`. (#365, kudos to @ikesyo)
+ 
+   These variants pass to the closure an `inout` reference to the accumulator, which helps the performance when a large value type is used, e.g. collection.
+
+1. `combinePrevious` for `Signal` and `SignalProducer` no longer requires an initial value. The first tuple would be emitted as soon as the second value is received by the operator if no initial value is given. (#445, kudos to @andersio)
+
+1. New operator: `promoteValue`. (#429)
+
+1. `promoteError` can now infer the new error type from the context. (#413, kudos to @andersio)
+
+1. `Property(initial:then:)` gains overloads that accept a producer or signal of the wrapped value type when the value type is an `Optional`. (#396)
+
+### Swift 3.2+
+
+1. In Swift 3.2 or later, you can use `map()` with the new Smart Key Paths. (#435, kudos to @sharplet)
+
+1. In Swift 3.2 or later, you may create `BindingTarget` for a key path of a specific object. (#440, kudos to @andersio)
+
+## Deprecations and Removals
+1. The requirement `BindingSource.observe(_:during:)` and the implementations have been removed.
+
+1. All Swift 2 (ReactiveCocoa 4) obsolete symbols have been removed.
+
+1. All deprecated methods and protocols in ReactiveSwift 1.1.x are no longer available.
+
+## Bugfixes
+1. Fixed an impedance mismatch in the `Signal` internals that caused heap corruptions. (#449, kudos to @gparker42)
+
+1. Mitigated a race condition related to ARC in the `Signal` internal. (#456, kudos to @andersio)
+
+
+## Acknowledgement
+
+Thank you to all of @ReactiveCocoa and all our contributors, but especially to @andersio, @calebd, @cwalcott, @eimantas, @erwald, @gparker42, @ikesyo, @Igor-Palaguta, @inamiy, @keitaito, @Marcocanc, @mdiep, @NachoSoto, @sharplet, @stephencelis, @stevebrambilla and @tjnet. ReactiveSwift is only possible due to the many hours of work that these individuals have volunteered. ❤️",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/7125524/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/7125524,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/2.0.0,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/2.0.0,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/2.0.0,2.0.0,False,False
+7013401,2017-07-12T13:05:31Z,2017-07-12T13:08:51Z,1.1.5,"This is a maintenance release of ReactiveSwift 1.1. It is compatible with Swift 3.
+
+## Fixed
+* A compile error with Xcode 9ß3 (#484, thanks @stephencelis!)",https://api.github.com/users/mdiep,1302,mdiep,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/7013401/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/7013401,1.x-maintenance,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/1.1.5,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.1.5,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/1.1.5,1.1.5,False,False
+7012893,2017-07-12T12:27:07Z,2017-07-12T12:30:49Z,1.1.4,This is a maintenance release of ReactiveSwift 1.1. It is compatible with Swift 3.0 and 3.1.,https://api.github.com/users/mdiep,1302,mdiep,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/7012893/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/7012893,1.x-maintenance,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/1.1.4,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.1.4,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/1.1.4,1.1.4,False,False
+7009636,2017-07-12T07:51:50Z,2017-07-12T07:53:42Z,2.0.0 Release Candidate 3,"This is the third release candidate of ReactiveSwift 2.0. It targets Swift 3.1 with preliminary support of Swift 3.2 and Swift 4.0.
+
+## Changes
+1. Updated for Swift 4.0 shipped with Xcode 9 beta 3. (#484, kudos to @stephencelis)
+
+1. `Lifetime.+=` which ties a `Disposable` to a `Lifetime`, is now part of the public API and is no longer deprecated.
+
+1. Feedbacks from `isEnabled` to the state of the same `Action` no longer deadlocks if it does not constitute an infinite feedback loop. (#481, kudos to @andersio)
+
+   Note that `isExecuting` already supports `Action` state feedback, and legitimate feedback loops would still deadlock.
+",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/7009636/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/7009636,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/2.0.0-rc.3,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/2.0.0-rc.3,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/2.0.0-rc.3,2.0.0-rc.3,False,True
+6941867,2017-07-05T18:59:19Z,2017-07-05T19:00:43Z,2.0.0 Release Candidate 2,"This is the second release candidate of ReactiveSwift 2.0. It targets Swift 3.1 with preliminary support of Swift 3.2 and Swift 4.0.
+
+### Bugfix
+
+1. Fixed a deadlock upon disposal when combining operators, i.e. zip and combineLatest, are used. (#471, kudos to @stevebrambilla for catching the bug)
+",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/6941867/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/6941867,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/2.0.0-rc.2,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/2.0.0-rc.2,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/2.0.0-rc.2,2.0.0-rc.2,False,True
+6845586,2017-06-27T07:38:42Z,2017-06-27T07:46:26Z,2.0.0 Release Candidate 1,"This is the first release candidate of ReactiveSwift 2.0. It targets Swift 3.1 with preliminary support of Swift 3.2 and Swift 4.0.
+
+## Changes
+1. If the input observer of a `Signal` deinitializes while the `Signal` has not yet terminated, an `interrupted` event would now be automatically sent. (#463, kudos to @andersio)
+
+1. `ValidationResult` and `ValidatorOutput` have been renamed to `ValidatingProperty.Result` and `ValidatingProperty.Decision`, respectively. (#443)
+
+1. Mitigated a race condition related to ARC in the `Signal` internal. (#456, kudos to @andersio)
+
+## Addition
+
+1. Added new convenience initialisers to `Action` that make creating actions with state input properties easier. When creating an `Action` that is conditionally enabled based on an optional property, use the renamed `Action.init(unwrapping:execute:)` initialisers. (#455, kudos to @sharplet)",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/6845586/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/6845586,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/2.0.0-rc.1,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/2.0.0-rc.1,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/2.0.0-rc.1,2.0.0-rc.1,False,True
+6699482,2017-06-13T17:40:19Z,2017-06-13T17:42:10Z,2.0.0 alpha 3,"This is the third alpha release of ReactiveSwift 2.0. It targets Swift 3.1 with preliminary support of Swift 3.2 and Swift 4.0.
+
+## Bugfixes
+1. Fixed an impedance mismatch in the `Signal` internals that caused heap corruptions. (#449, kudos to @gparker42)
+
+## Additions
+1. `combinePrevious` for `Signal` and `SignalProducer` no longer requires an initial value. The first tuple would be emitted as soon as the second value is received by the operator if no initial value is given. (#445, kudos to @andersio)
+
+1. In Swift 3.2 or later, you may create `BindingTarget` for a key path of a specific object. (#440, kudos to @andersio)",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/6699482/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/6699482,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/2.0.0-alpha.3,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/2.0.0-alpha.3,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/2.0.0-alpha.3,2.0.0-alpha.3,False,True
+6667965,2017-06-09T21:41:04Z,2017-06-09T21:46:18Z,2.0.0 alpha 2: Producing Productive Producers.,"This is the second alpha release of ReactiveSwift 2.0. It targets Swift 3.1 with preliminary support of Swift 3.2 and Swift 4.0.
+
+## Highlights
+
+1. The performance of `SignalProducer` has been improved significantly. (#140, kudos to @andersio)
+
+   All lifted `SignalProducer` operators no longer yield an extra `Signal`. As a result, the calling overhead of event delivery is generally reduced proportionally to the level of chaining of lifted operators.
+
+1. When composing `Signal` and `SignalProducer` of inhabitable types, e.g. `Never` or `NoError`, 
+
+    ReactiveSwift now warns about operators that are illogical to use, and traps at runtime when such operators attempt to instantiate an instance. (#429, kudos to @andersio)
+
+## Changes
+
+1. `interrupted` now respects `observe(on:)`. (#140)
+
+   When a produced `Signal` is interrupted, if `observe(on:)` is the last applied operator, `interrupted` would now be delivered on the `Scheduler` passed to `observe(on:)` just like other events.
+
+1. Feedbacks from `isExecuting` to the state of the same `Action`, including all `enabledIf` convenience initializers, no longer deadlocks. (#400, kudos to @andersio)
+
+1. `MutableProperty` now enforces exclusivity of access. (#419, kudos to @andersio)
+
+   In other words, nested modification in `MutableProperty.modify` is now prohibited. Generally speaking, it should have extremely limited impact as in most cases the `MutableProperty` would have been deadlocked already.
+
+## Additions
+
+1. New operator: `promoteValue`. (#429)
+
+1. `promoteError` can now infer the new error type from the context. (#413, kudos to @andersio)
+
+1. In Swift 3.2 or later, you can use `map()` with the new Smart Key Paths. (#435, kudos to @sharplet)
+
+1. N-ary `SignalProducer` operators are now generic and accept any type that can be expressed as `SignalProducer`. (#410, kudos to @andersio)
+
+   Types may conform to `SignalProducerConvertible` to be an eligible operand.",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/6667965/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/6667965,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/2.0.0-alpha.2,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/2.0.0-alpha.2,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/2.0.0-alpha.2,2.0.0-alpha.2,False,True
+6534821,2017-05-29T14:25:39Z,2017-05-29T14:27:55Z,2.0.0 alpha 1,"This is the first alpha release of ReactiveSwift 2.0. It requires Swift 3.1 (Xcode 8.3).
+
+## Changes
+### Modified `Signal` lifetime semantics (#355)
+The `Signal` lifetime semantics is modified to improve interoperability with memory debugging tools. ReactiveSwift 2.0 adopted a new `Signal` internal which does not exploit deliberate retain cycles that consequentially confuse memory debugging tools.
+
+A `Signal` is now automatically and silently disposed of, when:
+
+1. the `Signal`  is not retained and has no active observer; or
+1.  **(New)** both the `Signal`  and its input observer are not retained.
+
+It is expected that memory debugging tools would no longer report irrelevant negative leaks that were once caused by the ReactiveSwift internals.
+
+### `SignalProducer` resource management (#334)
+`SignalProducer` now uses `Lifetime` for resource management. You may observe the `Lifetime` for the disposal of the produced `Signal`.
+
+```swift
+let producer = SignalProducer<Int, NoError> { observer, lifetime in
+    if let disposable = numbers.observe(observer) {
+        lifetime.observeEnded(disposable.dispose)
+    }
+}
+```
+
+Two `Disposable`-accepting methods `Lifetime.Type.+=` and `Lifetime.add` are provided to aid migration, and are subject to removal in a future release.
+
+### Signal and SignalProducer 
+1. All `Signal` and `SignalProducer` operators now belongs to the respective concrete types. (#304)
+
+   Custom operators should extend the concrete types directly. `SignalProtocol` and `SignalProducerProtocol` should be used only for constraining associated types.
+
+1. `combineLatest` and `zip` are optimised to have a constant overhead regardless of arity, mitigating the possibility of stack overflow. (#345) 
+
+1. `flatMap(_:transform:)` is renamed to `flatMap(_:_:)`. (#339)
+
+1. `promoteErrors(_:)`is renamed to `promoteError(_:)`. (#408)
+
+1. `Event` is renamed to `Signal.Event`. (#376)
+
+1. `Observer` is renamed to `Signal.Observer`. (#376)
+
+### Action
+
+1. `Action(input:_:)`, `Action(_:)`, `Action(enabledIf:_:)` and `Action(state:enabledIf:_:)` are renamed to `Action(state:execute:)`, `Action(execute:)`, `Action(enabledIf:execute:)` and `Action(state:enabledIf:execute:)` respectively. (#325)
+
+### Properties
+1. The memory overhead of property composition has been considerably reduced. (#340)
+
+### Bindings
+1. The `BindingSource` now requires only a producer representation of `self`. (#359)
+
+1. The `<~` operator overloads are now provided by `BindingTargetProvider`. (#359)
+
+### Disposables
+1. `SimpleDisposable` and `ActionDisposable` has been folded into `AnyDisposable`. (#412)
+
+1. `CompositeDisposable.DisposableHandle` is replaced by `Disposable?`. (#363)
+
+1. The `+=` operator overloads for `CompositeDisposable` are now hosted inside the concrete types. (#412)
+
+### Bag
+
+1. Improved the performance of `Bag`. (#354)
+
+1. `RemovalToken` is renamed to `Bag.Token`. (#354)
+
+### Schedulers
+
+1. `Scheduler` gains a class bound. (#333)
+
+### Lifetime
+
+1. `Lifetime.ended` now uses the inhabitable `Never` as its value type. (#392)
+
+### Atomic
+
+1. `Signal` and `Atomic` now use `os_unfair_lock` when it is available. (#342)
+
+## Additions
+1. `FlattenStrategy.race` is introduced. (#233, kudos to @inamiy)
+
+   `race` flattens whichever inner signal that first sends an event, and ignores the rest.
+
+1. `FlattenStrategy.concurrent` is introduced. (#298, kudos to @andersio)
+
+   `concurrent` starts and flattens inner signals according to the specified concurrency limit. If an inner signal is received after the limit is reached, it would be queued and drained later as the in-flight inner signals terminate.
+
+1. New operators: `reduce(into:)` and `scan(into:)`. (#365, kudos to @ikesyo)
+ 
+   These variants pass to the closure an `inout` reference to the accumulator, which helps the performance when a large value type is used, e.g. collection.
+
+1. `Property(initial:then:)` gains overloads that accept a producer or signal of the wrapped value type when the value type is an `Optional`. (#396)
+
+## Deprecations and Removals
+1. The requirement `BindingSource.observe(_:during:)` and the implementations have been removed.
+
+1. All Swift 2 (ReactiveCocoa 4) obsolete symbols have been removed.
+
+1. All deprecated methods and protocols in ReactiveSwift 1.1.x are no longer available.
+
+## Acknowledgement
+
+Thank you to all of @ReactiveCocoa/reactiveswift and all our contributors, but especially to @andersio, @calebd, @eimantas, @ikesyo, @inamiy, @Marcocanc, @mdiep, @NachoSoto, @sharplet and @tjnet. ReactiveSwift is only possible due to the many hours of work that these individuals have volunteered. ❤️",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/6534821/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/6534821,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/2.0.0-alpha.1,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/2.0.0-alpha.1,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/2.0.0-alpha.1,2.0.0-alpha.1,False,True
+6382769,2017-05-13T10:44:49Z,2017-05-15T04:33:54Z,1.1.3,"This is a maintanence release of ReactiveSwift 1.1. It is compatible with Swift 3.0 and Swift 3.1.
+
+## Deprecation
+1. `observe(_:during:)` is now deprecated. It would be removed in ReactiveSwift 2.0.
+    Use `take(during:)` and the relevant observation API of `Signal`, `SignalProducer` and `Property` instead. (#374)",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/6382769/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/6382769,hotfix-1.1.3,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/1.1.3,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.1.3,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/1.1.3,1.1.3,False,False
+6352362,2017-05-11T10:22:17Z,2017-05-11T12:38:19Z,1.1.2,"This is a maintanence release of ReactiveSwift 1.1. It is compatible with Swift 3.0 and Swift 3.1.
+
+## Changes
+1. Fixed a rare occurrence of `interrupted` events being emitted by a `Property`. (#362)",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/6352362/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/6352362,hotfix-1.1.2,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/1.1.2,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.1.2,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/1.1.2,1.1.2,False,False
+5923688,2017-03-30T14:26:34Z,2017-03-30T14:30:11Z,1.1.1,"This is a maintanence release of ReactiveSwift 1.1. It is compatible with Swift 3.0 and Swift 3.1.
+
+## Changes
+1. The properties `Signal.negated`, `SignalProducer.negated` and `Property.negated` are deprecated. Use its operator form `negate()` instead.",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/5923688/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/5923688,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/1.1.1,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.1.1,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/1.1.1,1.1.1,False,False
+5589596,2017-02-28T03:40:22Z,2017-02-28T03:41:54Z,1.1.0,"This is the first feature release of ReactiveSwift 1.x.
+
+## Additions
+
+#### General
+1. New boolean operators: `and`, `or` and `negated`; available on `Signal<Bool, E>`, `SignalProducer<Bool, E>` and `Property<Bool, E>` types. (#160, kudos to @cristianames92)
+2. New operator `filterMap`. (#232, kudos to @RuiAAPeres)
+3. New operator `lazyMap(on:_:)`. It coalesces `value` events when they are emitted at a rate faster than the rate the given scheduler can handle. The transform is applied on only the coalesced and the uncontended values. (#240, kudos to @liscio)
+4. New protocol `BindingTargetProvider`, which replaces `BindingTargetProtocol`. (#254, kudos to @andersio)
+
+#### SignalProducer
+5. New initializer `SignalProducer(_:)`, which takes a `@escaping () -> Value` closure. It is similar to `SignalProducer(value:)`, but it lazily evaluates the value every time the producer is started. (#240, kudos to @liscio)
+
+#### Lifetime
+6. New method `Lifetime.observeEnded(self:)`. This is now the recommended way to explicitly observe the end of a `Lifetime`. Use `Lifetime.ended` only if composition is needed. (#229, kudos to @andersio)
+7. New factory method `Lifetime.make()`, which returns a tuple of `Lifetime` and `Lifetime.Token`. (#236, kudos to @sharplet)
+
+#### Properties
+8. `ValidatingProperty`: A mutable property that validates mutations before committing them. (#182, kudos to @andersio).
+9. A new interactive UI playground: `ReactiveSwift-UIExamples.playground`. It demonstrates how `ValidatingProperty` can be used in an interactive form UI. (#182)
+
+## Changes
+1. Flattening a signal of `Sequence` no longer requires an explicit `FlattenStrategy`. (#199, kudos to @dmcrodrigues)
+2. `BindingSourceProtocol` has been renamed to `BindingSource`. (#254)
+3. `SchedulerProtocol` and `DateSchedulerProtocol` has been renamed to `Scheduler` and `DateScheduler`, respectively. (#257)
+4. `take(during:)` now handles ended `Lifetime` properly. (#229)
+
+## Deprecations
+1. `AtomicProtocol` has been deprecated. (#279)
+2. `ActionProtocol` has been deprecated. (#284)
+3. `ObserverProtocol` has been deprecated. (#262)
+4. `BindingTargetProtocol` has been deprecated. (#254)
+",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/5589596/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/5589596,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/1.1.0,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.1.0,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/1.1.0,1.1.0,False,False
+5497751,2017-02-18T07:46:19Z,2017-02-18T07:47:01Z,1.0.1,"This is a maintenance release of ReactiveSwift 1.0.
+
+## Changes
+1. Fixed a couple of infinite feedback loops in `Action`. (#221)
+2. Fixed a race condition of `Signal` which might result in a deadlock when a signal is sent a terminal event as a result of an observer of it being released. (#267)
+
+## Acknowledgements
+
+Kudos to @mdiep, @sharplet and @andersio who helped review the pull requests.
+",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/5497751/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/5497751,hotfix-1.0.1,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/1.0.1,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.1,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/1.0.1,1.0.1,False,False
+5046992,2017-01-01T22:35:27Z,2017-01-01T23:16:58Z,1.0.0,"# ReactiveSwift 1.0 🎉
+
+This is the first major release of ReactiveSwift, a multi-platform, pure-Swift functional reactive programming library spun off from [ReactiveCocoa](https://github.com/ReactiveCocoa/ReactiveCocoa). As Swift continues to expand beyond Apple’s platforms, we hope that ReactiveSwift will see broader adoption. To learn more, please refer to ReactiveCocoa’s [CHANGELOG](https://github.com/ReactiveCocoa/ReactiveCocoa/blob/master/CHANGELOG.md).
+
+Major changes since ReactiveCocoa 4 include:
+- **Updated for Swift 3**
+  
+  APIs have been updated and renamed to adhere to the Swift 3 [API Design Guidelines](https://swift.org/documentation/api-design-guidelines/).
+- **Signal Lifetime Semantics**
+  
+  `Signal`s now live and continue to emit events only while either (a) they have observers or (b) they are retained. This clears up a number of unexpected cases and makes Signals much less dangerous.
+- **Reactive Proxies**
+  
+  Types can now declare conformance to `ReactiveExtensionsProvider` to expose a `reactive` property that’s generic over `self`. This property hosts reactive extensions to the type, such as the ones provided on `NotificationCenter` and `URLSession`.
+- **Property Composition**
+  
+  `Property`s can now be composed. They expose many of the familiar operators from `Signal` and `SignalProducer`, including `map`, `flatMap`, `combineLatest`, etc.
+- **Binding Primitives**
+  
+  `BindingTargetProtocol` and `BindingSourceProtocol` have been introduced to allow binding of observable instances to targets. `BindingTarget` is a new concrete type that can be used to wrap a settable but non-observable property.
+- **Lifetime**
+  
+  `Lifetime` is introduced to represent the lifetime of any arbitrary reference type. This can be used with the new `take(during:)` operator, but also forms part of the new binding APIs.
+- **Race-free Action**
+  
+   A new `Action` initializer `Action(state:enabledIf:_:)` has been introduced. It allows the latest value of any arbitrary property to be supplied to the execution closure in addition to the input from `apply(_:)`, while having the availability being derived from the property.
+  
+   This eliminates a data race in ReactiveCocoa 4.x, when both the `enabledIf` predicate and the execution closure depend on an overlapping set of properties.
+
+Extensive use of Swift’s `@available` declaration has been used to ease migration from ReactiveCocoa 4. Xcode should have fix-its for almost all changes from older APIs.
+
+Thank you to all of @ReactiveCocoa/ReactiveSwift and all our contributors, but especially to @andersio, @liscio, @mdiep, @nachosoto, and @sharplet. ReactiveSwift is only possible due to the many hours of work that these individuals have volunteered. ❤️
+",https://api.github.com/users/mdiep,1302,mdiep,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/5046992/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/5046992,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/1.0.0,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/1.0.0,1.0.0,False,False
+4996045,2016-12-22T23:12:39Z,2016-12-22T23:13:27Z,1.0.0 Release Candidate 3,"This is the third release candidate of ReactiveSwift 1.0.0.
+
+🚄 [Release Roadmap](https://github.com/ReactiveCocoa/ReactiveSwift/tree/1.0.0-rc.2#release-roadmap)
+
+### Changed since Release Candidate 2
+1. Fixed the unbound memory growth of unidirectional bindings. (#176)
+2. Fixed a leak in `CompositeDisposable.DisposableHandle`. (#177) 
+
+### Acknowledgements
+
+Kudos to @mdiep, @liscio and @andersio who helped review the pull requests.
+
+### Previous Releases
+- [1.0.0 Release Candidate 2](https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-rc.2)
+- [1.0.0 Release Candidate 1](https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-rc.1)
+- [1.0.0 alpha 4](https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-alpha.4)
+- [1.0.0 alpha 3](https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-alpha.3)
+- [1.0.0 alpha 2](https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-alpha.2)
+- [1.0.0 alpha 1](https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-alpha.1)
+",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/4996045/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/4996045,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/1.0.0-rc.3,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-rc.3,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/1.0.0-rc.3,1.0.0-rc.3,False,True
+4952124,2016-12-18T20:33:41Z,2016-12-18T20:34:19Z,1.0.0 Release Candidate 2,"This is the second release candidate of ReactiveSwift 1.0.0.
+
+🚄 [Release Roadmap](https://github.com/ReactiveCocoa/ReactiveSwift/tree/1.0.0-rc.2#release-roadmap)
+
+### New since Release Candidate 1
+1. `attempt` and `attemptMap` now have a variant that interoperates with native Swift error handling. (#141, kudos to @sharplet)
+
+### Changed since Release Candidate 1
+1. Fixed broken non-optional to optional bindings. (#165)
+   _Specifically: `Target<Value?> <~ Source<Value>`_
+2. `innerDisposable` of `SerialDisposable` and `ScopedDisposable` has been renamed. (#164)
+3. `Signal.pipe` now returns a named tuple. (#153, kudos to @sharplet)
+
+### Acknowledgements
+
+Kudos to @mdiep, @sharplet, @liscio and @andersio who helped review the pull requests.
+
+### Previous Releases
+- [1.0.0 Release Candidate 1](https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-rc.1)
+- [1.0.0 alpha 4](https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-alpha.4)
+- [1.0.0 alpha 3](https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-alpha.3)
+- [1.0.0 alpha 2](https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-alpha.2)
+- [1.0.0 alpha 1](https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-alpha.1)
+",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/4952124/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/4952124,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/1.0.0-rc.2,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-rc.2,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/1.0.0-rc.2,1.0.0-rc.2,False,True
+4930400,2016-12-15T14:35:39Z,2016-12-15T14:37:24Z,1.0.0 Release Candidate 1,"This is the first release candidate of ReactiveSwift 1.0.0.
+
+🚄 [Release Roadmap](https://github.com/ReactiveCocoa/ReactiveSwift/tree/1.0.0-rc.1#release-roadmap)
+
+### New since alpha 4
+1. New operator: `withLatest(from:)`. (#128, kudos to @inamiy)
+2. New operator: `throttle(while:on:)`. (#58, kudos to @sharplet)
+3. Streamlined binding operator implementation with the new `BindingSourceProtocol`. (#131, kudos to @mdiep)
+
+### Changed since alpha 4
+1. `startWithSignal` now disposes its signal appropriately under the new `Signal` lifetime semantics. (#106)
+2. `SignalProducer.times` is renamed to `SignalProducer.repeat`. (#119)
+3. The labels of the `Sequence` and `Signal` variants of `SignalProducer.init` are now dropped. (#120)
+4. Composed properties no longer capture its sources. (#117)
+5. `Property.init(_:)` now creates a property which observes the given property without retaining it. The existential property initializer is now renamed to `Property.init(capturing:)`, and is subject to deprecation when generalised existentials land. (#117)
+6. `URLSession.reactive.data(with:)` now wraps its error in `AnyError`. (#133, kudos to @ikesyo)
+7. All terminal events are now allowed to be sent recursively to prevent `Signal`s from deadlocks due to concurrent reference counting races. (#137, kudos to @andersio and @mdiep)
+8. Disposables are now faster with the adoption of lock-free primitives. (#107, kudos to @andersio)
+
+### Acknowledgements
+
+Kudos to @mdiep, @NachoSoto, @sharplet, @ikesyo, @liscio and @andersio who helped review the pull requests. Kudos also to @iv-mexx who helped update the documentation.
+
+### Previous Releases
+- [1.0.0 alpha 4](https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-alpha.4)
+- [1.0.0 alpha 3](https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-alpha.3)
+- [1.0.0 alpha 2](https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-alpha.2)
+- [1.0.0 alpha 1](https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-alpha.1)
+",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/4930400/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/4930400,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/1.0.0-rc.1,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-rc.1,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/1.0.0-rc.1,1.0.0-rc.1,False,True
+4768522,2016-11-28T00:23:31Z,2016-11-28T00:24:11Z,1.0.0 alpha 4,"### New since alpha 3
+1. `DispatchTimeInterval` is now used in place of `TimeInterval` in APIs that would offset `Date`s. (#48, kudos to @liscio, @NachoSoto and @mdiep)
+2. New `Action` initializer: `Action(state:enabledIf:_:)`. (#22, kudos to @sharplet and @mdiep)
+   - Create an `Action` from a `Property` with an availability predicate to be applied on the property. Note that the execution closure would be passed not only the input from `apply(_:)`, but also the latest property value observed by the `Action`.
+   - This new variant is recommended for modelling UI that has inputs to the `Action` that would affect the availability of the `Action`.
+3. New `Action` initializer: `Action(input:_:)`. (#22)
+   - Create an `Action` with a `Property` as its input. `apply` would accept no input, but takes the latest value from the property instead.
+   - If you supply a property of optional, the action is executed only if the input is not `nil`.
+
+### Changed since alpha 3
+1. `ReactiveExtensionsProvider` now provide a static `reactive` for extensions to the type. (#70, kudos to @sharplet)
+2. Fixed a bug in `SignalProducer.on` which caused the signal to be disposed of too early. (#80, kudos to @andersio and @ikesyo)
+3. Restored `value` as the last parameter of `SignalProducer.on`. (#104, kudos to @dmcrodrigues)
+4. Fixed two race conditions related to `interrupted` delivery in `Signal`. (#123, kudos to @andersio and @NachoSoto)
+5. Faster `Bag`. (#126, kudos to @andersio)
+
+### Acknowledgements
+
+Kudos to @mdiep, @NachoSoto, @sharplet, @ikesyo and @andersio who helped review the pull requests. Kudos also to @iv-mexx, @morganchen12 and @Iyuna who helped update the documentation and the playgrounds.
+",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/4768522/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/4768522,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/1.0.0-alpha.4,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-alpha.4,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/1.0.0-alpha.4,1.0.0-alpha.4,False,True
+4423962,2016-10-18T22:52:36Z,2016-10-18T22:53:33Z,1.0.0 alpha 3,"_This is an alpha release of ReactiveSwift. It targets Swift 3.0. Please be aware that more breaking changes are expected._
+
+**Improved**
+- APIs have been updated for Swift 3
+- `Signal`s completes when they have no observers and no strong references to them
+- `ScopedDisposable`s are generic over the inner disposable
+- `Atomic.modify` now uses `inout` to pass the value, and returns the generic result from the supplied action
+- `Property` subsumed `ConstantProperty`
+- Interoperability of `<~` bindings with `Optional`s
+- Reactive extensions to Foundation are moved to `.reactive` (the `Reactive` struct).
+- Notifications from `NotificationCenter` are now modelled as hot signals.
+
+**Added**
+- `Lifetime` for completing signals when an instance deallocates.
+- `Reactive` struct for adding ReactiveSwift extensions
+- Composition operators for properties
+
+Many more changes since ReactiveCocoa 4! Future releases will aim to have more complete release notes. 
+",https://api.github.com/users/andersio,11806295,andersio,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/4423962/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/4423962,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/1.0.0-alpha.3,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-alpha.3,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/1.0.0-alpha.3,1.0.0-alpha.3,False,True
+4337354,2016-10-07T21:17:59Z,2016-10-07T21:18:54Z,1.0.0-alpha.2,"_This is an alpha release of ReactiveSwift. It targets Swift 3.0. Please be aware that more breaking changes are expected._
+
+**Improved**
+- APIs have been updated for Swift 3
+- `Signal`s completes when they have no observers and no strong references to them
+- `ScopedDisposable`s are generic over the inner disposable
+- `Atomic.modify` now uses `inout` to pass the value, and returns the generic result from the supplied action
+- `Property` subsumed `ConstantProperty`
+- Interoperability of `<~` bindings with `Optional`s
+- Reactive extensions to Foundation are moved to `.reactive` (the `Reactive` struct).
+
+**Added**
+- `Lifetime` for completing signals when an instance deallocates.
+- `Reactive` struct for adding ReactiveSwift extensions
+- Composition operators for properties
+
+Many more changes since ReactiveCocoa 4! Future releases will aim to have more complete release notes. 
+",https://api.github.com/users/mdiep,1302,mdiep,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/4337354/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/4337354,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/1.0.0-alpha.2,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-alpha.2,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/1.0.0-alpha.2,1.0.0-alpha.2,False,True
+4219424,2016-09-24T01:00:46Z,2016-09-24T01:43:40Z,1.0.0-alpha.1,"_This is the first alpha release of ReactiveSwift. It targets Swift 3.0. Please be aware that more breaking changes are expected._
+
+**Improved**
+- APIs have been updated for Swift 3
+- `Signal`s completes when they have no observers and no strong references to them
+- `ScopedDisposable`s are generic over the inner disposable
+- `Atomic.modify` now uses `inout` to pass the value, and returns the generic result from the supplied action
+- `Property` subsumed `ConstantProperty`
+- Interoperability of `<~` bindings with `Optional`s
+
+**Added**
+- `Lifetime` for completing signals when an instance deallocates.
+- Composition operators for properties
+
+Many more changes since ReactiveCocoa 4! Future releases will aim to have more complete release notes. 
+",https://api.github.com/users/mdiep,1302,mdiep,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/4219424/assets,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/releases/4219424,master,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/tarball/1.0.0-alpha.1,https://github.com/ReactiveCocoa/ReactiveSwift/releases/tag/1.0.0-alpha.1,https://api.github.com/repos/ReactiveCocoa/ReactiveSwift/zipball/1.0.0-alpha.1,1.0.0-alpha.1,False,True

@@ -1,0 +1,285 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8115618,2017-10-13T19:26:21Z,2017-10-13T19:31:46Z,GVR SDK for Unity v1.100.1,"### Bug fixes
+  * Fixes ""**MissingReferenceException: The object of type 'GvrTrackedController' has been destroyed but you are still trying to access it.**"" error caused by `GvrTrackedController` registering a callback for `GvrControllerInput.OnStateChanged` twice, while only disconnecting once.",https://api.github.com/users/rusmaxham,13911074,rusmaxham,https://api.github.com/repos/googlevr/gvr-unity-sdk/releases/8115618/assets,https://api.github.com/repos/googlevr/gvr-unity-sdk/releases/8115618,master,https://api.github.com/repos/googlevr/gvr-unity-sdk/tarball/v1.100.1,https://github.com/googlevr/gvr-unity-sdk/releases/tag/v1.100.1,https://api.github.com/repos/googlevr/gvr-unity-sdk/zipball/v1.100.1,v1.100.1,False,False
+8031776,2017-10-07T02:13:08Z,2017-10-07T02:16:14Z,GVR SDK for Unity v1.100.0,"### Breaking changes
+   * The broken `GvrFPS` prefab and script have been removed. See [issue 674](//github.com/googlevr/gvr-unity-sdk/issues/674).
+     Daydream app developers are encouraged to use [Performance HUD](//developers.google.com/vr/tools/perfhud) instead.
+### Deprecations
+   * `GvrControllerInput`'s `Recentering` property has been deprecated. This property will be removed in an upcoming release. Note, this property has already been returning `false` for some time.
+### Behavioral changes
+   * The default raycast mode is now **Hybrid**, instead of **Camera**.
+      * With Hybrid raycast mode, introduced in v1.70, the laser is only fully shown when the reticle intersects with something closer than `maxLaserDistance`.
+      * Hybrid raycast mode avoid mismatches between the laser and the reticle when using a camera based ray. It smoothly transitions between Camera and Direct modes, shrinking the laser towards the reticle, based on the angle between the actual reticle position, and the forward direction of the pointer. The laser shrinking behavior is controlled by the `shrinkLaser` property of `GvrLaserVisual`. The raycast mode is controlled by `GvrLaserPointer`.
+      * The `GvrLaserPointer` inspector view provides **Hybrid**, **Camera**, and **Direct** mode buttons which update the laser to the recommended settings for each raycast mode.
+   * When using the mouse or trackpad to emulate head or controller momevement, the mouse cursor is locked, so it doesn't escape the Game view. Based on [PR 738](//github.com/googlevr/gvr-unity-sdk/pull/738).
+   * The controller state is updated at the start of each frame, rather than at the end. This should reduce input and controller latency, as well as guarantee that input state remains consistent during a frame.
+   * Improved `GvrEventSystem`'s touchpad scroll sensitivity. Touch direction threshold is now per-axis, so it is easier to scroll in only one direction, without accidentally scrolling in the perpendicular direction.
+   * Removed the dummy camera from `GvrControllerPointer` prefab. Instead, `GvrPointerGraphicRaycaster` automatically adds a dummy camera at runtime if required.
+### Other changes
+   * [Instant Preview](//developers.google.com/vr/tools/instant-preview) in now included as part of the SDK. Simply add the new `GvrInstantPreviewMain` prefab to your scene and attach your Android development phone to preview your Daydream app on your phone, while your app runs in the editor.
+   * Removed `GvrBaseControllerVisual` class.
+   * Removed `GvrFollowControllerPose` and merged its functionality into `GvrTrackedController`.
+   * `GvrLaserVisual` has been updated:
+      * Reticle functionality has been separated into the new `GvrControllerReticleVisual` class.
+      * Fixed a bug where the reticle wasn't visible if the laser `LineRenderer` was turned off, which casued `OnWillRenderObject` to not be called.
+      * Fixed a bug where the reticle was being incorrectly rotated/scaled when explicitly calling `Camera.Render()` for special effects.
+      * Exposed new **Size Meters** and **Is Size Based On Camera Distance** tuning properties to make it easier to control the size of the reticle.
+   * `GvrTrackedController` exposes a new `IsDeactivatedWhenDisconnected` property which is settable at runtime via script.
+   * Improved controller rendering performance by updating shader to use vertex colors and `saturate`, so it is branchless.
+   * Cardboard reticle `maxReticleDistance` property is now tunable.
+
+   * Some files in the `GoogleVR/Prefabs` and `GoogleVR/Scripts` directories have been moved for better plugin organization.
+   * Added new `GvrHeadset` class to support [Daydream standalone VR headsets](//vr.google.com/daydream/standalonevr/). Includes a basic logging-only example in the **GVRDemo** scene.
+   * You can now set `GvrVideoPlayerTexture` to render to an object other than the one that the script is attached to.
+   * In `GvrVideoPlayerTexture`, **Aspect Ratio**, **Width**, and **Height** are now exposed.
+   * Changes to `GvrArmModel`:
+      * Fixed a bug where the elbow position was too far back.
+      * Implementation has been refactored to be more extensible.
+      * There is now an actual controller joint, separate from the wrist joint, so that the controller visual does not need to be offset forward.
+      * Removed **Gaze Behaviour** and **Use Accelerometer** properties.
+      * Removed `PointerPositionFromController` and `PointerRotationFromController` from `GvrArmModel`. Position and rotation of the laser are now in the prefab, which makes it possible to simply move the laser relative to the controller.
+      * Previously private tuning properties are now exposed:
+
+Tuning property | Description
+----------------|-------------------------------------------------------------
+`elbowRestPosition` | Position of the elbow joint relative to the head before the arm model is applied.
+`wristRestPosition` | Position of the wrist joint relative to the elbow before the arm model is applied.
+`controllerRestPosition` | Position of the controller joint relative to the wrist before the arm model is applied.
+`armExtensionOffset` | Offset applied to the elbow position as the controller is rotated upwards.
+`elbowBendRatio` | Ratio of the controller's rotation to apply to the rotation of the elbow. The remaining rotation is applied to the wrist's rotation.
+`fadeControllerOffset` | Offset in front of the controller to determine what position to use when determing if the controller should fade. This is useful when objects are attached to the controller.
+`fadeDistanceFromHeadForward` | Controller distance from the front/back of the head after which the controller disappears (meters).
+`fadeDistanceFromHeadSide` | Controller distance from the left/right of the head after which the controller disappears (meters).
+`tooltipMinDistanceFromFace` | Controller distance from face after which the tooltips appear (meters).
+
+### Bug fixes
+   * `GvrControllerInput` **Up** / **Down** events are now based on the difference between the previous and current frame, which guarantees Up and Down events will be paired, and there will always be at least one frame between Up and Down events.
+   * `GVREditorEmulator` now ignores disabled cameras.
+   * Fixed a bug where the inherited serialized field `maximumAlpha` was not exposed in the `GvrControllerVisual` inspector view.
+   * Fix for **""DllNotFoundException: Unable to load DLL 'gvr': The specified module could not be found""** ([issues 621](//github.com/googlevr/gvr-unity-sdk/pull/621), [PR 622](//github.com/googlevr/gvr-unity-sdk/pull/622)) when calling `GvrCardboardHelpers.Recenter()` or `GvrCardboardHelpers.SetViewerProfile()`.
+   * Fixed `GvrControllerInput.Gyro` values when using mouse controller emulation.
+   * Fixed crashes when calling `GvrCardboardHelpers.Recenter()` or  `GvrCardboardHelpers.SetViewerProfile()` while the ""**Cardboard**"" VR SDK isn't active (usually when `VRSettings.enabled = false` or `VRSettings.loadedDeviceName != 'cardboard'`)  or `VRDevice.GetNativePtr() == IntPr.Zero`.
+   * Fixes a bug ([issue 666](//github.com/googlevr/gvr-unity-sdk/issues/666)) where `GvrReticlePointer` was set to the wrong raycast mode, causing the ""**GvrPointerGraphicRaycaster requires GvrPointer to have a Camera when in Direct mode**"" error message to be displayed continuously in the console.
+   * `GvrArmModel` and `GvrLaserVisual` now use `unscaledDeltaTime`, to support `Time.timeScale != 1.0f`.
+   * `GvrBaseControllerVisual` automatically multiplies `PreferredAlpha` by `maximumAlpha`, so the subclass doesn’t need to do it.
+   * Fixes a bug in `GvrVideoPlayerTexture` that would cause portrait videos to be rendered incorrectly.
+   * Improved `GvrControllerMain` prefab instantiation time.",https://api.github.com/users/rusmaxham,13911074,rusmaxham,https://api.github.com/repos/googlevr/gvr-unity-sdk/releases/8031776/assets,https://api.github.com/repos/googlevr/gvr-unity-sdk/releases/8031776,master,https://api.github.com/repos/googlevr/gvr-unity-sdk/tarball/v1.100.0,https://github.com/googlevr/gvr-unity-sdk/releases/tag/v1.100.0,https://api.github.com/repos/googlevr/gvr-unity-sdk/zipball/v1.100.0,v1.100.0,False,False
+7149420,2017-08-23T22:15:01Z,2017-07-24T18:52:26Z,GVR SDK for Unity v1.70.0,"### Breaking Changes
+
+*   Refactored Controller classes:
+    *    Deprecated `GvrPointerManager`. Its functionality has been moved to
+         `GvrPointerInputModule`.
+    *    `GvrArmModel` is no longer a singleton and has been moved to the
+         `GvrControllerPointer` prefab.
+    *    Renamed `GvrController` to `GvrControllerInput`. `GvrController` still
+         exists for backwards compatibility.
+    *    `GvrArmModelOffsets` has been replaced by `GvrFollowControllerPose`.
+         `GvrArmModelOffsets` still exists for backwards compatibility.
+    *    `GvrControllerVisualManager` has been replaced by
+         `GvrTrackedController`. `GvrControllerVisualManager` still exists for
+          backwards compatibility.
+    *    `GvrLaserPointer` has been de-coupled from the laser/reticle rendering
+         code (which is now handled by `GvrLaserVisual`).
+    *    Tooltips have been removed from the `GvrControllerPointer` prefab.
+         There are now prefabs for just tooltips.
+    *    Prefabs can be dynamically added to the controller visual by listing
+         them in the attachmentPrefabs property on the `GvrControllerVisual`
+         script.
+    *   RaycastMode is now set per-pointer instead of per-raycaster.
+
+### Additions
+
+*   You can now simulate the controller in the Unity editor using the mouse.
+    *  Hold the shift key with the game view in focus to use the mouse.
+       The controls are as follows:
+        *   Shift + move mouse: Change orientation.
+        *   Shift + left-click: ClickButton
+        *   Shift + right-click: AppButton
+        *   Shift + Middle mouse button: HomeButton/Recenter
+        *   Shift + Ctrl: IsTouching
+        *   Shift + Ctrl + Move Mouse: Change TouchPos
+*   Added the ability to anchor the arm model to the local position of the
+    head. This will be used for the standalone headsets so the arm model doesn't
+    break with positional tracking.
+*   Introduced a new experimental **Hybrid** raycast mode that combines
+    **Camera** and **Direct** modes to make the Daydream controller work better
+    in more complex scenes that include objects at many different depths and
+    locomotion. The default raycast mode is still **Camera**.
+
+### Changes
+
+*   We've updated the controller visualization. The new controller visual is
+    both higher fidelity and more performant.
+    *    Removed the touch point and battery indicator.
+    *    Replaced controller assets and textures.
+    *    Added new simple tooltips.
+*   The battery status UI is only displayed when the required library is available.
+    Unity includes the required library as of Unity 5.6.2p1.
+*   The `GvrDaydreamApi.LaunchVrHome()` API no longer requires that you first
+    call `GvrDaydreamApi.Create()`. However, the `Create()` method still exists
+    to give developers precise control over when the (expensive) instance creation
+    happens. The `Dispose()` method remains as well, to allow developers to clean
+    up unneeded memory. However, `Dispose()` is now called automatically upon
+    `OnApplicationPause(true)`. See class comments in `GvrDaydreamApi` for
+    additional details.
+*   Change DemoInputManger's default message to be less confusing when
+    viewing its message canvas when the app is not running.
+*   Included a few different improvements to scrolling in the GVR SDK for Unity:
+    *  `GvrPointerScrollInput` no longer directly accesses `GvrControllerInput`.
+       Instead, input is piped through `GvrBasePointer` just like it is for
+       `GvrPointerInputModule`. This makes it possible for the scroll events to
+       work cross-platform with custom GvrBasePointer implementations.
+    *  Added the ability to respond to Scroll Events globally in
+       `GvrAllEventsTrigger`.
+    *  Added the ability to override scroll inertia settings on a per-GameObject
+       basis by either implementing `IGvrScrollSettings` or using the script
+       `GvrScrollSettings`.
+*   Optimized GvrFps display by removing Canvas and replacing the Text component.
+    *  Renamed GvrFPSCanvas.prefab to GvrFPSDisplay.prefab.
+*   Removed (unused) ``GvrDistortion.cginc``.
+*   `GvrPointerPhysicsRaycaster` no longer allocates memory every frame. It now
+    uses `RaycastNonAlloc/SphereCastNonAlloc`. The size of the buffer for raycast
+    hits is determined by the new serialized property `maxRaycastHits`.
+*   It's now possible to use the pointer system with no main camera. A camera
+    can be (optionally) specified on the `overridePointerCamera` field on
+   `GvrLaserPointer`.
+*  `GvrDaydreamApi.LaunchVrHome()` and `Create()` have new method signatures
+    to communicate asynchronous implementation and to provide the caller with
+    a way to know when the call has completed:
+    `GvrDaydreamApi.LaunchVrHomeAsync(Action<bool> callback)`,
+    `CreateAsync(Action<bool> callback)`.
+*   Exposed `TouchPosCentered`, which remaps touchpad input from `(-1, 1)`,
+    centered on `0`, and magnitude <= `1` (e.g. clamped to the circular touchpad)
+*   Moved the `Plugins` folder underneath the `GoogleVR` folder so that future
+    SDK upgrades are easier since the top level `Plugins` folder will no longer
+    contain non-GVR and GVR content.
+*  `GVRVideoPlayerTexture` no longer copies `SurfaceTexture`s into Unity textures,
+    but rather renders `SurfaceTexture`s directly into the scene, optimizing it
+    to use much less memory and GPU.
+*   GVR Video Demo OBB sample video is now a stereo version of Big Buck Bunny.
+
+### Fixes
+
+*   Prevent serialized field properties in Google VR prefabs and scenes
+    being set to `null` when editing them while build platform is not Android
+    or iOS.
+*   Fixed continuous calls to the `Stop()` method in the `GvrAudioSource` source.
+*   Fixed a bug that caused the `INTERNET` permission to be added to the Android
+    manifest unnecessarily when using the SDK.
+*  `GVRVideoPlayerTexture.SetDisplayTexture()` now properly sets the display
+    texture.
+*  `GvrBuildProcessor` now ignores non-Google VR target build platforms.
+*   Fixed a bug that would cause `GvrReticlePointer` to render behind things
+    with a sort order > than `0`.
+*   Added support for tracking all of a scene's cameras (that target at least
+    one eye) in `GvrEditorEmulator`.
+*   Fixed audio not showing up in iOS native integration builds
+    ([issue 618](//github.com/googlevr/gvr-unity-sdk/issues/618)).",https://api.github.com/users/miraleung,5384433,miraleung,https://api.github.com/repos/googlevr/gvr-unity-sdk/releases/7149420/assets,https://api.github.com/repos/googlevr/gvr-unity-sdk/releases/7149420,master,https://api.github.com/repos/googlevr/gvr-unity-sdk/tarball/v1.70.0,https://github.com/googlevr/gvr-unity-sdk/releases/tag/v1.70.0,https://api.github.com/repos/googlevr/gvr-unity-sdk/zipball/v1.70.0,v1.70.0,False,False
+6626092,2017-06-07T01:07:48Z,2017-06-07T01:14:04Z,GVR Unity v1.60.0,"### Known Issues
+
+*    Some iOS developers are having issues running Cardboard projects.
+To run a Unity-built iOS Cardboard project, you must open the workspace
+ containing the project (not the project itself) in XCode and build and run
+ the project there. See [issue 607](//github.com/googlevr/gvr-unity-sdk/issues/607) for more information.
+
+### Additions
+
+*   Added `GvrCardboardHelpers.SetViewerParams` to set the Cardboard viewer
+    parameters from a URI.
+
+### Changes
+
+*   `GvrBuildProcessor` no longer warns at build time if **Player Settings >
+     Virtual Reality SDKs** contains the **None** device. At build time, the
+     following checks are currently performed:
+     1.   **Player Settings > Virtual Reality Supported** must be enabled.
+     1.   When the selected build platform is **Android**, **Player Settings >
+          Virtual Reality SDKs** must include **Daydream** or **Cardboard**.
+     1.   When the selected build platform is **iOS**, **Player Settings >
+          Virtual Reality SDKs** must include **Cardboard**.
+*   If an unsupported version of [Daydream Keyboard](//play.google.com/store/apps/details?id=com.google.android.vr.inputmethod)
+    is installed, you will be prompted to go to the Play Store to update it.
+
+### Fixes
+
+*  Fixed a bug where the controller emulator wasn't working on the latest
+   Macbook Pro due to `SystemInfo.graphicsDeviceID == 0`. See ([issue 585](//github.com/googlevr/gvr-unity-sdk/issues/585)).
+*  Fixed a bug where `GVRRecenterOnlyController` did not work correctly in-editor.
+*  Fixed a bug where Unity threw an exception when switching scenes.",https://api.github.com/users/miraleung,5384433,miraleung,https://api.github.com/repos/googlevr/gvr-unity-sdk/releases/6626092/assets,https://api.github.com/repos/googlevr/gvr-unity-sdk/releases/6626092,master,https://api.github.com/repos/googlevr/gvr-unity-sdk/tarball/v1.60.0,https://github.com/googlevr/gvr-unity-sdk/releases/tag/v1.60.0,https://api.github.com/repos/googlevr/gvr-unity-sdk/zipball/v1.60.0,v1.60.0,False,False
+6408869,2017-05-16T23:14:51Z,2017-05-16T23:19:45Z,GVR Unity v1.50.0,"### Important Changes
+
+*   **Versions of Unity older than 5.6 are no longer supported**.
+*   `GvrViewerMain` will be replaced by `GvrEditorEmulator`.
+    *   The editor preview is now mono, not stereo, but will still support simulated headtracking.
+    *   Instances of `GvrViewerMain` in scenes will change to `GvrEditorEmulator`.
+        automatically. This will not affect on-device builds.
+    *   Be sure to follow the _Upgrade Instructions_ to
+        ensure a clean migration.
+
+### Additions
+*  Daydream Keyboard is now supported in Unity.
+    *   Users need to update the keyboard app via the Play Store.
+    *   Includes an API similar to `GvrController` for ease-of-use.
+*   Added distance attenuation feature to `GvrAudioSoundfield`.
+*   Added `SetScheduledStartTime` and `SetScheduledEndTime` methods to `GvrAudioSource`.
+*   Added spatial blend to audio sources to control the contribution of distance
+    attenuation and doppler effects.
+*   Changed the `GvrAudioSource` occlusion computation method to use a cached
+    list to avoid dynamic memory allocation.
+
+### Fixes
+
+*   Fixed audio spatializer plugin registration issue in runtime on iOS.
+    See ([issue 554](//github.com/googlevr/gvr-unity-sdk/issues/554)).",https://api.github.com/users/miraleung,5384433,miraleung,https://api.github.com/repos/googlevr/gvr-unity-sdk/releases/6408869/assets,https://api.github.com/repos/googlevr/gvr-unity-sdk/releases/6408869,master,https://api.github.com/repos/googlevr/gvr-unity-sdk/tarball/v1.50.0,https://github.com/googlevr/gvr-unity-sdk/releases/tag/v1.50.0,https://api.github.com/repos/googlevr/gvr-unity-sdk/zipball/v1.50.0,v1.50.0,False,False
+6127615,2017-04-18T00:13:14Z,2017-04-19T20:27:15Z,GVR Unity v1.40.0,"Warning: This will be the **last** version compatible with all versions of Unity
+from 5.2.1 to 5.6. **Starting with 1.50.0** we will only support Unity 5.6 or newer.
+
+Note: You must enable dynamic library loading in VrCore to get the latest C++
+GVR Updates. To do this, go to **Settings > Developer Options > Enable Library
+Loading**. If Developer Options are not visible, tap 7 times on **Build Version**.
+
+### Additions
+
+*    Daydream iOS development now supported in Unity 5.6.
+*    Added controller battery indicator to `GvrControllerPointer`.
+     *  To use this feature dynamic library loading must be enabled and you must
+        be using VrCore version 1.40 or newer.
+*    Added an API to `GvrController` to query controller battery state.
+     *  Updated controller visuals to include this feature in the demo scenes.
+*    Added `GvrBaseControllerVisual` to easily inherit controller alpha fading.
+*    Added `GvrDaydreamApi` and a method `LaunchVrHome`.
+     *  Added to `GVRDemo` when running on Daydream devices.
+*    Added a build-time notification dialog if the user forgets to enable
+     Daydream or Cardboard in 5.6.
+*    `GVRDemo` and `VideoDemo`: Added support for runtime changes between
+     Daydream View and Cardboard viewer.
+*    `ScrollingUIDemo`: Added an Object pooling system as part of the Scrolling
+     UI Demo for reusing pages instead of reallocating them. The tab named
+     **Pooled** shows how to use it.
+
+### Changes
+
+*    No longer supports VrCore versions earlier than 1.0.
+*    Disabled reverb (room effects) cutoff at max rolloff distance for
+     GvrAudioSources.
+*    Removed the minimum time between down event and click event in
+     `GvrPointerInputModule`. This guarantees that click events will always happen
+     in the same frame as `GvrController.ClickButtonUp`.
+*    `GvrPointerInputModule` now supports velocity and inertia for scroll events
+     generated by touching the touch pad. Look at `GvrPointerScrollInput` for
+     details.
+
+### Fixes
+
+*    Fixed a `GvrAudioSoundfield` rotation bug.
+     See ([issue 500](//github.com/googlevr/gvr-unity-sdk/issues/500)).
+*    Fixed a `GvrAudioSource` bug where audible spikes occur with distance
+     attenuation.
+*    Enabled `spatializePostEffects` for `GvrAudioSources.
+     See ([issue 510](//github.com/googlevr/gvr-unity-sdk/issues/510)).
+*    Fixed a bug in `TiledPage` that would cause the staggered animation to be
+     calculated incorrectly when the page wasn't positioned in the forward
+     direction relative to the origin of the scene.
+*    Fixed a bug in `PagedScrollRect` that could put it into a bad state when it
+     is disabled.
+",https://api.github.com/users/miraleung,5384433,miraleung,https://api.github.com/repos/googlevr/gvr-unity-sdk/releases/6127615/assets,https://api.github.com/repos/googlevr/gvr-unity-sdk/releases/6127615,master,https://api.github.com/repos/googlevr/gvr-unity-sdk/tarball/v1.40.0,https://github.com/googlevr/gvr-unity-sdk/releases/tag/v1.40.0,https://api.github.com/repos/googlevr/gvr-unity-sdk/zipball/v1.40.0,v1.40.0,False,False

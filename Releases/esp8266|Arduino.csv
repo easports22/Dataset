@@ -1,0 +1,446 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8123284,2017-10-15T07:33:09Z,2017-10-15T18:48:49Z,2.4.0-rc2,"Core
+----
+
+- Redefine pgm_read_byte, pgm_read_word as macros to fix detection by libraries (#3140)
+- Move ASSERT() macro file text to PROGMEM (#3477)
+- Manifest for PlatformIO
+- Move debug constant strings to PROGMEM (#3478)
+- Initial support for attaching std::function to interrupts
+- Link airkiss library
+- Mask GPIO interrupts while attaching/detaching ISR handler (#3598)
+- Expand varargs correctly in printf_P (#2819)
+- Zero out memory in strncpy_P (#2633)
+- Fix erase size in ESP.eraseConfig
+- Add a workaround-delay in Serial.flush() (#3714)
+
+ESP8266WebServer
+----------------
+
+- Move MIME type table into PROGMEM to save RAM (#3475)
+- Parse parameters in the URL of a POST with empty content (#3398)
+- Digest Authentication support (#3053)
+
+ESP8266WiFi
+-----------
+
+- WiFiClient: apply write timeout to single chunk (#3273)
+- WiFiClientSecure: don’t send close alert when opening new session
+- Replace r_rand with os_random for LWIP_RAND() (#3499)
+- WiFiClientSecure: add loadCACert function (#3610)
+- WiFiClientSecure: add option to allow self-signed certificates
+- WiFiClientSecure: add support for keys and certificates in PROGMEM
+- Don't remove persistent WiFi settings when doing scan (#2946)
+
+Upstream dependencies
+---------------------
+
+- axTLS: update to 2.1.4
+    - Memory optimization: constants moved to PROGMEM, bigint cache cleared for loaded certificates
+    - Fix certificate chain verification issues
+- sdk: update to v2.1.0-10-g509eae8
+- esptool: update to 0.4.12
+    - Support for 8MB, 16MB flash sizes (image generation and uploading)
+    - Fix for uploading on OS X with Apple FTDI driver
+    - Fixes for error reporting
+- spiffs: update to 0.3.7+ (f5e26c4)
+- mkspiffs: update to 0.2.0
+- SoftwareSerial: update to 3.2.3
+
+Boards
+------
+
+- Add DigiStump Oak pins & board
+- Add Crystal Frequency menu item for generic board
+- Enable 8M and 16M flash sizes for generic board
+
+## Documentation for 2.4.0-rc2
+
+Documentation for this pre-release is hosted on readthedocs.org:
+http://arduino-esp8266.readthedocs.io/en/2.4.0-rc2/
+
+## Obtaining 2.4.0-rc2 pre-release
+
+To install this pre-release using boards manager, follow [the instructions](https://github.com/esp8266/Arduino#installing-with-boards-manager), with the package URL replaced with the following one:
+```
+https://github.com/esp8266/Arduino/releases/download/2.4.0-rc2/package_esp8266com_index.json
+```
+
+
+",https://api.github.com/users/igrr,4349050,igrr,https://api.github.com/repos/esp8266/Arduino/releases/8123284/assets,https://api.github.com/repos/esp8266/Arduino/releases/8123284,master,https://api.github.com/repos/esp8266/Arduino/tarball/2.4.0-rc2,https://github.com/esp8266/Arduino/releases/tag/2.4.0-rc2,https://api.github.com/repos/esp8266/Arduino/zipball/2.4.0-rc2,2.4.0-rc2,False,True
+6457753,2017-05-22T03:04:59Z,2017-05-22T03:07:00Z,,"This is a pre-release in preparation for release 2.4.0. It comes with many fixes accumulated over the past year, and includes many new features.
+
+This is the list of changes compared to 2.3.0.
+
+## Core
+
+- Const-correctness for MD5Builder (#3222)
+- detect division by zero in map() to prevent exceptions (#2397)
+- digitalWrite and digitalRead cancel analogWrite enabled on a pin (#2328)
+- Fix incorrect usage of memset() in PWM code which leads to incomplete initialization of struct
+- Fix libb64 decoder (#2883)
+- Force core_version to be added to compiled binary
+- Prevent divide by zero error causing tone() to crash (#2780)
+- progmem: replace C version of pgm_read_{word,byte} with assembly
+- SPIFFS: fix unaligned read in HAL (#3261)
+- Add Arduino File standard seek call
+- Add support to Print::printf for printing from flash (#2266)
+- Allow global object instances be switched off with defines (#2344)
+- Base64: add option to disable any newlines in output (#3208)
+- Enable floating point formatting in sprintf/sscanf (#1179)
+- Updated String library to use C++11 iterators. (#2267)
+- Use libc from newlib (#1752)
+- move libstdc++ to flash (#2804)
+- Link ESP-NOW library
+
+## ESP8266mDNS:
+
+- Fix link list bug (#2347)
+- Fix crash in mDNS destructor (#2389)
+- Optimize MDNS to prevent overflow and endless loop (#2333)
+- Improve compliance with DNS-SD RFC6763 (#3145)
+- Support AP and STA interfaces at the same time
+- Support multiple interfaces in query code
+- Use the provided IP in the mDNS begin method (#2349)
+
+## OTA
+
+- Updater: fail if there is not enough space to fit the new firmware (#2405)
+- ArduinoOTA: forward errors from Update.begin to espota.py
+- Add getCommand() api for OTA update type (#2259)
+- Updater: check boot mode before starting update
+- Add support for hashed OTA password (#2292)
+- Exposed sketch MD5 through HTTP headers (#2236)
+
+## ESP8266WebServer
+
+- Fix missing separator between get and post arguments (#2222)
+- Fix plain post content containing special chars being parsed as arguments (#2241)
+- Fix urlDecode points (#2212)
+- Match headers using equalsIgnoreCase (#2474)
+- Allow for overridable value for HTTP_UPLOAD_BUFLEN
+- Add chunked encoding support (#2199)
+- Add application/json content type
+
+## ESP8266HTTPClient
+
+- Add PUT Request to HTTP Client (#2310)
+
+## ESP8266WiFi
+
+- WiFi: add SoftAPModeProbeRequestReceived event handler (#2917)
+- Set DHCP subnet correctly for softAP (#2648)
+- Use WIFI_STA in WiFiClient-examples
+- Optimize WifiClient::write performance (#2177)
+- WiFiClient: add support for connect and write timeout (#1420, #3247, #2120)
+- WiFiClientSecure: add example of setCACert/verifyCertChain (#1851)
+- WiFiClientSecure: Add support for CA root cert verification
+- WiFiClientSecure: match CN and SANs ignoring case (#2978)
+- Allow usage of byte arrays to set RootCAs (#2968)
+- Add onComplete event handler support for the asynchronous network scanning. (#2287)
+
+## New features
+
+- Add an LLMNR responder implementation (#2880)
+- Implement Async NBNS (NetBIOS) name resolution for Windows (#2275)
+- Implement Serial RX Buffer (#2239)
+- Initial SPI Slave implementation and examples (#2234)
+- Add support for HSPI overlap mode (#1062)
+
+## Documentation
+
+- Documentation is now hosted on readthedocs.org
+- Initial release of FAQ / Troubleshooting section (#2207)
+- Documenting of ESP.getFlashChipRealSize() (#2210)
+- Use stable documentation of PlatformIO (#2337)
+- ESP8266WiFi library documentation (#2388)
+- Add PROGMEM docs
+- Add instructions how to re-enable DHCP (#2600)
+- Add a section on filesystem limitations (#2858)
+
+## Upstream dependencies
+
+- axTLS: update to 2.1.2 (includes TLS 1.2 support)
+- Update SDK to 2.0.0
+
+## Boards
+
+- Host toolchains on Github
+- Addition of gen4-IoD Range boards (#3202)
+- Arduino boards with ESP8266 (#3121)
+- Add 1M (No SPIFFS) board option (#3203)
+- Update keywords.txt for coloring syntax (#2892)
+
+## Documentation for 2.4.0-rc1
+
+Documentation for this pre-release is hosted on readthedocs.org:
+http://arduino-esp8266.readthedocs.io/en/2.4.0-rc1/
+
+## Obtaining 2.4.0-rc1 pre-release
+
+To install this pre-release using boards manager, follow [the instructions](https://github.com/esp8266/Arduino#installing-with-boards-manager), with the package URL replaced with the following one:
+```
+https://github.com/esp8266/Arduino/releases/download/2.4.0-rc1/package_esp8266com_index.json
+```
+
+
+",https://api.github.com/users/igrr,4349050,igrr,https://api.github.com/repos/esp8266/Arduino/releases/6457753/assets,https://api.github.com/repos/esp8266/Arduino/releases/6457753,master,https://api.github.com/repos/esp8266/Arduino/tarball/2.4.0-rc1,https://github.com/esp8266/Arduino/releases/tag/2.4.0-rc1,https://api.github.com/repos/esp8266/Arduino/zipball/2.4.0-rc1,2.4.0-rc1,False,True
+3505695,2016-06-23T07:31:09Z,2016-06-23T07:38:35Z,2.3.0,"### Core
+- Fix NMI interrupt handler alignment
+- Update SDK to 1.5.3
+- umm_malloc: print block start address before heap corruption callback is triggered
+- If GDBStub library is used, break into gdb on assert and panic
+- Add option to keep FS classes in namespace (#2030)
+- Add SPIFFS::end (#1657)
+- Add ArduinoOTA::getHostname() interface
+- Add __throw_out_of_range
+- Add support for RTC user memory in ESP-specific APIs. (#1836)
+- Expose RTC_USER_MEM in esp8266_peri.h
+- Remove DISABLED macro (#2072)
+- Execute global constructors in correct order (#2074)
+- Real board name available in Sketch/MDNS/OTA (#2054)
+- Add DOUT/QOUT flash modes
+- Add ESP8285 entry in boards menu
+- Move timer detachInterrupt functions into IRAM (#2083)
+- Make Updater be able to run inside async callbacks (#2096)
+- Add new boards Phoenix 1.0 & Phoenix 2.0 (#2088)
+- Store git version of the core in the compiled binary (#2099)
+- Rebuild libstdc++ with mlongcalls and link against it (#1983)
+- Add mechanism for posting functions to the main loop (#2082)
+- MD5Builder::addStream: fixed falsy calculated hash for len > filelength (#2126)
+- Fix SPIFFS.openDir("""") (#2143)
+- Bring back old semantics to random and randomSeed, add secureRandom (#1710) (#2142)
+- Add missing pgm_read_ptr{_near/_far} macros (#2160)
+- Add macro for maximum open SPIFFS files, settings it to 1 saves about 1k heap. (#2167)
+- Fix UART pins setting (#2098)
+- Fix ESP.getSketchSize, add ESP.getSketchMD5 (#2158)
+- Add Serial.baudRate() to get current baud rate (#2079)
+
+### Libraries
+- SNI support in WiFiClientSecure (#1285)
+- HTTPClient: return error when HTTPClient::begin is called with HTTPS URL without certificate fingerprint (#1941)
+- HTTPClient: fix default port not being set
+- HTTPClient: fix handling of chunked transfer encoding (#1975)
+- ESP8266SSDP: switch SSDP send arguments around
+- ESP8266WiFi: fix UdpContext::peek to return int (#1946)
+- ESP8266WiFi: fix WiFiSleepType_t values to match SDK ones
+- LwIP: use gcc-built LwIP by default (#1926)
+- LwIP: fix crash in igmp_start_timer (#1826)
+- HTTPClient: include non-standard ports in Host: header
+- ESP8266WiFi: Prevent WiFi config corruption (#1997 #1856 #1699 #1675)
+- GDBStub: fix section attribute for core gdbstub functions
+- Wire: I2C bus reset with info to user
+- ESP8266HTTPClient: allow HTTP header value without LWS
+- ESP8266mDNS: Fix mDNS doesn't accept queryService responses from avahi-daemon (#2015)
+- Add MFRC522 to supported libraries (#2044)
+- Update axTLS to ab516f7 (1.5.3+)
+- Mention ESP8266Ping library
+- ESP8266HTTPClient: fix duplicate Content-Length headers (#1902)
+- ESP8266HTTPUpdateServer: make HTTP Update Server more secure (#2104)
+- ESP8266WiFi: add virtual destructor to WiFiServer class (#2116)
+- ESP8266WiFi: fix error when calling `WiFiServer::close` more than once
+- ESP8266WiFi: WiFi event handling refactoring (#2119)
+- ESP8266mDNS: restart listening when WiFi STA is connected/disconnected (#1828)
+- ESP8266WiFi: allow DHCP client to be re-enabled using WiFi.config(0U, 0U, 0U) (#1896)
+- ESP8266WiFi: enable SO_REUSE in LwIP and WiFiServer (#1431)
+- ESP8266WebServer: make ESP8266WebServer::urlDecode public (#1419)
+- LwIP: sntp_localtime: return -1 in tm_isdst field (#2010)
+- ESP8266WiFi: fix for crash in WiFiClientSecure when WiFi is disconnected (#2139)
+- SD: Prevent WDT resets in SD library (#1815)
+- ESP8266WiFi: Fix issue when WiFi.begin(ssid, pass) is called right after WiFi.mode(WIFI_OFF)
+
+### Tools
+- Python 3 compatibility for get.py
+- Device side test library and test runner
+- Fix ARM toolchain files permissions (#2004)
+- Update esptool to 0.4.9
+",https://api.github.com/users/igrr,4349050,igrr,https://api.github.com/repos/esp8266/Arduino/releases/3505695/assets,https://api.github.com/repos/esp8266/Arduino/releases/3505695,master,https://api.github.com/repos/esp8266/Arduino/tarball/2.3.0,https://github.com/esp8266/Arduino/releases/tag/2.3.0,https://api.github.com/repos/esp8266/Arduino/zipball/2.3.0,2.3.0,False,False
+3446312,2016-06-15T03:49:51Z,2016-06-24T02:32:26Z,2.3.0-rc2,"### Core
+- Add option to keep FS classes in namespace (#2030)
+- Add SPIFFS::end (#1657)
+- Add ArduinoOTA::getHostname() interface
+- Add __throw_out_of_range
+- Add support for RTC user memory in ESP-specific APIs. (#1836)
+- Expose RTC_USER_MEM in esp8266_peri.h
+- Remove DISABLED macro (#2072)
+- Execute global constructors in correct order (#2074)
+- Real board name available in Sketch/MDNS/OTA (#2054)
+- Add DOUT/QOUT flash modes
+- Add ESP8285 entry in boards menu
+- Move timer detachInterrupt functions into IRAM (#2083)
+- Make Updater be able to run inside async callbacks (#2096)
+- Add new boards Phoenix 1.0 & Phoenix 2.0 (#2088)
+- Store git version of the core in the compiled binary (#2099)
+- Rebuild libstdc++ with mlongcalls and link against it (#1983)
+- Add mechanism for posting functions to the main loop (#2082)
+- MD5Builder::addStream: fixed falsy calculated hash for len > filelength (#2126)
+- Fix SPIFFS.openDir("""") (#2143)
+- Bring back old semantics to random and randomSeed, add secureRandom (#1710) (#2142)
+
+### Libraries
+- Wire: I2C bus reset with info to user
+- ESP8266HTTPClient: allow HTTP header value without LWS
+- ESP8266mDNS: Fix mDNS doesn't accept queryService responses from avahi-daemon (#2015)
+- Add MFRC522 to supported libraries (#2044)
+- Update axTLS to ab516f7 (1.5.3+)
+- Mention ESP8266Ping library
+- ESP8266HTTPClient: fix duplicate Content-Length headers (#1902)
+- ESP8266HTTPUpdateServer: make HTTP Update Server more secure (#2104)
+- ESP8266WiFi: add virtual destructor to WiFiServer class (#2116)
+- ESP8266WiFi: fix error when calling `WiFiServer::close` more than once
+- ESP8266WiFi: WiFi event handling refactoring (#2119)
+- ESP8266mDNS: restart listening when WiFi STA is connected/disconnected (#1828)
+- ESP8266WiFi: allow DHCP client to be re-enabled using WiFi.config(0U, 0U, 0U) (#1896)
+- ESP8266WiFi: enable SO_REUSE in LwIP and WiFiServer (#1431)
+- ESP8266WebServer: make ESP8266WebServer::urlDecode public (#1419)
+- LwIP: sntp_localtime: return -1 in tm_isdst field (#2010)
+- ESP8266WiFi: fix for crash in WiFiClientSecure when WiFi is disconnected (#2139)
+- SD: Prevent WDT resets in SD library (#1815)
+- ESP8266WiFi: Fix issue when WiFi.begin(ssid, pass) is called right after WiFi.mode(WIFI_OFF)
+",https://api.github.com/users/igrr,4349050,igrr,https://api.github.com/repos/esp8266/Arduino/releases/3446312/assets,https://api.github.com/repos/esp8266/Arduino/releases/3446312,master,https://api.github.com/repos/esp8266/Arduino/tarball/2.3.0-rc2,https://github.com/esp8266/Arduino/releases/tag/2.3.0-rc2,https://api.github.com/repos/esp8266/Arduino/zipball/2.3.0-rc2,2.3.0-rc2,False,True
+3199709,2016-05-11T06:38:11Z,2016-05-11T06:45:01Z,2.3.0-rc1,"### Core
+- Fix NMI interrupt handler alignment
+- Update SDK to 1.5.3
+- umm_malloc: print block start address before heap corruption callback is triggered
+- If GDBStub library is used, break into gdb on assert and panic
+
+### Libraries
+- SNI support in WiFiClientSecure (#1285)
+- Update axTLS to 139914f
+- HTTPClient: return error when HTTPClient::begin is called with HTTPS URL without certificate fingerprint (#1941)
+- HTTPClient: fix default port not being set
+- HTTPClient: fix handling of chunked transfer encoding (#1975)
+- ESP8266SSDP: switch SSDP send arguments around
+- ESP8266WiFi: fix UdpContext::peek to return int (#1946)
+- ESP8266WiFi: fix WiFiSleepType_t values to match SDK ones
+- LwIP: use gcc-built LwIP by default (#1926)
+- LwIP: fix crash in igmp_start_timer (#1826)
+- HTTPClient: include non-standard ports in Host: header
+- ESP8266WiFi: Prevent WiFi config corruption (#1997 #1856 #1699 #1675)
+- GDBStub: fix section attribute for core gdbstub functions
+
+### Tools
+- Python 3 compatibility for get.py
+- Device side test library and test runner
+- Fix ARM toolchain files permissions (#2004)
+",https://api.github.com/users/igrr,4349050,igrr,https://api.github.com/repos/esp8266/Arduino/releases/3199709/assets,https://api.github.com/repos/esp8266/Arduino/releases/3199709,master,https://api.github.com/repos/esp8266/Arduino/tarball/2.3.0-rc1,https://github.com/esp8266/Arduino/releases/tag/2.3.0-rc1,https://api.github.com/repos/esp8266/Arduino/zipball/2.3.0-rc1,2.3.0-rc1,False,True
+3040009,2016-04-18T08:23:17Z,2016-04-18T08:26:10Z,2.2.0,"### Core
+- Leverage realloc() in String::changeBuffer()
+- Clean up core files
+- Add host side tests
+- Fix possible null pointer in umm_malloc
+- Remove ""Upload Using"" option from Tools menu
+- Move attachInterrupt and detachInterrupt into IRAM (#1734)
+- Implement strstr_P
+- Allow indefinite duration for tone()
+- Fix crashes when using tone()
+- Fix RF_MODE and ADC_MODE
+- Move micros, delayMicroseconds, millis to IRAM (#1326)
+- Fix pulseIn (#1072, #1149)
+- Accept both named constant and ADC channel number in analogRead (#1766)
+- Enable heap poisoning only when debug options are enabled (#1800)
+- Bootloader: don't touch RTC memory if it doesn't contain a valid command (#619)
+- Update SDK to 1.5.2 (#1653)
+- Clean up variants, fix digitalPinHasPWM definition (#1831)
+- Don't set RF mode on boot unless it was overridden
+- Change build.board property for boards which renumber pins like NodeMCU (#1878)
+- Fix Exception 2 when using printf or vprintf
+
+### Libraries
+- Update axTLS to 5b4be7d
+- WiFiClientSecure: implement connection timeout, fix connected method behavior
+- WiFiClient: fix write behavior when connection is closed by remote side
+- ESP8266HTTPServer: add font MIME types, fix #1601
+- ESP8266mDNS: add client support
+- Update SPIFFS to 82aeac6
+- Servo: move some functions into IRAM (#1742)
+- Update SoftwareSerial to version 3.1.0
+- ESP8266SSDP: change templates to include deviceType
+- ESP8266WebServer: handle more file types
+- SPI: add CPOL setting
+- ESP8266WebServer: Fix buffer overflow in ESP8266WebServer::authenticate (#1790)
+- ESP8266WiFi: fix undefined behavior in WiFiServer::setNoDelay (#1695)
+- Servo: use peripheral clock frequency when calculating FRC1 tick count (#1789)
+- ESP8266WiFi: avoid multiple instances of INADDR_NONE
+- Add LwIP binary built with gcc
+- ESP8266WiFi: Allow PSK instead of passphrase in WiFiSTA::begin
+- SPI: Fix SPI.transfer16() using wrong endianness
+- HTTPClient: decouple transport layer handling + save some RAM
+- ESP8266httpUpdate: decouple HTTPS overloads + save some RAM
+- Update and move lwIP headers, add options to use different lwIP build
+- ESP8266WebServer: wait for data to arrive
+- ESP8266WebServer: save RAM by moving response strings to flash (#1732)
+- SPI: Speed up SPI.writePattern()
+
+### Tools
+- Add ARM tools (#269)
+",https://api.github.com/users/igrr,4349050,igrr,https://api.github.com/repos/esp8266/Arduino/releases/3040009/assets,https://api.github.com/repos/esp8266/Arduino/releases/3040009,master,https://api.github.com/repos/esp8266/Arduino/tarball/2.2.0,https://github.com/esp8266/Arduino/releases/tag/2.2.0,https://api.github.com/repos/esp8266/Arduino/zipball/2.2.0,2.2.0,False,False
+3010877,2016-04-13T13:26:59Z,2016-04-13T13:41:50Z,2.2.0-rc1,"2.2.0-rc1
+",https://api.github.com/users/igrr,4349050,igrr,https://api.github.com/repos/esp8266/Arduino/releases/3010877/assets,https://api.github.com/repos/esp8266/Arduino/releases/3010877,master,https://api.github.com/repos/esp8266/Arduino/tarball/2.2.0-rc1,https://github.com/esp8266/Arduino/releases/tag/2.2.0-rc1,https://api.github.com/repos/esp8266/Arduino/zipball/2.2.0-rc1,2.2.0-rc1,False,True
+2703369,2016-02-27T21:48:45Z,2016-02-27T21:57:44Z,2.1.0,"### Core
+- Add function to know last reset reason.
+- Allow control of enabling debug and debug level from IDE
+- Add espduino board
+- Rework StreamString::write to use String internal buffer directly (#1289)
+- Add function to measure stack high water mark
+- Fix RAM corruption caused by our hook of register_chipv6_phy(init_data*).
+- Optimize PWM interrupt handler for better precision
+- Add warning levels configurable through Preferences
+- SPIFFS: check if path length is valid (#1089)
+- Set CPU frequency before running setup
+- Add core_esp8266_features.h to be able to detect the features and libraries included in the ESP core
+- Add ESPino to supported boards
+- Fix pwm first step getting skipped
+- Update SDK to 1.5.1_16_01_08
+- Bufferless and interruptless HardwareSerial
+- HardwareSerial: allow mapping of UART0 TX to GPIO2
+- Add 128K SPIFFS for 512KB modules
+- Reduce stack usage by Print::printf
+- Fix a crash in String::changeBuffer()
+- Implement static initialization guards (#500)
+- Implementation of Tone API using timer1
+- Use umm_malloc for heap management
+- Configurable I2C clock stretching limit
+- Add a new board entry for the SparkFun Thing Dev
+
+### Libraries
+- ESP8266HTTPClient: add CHUNKED encoding support (#1324)
+- Fixed crash bug with mDNS where a string buffer could be used uninitialized
+- Add WiFi TX power control
+- Add WiFi sleep management
+- Allow to hook into WiFi events from sketch
+- Allow setting TCP timeout
+- Add setSleepMode + getSleepMode and setPhyMode + getPhyMode to WiFi
+- Update GDBStub library with the source of esp-gdbstub
+- Servo: fix detach and attach
+- ESP8266mDNS: refactoring, add TXT support
+- Add HTTP Basic Auth to WebServer and libb64 (base64) to core
+- Fix link-time dependency of ESP8266WebServer on SPIFFS (#862)
+- Allow setting client side TLS key and certificate
+- Replace chain of UDP pbufs with a single pbuf before sending (#1009)
+- Unique Built-In libraries library.properties name
+- Improvements for MD5Builder with Stream
+- ESP8266SSDP: fixing TTL to 2 per spec
+- ESP8266WebServer: a content length of zero should also be sent
+- Use SoftwareSerial version 2.2
+- EEPROM: optimised `_dirty` flag
+- ESP8266mDNS: advertise all hosted services
+- Remove bundled OneWire - ESP8266 support has been merged in the official OneWire sources
+- WiFiClientSecure: don't panic if memory allocation fails
+- Verify domain name in WiFiClientSecure::verify
+- Speed up WiFi.hostByName when the hostname is actually an IP
+- Fix WiFi scan issue (#1355)
+- Workaround for LwIP not handling ERR_ABRT
+- Servo value read and write fixes
+
+### Tools
+- espota.py: add support for manually selecting ip and port for host side
+- Update esptool to 0.4.8
+- Make espota compatible with python 3.5
+",https://api.github.com/users/igrr,4349050,igrr,https://api.github.com/repos/esp8266/Arduino/releases/2703369/assets,https://api.github.com/repos/esp8266/Arduino/releases/2703369,master,https://api.github.com/repos/esp8266/Arduino/tarball/2.1.0,https://github.com/esp8266/Arduino/releases/tag/2.1.0,https://api.github.com/repos/esp8266/Arduino/zipball/2.1.0,2.1.0,False,False
+2482851,2016-01-24T19:10:04Z,2016-01-24T19:30:39Z,2.1.0-rc2,,https://api.github.com/users/igrr,4349050,igrr,https://api.github.com/repos/esp8266/Arduino/releases/2482851/assets,https://api.github.com/repos/esp8266/Arduino/releases/2482851,master,https://api.github.com/repos/esp8266/Arduino/tarball/2.1.0-rc2,https://github.com/esp8266/Arduino/releases/tag/2.1.0-rc2,https://api.github.com/repos/esp8266/Arduino/zipball/2.1.0-rc2,2.1.0-rc2,False,True
+2368786,2016-01-04T14:26:35Z,2016-01-04T15:17:59Z,2.1.0-rc1,"2.1.0-rc1
+",https://api.github.com/users/igrr,4349050,igrr,https://api.github.com/repos/esp8266/Arduino/releases/2368786/assets,https://api.github.com/repos/esp8266/Arduino/releases/2368786,master,https://api.github.com/repos/esp8266/Arduino/tarball/2.1.0-rc1,https://github.com/esp8266/Arduino/releases/tag/2.1.0-rc1,https://api.github.com/repos/esp8266/Arduino/zipball/2.1.0-rc1,2.1.0-rc1,False,True
+2204612,2015-11-30T07:15:59Z,2015-11-30T08:20:33Z,2.0.0,,https://api.github.com/users/igrr,4349050,igrr,https://api.github.com/repos/esp8266/Arduino/releases/2204612/assets,https://api.github.com/repos/esp8266/Arduino/releases/2204612,master,https://api.github.com/repos/esp8266/Arduino/tarball/2.0.0,https://github.com/esp8266/Arduino/releases/tag/2.0.0,https://api.github.com/repos/esp8266/Arduino/zipball/2.0.0,2.0.0,False,False
+2176660,2015-11-24T08:45:32Z,2015-11-24T11:01:56Z,2.0.0-rc2,,https://api.github.com/users/igrr,4349050,igrr,https://api.github.com/repos/esp8266/Arduino/releases/2176660/assets,https://api.github.com/repos/esp8266/Arduino/releases/2176660,master,https://api.github.com/repos/esp8266/Arduino/tarball/2.0.0-rc2,https://github.com/esp8266/Arduino/releases/tag/2.0.0-rc2,https://api.github.com/repos/esp8266/Arduino/zipball/2.0.0-rc2,2.0.0-rc2,False,True
+2139492,2015-11-17T13:20:45Z,2015-11-17T14:25:20Z,2.0.0-rc1,,https://api.github.com/users/igrr,4349050,igrr,https://api.github.com/repos/esp8266/Arduino/releases/2139492/assets,https://api.github.com/repos/esp8266/Arduino/releases/2139492,master,https://api.github.com/repos/esp8266/Arduino/tarball/2.0.0-rc1,https://github.com/esp8266/Arduino/releases/tag/2.0.0-rc1,https://api.github.com/repos/esp8266/Arduino/zipball/2.0.0-rc1,2.0.0-rc1,False,True

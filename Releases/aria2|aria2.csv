@@ -1,0 +1,936 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8150508,2017-10-17T14:14:30Z,2017-10-17T14:31:58Z,aria2 1.33.0,"Release Note
+------------
+
+This release fixes several bugs, and add new features.
+
+Changes
+-------
+
+* Include arm in a filename of android zip
+
+* Upgrade base image of Dockerfile.mingw to ubuntu:16.04
+
+* wintls: Potential fix for undecrypted read
+
+  GH-1021
+
+* libaria2: Return last error code from DownloadHandle::getErrorCode
+
+  GH-991
+
+* Windows: pass writefds also as exceptfds to select()
+
+  winsock notifies connect() failures on exceptfds instead of
+  writefds.
+
+  Fixes GH-969
+  Fixes GH-975
+
+* libuv: use pkg-config
+
+* FeatureConfig: align text
+
+* Update Dockerfile.mingw
+
+  avoid docker cache when using git
+
+  Patch from qweaszxcdf
+
+  GH-970
+
+* Add --peer-agent option
+
+  Add --peer-agent for setting the version/user agent used in the
+  extended handshake protocol for bittorrent.
+
+  Patch from Kurt Kartaltepe
+
+  GH-947
+
+* OSX: Allow to specify a build
+
+* OSX: update c-ares
+
+* [Docs, libaria2] Fix type of obj pushed into options vector
+
+  aria::KeyVals is a vector of pair of std strings, therefore the type
+  of object being pushed should be std::pair<std::string,
+  std::string>, however in the docs, the type of the said object is
+  KeyVals.  If one follows the docs, their code will fail to compile.
+
+  Patch from geetam
+
+  GH-941
+
+* AppleTLS: Silence cipher suite selection
+
+* Unbreak build OSX build
+
+* Update macOS versions
+
+* Add --bt-load-saved-metadata option
+
+  Before getting torrent metadata from DHT when downloading with
+  magnet link, first try to read file saved by --bt-save-metadata
+  option. If it is successful, then skip downloading metadata from
+  DHT.  By default, this feature is turned off.
+
+  GH-909
+
+* Fix regression in bfc54d0b9a694e5d87efd8ed11b5393bc4b66f93
+
+  Don't save control file if --auto-save-interval is 0.
+
+  GH-917
+
+* Fix infinite loop bug when file is not found
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/8150508/assets,https://api.github.com/repos/aria2/aria2/releases/8150508,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.33.0,https://github.com/aria2/aria2/releases/tag/release-1.33.0,https://api.github.com/repos/aria2/aria2/zipball/release-1.33.0,release-1.33.0,False,False
+6416960,2017-05-17T13:25:34Z,2017-05-17T15:03:31Z,aria2 1.32.0,"Release Note
+------------
+
+This release fixes several minor bugs, and spelling mistakes.
+
+Changes
+-------
+
+* Clarify --max-concurrent-downloads option
+
+  GH-833
+
+* Fix compile error with toolchain which lacks IPV6_TCLASS
+
+  GH-895
+
+* Log directed URI in notice log level
+
+  GH-884
+
+* Fix typo
+
+  Patch from Tse Kit Yam
+
+  GH-879, GH-899
+
+* Spelling fixes
+
+  Patch from klemens
+
+  GH-870
+
+* Remove unused Android parts
+
+  These parts where unused after merging
+  https://github.com/aria2/aria2/pull/736
+
+  Patch from Fredrik Fornwall
+
+  GH-868
+
+* Save control file early
+
+  GH-859
+
+* Update links in Dockerfile.raspberrypi
+
+  Some links used in Dockerfile.raspberrypi are not accessible
+  anymore, because they were pointing to old versions of some source
+  packages and new versions were released.  This commit fixes this by
+  changing the links to point to the newest versions.
+
+  Patch from Michał Leśniewski
+
+  GH-860
+
+* Propagate disk full error on pre-allocation to last error code
+
+  GH-856
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/6416960/assets,https://api.github.com/repos/aria2/aria2/releases/6416960,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.32.0,https://github.com/aria2/aria2/releases/tag/release-1.32.0,https://api.github.com/repos/aria2/aria2/zipball/release-1.32.0,release-1.32.0,False,False
+5170559,2017-01-16T13:35:16Z,2017-01-16T13:45:47Z,aria2 1.31.0,"## Release Note
+
+This release fixes assertion error in
+SimpleRandomizer::getRandomBytes.  It adds new option
+content-disposition-default-utf8.
+
+## Changes
+- Better error message when local file status cannot be retrieved
+  
+  GH-836
+- Fix assertion failure in SimpleRandomizer::getRandomBytes
+  
+  errno might not be initialized to 0, and we may get both rv == -1
+  and errno != ENOSYS.  This leads to assertion failure.  Since
+  getrandom_linux always returns -1 on failure, checking errno is
+  useless in this function.
+  
+  GH-823
+- Add option content-disposition-default-utf8
+  
+  Patch from JimmyZ
+  
+  GH-813
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/5170559/assets,https://api.github.com/repos/aria2/aria2/releases/5170559,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.31.0,https://github.com/aria2/aria2/releases/tag/release-1.31.0,https://api.github.com/repos/aria2/aria2/zipball/release-1.31.0,release-1.31.0,False,False
+4930106,2016-12-15T13:59:31Z,2016-12-15T14:12:19Z,aria2 1.30.0,"## Release Note
+
+This release fixes several bugs.  See Changes below for detailed bug
+fixes.  This release adds an ability to expand `${HOME}` to user's
+home directory in several options.  It would be useful when used in
+configuration file.  -S option against torrent file now prints out DHT
+nodes.
+
+## Changes
+- mingw: Use sqlite 3.15.2
+- Fix bug that --disable-websocket causes build error
+- Fix bug that lower bound of optimize-concurrent-downloads becomes 1
+  
+  GH-798
+- Print DHT nodes with -S option
+  
+  GH-795
+- Take into account address family when resolving DHT node address
+  
+  GH-794
+- Allow block device file to -i option
+  
+  GH-785
+- Expand `${HOME}` to user's home directory in several options
+  
+  The following options implement this substitution:
+  - --ca-certificate
+  - --certificate
+  - --dht-file-path
+  - --dht-file-path6
+  - --dir
+  - --input-file
+  - --load-cookies
+  - --log
+  - --metalink-file
+  - --netrc-path
+  - --on-bt-download-complete
+  - --on-download-complete
+  - --on-download-error
+  - --on-download-start
+  - --on-download-stop
+  - --on-download_pause
+  - --out
+  - --private-key
+  - --rpc-certificate
+  - --rpc-private-key
+  - --save-cookies
+  - --save-session
+  - --server-stat-if
+  - --server-stat-of
+  - --torrent-file
+  
+  GH-780
+- Document that libaria2 is not thread safe
+  
+  GH-775
+- configure: Use pkg-config to find libs whenever possible
+  
+  Use pkg-config to find cppunit, libxml2 and expat. All those
+  libraries provide pkg-config files, and in all of those cases the
+  pkg-config macro is superior to the custom macros used currently.
+  
+  The advantages of pkg-config files include:
+  - Explicit static linking support via --static. Currently, e.g.
+    'xml2-config --libs' prints all libraries needed for static
+    linking when doing dynamic linking unnecessary, resulting in
+    unnecessary direct deps.
+  - Better cross-build support. You don't have to build the additional
+    *-config tools for target.
+  - Better multilib support. Per-ABI pkgconfig directories are
+    commonly supported while packages usually fail to look for
+    per-CHOST *-config variants.
+  - Better override support. The current macros allow little to no
+    result overrides, the pkg-config macros let you pass FOO_CFLAGS
+    and FOO_LIBS manually.
+  - Cleaner version checks. The code used in libxml.m4 is really
+    creepy.
+  
+  Patch from Michał Górny
+  
+  GH-773
+- WinTLS: Rewrite writeData
+  
+  We re-wrote WinTLSSession::writeData.  The major points are:
+  - Buffer is now preallocated once handshake is finished.
+    Previously, they are allocated each time when we send one TLS
+    record.
+  - Schannel uses header, body and trailer for each secBuffer.  Now we
+    send them off at once using WSASend which is windows counterpart
+    of sendv.  Previously, we do memmove if some of them are
+    truncated.
+  - We don't try to send application data in
+    WinTLSSession::closeConnection, since semantically we need same
+    application data used to create TLS record before.  Using 0 length
+    data to finish sending buffered data looks like a hack.
+  
+  GH-772
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/4930106/assets,https://api.github.com/repos/aria2/aria2/releases/4930106,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.30.0,https://github.com/aria2/aria2/releases/tag/release-1.30.0,https://api.github.com/repos/aria2/aria2/zipball/release-1.30.0,release-1.30.0,False,False
+4663549,2016-11-15T14:10:54Z,2016-11-15T14:18:40Z,aria2 1.29.0,"## Release Note
+
+This release fixes several bugs.  See Changes below for detailed bug
+fixes.  This release adds 1xx non-final response support.  Wslay
+library is updated to the latest revision.
+
+## Changes
+- WinTLS: Fix busy loop on write error
+  
+  GH-767
+- Support 1xx non-final response
+  
+  GH-763
+- Update wslay
+  
+  GH-764
+- Don't download piece which is filtered out (e.g., --select-file)
+  
+  This commit fixes the bug that piece which is not requested by
+  --select-file is downloaded in multi-file Web-Seeding.
+  
+  GH-769
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/4663549/assets,https://api.github.com/repos/aria2/aria2/releases/4663549,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.29.0,https://github.com/aria2/aria2/releases/tag/release-1.29.0,https://api.github.com/repos/aria2/aria2/zipball/release-1.29.0,release-1.29.0,False,False
+4400100,2016-10-16T08:34:23Z,2016-10-16T08:43:30Z,aria2 1.28.0,"## Release Note
+
+This release fixes the bug that file name is not logged with
+--conditional-get option is used.  The new option
+--keep-unfinished-download-result was added to keep incomplete
+downloads in memory regardless of --max-download-result so that we can
+save those downloads with --save-session option.  This option is
+enabled by default.
+
+This release
+
+## Changes
+- Restore LTLIBINTL in src/Makefile.am
+  
+  Patch from Juan Francisco Cantero Hurtado
+- Add --keep-unfinished-download-result option
+  
+  This option keeps unfinished download results even if doing so
+  exceeds --max-download-result.  This is useful if all unfinished
+  downloads must be saved in session file (see --save-session option).
+  Please keep in mind that there is no upper bound to the number of
+  unfinished download result to keep.  This option is enabled by
+  default.
+- Fix -Wexpansion-to-defined warning with clang-3.9
+  
+  The error message was:
+  
+  warning: macro expansion producing 'defined' has undefined behavior
+  [-Wexpansion-to-defined]
+  
+  http://lists.llvm.org/pipermail/cfe-commits/Week-of-Mon-20160118/147239.html
+- Fix bug that file name is not logged with --conditional-get
+  
+  GH-742
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/4400100/assets,https://api.github.com/repos/aria2/aria2/releases/4400100,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.28.0,https://github.com/aria2/aria2/releases/tag/release-1.28.0,https://api.github.com/repos/aria2/aria2/zipball/release-1.28.0,release-1.28.0,False,False
+4157591,2016-09-17T00:14:02Z,2016-09-17T00:23:47Z,aria2 1.27.1,"## Release Note
+
+This release fixes the packaging bug that libssl_compat.h is missing
+in the tar balls.
+
+## Changes
+- Add missing libssl_compat.h to SRCS
+  
+  GH-744
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/4157591/assets,https://api.github.com/repos/aria2/aria2/releases/4157591,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.27.1,https://github.com/aria2/aria2/releases/tag/release-1.27.1,https://api.github.com/repos/aria2/aria2/zipball/release-1.27.1,release-1.27.1,False,False
+4152151,2016-09-16T12:59:16Z,2016-09-16T13:08:35Z,aria2 1.27.0,"## Release Note
+
+This release fixes bug which may cause crash if UDP tracker is used.
+It adds new option --save-not-found which prevents downloads failed by
+""not found"" error from being saved in session file.
+
+## Changes
+- Hard-disable openssl in osx build
+  
+  Closes #739
+- Fix possible cause of crash if UDP tracker is used
+- Remove custom ftruncate64 for Android
+  
+  The latest NDK versions support ftruncate64, so building a local
+  copy of ftruncate64 is no longer needed.
+  
+  Also, the arm and x86 builds of ftruncate64 failed when targeting
+  API level 21 or higher, as they include <linux/err.h> which are not
+  present starting from API level 21.
+  
+  Patch from Fredrik Fornwall
+- Fix typo found by Debian's Lintian
+- Add --save-not-found option
+- Update comment to match code
+  
+  Patch from Torbjörn Lönnemark
+- WinTLS: Better errors (from WSA)
+- Compile with openssl 1.1.0
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/4152151/assets,https://api.github.com/repos/aria2/aria2/releases/4152151,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.27.0,https://github.com/aria2/aria2/releases/tag/release-1.27.0,https://api.github.com/repos/aria2/aria2/zipball/release-1.27.0,release-1.27.0,False,False
+3991832,2016-08-28T06:07:21Z,2016-08-28T07:45:07Z,aria2 1.26.1,"## Release Note
+
+This release fixes the bug that causes assertion failure during
+BitTorrent downloads.
+
+## Changes
+- Make assertion hold
+  
+  If we have peer which is already used, make addAndCheckoutPeer()
+  fail.  If peer is in unused list, first remove the old entry, and
+  then add new one.  This would make assertion in ~DefaultPeerStorage
+  hold.
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/3991832/assets,https://api.github.com/repos/aria2/aria2/releases/3991832,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.26.1,https://github.com/aria2/aria2/releases/tag/release-1.26.1,https://api.github.com/repos/aria2/aria2/zipball/release-1.26.1,release-1.26.1,False,False
+3931199,2016-08-20T02:11:07Z,2016-08-20T02:24:51Z,aria2 1.26.0,"## Release Note
+
+This release fixes linking bug with libaria2 enabled.  It also changes
+how aria2 renames the download file name when the same name already
+exists in file system.  In summary, we use numbers before extension
+(e.g., foo.1.txt), rather than after extension (e.g., foo.txt.1).  Now
+--seed-time option can take floating point number to specify
+fractional minutes.
+
+## Changes
+- aria2mon: Replace client.call with local method
+  
+  Patch from Florian Gamböck
+- Reorder a note section in aria2c.rst
+  
+  Patch from Artur Petrov
+  
+  Closes GH-722
+- bash_completion: Add missing options which takes one of pre-defined
+  values
+- Replace ""/"" with ""-"" in magnet dn name when used as in-memory
+  download name
+- Fix Dockerfile.raspberrypi to correctly decompress expat archive
+  
+  Patch from Char
+- Enable ccache in travis-ci
+  
+  Speeds up the build most of the time.
+  
+  Closes GH-710
+- Enable OSX/macOS build for travis
+  
+  Closes GH-711
+  Closes GH-666
+- Better auto-renaming
+  
+  Up until now aria2 file auto renaming worked by just appending a new
+  unique number to the file path, behind the file name extension, if
+  any, changing what most other programs consider the file extension
+  in the process.  Now, aria2 will attempt to insert the number before
+  the file extension, leaving the extension intact, so that e.g. a
+  "".jpg"" still is a "".jpg"" file and opens in your configured image
+  viewer when clicking it.  If a file has no extension (incl. so
+  called ""dot files""), the number will be appended to the file name as
+  usual.
+  
+  Note: This is a potentially breaking change that might break third
+  party scripts that rely on aria2 auto file renaming producing a
+  certain format for renamed files. Please fix your scripts
+  accordingly.
+  
+  Closes GH-709
+- Log number of items loaded from input file
+- Link external libraries to libaria2 with --enable-libaria2
+  
+  Fixes GH-707
+- Allow seconds for seed-time (fractional minutes)
+  
+  Patch from Sébastien Cabaniols
+  
+  Closes GH-704
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/3931199/assets,https://api.github.com/repos/aria2/aria2/releases/3931199,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.26.0,https://github.com/aria2/aria2/releases/tag/release-1.26.0,https://api.github.com/repos/aria2/aria2/zipball/release-1.26.0,release-1.26.0,False,False
+3667215,2016-07-15T13:55:32Z,2016-07-15T14:10:06Z,aria2 1.25.0,"## Release Note
+
+This release fixes many bugs reported so far.  There is no new
+functionality in this release.  We have fixed many performance issues
+in BitTorrent downloads.
+
+## Changes
+- Update third-party libraries for binary releases
+- Send have message without too much delay
+  
+  Also send bitfield rather than have messages if bitfield message is
+  equal to or less than the sum of have messages which otherwise would
+  be sent.
+- Fix bug that causes bogus EOF connection failure in BitTorrent
+  downloads
+- Fix frequent interested/not interested message transmission
+- Fix frequent choke/unchoke message transmission
+- Try to use available URI if all pooled requests are sleeping
+- Update expat in OSX build
+  
+  Closes GH-694
+- aria2mon: Add --secret option
+  
+  Fixes GH-700
+- Set server status error on network failure in server performance
+  profile
+- Disable AI_ADDRCONFIG if no IPv4/IPv6 address is configured for any
+  interface
+  
+  Fixes GH-698
+- Russian manual: Update aria2c.rst
+  
+  Patch from ITriskTI
+- Apply --retry-wait on 503 only
+- Ensure that lowest speed check is done even when download speed is 0
+  
+  Fixes GH-686
+- Document that -o is always relative to -d option
+  
+  Fixes GH-684
+- Allow larger ut_metadata size
+  
+  Fixes GH-681
+- mingw: Change FD_SETSIZE to 32768
+  
+  Fixes GH-678
+- Fix compile error on OS X
+  
+  Fixes GH-683
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/3667215/assets,https://api.github.com/repos/aria2/aria2/releases/3667215,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.25.0,https://github.com/aria2/aria2/releases/tag/release-1.25.0,https://api.github.com/repos/aria2/aria2/zipball/release-1.25.0,release-1.25.0,False,False
+3449574,2016-06-15T13:03:19Z,2016-06-15T13:16:35Z,aria2 1.24.0,"## Release Note
+
+This release fixes several bugs.  The new functionality is that when
+options which is only applicable in waiting state are submitted to an
+active download via RPC, the download is now automatically restarted
+to reflect the changes.  Previously, those options were just ignored.
+
+## Changes
+- BitTorrent: Allow 32KiB request
+  
+  It looks like the 32KiB is the default request size of python
+  bittorrent client.  Previously, aria2 only allowed maximum 16KiB
+  request.
+- Don't unchoke peer which is not interested in us
+- Fix bug that evaluation of Peer::amChoking is negated
+- Faster seed/download on fast connection
+- Increase DHT task concurrency to 15
+  
+  Fix GH-653
+- Fixed mmap failure check with MAP_FAILED flag
+  
+  Fix GH-662
+  
+  Patch from suzker
+- Added file size overflow check for mmap on 32bit os
+  
+  Fix GH-662
+  
+  Patch from suzker
+- Use standard percent-encode for tracker request query
+  
+  Fix GH-659
+- mingw32: Gain privilege before opening files
+  
+  Fix GH-657
+- Restart active download to apply previously not applicable options
+  
+  Previously, we categorized options that can be used in
+  aria2.changeOption RPC method into 2 categories.  The options in one
+  category can be applied on the fly, meaning that download continues
+  to be active while applying options.  Another category includes
+  options which are only applicable when downloads are waiting or
+  paused.
+  
+  In this change, when active download is ordered to change options
+  which only applicable in waiting or paused state, it is now paused,
+  and then automatically restarted.  Although we have limited number
+  of download concurrency, the pause and restart is done atomically,
+  and the download is inserted at the front of the queue, it is picked
+  up immediately if the concurrency regulation allows.
+  
+  Fix GH-640 and GH-644
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/3449574/assets,https://api.github.com/repos/aria2/aria2/releases/3449574,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.24.0,https://github.com/aria2/aria2/releases/tag/release-1.24.0,https://api.github.com/repos/aria2/aria2/zipball/release-1.24.0,release-1.24.0,False,False
+3228320,2016-05-15T10:28:38Z,2016-05-15T10:37:06Z,aria2 1.23.0,"# aria2 1.23.0
+
+## Release Note
+
+This release fixes several bugs reported by users, and adds several
+new features.  Read the following section for details.
+
+## Changes
+- Simplify cache write
+  
+  The previous cache write routine was too complex.  I'm sure I can
+  rewrite it to more elegantly.  But the primary motivation of this
+  complex logic is for disk activity reduction on Windows 7, and I
+  observed it on my old IDE disk.  I checked it again recently, and
+  there is no difference between with and without this complex logic.
+  For this reason, it was removed.  Will revert this change if many of
+  users are not happy with this.
+- Allow subsecond value in ns cookie.txt file's expiry time field
+  
+  Fixes GH-655
+- Adjust chromium cookie time
+- import-po: iterate on glob, not ls output
+  
+  Patch from Mingye Wang
+- Add --stderr option to redirect all stdout log output to stderr
+  
+  Fixes GH-638
+- Add ""hide"" to --download-result option
+  
+  Fixes GH-639
+- Fix downloaded metaurl torrent filename
+- Add a little bit of color to have a better visual of important
+  informations
+  
+  Patch from rotor
+- Update README URLs based on HTTP redirects
+  
+  Patch from ReadmeCritic
+- Relocate from github.com/tatsuhiro-t/aria2 to github.com/aria2/aria2
+  
+  Fixes GH-602
+- mingw: Defer the falloc warning until falloc is specified by option
+  
+  Fixes GH-594
+- Add bittorrent key to aria2.tellStopped status
+  
+  Fixes GH-612
+- Addsystem.listNotifications RPC method
+  
+  Merges GH-620
+  
+  Patch from Sonny Piers
+- Report CheckIntegrity info in tellStatus
+  - Adds verifiedLength to tellStatus. Reports the length of data that
+    has been verified of the current RequestGroup being verified.
+  - Adds verifyPending to tellStatus. Reports if the RequestGroup has
+    a verification of integrity pending.
+  
+  Closes GH-561
+  
+  Patch from Kurt Kartaltepe
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/3228320/assets,https://api.github.com/repos/aria2/aria2/releases/3228320,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.23.0,https://github.com/aria2/aria2/releases/tag/release-1.23.0,https://api.github.com/repos/aria2/aria2/zipball/release-1.23.0,release-1.23.0,False,False
+3028442,2016-04-15T14:10:09Z,2016-04-15T14:19:34Z,aria2 1.22.0,"## Release Note
+
+This release adds new feature that manages the number of concurrent
+downloads dynamically.  --stream-piece-selector option gets new value
+""random"" which randomizes the piece selection for HTTP/FTP downloads.
+This effectively randomizes the order of files on multi-file Web
+Seeding.  Now all contributor's names are in AUTHORS file.
+Previously, aria2 shows error when it sees floating point number in a
+torrent file because torrent file specification does not allow
+floating point number.  In this release, they are just ignored, and
+aria2 continues to parse the rest of the torrent file as if there is
+nothing wrong.
+
+## Changes
+- Add description about possible fragmentation with
+  --file-allocation=trunc
+- Make single-entry metalink download with multi-file torrent work
+- Add all contributor's names in AUTHORS
+- Ignore floating number in torrent file
+- Added support for a dynamic management of the number of concurrent
+  downloads as a function of the overall bandwidth observed
+  
+  This change adds --optimize-concurrent-downloads option.
+  
+  Patch from oliviercommelarbre
+- Add --stream-piece-selector=random
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/3028442/assets,https://api.github.com/repos/aria2/aria2/releases/3028442,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.22.0,https://github.com/aria2/aria2/releases/tag/release-1.22.0,https://api.github.com/repos/aria2/aria2/zipball/release-1.22.0,release-1.22.0,False,False
+2816121,2016-03-15T14:57:54Z,2016-03-15T15:45:49Z,aria2 1.21.0,"## Release Note
+
+This release fixes several bugs, see the Changes for details.  We
+added ""following"" key to the response of aria2.tellStatus RPC method
+as reverse link for followedBy.
+
+## Changes
+- SessionSerializer: Fix bug that pause=true is added to wrong item
+  
+  This change also defers writing metadata download to the location
+  where first its follower download is written.
+- Add ""following"" to aria2.tellStatus response key as reverse link for
+  followedBy
+- mingw: Add warning for falloc
+- Update ciphers in AppleTLS
+  
+  Also enable fast start while at it
+- OSX: Enable libssh2 and sftp
+  
+  Closes GH-468
+- Update OSX dependencies
+  
+  Closes GH-466
+- Fix compile error without TLS support
+- Add support for using gnutls system wide crypto policy
+  
+  Patch from Athmane Madjoudj
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/2816121/assets,https://api.github.com/repos/aria2/aria2/releases/2816121,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.21.0,https://github.com/aria2/aria2/releases/tag/release-1.21.0,https://api.github.com/repos/aria2/aria2/zipball/release-1.21.0,release-1.21.0,False,False
+2617551,2016-02-15T15:34:22Z,2016-02-15T16:10:57Z,aria2 1.20.0,"## Release Note
+
+This release fixes lots of bugs.  See the Changes section below.
+There are new features in this release.  We added ""seeder"" key in
+aria2.tellStatus RPC response.  We added system.listMethods RPC method
+to return all RPC method supported.  We added --max-mmap-limit option
+to avoid mmap if total file size is greater than given size.
+
+## Changes
+- src/WinConsoleFile.cc: fix colour
+  
+  Set default foreground/background colour correctly
+  
+  Patch from kwkam
+- configure.ac: fix autoreconf error
+  
+  Use m4_ifdef so we do not have to install optional libraries
+  
+  Patch from kwkam
+- Don't inherit file descriptor to child process
+  
+  For non-Mingw32 build, set FD_CLOEXEC to file descriptors which live
+  beyond function scope.  For Mingw32 build, just pass false to
+  bInheritHandles parameter of CreateProcessW.
+- Update Russian version documentation
+  
+  Patch from ITriskTI
+- Add ""seeder"" key to tellStatus RPC response
+- WinTLS: Fix hang because of buffered received data
+  
+  WinTLSSession buffers received decrypted data into its own buffer.
+  If read is requested, it copies the data from its buffer.  But if
+  requested buffer size is less than decrypted buffer, some of the
+  data is left in the buffer.  Previously, we had no facility to check
+  the existence of this pending data.  If this data is the last
+  requested data from remote server, we may end up waiting for read
+  event even if we have already data in our buffer, which may cause
+  hang.  This commit fixes this issue by introducing function to
+  return the buffered length in TLSSession.  SocketCore also provides
+  the same function, which delegates to TLSSession object.
+- Add --max-mmap-limit option
+  
+  Set the maximum file size to enable mmap (see --enable-mmap
+  option). The file size is determined by the sum of all files
+  contained in one download. For example, if a download contains 5
+  files, then file size is the total size of those files. If file size
+  is strictly greater than the size specified in this option, mmap
+  will be disabled.
+- mingw: Use SetFileValidData to make --file-allocation=falloc work
+- Retry with 504 status code
+- Increase DHT transaction ID from 2 to 4 bytes to avoid conflict
+- Update wslay
+- Add --enable-werror option to configure to enable warning flags
+- Don't modify user variables (e.g., CFLAGS, LIBS, etc)
+- Improve error message when loading pkcs12 file failed
+- Updated dependency and source url's
+  
+  The RaspberryPi Dockerfile had some out-of-date dependency packages
+  and was downloading an outdated aria2 source from Sourceforge, which
+  resulted in a build for version 1.19.0.  The new
+  fetch-latest-release-from-GitHub script I've cooked up should always
+  work as long as GitHub doesn't change their API and aria2's platform
+  agnostic releases follow the ""{version number}.tar.bz2"" naming
+  format.
+  
+  Patch from c3mb0
+- Reduce delay in tracker request
+  
+  We eliminated 1 second delay between completion of name resolution
+  for tracker request and time when it is actually issued.  We also
+  elimited 1 second delay after last torrent download exists and it is
+  told to DHTInteractionCommand.
+- Disable IPv6 on non-async NameResolver if configuration wants
+- Fix mysterious 1 second delay with async DNS
+- Fix bug that UDP port was incorrectly used in UDP tracker announce request
+- Refactor HttpRequest
+  
+  This also makes comparison performed when replacing builtin header
+  field with user-defined one case-insensitive.
+- Send Want-Digest as per RFC 3230
+- Try all found address set to bind sockets with --multiple-interface
+  
+  Fixes GH-523
+- Replace sourceforge references with aria2.github.io
+- Add system.listMethods RPC method
+  
+  system.listMethods just returns the available RPC method names.  It
+  can be executed without secret token, because it just returns the
+  method names, and does not alter anything.
+  
+  See GH-437
+- Support content-range from non-compliant server
+  
+  See GH-509
+- Reduce UDP tracker request timeout
+  
+  See GH-507
+- Apply --retry-wait when retrying after 404
+  
+  Previously, --retry-wait was not used when retrying after 404
+  (--max-file-not-found).  The retry was done without delay.  Also the
+  maximum retry count (--max-retries) was ignored when retrying with
+  404.
+  
+  This commit makes --retry-wait apply for retrying with 404 as well.
+  It also combines --max-retries and --max-file-not-found.  When
+  retrying with 404, it is counted toward retry count.
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/2617551/assets,https://api.github.com/repos/aria2/aria2/releases/2617551,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.20.0,https://github.com/aria2/aria2/releases/tag/release-1.20.0,https://api.github.com/repos/aria2/aria2/zipball/release-1.20.0,release-1.20.0,False,False
+2240650,2015-12-06T13:58:49Z,2015-12-06T14:24:12Z,aria2 1.19.3,"## Release Note
+
+This release fixes lots of bugs.  See the Changes section below.
+
+## Changes
+- Fix bug that pause/unpause seeding torrent prevents new downloads
+  from starting
+  
+  Previously, with --bt-detach-seed-only, when user issued pause and
+  unpause command to seeding torrent, and it was started again, and it
+  immediately got seeding status, but aria2 did not start new download
+  waiting in the queue.  This commit fixes this bug.
+  
+  See GH-490
+- Add --bt-enable-hook-after-hash-check option
+  
+  This option sets flag which allows hook command invocation after
+  hash check (see -V option) in BitTorrent download.  By default, when
+  hash check succeeds, the command given by --on-bt-download-complete
+  is executed.  To disable this action, give false to this option.
+- Add --socket-recv-buffer-size option
+  
+  Set the maximum socket receive buffer in bytes. Specifing 0 will
+  disable this option. This value will be set to socket file
+  descriptor using SO_RCVBUF socket option with setsockopt() call.
+  
+  See GH-487 about the usecase of this option
+- Disable --deferred-input when --save-session is used together
+  
+  With --deferred-input=true, aria2 only reads input file to fill
+  active download slots, while keeping input file open.  Meanwhile,
+  --save-session saves all download info inside memory, but this does
+  not take into account of unread item in input file.  This will lead
+  to lose input data in saved session file.  Also current BufferedFile
+  implementation used to read/write input/output file take a lock on
+  Windows.  This effectively prevents session serializer from writing
+  session data to the same file which is still kept open because of
+  --deferred-input.  See GH-493
+- base32: decode lowercased characters as well
+  
+  This fixes the bug that magnet URI with lowercased btih is treated
+  as malformed.
+- mingw: Use GetFileSize to get file size
+  
+  _wstat family does not work with symbolic links.  They always
+  returns size 0.  To workaround this, we now use GetFileSize to get
+  file size.  To do that, we need to first obtain file HANDLE, which
+  is a bit tedious because of the messy interface of CreateFileW, but
+  we have no way to get around it.
+- Fix bug that file allocation=trunc does not work with Windows
+  symlink
+- Send the last error message as part of tellStatus RPC response
+  
+  Patch from Jarda Snajdr
+- Don't enable mmap if file allocation is disabled
+  
+  Without file allocation, we cannot map file because file length
+  could be zero.
+  
+  This could fix bug reported at GH-478
+- Evict timed out pooled socket periodically
+  
+  Previously we only scanned pool socket to check they are timed out
+  when we pooled another socket.  This means that pooled socket is not
+  closed long time (stays in CLOSE-WAIT state) if we don't pool any
+  more socket.  In this commit, we now check pooled socket
+  periodically (30 seconds) to avoid the sockets hanging in CLOSE-WAIT
+  state long time.
+  
+  See GH-477
+- Don't write control file if content is not changed from previous one
+  
+  This is desirable so that we don't have to wake up disk if control
+  file is not changed, and it is not have to be written again.  We use
+  the same method (SHA1 hash) to check the content is the same.  The
+  limitation is the hash is stored in memory, so we have to write the
+  first time in each session.
+  
+  See GH-382
+- Remove content-length and content-range if transfer-encoding is
+  given
+  
+  See GH-473
+- Retry after 404 status if --max-file-not-found > 0
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/2240650/assets,https://api.github.com/repos/aria2/aria2/releases/2240650,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.19.3,https://github.com/aria2/aria2/releases/tag/release-1.19.3,https://api.github.com/repos/aria2/aria2/zipball/release-1.19.3,release-1.19.3,False,False
+1907799,2015-10-04T08:55:57Z,2015-10-04T09:39:52Z,aria2 1.19.2,"# aria2 1.19.2
+
+## Release Note
+
+This release fixes the bug that progress summary is not shown timely.
+
+## Changes
+- Fix bug that progress summary is not shown timely
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/1907799/assets,https://api.github.com/repos/aria2/aria2/releases/1907799,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.19.2,https://github.com/aria2/aria2/releases/tag/release-1.19.2,https://api.github.com/repos/aria2/aria2/zipball/release-1.19.2,release-1.19.2,False,False
+1873832,2015-09-27T14:52:09Z,2015-09-27T15:37:18Z,aria2 1.19.1,"# aria2 1.19.1
+
+## Release Note
+
+This release fixes TLS handshake error with servers which only support
+RSA-SHA1 signature algorithm.  We removed RSA-SHA1 for enchanced
+security, but many users reported there were servers which could not
+talk aria2 1.19.0, so added it again for compatibility reasons.  For
+Windows build, we fixed potential infinite loop bug when TLS is used.
+
+We changed the location where dht.dat and aria2.conf are looked up.
+The aria2 manual page described details.  Basically we now follow XDG
+specification (http://standards.freedesktop.org/basedir-spec/latest/).
+For dht.dat, the default location is $XDG_CACHE_HOME/aria2/ directory.
+For aria2.conf, the default location is $XDG_CONFIG_HOME/aria2/
+directory.  To keep the current user configuration working, if aria2
+detects dht.dat under $HOME/.aria2/ directory, it is used instead.
+Similarly, if aria2.conf exists under $HOME/.aria2/ directory, it is
+used instead.
+
+Previously, we return 500 HTTP status if RPC method execution
+encountered error.  Now it returns with 400 HTTP status with error
+code.  This is more natural because server processed request and found
+an error, and returned error reply correctly.  This is not something
+server crashed or something.  Also, there is RPC libraries which
+throws exception if it sees 5XX status code, where 400 is better
+because we can examine the error.
+
+## Changes
+- Update README.android
+  
+  Providing some workarounds about CA certificates and standard output
+  
+  Patch from amtlib-dot-dll
+- Return 400 HTTP status code if exception was caught while executing
+  RPC method
+  
+  Previously, we returned 500 HTTP status code.  I think the found in
+  RPC level, not in HTTP protocol, so 500 is not appropriate.
+- WinTLS: Fix potential infinite loop
+- Fix on-download-error is executed even if download succeeded
+- Update Dockerfile.mingw
+  
+  Patch from Adam Baxter
+- Increase --select-file upper bound to 1m for torrent containing lots
+  of files
+- Fix busy loop with --dry-run and 4xx response for URI listed in
+  metalink
+  
+  See GH-430
+- Update sqlite in OSX build to 3.8.10.2
+- Make LibuvEventPoll compatible with the latest libuv again
+- gnutls: Allow SIGN-RSA-SHA1 for compatibility reason
+- Make script compatible with both Python 2 and 3
+  
+  Patch from Vasilij Schneidermann
+- Make config and cache files conform to XDG
+  
+  See http://standards.freedesktop.org/basedir-spec/latest/ for
+  further details.  This implementation decides the default based on
+  whether a file exists at the legacy location, if it doesn't, it
+  picks the XDG-conforming location instead.
+  
+  Patch from Vasilij Schneidermann
+- ftp, sftp: Fix heap-after-free bug on exception
+- ftp: Fix timeout when reusing FTP connection
+- Various MinGW-w64 build improvements
+  - Fix detection of localtime_r and asctime_r on MinGW-w64
+  - Fix linking with libintl on MinGW-w64
+  
+  Patch from David Macek
+",https://api.github.com/users/tatsuhiro-t,404610,tatsuhiro-t,https://api.github.com/repos/aria2/aria2/releases/1873832/assets,https://api.github.com/repos/aria2/aria2/releases/1873832,master,https://api.github.com/repos/aria2/aria2/tarball/release-1.19.1,https://github.com/aria2/aria2/releases/tag/release-1.19.1,https://api.github.com/repos/aria2/aria2/zipball/release-1.19.1,release-1.19.1,False,False

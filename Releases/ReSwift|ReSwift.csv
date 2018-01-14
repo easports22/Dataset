@@ -1,0 +1,167 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+6137869,2017-04-19T15:57:30Z,2017-04-20T15:51:25Z,4.0.0,"**Breaking API Changes:**
+
+- Introduced a new Subscription API (#203) - @Ben-G, @mjarvis, @DivineDominion
+
+  - The subscription API provides basic operators, such as `skipRepeats` (skip calls to `newState` unless state value changed) and `select` (sub-select a state).
+
+  - This is a breaking API change that requires migrating existing subscriptions that sub-select a portion of a store's state:
+
+    - Subselecting state in 3.0.0:
+
+      ```swift
+      store.subscribe(subscriber) { ($0.testValue, $0.otherState?.name) }
+      ```
+    - Subselecting state in 4.0.0:
+
+      ```swift
+      store.subscribe(subscriber) {
+        $0.select {
+          ($0.testValue, $0.otherState?.name)
+        }
+      }
+      ```
+
+  - For any store state that is `Equatable` or any sub-selected state that is `Equatable`, `skipRepeats` will be used by default.
+
+  - For states/substates that are not `Equatable`, `skipRepeats` can be implemented via a closure:
+
+    ```swift
+    store.subscribe(subscriber) {
+      $0.select {
+          $0.testValue
+          }.skipRepeats {
+              return $0 == $1
+          }
+    }
+    ```
+
+- Reducer type has been removed in favor of reducer function (#177) - Ben-G
+
+  - Here's an example of a new app reducer, for details see the README:
+
+    ```swift
+    func counterReducer(action: Action, state: AppState?) -> AppState {
+        var state = state ?? AppState()
+
+        switch action {
+        case _ as CounterActionIncrease:
+            state.counter += 1
+        case _ as CounterActionDecrease:
+            state.counter -= 1
+        default:
+            break
+        }
+
+        return state
+    }
+    ```
+
+- `dispatch` functions now return `Void` instead of `Any` (#187) - @Qata
+
+  - The return type has been removed without any replacement, since the core team did not find any use cases of it. A common usage of the return type in redux is returning a promise that is fullfilled when a dispatched action is processed. While it's generally discouraged to disrupt the unidirectional data flow using this mechanism we do provide a `dispatch` overload that takes a `callback` argument and serves this purpose.
+
+- Make `dispatch` argument in middleware non-optional (#225) -  @dimazen, @mjarvis, @Ben-G
+
+- `Middleware` now has a generic type parameter that is used for the `getState` method and matches the Store's `State` type. This allows accessing the state in middleware code without type casting (#226) - @mjarvis
+
+
+**Other:**
+
+- Extend `StoreType` with substate selector subscription (#192) - @mjarvis
+- Add `DispatchingStoreType` protocol for testing (#197) - @mjarvis
+- Installation guide for Swift Package Manager - @thomaspaulmann
+- Update documentation to reflect breaking API changes - @mjarvis
+- Clarify error message on concurrent usage of ReSwift - @langford",https://api.github.com/users/Ben-G,1423068,Ben-G,https://api.github.com/repos/ReSwift/ReSwift/releases/6137869/assets,https://api.github.com/repos/ReSwift/ReSwift/releases/6137869,master,https://api.github.com/repos/ReSwift/ReSwift/tarball/4.0.0,https://github.com/ReSwift/ReSwift/releases/tag/4.0.0,https://api.github.com/repos/ReSwift/ReSwift/zipball/4.0.0,4.0.0,False,False
+4646381,2016-11-12T18:52:19Z,2016-11-13T17:55:46Z,3.0.0 (Swift 3.0.1 Release),"_Released: 11/12/2016_
+
+This release supports **Swift 3.0.1**
+
+**Breaking API Changes:**
+- Dropped support for Swift 2.2 and lower (#157) - @Ben-G
+
+**API Changes:**
+- Mark `Store` as `open`, this reverts a previously accidental breaking API Change (#157) - @Ben-G
+
+**Other**:
+- Update to Swift 3.0.1 - @Cristiam, @Ben-G
+- Documentation changes - @vkotovv
+",https://api.github.com/users/Ben-G,1423068,Ben-G,https://api.github.com/repos/ReSwift/ReSwift/releases/4646381/assets,https://api.github.com/repos/ReSwift/ReSwift/releases/4646381,master,https://api.github.com/repos/ReSwift/ReSwift/tarball/3.0.0,https://github.com/ReSwift/ReSwift/releases/tag/3.0.0,https://api.github.com/repos/ReSwift/ReSwift/zipball/3.0.0,3.0.0,False,False
+4149119,2016-09-16T04:13:54Z,2016-09-16T04:15:59Z,2.1.0 (Swift 3.0 Release),"_Released: 09/15/2016_
+
+This version  supports **Swift 3** for Swift 2.2 support use an earlier release.
+
+**Other**:
+- Swift 3 preview compatibility, maintaining Swift 2 naming - (#126) - @agentk
+- Xcode 8 GM Swift 3 Updates (#149) - @tkersey
+- Migrate Quick/Nimble testing to XCTest - (#127) - @agentk
+- Automatically build docs via Travis CI (#128) - @agentk
+- Documentation Updates & Fixes - @mikekavouras, @ColinEberhardt
+",https://api.github.com/users/Ben-G,1423068,Ben-G,https://api.github.com/repos/ReSwift/ReSwift/releases/4149119/assets,https://api.github.com/repos/ReSwift/ReSwift/releases/4149119,master,https://api.github.com/repos/ReSwift/ReSwift/tarball/2.1.0,https://github.com/ReSwift/ReSwift/releases/tag/2.1.0,https://api.github.com/repos/ReSwift/ReSwift/zipball/2.1.0,2.1.0,False,False
+3560932,2016-06-30T14:56:56Z,2016-06-30T15:00:15Z,2.0.0,"_Released: 06/30/2016_
+
+**Breaking API Changes**:
+- Significant Improvements to Serialization Code for `StandardAction` (relevant for recording tools) - @okla
+
+**Other**:
+- Swift 2.3 Updates - @agentk
+- Documentation Updates & Fixes - @okla, @gregpardo, @tomj, @askielboe, @mitsuse, @esttorhe, @RyanCCollins, @thomaspaulmann, @jlampa
+",https://api.github.com/users/Ben-G,1423068,Ben-G,https://api.github.com/repos/ReSwift/ReSwift/releases/3560932/assets,https://api.github.com/repos/ReSwift/ReSwift/releases/3560932,master,https://api.github.com/repos/ReSwift/ReSwift/tarball/2.0.0,https://github.com/ReSwift/ReSwift/releases/tag/2.0.0,https://api.github.com/repos/ReSwift/ReSwift/zipball/2.0.0,2.0.0,False,False
+2850548,2016-03-20T20:32:10Z,2016-03-20T20:34:34Z,1.0.0,"The first major release of ReSwift :tada: From here on forward we will be using semantic versioning.
+
+**API Changes:**
+- Remove callback arguments on synchronous dispatch methods - @Ben-G
+
+**Other:**
+- Move all documentation source into `Docs`, except `Readme`, `Changelog` and `License` - @agentk
+- Replace duplicated documentation with an enhanced `generate_docs.sh` build script - @agentk
+- Set CocoaPods documentation URL - (#56) @agentk
+- Update documentation for 1.0 release - @Ben-G
+",https://api.github.com/users/Ben-G,1423068,Ben-G,https://api.github.com/repos/ReSwift/ReSwift/releases/2850548/assets,https://api.github.com/repos/ReSwift/ReSwift/releases/2850548,master,https://api.github.com/repos/ReSwift/ReSwift/tarball/1.0.0,https://github.com/ReSwift/ReSwift/releases/tag/1.0.0,https://api.github.com/repos/ReSwift/ReSwift/zipball/1.0.0,1.0.0,False,False
+2667461,2016-02-20T23:04:17Z,2016-02-23T02:33:00Z,,"_Released: 02/20/2015_
+
+**API Changes:**
+- Subscribers can now sub-select a state when they subscribe to the store (#61) - @Ben-G
+- Rename initially dispatched Action to `ReSwiftInit` - @vfn
+
+**Fixes:**
+- Fix retain cycle caused by middleware (issue: #66) - @Ben-G
+- Store now holds weak references to subscribers to avoid unexpected memory managegement behavior (issue: #62) - @vfn
+- Documentation Fixes - @victorpimentel, @vfn, @juggernate, @raheelahmad
+
+**Other:**
+- We now have a [hosted documentation for ReSwift](http://reswift.github.io/ReSwift/master/) - @agentk
+- Refactored subscribers into a explicit `Subscription` typealias - @DivineDominion
+- Refactored `dispatch` for `AsyncActionCreator` to avoid duplicate code - @sendyhalim
+",https://api.github.com/users/Ben-G,1423068,Ben-G,https://api.github.com/repos/ReSwift/ReSwift/releases/2667461/assets,https://api.github.com/repos/ReSwift/ReSwift/releases/2667461,master,https://api.github.com/repos/ReSwift/ReSwift/tarball/0.2.5,https://github.com/ReSwift/ReSwift/releases/tag/0.2.5,https://api.github.com/repos/ReSwift/ReSwift/zipball/0.2.5,0.2.5,False,True
+2480562,2016-01-20T12:05:33Z,2016-01-23T22:12:22Z,,"Swift-Flow is now **ReSwift**.
+",https://api.github.com/users/Ben-G,1423068,Ben-G,https://api.github.com/repos/ReSwift/ReSwift/releases/2480562/assets,https://api.github.com/repos/ReSwift/ReSwift/releases/2480562,master,https://api.github.com/repos/ReSwift/ReSwift/tarball/0.2.3,https://github.com/ReSwift/ReSwift/releases/tag/0.2.3,https://api.github.com/repos/ReSwift/ReSwift/zipball/0.2.3,0.2.3,False,True
+2480561,2016-01-23T22:07:42Z,2016-01-23T22:11:50Z,0.2.4,"**API Changes:**
+- Pass typed store reference into `ActionCreator`. `ActionCreator` can now access `Store`s state without the need for typecasts - @Ben-G
+- `Store` can now be initialized with an empty state, allowing reducers to hydrate the store - @Ben-G
+
+**Bugfixes**
+- Break retain cycle when using middelware - @sendyhalim
+
+**Other:**
+- Update Documentation to reflect renaming to ReSwift - @agentk
+- Documentation fixes - @orta and @sendyhalim
+- Refactoring - @dcvz and @sendyhalim
+",https://api.github.com/users/Ben-G,1423068,Ben-G,https://api.github.com/repos/ReSwift/ReSwift/releases/2480561/assets,https://api.github.com/repos/ReSwift/ReSwift/releases/2480561,master,https://api.github.com/repos/ReSwift/ReSwift/tarball/0.2.4,https://github.com/ReSwift/ReSwift/releases/tag/0.2.4,https://api.github.com/repos/ReSwift/ReSwift/zipball/0.2.4,0.2.4,False,True
+2438754,2016-01-16T03:20:44Z,2016-01-16T03:26:10Z,0.2.2,"- Makes Store Generic over State
+- Fixes Issue with multiple Subscription
+- Adds CocoaPods Support
+",https://api.github.com/users/Ben-G,1423068,Ben-G,https://api.github.com/repos/ReSwift/ReSwift/releases/2438754/assets,https://api.github.com/repos/ReSwift/ReSwift/releases/2438754,master,https://api.github.com/repos/ReSwift/ReSwift/tarball/0.2.2,https://github.com/ReSwift/ReSwift/releases/tag/0.2.2,https://api.github.com/repos/ReSwift/ReSwift/zipball/0.2.2,0.2.2,False,True
+2359511,2015-12-31T17:43:25Z,2015-12-31T17:44:18Z,,"Fix: Dispatching is Allowed from StoreSubscribers #23 
+",https://api.github.com/users/Ben-G,1423068,Ben-G,https://api.github.com/repos/ReSwift/ReSwift/releases/2359511/assets,https://api.github.com/repos/ReSwift/ReSwift/releases/2359511,master,https://api.github.com/repos/ReSwift/ReSwift/tarball/v0.2.1,https://github.com/ReSwift/ReSwift/releases/tag/v0.2.1,https://api.github.com/repos/ReSwift/ReSwift/zipball/v0.2.1,v0.2.1,False,True
+2349023,2015-12-29T04:45:11Z,2015-12-29T04:57:05Z,v0.2,"This release comes with the following major changes:
+- **Middleware Support**
+- **Typed Actions are now used by default instead of serializable Actions**
+- **Much API renaming**
+
+Details:
+
+This Release Provides a Middleware API for Swift Flow. Further the library now uses typed actions by default. It is no longer required to provide actions that can be serialized. If you want to use Swift Flow Recorder, you can opt into serialization of actions.
+",https://api.github.com/users/agentk,117041,agentk,https://api.github.com/repos/ReSwift/ReSwift/releases/2349023/assets,https://api.github.com/repos/ReSwift/ReSwift/releases/2349023,master,https://api.github.com/repos/ReSwift/ReSwift/tarball/v0.2,https://github.com/ReSwift/ReSwift/releases/tag/v0.2,https://api.github.com/repos/ReSwift/ReSwift/zipball/v0.2,v0.2,False,True
+2288828,2015-12-15T08:13:56Z,2015-12-15T08:14:45Z,,"Initial Release with Experimental API
+",https://api.github.com/users/Ben-G,1423068,Ben-G,https://api.github.com/repos/ReSwift/ReSwift/releases/2288828/assets,https://api.github.com/repos/ReSwift/ReSwift/releases/2288828,master,https://api.github.com/repos/ReSwift/ReSwift/tarball/v0.1,https://github.com/ReSwift/ReSwift/releases/tag/v0.1,https://api.github.com/repos/ReSwift/ReSwift/zipball/v0.1,v0.1,False,True

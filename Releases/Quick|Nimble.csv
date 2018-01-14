@@ -1,0 +1,775 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7903938,2017-09-27T04:28:08Z,2017-09-27T04:30:51Z,v7.0.2,"This release fully supports Xcode 9 (both Swift 3.2 and Swift 4)! 🎉 This also contains a memory leak fix and some documentation updates.
+
+## Improvements
+
+- Support both Swift 3.x and Swift 4 #457 (Thanks @ikesyo)
+- Xcode 9 Support (Swift 3.2) #446 (Thanks @shaps80 and @ikesyo)
+- Address redundant conformance warnings in Swift 4 #443 (Thanks @ikesyo)
+
+## Bugfixes
+
+- Fix memory leak when using async expectations #449 and #450 (Thanks @ryanfitz and @jeffh)
+
+## Docs
+
+- README tweaks for Custom Validation #462 (Thanks @holmes)
+- Fix async Swift docs #458 (Thanks @mrh-is)
+- Show more illustrative example for waitUntil #441 (Thanks @mrh-is)",https://api.github.com/users/ikesyo,909674,ikesyo,https://api.github.com/repos/Quick/Nimble/releases/7903938/assets,https://api.github.com/repos/Quick/Nimble/releases/7903938,master,https://api.github.com/repos/Quick/Nimble/tarball/v7.0.2,https://github.com/Quick/Nimble/releases/tag/v7.0.2,https://api.github.com/repos/Quick/Nimble/zipball/v7.0.2,v7.0.2,False,False
+6619482,2017-06-06T14:58:40Z,2017-06-06T15:06:54Z,v7.0.1,"A small release with a hotfix for Xcode 9 and some documentation upkeep.
+
+## Bugfixes
+
+- Test in Swift 3 compatibility mode #431 (Thanks @sharplet)
+  - Fixes errors in Xcode 9 beta 1
+    `'Cannot use mutating member on immutable value: 'generator' is a 'let' constant`
+- Fixed expectation regression & failure bugs #428 (Thanks @jeffh)
+
+## Docs
+
+- Documentation update #423 (Thanks @chamander)
+- Fixed parameter name #421 (Thanks @honghaoz)
+- Fixed typos #426 (Thanks @Lutzifer)
+
+",https://api.github.com/users/phatblat,28851,phatblat,https://api.github.com/repos/Quick/Nimble/releases/6619482/assets,https://api.github.com/repos/Quick/Nimble/releases/6619482,master,https://api.github.com/repos/Quick/Nimble/tarball/v7.0.1,https://github.com/Quick/Nimble/releases/tag/v7.0.1,https://api.github.com/repos/Quick/Nimble/zipball/v7.0.1,v7.0.1,False,False
+6248313,2017-05-02T08:08:46Z,2017-05-02T08:15:20Z,v7.0.0,"Nimble 7 is released! This is part of a series of major version releases to support a major change undergoing in Nimble - specifically how custom matchers are written. **If you don't use custom matchers, you should see little visible changes and can safely skip to the bottom to see the ""Other Changes""**. But if you do use custom matchers or are interested in the technical details, continue reading.
+
+In short, Nimble is replacing `Matcher` protocol with `Predicate` type. The `Predicate` type attempts to address several common pitfalls when creating custom matchers and allow for several major features in the future:
+
+ - Protocol extension matchers: `expect(1).to.equal(1)`
+ - Add more composable matchers: `expect([1, 2]).to(contain(1) && contain(2))`
+ - Increase flexibility of existing composable matchers: `expect(1).to(equal(1) || beNil())`
+ - Allow wrapping existing matchers like: `expect([1, 2]).to(contain(1).followed(by: 2))`
+
+But we're getting ahead of ourselves for a future that isn't here yet (or guaranteed). Let's focus back on `Predicate`.
+
+The New `Predicate` Type
+======================
+
+Nimble v7.0.0 introduces a new matcher API via the `Predicate` type (we used all the matcher names). For the purposes of discussion, matcher refers to the concept Nimble has for building expectations and `Matcher` refers to the (now) deprecated matcher API.
+
+The main goal is to help make matcher writing less error-prone in several ways:
+
+ - Support special `nil` handling typical for Nimble matchers.
+ - Make error messaging explicit and less shared-state munging.
+ - Be explicit about the trinary behavior matchers have instead of relying on bools.
+
+`Predicate` aims to address these goals by changing the closure to be a pure function that returns a custom `PredicateResult` type. The `PredicateResult` type is simply two values:
+
+```swift
+PredicateResult(status: .fail, message: .expectedActualValueTo(""equal <\(expected)>""))
+```
+
+`status` describes if the matcher succeeds or fails against the given value and `message` is the structured textual representation of that status. `status` is a trinary with the following values:
+
+ - `.matches` - similar to returning ""true"". Indicates the expectation passes.
+ - `.doesNotMatch` - similar to returning ""false"". Indicates the expectation failed, but negation would succeed (eg - `toNot`)
+ - `.fail` - similar to returning ""false"". Indicates the expectation failed, even if negation was used.
+
+This allows matchers to better indicate improper usages that would incorrectly pass if negated. If you need only the normal boolean-like return, use the alternative `PredicateResult` constructor:
+
+```swift
+PredicateResult(bool: true, message: ...)
+```
+
+The `message` argument supports a more structured error messaging that composable matchers can rely upon. It is currently limited, but is open for possible expansion if you file an issue.
+
+`Predicate` replaces the following existing Nimble types:
+
+ - `Matcher` - Use `Predicate` instead.
+ - `NonNilMatcherFunc` - Use `Predicate` plus the `.requireNonNil` method
+ - `MatcherFunc` - Use `Predicate` instead.
+
+Since `Predicate` is not a protocol with an associated type, it makes function definitions much easier without requiring another type like `NonNilMatcherFunc`:
+
+```swift
+// OLD METHOD:
+//   returning protocol
+func equal<M: Matcher, T: Equatable where T == M.ValueType>(_ expected: T?) -> M { ... }
+// OLD METHOD:
+//   using NonNilMatcherFunc or MatcherFunc
+func equal<T: Equatable>(_ expected: T?) -> NonNilMatcherFunc<T> { ... }
+
+// NEW METHOD
+func equal<T: Equatable>(_ expected: T?) -> Predicate<T> { ... }
+```
+
+Removing the protocol with associated type allows more composability among matchers. Previous these function types made composing them difficult:
+
+```swift
+// OLD METHOD:
+func firstMatcher<M: Matcher, T: Equatable where T == M.ValueType>(_ expected: T?) -> M { ... }
+func secondMatcher<T: Equatable>(_ expected: T?) -> NonNilMatcherFunc<T> { ... }
+// can only specify every matcher in the generic
+func usesOnlyTwoMatchers<M1: Matcher, M2: Matcher where M1.ValueType == M2.ValueType>(first: M1, second: M2) -> M
+
+// NEW METHOD:
+func firstMatcher<T: Equatable>(_ expected: T?) -> Predicate<T> { ... }
+func secondMatcher<T: Equatable>(_ expected: T?) -> Predicate<T> { ... }
+// can support many matchers
+func usesManyMatchers<T>(matchers: [Predicate<T>]) -> Predicate<T>
+```
+
+
+Migrating to Predicate
+----------------------
+
+If you're not using custom matchers, there isn't any additional work for you 🎉.
+
+To migrate existing matchers, Nimble v7.0.0 currently provides temporary constructors:
+
+```swift
+/// These constructors are for convenience in adopting Nimble v7.0.0, but will be removed in Nimble v9.0.0
+// If you already have a Matcher type you need to simply convert to Predicate:
+Predicate.fromDeprecatedMatcher(myMatcher)
+// Alternatively, you can use the extension:
+myMatcher.predicate
+// If you want to construct a Predicate using the same arguments as MatcherFunc
+Predicate.fromDeprecatedClosure { actualExpression, failureMessage -> Bool in ... }
+// If you want to construct a Predicate using the same arguments as NonNilMatcherFunc
+Predicate.fromDeprecatedClosure { actualExpression, failureMessage -> Bool in
+    ...
+}.requireNonNil
+```
+
+These are useful to quickly adopt Nimble v7.0.0, but it's better in the long run to adopt the proper `Predicate` API to last beyond Nimble v9.0.0:
+
+```swift
+// The simple way to implment a NonNilMatcherFunc matcher in the new Predicate way:
+public func equal<T: Equatable>(_ expectedValue: T?) -> Predicate<T> {
+    // Alternatively, you can use Predicate.simple if you don't modify `msg`.
+    // When a string is given to .define(), then
+    // msg = .expectedActualValueTo(""equal <\(expectedValue)>"")
+    // Predicate.define and Predicate.simple imply calling .requireNonNil.
+    Predicate.define(""equal <\(expectedValue)>"") { actualExpression, msg -> PredicateResult in
+        let actualValue = try actualExpression.evaluate()
+        let matches = actualValue == expectedValue && expectedValue != nil
+        if expectedValue == nil || actualValue == nil {
+            if expectedValue == nil && actualValue != nil {
+                return PredicateResult(
+                    status: .fail,
+                    message: msg.appendedBeNilHint()
+                )
+            }
+            return PredicateResult(status: .fail, message: msg)
+        }
+        return PredicateResult(status: PredicateStatus(bool: matches), message: msg)
+    }
+}
+
+// For a MatcherFunc:
+public func beNil<T>() -> Predicate<T> {
+    // Alternatively, you can use Predicate.defineNilable
+    return Predicate.simpleNilable(""be nil"") { actualExpression -> PredicateStatus in
+        let actualValue = try actualExpression.evaluate()
+        return PredicateStatus(bool: actualValue == nil)
+    }
+}
+```
+
+To ease the migration process, Nimble will be removing `Matcher` after several major versions:
+
+ - **v7.x.x** will introduce a new replacement to `Matcher` family of types via the `Predicate` type.
+     - `Matcher`, `NonNilMatcherFunc`, `MatcherFunc` are marked as deprecated
+     - Introduces temporary, migration-friendly constructors on `Predicate` to help suppress warnings for now.
+ - **v8.x.x** will deprecate the temporary, migration friendly constructors.
+ - **v9.x.x** will remove the old matcher types and temporary migration-friendly constructors.
+
+New features that are released pre-v9.x.x will cater to the newer `Predicate` style. 
+Also, all built-in Nimble matchers currently use `Predicate` and `Predicate` also implemented the `Matcher` type until it's removal.
+
+Other Changes
+=============
+
+
+`toSucceed` Matcher
+-------------------
+
+For quick, inline matchers, you can use `toSucceed` with the `ToSucceedResult` enum:
+
+```swift
+expect {
+    return .succeeded
+}.to(succeed())
+
+expect {
+    return .failed(reason: ""expected a closure, got <nil> (use beNil() to match nils)"")
+}.to(succeed())
+```
+
+Changelog
+---------
+
+- ([#390](https://github.com/Quick/Nimble/pull/390)) Introduce new Matcher API (aka, Predicates)
+- ([#417](https://github.com/Quick/Nimble/pull/417)) Fix optional binding violation for SwiftLint (thanks @ysk-tngc)
+- ([#410](https://github.com/Quick/Nimble/pull/410)) Adds `toSucceed` matcher (thanks @rivukis)
+- ([#420](https://github.com/Quick/Nimble/pull/420)) Fix invalid reference to CwlCatchBadInstructionPOSIX.swift for case-sensitive file systems (thanks @dagio)
+
+As always, happy testing 😎!
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/6248313/assets,https://api.github.com/repos/Quick/Nimble/releases/6248313,master,https://api.github.com/repos/Quick/Nimble/tarball/v7.0.0,https://github.com/Quick/Nimble/releases/tag/v7.0.0,https://api.github.com/repos/Quick/Nimble/zipball/v7.0.0,v7.0.0,False,False
+5889847,2017-03-28T06:35:44Z,2017-03-28T06:39:25Z,v6.1.0,"This is a relatively small release that addresses issues for Xcode 8.3 / Swift 3.1. Merry Testing! 👾
+
+New:
+
+- Add float and double overloads to `beGreaterThan` for ObjC (Thanks @soranoba)
+
+Changes:
+
+- SwiftLint no longer runs for framework targets. Instead an internal SwiftLint target is used instead. (Thanks @wongzigii)
+
+Bugfixes:
+
+- Fixes `throwError` matcher with the latest version of Swift (Thanks @aaroncrespo)
+- Fixes `throwError` matcher warning for Xcode 8.3
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/5889847/assets,https://api.github.com/repos/Quick/Nimble/releases/5889847,master,https://api.github.com/repos/Quick/Nimble/tarball/v6.1.0,https://github.com/Quick/Nimble/releases/tag/v6.1.0,https://api.github.com/repos/Quick/Nimble/zipball/v6.1.0,v6.1.0,False,False
+5291896,2017-01-28T05:22:34Z,2017-01-28T05:25:13Z,Nimble v6.0.1,"A small bugfix release to fix an installation issue for Carthage users that
+have SwiftLint installed.
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/5291896/assets,https://api.github.com/repos/Quick/Nimble/releases/5291896,master,https://api.github.com/repos/Quick/Nimble/tarball/v6.0.1,https://github.com/Quick/Nimble/releases/tag/v6.0.1,https://api.github.com/repos/Quick/Nimble/zipball/v6.0.1,v6.0.1,False,False
+5247824,2017-01-24T08:29:14Z,2017-01-24T08:33:21Z,Nimble v6.0.0,"This release includes one small breaking change and new features in its Matchers. Happy testing 🎉!
+
+Breaking Changes:
+- Renamed framework target from `Nimble-OSX` to `Nimble-macOS` - Thanks Zigii Wong (@wongzigii)!
+
+New Features:
+- Add `containObjectSatisfying` matcher to perform order-indifferent check on collections - Thanks Jared Friese (@jwfriese)!
+- `beKindOf` matcher now supports Swift-only types - Thanks Jared Friese (@jwfriese)!
+
+Fixes:
+- Stylististic changes for SwiftLint (still on-going) - Thanks Yurii Samsoniuk (@sigito)!
+  - Also don't print warning about SwiftLint not being installed
+- Fix Nimble not running in Swift-only environments - Thanks Syo Ikeda (@ikesyo)!
+
+# New Features
+
+## containElementSatisfying matcher
+
+Add `containElementSatisfying` matcher to perform order-indifferent check on
+collections. This is convenient if you require at least one element in a
+collection to pass a predicate.
+
+``` swift
+// swift
+expect([1, 2, 3]).to(containElementSatisfying { n in
+    return n == 2
+})
+```
+
+``` objc
+// objc
+expect(@[@1, @2, @3]).to(containElementSatisfying(^BOOL(id n) {
+    return [n isEqualToNumber:@2];
+}));
+```
+
+## beAKindOf and beAnInstanceOf now operates on Swift-only types
+
+The `beAKindOf` and `beAnInstanceOf` matchers has been updated to support
+Swift-only types. That means this is now possible:
+
+``` swift
+// swift
+expect(""hello world"").to(beAKindOf(String.self))
+expect(""hello world"").to(beAnInstanceOf(String.self))
+```
+
+In older versions of Swift, casting was always self-evident and the compiler would
+disallow potentially invalid coercions (eg - Any to String). But this is no
+longer the case and these matchers have been updated.
+
+Also, `beAKindOf` is now available in Swift-only environments (aka - Linux).
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/5247824/assets,https://api.github.com/repos/Quick/Nimble/releases/5247824,master,https://api.github.com/repos/Quick/Nimble/tarball/v6.0.0,https://github.com/Quick/Nimble/releases/tag/v6.0.0,https://api.github.com/repos/Quick/Nimble/zipball/v6.0.0,v6.0.0,False,False
+4533751,2016-11-01T05:12:27Z,2016-11-01T05:14:58Z,Nimble v5.1.1,"This release is only a bugfix release.
+- Fixes umbrella header import for macOS and tvOS
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/4533751/assets,https://api.github.com/repos/Quick/Nimble/releases/4533751,master,https://api.github.com/repos/Quick/Nimble/tarball/v5.1.1,https://github.com/Quick/Nimble/releases/tag/v5.1.1,https://api.github.com/repos/Quick/Nimble/zipball/v5.1.1,v5.1.1,False,False
+4447504,2016-10-21T03:39:45Z,2016-10-21T03:52:55Z,Nimble v5.1.0,"This release includes new features and shouldn't break backwards compatibility
+with 5.0.0. Thus, 5.1.0 supports Swift 3 / Xcode 8. The TL;DR list of changes:
+
+New Features:
+- Add `throwAssertion` matcher to test precondition failures. Thanks @mattgallagher and @abbeycode!
+- Objective-C supports some C literals
+
+Fixes:
+- The regular expression `match` matcher is available for Linux. Thanks @ikesyo!
+- Document about `AsyncDefaults`. Thanks @wongzigii!
+- Fix `matchError` incorrectly succeeding on any Error type given.
+
+# New Feature Details
+
+## ThrowAssertion Matcher
+
+Nimble now includes a `throwAssertion` matcher to test if a given piece of code
+fails `precondition` or invokes `fatalError`.
+
+``` swift
+// swift
+expect { precondition(false, ""this will fail"") }.to(throwAssertion())
+// type-hint that this closure does not return anything
+expect { () -> Void in fatalError() }.to(throwAssertion())
+```
+
+Due to the inherit implementation of preconditions and fatalErrors, there are
+several limitations:
+- This is only available for Swift.
+- There is no validation of the failure message.
+- This only works for x86 architectures. This means Simulators + macOS only.
+- tvOS simulator requires you to disable ""Debug executable"" in your scheme's test configuration.
+
+Nimble embeds [CwlPreconditionTesting](https://github.com/mattgallagher/CwlPreconditionTesting) to implement `throwAssertion`. Special
+thanks to @mattgallagher for CwlPreconditionTesting and @abbeycode for the bulk
+of the adding the matcher for Nimble.
+
+Go test those assertions!
+
+## Objective-C: Limited C-Literals Support
+
+Objective-C version of Nimble now can automatically box certain C types for
+you. This means you don't need to wrap them yourself:
+
+``` objc
+// objective-c
+expect(1).to(equal(2));
+expect(98.6).to(beCloseTo(98.6));
+expect(YES).to(beTrue());
+expect(@[@1, @2]).to(haveCount(2));
+expect(""hello"").toNot(equal(""world""));
+expect(NSMakeRange(0, 5)).to(equal(NSMakeRange(0, 5)));
+```
+
+Currently, not all matchers support all types. The following matchers support C types:
+- `equal`
+- `beGreaterThan`
+- `beGreaterThanOrEqual`
+- `beLessThan`
+- `beLessThanOrEqual`
+- `beCloseTo`
+- `beTrue`
+- `beFalse`
+- `beTruthy`
+- `beFalsy`
+- `haveCount`
+
+The C types each supports is matcher specific. But there's here's the basic heuristics:
+- C numeric types are boxed as `NSNumber *`. (eg - `uint64_t -> NSNumber *`)
+- C booleans are boxed as `NSNumber *`. (eg - `BOOL -> NSNumber *`)
+- C strings are boxed as `NSString *` (eg - `char * -> NSString *`)
+- `NSRange` are boxed as `NSValue *` (eg - `NSRange -> NSValue *`)
+
+While they shouldn't cause too many suprises in practice, note that you still
+can have some gotchas with everything boxing as `NSNumber *` (eg -
+`expect(1).to(beTrue())` passes).
+
+Please file an issue if you want more matchers.
+
+---
+
+Happy testing! 😁
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/4447504/assets,https://api.github.com/repos/Quick/Nimble/releases/4447504,master,https://api.github.com/repos/Quick/Nimble/tarball/v5.1.0,https://github.com/Quick/Nimble/releases/tag/v5.1.0,https://api.github.com/repos/Quick/Nimble/zipball/v5.1.0,v5.1.0,False,False
+4178116,2016-09-20T06:59:48Z,2016-09-20T07:03:03Z,Nimble v5.0.0,"Version 5 supports Swift 3. For older versions of swift, please use an older version of Nimble.
+
+Features / Breaking Changes:
+- Convert to Swift 3
+- Change `NMBOrderedCollection` to use `-[objectForIndex:]` / `object(at index: Int)`. See bugfix.
+- `beCloseTo` supports `CGFloat`
+
+Bugfixes:
+- Fix `endsWith` matcher not working if the expected value was repeated
+  multiple times for strings and `NMBOrderedCollection`-conforming types.
+
+Special thanks to @nachosoto, @andersio, @briancroom, @ikesyo, @liscio,
+@mokagio, @norio-nomura, @raphaelcruzeiro for all the effort in getting
+Nimble to Swift 3!
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/4178116/assets,https://api.github.com/repos/Quick/Nimble/releases/4178116,master,https://api.github.com/repos/Quick/Nimble/tarball/v5.0.0,https://github.com/Quick/Nimble/releases/tag/v5.0.0,https://api.github.com/repos/Quick/Nimble/zipball/v5.0.0,v5.0.0,False,False
+3474830,2016-06-18T22:49:38Z,2016-06-18T22:55:47Z,v4.1.0,"# v4.1.0
+
+Added:
+- `NSDate` is now supported when using the `beCloseTo` & `beCloseWithin` matchers (#295 - thanks @mishimay!).
+- `Expectation`'s `expression` property is now public, for use when creating custom matchers (#300 - thanks @akashivskyy!).
+
+Improved:
+- The `contain` matcher now accepts sequences, in addition to the existing variadic form (#297 - thanks @stigi!).
+- The documentation for `beIdenticalTo` has been improved (#299 - thanks @lukeredpath!).
+
+Fixed:
+- Bitcode is now disabled for the tvOS platform (#287 - thanks @phatblat!).
+- Nimble can now be compiled under Xcode 8 with Swift 2.3 (#302). Swift 3 support will be part of a future release.
+",https://api.github.com/users/ashfurrow,498212,ashfurrow,https://api.github.com/repos/Quick/Nimble/releases/3474830/assets,https://api.github.com/repos/Quick/Nimble/releases/3474830,master,https://api.github.com/repos/Quick/Nimble/tarball/v4.1.0,https://github.com/Quick/Nimble/releases/tag/v4.1.0,https://api.github.com/repos/Quick/Nimble/zipball/v4.1.0,v4.1.0,False,False
+3075439,2016-04-22T07:53:38Z,2016-04-22T08:00:45Z,v4.0.1,"# Bug Fixes
+- Fixes a race condition in Xcode 7.3 that would prevent Nimble from writing output to the Xcode console during a test run. See #273.
+- Fixes a problem with CocoaPods integration concerning header files that can't be found. See #280.
+",https://api.github.com/users/ashfurrow,498212,ashfurrow,https://api.github.com/repos/Quick/Nimble/releases/3075439/assets,https://api.github.com/repos/Quick/Nimble/releases/3075439,master,https://api.github.com/repos/Quick/Nimble/tarball/v4.0.1,https://github.com/Quick/Nimble/releases/tag/v4.0.1,https://api.github.com/repos/Quick/Nimble/zipball/v4.0.1,v4.0.1,False,False
+2958314,2016-04-05T19:32:29Z,2016-04-05T19:38:05Z,v4.0.0,"## Breaking Changes
+- Remove `FullMatcherFunc`. Use `Matcher` or `MatcherFunc` instead. More
+  breaking changes around the protocols will probably occur in the future.
+
+## Features
+- `beEmpty()` supports `NSIndexSet`
+- Expose `stringify()` which Nimble matchers use to convert values to string.
+  - You can add custom support to stringify by conforming your type to
+    `TestDebugStringConvertible`
+
+## Bug Fixes
+- Fix bug where exceptions weren't properly caught for cocoapods users
+- Resolve warnings for Xcode 7.3
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/2958314/assets,https://api.github.com/repos/Quick/Nimble/releases/2958314,master,https://api.github.com/repos/Quick/Nimble/tarball/v4.0.0,https://github.com/Quick/Nimble/releases/tag/v4.0.0,https://api.github.com/repos/Quick/Nimble/zipball/v4.0.0,v4.0.0,False,False
+2829588,2016-03-16T23:45:05Z,2016-03-17T07:21:07Z,Nimble v3.2.0,"# Nimble v3.2.0
+
+This release includes bug fixes, minor enhancements, and a couple of new matchers. This release targets Xcode 7.2.x and Swift 2.1. It also generally works with Xcode 7.3 betas and Swift 2.2 (thanks @NachoSoto!), although many deprecation warnings are emitted.
+
+Additionally, initial support is available for using Nimble with the [Swift Package Manager](https://github.com/apple/swift-package-manager) on both OS X and Linux. This should be considered a technical preview as SwiftPM and the do not yet have any stable releases.
+
+# New Matcher: postNotifications
+
+This matcher allows testing that an expression causes one or more `NSNotification`s to be posted to a notification center. Thanks to @bgerstle for this work! (#228)
+
+``` swift
+expect {
+    NSNotificationCenter.defaultCenter().postNotification(myNotification)
+}.to(postNotifications(equal([myNotification]))
+```
+
+# New Matcher: beVoid
+
+This matcher allows testing whether an optional value of type `Void?` contains a value, or is `nil`. Thanks to @inamiy for this! (#250)
+
+``` swift
+expect(() as ()?).to(beVoid())
+```
+
+# Asynchronous Expectation Defaults
+
+It is now possible to modify the global default values for the timeout and poll interval used by `toEventually`. Thanks @mjbeauregard! (#256)
+
+``` swift
+AsyncDefaults.Timeout = 2
+AsyncDefaults.PollInterval = 0.05
+```
+
+# Swift Package Manager
+
+It is now possible to reference Nimble as a package dependency in a `Package.swift` file for use with the [Swift Package Manager](https://github.com/apple/swift-package-manager). As SwiftPM is not yet stable, this integration should be considered an early preview and may break.
+
+# Linux Support
+
+Complementing SwiftPM support, Nimble can now be used on Linux, with the caveat that not all behaviors and matchers are supported. Features that rely on the Objective-C runtime are disabled in this environment. On Linux, Nimble integrates with the [swift-corelibs-xctest](https://github.com/apple/swift-corelibs-xctest) library.
+
+# Miscellaneous
+- `be` can now be used as an alias for the `beIdenticalTo` matcher. Thanks @jwfriese! (#241)
+- The compiler will now produce a warning if `expect` is used without being followed up by `to`, `toNot`, etc. Thanks @pcantrell! (#245)
+- `NSData` now has a special string representation to prevent failure messages from including excessively long data descriptions. Thanks @inket! (#263)
+",https://api.github.com/users/briancroom,1062518,briancroom,https://api.github.com/repos/Quick/Nimble/releases/2829588/assets,https://api.github.com/repos/Quick/Nimble/releases/2829588,master,https://api.github.com/repos/Quick/Nimble/tarball/v3.2.0,https://github.com/Quick/Nimble/releases/tag/v3.2.0,https://api.github.com/repos/Quick/Nimble/zipball/v3.2.0,v3.2.0,False,False
+2451091,2016-01-19T09:19:29Z,2016-01-19T09:25:55Z,Nimble v3.1.0,"This is a bug fix + feature addition release. Thanks to @jwfriese for the work in this release.
+
+Note that this release does not include a pre-built binary for Carthage. Xcode doesn't gaurantee binary compatibility for pre-built frameworks. See more details: https://github.com/Carthage/Carthage/issues/924.
+
+On to the changes...
+
+## New Matcher: || (aka - satisfyAnyOf)
+
+Matchers can be combined using the `||` operator:
+
+``` swift
+expect(value).to(equal(2) || equal(3))
+```
+
+This expects `value` to be either 2 or 3. Using `||` can be useful in complex expectations or integration tests, where less-specific expectations are usually utilized.
+
+**Warning:** Conditionals in expectations are generally considered bad practice. Using `||` is a form of conditional that weakens the strength of the assertion. This matcher should be used sparingly if at all.
+
+## Updated Matcher: Equals + Optional Collections
+
+Equals now supports optional collections:
+
+``` swift
+let a: [String?] = [""a"", ""b"", nil]
+let b: [String?] = [""a"", ""b"", nil]
+
+expect(a).to(equal(b))
+```
+
+Previously, the above code caused a compiler error. Now this will work like non-optional collection types.
+
+## Asynchronous Expectations
+
+Async expectations have been rewritten to reduce flakiness. The public API remains the same but uses lower-level features to avoid complex interactions with common run loop features.
+
+Async expectations are any `waitUntil` or `expect(..).toEventually(..)` forms.
+
+Also, Nimble emits errors on invalid usages of async expectations:
+- Async expectations must be done on the main thread.
+- Async expectations cannot be nested.
+
+This is because async requires controlling the main run loop. These limitations were part of the old implementation, but left the test writer to discover them via flaky tests. The new implementation will immediately fail.
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/2451091/assets,https://api.github.com/repos/Quick/Nimble/releases/2451091,master,https://api.github.com/repos/Quick/Nimble/tarball/v3.1.0,https://github.com/Quick/Nimble/releases/tag/v3.1.0,https://api.github.com/repos/Quick/Nimble/zipball/v3.1.0,v3.1.0,False,False
+2023488,2015-10-27T05:44:57Z,2015-10-27T05:47:11Z,Nimble v3.0.0,"This release supports Xcode 7.1 with better tvOS support.
+
+Changes:
+- tvOS is a separate build target from iOS.
+- updated import headers to be relative from module-based for Xcode 7.1
+- revert waitUntil variadic completion function to avoid ambiguities for some edge cases
+- fix haveCount matcher's expected and actual values reversed in expectation message
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/2023488/assets,https://api.github.com/repos/Quick/Nimble/releases/2023488,master,https://api.github.com/repos/Quick/Nimble/tarball/v3.0.0,https://github.com/Quick/Nimble/releases/tag/v3.0.0,https://api.github.com/repos/Quick/Nimble/zipball/v3.0.0,v3.0.0,False,False
+1910243,2015-10-05T09:02:57Z,2015-10-05T08:24:45Z,Nimble v2.0.0,"This release is compatible with Xcode 7.0 (Swift 2.0). If you're looking for the `swift-2.0` branch, it is now the `master` branch.
+
+# Breaking Changes from RCs
+
+There's one breaking changes besides the upgrade to Swift 2.0 if you haven't be using the release candidates.
+
+## Weak Linking to XCTest
+
+**Nimble is now weakly linked to XCTest**. If you're not explicitly linking to XCTest (either via import or explicitly linking frameworks), you must now do so or else XCTest may not be automatically linked into your project. The default behavior of test bundles **will link** XCTest correctly.
+
+The README documents using Nimble without XCTest, if you choose to integrate Nimble to your own test runner or framework.
+
+# Changes from RCs
+- Added tvOS support
+- Added `haveCount` matcher which is a convenience to check for length.
+- Added `NSMapTable` support for `beEmpty`. `haveCount` also supports
+  `NSMapTable`.
+- Fix warning of missing reference to `$SDKROOT/Developer/Library/Frameworks`
+- waitUntil's done argument now accepts variadic arguments to allow passing
+  directly to completion blocks that requires other arguments.
+
+# Past Release Candidate Changes
+
+For convenience, here's the list of changes between the release candidates to 1.x.x versions.
+
+## Backwards Incompatible Changes
+- Backwards incompatible changes for Swift 2.0
+- swift: Expectations now properly handle the new Swift error handling syntax.
+  This means expectations implicitly allow throws and will fail with a useful
+  error message if a closure throws one:
+
+``` swift
+expect { try throwError() }.to(equal(1)) // Failed - Expected to equal 1, got an unexpected error thrown: ...
+```
+- objc: `expectAction()` is now a macro that requires an Objective-C block instead of building an implicit block:
+
+Old:
+
+``` objc
+expectAction([obj raiseException]).to(raiseException(...));
+```
+
+New:
+
+``` objc
+expectAction(^{ [obj raiseException]; }).to(raiseException(...));
+```
+
+## Changes in Release Candidates
+- `beEmpty()` matcher is now defined specifically for String
+- `beCloseTo` now works with `NSDate` without having to convert it
+- Cocoapod users can now run Nimble in devices
+- objc: Added `fail()` and `failWithMessage()` functions
+- You can now specify custom error messages for expectations. This is useful
+  for large integration tests, where an expectation is usually a sanity check to
+  a larger operation:
+
+``` swift
+expect(1).to(equal(2), description: ""Just checking equality!"") // failed - Just checking equality!
+```
+- swift: Fixed `≈` precedence
+- swift: `beAKindOf()` and `beAnInstanceOf()` emits useful errors when trying to
+  compare against Swift Types. This is not allowed in Nimble because the Swift
+  compiler already enforces this.
+- swift: Added `throwError()` matcher for verifying the behavior of closures that throw an error:
+
+``` swift
+expect { try somethingDangerous() }.to(throwError())
+```
+- objc: `NMBObjCMatcher` initializers are now public
+- objc: `contain()` matcher now accepts variadic arguments. Each value passed to contain() is expected to be in the container:
+
+``` objc
+expect(@[@1, @2, @3]).to(contain(@1, @2)); // passes
+```
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/1910243/assets,https://api.github.com/repos/Quick/Nimble/releases/1910243,master,https://api.github.com/repos/Quick/Nimble/tarball/v2.0.0,https://github.com/Quick/Nimble/releases/tag/v2.0.0,https://api.github.com/repos/Quick/Nimble/zipball/v2.0.0,v2.0.0,False,False
+1743117,2015-08-31T01:04:23Z,2015-08-31T01:14:00Z,Nimble v2.0.0 Release Candidate 3,"This release is compatible with Xcode 7 beta 6 (Swift 2.0).
+
+Note to carthage Users: You must explicitly give this version for Carthage to install.
+
+```
+github ""Quick/Nimble"" ""v2.0.0-rc.3""
+```
+
+# Changes
+- Updated for Xcode 7 beta 6
+- `beCloseTo` now works with `NSDate` without having to convert it
+- Cocoapod users can now run Nimble in physical devices
+- objc: Added `fail()` and `failWithMessage()` functions
+
+Also, [Quick has been updated](https://github.com/Quick/Quick/releases/tag/v0.6.0) for Xcode 7 beta 6.
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/1743117/assets,https://api.github.com/repos/Quick/Nimble/releases/1743117,master,https://api.github.com/repos/Quick/Nimble/tarball/v2.0.0-rc.3,https://github.com/Quick/Nimble/releases/tag/v2.0.0-rc.3,https://api.github.com/repos/Quick/Nimble/zipball/v2.0.0-rc.3,v2.0.0-rc.3,False,False
+1589286,2015-07-27T07:39:08Z,2015-07-27T07:40:06Z,Nimble 2.0.0 Release Candidate 2,"This release is compatible with Xcode 7 beta 4 (Swift 2.0).
+
+Note to Carthage Users: You must explicitly give this version for Carthage to install.
+
+```
+github ""Quick/Nimble"" ""v2.0.0-rc.2""
+```
+
+## Backwards Incompatible Changes
+- swift: Expectations now properly handle the new Swift error handling syntax.
+  This means expectations implicitly allow throws and will fail with a useful
+  error message if a closure throws one:
+
+```
+// Failed - Expected to equal 1, got an unexpected error thrown: ...
+expect { try throwAnError() }.to(equal(1))
+```
+- objc: expectAction() is now a macro that requires an Objective-C block instead of building an implicit block:
+
+``` objc
+// Old-style before RC 2
+expectAction([obj raiseException]).to(raiseException(...));
+// New-style in RC 2
+expectAction(^{ [obj raiseException]; }).to(raiseException(...));
+```
+
+## Additions
+- You can now specify custom error messages for expectations. This is useful
+  for large integration tests, where an expectation is usually a sanity check to
+  a larger operation:
+
+``` swift
+// failed - Just checking equality!
+expect(1).to(equal(2), description: ""Just checking equality!"")
+```
+- swift: Fixed `≈` precedence
+- swift: `beAKindOf()` and `beAnInstanceOf()` emits useful errors when trying to
+  compare against Swift Types. This is not allowed in Nimble because the Swift
+  compiler already enforces this.
+- swift: Added `throwError()` matcher for verifying the behavior of closures that throw an error:
+
+``` swift
+expect { try somethingDangerous() }.to(throwError())
+```
+- objc: `NMBObjCMatcher` initializers are now public
+- objc: `contain()` matcher now accepts variadic arguments. Each value passed to contain() is expected to be in the container:
+
+``` objc
+expect(@[@1, @2, @3]).to(contain(@1, @2)); // passes
+```
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/1589286/assets,https://api.github.com/repos/Quick/Nimble/releases/1589286,swift-2.0,https://api.github.com/repos/Quick/Nimble/tarball/v2.0.0-rc.2,https://github.com/Quick/Nimble/releases/tag/v2.0.0-rc.2,https://api.github.com/repos/Quick/Nimble/zipball/v2.0.0-rc.2,v2.0.0-rc.2,False,False
+1471724,2015-06-29T07:30:23Z,2015-06-29T07:39:32Z,Nimble v1.0.0 Final,"Final version release! From now on, Nimble will follow [semantic versioning rules](http://semver.org).
+
+**Remember** that version 1.0.0 of Nimble tracks with the stable Swift (1.2) / Xcode (6).
+If you're using Swift 2.0 / Xcode 7, please use `2.0.0-rc.1` instead.
+
+## Diff from Release Candidate 1 to Final
+
+Changes:
+- beAKindOf and beAnInstanceOf raise errors when used with swift native types instead of producing obscure compiler errors.
+- Publicize NMBObjCMatcher constructors
+- Updated README to use `@import Nimble;` instead of `#import <Nimble/Nimble.h>` for Objective-C.
+
+## Diff in Release Candidate 1
+
+_Repeated from 1.0.0-RC1 release notes._
+
+Changes:
+- FailureMessage.stringValue is now a property. It can be assigned to override other values.
+- beTruthy() and beFalsy() matchers now work for nil types and Swift
+- raiseException() no longer accepts matchers. Use the closure form instead.
+- AssertionHandler protocol recieves FailureMessage instead of a String.
+- Expectation.verify() now uses FailureMessage instead of String.
+- Renamed NMB_wait\* builder functions to be more consistent with rest of Nimble.
+- fail() with no args passes through line number and file information
+- NMBObjCMatcher closure no long accepts source location directly. Use actualExpression.location instead.
+- FullMatcherFunc no longer negates doesNotMatch() when invoking its given closure.
+
+Removed:
+- NMBWait class is now private.
+- Removed BasicMatcherWrapper
+- Removed NonNilBasicMatcherWrapper
+- Removed NonNilMatcherWrapper, use NonNilMatcherFunc for the same behavior.
+- Removed FullMatcherWrapper
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/1471724/assets,https://api.github.com/repos/Quick/Nimble/releases/1471724,swift-2.0,https://api.github.com/repos/Quick/Nimble/tarball/v1.0.0,https://github.com/Quick/Nimble/releases/tag/v1.0.0,https://api.github.com/repos/Quick/Nimble/zipball/v1.0.0,v1.0.0,False,False
+1396920,2015-06-10T02:48:43Z,2015-06-10T03:03:04Z,Nimble v2.0.0 Release Candidate 1,"Release Candidate for 2.0.0, which supports Xcode 7 and Swift 2.0. **Please try it out and report any issues**. If all is well, then this version may migrate to final 2.0.0.
+
+**Note to Carthage Users**: You must explicitly give this version for Carthage to install.
+`github ""Quick/Nimble"" ""v2.0.0-rc.1""`
+
+## Changes:
+- Backwards incompatible changes for Swift 2.0.
+- beEmpty() matcher is now defined specifically for String--in Swift 1.2 a
+  definition for NSString was sufficient.
+",https://api.github.com/users/modocache,552921,modocache,https://api.github.com/repos/Quick/Nimble/releases/1396920/assets,https://api.github.com/repos/Quick/Nimble/releases/1396920,master,https://api.github.com/repos/Quick/Nimble/tarball/v2.0.0-rc.1,https://github.com/Quick/Nimble/releases/tag/v2.0.0-rc.1,https://api.github.com/repos/Quick/Nimble/zipball/v2.0.0-rc.1,v2.0.0-rc.1,False,False
+1304205,2015-05-16T19:54:37Z,2015-05-16T20:10:50Z,Nimble v1.0.0 Release Candidate 1,"Release Candidate for 1.0.0. **Please try it out and report any issues**. If all is well, then this version may migrate to final 1.0.0.
+
+**Note to Carthage Users**: You must explicitly give this version for Carthage to install.
+`github ""Quick/Nimble"" ""v1.0.0-rc.1""`
+
+## Changes:
+- `FailureMessage.stringValue` is now a property. It can be assigned to override other values.
+- `beTruthy()` and `beFalsy()` matchers now work for nil types and Swift
+- `raiseException()` no longer accepts matchers. Use the closure form instead.
+- `AssertionHandler` protocol receives FailureMessage instead of a String.
+- `Expectation.verify()` now uses FailureMessage instead of String.
+- Renamed `NMB_wait*` builder functions to be more consistent with rest of Nimble.
+- `fail()` with no args passes through line number and file information
+- `NMBObjCMatcher` closure no long accepts source location directly. Use `actualExpression.location` instead.
+- `FullMatcherFunc` no longer negates `doesNotMatch()` when invoking its given closure.
+
+## Removed:
+- `NMBWait` class is now private.
+- Removed `BasicMatcherWrapper`
+- Removed `NonNilBasicMatcherWrapper`
+- Removed `NonNilMatcherWrapper`, use `NonNilMatcherFunc` for the same behavior.
+- Removed `FullMatcherWrapper`
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/1304205/assets,https://api.github.com/repos/Quick/Nimble/releases/1304205,master,https://api.github.com/repos/Quick/Nimble/tarball/v1.0.0-rc.1,https://github.com/Quick/Nimble/releases/tag/v1.0.0-rc.1,https://api.github.com/repos/Quick/Nimble/zipball/v1.0.0-rc.1,v1.0.0-rc.1,False,False
+1128507,2015-04-06T05:42:42Z,2015-04-06T05:50:31Z,Nimble v0.4.2,"Changes:
+- Set the minimum deployment target to iOS 7.
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/1128507/assets,https://api.github.com/repos/Quick/Nimble/releases/1128507,master,https://api.github.com/repos/Quick/Nimble/tarball/v0.4.2,https://github.com/Quick/Nimble/releases/tag/v0.4.2,https://api.github.com/repos/Quick/Nimble/zipball/v0.4.2,v0.4.2,False,False
+1081315,2015-03-13T01:05:23Z,2015-03-23T18:22:03Z,Nimble v0.4.1,"This is a minor bump to [v0.4.0](https://github.com/Quick/Nimble/releases/tag/v0.4.0), which includes the following improvements:
+- `equal()` can now be used to compare two sets.
+- Added the `allPass()` matcher.
+- `expect()` uses an autoclosure, as it did in [v0.3.0](https://github.com/Quick/Nimble/releases/tag/v0.3.0) and prior.
+- Fixed build error on Xcode 6.3β related to asynchronous matchers (fixes #105).
+",https://api.github.com/users/modocache,552921,modocache,https://api.github.com/repos/Quick/Nimble/releases/1081315/assets,https://api.github.com/repos/Quick/Nimble/releases/1081315,master,https://api.github.com/repos/Quick/Nimble/tarball/v0.4.1,https://github.com/Quick/Nimble/releases/tag/v0.4.1,https://api.github.com/repos/Quick/Nimble/zipball/v0.4.1,v0.4.1,False,False
+940308,2015-02-11T05:16:04Z,2015-02-11T05:21:35Z,Nimble v0.4.0,"This version includes backwards-incompatible changes to support Swift 1.2. The
+previous behavior of lazy evaluation of the argument in expect(...) has been
+removed since Swift 1.2 no longer supports this. Use expect { ... } if you want
+the lazy closure behavior.
+
+Using toEventually() will check that this explicit closure is used and will
+explicitly fail if the closure is not provided to expect.
+
+Along with fixes for Swift 1.2, there are a few new features:
+- Added beEmpty matcher for Objective-C.
+- raiseException matcher can compare an exception's userInfo
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/940308/assets,https://api.github.com/repos/Quick/Nimble/releases/940308,master,https://api.github.com/repos/Quick/Nimble/tarball/v0.4.0,https://github.com/Quick/Nimble/releases/tag/v0.4.0,https://api.github.com/repos/Quick/Nimble/zipball/v0.4.0,v0.4.0,False,False
+877711,2015-01-23T04:50:17Z,2015-01-25T08:54:33Z,Nimble v0.3.0,"Changes in this release:
+- **Added** `waitUntil` for Objective-C. Also `waitUntilWithTimeout` can be used with a custom timeout value. They work similarly to the swift versions:
+  
+  ``` objc
+  waitUntil(^(void (^done)(void) {
+      // do a lot of work...
+      done();
+  });
+  ```
+- **Added** approximate equality (`beCloseTo` matcher) can use the `≈` operator. The operator can be easily typed with (option+x):
+  
+  ``` swift
+  expect(1.2) ≈ 1.2001
+  ```
+- **Added** approximate equality can also be given a delta with the `±` operator (option + shift + =). This also works with the `==` operator, but still behaves like `beCloseTo`:
+  
+  ``` swift
+  // equivalent expectations
+  expect(1.2) == 1.3 ± 0.5
+  expect(1.2) ≈ 1.3 ± 0.5
+  ```
+- **Added** Nimble to Cocoapods Trunk. You no longer need to specify the `:git` keyword argument in your podfile. The prereleased version of cocoapods is still required.
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/877711/assets,https://api.github.com/repos/Quick/Nimble/releases/877711,master,https://api.github.com/repos/Quick/Nimble/tarball/v0.3.0,https://github.com/Quick/Nimble/releases/tag/v0.3.0,https://api.github.com/repos/Quick/Nimble/zipball/v0.3.0,v0.3.0,False,False
+736746,2014-11-26T20:32:57Z,2014-11-26T20:43:09Z,Nimble 0.2.0,"Changes in this release:
+- Change: Objective-C matchers will now all properly reject `nil` values. Use `beNil()` to match against nils.
+- Change: `beEmpty()` matcher no longer matches against `nil`
+- Change: `equal()` uses Swift's built-in equality comparison.
+- Change: Make objective-c matchers explicit about not accepting any arguments.
+- Removed: Undocumented `beOneOf()` matcher that was Swift-only.
+- New: `expect().withTimeout()` in objective-c for custom timeouts of async matchers.
+- New: Added Podspec for Cocoapods' Swift Branch
+- New: Documentation comments for Swift matchers
+- New: `NonNilMatcherFunc` which supports emitting a consistent `nil` error message. Matchers that use this still need to safely process nils.
+",https://api.github.com/users/jeffh,68616,jeffh,https://api.github.com/repos/Quick/Nimble/releases/736746/assets,https://api.github.com/repos/Quick/Nimble/releases/736746,master,https://api.github.com/repos/Quick/Nimble/tarball/v0.2.0,https://github.com/Quick/Nimble/releases/tag/v0.2.0,https://api.github.com/repos/Quick/Nimble/zipball/v0.2.0,v0.2.0,False,False

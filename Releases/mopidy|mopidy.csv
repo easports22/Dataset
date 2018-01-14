@@ -1,0 +1,178 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+489644,2014-08-03T21:39:25Z,2014-08-13T20:07:33Z,Mopidy v0.19.3,"Bug fix release.
+- Audio: Fix negative track length for radio streams. (Fixes: #662, PR: #796)
+- Audio: Tell GStreamer to not pick Jack sink. (Fixes: #604)
+- Zeroconf: Fix discovery by adding `.local` to the announced hostname. (PR: #795)
+- Zeroconf: Fix intermittent DBus/Avahi exception.
+- Extensions: Fail early if trying to setup an extension which doesn’t implement the `mopidy.ext.Extension.setup()` method. (Fixes: #813)
+",https://api.github.com/users/jodal,43726,jodal,https://api.github.com/repos/mopidy/mopidy/releases/489644/assets,https://api.github.com/repos/mopidy/mopidy/releases/489644,develop,https://api.github.com/repos/mopidy/mopidy/tarball/v0.19.3,https://github.com/mopidy/mopidy/releases/tag/v0.19.3,https://api.github.com/repos/mopidy/mopidy/zipball/v0.19.3,v0.19.3,False,False
+489641,2014-07-26T12:20:01Z,2014-08-13T20:06:51Z,Mopidy v0.19.2,"Bug fix release, directly from the Mopidy development sprint at EuroPython 2014 in Berlin.
+- Audio: Make `audio/mixer_volume` work on the software mixer again. This was broken with the mixer changes in 0.19.0. (Fixes: #791)
+- HTTP frontend: When using Tornado 4.0, allow WebSocket requests from other hosts. (Fixes: #788)
+- MPD frontend: Fix crash when MPD commands are called with the wrong number of arguments. This was broken with the MPD command changes in 0.19.0. (Fixes: #789)
+",https://api.github.com/users/jodal,43726,jodal,https://api.github.com/repos/mopidy/mopidy/releases/489641/assets,https://api.github.com/repos/mopidy/mopidy/releases/489641,develop,https://api.github.com/repos/mopidy/mopidy/tarball/v0.19.2,https://github.com/mopidy/mopidy/releases/tag/v0.19.2,https://api.github.com/repos/mopidy/mopidy/zipball/v0.19.2,v0.19.2,False,False
+489640,2014-07-23T16:14:55Z,2014-08-13T20:06:10Z,Mopidy v0.19.1,"Bug fix release.
+- Dependencies: Mopidy now requires Tornado >= 2.3, instead of >= 3.1. This should make Mopidy continue to work on Debian/Raspbian stable, where Tornado 2.3 is the newest version available.
+- HTTP frontend: Add missing string interpolation placeholder.
+- Development: `mopidy --version` and `mopidy.core.Core.get_version()` now returns the correct version when Mopidy is run from a Git repo other than Mopidy’s own. (Related to #706)
+",https://api.github.com/users/jodal,43726,jodal,https://api.github.com/repos/mopidy/mopidy/releases/489640/assets,https://api.github.com/repos/mopidy/mopidy/releases/489640,develop,https://api.github.com/repos/mopidy/mopidy/tarball/v0.19.1,https://github.com/mopidy/mopidy/releases/tag/v0.19.1,https://api.github.com/repos/mopidy/mopidy/zipball/v0.19.1,v0.19.1,False,False
+440865,2014-07-20T23:51:20Z,2014-07-21T06:40:53Z,Mopidy v0.19.0,"The focus of 0.19 have been on improving the MPD implementation, replacing GStreamer mixers with our own mixer API, and on making web clients installable with pip, like any other Mopidy extension.
+
+Since the release of 0.18, we’ve closed or merged 53 issues and pull requests through about 445 commits by 12 people, including five new guys. Thanks to everyone that has contributed!
+
+### Dependencies
+- Mopidy now requires Tornado >= 3.1.
+- Mopidy no longer requires CherryPy or ws4py. Previously, these were optional dependencies required for the HTTP frontend to work.
+
+### Backend API
+- Breaking change: Imports of the backend API from mopidy.backends no longer works. The new API introuced in v0.18 is now required. Most extensions already use the new API location.
+
+### Commands
+- The mopidy-convert-config tool for migrating the setings.py configuration file used by Mopidy up until 0.14 to the new config file format has been removed after over a year of trusty service. If you still need to convert your old settings.py configuration file, do so using and older release, like Mopidy 0.18, or migrate the configuration to the new format by hand.
+
+### Configuration
+- Add optional=True support to mopidy.config.Boolean.
+
+### Logging
+- Fix proper decoding of exception messages that depends on the user’s locale.
+- Colorize logs depending on log level. This can be turned off with the new logging/color configuration. (Fixes: #772)
+
+### Extension support
+- Breaking change: Removed the Extension methods that were deprecated in 0.18: get_backend_classes(), get_frontend_classes(), and register_gstreamer_elements(). Use mopidy.ext.Extension.setup() instead, as most extensions already do.
+
+### Audio
+- Breaking change: Removed support for GStreamer mixers. GStreamer 1.x does not support volume control, so we changed to use software mixing by default in v0.17.0. Now, we’re removing support for all other GStreamer mixers and are reintroducing mixers as something extensions can provide independently of GStreamer. (Fixes: #665, PR: #760)
+- Breaking change: Changed the audio/mixer config value to refer to Mopidy mixer extensions instead of GStreamer mixers. The default value, software, still has the same behavior. All other values will either no longer work or will at the very least require you to install an additional extension.
+- Changed the audio/mixer_volume config value behavior from affecting GStreamer mixers to affecting Mopidy mixer extensions instead. The end result should be the same without any changes to this config value.
+- Deprecated the audio/mixer_track config value. This config value is no longer in use. Mixer extensions that need additional configuration handle this themselves.
+- Use Proxy configuration when streaming media from the Internet. (Partly fixing #390)
+- Fix proper decoding of exception messages that depends on the user’s locale.
+- Fix recognition of ASX and XSPF playlists with tags in all caps or with carriage return line endings. (Fixes: #687)
+- Support simpler ASX playlist variant with <ENTRY> elements without children.
+- Added target_state attribute to the audio layer’s state_changed() event. Currently, it is None except when we’re paused because of buffering. Then the new field exposes our target state after buffering has completed.
+
+### Mixers
+- Added new mopidy.mixer.Mixer API which can be implemented by extensions.
+- Created a bundled extension, Mopidy-SoftwareMixer, for controlling volume in software in GStreamer’s pipeline. This is Mopidy’s default mixer. To use this mixer, set the audio/mixer config value to software.
+- Created an external extension, Mopidy-ALSAMixer, for controlling volume with hardware through ALSA. To use this mixer, install the extension, and set the audio/mixer config value to alsamixer.
+
+### HTTP frontend
+- CherryPy and ws4py have been replaced with Tornado. This will hopefully reduce CPU usage on OS X (#445) and improve error handling in corner cases, like when returning from suspend (#718).
+- Added support for packaging web clients as Mopidy extensions and installing them using pip. See the HTTP server side API for details. (Fixes: #440)
+- Added web page at /mopidy/ which lists all web clients installed as Mopidy extensions. (Fixes: #440)
+- Added support for extending the HTTP frontend with additional server side functionality. See HTTP server side API for details.
+- Exposed the core API using HTTP POST requests with JSON-RPC payloads at /mopidy/rpc. This is the same JSON-RPC interface as is exposed over the WebSocket at /mopidy/ws, so you can run any core API command.
+- The HTTP POST interfaces does not give you access to events from Mopidy, like the WebSocket does. The WebSocket interface is still recommended for web clients. The HTTP POST interface may be easier to use for simpler programs, that just needs to query the currently playing track or similar. See HTTP POST API for details.
+- If Zeroconf is enabled, we now announce the _mopidy-http._tcp service in addition to _http._tcp. This is to make it easier to automatically find Mopidy’s HTTP server among other Zeroconf-published HTTP servers on the local network.
+
+### Mopidy.js client library
+
+This version has been released to npm as Mopidy.js v0.4.0.
+- Update Mopidy.js to use when.js 3. If you maintain a Mopidy client, you should review the differences between when.js 2 and 3 and the when.js debugging guide.
+- All of Mopidy.js’ promise rejection values are now of the Error type. This ensures that all JavaScript VMs will show a useful stack trace if a rejected promise’s value is used to throw an exception. To allow catch clauses to handle different errors differently, server side errors are of the type Mopidy.ServerError, and connection related errors are of the type Mopidy.ConnectionError.
+- Add support for method calls with by-name arguments. The old calling convention, by-position-only, is still the default, but this will change in the future. A warning is logged to the console if you don’t explicitly select a calling convention. See the Mopidy.js JavaScript library docs for details.
+
+### MPD frontend
+- Proper command tokenization for MPD requests. This replaces the old regex based system with an MPD protocol specific tokenizer responsible for breaking requests into pieces before the handlers have at them. (Fixes: #591 and #592)
+- Updated command handler system. As part of the tokenizer cleanup we’ve updated how commands are registered and making it simpler to create new handlers.
+- Simplified a bunch of handlers. All the “browse” type commands now use a common browse helper under the hood for less repetition. Likewise the query handling of “search” commands has been somewhat simplified.
+- Adds placeholders for missing MPD commands, preparing the way for bumping the protocol version once they have been added.
+- Respond to all pending requests before closing connection. (PR: #722)
+- Stop incorrectly catching LookupError in command handling. (Fixes: #741)
+- Browse support for playlists and albums has been added. (PR: #749, #754)
+- The lsinfo command now returns browse results before local playlists. This is helpful as not all clients sort the returned items. (PR: #755)
+- Browse now supports different entries with identical names. (PR: #762)
+- Search terms that are empty or consists of only whitespace are no longer included in the search query sent to backends. (PR: #758)
+
+### Local backend
+- The JSON local library backend now logs a friendly message telling you about mopidy local scan if you don’t have a local library cache. (Fixes: #711)
+- The local scan command now use multiple threads to walk the file system and check files’ modification time. This speeds up scanning, escpecially when scanning remote file systems over e.g. NFS.
+  the local scan command now creates necessary folders if they don’t already exist. Previously, this was only done by the Mopidy server, so doing a local scan before running the server the first time resulted in a crash. (Fixes: #703)
+- Fix proper decoding of exception messages that depends on the user’s locale.
+
+### Stream backend
+- Add config value stream/metadata_blacklist to blacklist certain URIs we should not open to read metadata from before they are opened for playback. This is typically needed for services that invalidate URIs after a single use. (Fixes: #660)
+",https://api.github.com/users/jodal,43726,jodal,https://api.github.com/repos/mopidy/mopidy/releases/440865/assets,https://api.github.com/repos/mopidy/mopidy/releases/440865,develop,https://api.github.com/repos/mopidy/mopidy/tarball/v0.19.0,https://github.com/mopidy/mopidy/releases/tag/v0.19.0,https://api.github.com/repos/mopidy/mopidy/zipball/v0.19.0,v0.19.0,False,False
+308851,2014-01-19T21:33:03Z,2014-05-07T20:29:12Z,,"The focus of 0.18 have been on two fronts: the local library and browsing.
+
+First, the local library’s old tag cache file used for storing the track metadata scanned from your music collection has been replaced with a far simpler implementation using JSON as the storage format. At the same time, the local library have been made replaceable by extensions, so you can now create extensions that use your favorite database to store the metadata.
+
+Second, we’ve finally implemented the long awaited “file system” browsing feature that you know from MPD. It is supported by both the MPD frontend and the local and Spotify backends. It is also used by the new Mopidy-Dirble extension to provide you with a directory of Internet radio stations from all over the world.
+
+Since the release of 0.17, we’ve closed or merged 49 issues and pull requests through about 285 commits by 11 people, including six new guys. Thanks to everyone that has contributed!
+
+### Core API
+- Add `mopidy.core.Core.version()` for HTTP clients to manage compatibility between API versions. (Fixes: #597)
+- Add `mopidy.models.Ref` class for use as a lightweight reference to other model types, containing just an URI, a name, and an object type. It is barely used for now, but its use will be extended over time.
+- Add `mopidy.core.LibraryController.browse()` method for browsing a virtual file system of tracks. Backends can implement support for this by implementing `mopidy.backend.LibraryProvider.browse()`.
+- Events emitted on play/stop, pause/resume, next/previous and on end of track has been cleaned up to work consistently. See the message of commit 1d108752f64fc31ba96e75b415cda5ffb7a23df8 for the full details. (Fixes: #629)
+
+### Backend API
+- Move the backend API classes from `mopidy.backends.base` to `mopidy.backend` and remove the `Base` prefix from the class names:
+  - From `mopidy.backends.base.Backend` to `mopidy.backend.Backend`
+  - From `mopidy.backends.base.BaseLibraryProvider` to `mopidy.backend.LibraryProvider`
+  - From `mopidy.backends.base.BasePlaybackProvider` to `mopidy.backend.PlaybackProvider`
+  - From `mopidy.backends.base.BasePlaylistsProvider` to `mopidy.backend.PlaylistsProvider`
+  - From `mopidy.backends.listener.BackendListener` to `mopidy.backend.BackendListener`
+  - Imports from the old locations still works, but are deprecated.
+- Add `mopidy.backend.LibraryProvider.browse()`, which can be implemented by backends that wants to expose directories of tracks in Mopidy’s virtual file system.
+
+### Frontend API
+- The dummy backend used for testing many frontends have moved from `mopidy.backends.dummy` to `mopidy.backend.dummy`.
+
+### Commands
+- Reduce amount of logging from dependencies when using `mopidy -v`. (Fixes: #593)
+- Add support for additional logging verbosity levels with `mopidy -vv` and `mopidy -vvv` which increases the amount of logging from dependencies. (Fixes: #593)
+
+### Configuration
+- The default for the `mopidy --confi`g option has been updated to include `$XDG_CONFIG_DIRS` in addition to `$XDG_CONFIG_DIR`. (Fixes #431)
+- Added support for deprecating config values in order to allow for graceful removal of the no longer used config value `local/tag_cache_file`.
+
+### Extension support
+- Switched to using a registry model for classes provided by extension. This allows extensions to be extended by other extensions, as needed by for example pluggable libraries for the local backend. See `mopidy.ext.Registry` for details. (Fixes #601)
+- Added the new method `mopidy.ext.Extension.setup()`. This method replaces the now deprecated `get_backend_classes()`, `get_frontend_classes()`, and `register_gstreamer_elements()`.
+
+### Audio
+- Added `audio/mixer_volume` to set the initial volume of mixers. This is especially useful for setting the software mixer volume to something else than the default 100%. (Fixes: #633)
+
+### Local backend
+
+**Note:** After upgrading to Mopidy 0.18 you must run `mopidy local scan` to reindex your local music collection. This is due to the change of storage format.
+- Added support for browsing local directories in Mopidy’s virtual file system.
+- Finished the work on creating pluggable libraries. Users can now reconfigure Mopidy to use alternate library providers of their choosing for local files. (Fixes issue #44, partially resolves #397, and causes a temporary regression of #527.)
+- Switched default local library provider from a “tag cache” file that closely resembled the one used by the original MPD server to a compressed JSON file. This greatly simplifies our library code and reuses our existing model serialization code, as used by the HTTP API and web clients.
+- Removed our outdated and bug-ridden “tag cache” local library implementation.
+- Added the config value `local/library` to select which library to use. It defaults to `json`, which is the only local library bundled with Mopidy.
+- Added the config value `local/data_dir` to have a common config for where to store local library data. This is intended to avoid every single local library provider having to have it’s own config value for this.
+- Added the config value `local/scan_flush_threshold` to control how often to tell local libraries to store changes when scanning local music.
+
+### Streaming backend
+- Add live lookup of URI metadata. (Fixes #540)
+- Add support for extended M3U playlist, meaning that basic track metadata stored in playlists will be used by Mopidy.
+
+### HTTP frontend
+- Upgrade Mopidy.js dependencies and add support for using Mopidy.js with Browserify. This version has been released to npm as Mopidy.js v0.2.0. (Fixes: #609)
+
+### MPD frontend
+- Make the `lsinfo`, `listall`, and `listallinfo` commands support browsing of Mopidy’s virtual file system. (Fixes: #145)
+- Empty commands now return a ACK [5@0] {} No command given error instead of OK. This is consistent with the original MPD server implementation.
+
+### Internal changes
+- Events from the audio actor, backends, and core actor are now emitted asyncronously through the GObject event loop. This should resolve the issue that has blocked the merge of the EOT-vs-EOS fix for a long time.
+",https://api.github.com/users/jodal,43726,jodal,https://api.github.com/repos/mopidy/mopidy/releases/308851/assets,https://api.github.com/repos/mopidy/mopidy/releases/308851,develop,https://api.github.com/repos/mopidy/mopidy/tarball/v0.18.0,https://github.com/mopidy/mopidy/releases/tag/v0.18.0,https://api.github.com/repos/mopidy/mopidy/zipball/v0.18.0,v0.18.0,False,False
+308835,2014-01-23T22:27:25Z,2014-05-07T20:23:20Z,Mopidy v0.18.1,"Bug fix release.
+- Disable extension instead of crashing if a dependency has the wrong version. (Fixes: #657)
+- Make logging work to both console, debug log file, and any custom logging setup from `logging/config_file` at the same time. (Fixes: #661)
+",https://api.github.com/users/jodal,43726,jodal,https://api.github.com/repos/mopidy/mopidy/releases/308835/assets,https://api.github.com/repos/mopidy/mopidy/releases/308835,develop,https://api.github.com/repos/mopidy/mopidy/tarball/v0.18.1,https://github.com/mopidy/mopidy/releases/tag/v0.18.1,https://api.github.com/repos/mopidy/mopidy/zipball/v0.18.1,v0.18.1,False,False
+308831,2014-02-16T20:32:23Z,2014-05-07T20:22:13Z,Mopidy v0.18.2,"Bug fix release.
+- We now log warnings for wrongly configured extensions, and clearly label them in `mopidy config`, but does no longer stop Mopidy from starting because of misconfigured extensions. (Fixes: #682)
+- Fix a crash in the server side WebSocket handler caused by connection problems with clients. (Fixes: #428, #571)
+- Fix the `time_position` field of the `track_playback_ended` event, which has been always 0 since v0.18.0. This made scrobbles by Mopidy-Scrobbler not be persisted by Last.fm, because Mopidy reported that you listened to 0 seconds of each track. (Fixes: #674)
+- Fix the log setup so that it is possible to increase the amount of logging from a specific logger using the `loglevels` config section. (Fixes: #684)
+- Serialization of `Playlist` models with the `last_modified` field set to a `datetime.datetime` instance did not work. The type of `mopidy.models.Playlist.last_modified` has been redefined from a `datetime.datetime` instance to the number of milliseconds since Unix epoch as an integer. This makes serialization of the time stamp simpler.
+- Minor refactor of the MPD server context so that Mopidy’s MPD protocol implementation can easier be reused. (Fixes: #646)
+- Network and signal handling has been updated to play nice on Windows systems.
+",https://api.github.com/users/jodal,43726,jodal,https://api.github.com/repos/mopidy/mopidy/releases/308831/assets,https://api.github.com/repos/mopidy/mopidy/releases/308831,develop,https://api.github.com/repos/mopidy/mopidy/tarball/v0.18.2,https://github.com/mopidy/mopidy/releases/tag/v0.18.2,https://api.github.com/repos/mopidy/mopidy/zipball/v0.18.2,v0.18.2,False,False
+308825,2014-02-16T20:46:35Z,2014-05-07T20:19:36Z,Mopidy v0.18.3,"Bug fix release.
+- Fix documentation build.
+",https://api.github.com/users/jodal,43726,jodal,https://api.github.com/repos/mopidy/mopidy/releases/308825/assets,https://api.github.com/repos/mopidy/mopidy/releases/308825,develop,https://api.github.com/repos/mopidy/mopidy/tarball/v0.18.3,https://github.com/mopidy/mopidy/releases/tag/v0.18.3,https://api.github.com/repos/mopidy/mopidy/zipball/v0.18.3,v0.18.3,False,False

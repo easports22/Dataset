@@ -1,0 +1,371 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7350211,2017-08-10T13:35:01Z,2017-08-10T15:47:28Z,Version 1.5.0,"Version 1.5.0 contains several improvements and bug fixes, including:
+
+* Better control of bitmap GPU uploads
+* Add support for fitBottomStart scaleType
+* Support for local content video URI thumbnails
+* Bug fixes
+
+## Sample Apps
+
+The following improvements were made to the Fresco Showcase app:
+
+* Added image resizing example
+* Support loading of SVG files not starting with ""<svg"" (in the Showcase SVG decoder example)
+
+## Breaking changes
+
+* MediaIdExtractor was removed
+
+## Thanks
+
+Thanks to the following for their pull requests which are included in this release: @a-d-collins, @JuniperPhoton, @DkBai, @IguteChung
+",https://api.github.com/users/erikandre,4519148,erikandre,https://api.github.com/repos/facebook/fresco/releases/7350211/assets,https://api.github.com/repos/facebook/fresco/releases/7350211,master,https://api.github.com/repos/facebook/fresco/tarball/v1.5.0,https://github.com/facebook/fresco/releases/tag/v1.5.0,https://api.github.com/repos/facebook/fresco/zipball/v1.5.0,v1.5.0,False,False
+7062767,2017-07-14T18:23:51Z,2017-07-17T12:00:22Z,Version 1.4.0,"## Animated Image Changes
+
+Rewritten implementation for animated images (GIFs and animated WebPs) with better performance, particularly when showing multiple GIFs.
+
+This brings improved frame caching and memory management, better control for users of Fresco, new features and some GIF rendering issues have been fixed.
+
+## Other Updates in 1.4.0
+
+* Support for `Bitmap.prepareToDraw` to upload bitmaps to the GPU ahead of time (as suggested by @
+    ChrisCraik) - enabled via `ImagePipelineExperiments`
+* Fixed Shared Element Transitions. You have to manually call `draweeView.setLegacyVisibilityHandlingEnabled(true)`
+* Per-image custom drawable factory support
+* Caching improvements
+    * You can now set a custom cache trim strategy for the image pipeline
+    * Added `BaseCacheEventListener` that implements `CacheEventListener` for convenience
+* Easier synchronous requests with `DataSources#waitForFinalResult`
+* Fixed `IncreasingQualityDataSource` to keep the low res image if the high res request fails
+* Various other bug fixes and improvements: BitmapCounterProvider, Media Variations, Progressive JPEGs, EXIF parsing, ZoomableDraweeView touch logic, DraweeView attributes in Android Studio
+
+## Breaking Changes
+
+### AnimatedDrawable
+
+The old animation code has been removed, including `AbstractAnimatedDrawable`, `AnimatedDrawable`, or `AnimatedDrawableSupport` . Change your casts to `AnimatedDrawable2`.
+We also removed `com.facebook.fresco:animated-base-support` since it is no longer needed.
+### DrawableFactory
+
+Moved DrawableFactory to `com.facebook.imagepipeline.drawable.DrawableFactory.` Please change your imports if you're using custom drawable factories.
+
+### Small cache threshold
+
+Removed this option from `ImagePipelineExperiments` as well as related code.
+
+### Internal changes
+
+Added `void onNewResult(T newResult, @Status int status)` to `Consumer` interface.
+
+### Removed deprecated methods
+
+* `ImagePipeline#getDataSourceSupplier(ImageRequest, Object, boolean)`
+* `EncodedImage#setEncodedCacheKey(CacheKey)`
+* `EncodedImage#getEncodedCacheKey()`
+* `GenericDraweeHierarchyBuilder#setActualImageMatrix()`
+* `GenericDraweeHierarchyBuilder#getActualImageMatrix()`
+
+## Sample Apps (now with Kotlin!)
+
+We've updated our Showcase sample app to include more samples and merged other sample apps into it.
+
+There is also a new Kotlin sample app that shows how to use Fresco with Kotlin.",https://api.github.com/users/kirwan,3764367,kirwan,https://api.github.com/repos/facebook/fresco/releases/7062767/assets,https://api.github.com/repos/facebook/fresco/releases/7062767,master,https://api.github.com/repos/facebook/fresco/tarball/v1.4.0,https://github.com/facebook/fresco/releases/tag/v1.4.0,https://api.github.com/repos/facebook/fresco/zipball/v1.4.0,v1.4.0,False,False
+6135506,2017-04-20T11:47:52Z,2017-04-20T13:21:40Z,Version 1.3.0,"Version 1.3.0 is mainly a bugfix release.
+
+- Showcase application improved and new examples added
+- New onUltimateProducerReached() callback method added to ProducerListener.
+- It's now possible to load resources using a qualifying resource URI. This allows for loading resources that are not part of the application's main package.
+
+## Breaking Changes
+
+### PooledByteBuffer and PooledByteBufferInputStream
+
+These two classes have moved package from `com.facebook.imagepipeline.memory` to `com.facebook.imagepipeline.memory`. If you directly make use of either class, simply update your imports.
+
+### ProducerListener
+
+The `ProducerListener` interface has a new callback: `onUltimateProducerReached()`. This identifies the producer which was ultimately responsible for producing the result which was passed back, so can give an idea about how many requests are satisfied from caches.
+
+If you have an implementation of `ProducerListener` or `RequestListener` you will need to add an implementation of this method.
+
+## Thanks
+
+Thanks to the following for their pull requests which are included in this release: @voiddog, @nesterov-n, @paour and @josephlam1984.",https://api.github.com/users/massimocarli,235695,massimocarli,https://api.github.com/repos/facebook/fresco/releases/6135506/assets,https://api.github.com/repos/facebook/fresco/releases/6135506,master,https://api.github.com/repos/facebook/fresco/tarball/v1.3.0,https://github.com/facebook/fresco/releases/tag/v1.3.0,https://api.github.com/repos/facebook/fresco/zipball/v1.3.0,v1.3.0,False,False
+5829965,2017-03-21T16:24:44Z,2017-03-22T11:43:41Z,Version 1.2.0,"Version 1.2.0 is mainly a bugfix release.
+
+- A MediaIdExtractor interface has been added to benefit from media variations without explicitly adding media IDs to every image request. This is currently experimental though and not recommended unless you're careful and confident in the URLs your app uses.
+- Added option to ImageRequestBuilder for setting a custom image decoder for that particular request.
+- libfb_jpegturbo is now linked as a shared library.
+- Updated to OkHttp v3.6.0.
+- Updated libpng to v1.6.26.
+
+## Thanks
+
+Thanks to the following for their pull requests which are included in this release: @paour, @desmond1121, @caojianfeng, @FtheGFW, @eldk, @lucas34, @angarron",https://api.github.com/users/erikandre,4519148,erikandre,https://api.github.com/repos/facebook/fresco/releases/5829965/assets,https://api.github.com/repos/facebook/fresco/releases/5829965,master,https://api.github.com/repos/facebook/fresco/tarball/v1.2.0,https://github.com/facebook/fresco/releases/tag/v1.2.0,https://api.github.com/repos/facebook/fresco/zipball/v1.2.0,v1.2.0,False,False
+5453603,2017-02-14T13:27:07Z,2017-02-14T15:27:18Z,Version 1.1.0,"Version 1.1.0 is mainly a bugfix release.
+
+There is one breaking change: `MemoryUiTrimmable` was removed. See d41bf01 for details.
+
+All commits going into this release: https://github.com/facebook/fresco/compare/v1.0.1...v1.1.0
+
+## Thanks
+
+Thanks to the following for their pull requests which are included in this release: @lucas34
+",https://api.github.com/users/foghina,412054,foghina,https://api.github.com/repos/facebook/fresco/releases/5453603/assets,https://api.github.com/repos/facebook/fresco/releases/5453603,master,https://api.github.com/repos/facebook/fresco/tarball/v1.1.0,https://github.com/facebook/fresco/releases/tag/v1.1.0,https://api.github.com/repos/facebook/fresco/zipball/v1.1.0,v1.1.0,False,False
+5207188,2017-01-19T14:18:37Z,2017-01-19T15:10:08Z,Version 1.0.1,"Version 1.0.1 is mainly a bugfix release:
+- Fixed an issue where URIs with spaces could not be parsed correctly.
+- Updated libwebp to 0.5.2 and fixed some WebP issues.
+- Downsampling ratio calculations are now correct.
+- The image pipeline now uses the correct producer sequence for local files.
+- SimpleDraweeSpanTextView now resizes itself correctly.
+
+## New Features
+
+You can use `UriUtil.getUriForFile(File)` and `ImageRequest.fromFile(File)` to create URIs and `ImageRequest`s for files.
+
+## Thanks
+
+Thanks to the following for their pull requests which are included in this release:
+@angarron, @korDen, @sachins, @pizza, @JoelMarcey
+",https://api.github.com/users/oprisnik,2699634,oprisnik,https://api.github.com/repos/facebook/fresco/releases/5207188/assets,https://api.github.com/repos/facebook/fresco/releases/5207188,master,https://api.github.com/repos/facebook/fresco/tarball/v1.0.1,https://github.com/facebook/fresco/releases/tag/v1.0.1,https://api.github.com/repos/facebook/fresco/zipball/v1.0.1,v1.0.1,False,False
+4933535,2016-12-14T18:45:00Z,2016-12-15T19:16:43Z,Version 1.0.0 🎉,"The version bump was overdue - the library is stable for a long time. It is used in all the major Facebook apps for years (Facebook, Messenger, Moments, Facebook Lite). On top of that it also powers a lot of non Facebook apps like Twitter, Wikipedia and Vimeo. We were careful with breaking changes for at least a year - so here we go: **Version 1.0**!
+
+With this release, Fresco allows you to easily add **support for more image formats and custom decoders**. This is configurable using the `ImageDecoderConfig` class. See our sample application for a practical example.
+
+Fresco now allows you to provide it with more semantic information about different versions and URIs of the same image. The concept is called **Media Variations** and it uses a `media id` to group different URIs that refer to the same underlying source image that might be loaded in different sizes. Fresco will try to satisfy a new request by first looking if another already cached image with the same `media id` exists and displaying that. See our sample application for a practical example.
+
+We added a **Debug overlay** for drawees. They can show you how large the underlying image is with respect to the actually drawn screen area. This is helpful in order to screen you app for images that should be loaded at a smaller resolution. You can activate it using the `DraweeConfig` parameter of `Fresco.initialize(...)`.
+
+If you are manually dealing with `CloseableReferences` you might find yourself leaking memory. One can now specify `UnclosedReferenceListener` in order to log these leaks or crash in debug builds.
+
+**`DraweeSpan`** and **`BetterImageSpan`** are new `Spannable` implementations for displaying `Drawee`s within text.
+
+## Breaking Change
+
+Fresco now longer has a direct dependency on the Android Support library. Instead, it expects certain part of the support library to be provided by the including application. If you do not include the Android Support Library yourself already, you will have to add the following line to your `build.gradle` file:
+
+```
+compile ""com.android.support:support-core-utils:24.2.1""
+```
+
+With this version we have also removed methods and classes that have been marked as `@Deprecated` for some time. For all those cases there are new APIs that are easy to use.
+
+## Thanks
+
+ Thanks to the following for their pull requests which are included in this release: @PiotrWpl, @rigdern, @nesterov-n, @sdqhzhm, @kukuhyoniatmoko, @ghassett, @sailaway
+",https://api.github.com/users/oprisnik,2699634,oprisnik,https://api.github.com/repos/facebook/fresco/releases/4933535/assets,https://api.github.com/repos/facebook/fresco/releases/4933535,master,https://api.github.com/repos/facebook/fresco/tarball/v1.0.0,https://github.com/facebook/fresco/releases/tag/v1.0.0,https://api.github.com/repos/facebook/fresco/zipball/v1.0.0,v1.0.0,False,False
+4275631,2016-09-30T14:47:51Z,2016-09-30T16:46:17Z,Version 0.14.1,"This is a patch release to fix a bug in ResizeAndRotateProducer which stopped images appearing in some cases.
+
+There is also a new IterativeBoxBlurPostProcessor for performant blurring of images.
+
+## Breaking Change
+
+ImageFormat is now a class instead of an enum to allow for future support for custom formats. All default formats can be found in DefaultImageFormats.
+",https://api.github.com/users/kirwan,3764367,kirwan,https://api.github.com/repos/facebook/fresco/releases/4275631/assets,https://api.github.com/repos/facebook/fresco/releases/4275631,master,https://api.github.com/repos/facebook/fresco/tarball/v0.14.1,https://github.com/facebook/fresco/releases/tag/v0.14.1,https://api.github.com/repos/facebook/fresco/zipball/v0.14.1,v0.14.1,False,False
+4214900,2016-09-23T14:07:18Z,2016-09-23T14:52:32Z,Version 0.14.0,"- `PlatformBitmapFactory` now supports more `createBitmap` variations
+- Support for custom Drawable factories
+- New `DefaultConfig` allows to set global defaults for ImageRequests
+- `RotationOptions` allow for better control of rotation (either manual or based on EXIF information)
+- We've updated the target, build tools and support library to 24.2.1 which now requires Java 8
+- Improved sample applications
+- And a variety of other fixes and improvements
+
+## Breaking Changes
+
+In support library 24.2 Google split the library into smaller parts. By upgrading our support library dependency to 24.2.1, we've been able to specify the parts which Fresco needs (which is very little).
+
+We recommend both upgrading your support library dependencies similarly and making sure you explicitly depend on the parts of the support library that you need. This can reduce your APK size.
+
+## Thanks
+
+Thanks to the following for their pull requests which are included in this release: @eldk, @s1rius, @gtpark, @kunny
+",https://api.github.com/users/lambdapioneer,908387,lambdapioneer,https://api.github.com/repos/facebook/fresco/releases/4214900/assets,https://api.github.com/repos/facebook/fresco/releases/4214900,master,https://api.github.com/repos/facebook/fresco/tarball/v0.14.0,https://github.com/facebook/fresco/releases/tag/v0.14.0,https://api.github.com/repos/facebook/fresco/zipball/v0.14.0,v0.14.0,False,False
+3925894,2016-08-19T10:41:21Z,2016-08-19T14:46:45Z,Version 0.13.0,"- Libjpg-turbo upgraded to version 1.5.0
+- Animation Info exposed
+- NineOldAndroid dependency removed from ImagePipeline module
+- Improved sample applications
+- And a variety of other fixes and improvements
+
+## Breaking Changes
+- Unused flags removed from `ImageDecodeOptions`. 
+
+## Thanks
+
+Thanks to the following for their pull requests which are included in this release: @lambdapioneer, @ahmedre, @joonho  and @KoMinkyu.
+",https://api.github.com/users/massimocarli,235695,massimocarli,https://api.github.com/repos/facebook/fresco/releases/3925894/assets,https://api.github.com/repos/facebook/fresco/releases/3925894,master,https://api.github.com/repos/facebook/fresco/tarball/v0.13.0,https://github.com/facebook/fresco/releases/tag/v0.13.0,https://api.github.com/repos/facebook/fresco/zipball/v0.13.0,v0.13.0,False,False
+3718599,2016-07-22T11:53:51Z,2016-07-22T13:14:50Z,Version 0.12.0,"- Fixed ProGuard issues with `animated-*` and `okhttp3` modules
+- Disk cache memory index is now persisted across sessions
+- Removed unnecessary dependencies on nineoldanroids
+- Fixed behavior of zoomables
+- Improved sample applications
+- And a variety of other fixes and improvements
+
+## Breaking Changes
+- `ImageType` has been renamed to `CacheChoice`
+
+## Thanks
+
+Thanks to the following for their pull requests which are included in this release: @huangjunkun, @PiotrWpl, @s1rius and @0mok
+",https://api.github.com/users/lambdapioneer,908387,lambdapioneer,https://api.github.com/repos/facebook/fresco/releases/3718599/assets,https://api.github.com/repos/facebook/fresco/releases/3718599,master,https://api.github.com/repos/facebook/fresco/tarball/v0.12.0,https://github.com/facebook/fresco/releases/tag/v0.12.0,https://api.github.com/repos/facebook/fresco/zipball/v0.12.0,v0.12.0,False,False
+3441423,2016-06-14T17:02:54Z,2016-06-14T20:21:19Z,Version 0.11.0,"- Image pipeline
+  - Split out ImagePipelineExperiments from ImagePipelineConfig
+  - Volley is now integrated as a backend for the image pipeline as an alternative to OkHttp or HttpUrlConnection
+  - Resumed requests occur in their original order
+  - Fixed a bug where the OkHttp backend could leak non-successful responses
+- Cache
+  - Added details of each event to CacheEventListener methods
+  - Added caller context as a parameter for CacheKeyFactory methods
+  - Added support for synchronous disk cache checks
+- Drawee
+  - Added support for the hotspot so ripple drawables work as expected in Lollipop and up.
+  - GenericDraweeHierarchy now has setter methods supporting resource IDs
+  - Fixed drawee scale type transitions when using activity transitions
+  - Added support for dynamically changing backgrounds and overlays
+- Samples
+  - Improved gesture handling in the zoomable sample code
+  - Added a new sample app to test scroll performance
+- Also
+  - Changed Bolts dependency to the smaller Tasks module
+  - And a variety of other fixes and improvements
+
+## Breaking changes
+
+### Experimental config options
+
+To make it clearer which options in `ImagePipelineConfig` are included for experimental purposes, these have been moved into a separate `ImagePipelineExperiments` class. Options here should be expected to be volatile and liable to be changed or removed in future releases. Changing these values from their defaults is not recommended in most cases.
+
+These methods are still available in a chain while building your config so if you had the following before:
+
+```
+ImagePipelineConfig config = ImagePipelineConfig.newBuilder(context)
+    .setForceSmallCacheThresholdBytes(maxSmallImageBytes)
+```
+
+you can fix it by changing it as follows:
+
+```
+ImagePipelineConfig config = ImagePipelineConfig.newBuilder(context)
+    .experiment().setForceSmallCacheThresholdBytes(maxSmallImageBytes)
+```
+
+### CacheEventListener
+
+All `CacheEventListener` methods now receive a new `CacheEvent` object.
+
+If you have a custom implementation you will need to add the extra parameter to each method. In the case of `onEviction()` the old parameters have been replaced so you will also need to extract the values from the event if you are making use of them.
+
+### CacheKeyFactory
+
+All `CacheKeyFactory` methods now receive an extra parameter with the caller context object that can be specified when the image is requested.
+
+If you have a custom implementation you will simply need to add the extra parameter to each method.
+
+### Multiple drawee backgrounds
+
+It was previously possible to specify multiple backgrounds in a drawee hierarchy. This is still possible but deprecated and if you specify multiple backgrounds these can no longer be rounded.
+
+## Thanks
+
+Thanks to the following for their pull requests which are included in this release: @chethann, @droidekas, @sagartrehan, @froxCZ, @nborodikhin, @Ribesg, @dmitrychistyakov, @plamenko, @szpnygo, @s1rius and @Rexee.
+",https://api.github.com/users/kirwan,3764367,kirwan,https://api.github.com/repos/facebook/fresco/releases/3441423/assets,https://api.github.com/repos/facebook/fresco/releases/3441423,master,https://api.github.com/repos/facebook/fresco/tarball/v0.11.0,https://github.com/facebook/fresco/releases/tag/v0.11.0,https://api.github.com/repos/facebook/fresco/zipball/v0.11.0,v0.11.0,False,False
+3091667,2016-04-25T13:49:36Z,2016-04-25T14:49:01Z,Version 0.10.0,"- decreased library size by making animated GIF and animated WebP modules optional
+- decreased library size by optimizing native code
+- custom scale type support for Drawee
+- improved and simplified zoomable functionality: added support for tap listeners and inflation from XML
+- OkHttp 3 support
+- added ability to disable disk cache for certain requests (for security purposes)
+- several bug fixes
+
+# Breaking change!
+
+If you are using animated images (animated GIFs or animated WebPs) you need to add the following dependencies to your Gradle file:
+
+animated GIF support:
+`compile 'com.facebook.fresco:animated-gif:0.10.0'`
+
+animated WebP support:
+`compile 'com.facebook.fresco:animated-webp:0.10.0'`
+
+if you’re using Gingerbread you also need to add:
+`compile 'com.facebook.fresco:animated-base-support:0.10.0'`
+
+## Drawee changes
+
+If you've been using `R.styleable.GenericDraweeView`, you now have to use `R.styleable.GenericDraweeHierarchy` instead.
+",https://api.github.com/users/oprisnik,2699634,oprisnik,https://api.github.com/repos/facebook/fresco/releases/3091667/assets,https://api.github.com/repos/facebook/fresco/releases/3091667,master,https://api.github.com/repos/facebook/fresco/tarball/v0.10.0,https://github.com/facebook/fresco/releases/tag/v0.10.0,https://api.github.com/repos/facebook/fresco/zipball/v0.10.0,v0.10.0,False,False
+2434631,2016-01-15T13:17:08Z,2016-01-15T13:40:21Z,Version 0.9.0,"- reduced library size (made webp support for Jelly Bean and below optional)
+- added Stetho plugin
+- upgrade to OkHttp 2.6
+- rounding is applied to all branches of DraweeHierarchy
+- several bug fixes
+
+Breaking change! If you're using webp images below Jelly Bean read [this](http://frescolib.org/docs/webp-support.html#_) migration guide
+",https://api.github.com/users/tyronen,958570,tyronen,https://api.github.com/repos/facebook/fresco/releases/2434631/assets,https://api.github.com/repos/facebook/fresco/releases/2434631,master,https://api.github.com/repos/facebook/fresco/tarball/v0.9.0,https://github.com/facebook/fresco/releases/tag/v0.9.0,https://api.github.com/repos/facebook/fresco/zipball/v0.9.0,v0.9.0,False,False
+2054177,2015-10-30T14:10:49Z,2015-11-01T22:01:31Z,Version 0.8.1,"- Quick re-release to sort out problems that occurred in v0.8.0 upload
+- A few bug fixes
+",https://api.github.com/users/tyronen,958570,tyronen,https://api.github.com/repos/facebook/fresco/releases/2054177/assets,https://api.github.com/repos/facebook/fresco/releases/2054177,master,https://api.github.com/repos/facebook/fresco/tarball/v0.8.1,https://github.com/facebook/fresco/releases/tag/v0.8.1,https://api.github.com/repos/facebook/fresco/zipball/v0.8.1,v0.8.1,False,False
+1985755,2015-10-19T21:56:58Z,2015-10-19T23:45:30Z,Version 0.8.0,"- Allow Bitmap.Config to be set by caller
+- New BaseBooleanSubscriber class
+- New experimental code to put encoded images in ashmem (JellyBean and below)
+- New experimental code to decode WebP directly on older platforms instead of transcoding
+- New sample apps to demonstrate shared transitions and write-you-own uri
+- Added AQuery to comparison app
+- Lotsa bug fixes
+",https://api.github.com/users/tyronen,958570,tyronen,https://api.github.com/repos/facebook/fresco/releases/1985755/assets,https://api.github.com/repos/facebook/fresco/releases/1985755,master,https://api.github.com/repos/facebook/fresco/tarball/v0.8.0,https://github.com/facebook/fresco/releases/tag/v0.8.0,https://api.github.com/repos/facebook/fresco/zipball/v0.8.0,v0.8.0,False,False
+1731082,2015-08-27T12:37:20Z,2015-08-27T13:31:48Z,Version 0.7.0,"- New simpler API to determine if an image is in cache
+- Improvements to the comparison app
+- Upgrade some deps
+- Some bug fixes
+",https://api.github.com/users/tyronen,958570,tyronen,https://api.github.com/repos/facebook/fresco/releases/1731082/assets,https://api.github.com/repos/facebook/fresco/releases/1731082,master,https://api.github.com/repos/facebook/fresco/tarball/v0.7.0,https://github.com/facebook/fresco/releases/tag/v0.7.0,https://api.github.com/repos/facebook/fresco/zipball/v0.7.0,v0.7.0,False,False
+1650960,2015-08-10T13:04:23Z,2015-08-10T14:28:22Z,Version 0.6.1,"- Fixed file-descriptors issue
+- Fixed closing-streams issue
+- Fixed some issues with rounding
+- Other small fixes
+",https://api.github.com/users/tyronen,958570,tyronen,https://api.github.com/repos/facebook/fresco/releases/1650960/assets,https://api.github.com/repos/facebook/fresco/releases/1650960,master,https://api.github.com/repos/facebook/fresco/tarball/v0.6.1,https://github.com/facebook/fresco/releases/tag/v0.6.1,https://api.github.com/repos/facebook/fresco/zipball/v0.6.1,v0.6.1,False,False
+1561839,2015-07-20T20:33:07Z,2015-07-20T20:42:01Z,Version 0.6.0,"- Significant performance improvements, especially for local camera images
+- Ability to cache postprocessed images
+- Map of ImageFormats to standard file extensions
+- Simpler API for clearing cache, and invalidating individual entries
+- Remove some no-longer-used classes
+",https://api.github.com/users/tyronen,958570,tyronen,https://api.github.com/repos/facebook/fresco/releases/1561839/assets,https://api.github.com/repos/facebook/fresco/releases/1561839,master,https://api.github.com/repos/facebook/fresco/tarball/v0.6.0,https://github.com/facebook/fresco/releases/tag/v0.6.0,https://api.github.com/repos/facebook/fresco/zipball/v0.6.0,v0.6.0,False,False
+1471004,2015-06-28T22:58:44Z,2015-06-28T23:32:40Z,Version 0.5.3,"- Remove some time utils from fbcore
+- Slight speedup in local images
+- Fix some bugs
+",https://api.github.com/users/tyronen,958570,tyronen,https://api.github.com/repos/facebook/fresco/releases/1471004/assets,https://api.github.com/repos/facebook/fresco/releases/1471004,master,https://api.github.com/repos/facebook/fresco/tarball/v0.5.3,https://github.com/facebook/fresco/releases/tag/v0.5.3,https://api.github.com/repos/facebook/fresco/zipball/v0.5.3,v0.5.3,False,False
+1418457,2015-06-15T16:20:45Z,2015-06-15T18:12:23Z,Version 0.5.2,"- Assorted bug fixes
+",https://api.github.com/users/tyronen,958570,tyronen,https://api.github.com/repos/facebook/fresco/releases/1418457/assets,https://api.github.com/repos/facebook/fresco/releases/1418457,master,https://api.github.com/repos/facebook/fresco/tarball/v0.5.2,https://github.com/facebook/fresco/releases/tag/v0.5.2,https://api.github.com/repos/facebook/fresco/zipball/v0.5.2,v0.5.2,False,False
+1375831,2015-06-04T09:12:21Z,2015-06-04T10:04:31Z,Version 0.5.1,"- Allow RoundingParams type to change dynamically
+- Fixed BMP decoding
+- Fixed decoding of non-animated GIFs
+- Added support for 64-bit ABIs
+- Adapted resizing policy
+- Assorted other bug fixes
+",https://api.github.com/users/tyronen,958570,tyronen,https://api.github.com/repos/facebook/fresco/releases/1375831/assets,https://api.github.com/repos/facebook/fresco/releases/1375831,master,https://api.github.com/repos/facebook/fresco/tarball/v0.5.1,https://github.com/facebook/fresco/releases/tag/v0.5.1,https://api.github.com/repos/facebook/fresco/zipball/v0.5.1,v0.5.1,False,False
+1299950,2015-05-15T09:09:27Z,2015-05-15T09:46:37Z,Version 0.5.0,"- Add support for data URIs
+- Fix progressive decoding of resized images
+- Fix dynamic changing of rounded corners
+- Eliminated some race conditions
+- Assorted other bug fixes
+",https://api.github.com/users/tyronen,958570,tyronen,https://api.github.com/repos/facebook/fresco/releases/1299950/assets,https://api.github.com/repos/facebook/fresco/releases/1299950,master,https://api.github.com/repos/facebook/fresco/tarball/v0.5.0,https://github.com/facebook/fresco/releases/tag/v0.5.0,https://api.github.com/repos/facebook/fresco/zipball/v0.5.0,v0.5.0,False,False
+1207406,2015-04-23T16:46:20Z,2015-04-23T16:55:35Z,Version 0.4.0,"- Can now specify aspect ratio in XML
+- Fix cancellation in network fetcher
+- No longer ships with gnustl_shared.so
+- New test runner script
+- Cache refactors
+- Assorted other fixes
+",https://api.github.com/users/tyronen,958570,tyronen,https://api.github.com/repos/facebook/fresco/releases/1207406/assets,https://api.github.com/repos/facebook/fresco/releases/1207406,master,https://api.github.com/repos/facebook/fresco/tarball/v0.4.0,https://github.com/facebook/fresco/releases/tag/v0.4.0,https://api.github.com/repos/facebook/fresco/zipball/v0.4.0,v0.4.0,False,False
+1176570,2015-04-16T14:12:14Z,2015-04-16T16:23:32Z,Version 0.3.0,"- Support for using Eclipse
+- Revised postprocessor API
+- Converted libjpg, libpng, libgif to static libraries
+- Sample app now uses per-CPU build flavors
+- Build improvements
+- New helper method for resource id requests
+",https://api.github.com/users/tyronen,958570,tyronen,https://api.github.com/repos/facebook/fresco/releases/1176570/assets,https://api.github.com/repos/facebook/fresco/releases/1176570,master,https://api.github.com/repos/facebook/fresco/tarball/v0.3.0,https://github.com/facebook/fresco/releases/tag/v0.3.0,https://api.github.com/repos/facebook/fresco/zipball/v0.3.0,v0.3.0,False,False
+1140423,2015-04-08T16:29:42Z,2015-04-08T17:49:44Z,Version 0.2.0,"- Revised API for custom network layers
+- Support for progress bars
+- Allow fetches to stop in cache
+- Various bug fixes
+",https://api.github.com/users/michalgr,632455,michalgr,https://api.github.com/repos/facebook/fresco/releases/1140423/assets,https://api.github.com/repos/facebook/fresco/releases/1140423,master,https://api.github.com/repos/facebook/fresco/tarball/v0.2.0,https://github.com/facebook/fresco/releases/tag/v0.2.0,https://api.github.com/repos/facebook/fresco/zipball/v0.2.0,v0.2.0,False,False
+1091936,2015-03-26T22:06:19Z,2015-03-28T22:00:25Z,Version 0.1.0,"Initial release.
+",https://api.github.com/users/tyronen,958570,tyronen,https://api.github.com/repos/facebook/fresco/releases/1091936/assets,https://api.github.com/repos/facebook/fresco/releases/1091936,master,https://api.github.com/repos/facebook/fresco/tarball/v0.1.0,https://github.com/facebook/fresco/releases/tag/v0.1.0,https://api.github.com/repos/facebook/fresco/zipball/v0.1.0,v0.1.0,False,False

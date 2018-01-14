@@ -1,0 +1,433 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8055121,2017-10-08T09:41:28Z,2017-10-09T23:31:00Z,Zstandard v1.3.2 - Long Range Mode,"# Zstandard Long Range Match Finder
+
+Zstandard has a new long range match finder written by our intern Stella Lau (@stellamplau), which specializes on finding long matches in the distant past. It integrates seamlessly with the regular compressor, and the output can be decompressed just like any other Zstandard compressed data.
+
+The long range match finder adds minimal overhead to the compressor, works with any compression level, and maintains Zstandard's blazingly fast decompression speed. However, since the window size is larger, it requires more memory for compression and decompression.
+
+To go along with the long range match finder, we've increased the maximum window size to 2 GB. The decompressor only accepts window sizes up to 128 MB by default, but `zstd -d --memory=2GB` will decompress window sizes up to 2 GB.
+
+## Example usage
+
+```
+# 128 MB window size
+zstd -1 --long file
+zstd -d file.zst
+
+# 2 GB window size (window log = 31)
+zstd -6 --long=31 file
+zstd -d --long=31 file.zst
+# OR
+zstd -d --memory=2GB file.zst
+```
+
+```c
+ZSTD_CCtx *cctx = ZSTD_createCCtx();
+ZSTD_CCtx_setParameter(cctx, ZSTD_p_compressionLevel, 19);
+ZSTD_CCtx_setParameter(cctx, ZSTD_p_enableLongDistanceMatching, 1); // Sets windowLog=27
+ZSTD_CCtx_setParameter(cctx, ZSTD_p_windowLog, 30); // Optionally increase the window log
+ZSTD_compress_generic(cctx, &out, &in, ZSTD_e_end);
+
+ZSTD_DCtx *dctx = ZSTD_createDCtx();
+ZSTD_DCtx_setMaxWindowSize(dctx, 1 << 30);
+ZSTD_decompress_generic(dctx, &out, &in);
+```
+
+## Benchmarks
+
+We compared the zstd long range matcher to zstd and [lrzip](https://github.com/ckolivas/lrzip). The benchmarks were run on an AMD Ryzen 1800X (8 cores with 16 threads at 3.6 GHz).
+
+### Compressors
+
+* zstd — The regular Zstandard compressor.
+* zstd 128 MB — The Zstandard compressor with a 128 MB window size.
+* zstd 2 GB — The Zstandard compressor with a 2 GB window size.
+* lrzip xz — The lrzip compressor with default options, which uses the xz backend at level 7 with 16 threads.
+* lrzip xz single — The lrzip compressor with a single-threaded xz backend at level 7.
+* lrzip zstd — The lrzip compressor without a backend, then its output is compressed by zstd (not multithreaded).
+
+### Files
+
+* Linux 4.7 - 4.12 — This file consists of the uncompressed tarballs of the six Linux kernel release from 4.7 to 4.12 concatenated together in order. This file is extremely compressible if the compressor can match against the previous versions well.
+* Linux git — This file is a tarball of the linux repo, created by `git clone https://github.com/torvalds/linux && tar -cf linux-git.tar linux/`. This file gets a small benefit from long range matching. This file shows how the long range matcher performs when there isn't too many matches to find.
+
+### Results
+
+Both zstd and zstd 128 MB don't have large enough of a window size to compress Linux 4.7 - 4.12 well. zstd 2 GB compresses the fastest, and slightly better than lrzip-zstd. lrzip-xz compresses the best, and at a reasonable speed with multithreading enabled. The place where zstd shines is decompression ease and speed. Since it is just regular Zstandard compressed data, it is decompressed by the highly optimized decompressor.
+
+The Linux git file shows that the long range matcher maintains good compression and decompression speed, even when there are far less long range matches. The decompression speed takes a small hit because it has to look further back to reconstruct the matches.
+
+Compression Ratio vs Speed | Decompression Speed
+---------------------------|--------------------
+![Linux 4.7 - 12 compression ratio vs speed](https://github.com/facebook/zstd/blob/6d8778d8e7af50f0a7055d239df796e34f188239/doc/images/linux-4.7-12-compress.png ""Linux 4.7 - 12 compression ratio vs speed"") | ![Linux 4.7 - 12 decompression speed](https://github.com/facebook/zstd/blob/6d8778d8e7af50f0a7055d239df796e34f188239/doc/images/linux-4.7-12-decompress.png ""Linux 4.7 - 12 decompression speed"")
+![Linux git compression ratio vs speed](https://github.com/facebook/zstd/blob/6d8778d8e7af50f0a7055d239df796e34f188239/doc/images/linux-git-compress.png ""Linux git compression ratio vs speed"") | ![Linux git decompression speed](https://github.com/facebook/zstd/blob/6d8778d8e7af50f0a7055d239df796e34f188239/doc/images/linux-git-decompress.png ""Linux git decompression speed"")
+
+## Implementation details 
+
+The long distance match finder was inspired by great work from Con Kolivas' [lrzip](http://ck.kolivas.org/apps/lrzip/README.md), which in turn was inspired by Andrew Tridgell's [rzip](https://rzip.samba.org/). Also, let's mention Bulat Ziganshin's [srep](https://encode.ru/threads/43-FreeArc?highlight=srep), which we have not been able to test unfortunately (site down), but the discussions on [encode.ru](https://encode.ru/forums/2-Data-Compression) proved great sources of inspiration.
+
+Therefore, many similar mechanisms are adopted, such as using a [rolling hash](https://en.wikipedia.org/wiki/Rolling_hash), and filling a [hash table](https://en.wikipedia.org/wiki/Hash_table) divided into buckets of entries.
+
+That being said, we also made different choices, with the goal to favor speed, as can be observed in benchmark. The rolling hash formula is selected for computing efficiency. There is a restrictive insertion policy, which only inserts candidates that respect a mask condition. The insertion policy allows us to skip the hash table in the common case that a match isn't present. Confirmation bits are saved, to only check for matches when there is a strong presumption of success. These and a few more details add up to make zstd's long range matcher a speed-oriented implementation.
+
+The biggest difference though is that the long range matcher is blended into the regular compressor, producing a single valid zstd frame, undistinguishable from normal operation (except obviously for the larger window size). This makes decompression a single pass process, preserving its speed property.
+
+More details are available directly in source code, at [lib/compress/zstd_ldm.c](https://github.com/facebook/zstd/blob/master/lib/compress/zstd_ldm.c).
+
+## Future work
+
+This is a first implementation, and it still has a few limitations, that we plan to lift in the future.
+
+The long range matcher doesn't interact well with multithreading. Due to the way zstd multithreading is currently implemented, memory usage will scale with the window size times the number of threads, which is a problem for large window sizes. We plan on supporting multithreaded long range matching with reasonable memory usage in a future version.
+
+Secondly, Zstandard is currently limited to a 2 GB window size because of indexer's design. While this is a significant update compared to previous 128 MB limit, we believe this limitation can be lifted altogether, with some structural changes in the indexer. However, it also means that window size would become really big, with knock-off consequences on memory usage. So, to reduce this load, we will have to consider memory map as a complementary way to reference past content in the uncompressed file.
+
+# Detailed list of changes 
+
+- new : __long range mode__, using `--long` command, by Stella Lau (@stellamplau)
+- new : ability to generate and decode magicless frames (#591)
+- changed : maximum nb of threads reduced to 200, to avoid address space exhaustion in 32-bits mode
+- fix : multi-threading compression works with custom allocators, by @terrelln 
+- fix : a rare compression bug when compression generates very large distances and bunch of other conditions (only possible at `--ultra -22`)
+- fix : 32-bits build can now decode large offsets (levels 21+)
+- cli : added LZ4 frame support by default, by Felix Handte (@felixhandte)
+- cli : improved `--list` output
+- cli : new : can split input file for dictionary training, using command `-B#`
+- cli : new : clean operation artefact on Ctrl-C interruption (#854)
+- cli : fix : do not change /dev/null permissions when using command `-t` with root access, reported by @mike155 (#851)
+- cli : fix : write file size in header in multiple-files mode
+- api : added macro `ZSTD_COMPRESSBOUND()` for static allocation
+- api : experimental : new advanced decompression API
+- api : fix : `sizeof_CCtx()` used to over-estimate
+- build: fix : compilation works with `-mbmi` (#868)
+- build: fix : no-multithread variant compiles without `pool.c` dependency, reported by Mitchell Blank Jr (@mitchblank) (#819)
+- build: better compatibility with reproducible builds, by Bernhard M. Wiedemann (@bmwiedemann) (#818)
+- example : added `streaming_memory_usage`
+- license : changed /examples license to BSD + GPLv2
+- license : fix a few header files to reflect new license (#825)
+
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/8055121/assets,https://api.github.com/repos/facebook/zstd/releases/8055121,master,https://api.github.com/repos/facebook/zstd/tarball/v1.3.2,https://github.com/facebook/zstd/releases/tag/v1.3.2,https://api.github.com/repos/facebook/zstd/zipball/v1.3.2,v1.3.2,False,False
+7862187,2017-09-22T16:01:39Z,2017-09-22T23:16:48Z,Zstandard Fuzz Corpora,Zstandard Fuzz Corpora,https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/7862187/assets,https://api.github.com/repos/facebook/zstd/releases/7862187,dev,https://api.github.com/repos/facebook/zstd/tarball/fuzz-corpora,https://github.com/facebook/zstd/releases/tag/fuzz-corpora,https://api.github.com/repos/facebook/zstd/zipball/fuzz-corpora,fuzz-corpora,False,True
+7457053,2017-08-20T19:34:18Z,2017-08-20T19:37:00Z,Zstandard v1.3.1,"- **New license** : BSD + GPLv2
+- perf: substantially decreased memory usage in Multi-threading mode, thanks to reports by Tino Reichardt (@mcmilk)
+- perf: Multi-threading supports up to 256 threads. Cap at 256 when more are requested (#760)
+- cli : improved and fixed `--list` command, by @ib (#772)
+- cli : command `-vV` lists supported formats, by @ib (#771)
+- build : fixed binary variants, reported by @svenha (#788)
+- build : fix Visual compilation for non x86/x64 targets, reported by @GregSlazinski (#718)
+- API exp : breaking change : `ZSTD_getframeHeader()` provides more information
+- API exp : breaking change : pinned down values of error codes
+- doc : fixed huffman example, by Ulrich Kunitz (@ulikunitz)
+- new : `contrib/adaptive-compression`, I/O driven compression level, by Paul Cruz (@paulcruz74)
+- new : `contrib/long_distance_matching`, statistics tool by Stella Lau (@stellamplau)
+- updated : `contrib/linux-kernel`, by Nick Terrell (@terrelln)",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/7457053/assets,https://api.github.com/repos/facebook/zstd/releases/7457053,master,https://api.github.com/repos/facebook/zstd/tarball/v1.3.1,https://github.com/facebook/zstd/releases/tag/v1.3.1,https://api.github.com/repos/facebook/zstd/zipball/v1.3.1,v1.3.1,False,False
+6941255,2017-07-05T18:05:17Z,2017-07-05T18:05:54Z,Zstandard v1.3.0,"cli : new : `--list` command, by @paulcruz74 
+cli : changed : xz/lzma support enabled by default
+cli : changed : `-t *` continue processing list after a decompression error
+API : added : `ZSTD_versionString()`
+API : promoted to stable status : `ZSTD_getFrameContentSize()`, by @iburinoc 
+API exp : **new advanced API** : `ZSTD_compress_generic()`, `ZSTD_CCtx_setParameter()`
+API exp : new : API for static or external allocation : `ZSTD_initStatic?Ctx()`
+API exp : added : `ZSTD_decompressBegin_usingDDict()`, requested by @Crazee (#700)
+API exp : clarified memory estimation / measurement functions.
+API exp : changed : strongest strategy renamed `ZSTD_btultra`, fastest strategy `ZSTD_fast` set to 1
+Improved : reduced stack memory usage, by @terrelln and @stellamplau 
+tools : decodecorpus can generate random dictionary-compressed samples, by @paulcruz74 
+new : contrib/seekable_format, demo and API, by @iburinoc 
+changed : contrib/linux-kernel, updated version and license, by @terrelln ",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/6941255/assets,https://api.github.com/repos/facebook/zstd/releases/6941255,master,https://api.github.com/repos/facebook/zstd/tarball/v1.3.0,https://github.com/facebook/zstd/releases/tag/v1.3.0,https://api.github.com/repos/facebook/zstd/zipball/v1.3.0,v1.3.0,False,False
+6283068,2017-05-04T18:18:24Z,2017-05-04T18:23:23Z,Zstandard v1.2.0,"Major features :
+- Multithreading is enabled by default in the cli. Use `-T#` to select nb of thread. To disable multithreading, build target `zstd-nomt` or compile with `HAVE_THREAD=0`.
+- New dictionary builder named ""cover"" with improved quality (produces better compression ratio), by @terrelln. Legacy dictionary builder remains available, using `--train-legacy` command.
+
+Other changes :
+cli : new : command `-T0` means ""detect and use nb of cores"", by @iburinoc 
+cli : new : `zstdmt` symlink hardwired to `zstd -T0`
+cli : new : command `--threads=#` (#671)
+cli : new : commands `--train-cover` and `--train-legacy`, to select dictionary algorithm and parameters
+cli : experimental targets `zstd4` and `xzstd4`, supporting lz4 format, by @iburinoc 
+cli : fix : does not output compressed data on console
+cli : fix : ignore symbolic links unless `--force` specified,
+API : breaking change : `ZSTD_createCDict_advanced()` uses `compressionParameters` as argument
+API : added : prototypes `ZSTD_*_usingCDict_advanced()`, for direct control over `frameParameters`.
+API : improved: `ZSTDMT_compressCCtx()` reduced memory usage
+API : fix : `ZSTDMT_compressCCtx()` now provides `srcSize` in header (#634)
+API : fix : src size stored in frame header is controlled at end of frame
+API : fix : enforced consistent rules for `pledgedSrcSize==0` (#641)
+API : fix : error code `GENERIC` replaced by `dstSizeTooSmall` when appropriate
+build: improved cmake script, by @Majlen
+build: enabled Multi-threading support for *BSD, by @bapt 
+tools: updated `paramgrill`. Command `-O#` provides best parameters for sample and speed target.
+new : `contrib/linux-kernel` version, by @terrelln ",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/6283068/assets,https://api.github.com/repos/facebook/zstd/releases/6283068,master,https://api.github.com/repos/facebook/zstd/tarball/v1.2.0,https://github.com/facebook/zstd/releases/tag/v1.2.0,https://api.github.com/repos/facebook/zstd/zipball/v1.2.0,v1.2.0,False,False
+5787917,2017-03-16T00:31:40Z,2017-03-17T21:33:25Z,Zstandard v1.1.4,"cli : new : can compress in `*.gz` format, using `--format=gzip` command, by @inikep 
+cli : new : advanced benchmark command `--priority=rt`
+cli : fix : write on sparse-enabled file systems in 32-bits mode, by @ds77
+cli : fix : `--rm` remains silent when input is stdin
+cli : experimental `xzstd` target, with support for xz/lzma decoding, by @inikep
+speed : improved decompression speed in streaming mode for single pass scenarios (+5%)
+memory : DDict (decompression dictionary) memory usage down from 150 KB to 20 KB
+arch : 32-bits variant able to generate and decode very long matches (>32 MB), by @iburinoc 
+API : new : `ZSTD_findFrameCompressedSize()`, `ZSTD_getFrameContentSize()`, `ZSTD_findDecompressedSize()`
+API : changed : dropped support of legacy versions <= v0.3 (can be selected by modifying `ZSTD_LEGACY_SUPPORT` value)
+build: new: meson build system in contrib/meson, by @dimkr 
+build: improved cmake script, by @Majlen
+build: added `-Wformat-security` flag, as recommended by @pixelb 
+doc : new : `doc/educational_decoder`, by @iburinoc 
+
+__Warning__ : the experimental target `zstdmt` contained in this release has an issue when using multiple threads on large enough files, which makes it generate buggy header. While fixing the header after the fact is possible, it's still better to avoid the issue. This can be done by using `zstdmt` in pipe mode : 
+`cat file | zstdmt -T2 -o file.zst`
+This issue is fixed in current `dev` branch, so alternatively, create `zstdmt` from `dev` branch.
+
+_Note_ : pre-compiled Windows binaries attached below contain the fix for `zstdmt`",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/5787917/assets,https://api.github.com/repos/facebook/zstd/releases/5787917,master,https://api.github.com/repos/facebook/zstd/tarball/v1.1.4,https://github.com/facebook/zstd/releases/tag/v1.1.4,https://api.github.com/repos/facebook/zstd/zipball/v1.1.4,v1.1.4,False,False
+5372990,2017-02-06T17:17:34Z,2017-02-06T17:19:09Z,Zstandard v1.1.3,"cli : zstd can decompress .gz files (can be disabled with `make zstd-nogz` or `make HAVE_ZLIB=0`)
+cli : new : experimental target `make zstdmt`, with multi-threading support
+cli : new : improved dictionary builder ""cover"" (experimental), by @terrelln, based on previous work by @ot 
+cli : new : advanced commands for detailed parameters, by @inikep
+cli : fix zstdless on Mac OS-X, by @apjanke
+cli : fix #232 ""compress non-files""
+API : new : `lib/compress/ZSTDMT_compress.h` multithreading API (experimental)
+API : new : `ZSTD_create?Dict_byReference()`, requested by Bartosz Taudul
+API : new : `ZDICT_finalizeDictionary()`
+API : fix : `ZSTD_initCStream_usingCDict()` properly writes dictID into frame header, by @indygreg (#511)
+API : fix : all symbols properly exposed in libzstd, by @terrelln
+build : support for Solaris target, by @inikep
+doc : clarified specification, by @iburinoc
+
+Sample set for reference dictionary compression benchmark
+=============================================
+```
+# Download and expand sample set 
+wget https://github.com/facebook/zstd/releases/download/v1.1.3/github_users_sample_set.tar.zst
+zstd -d github_users_sample_set.tar.zst
+tar xf github_users_sample_set.tar
+```
+
+```
+# benchmark sample set with and without dictionary compression
+zstd -b1 -r github
+zstd --train -r github
+zstd -b1 -r github -D dictionary
+```
+
+```
+# rebuild sample set archive
+tar cf github_users_sample_set.tar github
+zstd -f --ultra -22 github_users_sample_set.tar
+```
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/5372990/assets,https://api.github.com/repos/facebook/zstd/releases/5372990,master,https://api.github.com/repos/facebook/zstd/tarball/v1.1.3,https://github.com/facebook/zstd/releases/tag/v1.1.3,https://api.github.com/repos/facebook/zstd/zipball/v1.1.3,v1.1.3,False,False
+4926792,2016-12-14T13:53:47Z,2016-12-15T08:00:35Z,Zstandard v1.1.2,"**new** : programs/**gzstd** , combined `*.gz` and `*.zst` decoder, by @inikep 
+**new** : zstdless, less on compressed `*.zst` files
+**new** : zstdgrep, grep on compressed `*.zst` files
+fixed : zstdcat
+
+cli : new : preserve file attributes
+cli : fixed : status displays total amount decoded, even for file consisting of multiple frames (like pzstd)
+lib : improved : faster decompression speed at ultra compression settings and 32-bits mode
+lib : changed : only public ZSTD_ symbols are now exposed in dynamic library
+lib : changed : reduced usage  of stack memory
+lib : fixed : several corner case bugs, by @terrelln 
+API : streaming : decompression : changed : automatic implicit reset when chain-decoding new frames without init
+API : experimental : added : dictID retrieval functions, and ZSTD_initCStream_srcSize()
+API : zbuff : changed : prototypes now generate deprecation warnings
+zlib_wrapper : added support for gz\* functions, by @inikep 
+install : better compatibility with FreeBSD, by @DimitryAndric 
+source tree : changed : zbuff source files moved to lib/deprecated
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/4926792/assets,https://api.github.com/repos/facebook/zstd/releases/4926792,dev,https://api.github.com/repos/facebook/zstd/tarball/v1.1.2,https://github.com/facebook/zstd/releases/tag/v1.1.2,https://api.github.com/repos/facebook/zstd/zipball/v1.1.2,v1.1.2,False,False
+4543918,2016-11-01T18:13:22Z,2016-11-02T04:06:40Z,Zstandard v1.1.1,"New : cli commands `-M#`, `--memory=`, `--memlimit=`, `--memlimit-decompress=` to limit allowed memory consumption during decompression
+New : doc/zstd_manual.html, by @inikep
+Improved : slightly better compression ratio at `--ultra` levels (>= 20)
+Improved : better memory usage when using streaming compression API, thanks to @Rogier-5 report
+Added : API : `ZSTD_initCStream_usingCDict()`, `ZSTD_initDStream_usingDDict()` (experimental section)
+Added : `examples/multiple_streaming_compression.c`
+Changed : `zstd_errors.h` is now installed within `/include` (and replaces `errors_public.h`)
+Updated man page
+Fixed : several sanitizer warnings, by @terrelln 
+Fixed : `zstd-small`, `zstd-compress` and `zstd-decompress` compilation targets
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/4543918/assets,https://api.github.com/repos/facebook/zstd/releases/4543918,dev,https://api.github.com/repos/facebook/zstd/tarball/v1.1.1,https://github.com/facebook/zstd/releases/tag/v1.1.1,https://api.github.com/repos/facebook/zstd/zipball/v1.1.1,v1.1.1,False,False
+4247235,2016-09-27T22:15:03Z,2016-09-28T03:18:33Z,Zstandard v1.1.0,"New : **pzstd** , parallel version of zstd, by @terrelln 
+
+added : NetBSD install target (#338)
+Improved : speed for batches of small files
+Improved : speed of zlib wrapper, by @inikep 
+Changed : libzstd on Windows supports legacy formats, by @KrzysFR 
+Fixed : CLI -d output to stdout by default when input is stdin (#322)
+Fixed : CLI correctly detects console on Mac OS-X
+Fixed : CLI supports recursive mode -r on Mac OS-X
+Fixed : Legacy decoders use unified error codes, reported by benrg (#341), fixed by @inikep 
+Fixed : compatibility with OpenBSD, reported by@juanfra684 (#319)
+Fixed : compatibility with Hurd, by @inikep (#365)
+Fixed : zstd-pgo, reported by @octoploid (#329)
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/4247235/assets,https://api.github.com/repos/facebook/zstd/releases/4247235,dev,https://api.github.com/repos/facebook/zstd/tarball/v1.1.0,https://github.com/facebook/zstd/releases/tag/v1.1.0,https://api.github.com/repos/facebook/zstd/zipball/v1.1.0,v1.1.0,False,False
+4020326,2016-08-31T16:09:10Z,2016-08-31T16:10:23Z,Zstandard v1.0,"Change Licensing, all project is now BSD, copyright Facebook
+Added Patent Grant
+Small decompression speed improvement
+API : Streaming API supports legacy format
+API : New : ZDICT_getDictID(), ZSTD_sizeof_{CCtx, DCtx, CStream, DStream}(), ZSTD_setDStreamParamter()
+CLI supports legacy formats v0.4+
+Fixed : compression fails on certain huge files, reported by Jesse McGrew
+Enhanced documentation, by @inikep
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/4020326/assets,https://api.github.com/repos/facebook/zstd/releases/4020326,master,https://api.github.com/repos/facebook/zstd/tarball/v1.0.0,https://github.com/facebook/zstd/releases/tag/v1.0.0,https://api.github.com/repos/facebook/zstd/zipball/v1.0.0,v1.0.0,False,False
+3917850,2016-08-18T14:14:00Z,2016-08-18T15:08:01Z,Zstandard v0.8.1,"New streaming API
+Changed : --ultra now enables levels beyond 19
+Changed : -i# now selects benchmark time in second
+Fixed : ZSTD_compress\* can now compress > 4 GB in a single pass, reported by Nick Terrell
+Fixed : speed regression on specific patterns (#272)
+Fixed : support for Z_SYNC_FLUSH, by @dak-evanti-ru  (#291)
+Fixed : ICC compilation, by @inikep 
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/3917850/assets,https://api.github.com/repos/facebook/zstd/releases/3917850,master,https://api.github.com/repos/facebook/zstd/tarball/v0.8.1,https://github.com/facebook/zstd/releases/tag/v0.8.1,https://api.github.com/repos/facebook/zstd/zipball/v0.8.1,v0.8.1,False,False
+3793422,2016-08-01T07:51:18Z,2016-08-02T13:57:17Z,Zstandard v0.8.0,"**Final compression format**
+Improved : better speed on clang and gcc -O2, thanks to @ebiggers 
+New : Build on FreeBSD and DragonFly, thanks to @jrmarino 
+Changed : modified API : ZSTD_compressEnd()
+Fixed : legacy mode with ZSTD_HEAPMODE=0, by @gymdis
+Fixed : premature end of frame when zero-sized raw block, reported by @ebiggers
+Fixed : large dictionaries (> 384 KB), reported by Ilona Papava
+Fixed : checksum correctly checked in single-pass mode
+Fixed : combined --test amd --rm, reported by @amnilsson
+Modified : minor compression level adaptations
+Updated : compression format specification to v0.2.0
+changed : zstd.h moved to /lib directory
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/3793422/assets,https://api.github.com/repos/facebook/zstd/releases/3793422,master,https://api.github.com/repos/facebook/zstd/tarball/v0.8.0,https://github.com/facebook/zstd/releases/tag/v0.8.0,https://api.github.com/repos/facebook/zstd/zipball/v0.8.0,v0.8.0,False,False
+3792527,2016-08-02T09:00:08Z,2016-08-02T12:04:14Z,"Zstandard v0.6.2 ""transition""","Same as v0.6.1
+with added ability to decode v0.7x and v0.8x streams (forward compatibility)
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/3792527/assets,https://api.github.com/repos/facebook/zstd/releases/3792527,dev062,https://api.github.com/repos/facebook/zstd/tarball/v0.6.2,https://github.com/facebook/zstd/releases/tag/v0.6.2,https://api.github.com/repos/facebook/zstd/zipball/v0.6.2,v0.6.2,False,False
+3783531,2016-08-01T11:25:55Z,2016-08-01T12:28:38Z,"Zstandard v0.7.5 ""transition""","Same as v0.7.4
+with added ability to decode v0.8x streams (forward compatibility)
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/3783531/assets,https://api.github.com/repos/facebook/zstd/releases/3783531,dev075,https://api.github.com/repos/facebook/zstd/tarball/v0.7.5,https://github.com/facebook/zstd/releases/tag/v0.7.5,https://api.github.com/repos/facebook/zstd/zipball/v0.7.5,v0.7.5,False,False
+3673656,2016-07-16T18:17:53Z,2016-07-16T18:19:10Z,Zstandard v0.7.4,"Modified : default compression level is now **3** for CLI
+Added : homebrew for Mac, by @cadedaniel 
+Fixed : segfault when using small dictionaries, reported by Felix Handte
+Added : more examples
+Updated : specification, to v0.1.1
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/3673656/assets,https://api.github.com/repos/facebook/zstd/releases/3673656,master,https://api.github.com/repos/facebook/zstd/tarball/v0.7.4,https://github.com/facebook/zstd/releases/tag/v0.7.4,https://api.github.com/repos/facebook/zstd/zipball/v0.7.4,v0.7.4,False,False
+3618615,2016-07-08T19:30:43Z,2016-07-08T19:33:59Z,Zstandard v0.7.3,"New : compression format specification `zstd_compression_format.md`
+New : `--` separator, stating that all following arguments are file names. Suggested by @chipturner 
+New : `ZSTD_getDecompressedSize()`
+New : OpenBSD target, by @juanfra684
+New : `examples` directory
+fixed : dictBuilder using HC levels, reported by Bartosz Taudul
+fixed : legacy support from `ZSTD_decompress_usingDDict()`, reported by Felix Handte
+fixed : multi-blocks decoding with intermediate uncompressed blocks, reported by @GregSlazinski
+modified : removed ""mem.h"" and ""error_public.h"" dependencies from ""zstd.h"" (experimental section)
+modified : legacy functions no longer need magic number
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/3618615/assets,https://api.github.com/repos/facebook/zstd/releases/3618615,master,https://api.github.com/repos/facebook/zstd/tarball/v0.7.3,https://github.com/facebook/zstd/releases/tag/v0.7.3,https://api.github.com/repos/facebook/zstd/zipball/v0.7.3,v0.7.3,False,False
+3577899,2016-07-03T19:06:42Z,2016-07-03T19:10:49Z,Zstandard v0.7.2,"fixed : ZSTD_decompressBlock() using multiple consecutive blocks. Reported by @GregSlazinski
+fixed : potential segfault on very large files (many gigabytes). Reported by @chipturner 
+fixed : CLI displays system error message when destination file cannot be created (#231). Reported by @chipturner 
+fixed : leak in some fail scenario in dictionary builder, reported by @nemequ
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/3577899/assets,https://api.github.com/repos/facebook/zstd/releases/3577899,master,https://api.github.com/repos/facebook/zstd/tarball/v0.7.2,https://github.com/facebook/zstd/releases/tag/v0.7.2,https://api.github.com/repos/facebook/zstd/zipball/v0.7.2,v0.7.2,False,False
+3505945,2016-06-22T23:32:56Z,2016-06-23T08:16:44Z,Zstandard v0.7.1,"v0.7.1
+fixed : `ZBUFF_compressEnd()` called multiple times with too small `dst` buffer, reported by @KrzysFR 
+fixed : dictBuilder fails if first sample is too small, reported by @velavokr
+fixed : corruption issue, reported by cj
+modified : frame checksum enabled by default in command line mode (can be disabled with `--no-check`)
+fixed : cli breaks during destination file overwrite confirmation
+
+v0.7.0
+**Candidate compression format**
+New : Support for directory compression, using `-r`, thanks to @inikep 
+New : Command `--rm`, to remove source file after successful de/compression
+New : Visual build scripts, by @KrzysFR 
+New : Support for Sparse File-systems (do not use space for zero-filled sectors)
+New : Frame checksum support
+New : Support pass-through mode (when using `-df`)
+API : more efficient Dictionary API : `ZSTD_compress_usingCDict()`, `ZSTD_decompress_usingDDict()`
+API : create dictionary files from custom content, by @ot 
+API : support for custom malloc/free functions
+New : controllable Dictionary ID
+New : Support for skippable frames
+Changed : removed `zstd_static.h`, now replaced by a `#define ZSTD_STATIC_LINKING_ONLY` before `#include zstd.h`. Same logic for all others `*_static.h`.
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/3505945/assets,https://api.github.com/repos/facebook/zstd/releases/3505945,master,https://api.github.com/repos/facebook/zstd/tarball/v0.7.1,https://github.com/facebook/zstd/releases/tag/v0.7.1,https://api.github.com/repos/facebook/zstd/zipball/v0.7.1,v0.7.1,False,False
+3219457,2016-05-13T12:01:34Z,2016-05-13T12:04:56Z,Zstandard v0.6.1,"New : zlib wrapper API, thanks to @inikep 
+New : Ability to compile compressor / decompressor separately
+Changed : new lib directory structure
+Fixed : Legacy codec v0.5 compatible with dictionary decompression
+Fixed : Decoder corruption error (#173)
+Fixed : null-string roundtrip (#176)
+New : benchmark mode can select directory as input
+Experimental : midipix support, VMS support
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/3219457/assets,https://api.github.com/repos/facebook/zstd/releases/3219457,master,https://api.github.com/repos/facebook/zstd/tarball/v0.6.1,https://github.com/facebook/zstd/releases/tag/v0.6.1,https://api.github.com/repos/facebook/zstd/zipball/v0.6.1,v0.6.1,False,False
+3006721,2016-04-12T23:28:41Z,2016-04-12T23:31:58Z,Zstandard v0.6.0,"Stronger high compression modes, thanks to @inikep 
+Changed : highest compression modes require `--ultra` command to remove memory restrictions
+API : `ZSTD_getFrameParams()` provides size of decompressed content
+Fixed : zstd cli return error code > 0 and removes dst file artifact when decompression fails, thanks to Chip Turner
+Various fixes and small performance improvements
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/3006721/assets,https://api.github.com/repos/facebook/zstd/releases/3006721,master,https://api.github.com/repos/facebook/zstd/tarball/v0.6.0,https://github.com/facebook/zstd/releases/tag/v0.6.0,https://api.github.com/repos/facebook/zstd/zipball/v0.6.0,v0.6.0,False,False
+2639313,2016-02-18T11:04:02Z,2016-02-18T11:08:04Z,Zstandard v0.5.1,"- New : Optimal parsing => Very high compression modes, thanks to @inikep 
+- Changed : Dictionary builder integrated into libzstd and zstd cli
+- Changed (!) : zstd cli now uses ""multiple input files"" as default mode. See `zstd -h`.
+- Fix : high compression modes for big-endian platforms (#123)
+- New : zstd cli : `-t` | `--test` command
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2639313/assets,https://api.github.com/repos/facebook/zstd/releases/2639313,master,https://api.github.com/repos/facebook/zstd/tarball/v0.5.1,https://github.com/facebook/zstd/releases/tag/v0.5.1,https://api.github.com/repos/facebook/zstd/zipball/v0.5.1,v0.5.1,False,False
+2561004,2016-02-05T15:04:52Z,2016-02-05T15:35:04Z,Zstandard v0.5.0,"New : Dictionary builder tool
+Changed : Advanced API for streaming and dictionary compression
+Improved : better compression of small data
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2561004/assets,https://api.github.com/repos/facebook/zstd/releases/2561004,master,https://api.github.com/repos/facebook/zstd/tarball/v0.5.0,https://github.com/facebook/zstd/releases/tag/v0.5.0,https://api.github.com/repos/facebook/zstd/zipball/v0.5.0,v0.5.0,False,False
+2474087,2016-01-22T12:14:29Z,2016-01-22T12:15:48Z,Zstandard v0.4.7,"Improved : small compression speed improvement in HC mode
+Changed : `zstd_decompress.c` starts with ZSTD_LEGACY_SUPPORT set to 0 by default
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2474087/assets,https://api.github.com/repos/facebook/zstd/releases/2474087,master,https://api.github.com/repos/facebook/zstd/tarball/v0.4.7,https://github.com/facebook/zstd/releases/tag/v0.4.7,https://api.github.com/repos/facebook/zstd/zipball/v0.4.7,v0.4.7,False,False
+2416484,2016-01-12T23:47:28Z,2016-01-12T23:48:50Z,Zstandard v0.4.6,"fix : fast compression mode on Windows
+New : cmake configuration file, thanks to @mailagentrus 
+Improved : high compression mode on repetitive data
+New : block-level API
+New : Duplicate context for faster dictionary compression
+Changed : ZSTD_decompress() uses heap memory by default (can be changed back to stack with #define)
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2416484/assets,https://api.github.com/repos/facebook/zstd/releases/2416484,master,https://api.github.com/repos/facebook/zstd/tarball/v0.4.6,https://github.com/facebook/zstd/releases/tag/v0.4.6,https://api.github.com/repos/facebook/zstd/zipball/v0.4.6,v0.4.6,False,False
+2309125,2015-12-18T02:59:36Z,2015-12-18T03:00:18Z,Zstandard v0.4.5,"Added : Command line : `-m` : compress / decompress multiple files. wildcard `*` support.
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2309125/assets,https://api.github.com/repos/facebook/zstd/releases/2309125,master,https://api.github.com/repos/facebook/zstd/tarball/v0.4.5,https://github.com/facebook/zstd/releases/tag/v0.4.5,https://api.github.com/repos/facebook/zstd/zipball/v0.4.5,v0.4.5,False,False
+2283122,2015-12-14T12:46:54Z,2015-12-14T12:49:10Z,Zstandard v0.4.4,"Fixed : high compression modes for Windows 32 bits
+new : external dictionary API : direct and buffered mode, accessible through command line (`-D`)
+new : Visual DLL project, thanks to @KrzysFR
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2283122/assets,https://api.github.com/repos/facebook/zstd/releases/2283122,master,https://api.github.com/repos/facebook/zstd/tarball/v0.4.4,https://github.com/facebook/zstd/releases/tag/v0.4.4,https://api.github.com/repos/facebook/zstd/zipball/v0.4.4,v0.4.4,False,False
+2243492,2015-12-07T10:11:01Z,2015-12-07T10:13:04Z,Zstandard v0.4.3,"- External dictionary mode (API only)
+- zstd-frugal : small-size binary
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2243492/assets,https://api.github.com/repos/facebook/zstd/releases/2243492,master,https://api.github.com/repos/facebook/zstd/tarball/v0.4.3,https://github.com/facebook/zstd/releases/tag/v0.4.3,https://api.github.com/repos/facebook/zstd/zipball/v0.4.3,v0.4.3,False,False
+2220280,2015-12-02T14:32:42Z,2015-12-02T14:33:40Z,Zstandard v0.4.2,"Generic minor improvements for small blocks
+Fixed : big-endian compatibility, by @peterh (#85)
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2220280/assets,https://api.github.com/repos/facebook/zstd/releases/2220280,master,https://api.github.com/repos/facebook/zstd/tarball/zstd-0.4.2,https://github.com/facebook/zstd/releases/tag/zstd-0.4.2,https://api.github.com/repos/facebook/zstd/zipball/zstd-0.4.2,zstd-0.4.2,False,False
+2213553,2015-12-01T12:07:48Z,2015-12-01T14:27:49Z,Zstandard v0.4.1,"- Build without legacy support, using ZSTD_LEGACY_SUPPORT=0
+- pgo assisted build (zstd-pgo)
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2213553/assets,https://api.github.com/repos/facebook/zstd/releases/2213553,master,https://api.github.com/repos/facebook/zstd/tarball/zstd-0.4.1,https://github.com/facebook/zstd/releases/tag/zstd-0.4.1,https://api.github.com/repos/facebook/zstd/zipball/zstd-0.4.1,zstd-0.4.1,False,False
+2202260,2015-11-29T11:59:33Z,2015-11-29T12:32:33Z,Zstandard v0.4,"High compression levels now accessible through command line
+new : ZBUFF API (see zstd_buffered.h)
+improved bufferless streaming API
+zstdhc API merged into regular zstd
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2202260/assets,https://api.github.com/repos/facebook/zstd/releases/2202260,master,https://api.github.com/repos/facebook/zstd/tarball/zstd-0.4.0,https://github.com/facebook/zstd/releases/tag/zstd-0.4.0,https://api.github.com/repos/facebook/zstd/zipball/zstd-0.4.0,zstd-0.4.0,False,False
+2100598,2015-11-10T10:17:57Z,2015-11-10T10:19:49Z,Zstandard v0.3.6,"Small improvements for small files
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2100598/assets,https://api.github.com/repos/facebook/zstd/releases/2100598,master,https://api.github.com/repos/facebook/zstd/tarball/zstd-0.3.6,https://github.com/facebook/zstd/releases/tag/zstd-0.3.6,https://api.github.com/repos/facebook/zstd/zipball/zstd-0.3.6,zstd-0.3.6,False,False
+2094243,2015-11-09T11:50:27Z,2015-11-09T11:51:11Z,Zstandard v0.3.5,"small compression improvements
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2094243/assets,https://api.github.com/repos/facebook/zstd/releases/2094243,master,https://api.github.com/repos/facebook/zstd/tarball/zstd-0.3.5,https://github.com/facebook/zstd/releases/tag/zstd-0.3.5,https://api.github.com/repos/facebook/zstd/zipball/zstd-0.3.5,zstd-0.3.5,False,False
+2084117,2015-11-06T13:29:04Z,2015-11-06T13:33:26Z,Zstandard v0.3.4,"Faster compression levels; scale changed to 1-20
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2084117/assets,https://api.github.com/repos/facebook/zstd/releases/2084117,master,https://api.github.com/repos/facebook/zstd/tarball/zstd-0.3.4,https://github.com/facebook/zstd/releases/tag/zstd-0.3.4,https://api.github.com/repos/facebook/zstd/zipball/zstd-0.3.4,zstd-0.3.4,False,False
+2074484,2015-11-05T01:42:59Z,2015-11-05T01:43:19Z,Zstandard v0.3.3,"Improved compression ratio
+Fixed bugs reported by Maciej Adamczyk and @luben
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2074484/assets,https://api.github.com/repos/facebook/zstd/releases/2074484,master,https://api.github.com/repos/facebook/zstd/tarball/zstd-0.3.3,https://github.com/facebook/zstd/releases/tag/zstd-0.3.3,https://api.github.com/repos/facebook/zstd/zipball/zstd-0.3.3,zstd-0.3.3,False,False
+2056292,2015-11-02T11:46:42Z,2015-11-02T12:08:16Z,Zstandard v0.3.2,"Restored Visual Studio fix by @KrzysFR (reported by @mailagentrus)
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2056292/assets,https://api.github.com/repos/facebook/zstd/releases/2056292,master,https://api.github.com/repos/facebook/zstd/tarball/zstd-0.3.2,https://github.com/facebook/zstd/releases/tag/zstd-0.3.2,https://api.github.com/repos/facebook/zstd/zipball/zstd-0.3.2,zstd-0.3.2,False,False
+2054639,2015-11-02T02:19:38Z,2015-11-02T02:22:05Z,Zstandard v0.3.1,"Small compression ratio improvement
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2054639/assets,https://api.github.com/repos/facebook/zstd/releases/2054639,master,https://api.github.com/repos/facebook/zstd/tarball/zstd-0.3.1,https://github.com/facebook/zstd/releases/tag/zstd-0.3.1,https://api.github.com/repos/facebook/zstd/zipball/zstd-0.3.1,zstd-0.3.1,False,False
+2047516,2015-10-30T15:47:08Z,2015-10-30T15:53:54Z,Zstandard v0.3,"Configurable compression levels (1-25)
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2047516/assets,https://api.github.com/repos/facebook/zstd/releases/2047516,master,https://api.github.com/repos/facebook/zstd/tarball/zstd-0.3.0,https://github.com/facebook/zstd/releases/tag/zstd-0.3.0,https://api.github.com/repos/facebook/zstd/zipball/zstd-0.3.0,zstd-0.3.0,False,False
+2031932,2015-10-28T11:26:57Z,2015-10-28T11:28:47Z,Zstandard v0.2.2,"Fixed : wrong binary generation by Visual Studio 2013 & 2015 in release mode (issue #52, compiler bug), reported and fixed by Christophe Chevalier (@KrzysFR)
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2031932/assets,https://api.github.com/repos/facebook/zstd/releases/2031932,master,https://api.github.com/repos/facebook/zstd/tarball/zstd-0.2.2,https://github.com/facebook/zstd/releases/tag/zstd-0.2.2,https://api.github.com/repos/facebook/zstd/zipball/zstd-0.2.2,zstd-0.2.2,False,False
+2013079,2015-10-24T13:06:42Z,2015-10-24T13:07:11Z,Zstandard v0.2.1,"Fixed issues reported by Hanno Böck (@hannob)
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2013079/assets,https://api.github.com/repos/facebook/zstd/releases/2013079,master,https://api.github.com/repos/facebook/zstd/tarball/zstd-0.2.1,https://github.com/facebook/zstd/releases/tag/zstd-0.2.1,https://api.github.com/repos/facebook/zstd/zipball/zstd-0.2.1,zstd-0.2.1,False,False
+2000630,2015-10-22T07:30:32Z,2015-10-22T07:32:55Z,Zstandard v0.2,"- Improved decompression speed (+30%)
+- New compressed format
+  - Decoder compatible with v0.1.x compressed files
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/2000630/assets,https://api.github.com/repos/facebook/zstd/releases/2000630,master,https://api.github.com/repos/facebook/zstd/tarball/zstd-0.2.0,https://github.com/facebook/zstd/releases/tag/zstd-0.2.0,https://api.github.com/repos/facebook/zstd/zipball/zstd-0.2.0,zstd-0.2.0,False,False
+1965146,2015-10-15T10:10:12Z,2015-10-15T11:47:32Z,Zstandard v0.1.3,"minor improvements : 
+- Saved one allocation, thanks to @xaphier 
+- Fixed uninitialization warnings thanks to @nemequ report
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/1965146/assets,https://api.github.com/repos/facebook/zstd/releases/1965146,master,https://api.github.com/repos/facebook/zstd/tarball/zstd-0.1.3,https://github.com/facebook/zstd/releases/tag/zstd-0.1.3,https://api.github.com/repos/facebook/zstd/zipball/zstd-0.1.3,zstd-0.1.3,False,False
+1798812,2015-09-10T23:22:25Z,2015-09-11T09:33:57Z,Zstandard v0.1.2,"Added : frame concatenation support
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/1798812/assets,https://api.github.com/repos/facebook/zstd/releases/1798812,master,https://api.github.com/repos/facebook/zstd/tarball/zstd-0.1.2,https://github.com/facebook/zstd/releases/tag/zstd-0.1.2,https://api.github.com/repos/facebook/zstd/zipball/zstd-0.1.2,zstd-0.1.2,False,False
+1728269,2015-08-26T22:59:17Z,2015-08-26T23:00:37Z,Zstandard v0.1.1,"- fixed a bug in compression
+- detects write-on-flush errors
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/1728269/assets,https://api.github.com/repos/facebook/zstd/releases/1728269,master,https://api.github.com/repos/facebook/zstd/tarball/v0.1.1,https://github.com/facebook/zstd/releases/tag/v0.1.1,https://api.github.com/repos/facebook/zstd/zipball/v0.1.1,v0.1.1,False,False
+1717199,2015-08-24T20:29:21Z,2015-08-25T00:47:37Z,First Zstd release,"First Zstd release,
+compression speed ~ 250 MB/s per core, and decompression speed > 500 MB/s per core.
+It features a ""robust"" decoder, able to properly handle erroneous input.
+
+Note : the internal compressed format is not yet ""final"".
+Use this version for testing only, or if you intend to ship the decoder alongside compressed data.
+",https://api.github.com/users/Cyan4973,750081,Cyan4973,https://api.github.com/repos/facebook/zstd/releases/1717199/assets,https://api.github.com/repos/facebook/zstd/releases/1717199,master,https://api.github.com/repos/facebook/zstd/tarball/v0.1.0,https://github.com/facebook/zstd/releases/tag/v0.1.0,https://api.github.com/repos/facebook/zstd/zipball/v0.1.0,v0.1.0,False,False

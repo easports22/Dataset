@@ -1,0 +1,1190 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8208561,2017-10-21T22:51:39Z,2017-10-21T22:51:01Z,7.1.6,"* Add warning for using `browserslist` option instead of `browsers`.
+* Add warning for multiple control comments in the same scope.
+* Fix `Invalid array length` error during indent changes.",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/8208561/assets,https://api.github.com/repos/postcss/autoprefixer/releases/8208561,master,https://api.github.com/repos/postcss/autoprefixer/tarball/7.1.6,https://github.com/postcss/autoprefixer/releases/tag/7.1.6,https://api.github.com/repos/postcss/autoprefixer/zipball/7.1.6,7.1.6,False,False
+8031221,2017-10-06T21:31:19Z,2017-10-06T21:33:45Z,7.1.5,"* Fix `::placeholder` prefix for Edge.
+* Fix `inherit`/`initial`/`unset` values for `flex-direction`.
+* Fix RegExp usage in gradients (by @YetAnotherMinion).",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/8031221/assets,https://api.github.com/repos/postcss/autoprefixer/releases/8031221,master,https://api.github.com/repos/postcss/autoprefixer/tarball/7.1.5,https://github.com/postcss/autoprefixer/releases/tag/7.1.5,https://api.github.com/repos/postcss/autoprefixer/zipball/7.1.5,7.1.5,False,False
+8031217,2017-09-07T05:08:02Z,2017-10-06T21:33:21Z,7.1.4,"* Fix `radial-gradient` direction conversion.
+* Fix `image-set` in `cursor`.",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/8031217/assets,https://api.github.com/repos/postcss/autoprefixer/releases/8031217,master,https://api.github.com/repos/postcss/autoprefixer/tarball/7.1.4,https://github.com/postcss/autoprefixer/releases/tag/7.1.4,https://api.github.com/repos/postcss/autoprefixer/zipball/7.1.4,7.1.4,False,False
+8031212,2017-08-28T05:15:28Z,2017-10-06T21:33:04Z,7.1.3,* Add warning for old `radial-gradient` direction syntax.,https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/8031212/assets,https://api.github.com/repos/postcss/autoprefixer/releases/8031212,master,https://api.github.com/repos/postcss/autoprefixer/tarball/7.1.3,https://github.com/postcss/autoprefixer/releases/tag/7.1.3,https://api.github.com/repos/postcss/autoprefixer/zipball/7.1.3,7.1.3,False,False
+6953436,2017-07-06T15:37:44Z,2017-07-06T15:45:27Z,7.1.2,* Fix `text-decoration` shortcut support.,https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/6953436/assets,https://api.github.com/repos/postcss/autoprefixer/releases/6953436,master,https://api.github.com/repos/postcss/autoprefixer/tarball/7.1.2,https://github.com/postcss/autoprefixer/releases/tag/7.1.2,https://api.github.com/repos/postcss/autoprefixer/zipball/7.1.2,7.1.2,False,False
+6430470,2017-05-18T14:31:04Z,2017-05-18T14:32:43Z,7.1.1,* Remove non-`-webkit-` intrinsic prefixes in Grid Layout (by @yisibl).,https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/6430470/assets,https://api.github.com/repos/postcss/autoprefixer/releases/6430470,master,https://api.github.com/repos/postcss/autoprefixer/tarball/7.1.1,https://github.com/postcss/autoprefixer/releases/tag/7.1.1,https://api.github.com/repos/postcss/autoprefixer/zipball/7.1.1,7.1.1,False,False
+6381506,2017-05-14T23:27:41Z,2017-05-14T23:52:38Z,7.1 “Universitas litterarum”,"<img src=""https://cloud.githubusercontent.com/assets/19343/26038720/24ea441c-390f-11e7-89fa-01a394af2085.png"" alt=""Humboldt University of Berlin coat of arms"" width=""200"" height=""197"" align=""right"" />
+
+Autoprefixer 7.1 brings `unicode-bidi` support, `-webkit-appearance` to Edge and fix intrinsic widths prefixes in Grid Layout.
+
+## `unicode-bidi`
+
+Autoprefixer 7.1 will add prefixes for `isolate`, `plaintext` and `isolate-override` values in `unicode-bidi`:
+
+```css
+.foo {
+  unicode-bidi: -webkit-isolate;
+  unicode-bidi: isolate;
+}
+```
+
+### Edge and `-webkit-appearance`
+
+Prefixes sometime could be very strange. Edge started to support `appearance` property with a prefix. But because of many only-for-Safari websites it supports `-webkit-appearance` instead of `-ms-appearance`.
+
+Autoprefixer 7.1 knows it and will generate `-webkit-appearance` even if you set only `""last 1 Edge version""` in [browserslist](https://github.com/ai/browserslist) config.
+
+### Intrinsic Widths
+
+`min-content`, `stretch` and other Intrinsic sizes was fixed in `grid-template-columns` and other Grid Layout properties.
+
+```css
+.foo {
+  grid-template-columns: minmax(100px, -webkit-min-content);
+  grid-template-columns: minmax(100px, min-content);
+}
+```
+
+### Browserslist in `info()`
+
+By accident Browserslist 1 loaded config from current working dir if file path was missed. In Browserslist 2 we fixed it and now you must specify path to file in explicit way.
+
+It is not a problem for Autoprefixer user, because Autoprefixer takes CSS file path from PostCSS.
+But `autoprefixer.info()` stopped to load conifg in 7.0. In 7.1 we added `from` option to `info()`.
+
+Set the path to your CSS file and `info()` will show what prefixes and why it will added to this CSS file:
+
+```js
+autoprefixer.info({ from: './scr/app.css' })
+//=> Browsers:
+//     Chrome: 58
+//
+//   These browsers account for 1.68% of all users globally
+//
+//   Selectors:
+//     :fullscreen: webkit
+//   …
+```",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/6381506/assets,https://api.github.com/repos/postcss/autoprefixer/releases/6381506,master,https://api.github.com/repos/postcss/autoprefixer/tarball/7.1.0,https://github.com/postcss/autoprefixer/releases/tag/7.1.0,https://api.github.com/repos/postcss/autoprefixer/zipball/7.1.0,7.1.0,False,False
+6304329,2017-05-07T16:01:43Z,2017-05-07T16:04:55Z,7.0.1,* Fix Autoprefixer for old JS runtimes.,https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/6304329/assets,https://api.github.com/repos/postcss/autoprefixer/releases/6304329,master,https://api.github.com/repos/postcss/autoprefixer/tarball/7.0.1,https://github.com/postcss/autoprefixer/releases/tag/7.0.1,https://api.github.com/repos/postcss/autoprefixer/zipball/7.0.1,7.0.1,False,False
+6300426,2017-05-06T13:30:11Z,2017-05-06T13:51:53Z,7.0 “Coelestem adspicit lucem”,"<img src=""https://cloud.githubusercontent.com/assets/19343/25772754/e47887e8-3271-11e7-9830-c4bdb72cf71e.png"" alt=""University of Copenhagen coat of arms"" width=""220"" height=""303"" align=""right"" />
+
+Autoprefixer 7.0 uses [PostCSS 6.0](https://github.com/postcss/postcss/releases/tag/6.0.0), [Browserslist 2.0](https://evilmartians.com/chronicles/autoprefixer-7-browserslist-2-released) and [`caniuse-lite`](https://github.com/ben-eb/caniuse-lite).
+
+### Browserslist 2.0
+
+Browserslist 2.0 and `caniuse-lite` by @ben-eb are the main changes in Autoprefixer 7.0. We wrote an article about these changes:
+
+**[> Autoprefixer 7.0 and Browserslist 2.0](https://evilmartians.com/chronicles/autoprefixer-7-browserslist-2-released)**
+
+## Breaking Changes
+
+Node.js [stopped](https://github.com/nodejs/LTS) 0.12 support in January 01. So PostCSS dropped Node.js 0.12 from all tests. Please update your Node.js version to 4.0 or 7.0.
+
+IE has very basic support of Grid Layout. So Autoprefixer added `-ms-` prefixes and change property syntax. Unfortunately, IE supports a really small subset of Grid Layout. So prefixes were not really useful. This is why we disabled Grid Layout prefixes by default. But you still can enable it:
+
+```js
+autoprefixer({ grid: true })
+```
+
+### Babel
+
+Autoprefixer was one of the biggest CoffeeScript projects. We thought to rewrite it, but reasons were small, and work was big. But @Semigradsky used great [decaffeinate](https://github.com/decaffeinate/decaffeinate) tool for automatically CoffeeScript → ES6 converting, and now all Autoprefixer sources are written in JS.
+
+### PostCSS 6.0
+
+New PostCSS uses stream parser and uses less memory. Also, it uses less space in `node_modules`.
+
+### Other Changes
+
+* Use `^` for Browserslist dependencies, instead of `~`.
+* Fix `-ms-grid-column-align`.
+* Move tests to Jest.",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/6300426/assets,https://api.github.com/repos/postcss/autoprefixer/releases/6300426,master,https://api.github.com/repos/postcss/autoprefixer/tarball/7.0.0,https://github.com/postcss/autoprefixer/releases/tag/7.0.0,https://api.github.com/repos/postcss/autoprefixer/zipball/7.0.0,7.0.0,False,False
+5711125,2017-03-11T11:20:18Z,2017-03-11T11:21:18Z,6.7.7,* Fix `order` for non-digit values.,https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/5711125/assets,https://api.github.com/repos/postcss/autoprefixer/releases/5711125,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.7.7,https://github.com/postcss/autoprefixer/releases/tag/6.7.7,https://api.github.com/repos/postcss/autoprefixer/zipball/6.7.7,6.7.7,False,False
+5592030,2017-02-28T10:02:26Z,2017-02-28T10:08:19Z,6.7.6,"- Fix `font-kerning` (by @cvle).
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/5592030/assets,https://api.github.com/repos/postcss/autoprefixer/releases/5592030,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.7.6,https://github.com/postcss/autoprefixer/releases/tag/6.7.6,https://api.github.com/repos/postcss/autoprefixer/zipball/6.7.6,6.7.6,False,False
+5534006,2017-02-22T12:06:18Z,2017-02-22T12:13:55Z,6.7.5,"- Fix `text-decoration-skip` in iOS (by @cvle).
+- Fix `clip-path` (by @cvle).
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/5534006/assets,https://api.github.com/repos/postcss/autoprefixer/releases/5534006,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.7.5,https://github.com/postcss/autoprefixer/releases/tag/6.7.5,https://api.github.com/repos/postcss/autoprefixer/zipball/6.7.5,6.7.5,False,False
+5510625,2017-02-20T14:11:08Z,2017-02-20T14:14:57Z,6.7.4,"- Improve `browsers` option perfomance.
+- Update CoffeeScript compiler.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/5510625/assets,https://api.github.com/repos/postcss/autoprefixer/releases/5510625,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.7.4,https://github.com/postcss/autoprefixer/releases/tag/6.7.4,https://api.github.com/repos/postcss/autoprefixer/zipball/6.7.4,6.7.4,False,False
+5465045,2017-02-15T13:45:51Z,2017-02-15T14:06:35Z,6.7.3,"- Fix compatibility with “Intrinsic & Extrinsic Sizing” [spec update](https://www.w3.org/TR/2017/WD-css-sizing-3-20170207/#changes).
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/5465045/assets,https://api.github.com/repos/postcss/autoprefixer/releases/5465045,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.7.3,https://github.com/postcss/autoprefixer/releases/tag/6.7.3,https://api.github.com/repos/postcss/autoprefixer/zipball/6.7.3,6.7.3,False,False
+5317565,2017-01-31T16:02:59Z,2017-01-31T16:37:05Z,6.7.2,"- Do not prefix grid/flexbox in `@supports` on `grid: false`/`flexbox: false`.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/5317565/assets,https://api.github.com/repos/postcss/autoprefixer/releases/5317565,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.7.2,https://github.com/postcss/autoprefixer/releases/tag/6.7.2,https://api.github.com/repos/postcss/autoprefixer/zipball/6.7.2,6.7.2,False,False
+5317100,2017-01-30T13:01:24Z,2017-01-31T15:59:31Z,6.7.1,"- Update Browserslist with `last n version` fix.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/5317100/assets,https://api.github.com/repos/postcss/autoprefixer/releases/5317100,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.7.1,https://github.com/postcss/autoprefixer/releases/tag/6.7.1,https://api.github.com/repos/postcss/autoprefixer/zipball/6.7.1,6.7.1,False,False
+5230985,2017-01-22T13:08:47Z,2017-01-22T13:33:36Z,6.7 “Krungthep doot thep saang”,"<img src=""https://cloud.githubusercontent.com/assets/19343/22182742/85d6af00-e0df-11e6-8d7b-3d7a3e672c9d.png"" alt=""Seal of Bangkok"" width=""200"" height=""200"" align=""right"" />
+
+## Electron Support
+
+Electron is a framework to build desktop applications with JS and CSS. It is used in Atom text editor and Hyper terminal. Electron is based on Chromium, but have different versions. For instance, Electron 1.4 is based on Chromium 53.
+
+@Kilian made a npm package and Electron-to-Chrome versions mapping. Browserslist 1.6 uses this npm package to covert Electron version to Chrome:
+
+``` js
+browserslist('Electron >= 1.3') //=> [""chrome 53"", ""chrome 52""]
+```
+
+Autoprefixer 6.7 uses new Browserslist version, so you could write Electron versions in your `browserslist` section of `package.json`.
+
+Also new Browserslist fixes inconsistency of Can I Use data to prevent errors like:
+
+```
+BrowserslistError: Unknown version 0 of and_chr
+```
+
+## `flex-flow`
+
+Autoprefixer converts flexbox syntax to support 2012 and 2009 flexbox specification. Unfortunately, not all properties could be converted to 2009 spec.
+
+Oldest specification doesn’t support `flex-flow` too, so previous Autoprefixer releases ignore this property.
+
+``` css
+.foo {
+    flex-flow: row
+}
+```
+
+But `flex-flow` is just a shortcut of `[flex-direction] [flex-wrap]` and `flex-direction` could be converted to two properties in 2009 specification.
+
+Autoprefixer 1.7 converts `row`, `column`, `row-reverse` and `column-reverse` values of `flex-flow` too.
+
+``` css
+.foo {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-flow: row;
+        -ms-flex-flow: row;
+            flex-flow: row;
+}
+```
+
+Note, that `wrap`, `wrap-reverse` and `nowrap` values still not supported.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/5230985/assets,https://api.github.com/repos/postcss/autoprefixer/releases/5230985,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.7.0,https://github.com/postcss/autoprefixer/releases/tag/6.7.0,https://api.github.com/repos/postcss/autoprefixer/zipball/6.7.0,6.7.0,False,False
+5053485,2017-01-03T05:24:37Z,2017-01-03T05:33:23Z,6.6.1,"- Add metadata to use Autoprefixer in [JSS](https://github.com/cssinjs/jss) tests (by @cvle).
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/5053485/assets,https://api.github.com/repos/postcss/autoprefixer/releases/5053485,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.6.1,https://github.com/postcss/autoprefixer/releases/tag/6.6.1,https://api.github.com/repos/postcss/autoprefixer/zipball/6.6.1,6.6.1,False,False
+4997295,2016-12-23T04:03:09Z,2016-12-23T04:31:00Z,6.6 “Kaiyuan”,"<img src=""https://cloud.githubusercontent.com/assets/19343/21446927/a979d71c-c892-11e6-818f-ffb0a3fc2115.jpg"" alt=""Emperor Xuanzong of Tang"" width=""200"" height=""254"" align=""right"" />
+
+This release uses [Browserslist](https://github.com/ai/browserslist) 1.5 and is focused on sharing browsers with [babel-preset-env](https://github.com/babel/babel-preset-env) and [create-react-app](https://github.com/facebookincubator/create-react-app).
+
+## `package.json`
+
+We know that many developers hate the current mess of config files in the project root.
+
+With Autoprefixer 6.6 you can specify browsers in `package.json` to reduce config files:
+
+``` json
+{
+  ""private"": true,
+  ""devDependencies"": {
+    ""autoprefixer"": ""^6.6.0"",
+    ""postcss"": ""^5.2.6""
+  },
+  ""browserslist"": [
+    ""last 2 versions"",
+    ""ie 9""
+  ]
+}
+```
+
+Note that we highly recommend specifying browsers in `browserslist` config or in `package.json` instead of Autoprefixer option. In this case many other tools will share browsers list, including [Stylelint](http://stylelint.io/) and [babel-env-preset](https://github.com/babel/babel-preset-env).
+
+## Environments
+
+In most cases, you should use same browsers list for Autoprefixer in development and production. But right now Autoprefixer share browsers list with many other tools including [babel-env-preset](https://github.com/babel/babel-preset-env).
+
+To improve development performance developers [might want](https://github.com/facebookincubator/create-react-app/pull/1249#issuecomment-266563945) to use different target browsers in development.
+
+So both Browserslist config now supports environments:
+
+``` ini
+[development]
+last 1 version
+
+[production]
+last 2 version
+> 1%
+```
+
+``` json
+  ""private"": true,
+  ""devDependencies"": {
+    ""autoprefixer"": ""^6.6.0"",
+    ""postcss"": ""^5.2.6""
+  },
+  ""browserslist"": {
+    ""development"": [
+      ""last 1 version""
+    ],
+    ""production"": [
+      ""last 2 version"",
+      ""> 1%""
+    ]
+  }
+```
+
+Autoprefixer will use `env` option, `BROWSERSLIST_ENV` or `NODE_ENV` to detect current environment.
+
+## Custom Browser Statistics
+
+In addition to `> 1%` and `> 1% in US`, Browserslist supports `> 1% in my stats` to select popular versions according your visitors statistics.
+
+To do it you need [save JSON data](https://github.com/ai/browserslist#custom-usage-data) from Google Analytics.
+
+Autoprefixer 6.6 support standard name for this usage data file `browserslist-stats.json` and will load it automatically, without need to pass `stats` options.
+
+It is especially useful if you share browsers with other tools without `stats` option support.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/4997295/assets,https://api.github.com/repos/postcss/autoprefixer/releases/4997295,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.6.0,https://github.com/postcss/autoprefixer/releases/tag/6.6.0,https://api.github.com/repos/postcss/autoprefixer/zipball/6.6.0,6.6.0,False,False
+4899547,2016-12-12T21:43:57Z,2016-12-12T21:45:46Z,6.5.4,"- Fix unitless 0 basis in IE10/IE11 shorthand flex (by Google).
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/4899547/assets,https://api.github.com/repos/postcss/autoprefixer/releases/4899547,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.5.4,https://github.com/postcss/autoprefixer/releases/tag/6.5.4,https://api.github.com/repos/postcss/autoprefixer/zipball/6.5.4,6.5.4,False,False
+4624022,2016-11-10T12:28:34Z,2016-11-10T12:35:30Z,6.5.3,"- Add error for popular mistake with `browser` option instead of `browsers`.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/4624022/assets,https://api.github.com/repos/postcss/autoprefixer/releases/4624022,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.5.3,https://github.com/postcss/autoprefixer/releases/tag/6.5.3,https://api.github.com/repos/postcss/autoprefixer/zipball/6.5.3,6.5.3,False,False
+4624020,2016-11-06T12:06:01Z,2016-11-10T12:35:11Z,6.5.2,"- Clean prefixes data (by @schiehll).
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/4624020/assets,https://api.github.com/repos/postcss/autoprefixer/releases/4624020,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.5.2,https://github.com/postcss/autoprefixer/releases/tag/6.5.2,https://api.github.com/repos/postcss/autoprefixer/zipball/6.5.2,6.5.2,False,False
+4373427,2016-10-12T20:32:41Z,2016-10-12T20:48:52Z,6.5.1,"- Fix selectors with `:--` prefix support.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/4373427/assets,https://api.github.com/repos/postcss/autoprefixer/releases/4373427,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.5.1,https://github.com/postcss/autoprefixer/releases/tag/6.5.1,https://api.github.com/repos/postcss/autoprefixer/zipball/6.5.1,6.5.1,False,False
+4238151,2016-09-27T08:56:09Z,2016-09-27T09:12:03Z,6.5 “Einigkeit und Recht und Freiheit”,"<img src=""https://cloud.githubusercontent.com/assets/19343/18866736/ec7242d4-84a9-11e6-9761-749be98f2769.png"" width=""200"" height=""249"" align=""right"" alt=""The Lesser Arms of the German Empire, 1871 - 1918"">
+
+Autoprefixer 6.5 brings `defaults` keyword and fixes Grid support.
+
+## `defaults`
+
+Autoprefixer 6.5 includes [Browserslist](https://github.com/ai/browserslist) 1.4 with `defaults` keyword. So now you could extend default browsers list:
+
+``` js
+postcss([
+  autoprefixer({ browsers: ['defaults', 'ie 9'] })
+])
+```
+
+Also don’t miss new tool to check what browsers will be picked by Browserslist: [browserl.ist](http://browserl.ist/).
+
+## CSS Grid Layout
+
+With Autoprefixer small subset of coming CSS Grid Layout will works in IE by adding a `-ms-` prefix and change the syntax (as we do for Flexbox). In 6.5 we fixed some cases with `-ms-grid-row-align`.
+
+``` css
+.container {
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+.element {
+    align-self: stretch;
+    grid-column-start: 1;
+    grid-column-end: span 3;
+}
+```
+
+``` css
+.container {
+    display: -ms-grid;
+    display: grid;
+    -ms-grid-columns: auto 1fr;
+    grid-template-columns: auto 1fr;
+}
+.element {
+    -ms-grid-row-align: stretch;
+    align-self: stretch;
+    -ms-grid-column: 1;
+    grid-column-start: 1;
+    -ms-grid-column-span: 3;
+    grid-column-end: span 3;
+}
+```
+
+## Flexbox
+
+`align-self` has same syntax in final and 2009 Flexbox specification.
+
+In 6.5 we fixed when Autopefixer removed `-webkit-align-self` even if final spec is still in requirements.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/4238151/assets,https://api.github.com/repos/postcss/autoprefixer/releases/4238151,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.5.0,https://github.com/postcss/autoprefixer/releases/tag/6.5.0,https://api.github.com/repos/postcss/autoprefixer/zipball/6.5.0,6.5.0,False,False
+4233649,2016-09-02T00:05:37Z,2016-09-26T19:55:26Z,6.4.1,"- Fix node cloning after some PostCSS plugins.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/4233649/assets,https://api.github.com/repos/postcss/autoprefixer/releases/4233649,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.4.1,https://github.com/postcss/autoprefixer/releases/tag/6.4.1,https://api.github.com/repos/postcss/autoprefixer/zipball/6.4.1,6.4.1,False,False
+3801477,2016-08-03T10:28:24Z,2016-08-03T10:37:12Z,6.4 “Hic et ubique terrarum”,"<img src=""https://cloud.githubusercontent.com/assets/19343/17362506/069d4516-597e-11e6-90c2-3c95ec8e202b.png"" width=""200"" height=""224"" align=""right"" alt=""Coat of arms of University of Paris"">
+
+Autoprefixer 6.4 brings `:any-link` and `text-decoration-skip` support.
+
+## New Support
+
+New Autoprefixer will compile:
+
+``` css
+:any-link {
+    text-decoration-skip: ink;
+}
+```
+
+to:
+
+``` css
+:-webkit-any-link {
+  -webkit-text-decoration-skip: ink;
+          text-decoration-skip: ink;
+}
+:-moz-any-link {
+  text-decoration-skip: ink;
+}
+:any-link {
+  -webkit-text-decoration-skip: ink.;
+          text-decoration-skip: ink;
+}
+```
+
+## Transition
+
+Autoprefixer 6.4 support reverse parameters in transition:
+
+``` css
+.foo {
+    transition: 200ms color;
+}
+```
+
+Also we fix transition prefixing in Opera 12.
+
+## Other
+- Fix `-webkit-` prefix for `backface-visibility`.
+- Fix `rad` unit support in gradients (by @gucong3000).
+- Removed Safari TP Grid prefixes support.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/3801477/assets,https://api.github.com/repos/postcss/autoprefixer/releases/3801477,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.4.0,https://github.com/postcss/autoprefixer/releases/tag/6.4.0,https://api.github.com/repos/postcss/autoprefixer/zipball/6.4.0,6.4.0,False,False
+3575407,2016-07-01T17:50:36Z,2016-07-02T17:40:39Z,6.3.7,"- Fix rare `Cannot read property 'constructor' of null` issue.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/3575407/assets,https://api.github.com/repos/postcss/autoprefixer/releases/3575407,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.3.7,https://github.com/postcss/autoprefixer/releases/tag/6.3.7,https://api.github.com/repos/postcss/autoprefixer/zipball/6.3.7,6.3.7,False,False
+2940195,2016-04-02T19:03:05Z,2016-04-02T19:47:05Z,6.3.6,"- Add Safari TP prefix support for Grid Layout.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/2940195/assets,https://api.github.com/repos/postcss/autoprefixer/releases/2940195,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.3.6,https://github.com/postcss/autoprefixer/releases/tag/6.3.6,https://api.github.com/repos/postcss/autoprefixer/zipball/6.3.6,6.3.6,False,False
+2940194,2016-03-27T08:17:41Z,2016-04-02T19:46:50Z,6.3.5,"- Fix duplicate prefixes for `-ms-interpolation-mode`.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/2940194/assets,https://api.github.com/repos/postcss/autoprefixer/releases/2940194,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.3.5,https://github.com/postcss/autoprefixer/releases/tag/6.3.5,https://api.github.com/repos/postcss/autoprefixer/zipball/6.3.5,6.3.5,False,False
+2940189,2016-03-21T06:40:32Z,2016-04-02T19:46:19Z,6.3.4,"- Show users coverage for selected browsers in `info()`.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/2940189/assets,https://api.github.com/repos/postcss/autoprefixer/releases/2940189,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.3.4,https://github.com/postcss/autoprefixer/releases/tag/6.3.4,https://api.github.com/repos/postcss/autoprefixer/zipball/6.3.4,6.3.4,False,False
+2608835,2016-02-13T13:13:18Z,2016-02-13T13:14:52Z,6.3.3,"- Fix transition warning.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/2608835/assets,https://api.github.com/repos/postcss/autoprefixer/releases/2608835,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.3.3,https://github.com/postcss/autoprefixer/releases/tag/6.3.3,https://api.github.com/repos/postcss/autoprefixer/zipball/6.3.3,6.3.3,False,False
+2589271,2016-02-10T19:38:12Z,2016-02-10T19:39:57Z,6.3.2,"- Fix jspm support (by @MeoMix).
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/2589271/assets,https://api.github.com/repos/postcss/autoprefixer/releases/2589271,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.3.2,https://github.com/postcss/autoprefixer/releases/tag/6.3.2,https://api.github.com/repos/postcss/autoprefixer/zipball/6.3.2,6.3.2,False,False
+2433840,2016-01-15T10:58:23Z,2016-01-15T10:59:23Z,6.3.1,"- Fix compatibility with Flexibility polyfill.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/2433840/assets,https://api.github.com/repos/postcss/autoprefixer/releases/2433840,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.3.1,https://github.com/postcss/autoprefixer/releases/tag/6.3.1,https://api.github.com/repos/postcss/autoprefixer/zipball/6.3.1,6.3.1,False,False
+2430330,2016-01-14T19:57:32Z,2016-01-14T20:45:01Z,6.3 “Pro rege et lege”,"<img src=""https://cloud.githubusercontent.com/assets/19343/12336198/3268dc18-bb14-11e5-8b3e-dbb36d7bfba7.jpg"" width=""220"" height=""217"" align=""right"" alt=""Coat of arms of Leeds"">
+
+Autoprefixer 6.3 brings Grid Layout supports and custom browsers usage statistics.
+
+## Grid Layout
+
+Grid Layout should be released in 2016. But IE already supports the old version of specification with `-ms-` prefixes.
+
+The old specification is limited and has different properties, that current one. Autoprefixer will try to convert simple usage cases.
+
+``` css
+.container {
+    display: grid;
+    grid-template-columns: 200px 1% 1fr;
+    grid-template-rows: auto 15px repeat(3, 1fr);
+}
+.logo {
+    grid-column: 1;
+    grid-row: 1 / 2;
+}
+```
+
+Output:
+
+``` css
+.container {
+    display: -ms-grid;
+    display: grid;
+    -ms-grid-columns: 200px 1% 1fr;
+        grid-template-columns: 200px 1% 1fr;
+    -ms-grid-rows: auto 15px (1fr)[3];
+        grid-template-rows: auto 15px repeat(3, 1fr);
+}
+.logo {
+    -ms-grid-column-span: 2;
+    -ms-grid-column: 1;
+        grid-column: 1 / span 2;
+}
+```
+
+But Grid support is very limited in IE. So we add a `grid: false` option to disable this Autoprefixer feature if you want to use JS polyfill.
+
+Also you can disable `@supports` by `supports: false`. With `flexbox` option you can disable this feature completely or disable 2009 limited specification by `""no-2009""` value.
+
+## Custom Browsers Statistics
+
+Autoprefixer 6.3 includes Browserslist 1.1 with custom browsers statistics support by @DanReyLop.
+
+So now you can use Google Analytics data from your site to select browsers by popularity:
+
+``` js
+postcss([
+    autoprefixer({ browers: '> 5% in my stats', stats: './browsers-stats.json' })
+])
+```
+
+Browserslist docs contain [good instractions](https://github.com/ai/browserslist#custom-usage-data) how to get this statistics file.
+
+## Other
+- Add `text-spacing` support.
+- Fix compatibility with other PostCSS plugins.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/2430330/assets,https://api.github.com/repos/postcss/autoprefixer/releases/2430330,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.3.0,https://github.com/postcss/autoprefixer/releases/tag/6.3.0,https://api.github.com/repos/postcss/autoprefixer/zipball/6.3.0,6.3.0,False,False
+2430113,2015-12-29T20:52:27Z,2016-01-14T20:10:58Z,6.2.3,"- Fix error on broken transition with double comma.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/2430113/assets,https://api.github.com/repos/postcss/autoprefixer/releases/2430113,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.2.3,https://github.com/postcss/autoprefixer/releases/tag/6.2.3,https://api.github.com/repos/postcss/autoprefixer/zipball/6.2.3,6.2.3,False,False
+2342949,2015-12-21T09:33:47Z,2015-12-26T22:33:25Z,6.2.1,"- Fix AST error in transition warning (by @jvdanilo).
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/2342949/assets,https://api.github.com/repos/postcss/autoprefixer/releases/2342949,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.2.1,https://github.com/postcss/autoprefixer/releases/tag/6.2.1,https://api.github.com/repos/postcss/autoprefixer/zipball/6.2.1,6.2.1,False,False
+2342947,2015-12-26T22:02:44Z,2015-12-26T22:33:07Z,6.2.2,"- Fix issues in broken transitions.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/2342947/assets,https://api.github.com/repos/postcss/autoprefixer/releases/2342947,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.2.2,https://github.com/postcss/autoprefixer/releases/tag/6.2.2,https://api.github.com/repos/postcss/autoprefixer/zipball/6.2.2,6.2.2,False,False
+2312435,2015-12-18T15:27:45Z,2015-12-18T18:28:15Z,6.2 “Fluctuat nec mergitur”,"<img src=""https://cloud.githubusercontent.com/assets/19343/11900579/e52246b8-a5b7-11e5-8018-51e288b2980a.png"" width=""200"" height=""237"" align=""right"" alt=""Coat of arms of Paris"">
+
+Autoprefixer 6.2 contains spec changes, `text-emphasis-position`, better `@support` and linear gradients support.
+
+## Spec Changes
+
+W3C changed `fill-available` to `fill` in [Intrinsic & Extrinsic spec](https://drafts.csswg.org/css-sizing/?c=M%3BO%3DD#valdef-width-fill). @yisibl found it and updated Autoprefixer behaviour.
+
+Autoprefixer will warn you about outdated `fill-available` in your CSS, but it will not fix it for you. Because your CSS should be ready for the prefix-less future.
+
+## Transition
+
+Autoprefixer just works: you can write any CSS and Autoprefixer does the rest (even with complicated cases). But now we have the case when Autoprefixer retreats.
+
+Look at this output for `transition-property: color, filter`:
+
+``` css
+a {
+    -webkit-transition-property: color, -webkit-filter; /* UC Browser */
+    transition-property: color, -webkit-filter;         /* Safari */
+    transition-property: color, filter;                 /* Future version of Safari */
+    transition-property: color, filter, -webkit-filter; /* Blink and other browsers */
+}
+```
+
+As you can see, we need to change amount of properties for a different browser. Unfortunately, we have cases, when Autoprefixer can break a CSS:
+
+``` css
+a {
+    transition-property: color, filter;
+    transition-duration: 600ms, 300ms;
+}
+.is-slow {
+    transition-duration: 1200ms, 600ms;
+}
+```
+
+Sorry, but I didn’t find a solution for this case. Autoprefixer will show the warning and force you to use multiple names only in safer `transition` instead of `transition-*`.
+
+## Supports At-Rule
+
+In 6.2 we rewrote all code for [`@supports` at-rule](https://developer.mozilla.org/ru/docs/Web/CSS/@supports):
+- Now Autoprefixer adds prefixes to parameters only for browsers with `@supports` support. 
+- With new brackets parser we solved broken parenthesis [in some cases](https://github.com/postcss/autoprefixer/issues/568) found by @kmuncie and @heady.
+
+## Time Capsule
+
+<img src=""https://cloud.githubusercontent.com/assets/19343/11904066/b2f1db6a-a5ce-11e5-8094-8dda09f1b622.png"" width=""250"" height=""108"" align=""right"" alt=""Screenshot from 2029 year in Terminator movie"">
+
+We put a “time capsule” into Autoprefixer so that we are ready for the prefix-less future. If Autoprefixer sees, that your specified `browsers` don’t require any prefixes, it will ask to delete itself.
+
+## Other
+- https://github.com/postcss/autoprefixer/issues/578 Add `text-emphasis-position` support.
+- https://github.com/postcss/autoprefixer/issues/589 Add `rad`, `grad` and `turn` units support to linear gradients.
+- https://github.com/postcss/autoprefixer/issues/589 Add some `deg` directions support for old WebKit linear gradients.
+- Normalize all warning messages.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/2312435/assets,https://api.github.com/repos/postcss/autoprefixer/releases/2312435,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.2.0,https://github.com/postcss/autoprefixer/releases/tag/6.2.0,https://api.github.com/repos/postcss/autoprefixer/zipball/6.2.0,6.2.0,False,False
+2208163,2015-11-30T18:50:22Z,2015-11-30T18:51:37Z,6.1.2,"- Fix gradient hack on some parameters (by @lexich).
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/2208163/assets,https://api.github.com/repos/postcss/autoprefixer/releases/2208163,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.1.2,https://github.com/postcss/autoprefixer/releases/tag/6.1.2,https://api.github.com/repos/postcss/autoprefixer/zipball/6.1.2,6.1.2,False,False
+2169432,2015-11-23T08:41:49Z,2015-11-23T09:27:56Z,6.1.1,"- Fix `cursor: grab` and `cusror: grabbing` support.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/2169432/assets,https://api.github.com/repos/postcss/autoprefixer/releases/2169432,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.1.1,https://github.com/postcss/autoprefixer/releases/tag/6.1.1,https://api.github.com/repos/postcss/autoprefixer/zipball/6.1.1,6.1.1,False,False
+2079927,2015-11-05T20:18:47Z,2015-11-05T20:17:38Z,6.1 “Bil-shaʿb wa lil-shaʿb”,"<img src=""https://cloud.githubusercontent.com/assets/19343/10979258/7fb5c128-840c-11e5-8004-0907335b6bc0.png"" width=""215"" height=""215"" align=""right"" alt=""Emblem of Algeria"">
+
+Autoprefixer 6.1 contains new `transition` logic, CSS-in-JS support, `:read-only` support and a few other fixes.
+
+## New Transition Support
+
+Unfortunately, Safari ignores entire `transition` rule if it contains unknown properties. This issue became visible, when Safari removed prefixes for `transition`.
+
+So Autoprefixer now generates more robust CSS and `a { transition: filter 1s }` will be compiled to:
+
+``` css
+a {
+    -webkit-transition: -webkit-filter 1s;    /* UC and old Safari */
+    transition: -webkit-filter 1s;            /* Safari */
+    transition: filter 1s;                    /* Future version of Safari */
+    transition: filter 1s, -webkit-filter 1s; /* Blink and other browsers */
+}
+```
+
+## CSS-in-JS
+
+With [postcss-js](https://github.com/postcss/postcss-js), any PostCSS plugin can be used for React Inline Styles, Radium, Free Style or any other CSS-in-JS flavor. Unfortunately, the previous version of Autoprefixer had a issue that is now resolved.
+
+``` js
+let prefixer = postcssJs.sync([ autoprefixer ]);
+
+prefixer({
+    display: 'flex'
+});
+//=> {
+//        display: ['-webkit-box',
+//                  '-webkit-flex',
+//                  '-ms-flexbox',
+//                  'flex']
+//   }
+```
+
+## Other Changes
+- Add `:read-only` support.
+- Add support for `appearance` with any values.
+- Add loud `/*! autoprefixer: off */` control comments support.
+- Convert `rotateZ` to `rotate` for `-ms-transform`.
+- Use [postcss-value-parser](https://github.com/TrySound/postcss-value-parser) to carefully work with gradients.
+- Remove `-ms-transform-style` and `-o-transform-style` that never existed.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/2079927/assets,https://api.github.com/repos/postcss/autoprefixer/releases/2079927,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.1.0,https://github.com/postcss/autoprefixer/releases/tag/6.1.0,https://api.github.com/repos/postcss/autoprefixer/zipball/6.1.0,6.1.0,False,False
+1827844,2015-09-17T12:26:09Z,2015-09-17T12:41:06Z,6.0.3,"- Fix old gradient direction warning.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1827844/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1827844,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.0.3,https://github.com/postcss/autoprefixer/releases/tag/6.0.3,https://api.github.com/repos/postcss/autoprefixer/zipball/6.0.3,6.0.3,False,False
+1778453,2015-09-07T15:47:42Z,2015-09-07T15:49:12Z,6.0.2,"- Remove unnecessary `-khtml-` prefix too.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1778453/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1778453,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.0.2,https://github.com/postcss/autoprefixer/releases/tag/6.0.2,https://api.github.com/repos/postcss/autoprefixer/zipball/6.0.2,6.0.2,False,False
+1774320,2015-09-06T10:47:05Z,2015-09-06T10:49:39Z,6.0.1,"- Fix `cross-fade()` support (by @yisibl)
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1774320/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1774320,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.0.1,https://github.com/postcss/autoprefixer/releases/tag/6.0.1,https://api.github.com/repos/postcss/autoprefixer/zipball/6.0.1,6.0.1,False,False
+1769852,2015-09-04T14:56:46Z,2015-09-04T15:55:14Z,6.0 “Eureka”,"<img src=""https://cloud.githubusercontent.com/assets/19343/9686975/62da9ca8-532f-11e5-8855-e444f2007c4f.jpeg"" width=""215"" height=""215"" align=""right"" alt=""Seal of California"">
+
+Autoprefixer 6.0 uses PostCSS 5.0 and Browserslist 1.0 and brings many new prefixes.
+
+ The big change in Autoprefixer 6.0 is that we removed the CLI and join `autoprefixer` and `autoprefixer-core` packages. Find and replace `autoprefixer-core` with `autoprefixer` in your `package.json`.
+
+The official CLI for Autoprefixer is [postcss-cli](https://github.com/code42day/postcss-cli), because we should be cooperative with the PostCSS ecosystem, where CSS revolution is happening right now (see [CSS Modules](http://glenmaddern.com/articles/css-modules) for example).
+
+But you can still use old CLI too. It was moved to [autoprefixer-cli](https://github.com/ai/autoprefixer-cli).
+
+## Under the Hood
+
+Autoprefixer 6.0 is based on [PostCSS 5.0](https://github.com/postcss/postcss/releases/tag/5.0.0) and [Browserslist 1.0](https://github.com/ai/browserslist/releases).
+
+Let’s start from bad breaking news:
+- Deprecated `autoprefixer(opt).process(css)` was removed in favor of `autoprefixer.process(css, opt)`, common for all PostCSS plugins.
+- `safe` option was removed in favor of [PostCSS Safe Parser](https://github.com/postcss/postcss-safe-parser)
+- Opera 12.1 was removed from default query. It was awesome browser, but new Blink’s Opera was released for all platforms a long time ago.
+
+That bad things is out payment for all this awesome features:
+- Autoprefixer now supports [Custom Syntaxes](https://github.com/postcss/postcss/#custom-syntaxes) from PostCSS. As result you can add prefixes directly to SCSS sources by [postcss-scss](https://github.com/postcss/postcss-scss). Or can use Autoprefixer in isomorphic/universal JS directly to CSS-in-JS object.
+- Autoprefixer now uses PostCSS 5.0 API, so you can use it with new PostCSS runners without any warnings.
+- Now we have Microsoft Edge support by @andrepolischuk.
+- You can use `not` word in browsers query. Because Edge and IE are different browses, `last 2 browsers` will include IE 11, 10 and Edge. Use `last 2 browsers, not IE 10` if you want only 2 versions of Microsoft browsers.
+- @ben-eb adds browsers versions ranges like `IE 6-9`.
+
+## Prefixes
+
+ When I started Autoprefixer 2 years ago, I thought we would stop seeing new prefixes. Unfortunately, the Safari team has a different view. As a result, Autoprefixer 6.0 presents many new shining prefixes:
+- @yisibl add very important `image-set()` prefixes. See also [postcss-image-set](https://github.com/Alex499/postcss-image-set).
+- Also @yisibl fix mask support by adding `mask-border` properties.
+- @iamvdo add many new awesome Safari features: `filter()`, `element()`<br> and `backdrop-filter`. He also wrote [article with good examples](http://iamvdo.me/en/blog/advanced-css-filters) about this new things.
+- Add [CSS Regions](http://www.hongkiat.com/blog/css3-regions/) support.
+- Add [Scroll Snap Points](http://blog.gospodarets.com/css-scroll-snap/) support.
+- Add `writing-mode` support.
+- Add `::backdrop` support for fullscreen apps.
+- Add `cross-fade()` support.
+- Add other `break-` properties to multicolumn support.
+
+## Other Changes
+- Always show old gradient direction warning.
+- Fix `filter` in `transition` support on Safari.
+- Fix `pixelated` cleaning.
+- PostCSS 5.0 fixes `url()` parsing.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1769852/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1769852,master,https://api.github.com/repos/postcss/autoprefixer/tarball/6.0.0,https://github.com/postcss/autoprefixer/releases/tag/6.0.0,https://api.github.com/repos/postcss/autoprefixer/zipball/6.0.0,6.0.0,False,False
+1766315,2014-08-27T23:22:56Z,2015-09-03T23:22:02Z,3.0.1,"- Fix `autoprefixer.postcss` in callbacks.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1766315/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1766315,master,https://api.github.com/repos/postcss/autoprefixer/tarball/3.0.1,https://github.com/postcss/autoprefixer/releases/tag/3.0.1,https://api.github.com/repos/postcss/autoprefixer/zipball/3.0.1,3.0.1,False,False
+1766313,2014-10-06T10:48:37Z,2015-09-03T23:21:43Z,3.1.1,"- Use Flexbox 2009 spec for Android stock browser < 4.4.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1766313/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1766313,master,https://api.github.com/repos/postcss/autoprefixer/tarball/3.1.1,https://github.com/postcss/autoprefixer/releases/tag/3.1.1,https://api.github.com/repos/postcss/autoprefixer/zipball/3.1.1,3.1.1,False,False
+1766312,2014-10-16T11:02:16Z,2015-09-03T23:21:32Z,3.1.2,"- Update Firefox ESR version from 24 to 31.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1766312/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1766312,master,https://api.github.com/repos/postcss/autoprefixer/tarball/3.1.2,https://github.com/postcss/autoprefixer/releases/tag/3.1.2,https://api.github.com/repos/postcss/autoprefixer/zipball/3.1.2,3.1.2,False,False
+1766309,2014-11-21T13:06:23Z,2015-09-03T23:21:12Z,4.0.1,"- Fix `@supports` support with brackets in values (by @iamvdo).
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1766309/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1766309,master,https://api.github.com/repos/postcss/autoprefixer/tarball/4.0.1,https://github.com/postcss/autoprefixer/releases/tag/4.0.1,https://api.github.com/repos/postcss/autoprefixer/zipball/4.0.1,4.0.1,False,False
+1766306,2014-12-07T21:15:46Z,2015-09-03T23:20:45Z,4.0.2,"- Remove `o-border-radius`, which is common mistake in legacy CSS.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1766306/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1766306,master,https://api.github.com/repos/postcss/autoprefixer/tarball/4.0.2,https://github.com/postcss/autoprefixer/releases/tag/4.0.2,https://api.github.com/repos/postcss/autoprefixer/zipball/4.0.2,4.0.2,False,False
+1766301,2015-02-03T02:32:00Z,2015-09-03T23:19:48Z,5.1.2,"- Add never existed `@-ms-keyframes` to common mistake.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1766301/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1766301,master,https://api.github.com/repos/postcss/autoprefixer/tarball/5.1.2,https://github.com/postcss/autoprefixer/releases/tag/5.1.2,https://api.github.com/repos/postcss/autoprefixer/zipball/5.1.2,5.1.2,False,False
+1766298,2015-02-03T04:15:50Z,2015-09-03T23:19:26Z,5.1.3,"- Add IE support for `image-rendering: crisp-edges`.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1766298/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1766298,master,https://api.github.com/repos/postcss/autoprefixer/tarball/5.1.3,https://github.com/postcss/autoprefixer/releases/tag/5.1.3,https://api.github.com/repos/postcss/autoprefixer/zipball/5.1.3,5.1.3,False,False
+1766294,2015-02-07T02:50:29Z,2015-09-03T23:19:07Z,5.1.4,"- Use `-webkit-` prefix for Opera Mobile 24.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1766294/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1766294,master,https://api.github.com/repos/postcss/autoprefixer/tarball/5.1.4,https://github.com/postcss/autoprefixer/releases/tag/5.1.4,https://api.github.com/repos/postcss/autoprefixer/zipball/5.1.4,5.1.4,False,False
+1766291,2015-02-08T02:34:48Z,2015-09-03T23:18:53Z,5.1.5,"- Add transition support for CSS Masks properties.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1766291/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1766291,master,https://api.github.com/repos/postcss/autoprefixer/tarball/5.1.5,https://github.com/postcss/autoprefixer/releases/tag/5.1.5,https://api.github.com/repos/postcss/autoprefixer/zipball/5.1.5,5.1.5,False,False
+1766289,2015-02-19T09:29:23Z,2015-09-03T23:18:38Z,5.1.6,"- Use official `::placeholder-shown` selector (by @iamvdo).
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1766289/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1766289,master,https://api.github.com/repos/postcss/autoprefixer/tarball/5.1.6,https://github.com/postcss/autoprefixer/releases/tag/5.1.6,https://api.github.com/repos/postcss/autoprefixer/zipball/5.1.6,5.1.6,False,False
+1766284,2015-02-20T10:01:24Z,2015-09-03T23:18:17Z,5.1.7,"- Fix placeholder selector (by @iamvdo)
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1766284/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1766284,master,https://api.github.com/repos/postcss/autoprefixer/tarball/5.1.7,https://github.com/postcss/autoprefixer/releases/tag/5.1.7,https://api.github.com/repos/postcss/autoprefixer/zipball/5.1.7,5.1.7,False,False
+1766281,2015-03-26T13:47:22Z,2015-09-03T23:17:55Z,5.1.8,"- Fix gradients in `mask` and `mask-image` properties.
+- Fix old webkit prefix on some unsupported gradients.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1766281/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1766281,master,https://api.github.com/repos/postcss/autoprefixer/tarball/5.1.8,https://github.com/postcss/autoprefixer/releases/tag/5.1.8,https://api.github.com/repos/postcss/autoprefixer/zipball/5.1.8,5.1.8,False,False
+1766278,2015-04-13T17:21:40Z,2015-09-03T23:17:39Z,5.1.9,"- Fix DynJS compatibility (by @halfninja).
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1766278/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1766278,master,https://api.github.com/repos/postcss/autoprefixer/tarball/5.1.9,https://github.com/postcss/autoprefixer/releases/tag/5.1.9,https://api.github.com/repos/postcss/autoprefixer/zipball/5.1.9,5.1.9,False,False
+1766277,2015-04-17T21:02:47Z,2015-09-03T23:17:03Z,5.1.10,"- Do not generate `-webkit-image-rendering`.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1766277/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1766277,master,https://api.github.com/repos/postcss/autoprefixer/tarball/5.1.10,https://github.com/postcss/autoprefixer/releases/tag/5.1.10,https://api.github.com/repos/postcss/autoprefixer/zipball/5.1.10,5.1.10,False,False
+1766276,2015-04-20T10:46:41Z,2015-09-03T23:16:31Z,5.1.11,"- Update `num2fraction` to fix resolution media query (by @yisibl).
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1766276/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1766276,master,https://api.github.com/repos/postcss/autoprefixer/tarball/5.1.11,https://github.com/postcss/autoprefixer/releases/tag/5.1.11,https://api.github.com/repos/postcss/autoprefixer/zipball/5.1.11,5.1.11,False,False
+1766272,2015-06-22T02:19:54Z,2015-09-03T23:15:32Z,5.2.1,"- Fix parent-less node issue on some cases (by @joshgillies)
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1766272/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1766272,master,https://api.github.com/repos/postcss/autoprefixer/tarball/5.2.1,https://github.com/postcss/autoprefixer/releases/tag/5.2.1,https://api.github.com/repos/postcss/autoprefixer/zipball/5.2.1,5.2.1,False,False
+1343005,2015-05-27T13:40:07Z,2015-05-27T14:09:08Z,5.2 “Dont tread on me”,"<img src=""https://cloud.githubusercontent.com/assets/19343/7837955/ede9e31c-0492-11e5-8e89-08502d7da04c.png"" width=""220"" height=""147"" alt=""Gadsden flag"" align=""right"">
+
+Autoprefixer 5.2 is 30% faster, adds prefixes for `appearance` and uses warnings API from [PostCSS 4.1](https://github.com/postcss/postcss/releases/tag/4.1.0).
+
+### Prefixes
+- Autoprefixer 5.2 will add `-webkit-` and `-moz-` prefixes for `appearance: none`, because it became part of W3C draft. Note, that only `none` value is supported.
+- In 5.1.6 release we made a mistake by adding `::placeholder` pseudo-elements prefixes for `:placeholder-shown` pseudo-classes selector. This release fixes it.
+- There was confused situation with prefixes for `image-rendering`. Prefixed `-moz-crisp-edges` value works like W3C’s `pixelated`, not like `crisp-edges`. So Autoprefixer 5.2 will add prefixes only for `pixelated` value.<br>Because there is no even plans for `crisp-edges` browsers support, Autoprefixer will warn you about `crisp-edges` value in your CSS. It will help you to update styles.
+- Also 5.2 release contains fix for `text-decoration` prefixes.
+
+### Warnings
+
+[PostCSS 4.1](https://github.com/postcss/postcss/releases/tag/4.1.0) brings new APIs for plugins. Most important new API for Autoprefixer is a warnings.
+
+Outdated articles and copy-paste developing created many pain for us. There are many code examples with `display: box` value by 2009 spec, instead of `display: flex` in final spec. Or many legacy CSS and outdated examples uses old gradient direction syntax (`bottom` instead of final `to top`).
+
+Autoprefixer 5.2 will print a warning, when it see outdated syntax in unprefixed properties:
+
+```
+autoprefixer: app.css:104:4: You should write display: flex by final spec instead of display: box
+```
+
+If you develop a builder plugin with Autoprefixer (like `gulp-autoprefixer`), please print warnings in most proper way for your builder API:
+
+``` js
+postcss([ autoprefixer ]).then(function (result) {
+    result.warnings().forEach(function (warn) {
+        console.warn(warn.toString());
+    });
+    callback(result.css);
+});
+```
+
+### API
+
+Modular architecture shows great results in [PostCSS](https://github.com/postcss/postcss). So @ben-eb decided to create a modular CSS minifier [cssnano](of course as PostCSS plugin). Autoprefixer 5.2 has special option for it: `add: false` will disable adding new prefixes, so Autoprefixer will only remove outdated prefixes.
+
+PostCSS now has a great ecosystem. So maintaining Autoprefixer only solution takes too much time. Because Autoprefixer is just a PostCSS plugin, we can deprecate:
+- `autoprefixer` CLI tool. Use [postcss-cli](https://github.com/code42day/postcss-cli) instead.
+- `autoprefixer.process()` shortcut. Use PostCSS API instead.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1343005/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1343005,master,https://api.github.com/repos/postcss/autoprefixer/tarball/5.2.0,https://github.com/postcss/autoprefixer/releases/tag/5.2.0,https://api.github.com/repos/postcss/autoprefixer/zipball/5.2.0,5.2.0,False,False
+1308584,2015-02-01T03:05:40Z,2015-05-18T15:38:24Z,5.1.1,"- Fix process exit status in CLI (by @mhart)
+- Safer value split in `flex` hack.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/1308584/assets,https://api.github.com/repos/postcss/autoprefixer/releases/1308584,master,https://api.github.com/repos/postcss/autoprefixer/tarball/5.1.1,https://github.com/postcss/autoprefixer/releases/tag/5.1.1,https://api.github.com/repos/postcss/autoprefixer/zipball/5.1.1,5.1.1,False,False
+899208,2015-01-29T22:17:26Z,2015-01-30T02:20:01Z,5.1 “Jianyuan”,"<img src=""https://cloud.githubusercontent.com/assets/19343/5969945/391ee70a-a83c-11e4-96ae-16c0dd6fa25a.png"" width=""190"" width=""190"" alt=""Han dynasty"" align=""right"">
+
+Autoprefixer 5.1 has support for many new properties and at-rules and remove prefixes in values with higher accuracy.
+
+### New At-Rules
+
+Now Autoprefixer adds prefixes for `@viewport`<br> and `min-resolution`/`max-resolution` query in CSS Media Queries:
+
+``` css
+@viewport {
+    width: device-width;
+}
+@media  (min-resolution: 192dpi), (min-resolution: 2dppx) {
+    background: url(image@2x.jpg);
+}
+```
+
+↓
+
+``` css
+@-ms-viewport {
+    width: device-width;
+}
+@-o-viewport {
+    width: device-width;
+}
+@viewport {
+    width: device-width;
+}
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi), (min-resolution: 2dppx) {
+    background: url(image@2x.jpg);
+}
+```
+
+Also new Autoprefixer doesn’t remove your code style while adding prefixes to `@keyframes` and `@viewport`.
+
+### New Properties
+
+@yisibl find many new properties for Autoprefixer and helped to implement them:
+
+``` css
+a {
+    text-emphasis: dot;
+    image-rendering: crisp-edges;
+    text-align-last: justify;
+    text-overflow: ellipsis;
+    margin-block-start: 10px;
+    padding-inline-end: 10px;
+}
+```
+
+↓
+
+``` css
+a {
+    -webkit-text-emphasis: dot;
+            text-emphasis: dot;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -o-crisp-edges;
+    image-rendering: crisp-edges;
+    -moz-text-align-last: justify;
+         text-align-last: justify;
+    -o-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+    -webkit-margin-before: 10px;
+            margin-block-start: 10px;
+    -webkit-padding-end: 10px;
+       -moz-padding-end: 10px;
+            padding-inline-end: 10px;
+}
+```
+
+### Vendor Hacks in Values
+
+Autoprefixer removes outdated prefixes. But it is smart and understand, when you use old prefix for vendor-specific hack like `-webkit-transform: translateZ(0)`.
+
+Unfortunately, previous Autoprefixer detected vendor hacks only in properties, but removed all old prefixes in values. Autoprefixer 5.1 became more attentive and doesn’t remove prefix if there is not unprefixed version around.
+
+### Browserslist 0.2
+
+Autoprefixer 5.1 uses [Browserslist 0.2](https://github.com/ai/browserslist). Can I Use joins some versions like `ios_saf 7.0-7.1` and in Browserslist you can select this joinded versions only by latest version `iOS 7.1`.
+
+@iamvdo found this lost versions and fix it. Now you can select `ios_saf 7.0-7.1` by `iOS 7.0` or even `iOS 7`.
+
+### Other Changes
+- Return `autoprefixer.defaults` as alias to current `browserslist.defaults`.
+- Fix `-webkit-filter` in `transition`.
+- Fix compatibility with `postcss-import` (by @jasonkuhrt).
+- Fix Flexbox prefixes for BlackBerry and UC Browser.
+- Fix gradient prefixes for old Chrome.
+- Add `--no-remove` option to CLI.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/899208/assets,https://api.github.com/repos/postcss/autoprefixer/releases/899208,master,https://api.github.com/repos/postcss/autoprefixer/tarball/5.1.0,https://github.com/postcss/autoprefixer/releases/tag/5.1.0,https://api.github.com/repos/postcss/autoprefixer/zipball/5.1.0,5.1.0,False,False
+850984,2015-01-14T13:12:12Z,2015-01-14T13:31:32Z,5.0 “Pravda vítězí”,"<img src=""https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Coat_of_arms_of_the_Czech_Republic.svg/500px-Coat_of_arms_of_the_Czech_Republic.svg.png"" width=""180"" height=""215"" align=""right"" alt=""Coat of arms of the Czech Republic"">
+
+Autoprefixer 5.0 uses [PostCSS 4.0](https://github.com/postcss/postcss/releases/tag/4.0.0) and [Browserslist](https://github.com/ai/browserslist).
+
+### Browserslist
+
+Browserslist is a library to parse browsers queries like `last 2 versions`. It gives to Autoprefixer:
+- More accurate usage statistics calculation.
+- New `> 5% in US` query to select browsers by usage statistics in some country.
+- Global `browserslist` config. It is used in many other tools like [Autopolyfiller](http://azproduction.ru/autopolyfiller/) or [doiuse](https://github.com/anandthakker/doiuse). Now you have one place to storage supported browsers across different tools.
+
+### New Properties
+
+With @yisibl help Autoprefixer 5.0 now adds `-o-` prefix for `object-fit` and `object-position` properties and `-webkit-` prefix for [CSS Shapes](http://www.w3.org/TR/css-shapes/) properties.
+
+### Other Changes
+- Fix UC Browser in debug info.
+- Remove `autoprefixer.defaults` and use defaults from Browserslist. 
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/850984/assets,https://api.github.com/repos/postcss/autoprefixer/releases/850984,master,https://api.github.com/repos/postcss/autoprefixer/tarball/5.0.0,https://github.com/postcss/autoprefixer/releases/tag/5.0.0,https://api.github.com/repos/postcss/autoprefixer/zipball/5.0.0,5.0.0,False,False
+703289,2014-11-14T00:04:54Z,2014-11-14T00:16:00Z,4.0 “Indivisibiliter ac Inseparabiliter”,"<img src=""https://upload.wikimedia.org/wikipedia/commons/0/0c/Austria-Hungaria_transparency.png"" width=""250"" height=""157"" alt=""Coat of Arms of Austria-Hungary"" align=""right"">
+
+Autoprefixer 4.0 is based on [PostCSS 3.0](https://github.com/postcss/postcss/releases/tag/3.0.0), so it become 2,5 times faster.
+
+### Sources Maps
+
+PostCSS 3.0 sets `map.inline` and `map.sourcesContent` to `true` by default, since it is now the most popular way to use maps.
+
+Previous source map is now used in more places. If you miss `from` option, PostCSS will take file name from `file` field in source map. If CSS contains syntax errors, PostCSS will show origin source of error even if you concatenate many files before Autoprefixer.
+
+Also PostCSS 3.0 now supports Unicode BOM symbol in source maps and better works with `sourceMappingURL` annotation comment.
+
+### Cleaning
+
+By default Autoprefixer removes outdated prefixes.
+
+Now you can disable this behavior by `remove: false` option:
+
+``` js
+autoprefixer()
+  .process('a { -webkit-border-radius: 2px; border-radius: 2px }');
+// remove outdated -webkit-border-radius
+
+autoprefixer({ remove: false })
+  .process('a { -webkit-border-radius: 2px; border-radius: 2px }');
+// keeps -webkit-border-radius
+```
+
+### Other Changes
+- Add `box-decoration-break` support.
+- Do not add old `-webkit-` prefix for gradients with `px` units.
+- Parse at-rules without spaces like `@import""file""`.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/703289/assets,https://api.github.com/repos/postcss/autoprefixer/releases/703289,master,https://api.github.com/repos/postcss/autoprefixer/tarball/4.0.0,https://github.com/postcss/autoprefixer/releases/tag/4.0.0,https://api.github.com/repos/postcss/autoprefixer/zipball/4.0.0,4.0.0,False,False
+556627,2014-09-14T21:16:21Z,2014-09-14T21:20:53Z,3.1 “Satyameva Jayate”,"<img src=""https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/452px-Emblem_of_India.svg.png"" width=""180"" height=""305"" align=""right"">
+- Do not remove comments from prefixed values (by @rousso1).
+- Allow Safari 6.1 to use final Flexbox spec (by @radium-v).
+- Fix `filter` value in `transition` in Webkits.
+- Show greetings if your browsers don’t require any prefixes.
+- Add `<=` and `<` browsers requirement (by @papandreou).
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/556627/assets,https://api.github.com/repos/postcss/autoprefixer/releases/556627,master,https://api.github.com/repos/postcss/autoprefixer/tarball/3.1.0,https://github.com/postcss/autoprefixer/releases/tag/3.1.0,https://api.github.com/repos/postcss/autoprefixer/zipball/3.1.0,3.1.0,False,False
+509704,2014-08-22T19:48:13Z,2014-08-22T22:31:25Z,"3.0 “Liberté, Égalité, Fraternité”","<img src=""https://upload.wikimedia.org/wikipedia/commons/8/83/Devise_r%C3%A9volutionnaire.jpg"" width=""200"" height="""" align=""right"">
+
+Autoprefixer 3.0 changes browsers API, adds `autoprefixer-core` package and uses GNU style for syntax error messages.
+
+### API Changes
+
+Method `autoprefixer()` had confused and too difficult options. @sindresorhus showed issue and @lydell suggested new API.
+
+Now you will set browsers list in `browsers` key with other options:
+
+``` js
+autoprefixer({ browsers: ['> 5%', 'IE 7'], cascade: false }).process(css).css;
+```
+
+If you want to clean CSS from any prefixes you should set `[]` instead of deprecated `none`.
+
+``` js
+var cleaner = autoprefixer({ browsers: [] });
+```
+
+Old API was deprecated and prints warnings. It will be removed in 3.1 release.
+
+### Core Package
+
+@MoOx and @jonathanong [noticed](https://github.com/postcss/postcss/issues/65), that `autoprefixer` package contained many unnecessary code for plugin like `grunt-autoprefixer`.
+
+So Autoprefixer was split to `autoprefixer` and `autoprefixer-core` npm packages. CLI tool and all file system code and dependencies were moved from `autoprefixer-core` to `autoprefixer`.
+
+Package `autoprefixer` provide same API as `autoprefixer-core`, but all plugin developers should use only `autoprefixer-core`.
+
+### GNU Style for Syntax Errors
+
+Autoprefixer 3.0 uses new PostCSS 2.2. It uses [GNU Coding Standards](https://www.gnu.org/prep/standards/html_node/Errors.html) for syntax error messages:
+
+```
+a.css:2:1 Unexpected { in decls
+```
+
+CoffeeScript and other tools uses same format and some IDE can parse this format and open wrong line in editor.
+
+### ES6 Migration
+
+To be more familiar to new developers PostCSS was rewritten from CoffeeScript to JS ES6. Now Autoprefixer starts to use more ES6.
+
+Autoprefixer package now contains only ES6 code. Autoprefixer Core uses ES6 only in built tasks, but we want to rewrite it completely.
+
+Maybe you want to help us in ES6 migration? Work is very easy, but it will be routine. This help will makes you one of the biggest contributor (because you will changes many files :) ). [Write me](mailto:andrey@sitnik.ru) and I will send you instructions.
+
+### PostCSS Organization
+
+Autoprefixer and Autoprefixer Core repositories was moved to [PostCSS organization](https://github.com/postcss) to be with other official PostCSS plugins.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/509704/assets,https://api.github.com/repos/postcss/autoprefixer/releases/509704,master,https://api.github.com/repos/postcss/autoprefixer/tarball/3.0.0,https://github.com/postcss/autoprefixer/releases/tag/3.0.0,https://api.github.com/repos/postcss/autoprefixer/zipball/3.0.0,3.0.0,False,False
+457381,2014-07-29T10:44:12Z,2014-07-29T11:58:07Z,2.2 “Mobilis in mobili”,"<img src=""https://upload.wikimedia.org/wikipedia/commons/c/cf/20000_mobilis_in_mobili.jpg"" width=""200"" height=""94"" align=""right"">
+
+Autoprefixer 2.2 is based on [PostCSS 2.1](https://github.com/ai/postcss/releases/tag/2.1.0) with Safe Mode and brings control comments to disable Autoprefixer in some part of CSS.
+
+### PostCSS 2.1
+
+New version of PostCSS was totally rewritten from CoffeeScript to ES6, but Autoprefixer users will see only 2 features: Safe Mode and better error messages.
+
+Now Autoprefixer had special Safe Mode, which try to fix broken CSS. For example, it will parse `a {` as `a {}`. It will be useful for live input tool or to parse old legacy code.
+
+``` js
+autoprefixer.process('a {');                 // will throw ""Unclosed block""
+autoprefixer.process('a {', { safe: true }); // process CSS as a {}
+```
+
+You can now try Safe Mode on live input in [Autoprefixer interactive demo](http://jsfiddle.net/simevidas/udyTs/show/light/) by @simevidas.
+
+Also by @jonathanong idea CSS syntax error messages now include broken source line:
+
+```
+> autoprefixer.process('a {\n  b { }\n}')
+Can't parse CSS: Unexpected { in decls at line 2:5
+a {
+  b { }
+    ^
+}
+```
+
+PostCSS will try to detect environment and use colors in error output if they are supported.
+
+### Control Comments
+
+Autoprefixer was designed without any interface. You just write CSS and Autoprefixer process it in background.
+
+For example, it detects hacks automatically, when you use outdated prefix to control special browser:
+
+``` css
+a {
+    transform: scale(0.5);
+    -moz-transform: scale(0.6)
+}
+```
+
+But [sometimes](https://github.com/ai/autoprefixer/issues/107) we need control. Now you can disable Autoprefixer for some rules and write prefixes manually. Just put `/* autoprefixer: off */` control comment inside rule:
+
+``` css
+a {
+    transition: 1s; /* it will be prefixed */
+}
+
+b {
+    /* autoprefixer: off */
+    transition: 1s; /* it will not be prefixed */
+}
+```
+
+Also you can use control comments recursively:
+
+``` css
+/* autoprefixer: off */
+@support (transition: all) {
+    /* autoprefixer: on */
+    a {
+        /* autoprefixer: off */
+    }
+}
+```
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/457381/assets,https://api.github.com/repos/postcss/autoprefixer/releases/457381,master,https://api.github.com/repos/postcss/autoprefixer/tarball/2.2.0,https://github.com/postcss/autoprefixer/releases/tag/2.2.0,https://api.github.com/repos/postcss/autoprefixer/zipball/2.2.0,2.2.0,False,False
+429567,2014-07-15T05:14:53Z,2014-07-15T05:23:52Z,2.1.1,"- Fix `-webkit-background-size` hack for `contain` and `cover` values.
+- Don’t add `-webkit-` prefix to `filter` with SVG (by @iamvdo).
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/429567/assets,https://api.github.com/repos/postcss/autoprefixer/releases/429567,master,https://api.github.com/repos/postcss/autoprefixer/tarball/2.1.1,https://github.com/postcss/autoprefixer/releases/tag/2.1.1,https://api.github.com/repos/postcss/autoprefixer/zipball/2.1.1,2.1.1,False,False
+402424,2014-06-30T12:40:08Z,2014-06-30T12:43:02Z,2.1 “Eleftheria i thanatos”,"<img src=""https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Coat_of_arms_of_Greece.svg/500px-Coat_of_arms_of_Greece.svg.png"" width=""200"" height=""196"" align=""right"">
+- Add support for `clip-path` and `mask` properties.
+- Fix 2.0.2 issue and return `-webkit-` prefix to `filter` with SVG URI. Thanks to @iamvdo for notice.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/402424/assets,https://api.github.com/repos/postcss/autoprefixer/releases/402424,master,https://api.github.com/repos/postcss/autoprefixer/tarball/2.1.0,https://github.com/postcss/autoprefixer/releases/tag/2.1.0,https://api.github.com/repos/postcss/autoprefixer/zipball/2.1.0,2.1.0,False,False
+402221,2014-06-30T10:36:29Z,2014-06-30T10:39:29Z,2.0.2,"- Add readable names for new browsers from 2.0 release.
+- Don’t add `-webkit-` prefix to `filter` with SVG URI.
+- Don’t add `-o-` prefix 3D transforms.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/402221/assets,https://api.github.com/repos/postcss/autoprefixer/releases/402221,master,https://api.github.com/repos/postcss/autoprefixer/tarball/2.0.2,https://github.com/postcss/autoprefixer/releases/tag/2.0.2,https://api.github.com/repos/postcss/autoprefixer/zipball/2.0.2,2.0.2,False,False
+402218,2014-06-28T05:16:08Z,2014-06-30T10:39:11Z,2.0.1,"- Save declaration style, when clone declaration to prefix.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/402218/assets,https://api.github.com/repos/postcss/autoprefixer/releases/402218,master,https://api.github.com/repos/postcss/autoprefixer/tarball/2.0.1,https://github.com/postcss/autoprefixer/releases/tag/2.0.1,https://api.github.com/repos/postcss/autoprefixer/zipball/2.0.1,2.0.1,False,False
+391215,2014-06-24T06:31:14Z,2014-06-24T07:33:27Z,2.0 “Hongik Ingan”,"<img src=""https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Emblem_of_South_Korea.svg/479px-Emblem_of_South_Korea.svg.png"" width=""200"" height=""200"" align=""right"">
+
+This version based on [PostCSS](https://github.com/ai/postcss) 1.0, supports `@supports` and enable visual cascade by default.
+
+### PostCSS 1.0
+
+[New PostCSS release](https://github.com/ai/postcss/releases/tag/1.0.0) has a lot of improvements, but source map API update is most important for Autoprefixer’s users.
+
+@lydell [suggested](https://github.com/ai/postcss/issues/49) great plan to clean up options. Now all map options will be inside `map` object.
+- `inlineMap: true` was renamed to `map: { inline: true }`.
+- `mapAnnotation: false` was renamed to `map: { annotation: false }`.
+- Previous source map should be set to separated option `map: { prev: prevMap }` instead of old `map: prevMap`.
+
+There is `map: 'inline'` shortcut if you want to set only `map: { inline: true }`. Old options are deprecated and will print warnings.
+
+Also there is two API improvements for plugin’s popular needs:
+- Map can contain origin CSS source, if you set `map: { sourcesContent: true }` option.
+- You can change result map path by `map: { annotation: '../maps/app.css.map' }` option. Note that path in `annotation` must be relative to output CSS file.
+
+Property `result.map` will contains `SourceMapGenerator` object (from Mozilla’s [source-map](https://github.com/mozilla/source-map)) instead of string. It will allow to change something in generated map:
+
+``` js
+var result = autoprefixer.process(css, { map: true });
+result.map.applySourceMap(otherMap, 'undetected.css');
+
+console.log('map: ' + result.map) // SourceMapGenerator has toString() method,
+                                  // so old code should work
+result.map.toJSON().file // But also you can access to generated map properties
+```
+
+Check out all changes in [PostCSS docs](https://github.com/ai/postcss/releases/tag/1.0.0).
+
+### Visual Cascade
+
+By [idea](https://github.com/ai/autoprefixer/issues/19) from @paulirish, Autoprefixer from 1.1 version has option for prefixes cascade. But this feature was disabled by default, because old Autoprefixer can’t restore own cascade, when it removes prefixes.
+
+New Autoprefixer can restore prefixes cascade, when it remove unnecessary prefixes. So, now we can enable visual cascade by default.
+
+``` css
+a {
+    -webkit-border-radius: 4px;
+       -moz-border-radius: 4px;
+            border-radius: 4px
+}
+
+b {
+    user-select: none
+}
+```
+
+will be processed to:
+
+``` css
+a {
+    border-radius: 4px;
+}
+
+b {
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none
+}
+```
+
+Cascade will be used, only if you process uncompressed CSS. Use `cascade: false` option to disable cascade, if you don’t like it.
+
+### `@supports` At-rule
+
+CSS 3 added new [@supports at-rule](https://developer.mozilla.org/en-US/docs/Web/CSS/@supports) to use some styles, only if browser supports properties and values in at-rule conditions.
+
+For example, we can set some styles only for browsers, which support `fit-content` width:
+
+``` css
+.menu {
+  width: 400px
+}
+
+@supports (width: fit-content) {
+     /* content will be used, only if browser supports fit-content */
+    .menu {
+        width: fit-content
+    }
+}
+```
+
+But Chrome doesn’t know `fit-content`, it knows only `-webkit-fit-content`. So we need to use prefixed properties and values in `@support`.
+
+@callumacrae [suggested this feature](https://github.com/ai/autoprefixer/issues/220) and explained how it should works. And now Autoprefixer 2.0 supports this at-rule and adds prefixes inside it conditions:
+
+``` css
+@supports ((width: -webkit-fit-content) or (width: -moz-fit-content) or (width: fit-content)) {
+     /* content will be used, only if browser supports fit-content */
+    .menu {
+        width: -webkit-fit-content;
+        width: -moz-fit-content;
+        width: fit-content
+    }
+}
+
+```
+
+### Other Changes
+- Autoprefixer now supports all browsers from Can I Use: `ie_mob`, `and_chr`, `and_ff`, `op_mob` and `op_mini`.
+- Autoprefixer is written on CoffeeScript, so you wasn’t be able to use latest unreleased versions from GitHub. Now code contains special hack and you can use latest Autoprefixer by
+  `""autoprefixer"": ""ai/autoprefixer""` in your npm’s `package.json`.
+- Binary now has `--no-cascade`, `--annotation` and `--sources-content` options and deprecates<br>`-c` and `--cascade`.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/391215/assets,https://api.github.com/repos/postcss/autoprefixer/releases/391215,master,https://api.github.com/repos/postcss/autoprefixer/tarball/2.0.0,https://github.com/postcss/autoprefixer/releases/tag/2.0.0,https://api.github.com/repos/postcss/autoprefixer/zipball/2.0.0,2.0.0,False,False
+387740,2014-06-22T02:37:17Z,2014-06-22T02:38:51Z,1.3.1,"- Fix gradient hack, when `background` property contains color.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/387740/assets,https://api.github.com/repos/postcss/autoprefixer/releases/387740,master,https://api.github.com/repos/postcss/autoprefixer/tarball/1.3.1,https://github.com/postcss/autoprefixer/releases/tag/1.3.1,https://api.github.com/repos/postcss/autoprefixer/zipball/1.3.1,1.3.1,False,False
+385055,2014-06-20T04:43:11Z,2014-06-20T04:57:53Z,1.3 “Tenka Fubu”,"<img src=""http://magistatic.com/crests/1047-1273245021.png"" align=""right"" width=""180"" height=""180"">
+
+* Add `text-size-adjust` support.
+* Add `background-size` to support Android 2.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/385055/assets,https://api.github.com/repos/postcss/autoprefixer/releases/385055,master,https://api.github.com/repos/postcss/autoprefixer/tarball/1.3.0,https://github.com/postcss/autoprefixer/releases/tag/1.3.0,https://api.github.com/repos/postcss/autoprefixer/zipball/1.3.0,1.3.0,False,False
+366041,2014-06-10T12:00:18Z,2014-06-10T12:24:53Z,1.2 “Meiji”,"<img src=""https://upload.wikimedia.org/wikipedia/commons/3/37/Imperial_Seal_of_Japan.svg"" width=""180"" height=""180"" align=""right"">
+
+Autoprefixer uses [Can I Use](http://caniuse.com/) data. Previous versions contain Can I Use dump inside npm package and I had special script to update this data from Can I Use repo. I manually run this scripts every day. It was a hack, not a good solution. 
+
+Few month ago @Fyrd started to publish official [caniuse-db](https://www.npmjs.org/package/caniuse-db) npm package. Autoprefixer 1.2 start to use this official data instead of local copy.
+
+This changes made Autoprefixer’s maintaining much easier, but also it gives a few benefits to end-users:
+1. Autoprefixer stops to use strange `1.1.20140605` versions with dump date in minor part. Now it will be normal versions like `1.2.0`.
+2. You can update Can I Use data separetly from Autoprefixer’s code. It is important for big companies, which have long test period on every code changes. Now you can have up-to-date browsers data and don’t be worry to broke styles.
+3. Autoprefixer extremely cares about actual prefix data. In previous version there was day delay between Can I Use updates and Autoprefixer release. Now you will get faster updates directly from Can I Use author. Don’t forget to call `npm update caniuse-db`.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/366041/assets,https://api.github.com/repos/postcss/autoprefixer/releases/366041,master,https://api.github.com/repos/postcss/autoprefixer/tarball/1.2.0,https://github.com/postcss/autoprefixer/releases/tag/1.2.0,https://api.github.com/repos/postcss/autoprefixer/zipball/1.2.0,1.2.0,False,False
+190690,2014-02-18T16:59:55Z,2014-02-18T17:39:19Z,1.1 “Nutrisco et extingo”,"<img src=""http://www.sacred-texts.com/lcr/fsca/img/20900.jpg"" align=""right"" width=""200"" height=""152"" />
+
+### Notable Changes
+
+Autoprefixer 1.1 based on [PostCSS](https://github.com/ai/postcss) 0.3 “Prince Seere” with great improvements in source map support:
+- **Add source map annotation comment support.**\* Autoprefiixer now reads/writes annotation comment to end of CSS file, if map support is enabled.
+- **Add inline source map support.** It will be really helpful for LESS users.
+- **Autodetect previous source map.** If input CSS will contain annotation comment with inline map, Autoprefixer will read previous map, update it with prefixes changes and inline back to comment. If you set `from` option with input CSS file path and Autoprefixer will find map file near input CSS, it will read map, update and write new map file. You can disable autodetect by `map: false` option.
+- **Fix source map support on Windows and in subdirectories.**\* PostCSS 0.3 is much smarter with previous map support (maybe now it has best support for chain CSS tranformations with source maps). @nDmitry and @lydell did a [great investigation](https://github.com/ai/postcss/issues/13) about special cases with source map.
+- **Optional visual cascade of prefixes.** This behavior is disabled by default yet, but you can enable it with `cascade` option.
+  
+  ``` css
+  a {
+      -webkit-box-sizing: border-box;
+         -moz-box-sizing: border-box;
+              box-sizing: border-box
+  }
+  ```
+- Autoprefixer now has nice **[interactive demo](http://jsfiddle.net/simevidas/udyTs/show/light/)** by @simevidas.
+
+<em>\* [grunt-autoprefixer](https://github.com/nDmitry/grunt-autoprefixer) already had this fixes. @nDmitry covered Autoprefixer and fixed them by hacks.</em>
+
+### API Changes
+- Deprecated API from 0.8 version was removed. Use `process(from: ""a.css"").css` instead of `compile(file: ""a.css"")` and `info()` instead of `inspect()`.
+- Add new `inlineMap`, `mapAnnotation` options to control source map support. Read about them in [PostCSS documentation](https://github.com/ai/postcss#source-map-1).
+
+### Fixes
+- Autoprefixer now adds prefix delector even if it is already prefixed by developer. @necolas [find](https://github.com/ai/autoprefixer/issues/189) a lot of cases, when property logic can be used in selectors.
+- Better flexbox support by @Rowno. `flex` property values now will be converted for old `box-flex` syntax. `flex-basis`, `flex-shrink` and `flex-grow` will be converted to separated properties for IE 10, instead of one `flex` property.
+- Better `break-inside` support by hacks suggested in [great investigation](https://github.com/ai/autoprefixer/issues/177) by @interpaul.
+- Autoprefixer now smarter groups prefixed and unprefixed properties and better wprks when you write two same properties near by (for example, two `transform` with and without `calc()`).
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/190690/assets,https://api.github.com/repos/postcss/autoprefixer/releases/190690,master,https://api.github.com/repos/postcss/autoprefixer/tarball/1.1,https://github.com/postcss/autoprefixer/releases/tag/1.1,https://api.github.com/repos/postcss/autoprefixer/zipball/1.1,1.1,False,False
+129423,2013-12-22T01:10:18Z,2013-12-22T01:59:10Z,1.0 “Plus ultra”,"<img src=""https://upload.wikimedia.org/wikipedia/commons/5/56/Coat_of_Arms_of_Spain_%28corrections_of_heraldist_requests%29.svg"" width=""180"" height=""199"" align=""right"" />
+
+### Notable Changes
+- **Source map support.** Autoprefixer now generates source map or modify previous source map (for example, from Sass).
+- **Preserves code indentations.** New parser now saves all spaces from input CSS, so output prefixed CSS will be with same code style. It makes Autoprefixer much better for text editors plugin and prevents Autoprefixer to uncompress CSS from Sass.
+- **CSS parser was changed to [PostCSS](https://github.com/ai/postcss).** It allows to add prefixes inside some new or custom at-rules and fix issue with comment in property name. Also it clean Autoprefixer code by moving some common CSS processor code to PostCSS.
+- **Better vendor hacks detection.** Autoprefixer will preserve outdated prefixed property if you it put right after unprefixed ones. Also fixed bug with same properties in one rule.
+- **License was changed to MIT.** New license is more free and allow to remove long LGPL preamble from each file.
+- **Long browser names.** Autoprefixer now understands `firefox`, `explorer` and `blackberry` browser aliases and ignore case in browser names. So you can set supported browsers like `Firefox >= 22`. Also you can select last `n` versions of some specified browser by `last 2 Chrome versions` requirement.
+
+### API Changes
+- Method `compile()` was renamed to `process()` and now return `Result` object with `css` and `map` properties. Instead of input file in `file` option, you should set input and output file names to `from` and `to` options to generate correct source map. Old `compile()` API show deprecated warning and will be removed in next 1.1 release.
+- Method `inspect()` was renamed to `info()` to fix name conflict with Console API.
+- There is no `autoprefixer.rework` method anymore. Just use `autoprefixer.process(css).css` after your Rework transformations.
+
+### Binary
+- Binary now will not concat output files. Concat requires extra code to support source map. Use special tools like [grunt-concat-sourcemap](https://github.com/kozy4324/grunt-concat-sourcemap).
+- New `-d` option to set output directory for multiple input files.
+- Syntax error now displays input file name.
+
+### Fixes
+- Add prefixes inside custom at-rules.
+- Add only necessary prefixes to selector inside prefixed at-rule.
+- Safer backgrounds list parser from PostCSS in gradient hack.
+- Prefix `@keyframes` inside `@media`.
+- Don’t prefix values for CSS3 PIE properties.
+- Use browserify to build standalone version.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/129423/assets,https://api.github.com/repos/postcss/autoprefixer/releases/129423,master,https://api.github.com/repos/postcss/autoprefixer/tarball/1.0,https://github.com/postcss/autoprefixer/releases/tag/1.0,https://api.github.com/repos/postcss/autoprefixer/zipball/1.0,1.0,False,False
+127655,2013-04-09T11:55:57Z,2013-12-19T23:21:53Z,0.1 “Fire and Blood”,"<img src=""http://awoiaf.westeros.org/images/4/43/House_Targaryen.PNG"" width=""180"" height=""234"" align=""right"" />
+* Initial release.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/127655/assets,https://api.github.com/repos/postcss/autoprefixer/releases/127655,master,https://api.github.com/repos/postcss/autoprefixer/tarball/0.1,https://github.com/postcss/autoprefixer/releases/tag/0.1,https://api.github.com/repos/postcss/autoprefixer/zipball/0.1,0.1,False,False
+127653,2013-04-13T14:12:21Z,2013-12-19T23:20:05Z,0.2 “Hear Me Roar!”,"<img src=""http://awoiaf.westeros.org/images/8/88/House_Lannister.png"" width=""180"" height=""212"" align=""right"" />
+- Update parse libraries.
+- Use [Component](https://github.com/component/component) package manager to build standalone script.
+- Add inspect to standalone script.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/127653/assets,https://api.github.com/repos/postcss/autoprefixer/releases/127653,master,https://api.github.com/repos/postcss/autoprefixer/tarball/0.2,https://github.com/postcss/autoprefixer/releases/tag/0.2,https://api.github.com/repos/postcss/autoprefixer/zipball/0.2,0.2,False,False
+127650,2013-04-23T06:37:35Z,2013-12-19T23:18:47Z,0.3 “Growing Strong”,"<img src=""http://awoiaf.westeros.org/images/9/99/House_Tyrell.PNG"" width=""180"" height=""241"" align=""right"" />
+- Rename `autoprefixer.filter()` to `autoprefixer.rework()`.
+- Use own filters instead of Rework’s `prefix` and `prefixValue`.
+- Smarter value prefixer without false match “order” in “border”.
+- 40% faster.
+- Don’t add unnecessary properties instead of Rework’s `prefixValue`.
+- Don’t change properties order.
+- Sort properties and values in inspect output.
+- Add main to component config (by @jonathanong).
+- Fix documentation (by @putnik and @mvasilkov).
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/127650/assets,https://api.github.com/repos/postcss/autoprefixer/releases/127650,master,https://api.github.com/repos/postcss/autoprefixer/tarball/0.3,https://github.com/postcss/autoprefixer/releases/tag/0.3,https://api.github.com/repos/postcss/autoprefixer/zipball/0.3,0.3,False,False
+127646,2013-05-07T08:36:06Z,2013-12-19T23:17:06Z,0.4 “Winter Is Coming”,"<img src=""http://awoiaf.westeros.org/images/5/51/House_Stark.PNG"" width=""180"" height=""241"" align=""right"" />
+- Remove outdated prefixes.
+- Add `border-radius` and `box-shadow` properties to database.
+- Change degrees in webkit gradients.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/127646/assets,https://api.github.com/repos/postcss/autoprefixer/releases/127646,master,https://api.github.com/repos/postcss/autoprefixer/tarball/0.4,https://github.com/postcss/autoprefixer/releases/tag/0.4,https://api.github.com/repos/postcss/autoprefixer/zipball/0.4,0.4,False,False
+127643,2013-06-15T14:03:54Z,2013-12-19T23:15:11Z,0.5 “Ours is the Fury”,"<img src=""http://awoiaf.westeros.org/images/d/d1/House_Baratheon.PNG"" width=""180"" height=""208"" align=""right"" />
+- Rewrite Autoprefixer to be more flexible.
+- Use `css`, instead of Rework, to fix CSS parsing errors faster.
+- Fix a lot of CSS parsing errors.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/127643/assets,https://api.github.com/repos/postcss/autoprefixer/releases/127643,master,https://api.github.com/repos/postcss/autoprefixer/tarball/0.5,https://github.com/postcss/autoprefixer/releases/tag/0.5,https://api.github.com/repos/postcss/autoprefixer/zipball/0.5,0.5,False,False
+37394,2013-09-02T19:48:22Z,2013-09-02T19:51:50Z,"0.8 “Unbowed, Unbent, Unbroken”","<img src=""http://awoiaf.westeros.org/images/d/d6/MartellCoA.png"" width=""180"" height=""181"" align=""right"" />
+- Add more browsers to defaults (`> 1%, last 2 versions, ff 17, opera 12.1`
+  instead of just `last 2 browsers`).
+- Keep vendor prefixes without unprefixed version (like vendor-specific hacks).
+- Convert gradients to old WebKit syntax (actual for Android 2.3).
+- Better support for several syntaxes with one prefix (like Flexbox and
+  gradients in WebKit).
+- Add intrinsic and extrinsic sizing values support.
+- Remove never existed prefixes from common mistakes (like -ms-transition).
+- Add Opera 17 data.
+- Fix selector prefixes order.
+- Fix browser versions order in inspect.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/37394/assets,https://api.github.com/repos/postcss/autoprefixer/releases/37394,master,https://api.github.com/repos/postcss/autoprefixer/tarball/0.8,https://github.com/postcss/autoprefixer/releases/tag/0.8,https://api.github.com/repos/postcss/autoprefixer/zipball/0.8,0.8,False,False
+21130,2013-08-05T12:48:34Z,2013-08-05T13:01:37Z,0.7 “We Do Not Sow”,"<img src=""http://awoiaf.westeros.org/images/f/f3/Greyjoy_coat_sigil.png"" width=""180"" height=""180"" align=""right"" />
+- Add vendor prefixes to selectors.
+- Add `::selection` and `::placeholder` selectors support.
+- Allow to load support data from Can I Use pull requests.
+- Remove deprecated API.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/21130/assets,https://api.github.com/repos/postcss/autoprefixer/releases/21130,master,https://api.github.com/repos/postcss/autoprefixer/tarball/0.7,https://github.com/postcss/autoprefixer/releases/tag/0.7,https://api.github.com/repos/postcss/autoprefixer/zipball/0.7,0.7,False,False
+10636,2013-07-16T13:47:00Z,2013-07-16T13:52:02Z,0.6 “As High As Honor”,"<img src=""http://awoiaf.westeros.org/images/b/be/House_Arryn.PNG"" width=""180"" height=""193"" align=""right"" />
+- New faster API, which cache preprocessed data. Old API is deprecated.
+- A lot of perfomance improvements.
+- Add Opera 15 `-webkit-` prefix support.
+- Update Chrome 29 and Safari 7 prefixes data.
+- Add minor browsers in popularity select.
+- Better syntax error messages.
+",https://api.github.com/users/ai,19343,ai,https://api.github.com/repos/postcss/autoprefixer/releases/10636/assets,https://api.github.com/repos/postcss/autoprefixer/releases/10636,master,https://api.github.com/repos/postcss/autoprefixer/tarball/0.6,https://github.com/postcss/autoprefixer/releases/tag/0.6,https://api.github.com/repos/postcss/autoprefixer/zipball/0.6,0.6,False,False

@@ -1,0 +1,1507 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+3460630,2016-06-16T16:22:36Z,2016-06-17T08:45:24Z,Predis v1.1.1,"This is a patch release of Predis v1.1 that fixes a few bugs affecting the previous release. As usual you can read the [CHANGELOG](https://github.com/nrk/predis/blob/v1.1.1/CHANGELOG.md#v111-2016-06-16) for a schematic list of the changes.
+
+## Bug fixes
+- **FIX**: `password` and `database` from the global `parameters` client option were still being applied to sentinels connections making them fail (sentinels do not understand the `AUTH` and `SELECT` commands) (PR #346).
+- **FIX**: when a sentinel instance reports no slave for a service, invoking `connect()` on the redis-sentinel connection backend should fall back to the master connection instead of failing (ISSUE #342).
+- **FIX**: the two connection backends based on ext-phpiredis has some kind of issues with the GC and the internal use of closures as reader callbacks that prevented connections going out of scope from being properly collected and the underlying stream or socket resources from being closed and freed. This should not have had any actual effect in real-world scenarios due to the lifecycle of PHP scripts, but we fixed it anyway (ISSUE #345).
+
+## Other links
+- [Packagist](http://packagist.org/packages/predis/predis)
+- [PEAR](http://pear.nrk.io/)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/3460630/assets,https://api.github.com/repos/nrk/predis/releases/3460630,v1.1,https://api.github.com/repos/nrk/predis/tarball/v1.1.1,https://github.com/nrk/predis/releases/tag/v1.1.1,https://api.github.com/repos/nrk/predis/zipball/v1.1.1,v1.1.1,False,False
+3350007,2016-06-02T07:05:10Z,2016-06-02T08:34:58Z,Predis v1.1.0,"## Introduction
+
+This is a minor release of Predis packed with new features and various improvements of existing ones. As usual you can read the [CHANGELOG](https://github.com/nrk/predis/blob/v1.1.0/CHANGELOG.md#v110-2016-06-02) for a schematic list of the changes. Thanks to anyone who provided feedback, especially on the new features, and proposed changes implemented in this release! Starting today we also have a [chat room on Gitter](https://gitter.im/nrk/predis), for now it's kind of an experiment but we'll see on the long run if it'll prove to be useful.
+
+**IMPORTANT**: if you are using `""predis/predis"": ""dev-master""` in `composer.json` then **replace the requirement with tagged releases in the v1.1 branch as soon as possible!** Starting today the `master` branch will host the development of the next major version of Predis, the first few commits containing some major breaking changes will land there in a matter of days meaning that if you won't replace `dev-master` your applications may (and most likely will) fail all of sudden.
+
+**NOTE**: speaking of Predis v2.0 we are aiming to bump the minimum required version of PHP to 5.5.9 (most likely to happen) and drop PEAR for distribution (still to be decided). The v1.1 branch will be maintaned for fixes so if you are stuck with PHP 5.3 and 5.4 you don't have too much to worry about for a while. If you have anything to say on the matter please join the discussion by leaving a comment or a reaction on #335, we need your feedback!
+
+## New features
+- Support for **redis-sentinel** is finally baked into Predis! As usual configuring the client is easy, it's just a matter of providing a list of sentinel servers and configure the client accordingly:
+  
+  ``` php
+  $parameters = ['tcp://127.0.0.1:5380', 'tcp://127.0.0.1:5381', 'tcp://127.0.0.1:5382'];
+  
+  $options = [
+      'replication' => 'sentinel', // use the appropriate replication backend
+      'service' => 'mymaster',     // provide a service name for discovery
+  ];
+  
+  $client = new Predis\Client($parameters, $options);
+  ```
+  
+  See [`replication_sentinel.php`](https://github.com/nrk/predis/blob/v1.1.0/examples/replication_sentinel.php) for a complete example.
+- Redis servers protected by SSL-encrypted connections can be accessed by using the `tls` or `rediss` scheme in connection parameters along with [SSL-specific options](http://php.net/manual/context.ssl.php) in the `ssl` parameter (array):
+  
+  ``` php
+  // Parameters in the form of a named array
+  $parameters = [
+      'scheme' => 'tls',
+      'host'   => '127.0.0.1',
+      'ssl'    => [
+          'cafile' => '/path/to/redis.pem',
+          'verify_peer_name' => true,
+      ],
+  ];
+  
+  // Parameters in the form of an URI string
+  $parameters = 'tls://127.0.0.1?ssl[cafile]=/path/to/redis.pem&ssl[verify_peer_name]=1';
+  ```
+- Implemented the ability to specify default connection parameters for aggregate connections with the new `parameters` client option. These parameters augment the usual user-supplied connection parameters (but do not take the precedence over them) when creating new connections and they are mostly useful when the client is using aggregate connections such as redis-cluster and redis-sentinel as these backends can create new connections on the fly based on responses and redirections from Redis:
+  
+  ``` php
+  $parameters = ['tcp://127.0.0.1:6381', 'tcp://127.0.0.1:6382', 'tcp://127.0.0.1:6383'];
+  
+  $options = [
+      'cluster' => 'redis',
+      // New connections to Redis will be created using the same following parameters:
+      'parameters' => ['database' => 5, 'password' => $secret],
+  ];
+  
+  $client = new Predis\Client($parameters, $options);
+  ```
+- `Predis\Client` implements the `IteratorAggregate` interface making it is possible to iterate over traversable aggregate connections and get a new client instance for each Redis node:
+  
+  ``` php
+  $client = new Predis\Client($parameters, ['cluster' => 'redis']);
+  
+  foreach ($client as $nodeClient) {
+      $nodeClient->flushdb();  // executes FLUSHDB on each node of the cluster
+  }
+  ```
+
+## Changes
+- The default server profile for the client now targets Redis 3.2.
+- Responses to the following list of commands are not casted into booleans anymore but instead the original integer value of the response is returned: `SETNX`, `MSETNX`, `SMOVE`, `SISMEMBER`, `HSET`, `HSETNX`, `HEXISTS`, `PFADD`, `EXISTS`, `MOVE`, `PERSIST`, `EXPIRE`, `EXPIREAT`, `RENAMENX`. This change does not have a significant impact unless when using strict comparisons (`===` and `!==`) on the returned value.
+- Using `unix:///path/to/socket` in URI strings to specify a UNIX domain socket file is now deprecated in favor of the format `unix:/path/to/socket` (note the lack of the double slash after the scheme) and will not be supported starting with the next major release.
+- The client throws exceptions when Redis returns any kind of error response to initialization commands (the ones being automatically sent when a connection is established, such as `SELECT` and `AUTH` when database and password are set in connection parameters) regardless of the value of the exception option.
+-  Iterating over an instance of `Predis\Connection\Aggregate\RedisCluster` will return all the connections mapped in the slots map instead of just the ones in the in-memory pool. This change makes it possible, when the slots map is retrieved from Redis, to iterate over all of the master nodes in the cluster. When the use of `CLUSTER SLOTS` is disabled via the `useClusterSlots()` method, the iteration returns only the connections with slots ranges associated in their parameters or the ones initialized by `-MOVED` responses in order to make the behaviour of the iteration consistent between the two modes of operation.
+
+## Improvements
+- Non-boolean string values passed to the `persistent` connection parameter can be used to create different persistent connections to the same host-port pair:
+  
+  ``` php
+  // $parameters1 and $parameters2 will create two different persistent connections:
+  $parameters1 = ""tcp://127.0.0.1:6379?persistent=first"";
+  $parameters2 = ""tcp://127.0.0.1:6379?persistent=second"";
+  ```
+  
+  Note that this feature was already present in Predis but required both `persistent` and `path` to be set as illustrated by #139, this change was needed to prevent confusion with how `path` is used to select a database when using the `redis` scheme.
+- Various improvements to `Predis\Connection\Aggregate\MasterSlaveReplication` (the ""basic"" replication backend, not the new one based on redis-sentinel):
+  - When the client is not able to send a read-only command to a slave because the current connection fails or the slave is resyncing (`-LOADING` response returned by Redis), the backend discards the failed connection and performs a new attempt on the next slave. When no other slave is available the master server is used for read-only commands as last resort.
+  - It is possible to discover the current replication configuration on the fly by invoking the `discover()` method which internally relies on the output of the command `INFO REPLICATION` executed against the master server or one of the slaves. The backend can also be configured to do this automatically when it fails to reach one of the servers.
+  - Implemented the `switchToMaster()` and `switchToSlave()` methods to make it easier to force a switch to the master server or a random slave when needed.
+
+## Other links
+- [Packagist](http://packagist.org/packages/predis/predis)
+- [PEAR](http://pear.nrk.io/)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/3350007/assets,https://api.github.com/repos/nrk/predis/releases/3350007,master,https://api.github.com/repos/nrk/predis/tarball/v1.1.0,https://github.com/nrk/predis/releases/tag/v1.1.0,https://api.github.com/repos/nrk/predis/zipball/v1.1.0,v1.1.0,False,False
+3333065,2016-05-30T15:32:14Z,2016-05-30T15:34:34Z,Predis v1.0.4,"This is a maintenance release for the 1.0 series. What follows is an overview of the changes and bug fixes introduced in this release, more details are available in the [CHANGELOG](https://github.com/nrk/predis/blob/v1.0.4/CHANGELOG.md#v104-2016-05-30).
+
+**IMPORTANT**: Predis v1.1.0 is going to be released in just a few days, this minor release will ship with various improvements and the much-awaited support for redis-sentinel. Soon after that the `master` branch will host the development of Predis v2.0 and the first major change will be a bump of the minimum required version of PHP to 5.5.9, please [read about it here](https://github.com/nrk/predis/issues/335) and leave a comment if you have something to say on the matter as the decision has not been finalized as of yet.
+
+## Improvements
+- Added a new profile for Redis 3.2 with its new commands: `HSTRLEN`, `BITFIELD`, `GEOADD`, `GEOHASH`, `GEOPOS`, `GEODIST`, `GEORADIUS`, `GEORADIUSBYMEMBER`. The default server profile for Predis is still the one for Redis 3.0 so you must set the `profile` client option to `3.2` when initializing the client in order to be able to use them when connecting to Redis 3.2.
+- **redis-cluster:** when the connection to a specific node fails the client tries to connect to another node in order to refresh the slots map and perform a new attempt to execute a command.
+- **redis-cluster:** connections to nodes can now be preassigned to non-contiguous slot ranges via the `slots` parameter using a comma separator (e.g. `tcp://127.0.0.1:6379?slots=0-5460,5500-5600,11000`)
+
+## Bug fixes
+- **FIX**: `Predis\Collection\Iterator\HashKey` was returning corrupted values when iterating hash keys containing integer fields (PR #330, ISSUE #331).
+- **FIX**: `Predis\Connection\StreamConnection` and `Predis\Protocol\Text\RequestSerializer` do not fail when serializing commands with holes in their arguments (e.g. `[0 => 'key:0', 2 => 'key:2']`) just like the phpiredis-based connection backends (ISSUE #316).
+
+## Other links
+- [Packagist](http://packagist.org/packages/predis/predis)
+- [PEAR](http://pear.nrk.io/)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/3333065/assets,https://api.github.com/repos/nrk/predis/releases/3333065,v1.0,https://api.github.com/repos/nrk/predis/tarball/v1.0.4,https://github.com/nrk/predis/releases/tag/v1.0.4,https://api.github.com/repos/nrk/predis/zipball/v1.0.4,v1.0.4,False,False
+1609146,2015-07-30T18:37:04Z,2015-07-30T18:54:57Z,Predis v1.0.3,"This is a maintenance release for the 1.0 series. What follows is an overview of the changes and bug fixes introduced in this release, more details are available in the [CHANGELOG](https://github.com/nrk/predis/blob/v1.0.3/CHANGELOG.md#v103-2015-07-30).
+
+**IMPORTANT NOTICE**: this release supersedes [v1.0.2](https://github.com/nrk/predis/releases/v1.0.2).
+
+## Bug fixes
+- **FIX**:  the previous release introduced a severe regression on HHVM preventing the client from connecting to Redis using IPv4 addresses. Code running on the standard PHP interpreter is unaffected. (#269)
+
+## Other links
+- [Packagist](http://packagist.org/packages/predis/predis)
+- [PEAR](http://pear.nrk.io/)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/1609146/assets,https://api.github.com/repos/nrk/predis/releases/1609146,v1.1,https://api.github.com/repos/nrk/predis/tarball/v1.0.3,https://github.com/nrk/predis/releases/tag/v1.0.3,https://api.github.com/repos/nrk/predis/zipball/v1.0.3,v1.0.3,False,False
+1606593,2015-07-30T10:25:01Z,2015-07-30T10:28:06Z,Predis v1.0.2,"This is a maintenance release for the 1.0 series. What follows is an overview of the changes and bug fixes introduced in this release, more details are available in the [CHANGELOG](https://github.com/nrk/predis/blob/v1.0.2/CHANGELOG.md#v102-2015-07-30).
+
+**IMPORTANT NOTICE**: this release has been superseded by [v1.0.3](https://github.com/nrk/predis/releases/v1.0.3) due to a severe regression affecting only HHVM preventing the client from connecting to Redis using IPv4 addresses. Code running on the standard PHP interpreter is unaffected.
+
+## Improvements
+- IPv6 is fully supported.
+- The `redis` scheme can be used in URI strings and is considered an alias of `tcp` but the rules applied when parsing the URI follow the provisional registration document [published by IANA](http://www.iana.org/assignments/uri-schemes/prov/redis) while the usual Predis-specific rules still apply when using `tcp` and other schemes.
+- Implemented some missing commands: [`HSTRLEN`](http://redis.io/commands/hstrlen) (Redis >= 3.2), [`ZREVRANGEBYLEX`](http://redis.io/commands/zrevrangebylex) (Redis >= 2.8) and [`MIGRATE`](http://redis.io/commands/migrate) (>= 2.6).
+- The [`ZADD`](http://redis.io/commands/zadd) modifiers `NX|XX`, `CH`, `INCR` introduced in Redis 3.0.2 can also be used with the _simplified signature_ of this command where scores and members are passed as a named array.
+
+## Bug fixes
+- **FIX**: `Predis\Configuration\Options` must not trigger the autoloader when values are strings (#257).
+- **FIX**: `BITPOS` was not defined in the key-prefix processor (#265) and in the replication strategy.
+
+## Notes
+- Predis v1.1.0 should follow in just a few weeks and, being a minor release, will deliver more than just bugfixes or minor improvements. The addition of support for redis-sentinel is a long-standing feature request that will hopefully find its way into the library (see #131) and some major and much needed improvements to redis-cluster are also scheduled (see #173). As usual any help is more than appreciated so feel free to hop on these issues for sharing ideas and advices, or even contribute with a pull request.
+
+## Other links
+- [Packagist](http://packagist.org/packages/predis/predis)
+- [PEAR](http://pear.nrk.io/)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/1606593/assets,https://api.github.com/repos/nrk/predis/releases/1606593,v1.0,https://api.github.com/repos/nrk/predis/tarball/v1.0.2,https://github.com/nrk/predis/releases/tag/v1.0.2,https://api.github.com/repos/nrk/predis/zipball/v1.0.2,v1.0.2,False,False
+819900,2015-01-02T12:53:22Z,2015-07-30T10:34:58Z,Predis v1.0.1,"This is a maintenance release for the 1.0 series. What follows is an overview of the changes and bug fixes introduced in this release, more details are available in the [CHANGELOG](https://github.com/nrk/predis/blob/v1.0.1/CHANGELOG.md#v101-2015-01-02).
+
+## Improvements
+- Added the [`BITPOS`](http://redis.io/commands/bitpos) command to the server profile for Redis 2.8 (pull request by @nicchap).
+- It is now possible to specify a timeout for read/write operations also when using UNIX domain sockets with `Predis\Connection\StreamConnection` which is the default connection class based on PHP's streams (pull request by @srhnsn).
+
+## Bug fixes
+- A bug prevented `Predis\Collection\Iterator\SortedSetKey` to work correctly when iterating over sorted sets containing integer members (see #216).
+- Applied a workaround for a bug in old versions of PHP < 5.3.9 affecting inheritance (see 99f4312a6feb2cadaf83b008d006c1720f580723).
+- Prevent `E_NOTICE` messages from being emitted when requesting empty or unexistent info sections using [`INFO`](http://redis.io/commands/info).
+
+## Notes
+- Due to a bug in HHVM <= 3.4.0, it is not possible to use `Predis\PubSub\Consumer` and `Predis\Monitor\Consumer` when running under Facebook's runtime for now. You can find more details in the discussion on #231 (thanks @rubensayshi for the catch!) which also provides an hack to work around this issue until the next release of HHVM will ship with their bug fixed.
+
+## Downloads
+- [Packagist](http://packagist.org/packages/predis/predis)
+- [PEAR](http://pear.nrk.io/)
+- [TGZ](https://github.com/nrk/predis/tarball/v1.0.1)
+- [ZIP](https://github.com/nrk/predis/zipball/v1.0.1)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/819900/assets,https://api.github.com/repos/nrk/predis/releases/819900,v1.0,https://api.github.com/repos/nrk/predis/tarball/v1.0.1,https://github.com/nrk/predis/releases/tag/v1.0.1,https://api.github.com/repos/nrk/predis/zipball/v1.0.1,v1.0.1,False,False
+454550,2014-08-01T10:09:43Z,2016-06-01T14:19:13Z,Predis v1.0.0,"This is not only a new and major release of Predis, but it is an important milestone because it represents the first stable release in terms of API (both public and internal). Lots of changes have been made to improve the overall design and code quality while optimizing the library as much as possible.
+
+You can consult the [CHANGELOG](https://github.com/nrk/predis/blob/v1.0.0/CHANGELOG.md#v100-2014-08-01) for more details about changes and bug fixes introduced in this release.
+
+**IMPORTANT NOTE**: we switched to **[PSR-4](http://www.php-fig.org/psr/psr-4/)** for autoloading but PEAR packaging still uses [PSR-0](http://www.php-fig.org/psr/psr-0/) for obvious reasons, the conversion is performed when generating the package using `bin/create-pear`. We do not plan to support installation through PEAR indefinitely, but we will stick with it for a few more releases.
+
+## Introduction
+
+One of the purposes of this new release was to make use of better names for classes, interfaces and namespaces so we ended up with shorter fully-qualified names and a better organization of namespaces. While these changes can be quite radical in certain cases, the truth is that they will most likely affect only code-bases where developers made use of certain classes to extend the library with custom features. Those simply using Predis as a client will not probably notice any difference. Just to make a few examples (for the rest, see the [CHANGELOG](https://github.com/nrk/predis/blob/v1.0.0/CHANGELOG.md#v100-2014-08-01)): 
+- The `Predis\Option` namespace is now `Predis\Configuration`.
+- The `Predis\Command\AbstractCommand` class is now `Predis\Command\Command`.
+- The `Predis\Command\ScriptedCommand` class is now `Predis\Command\ScriptCommand`.
+- Aggregate connections (cluster, replication) are in the `Predis\Connection\Aggregate` namespace.
+- Classes representing status and error responses are in the `Predis\Response` namespace.
+
+Obviously it is not only a matter of renaming or moving things around, the overall internal design of Predis has been dramatically improved and now certain aspects of the library (such as clustering) are more solid and more open to extension. Last but not least a lot of work has been done to keep performances in check, resulting in less overhead when initializing client instances and no difference at runtime in raw numbers compared to v0.8.x despite the additional flexibility.
+
+## Improvements
+- **@method in docblocks**: while this is not strictly a feature, now Predis ships with `@method` tags for `Predis\ClientInterface` and `Predis\ClientContextInterface` (pipelines, transactions) so you can leverage autocompletion and inspection while coding with your favourite IDE. This should be a much welcome addition for many developers since it has been requested many times in the last couple of years.
+- **Server profiles**: the default one is now `3.0` (obviously targeting Redis 3.0.0). It is safe to switch now since the are no breaking changes between Redis 2.8 and 3.0. At the same time, the server profile for Redis 1.2 has been removed since it is relatively ancient stuff.
+- **New commands**: added `SENTINEL` to the server profile for Redis 2.6 and [`PUBSUB`](http://redis.io/commands/pubsub) to the server profile for Redis 2.8. **Please note** that you will not find `CLUSTER` and other commands used by redis-cluster in the server profile for Redis 3.0. Internally they are used as raw commands, they may be added in the future though as soon as Redis 3.0 becomes stable.
+- **Raw commands**: now they can be sent simply by providing an array of arguments (comprising of the command ID) to `Predis\Client::executeRaw()`. This method skips key prefixing (and more generally, any command processor) and response parsing, so it always returns responses as documented on the Redis website. It is also possible to tell when Redis returns an error thanks to the second optional argument populated by reference with a boolean value:
+  
+  ``` php
+  $response = $client->executeRaw([""SET"", ""foo"", ""bar""]); // string(2) ""OK""
+  $response = $client->executeRaw([""STRLEN"", ""foo""]);     // int(3)
+  
+  // When $iserror is TRUE, $response contains the error string.
+  $response = $client->executeRaw([""LPUSH"", ""foo"", ""bar""], &$iserror);
+  ```
+- **Changes for `ZRANGE`-like commands using `WITHSCORES`**: Predis used to return the `member` and `score` pair as an array of `[$member, $score]` when using the `WITHSCORES` modifier with [`ZRANGE`](http://redis.io/commands/zrange), [`ZREVRANGE`](http://redis.io/commands/zrevrange), [`ZRANGEBYSCORE`](http://redis.io/commands/zrangebyscore) and [`ZREVRANGEBYSCORE`](http://redis.io/commands/zrevrangebyscore). Now the raw response is parsed to a named array so members and their scores can be accessed as `$member => $score`.
+  
+  ``` php
+  $members = $client->zrange(""key"", 0, -1, ""withscores"");
+  // Predis v0.8 (old): [[""member1"", ""score1""], ...]
+  // Predis v1.0 (new): [""member1"" => ""score1"", ...]
+  ```
+  
+  The output of [`ZSCAN`](http://redis.io/commands/zscan) has also been changed accordingly in order to reflect the same output, while `Predis\Collection\Iterator\SortedSetKey` is not affected by this change. **NOTE**: the ordering of the original response is still preserved thanks to how PHP internally works with named arrays.
+- **Redis responses**: status responses are now returned as instances of `Predis\Response\Status` and carry their original payload string. `+OK` is then no more returned to the client as a boolean `TRUE`, but since a status response can be transparently casted to string one can do `$response == ""OK""` which is also more akin to how Redis replies to clients. Instances of common status responses such as `+OK` or `+QUEUED` are shared internally in order to avoid wasting memory. Another change regards custom response parsers in commands (see `Predis\Command\CommandInterface::parseResponse()`) which are now applied inside consumer classes such as `Predis\Client`.
+- **Client options**: the fully reworked `Predis\Configuration\Options` class now has the ability to lazily initialize values using objects that respond to `__invoke()` and it works even for custom options defined by the user. This is an example of a complex and modular set of options where standard and user-defined options are mixed together, and the ones regarding cluster are initialized lazily only when needed by the client:
+  
+  ``` php
+  $client = new Predis\Client($parameters, [
+    'exceptions'  => true,
+    'connections' => [
+      'tcp'  => 'Predis\Connection\PhpiredisStreamConnection',
+    ],
+    'distributor' => function () {
+      return new Predis\Cluster\Distributor\KetamaRing();
+    },
+    'strategy'    => function ($options) {
+      return new Predis\Cluster\PredisStrategy($options->distributor);
+    },
+    'cluster'     => function ($options) {
+      $strategy = $options->strategy;
+      $cluster = new Predis\Connection\Aggregate\PredisCluster($strategy);
+  
+      return $cluster;
+    },
+    'profile'     => function ($options, $option) {
+      $profile = $options->getDefault($option);
+      $profile->defineCommand(""luascript"", ""Nrk\Command\LuaScriptCommand"");
+  
+      return $profile;
+    },
+  ]);
+  ```
+  
+  In addition to the client options already supported by v0.8, the new **`aggregate`** option overrides both **`cluster`** and **`replication`** and can be used to initialize an aggregate connection taking full control over its initialization (the return type must be `Predis\Connection\AggregateConnectionInterface`).
+- **Cluster with client-side sharding**: Predis now uses the same rules defined by the redis-cluster specification when dealing with empty hash-tags `{}` in keys, so upgrading Predis **might** affect the distribution of your already-deployed cluster. If you want to make sure that you will not be affected by this change, you can extend `Predis\Cluster\PredisStrategy` to override the `extractKeyTag($key)` method and configure the client to use your strategy like this:
+  
+  ``` php
+  class OldPredisStrategy extends Predis\Cluster\PredisStrategy
+  {
+    protected function extractKeyTag($key)
+    {
+      if (false !== $start = strpos($key, '{')) {
+        if (false !== $end = strpos($key, '}', $start)) {
+          $key = substr($key, ++$start, $end - $start);
+        }
+      }
+  
+      return $key;
+    }
+  }
+  
+  $client = new Predis\Client($nodes, [
+    ""cluster"" => function () {
+      $strategy = new OldPredisStrategy();
+      $cluster = new Predis\Connection\Aggregate\PredisCluster($strategy);
+  
+      return $cluster;
+    },
+  ]);
+  ```
+  
+  This is possible because, starting with v1.0, `Predis\Connection\Aggregate\PredisCluster` accepts an instance of `Predis\Cluster\StrategyInterface` as the only argument in its constructor instead of `Predis\Cluster\Distributor\DistributorInterface`. The distributor, on the other hand, is now wrapped by `Predis\Cluster\PredisStrategy`.
+- **Pipeline options**: `Predis\Client::pipeline()` now accepts options to choose which kind of pipeline object should be initialized among the ones supported by Predis:
+  - **`atomic`**: wraps the pipeline in a `MULTI` / `EXEC` transaction (`Predis\Pipeline\Atomic`).
+  - **`fire-and-forget`**: does not read back responses (`Predis\Pipeline\FireAndForget`).
+- **Transaction options**: while `Predis\Transaction\MultiExec` still supports `cas`, `watch` and `retry`, there are also a couple of changes:
+  - **`exceptions`**: overrides the value of `$options->exceptions` provided in client options.
+  - **`on_retry`**: this option **has been removed**.
+- **Key prefixing**: while changes in this case are completely transparent to users, the prefixing logic has been moved from command classes to the key prefix processor returned by `$options->prefix`. Commands are recognized by their IDs and developers can define or override the handlers used to prefix keys based on their arguments. This makes it possible to prefix keys also when using the generic `Predis\Command\RawCommand` class.
+
+## Dropped stuff:
+- **Obsolete methods**: `Predis\Client::multiExec()` and `Predis\Client::pubSub()` have been removed after having been deprecated in v0.8.5. The new names for these methods are respectively `Predis\Client::transaction()` and `Predis\Client::pubSubLoop()`.
+- **Iterable multibulk responses**: the commonly used `Predis\Connection\StreamConnection` does not support them anymore and `iterable_multibulk` has been removed from the default connection parameters. You can still use them with `Predis\Connection\CompositeStreamConnection` (it is slower, but makes use of a pluggable protocol system) and the classes implementing multibulk iterators are available in the `Predis\Response\Iterator` namespace.
+- **Pipeline executors**: they are no more needed after the changes in `Predis\Pipeline\Pipeline`.
+
+## What's next?
+
+Having finally reached v1.0 is a great milestone considering that Predis has been around for 5 years now, but there is obviously more to come: v1.1 will ship with new features and the most important ones will most likely be support for redis-sentinel with replication and support for slaves in redis-cluster. Minor versions will be released more frequently compared to the past, now that the library is considered stable in terms of design and API.
+
+There is also another aspect that should really be addressed: documentation. Predis simply does not have enough documentation covering useful features or the inner parts of the library. I plan to resume the initial efforts started in the [documentation branch](https://github.com/nrk/predis/tree/documentation) but frankly I hope to receive also some external contributions.
+
+All in all I am happy with this release and even though it took 7 months to ship (way more than what I originally planned, mostly due to some busy months) the result is more than satisfactory in terms of quality. Big thanks to everyone who has shared their feedbacks or contributed with suggestions and code!
+
+KTHXBYE.
+
+## Downloads
+- [Packagist](http://packagist.org/packages/predis/predis)
+- [PEAR](http://pear.nrk.io/)
+- [TGZ](https://github.com/nrk/predis/tarball/v1.0.0)
+- [ZIP](https://github.com/nrk/predis/zipball/v1.0.0)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/454550/assets,https://api.github.com/repos/nrk/predis/releases/454550,master,https://api.github.com/repos/nrk/predis/tarball/v1.0.0,https://github.com/nrk/predis/releases/tag/v1.0.0,https://api.github.com/repos/nrk/predis/zipball/v1.0.0,v1.0.0,False,False
+454549,2014-08-01T09:43:31Z,2014-08-01T10:11:35Z,Predis v0.8.7,"This is a maintenance release for the 0.8 series. What follows is an overview of the changes and bug fixes introduced in this release, more details are available in the [CHANGELOG](https://github.com/nrk/predis/blob/v0.8.7/CHANGELOG.md#v087-2014-08-01).
+
+## New features
+
+### Redis commands
+- Added the profile alias `3.0` for Redis 3.0, but `2.8` is still the default one.
+- Added [`COMMAND`](http://redis.io/commands/command) to the server profile for Redis 2.8. This command is actually available since Redis 2.8.13 so it will return a `-ERR` when executed against older versions of Redis.
+
+### Redis Cluster
+
+The new default for redis-cluster when the client receives a `-MOVED` response is to fetch an updated slots map  automatically from the node target of the persistent redirection. Thanks to this change you can now feed the client constructor with only a few of the nodes in your cluster without the need to use a more complex configuration, so even if your cluster have - let's say - 10 nodes you can still use only a couple or more connection parameters:
+
+``` php
+$client = new Predis\Client(
+    [""tcp://10.0.0.1:6379"", ""tcp://10.0.0.1:6380""],
+    [""cluster"" => ""redis""]
+);
+```
+
+Internally the client fetches the slots map using the new `CLUSTER SLOTS` command made available since Redis 3.0.0b7, which means your nodes **must** be upgraded to the most recent beta release of Redis (but you should do it anyway since it is beta software).
+
+### PubSub
+
+Implemented [`PING`](http://redis.io/commands/ping) in our PUB/SUB loop abstraction for Redis >= 3.0.0b8. You can now ping the connection with an optional payload directly from the loop instance, and receive back a `PONG` message:
+
+``` php
+foreach ($pubSubLoop as $message) {
+    switch ($message->kind) {
+        case ""subscribe"":
+            $pubSubLoop->ping(""hello!"");
+            break;
+
+        case ""pong"":
+            echo ""Pong message with payload $message->payload\n"";
+            break;
+    }
+}
+```
+
+## Bug fixes
+- The patch applied in `v0.8.6` to fix [#180](https://github.com/nrk/predis/issues/180) introduced a regression affecting read/write timeouts in `Predis\Connection\PhpiredisStreamConnection` so we had to apply a further fix which, unfortunately, absolutely requires PHP 5.4+ meaning that read/write timeouts will be ignored from now on PHP 5.3.
+
+## Downloads
+- [Packagist](http://packagist.org/packages/predis/predis)
+- [PEAR](http://pear.nrk.io/)
+- [TGZ](https://github.com/nrk/predis/tarball/v0.8.7)
+- [ZIP](https://github.com/nrk/predis/zipball/v0.8.7)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/454549/assets,https://api.github.com/repos/nrk/predis/releases/454549,v0.8,https://api.github.com/repos/nrk/predis/tarball/v0.8.7,https://github.com/nrk/predis/releases/tag/v0.8.7,https://api.github.com/repos/nrk/predis/zipball/v0.8.7,v0.8.7,False,False
+432450,2013-02-03T13:00:08Z,2014-07-16T10:12:21Z,Predis v0.8.2,"[Predis](http://github.com/nrk/predis) is a flexible and feature-complete PHP (>= 5.3.2) client library for [Redis](http://redis.io/).
+
+This is a maintenance release for the 0.8 series. What follows is an overview of the new features and fixes introduced in this new release, for a more in-depth list of changes please see the [CHANGELOG](https://github.com/nrk/predis/blob/v0.8.2/CHANGELOG.md#v082-2013-02-03).
+
+## New features and changes
+
+### Fix for response parsing in pipelines
+
+The main reason for this new patch release is to fix a bug introduced right before releasing v0.8.0 that prevented complex responses from Redis from being parsed correctly in command pipelines as reported on [this issue](https://github.com/nrk/predis/issues/101). This bug didn't affect correctness of the data stored or returned by Redis, but prevented replies to certain commands such as [HGETALL](http://redis.io/commands/hgetall) from being parsed by the client before returning to the user's code.
+
+### Predis-based session handler
+
+A new class [Predis\Session\SessionHandler](https://github.com/nrk/predis/blob/v0.8.2/lib/Predis/Session/SessionHandler.php) has been added to provide an easy way to use Predis as a backend to store PHP's sessions on Redis. This new class is mainly intended for PHP >= 5.4 since it implements [SessionHandlerInterface](http://php.net/manual/en/class.sessionhandlerinterface.php) but it can be used with PHP 5.3 if a polyfill for this interface is provided by you or an external package in your dependencies (such as [symfony/http-foundation](https://packagist.org/packages/symfony/http-foundation) just to name one).
+
+``` php
+<?php
+$client = new Predis\Client('tcp://127.0.0.1', array('prefix' => 'sessions:'));
+$handler = new Predis\Session\SessionHandler($client);
+$handler->register();
+```
+
+See a [more exhaustive example](https://github.com/nrk/predis/blob/v0.8.2/examples/SessionHandler.php).
+
+### Predis service provider for Silex
+
+Along with this release, the [official service provider](https://github.com/nrk/PredisServiceProvider#predisserviceprovider) for Silex has been finally updated to use Predis v0.8 with a new version bump that brings some breaking changes when dealing with multiple clients configuration. These changes was necessary to better fit with the boot mechanism for service providers that was introduced a few months ago in Silex.
+
+## Additional notes
+
+### Downloads
+- [Packagist](http://packagist.org/packages/predis/predis)
+- [PEAR](http://pear.nrk.io/)
+- [TGZ](https://github.com/nrk/predis/tarball/v0.8.2)
+- [ZIP](https://github.com/nrk/predis/zipball/v0.8.2)
+
+### Useful links
+- [Project repository](https://github.com/nrk/predis)
+- [Issue tracker](https://github.com/nrk/predis/issues)
+- [Wiki](https://wiki.github.com/nrk/predis)
+- [Other downloads](https://github.com/nrk/predis/tags)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/432450/assets,https://api.github.com/repos/nrk/predis/releases/432450,v1.1,https://api.github.com/repos/nrk/predis/tarball/v0.8.2,https://github.com/nrk/predis/releases/tag/v0.8.2,https://api.github.com/repos/nrk/predis/zipball/v0.8.2,v0.8.2,False,False
+432447,2013-02-18T14:06:46Z,2014-07-16T10:11:15Z,Predis v0.8.3,"[Predis](http://github.com/nrk/predis) is a flexible and feature-complete PHP (>= 5.3.2) client library for [Redis](http://redis.io/).
+
+This is a maintenance release for the 0.8 series shipping some new features and minor micro-optimizations. What follows is an overview of the new features and changes introduced in this new release, for a more in-depth list of changes please see the [CHANGELOG](https://github.com/nrk/predis/blob/v0.8.3/CHANGELOG.md#v083-2013-02-18).
+
+## New features and changes
+
+### CLIENT SETNAME and CLIENT GETNAME
+
+Thanks to [Raphael Stolt](https://github.com/raphaelstolt)'s [pull request](https://github.com/nrk/predis/issues/102) you can now use [`CLIENT SETNAME`](http://redis.io/commands/client-setname) and [`CLIENT GETNAME`](http://redis.io/commands/client-getname).
+
+### New stream-based phpiredis connection backend
+
+We've had a [connection backend](https://github.com/nrk/predis/blob/v0.8.3/lib/Predis/Connection/PhpiredisConnection.php) based on the [phpiredis extension](https://github.com/nrk/phpiredis) for quite some time now, but it required the `socket` extension to be loaded in order to work. Now there's a [new connection backend](https://github.com/nrk/predis/blob/v0.8.3/lib/Predis/Connection/PhpiredisStreamConnection.php) which still relies on phpiredis to parse and serialize the Redis protocol, but internally uses PHP's native streams. One of the benefits of using streams is that they support persistent connections when used with plain FastCGI or php-fpm processes. Client configuration to make use of this connection backend is the same as usual, you just need to specify the `Predis\Connection\PhpiredisStreamConnection` class:
+
+``` php
+<?php
+$client = new Predis\Client('tcp://127.0.0.1', array(
+    'connections' => array(
+        'tcp'  => 'Predis\Connection\PhpiredisStreamConnection',
+        'unix' => 'Predis\Connection\PhpiredisStreamConnection',
+    ),
+);
+```
+
+### TCP_NODELAY with stream-based connections (PHP >= 5.4.0 only)
+
+One of the historic downsides of using stream-wrapped sockets has always been the impossibility of tinkering with socket options, but luckily for us the introduction of [socket_import_stream()](http://php.net/manual/function.socket-import-stream.php) in PHP 5.4 removed this limitation. This make it possible to set the `TCP_NODELAY` socket option to enable or disable [Nagle's algorithm](http://en.wikipedia.org/wiki/Nagle's_algorithm) using the `tcp_nodelay` connection parameter:
+
+``` php
+<?php
+$client = new Predis\Client('tcp://127.0.0.1?tcp_nodelay=0');
+```
+
+You can effectively set any kind of [socket option](http://www.php.net/manual/en/function.socket-get-option.php) by yourself in your library or application's code with something like:
+
+``` php
+<?php
+$client = new Predis\Client('tcp://127.0.0.1');
+$socket = socket_import_stream($client->getConnection()->getResource());
+socket_set_option($socket, SOL_TCP, TCP_NODELAY, 0);
+```
+
+### Callable objects for`$parameters` in client constructor
+
+Additionally to strings, arrays or even instances of `Predis\Connection\ConnectionInterface`, now the first argument of `Predis\Client::__construct()` can accept callable objects returning instances of `Predis\Connection\ConnectionInterface`. This may appear as an unnecessary addition, but it can reveal itself useful to create custom and self-contained solutions to handle complex configuration scenarios. As an (admittedly) extreme example, we [relied on this feature](https://gist.github.com/nrk/4959926#file-example-php) to wrap the code needed to use client-side sharding to distribute keys among virtual nodes of replicated Redis instances without further changing the library's code.
+
+### Minor non-breaking change in Lua scripting abstraction
+
+When instructing [scripted commands](https://github.com/nrk/predis/blob/v0.8.3/examples/ServerSideScripting.php) to use all the arguments to populate the `ARGV` table and leave `KEYS` empty on Lua's side, developers were required to return `FALSE` (strictly boolean) from `getKeysCount()` in their command implementation. This choice didn't make much sense and now you can simply return `0`. This change does not break existing code since `0 == FALSE` in PHP.
+
+### Changes in redis-cluster distribution
+
+[Salvatore](http://antirez.com) recently started working again on redis-cluster (that alone is an awesome news!) and commited a change [raising the number of hash slots](https://github.com/antirez/redis/commit/ebd666d) used for distribution, from 4096 to 16384. Our [aggregated connection for redis-cluster](https://github.com/nrk/predis/blob/v0.8.3/lib/Predis/Connection/RedisCluster.php) has been updated accordingly, so **pay attention** when upgrading both Redis and Predis if you were brave enough having something based on it.
+
+## Additional notes
+
+### Downloads
+- [Packagist](http://packagist.org/packages/predis/predis)
+- [PEAR](http://pear.nrk.io/)
+- [TGZ](https://github.com/nrk/predis/tarball/v0.8.3)
+- [ZIP](https://github.com/nrk/predis/zipball/v0.8.3)
+
+### Useful links
+- [Project repository](https://github.com/nrk/predis)
+- [Issue tracker](https://github.com/nrk/predis/issues)
+- [Wiki](https://wiki.github.com/nrk/predis)
+- [Other downloads](https://github.com/nrk/predis/tags)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/432447/assets,https://api.github.com/repos/nrk/predis/releases/432447,v1.1,https://api.github.com/repos/nrk/predis/tarball/v0.8.3,https://github.com/nrk/predis/releases/tag/v0.8.3,https://api.github.com/repos/nrk/predis/zipball/v0.8.3,v0.8.3,False,False
+432443,2013-01-19T10:24:15Z,2014-07-16T10:09:11Z,Predis v0.8.1,"[Predis](http://github.com/nrk/predis) is a flexible and feature-complete PHP (>= 5.3.2) client library for [Redis](http://redis.io/).
+
+This is a maintenance release for the 0.8 series. What follows is an overview of the new features and fixes introduced in this new release, for a more in-depth list of changes please see the [CHANGELOG](https://github.com/nrk/predis/blob/v0.8.1/CHANGELOG.md#v081-2013-01-19).
+
+## New features and changes
+
+### Client options
+
+When using callables with client options accepting them, Predis now passes the current option instance as their second argument making it possible to get the default value for that option:
+
+``` php
+<?php
+$options = array(
+    'profile'  => function ($options, $option) {
+        $profile = $option->getDefault($options);
+        $profile->defineCommand('test', 'My\Command\TestCommand');
+
+        return $profile;
+    },
+);
+
+$client = new Predis\Client('tcp://127.0.0.1', $options);
+```
+
+Now you can use a callable with the `connections` option to initialize the instance of `Predis\Connection\ConnectionFactoryInterface` that will be used internally by the client to create the underlying connection:
+
+``` php
+<?php
+$options = array(
+    'connections' => function ($options, $option) {
+        $factory = $option->getDefault($options);
+
+        if (extension_loaded('phpiredis')) {
+            $factory->define('tcp', 'Predis\Connection\PhpiredisConnection');
+            $factory->define('unix', 'Predis\Connection\PhpiredisConnection');
+        }
+
+        return $factory.
+    },
+);
+```
+
+### Client-side sharding based on node alias
+
+There was [this long-standing feature request](https://github.com/nrk/predis/issues/36) that never got a decent solution shipped within the library in order to support _named connections_ (distribution of nodes is based on their alias instead of the `host:port` pair), but now we have a generalized way to do that supported by both `Predis\Cluster\Distribution\HashRing` and `Predis\Cluster\Distribution\KetamaPureRing` and consists of passing a callable to the second argument of their constructors:
+
+``` php
+<?php
+use Predis\Cluster\Distribution\HashRing;
+use Predis\Connection\PredisCluster;
+
+$options = array(
+    'cluster' => function ($options) {
+        $replicas = HashRing::DEFAULT_REPLICAS;
+
+        $nodehash = function ($connection) {
+            return $connection->getParameters()->alias;
+        }
+
+        $hashring = new HashRing($replicas, $nodehash);
+        $cluster  = new PredisCluster($hashring);
+
+        return $cluster;
+    },
+);
+```
+
+As you can see you can decide which kind of value to return from your callback, but keep in mind that everything will be casted to `string` by our hashring implementation.
+
+### Fix for edge case in Lua scripting abstraction
+
+When leveraging the [scripted commands](https://github.com/nrk/predis/blob/v0.8.1/examples/ServerSideScripting.php) abstraction Predis always tries to optimize things by using [EVALSHA](http://redis.io/commands/evalsha) which, on the other hand, could fail with a `-NOSCRIPT` error if the Lua script referred by its SHA1 hash has not been cached by Redis yet. In these cases Predis automatically retries by issuing an [EVAL](http://redis.io/commands/eval) command with the same arguments in addition to the whole Lua script body, but [due to this bug](https://github.com/nrk/predis/issues/94) the client wasn't using the original `parseResponse()` method from the initial command instance to parse the response.
+
+## Documentation
+
+Thanks to [dominics](https://github.com/dominics)' initial push we have finally started with the long-overdue task of [documenting Predis](https://github.com/nrk/predis/issues/91) using [Sphinx](http://sphinx-doc.org/). Documentation is being written and integrated into our separate [documentation branch](https://github.com/nrk/predis/tree/documentation), so make sure to open your pull requests against this branch if you plan to contribute.
+
+## Phpiredis extension
+
+Thanks to the work of [seppo0010](https://github.com/seppo0010) we were able to add the support for a PHP extension to parse the Redis protocol in a more efficient way since Predis v0.7.0, but now that the ownership of the [phpiredis](https://github.com/nrk/phpiredis) repository has been transferred to me I plan to tweak it and add new features from time to time (though the idea is to keep it minimal and simple). Having said that, I am by no means a C developer so help and contributions will be highly welcome and appreciated!
+
+## Additional notes
+
+### Downloads
+- [Packagist](http://packagist.org/packages/predis/predis)
+- [PEAR](http://pear.nrk.io/)
+- [TGZ](https://github.com/nrk/predis/tarball/v0.8.1)
+- [ZIP](https://github.com/nrk/predis/zipball/v0.8.1)
+
+### Useful links
+- [Releases](https://github.com/nrk/predis/releases)
+- [Project repository](https://github.com/nrk/predis)
+- [Issue tracker](https://github.com/nrk/predis/issues)
+- [Wiki](https://wiki.github.com/nrk/predis)
+- [Other downloads](https://github.com/nrk/predis/tags)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/432443/assets,https://api.github.com/repos/nrk/predis/releases/432443,v1.1,https://api.github.com/repos/nrk/predis/tarball/v0.8.1,https://github.com/nrk/predis/releases/tag/v0.8.1,https://api.github.com/repos/nrk/predis/zipball/v0.8.1,v0.8.1,False,False
+432438,2012-10-22T23:49:04Z,2014-07-16T10:05:16Z,Predis v0.8.0,"[Predis](http://github.com/nrk/predis) is a flexible and feature-complete PHP <sup><sub>(>= 5.3.2)</sub></sup> client library for [Redis](http://redis.io/).
+
+This is a major release and it is **not backwards compatible** with the v0.7.x series due to the fact that some [namespaces and classes have been renamed or moved](https://github.com/nrk/predis/blob/v0.8.0/CHANGELOG.NAMING.md) and a few parameters and client options have been modified. What follows is an overview of the new features and major changes introduced with this new release, for a more in-depth list of changes please read the [CHANGELOG](https://github.com/nrk/predis/blob/v0.8.0/CHANGELOG.md).
+
+## New features and changes
+
+### Support for Redis versions and features
+
+The default server profile is now `2.6` which is the current stable branch of Redis while the `dev` profile targets Redis 2.8. Please note that starting with Redis 2.6 the output of [`INFO`](http://redis.io/commands/info) is splitted into sections and, to accomodate this change, Predis returns nested named arrays when using the `2.6` profile.
+
+### Connection parameters and client options
+
+There are some changes for connection parameters.
+- `connection_async` is now `async_connect`
+- `connection_timeout` is now `timeout`
+- `connection_persistent` is now `persistent`
+- `throw_errors` has been removed, replaced by the new `exceptions` client option.
+
+Please note that using the old parameter names with this new version **does not raise any notice**.
+
+As an example, the following client configuration for Predis v0.7.x:
+
+```
+$parameters = ""tcp://127.0.0.1?connection_async=1&connection_timeout=5&connection_persistent=1&throw_errors=1"";
+$client = new Predis\Client($parameters);
+```
+
+starting with Predis v0.8.0 must be changed into:
+
+```
+$parameters = ""tcp://127.0.0.1?async_connect=1&timeout=5&persistent=1""
+$client = new Predis\Client($parameters, array('exceptions' => true));
+```
+
+Additionally, the second parameter of the constructor of `Predis\Client` does not accept strings or instances of `Predis\Profile\ServerProfileInterface` like in the past but the server profile must be set by using the `profile` client option explicitly:
+
+```
+$client = new Predis\Client('tcp://127.0.0.1', '2.4');                      // Wrong
+$client = new Predis\Client('tcp://127.0.0.1', array('profile' => '2.4'));  // OK
+```
+
+### Redis Cluster
+
+While [redis-cluster](http://redis.io/topics/cluster-spec) will not be available until Redis 3.0, Predis already ships with a first working implementation of the logic needed to use this amazing new feature. Configuring the client is simply a matter of passing the list of nodes in the same exact order as they are specified when using `redis-trib` and setting the `cluster` client option to `redis`:
+
+```
+$nodes = array('tcp://10.0.0.1', 'tcp://10.0.0.2', 'tcp://10.0.0.3');
+$client = new Predis\Client($nodes, array('cluster' => 'redis'));
+```
+
+Obviously you can rest assured that the good old way of creating a cluster of Redis nodes simply by relying on client-side sharding is still in place and is the default behavior of the client.
+
+### Server-side scripting with Lua
+
+Predis supported [Redis scripting](http://redis.io/commands/eval) since v0.7.0 but our high-level abstraction built on top of [`EVAL`](http://redis.io/commands/eval) and [`EVALSHA`](http://redis.io/commands/evalsha) (we call it a [_scripted command_](https://github.com/nrk/predis/blob/v0.8.0/examples/ServerSideScripting.php)) has been improved to save bandwidth by using the latter by default and falling back transparently to the former when required (that is, when Redis replies to `EVALSHA` with a `-NOSCRIPT` error). 
+
+### Going asynchronous with Predis\Async
+
+Crazy? Maybe, but at least now you can thanks to [Predis\Async](https://github.com/nrk/predis-async). This separate project shares the same style and feel of Predis by reusing some of its core classes and is built on top of [React](https://github.com/react-php/react) to provide a fully-asynchronous implementation of a Redis client. The library is considered experimental and subject to changes in its API, but it already works and can cooperate seamlessy with any other library that makes use of the core event loop abstraction provided by [React/EventLoop](https://github.com/react-php/event-loop).
+
+## Future development
+
+While this new major release admittedly do not add much features to the plate aside from early support for redis-cluster and a separate project for a fully-asynchronous client, the internals of Predis have been extensively reworked to make the library and its core parts even more easy to extend and reuse, but also with some optimizations put in place. We are at a point in which further changes to the internal architecture of Predis should not be needed for a while, or at least not until we decide to drop compatibility with PHP 5.3 and rewrite stuff to make use of new features introduced in PHP 5.4, which means that we can proceed with experimenting a few ideas such as having core parts of the library implemented in C as an **optional** PHP extension. Right now [you can already use phpiredis](https://github.com/nrk/predis/blob/v0.8.0#multiple-and-customizable-connection-backends) to speed thins up, but we can definitely do better that that.
+
+In a more immediate future, aside from addressing eventual bugs the next patch releases in the v0.8.x series will also see the addition of some missing features such as an abstration to deal with [redis-sentinel](http://redis.io/topics/sentinel).
+
+## Additional notes
+
+### Downloads
+- [TGZ](https://github.com/nrk/predis/tarball/v0.8.0)
+- [ZIP](https://github.com/nrk/predis/zipball/v0.8.0)
+
+### Useful links
+- [Project repository](https://github.com/nrk/predis)
+- [Issue tracker](https://github.com/nrk/predis/issues)
+- [Wiki](https://wiki.github.com/nrk/predis)
+- [Other downloads](https://github.com/nrk/predis/tags)
+- [Project page on Packagist](http://packagist.org/packages/predis/predis)
+- [PEAR channel](http://pear.nrk.io/)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/432438/assets,https://api.github.com/repos/nrk/predis/releases/432438,v1.1,https://api.github.com/repos/nrk/predis/tarball/v0.8.0,https://github.com/nrk/predis/releases/tag/v0.8.0,https://api.github.com/repos/nrk/predis/zipball/v0.8.0,v0.8.0,False,False
+432432,2012-06-01T09:20:14Z,2014-07-16T10:04:15Z,Predis v0.7.3,"[Predis](http://github.com/nrk/predis) is a flexible and feature-complete PHP client library for [Redis](http://redis.io/).
+
+This is a maintenance release for the 0.7 series. What follows is an overview of the new features introduced in this new release. For a more in-depth list of changes please see the [CHANGELOG](https://github.com/nrk/predis/blob/v0.7.3/CHANGELOG.md#v073-2012-06-01).
+
+## New features and changes
+
+### New commands in the Redis 2.6 server profile
+
+Two new commands have been added to Redis 2.6: [`BITOP`](http://redis.io/commands/bitop) and [`BITCOUNT`](http://redis.io/commands/bitcount).
+
+### Scripting abstraction improvements
+
+It is now possible to use negative numbers in the `getKeysCount()` method to tell `Predis\Commands\ScriptedCommand` to calculate the actual number of keys used to populate the `KEYS` array for `EVAL` starting from the end of the arguments list. You can [read this comment](https://github.com/nrk/predis/issues/68#issuecomment-5327373) for a description of a use case.
+
+We also fixed a bug in `Predis\Commands\ServerEvalSHA::getScriptHash()`.
+
+## Additional notes
+
+### Downloads
+- [TGZ](http://github.com/nrk/predis/tarball/v0.7.3)
+- [ZIP](http://github.com/nrk/predis/zipball/v0.7.3)
+
+### Related projects
+- [SncRedisBundle](http://github.com/snc/SncRedisBundle) for [Symfony2](http://symfony.com/).
+- [PredisServiceProvider](http://github.com/nrk/PredisServiceProvider) for [Silex](http://silex.sensiolabs.org/).
+
+### Useful links
+- [Project repository](http://github.com/nrk/predis)
+- [Issue tracker](http://github.com/nrk/predis/issues)
+- [Wiki](http://wiki.github.com/nrk/predis)
+- [Other downloads](http://github.com/nrk/predis/tags)
+- [Project page on Packagist](http://packagist.org/packages/predis/predis)
+- [PEAR channel](http://pear.nrk.io/)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/432432/assets,https://api.github.com/repos/nrk/predis/releases/432432,v1.1,https://api.github.com/repos/nrk/predis/tarball/v0.7.3,https://github.com/nrk/predis/releases/tag/v0.7.3,https://api.github.com/repos/nrk/predis/zipball/v0.7.3,v0.7.3,False,False
+432428,2012-04-01T08:11:45Z,2014-07-16T10:03:29Z,Predis v0.7.2,"[Predis](http://github.com/nrk/predis) is a flexible and feature-complete PHP client library for [Redis](http://redis.io/).
+
+This is a maintenance release for the 0.7 series. What follows is an overview of the new features introduced in this new release. For a more in-depth list of changes please see the [CHANGELOG](http://github.com/nrk/predis/blob/v0.7.2/CHANGELOG.md)..
+
+## New features and changes
+
+### New server profile for Redis 2.6
+
+While `2.4` is still the default server profile, you can now use `2.6` instead of `dev` to use the new commands and features (such as scripting) implemented in Redis 2.6:
+
+```
+$client = new Predis\Client('tcp://127.0.0.1', array('profile' => '2.6'));
+```
+
+The `dev` profile will target Redis `2.8`.
+
+### MONITOR and Redis 2.6
+
+The output of `MONITOR` in Redis 2.6 has been slightly changed resulting in the inability for `Predis\MonitorContext` to work properly. Now Predis can handle the new output automatically and will add the `client` field to the returned message object when connected to Redis >= 2.6.
+
+### Serializable connections
+
+Connection instances can be serialized and unserialized using `serialize()` and `unserialize()`. While probably not useful in most scenarios, this can be handy for example with client-side clustering or replication to lower the overhead of initializing a connection object with many sub-connections since unserializing them can be up to 5x times faster.
+
+```
+$client1 = new Predis\Client();
+$serializedConnection = serialize($client->getConnection());
+
+$unserializedConnection = unserialize($serializedConnection);
+$client2 = new Predis\Client($unserializedConnection);
+```
+
+## Additional notes
+
+### Downloads
+- [TGZ](http://github.com/nrk/predis/tarball/v0.7.2)
+- [ZIP](http://github.com/nrk/predis/zipball/v0.7.2)
+
+### Related projects
+- [SncRedisBundle](http://github.com/snc/SncRedisBundle) for [Symfony2](http://symfony.com/).
+- [PredisServiceProvider](http://github.com/nrk/PredisServiceProvider) for [Silex](http://silex.sensiolabs.org/).
+
+### Useful links
+- [Project repository](http://github.com/nrk/predis)
+- [Issue tracker](http://github.com/nrk/predis/issues)
+- [Wiki](http://wiki.github.com/nrk/predis)
+- [Other downloads](http://github.com/nrk/predis/tags)
+- [Project page on Packagist](http://packagist.org/packages/predis/predis)
+- [PEAR channel](http://pear.nrk.io/)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/432428/assets,https://api.github.com/repos/nrk/predis/releases/432428,v1.1,https://api.github.com/repos/nrk/predis/tarball/v0.7.2,https://github.com/nrk/predis/releases/tag/v0.7.2,https://api.github.com/repos/nrk/predis/zipball/v0.7.2,v0.7.2,False,False
+432424,2011-12-27T15:20:27Z,2014-07-16T10:02:43Z,Predis v0.7.1,"[Predis](http://github.com/nrk/predis) is a flexible and feature-complete PHP client library for [Redis](http://redis.io/).
+
+This is a maintenance release for the 0.7 series that fixes some minor glitches and adds a couple of new features. What follows is an overview of the new features introduced in this new release. For a more in-depth list of changes please see the [CHANGELOG](http://github.com/nrk/predis/blob/v0.7.1/CHANGELOG.md)..
+
+## New features and changes
+
+### New PEAR channel
+
+We still want to have PEAR as one of the methods to distribute Predis, but unfortunately [PearHub](http://pearhub.com/) seems to be unmaintained and the generation of new PEAR packages is currently stuck. To overcome this issue we set up a [new PEAR channel](http://pear.nrk.io) that will host past and future releases of Predis.
+
+### Master / slave replication
+
+This one has been [a long-standing feature request](http://github.com/nrk/predis/issues/21) but master / slave replication configurations are now supported at client level, which means that it is now possible to configure a group of connections with one master server and one or more slave servers. Commands performing read operations (such as `GET`) are executed against one of the slaves and the client switches to the master only upon commands performing write operations (such as `SET`). The configuration of a new client instance for replication is easy, just set the `replication` client option to `true` and specify at least two connections, with one of them being the master (see `alias=master`):
+
+```
+$parameters = array(
+    'tcp://127.0.0.1:6379?alias=master',
+    'tcp://127.0.0.1:6380?alias=slave1',
+);
+
+$options = array('replication' => true);
+
+$client = new Predis\Client($parameters, $options);
+```
+
+Redis transactions (`MULTI` / `EXEC`) force the client to switch to the master server even when the transaction contains read-only operations. The same applies to pipelines, but in this case it is is an implementation detail that could change in future releases.
+
+`EVAL` and `EVALSHA` are considered _write commands_ by default since it is not possible for the client to know when a script performs read-only operations or not. Developers can still override this behaviour on a script-basis with a slightly more complex configuration using the `replication` client option:
+
+```
+$options = array(
+    'replication' => function() {
+        $replication = new Predis\Network\MasterSlaveReplication();
+        $replication->setScriptReadOnly(""return redis.call('GET', KEYS[1])"");
+
+        return $replication;
+    },
+);
+```
+
+You can see [this example](http://github.com/nrk/predis/blob/v0.7.1/examples/MasterSlaveReplication.php) for a complete script using a simple configuration and [this one](http://github.com/nrk/predis/blob/v0.7.1/examples/MasterSlaveReplicationComplex.php) for a more complex one.
+
+## Additional notes
+
+### Downloads
+- [TGZ](http://github.com/nrk/predis/tarball/v0.7.1)
+- [ZIP](http://github.com/nrk/predis/zipball/v0.7.1)
+
+### Related projects
+- [SncRedisBundle](http://github.com/snc/SncRedisBundle) for [Symfony2](http://symfony.com/).
+- [PredisServiceProvider](http://github.com/nrk/PredisServiceProvider) for [Silex](http://silex.sensiolabs.org/).
+
+### Useful links
+- [Project repository](http://github.com/nrk/predis)
+- [Issue tracker](http://github.com/nrk/predis/issues)
+- [Wiki](http://wiki.github.com/nrk/predis)
+- [Other downloads](http://github.com/nrk/predis/tags)
+- [Project page on Packagist](http://packagist.org/packages/predis/predis)
+- [PEAR channel](http://pear.nrk.io/)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/432424/assets,https://api.github.com/repos/nrk/predis/releases/432424,v1.1,https://api.github.com/repos/nrk/predis/tarball/v0.7.1,https://github.com/nrk/predis/releases/tag/v0.7.1,https://api.github.com/repos/nrk/predis/zipball/v0.7.1,v0.7.1,False,False
+432422,2011-12-11T16:28:07Z,2014-07-16T10:01:05Z,Predis v0.7.0,"[Predis](http://github.com/nrk/predis) is a flexible and feature-complete PHP client library for [Redis](http://redis.io/).
+
+This is a major release and it is **not backwards compatible** with the 0.6 series. Predis requires at least PHP 5.3.2 and works perfectly fine on PHP 5.4-dev. Support for PHP 5.2 has been irrevocably dropped and there will not be any more backported release. What follows is an overview of the new features and changes introduced with this new release. For a more in-depth list of changes please read the [CHANGELOG](http://github.com/nrk/predis/blob/v0.7.0/CHANGELOG.md).
+
+## New features and changes
+
+### PSR-0 autoloading
+
+Predis now adheres to the [PSR-0](http://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md) standard that defines a precise scheme for autoloading widely accepted and used by more and more frameworks and libraries. This means that the times when the library consisted of a mere single file are now gone and you need to use a PSR-0 compatible autoloader to be able to use Predis. Basically any modern framework offers such a facility, but when you are using Predis in simple scripts you can just leverage the default basic autoloader class that comes with Predis by requiring `Predis/Autoloader.php` followed by `Predis\Autoloader::register()`.
+
+### Packagist and Composer
+
+Predis is available on [Packagist](http://packagist.org/packages/predis/predis) making the library installable using [Composer](http://packagist.org/about-composer). This makes things a lot easier when managing dependencies in your applications and libraries. It is still possible to install Predis via PEAR using [PearHub](http://pearhub.org/projects/predis)'s channel.
+
+### Support for Redis versions and features
+
+The default server profile is `2.4` which is currently the stable branch of Redis. The `dev` profile targets Redis 2.6 and supports some new features added to Redis such as server-side scripting with Lua. Support for Redis 1.0 has been completely removed.
+
+### Multiple connection backends
+
+The default class responsible for connection and protocol handling is now part of a pluggable system that makes it possible to replace the default implementation with custom ones. For example, it is now possible to leverage the [phpiredis](https://github.com/seppo0010/phpiredis) C extension to lower the overhead of protocol handling thus gaining speed especially with multibulk replies.
+
+```
+$parameters = 'tcp://127.0.0.1:6379';
+$options = array('connections' => array(
+    'tcp'  => 'Predis\Network\PhpiredisConnection',
+    'unix' => 'Predis\Network\PhpiredisConnection',
+));
+
+$client = new Predis\Client($parameters, $options);
+```
+
+This also opens up the possibility of having different classes implementing new kinds of protocols. Now that the `redis` scheme has been removed in favour of the `tcp` scheme, you can restore it with the following lines of code:
+
+```
+$parameters = 'redis://127.0.0.1:6379';
+$options = array('connections' => array(
+    'redis'  => 'Predis\Network\StreamConnection',
+));
+
+$client = new Predis\Client($parameters, $options);
+```
+
+### Webdis
+
+By leveraging the multiple-backends design for connections, Predis is able to talk with [Webdis](http://webd.is/) by default, albeit with certain restrictions since pipelining and transactions are not supported, provided that you are using a PHP interpreter with both the `curl` and `phpiredis` extensions loaded. Simply specify the `http` scheme in your connection parameters and use the client as you would normally do:
+
+```
+$client = new Predis\Client('http://127.0.0.1:7369');
+```
+
+### Transparent key prefixing
+
+Predis can now apply a prefix to your keys automatically by specifying a string in the `prefix` client option. The prefix is applied globally to your client instance which means that it will be used for all the connections that compose a cluster. The standard prefixing strategy is also able to handle commands with a complex use of keys such as `SORT`.
+
+```
+$client = new Predis\Client('tcp://127.0.0.1:6370', array('prefix' => 'pfx:'));
+```
+
+## Future development
+
+Predis v0.7.0 is actually very stable and it is already being used by many developers since a few months without any major issue reported, and recently a whole new comprehensive test suite has been added to ensure this stability. This is also a long overdue release that has been postponed many times in the past for various reasons, but all in all Predis v0.6 served well its purpose (no bugs reported for it since the release of v0.6.6 in April!) so now we can finally have a solid new major release.
+
+There is one missing feature that was initially planned for Predis v0.7.0 but has now been postponed to Predis v0.8: support for redis-cluster. The release plans for redis-cluster changed quite a bit in the last months and it has been pushed back to later dates at least a couple of times. Add to that the fact that this shiny new beast would require some more changes in the internal design of Predis to provide a decent support and you will easily understand the reason for this decision.
+
+## Additional notes
+
+### Downloads
+- [TGZ](http://github.com/nrk/predis/tarball/v0.7.0)
+- [ZIP](http://github.com/nrk/predis/zipball/v0.7.0)
+
+### Related projects
+- [SncRedisBundle](http://github.com/snc/SncRedisBundle) for [Symfony2](http://symfony.com/).
+- [PredisServiceProvider](http://github.com/nrk/PredisServiceProvider) for [Silex](http://silex.sensiolabs.org/).
+
+### Useful links
+- [Project repository](http://github.com/nrk/predis)
+- [Issue tracker](http://github.com/nrk/predis/issues)
+- [Wiki](http://wiki.github.com/nrk/predis)
+- [Other downloads](http://github.com/nrk/predis/tags)
+- [Project page on Packagist](http://packagist.org/packages/predis/predis)
+- [Project page on PearHub](http://pearhub.org/projects/predis)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/432422/assets,https://api.github.com/repos/nrk/predis/releases/432422,v1.1,https://api.github.com/repos/nrk/predis/tarball/v0.7.0,https://github.com/nrk/predis/releases/tag/v0.7.0,https://api.github.com/repos/nrk/predis/zipball/v0.7.0,v0.7.0,False,False
+432405,2011-04-01T18:40:49Z,2014-07-16T09:55:59Z,Predis v0.6.6,"Predis is a flexible and feature-complete PHP client library for [Redis](http://redis.io/). This is a maintenance release for the 0.6 series that features mainly performance improvements and adds some new features. As with previous releases, Predis is also available for PHP 5.2 with an officially supported backport (PHP >= 5.2.6). What follows is an overview of the new features introduced in this new release. For a more in-depth list of changes please see the [CHANGELOG](http://github.com/nrk/predis/blob/v0.6.6/CHANGELOG).
+
+Please read also the **roadmap for future releases** paragraph.
+
+## New features and changes
+
+### New default server profile
+
+The default server profile has been upgraded to Redis 2.2 since there are no changes that would break backwards compatibility in your applications. That said, if you are still using Redis 2.0 (or an older version of Redis) but you want to upgrade Predis, it is advisable to set accordingly the server profile that will be used by the client instance.
+
+Long aliases for Redis commands are no more supported by default, but if you need them you can still require `Predis_Compatibility.php` which will automatically register new server profiles providing them.
+
+### Performance improvements
+
+Performances for this release have been further improved resulting in an average 16% faster processing of multi bulk replies and a bit more throughput for pipelined and non-pipelined commands executed against local Redis instances.
+
+A new lightweight response reader that uses less memory and is a bit faster than the previous one is now being used internally but the old handler-based response reader can be enabled by passing `composable` as the value for the new `reader` client option:
+
+```
+$client = new Predis\Client($server, array('reader' => 'composable'));
+```
+
+This option can also accept any class implementing the `Predis\IResponseReader` interface (e.g. `Predis\FastResponseReader`), which means that developers can create their own response readers. 
+
+A few core classes have also been optimized in order to generate less overhead when creating their instances.
+
+### UNIX domain sockets
+
+Users can now connect to local Redis instances using UNIX domain sockets on POSIX systems:
+
+```
+$client = new Predis\Client('unix:///tmp/redis.sock');
+$client = new Predis\Client(array('scheme' => 'unix', 'path' => '/tmp/redis.sock'));
+```
+
+### Redis commands improvements
+
+[`SINTERSTORE`](http://redis.io/commands/sinterstore), [`SUNIONSTORE`](http://redis.io/commands/sunionstore), [`SDIFFSTORE`](http://redis.io/commands/sdiffstore), [`ZINTERSTORE`](http://redis.io/commands/zinterstore) and [`ZUNIONSTORE`](http://redis.io/commands/zunionstore) can now accept an array to specify the list of the source keys to be used to populate the destination key:
+
+```
+$client->sinterstore('setOutput', array('setA', 'setB'));
+$client->zunionstore('zsetOutput', array('zsetA', 'zsetB', 'zsetC'), $options);
+```
+
+The same applies for commands that simply accept a variable number of keys such as [`MGET`](http://redis.io/commands/mget), [`SINTER`](http://redis.io/commands/sinter), [`SUNION`](http://redis.io/commands/sunion), [`SDIFF`](http://redis.io/commands/sdiff), [`SUBSCRIBE`](http://redis.io/commands/subscribe) and [`PSUBSCRIBE`](http://redis.io/commands/psubscribe):
+
+```
+$keys = $client->mget(array('key1', 'key2', 'key3'));
+$set = $client->sinter(array('setA', 'setB', 'setC'));
+$client->subscribe(array('channel1', 'channel2', 'channel3'));
+```
+
+## Notes
+
+### Roadmap for future releases (Predis v0.7.0)
+
+Predis 0.7 has been in the works for a while now and the first stable release has been delayed a couple of times, but for very good reasons. Right now it is in a kind of _beta stage_ but it is already being leveraged by a few developers in the wild with success. To cite a few points that will make it an exciting major release:
+- It targets only PHP >= 5.3. If you are still on PHP 5.2 then you will have to stick with Predis 0.6, but you should seriously consider to upgrade since PHP 5.2 is slower and it is not even supported anymore.
+- It is faster and consumes less memory than Predis v0.6.6 by default, with options to make it even faster.
+- The internal API is much more clean and coherent, and almost every class used internally by the library can be easily swapped by custom implementations. Almost nothing has changed in the way Redis commands are exposed by the main client class (using them is as easy as it has always been).
+- It complies with [PSR-0](http://groups.google.com/group/php-standards/web/psr-0-final-proposal) to play nice with many recent PHP frameworks such as [Symfony2](http://symfony.com/) (see also the excellent [RedisBundle](http://github.com/snc/RedisBundle) project).
+- It will transparently support [Redis cluster](http://redis.io/presentation/Redis_Cluster.pdf) (when available) as an option to the current cluster implemented via client-side sharding.
+
+You should expect at least one more patch release for Predis 0.6 finalizing a couple of things before Predis v0.7.0 is officially released as stable.
+
+### Downloads
+- **PHP 5.3** (mainline): 
+  [TGZ](http://github.com/nrk/predis/tarball/v0.6.6) or
+  [ZIP](http://github.com/nrk/predis/zipball/v0.6.6)
+- **PHP 5.2** (backport): 
+  [TGZ](http://github.com/nrk/predis/tarball/v0.6.6-PHP5.2) or 
+  [ZIP](http://github.com/nrk/predis/zipball/v0.6.6-PHP5.2)
+
+### Useful links
+- [Project repository](http://github.com/nrk/predis)
+- [Issue tracker](http://github.com/nrk/predis/issues)
+- [Wiki](http://wiki.github.com/nrk/predis)
+- [Other downloads](http://github.com/nrk/predis/downloads)
+- [Project page on PearHub](http://pearhub.org/projects/predis)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/432405/assets,https://api.github.com/repos/nrk/predis/releases/432405,v1.1,https://api.github.com/repos/nrk/predis/tarball/v0.6.6,https://github.com/nrk/predis/releases/tag/v0.6.6,https://api.github.com/repos/nrk/predis/zipball/v0.6.6,v0.6.6,False,False
+432402,2011-02-12T21:00:16Z,2014-07-16T09:54:54Z,Predis v0.6.5,"Predis is a flexible and feature-complete PHP client library for [Redis](http://redis.io/). This is a maintenance release for the 0.6 series exclusively aimed to fix a bug introduced in v0.6.4 when reading zero-length bulk replies from the server. For a complete list of the new features introduced in Predis v0.6.4 you can read the [related release notes](http://gist.github.com/823727).
+
+## New features and changes
+
+### Fix for the zero-length bulk replies bug
+
+Due to a minor change introduced in Predis v0.6.4 that was not covered by any test, zero-length bulk replies were being incorrectly handled, which resulted in protocol desynchronization errors. Here is a snippet to reproduce the issue with v0.6.4:
+
+```
+$redis->set('foo', '');
+$foo1 = $redis->get('foo'); // correct value returned, but wrong protocol handling
+$foo2 = $redis->get('foo'); // desynchronization error ensues with the successive read op.    
+```
+
+## Notes
+
+### Credits
+
+Thanks to [Jordi Boggiano](http://github.com/Seldaek) for quickly spotting the above-mentioned bug and providing a patch to fix the issue.
+
+### Downloads
+- **PHP 5.3** (mainline): 
+  [TGZ](http://github.com/nrk/predis/tarball/v0.6.5) or
+  [ZIP](http://github.com/nrk/predis/zipball/v0.6.5)
+- **PHP 5.2** (backport): 
+  [TGZ](http://github.com/nrk/predis/tarball/v0.6.5-PHP5.2) or 
+  [ZIP](http://github.com/nrk/predis/zipball/v0.6.5-PHP5.2)
+
+### Useful links
+- [Project repository](http://github.com/nrk/predis)
+- [Issue tracker](http://github.com/nrk/predis/issues)
+- [Wiki](http://wiki.github.com/nrk/predis)
+- [Other downloads](http://github.com/nrk/predis/downloads)
+- [Project page on PearHub](http://pearhub.org/projects/predis)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/432402/assets,https://api.github.com/repos/nrk/predis/releases/432402,v1.1,https://api.github.com/repos/nrk/predis/tarball/v0.6.5,https://github.com/nrk/predis/releases/tag/v0.6.5,https://api.github.com/repos/nrk/predis/zipball/v0.6.5,v0.6.5,False,False
+432400,2011-02-12T13:06:01Z,2014-07-16T09:53:59Z,Predis v0.6.4,"Predis is a flexible and feature-complete PHP client library for [Redis](http://redis.io/). This is a maintenance release for the 0.6 series that features mainly performance improvements. As with previous releases, Predis is also available for PHP 5.2 with an officially supported backport (PHP >= 5.2.6). What follows is an overview of the new features introduced in this new release. For a more in-depth list of changes please see the [CHANGELOG](http://github.com/nrk/predis/blob/v0.6.4/CHANGELOG).
+
+Please read also the **roadmap for future releases** paragraph.
+
+## New features and changes
+
+### Performance improvements
+
+Various performance tweaks have been made for this release resulting in a faster reply parsing for big multi-bulk replies (that is, replies to commands that return list of elements such as [`LRANGE`](http://redis.io/commands/lrange) and [`KEYS`](http://redis.io/commands/keys)) and more optimized code for client-side sharding. This is only a start since most of the speed / overhead improvements will be available starting from Predis 0.7.0, but the library is now 15% / 25% faster on average than previous versions in the above said scenario without any breaking changes to the public API.
+
+### MULTI / EXEC and automatic retries
+
+`Predis\MultiExecBlock` now supports a new `on_retry` option accepting an external callback (any kind of callable object) that gets invoked whenever the server aborts a transaction and the client attempts to replay it.
+
+```
+$options = array(
+    'watch' => array('foo'), 'cas' => true, 'retry' => 2, 
+    'on_retry' => function($tx, $attemptsLeft) {
+        echo ""Number of attempts left: $attemptsLeft"";
+    },
+);
+
+$redis->multiExec($options, function($tx) {
+    // Code for MULTI / EXEC transaction
+});
+```
+
+### PUBSUB automatic subscribption
+
+`Predis\PubSubContext` can be initialized with the `subscribe` and `psubscribe` options to let the client transparently subscribe to the specified channels before entering the PubSub loop.
+
+```
+$subscriptions = array(
+    'subscribe'  => array('control_channel', 'notifications'), 
+    'psubscribe' => 'channel_*',
+);
+
+foreach ($redis->pubSubContext($subscriptions) as $message) {
+    // PUBSUB loop
+}
+```
+
+## Notes
+
+### Roadmap for future releases
+
+`Predis 0.7.0` is currently in the works and it will be a major release with a whole lot of breaking changes (excepts for the Redis commands) and, for this very same reason, this is probably the right time to drop the backported version for PHP 5.2 and support only PHP >= 5.3. A lot of thoughts have been put into this decision and while [such an online poll](http://www.anonvote.com/poll.php?id=w8884714x) does not have statistical relevance given the low numbers, it shows an interesting tendency among developers that use Predis. If you add to that the fact that most of the recent frameworks are PHP 5.3-only and even the recently released Debian 6.0 _Squeeze_ now ships with it, you should pretty much realize how PHP 5.3 is no more the future of PHP but its present. That said, those still relying on PHP 5.2 can continue using Predis 0.6: this version is very stable and feature complete and it is also very unlikely that Redis is going to add some new features soon that will require deep changes to the library to implement them. Basically, there is no pressing reason for you to upgrade. To ease this _transition_, Predis 0.6 will probably be officially maintained for a few months after the release of 0.7.
+
+### Downloads
+- **PHP 5.3** (mainline): 
+  [TGZ](http://github.com/nrk/predis/tarball/v0.6.4) or
+  [ZIP](http://github.com/nrk/predis/zipball/v0.6.4)
+- **PHP 5.2** (backport): 
+  [TGZ](http://github.com/nrk/predis/tarball/v0.6.4-PHP5.2) or 
+  [ZIP](http://github.com/nrk/predis/zipball/v0.6.4-PHP5.2)
+
+### Useful links
+- [Project repository](http://github.com/nrk/predis)
+- [Issue tracker](http://github.com/nrk/predis/issues)
+- [Wiki](http://wiki.github.com/nrk/predis)
+- [Other downloads](http://github.com/nrk/predis/downloads)
+- [Project page on PearHub](http://pearhub.org/projects/predis)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/432400/assets,https://api.github.com/repos/nrk/predis/releases/432400,v1.1,https://api.github.com/repos/nrk/predis/tarball/v0.6.4,https://github.com/nrk/predis/releases/tag/v0.6.4,https://api.github.com/repos/nrk/predis/zipball/v0.6.4,v0.6.4,False,False
+432395,2011-01-01T17:58:48Z,2014-07-16T09:52:40Z,Predis v0.6.3,"Predis is a flexible and feature-complete PHP client library for [Redis](http://redis.io/). This is a maintenance release for the 0.6 series that features support for check and set (CAS) operations using the `Predis\MultiExecBlock` abstraction for `MULTI`/`EXEC` transactions and the addition of the remaining commands that will be part of Redis 2.2 (now in the RC stage). As with previous releases, Predis is also available for PHP 5.2 with an officially supported backport (PHP >= 5.2.6). What follows is an overview of the new features introduced in this new release. For a more in-depth list of changes please see the [CHANGELOG](http://github.com/nrk/predis/blob/v0.6.3/CHANGELOG).
+
+## New features and changes
+
+### Transactions with CAS support
+
+With the addition of the [`WATCH`](http://redis.io/commands/watch) command in Redis 2.2, it is now possible to use optimistic locking on keys to provide check and set operations. The abstraction for `MULTI`/`EXEC` implemented by the `Predis\MultiExecBlock` class now provides the ability to leverage this powerful concept by initializing a transaction with the CAS option set to `true`: 
+
+```
+$options = array('cas' => true, 'watch' => 'foo');
+$replies = $redis->multiExec($options, function($tx) {
+    $foo = $tx->get('foo');
+    // when cas => true, we *must* explicitly call MULTI
+    $tx->multi();
+    $tx->set('foobar', ""atomic $foo!"");
+    $tx->mget('foo', 'foobar');
+});
+```
+
+In case another client modified one of the WATCHed keys causing the current transaction to be aborted by the server, by default the client throws a `Predis\AbortedMultiExec` exception. By using the `retry` option, it is possible to instruct the client to transparently retry a certain number of times before giving up and throwing an exception:
+
+```
+$options = array('retry' => 2, 'cas' => true, 'watch' => 'foo');
+$replies = $redis->multiExec($options, function($tx) {
+    // attempts to execute this block for 3 times before giving up
+});
+```
+
+It should be noted that developers can use the new CAS mode when writing code using the fluent interface API, with the only difference that the automatic retry mechanism for aborted transaction is not available (which means developers must roll their own solution):
+
+```
+$tx  = $redis->multiExec(array('watch' => 'foo', 'cas' => true));
+$foo = $tx->get('foo');
+$replies = $tx->multi()
+              ->set('foobar', ""atomic $foo!"")
+              ->mget('foo', 'foobar')
+              ->exec();
+```
+
+### New commands for Redis v2.2
+
+All of the commands added in Redis v2.2 are now available with this release using the `dev` profile. Here is a list of the new commands added since Predis v0.6.2:
+- [`SETRANGE`](http://redis.io/commands/setrange)
+- [`GETRANGE`](http://redis.io/commands/getrange)
+- [`SETBIT`](http://redis.io/commands/setbit)
+- [`GETBIT`](http://redis.io/commands/getbit)
+- [`BRPOPLPUSH`](http://redis.io/commands/brpoplpush)
+
+## Notes
+
+### Downloads
+- **PHP 5.3** (mainline): 
+  [TGZ](http://github.com/nrk/predis/tarball/v0.6.3) or
+  [ZIP](http://github.com/nrk/predis/zipball/v0.6.3)
+- **PHP 5.2** (backport): 
+  [TGZ](http://github.com/nrk/predis/tarball/v0.6.3-PHP5.2) or 
+  [ZIP](http://github.com/nrk/predis/zipball/v0.6.3-PHP5.2)
+
+### Useful links
+- [Project repository](http://github.com/nrk/predis)
+- [Issue tracker](http://github.com/nrk/predis/issues)
+- [Wiki](http://wiki.github.com/nrk/predis)
+- [Other downloads](http://github.com/nrk/predis/downloads)
+- [Project page on PearHub](http://pearhub.org/projects/predis)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/432395/assets,https://api.github.com/repos/nrk/predis/releases/432395,v1.1,https://api.github.com/repos/nrk/predis/tarball/v0.6.3,https://github.com/nrk/predis/releases/tag/v0.6.3,https://api.github.com/repos/nrk/predis/zipball/v0.6.3,v0.6.3,False,False
+432389,2010-11-28T19:27:59Z,2014-07-16T09:50:37Z,Predis v0.6.2,"Predis is a flexible and feature-complete PHP client library for [Redis](http://code.google.com/p/redis/). This is a maintenance release for the 0.6 series that mainly features internal optimizations, a more stable support for transactions (MULTI/EXEC) and comes with a bunch of new commands for Redis 2.2-dev. As with previous releases, Predis is also available for PHP 5.2 with an officially supported backport (PHP >= 5.2.6). What follows is an overview of the new features introduced in this new release. For a more in-depth list of changes please see the [CHANGELOG](http://github.com/nrk/predis/blob/v0.6.2/CHANGELOG).
+
+## New features and changes
+
+### Miscellaneous
+
+Support MULTI/EXEC has been internally improved to handle a few corner cases with client-side exceptions and aborted transaction.
+
+Aside from a bunch of new commands added for Redis 2.2 (`STRLEN`, `LINSERT`, `RPUSHX`, `LPUSHX`, `ZREVRANGEBYSCORE`, `PERSIST`) and a couple of fixes for `SORT`, now `WATCH` can be also called with an array of keys:
+
+```
+$redis->watch(array('foo', 'bar'));
+```
+
+Method chaining with `UNWATCH` and `DISCARD` using `Predis\MultiExecBlock` has been fixed and now it is possible to do:
+
+```
+$replies = $redis->multiExec(array('watch' => 'foo'))
+                 ->set('foo', 'bar')
+                 ->unwatch()
+                 ->discard()
+                 ->set('foo', 'bar')
+                 ->execute();
+```
+
+## Notes
+
+### Downloads
+- **PHP 5.3** (mainline): 
+  [TGZ](http://github.com/nrk/predis/tarball/v0.6.2) or
+  [ZIP](http://github.com/nrk/predis/zipball/v0.6.2)
+- **PHP 5.2** (backport): 
+  [TGZ](http://github.com/nrk/predis/tarball/v0.6.2-PHP5.2) or 
+  [ZIP](http://github.com/nrk/predis/zipball/v0.6.2-PHP5.2)
+
+### Useful links
+- [Project repository](http://github.com/nrk/predis)
+- [Issue tracker](http://github.com/nrk/predis/issues)
+- [Wiki](http://wiki.github.com/nrk/predis)
+- [Other downloads](http://github.com/nrk/predis/downloads)
+- [Project page on PearHub](http://pearhub.org/projects/predis)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/432389/assets,https://api.github.com/repos/nrk/predis/releases/432389,v1.1,https://api.github.com/repos/nrk/predis/tarball/v0.6.2,https://github.com/nrk/predis/releases/tag/v0.6.2,https://api.github.com/repos/nrk/predis/zipball/v0.6.2,v0.6.2,False,False
+432384,2010-07-11T15:36:33Z,2014-07-16T09:48:53Z,Predis v0.6.1,"Predis is a flexible and feature-complete PHP client library for [Redis](http://code.google.com/p/redis/). This is a maintenance release for the 0.6 series featuring some internal optimizations and a more stable and consistent support for pipelines and transactions (MULTI/EXEC) without any breaking changes. As with previous releases, Predis is also available for PHP 5.2 with an officially supported backport (PHP >= 5.2.6). What follows is an overview of the new features introduced in this new release. For a more in-depth list of changes please see the [CHANGELOG](http://github.com/nrk/predis/blob/v0.6.1/CHANGELOG).
+
+## New features and changes
+
+### Transactions (MULTI/EXEC)
+
+Support for dynamic arguments has been added to the `Predis\Client::multiExec()` method which can also accept an optional array of parameters to initialize the underlying transaction. Moreover, support for the `WATCH` and `UNWATCH` commands has been added when using the current development profile (Redis v2.2):
+
+```
+$transaction = $redis->multiExec();
+$transaction->watch('foo')->get('foo')->unwatch('foo')->execute();
+
+// or ...
+
+$options = array('watch' => 'foo');
+$transaction = $redis->multiExec($options, function($transaction) {
+    $transaction->get('foo');
+    $transaction->unwatch('foo');
+});
+```
+
+See the [`WATCH`](http://redis.io/commands/watch) and [`UNWATCH`](http://redis.io/commands/unwatch) commands in the command reference of Redis for more details.
+
+### Command pipelines
+
+Despite having been introduced with 0.6.0, the `Predis\Client::pipelineSafe()` method has been already deprecated (and might be removed in the next major release) in favour of the usual `Predis\Client::pipeline()` method with added support for dynamic arguments and an optional array of parameters used to initialize the underlying pipeline. The following lines of code are equivalent:
+
+```
+// the old way, deprecated but still valid for compatibility
+$redis->pipelineSafe(function($pipe) { 
+    // ... 
+});
+
+// the new way
+$redis->pipeline(array('safe' => true), function($pipe) { 
+    // ... 
+});
+
+// get a pipeline object instead of passing a callable
+$pipe = $redis->pipeline(array('safe' => true));
+```
+
+### Miscellaneous
+
+`Predis\MultiExecBlock` and `Predis\PubSubContext` now throw an exception when trying to use features that depend on commands not supported by the server profile that is being used for the client:
+
+```
+$profile = '2.0';    // Redis 2.0 does not support WATCH and UNWATCH
+$redis = new Predis\Client('redis://127.0.0.1/', '2.0');
+$transaction = $redis->multiExec();
+$transaction->watch(""foo"");    // throws a Predis\ClientException
+```
+
+An exception is also raised when trying to initialize `Predis\MultiExecBlock` and `Predis\PubSubContext` using a client connected to a cluster of servers since both work only on single connections.
+
+Optional modifiers for `ZRANGE`, `ZREVRANGE` and `ZRANGEBYSCORE` can now be passed as an associative array to their respective methods. Also, `ZRANGEBYSCORE` now support the `LIMIT` modifier:
+
+```
+$redis->zrangebyscore('zsetkey', 1, 100, array(
+    'limit'      => array('offset' => 1, 'count' => 2),  // or simply array(1, 2)
+    'withscores' => true,
+));
+```
+
+## Notes
+
+### Downloads
+- **PHP 5.3** (mainline): 
+  [TGZ](http://github.com/nrk/predis/tarball/v0.6.1) or
+  [ZIP](http://github.com/nrk/predis/zipball/v0.6.1)
+- **PHP 5.2** (backport): 
+  [TGZ](http://github.com/nrk/predis/tarball/v0.6.1-PHP5.2) or 
+  [ZIP](http://github.com/nrk/predis/zipball/v0.6.1-PHP5.2)
+
+### Useful links
+- [Project repository](http://github.com/nrk/predis)
+- [Issue tracker](http://github.com/nrk/predis/issues)
+- [Wiki](http://wiki.github.com/nrk/predis)
+- [Other downloads](http://github.com/nrk/predis/downloads)
+- [Project page on PearHub](http://pearhub.org/projects/predis)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/432384/assets,https://api.github.com/repos/nrk/predis/releases/432384,v1.1,https://api.github.com/repos/nrk/predis/tarball/v0.6.1,https://github.com/nrk/predis/releases/tag/v0.6.1,https://api.github.com/repos/nrk/predis/zipball/v0.6.1,v0.6.1,False,False
+432379,2010-05-24T17:42:00Z,2014-07-16T09:47:42Z,Predis v0.6.0,"Predis is a flexible and feature-complete PHP client library for [Redis](http://code.google.com/p/redis/). This release provides developers an even more stable, customizable and up-to-date client than previous versions, with just a tiny bit of overhead added when compared to the 0.5.x series. As with previous releases, Predis is also available for PHP 5.2 with an officially supported backport (PHP >= 5.2.6). What follows is an overview of the new features introduced in this new release. For a more in-depth list of changes plese see the [CHANGELOG](http://github.com/nrk/predis/blob/v0.6.0/CHANGELOG).
+
+## New features and changes
+
+### Server profiles
+
+Predis 0.6.0 is fully compatible with Redis 2.0 (which has reached the RC stages just a few days ago at the time of writing) and its command set. The default server profile is set to `2.0`. Those who are using older versions of Redis should specify the correct server profile accordingly when instantiating a new client (highly recommended):
+
+```
+$redis = new Predis\Client('redis://127.0.0.1/', '1.2');
+```
+
+For compatibility reasons, the old way of specifying which server profile to use is still valid:
+
+```
+$profile = Predis\RedisServerProfile::get('1.2');
+$redis = new Predis\Client('redis://127.0.0.1/', $profile);
+```
+
+Please note that default support for Redis 1.0 has been removed and it is now provided only when including [Predis_Compatibility.php](http://github.com/nrk/predis/blob/v0.6.0/lib/Predis_Compatibility.php) as follows:
+
+```
+require_once('lib/Predis.php');
+require_once('lib/Predis_Compatibility.php');
+
+$redis = new Predis\Client('redis://127.0.0.1/', '1.0');
+```
+
+In accordance with the latest recommendations, Predis now uses the so-called _new protocol_ (every command is serialized as a multibulk request) when connecting to Redis >= 1.2. The server profile for Redis 1.0 still uses inline and bulk requests though.
+
+### Client options
+
+Now the second argument for `Predis\Client::__construct()` accepts also an array of client-level options or an instance of _Predis\ClientOptions_.
+
+```
+$options = array(
+    'profile'            => '2.0',
+    'key_distribution'   => 'Predis\Distribution\HashRing',
+    'throw_on_error'     => true,
+    'iterable_multibulk' => false,
+);
+
+$redis = new Predis\Client('redis://127.0.0.1/', $options);
+```
+- **profile** [default: `2.0`]: 
+  specifies which server profile to use. Accepts a version string (e.g. `1.2`, `2.0`, `default`, `dev`) or an instance of a class that inherits from `Predis\RedisServerProfile`.
+- **key_distribution** [cluster only - default: `Predis\Distribution\HashRing`]: 
+  specifies which distribution strategy to use to distribute keys when connecting to a cluster of Redis servers. Accepts a full class name (as a string) or an instance of a class that implements the `Predis\Distribution\IDistributionStrategy` interface.
+- **throw_on_error** [default: `true`]: 
+  specifies if server errors throw exceptions or they are returned as instances of `Predis\ResponseError`. Accepts boolean values.
+- **iterable_multibulk** [default: `false`]: 
+  specifies if multibulk replies are returned as arrays or as iterator instances (the latter enables the client to stream replies down to application's code). Accepts boolean values.
+
+### Connection parameters
+
+The following example shows the new connection parameters that are in addition to the ones previously supported.
+
+```
+$connection_parameters = array(
+    'alias'                 => 'cache-a',
+    'weight'                => 100,
+    'connection_async'      => false,
+    'connection_persistent' => false,
+);
+
+$redis = new Predis\Client($connection_parameters);
+```
+- **alias** [cluster only - default: not set]: 
+  identifies each connection by providing a mnemonic alias. Accepts string values.
+- **weight** [cluster only - default: not set]: 
+  specifies a weight used to balance the distribution of keys asymmetrically across multiple servers. Accepts integer values.
+- **connection_async** [default: `false`]: 
+  specifies if connections to servers are estabilished in a non-blocking way (the client is not blocked while the underlying resource performs the actual connection). Accepts boolean values.
+- **connection_persistent** [default: `false`]: 
+  specifies if the underlying connection resource should be left open when a script ends its lifecycle. Accepts boolean values.
+
+### Command pipelines
+
+Command pipelines now support method chaining.
+
+```
+$replies = $redis->pipeline()->set('key', 'value')->get('key')->execute();
+```
+
+The new method `Predis\Client::pipelineSafe()` initializes a command pipeline that does not throw exceptions on server, protocol or connection errors. Instead, the generated exceptions are returned as values in the replies array. This new approach is useful when pipelines are used in a clustered environment since it enables the client to continue processing commands even if one or more servers in the cluster generate an error or become unavailable.
+
+### Transactions (Redis 2.0)
+
+Predis 0.5.x already provided Redis transaction blocks via `Predis\Client::multiExec()`. The current implementation now supports method chaining and the ability to discard the commands issued in a transaction (see the [`DISCARD`](redis.io/commands/discard) command in the command reference of Redis).
+
+### Publish / Subscribe (Redis 2.0)
+
+Predis 0.6.0 supports PUBSUB contexts via PHP iterators with the new method `Predis\Client::pubSubContext()`. See the [following example](http://github.com/nrk/predis/blob/v0.6.0/examples/PubSubContext.php) for more details.
+
+### Miscellaneous
+
+It is now possible to get a new client instance for a single connection of a cluster by passing its alias to the method `Predis\Client::getClientFor()`. The new client inherits the same options of the originator client.
+
+```
+$cluster = new Predis\Client(array(
+    'redis://127.0.0.1:6379?alias=first', 
+    'redis://127.0.0.1:6379?alias=second'
+));
+
+$first = $cluster->getClientFor('first');
+$first->info();
+```
+
+The `Predis\RedisServerProfile` class now allows developers to register their own server profiles or override the default ones provided by Predis. 
+
+```
+class MyCustomProfile extends Predis\RedisServerProfile {
+    public function getVersion() { return '2.2'; }
+    public function getSupportedCommands() {
+        // Implementation here...
+    }
+}
+
+Predis\RedisServerProfile::registerProfile('MyCustomProfile', 'custom');
+$redis = new Predis\Client('redis://127.0.0.1/', 'custom');
+```
+
+## Notes
+
+### Roadmap for future releases
+
+Since this new version of Predis already offers a multitude of new features and enhancements, the next releases in the 0.6.x series should contain only bug fixes, performance improvements and minor changes or additions. All the big new features will be reserved to the 0.7.x series, whose development cycle will be heavily influenced by the development cycle of Redis. Depending on the work needed to support future releases of Redis, 0.7.x might introduce some breaking changes. Long aliases for commands (e.g. `$redis->setMultiple()`, `$redis->getMultiple()` and such) are discouraged and should be considered obsolete as they could be removed in future major releases of Predis, depending on the feedback from the community.
+
+### Credits
+
+I would like to especially thank [Lorenzo Castelli](http://github.com/lcastelli) for providing a whole lot of suggestions and reference code that hugely contributed to the final implementation of many new features shipped in this new version of Predis (see partial failures in pipelines, asynchronous connects, persistent connections, improvements in the current hashring implementation and a few minor fixes).
+
+Thanks also to those who have reported bugs on the issue tracker and, finally, to all those who have sent me emails with words of appreciation for the work that has been made in Predis: these words are shared with anyone who contributed to make this new release possible.
+
+### Downloads
+- **PHP 5.3** (mainline): 
+  [TGZ](http://github.com/nrk/predis/tarball/v0.6.0) or
+  [ZIP](http://github.com/nrk/predis/zipball/v0.6.0)
+- **PHP 5.2** (backport): 
+  [TGZ](http://github.com/nrk/predis/tarball/v0.6.0-PHP5.2) or 
+  [ZIP](http://github.com/nrk/predis/zipball/v0.6.0-PHP5.2)
+
+### Useful links
+- [Project repository](http://github.com/nrk/predis)
+- [Issue tracker](http://github.com/nrk/predis/issues)
+- [Wiki](http://wiki.github.com/nrk/predis)
+- [Other downloads](http://github.com/nrk/predis/downloads)
+- [Project page on PearHub](http://pearhub.org/projects/predis)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/432379/assets,https://api.github.com/repos/nrk/predis/releases/432379,v1.1,https://api.github.com/repos/nrk/predis/tarball/v0.6.0,https://github.com/nrk/predis/releases/tag/v0.6.0,https://api.github.com/repos/nrk/predis/zipball/v0.6.0,v0.6.0,False,False
+429899,2014-07-15T09:56:00Z,2014-07-15T10:03:01Z,Predis v0.8.6,"This is a maintenance release for the 0.8 series with some improvements to existing features. What follows is an overview of the changes and bug fixes introduced in this new release, details are also available in the [CHANGELOG](https://github.com/nrk/predis/blob/v0.8.6/CHANGELOG.md#v086-2014-07-15).
+
+## New features
+
+### Redis commands
+- Redis 2.8 is the new default server profile. There are no backwards incompatible changes, Redis 2.8 only added new commands so it is safe to switch.
+- New commands added to the `2.8` profile: [`PFADD`](http://redis.io/commands/pfadd), [`PFCOUNT`](http://redis.io/commands/pfcount), [`PFMERGE`](http://redis.io/commands/pfmerge), [`ZLEXCOUNT`](http://redis.io/commands/zlexcount), [`ZRANGEBYLEX`](http://redis.io/commands/zrangebylex) and [`ZREMRANGEBYLEX`](http://redis.io/commands/zremrangebylex).
+
+## Improvements
+
+### Redis Cluster
+
+When coupled with Redis >= 3.0.0b1 you can now use key hash tags (e.g. `key:{hash:tag}`) to force certain keys to be stored on the same node, just like it happens with the good old client-side sharding. See commit ba2ffb6.
+
+### Bug fixes
+- Minor tweaks to make this version of Predis compatible with [HHVM](http://hhvm.com/) >= 2.4.0.
+- Using Redis sentinel does not break the parsing of responses to [`INFO`](http://redis.io/commands/info) anymore. See issue #154 and commit f4a950b.
+- [`INCRBYFLOAT`](http://redis.io/commands/incrbyfloat) is now handled as expected in cluster and replication configurations. See issue #159 and commit c2ae1c6.
+- Fixed the parsing procedure for the output of `CLUSTER NODES` when fetching the slots map from a node and redis-cluster has slaves in its configuration. See issue #165 and commit e148dc8. **NOTE**: the new `CLUSTER SLOTS` command is the proper way to fetch the slots map now, but we'll stick with the old method for this patch release of v0.8 while v1.0.0 will rely on it by default.
+- Prevent a stack overflow when iterating over large Redis collections using our abstraction for cursor-based iterators. See issue #182 and commit b77da84.
+- Properly discards transactions when the server immediately returns an error response (e.g. `-OOM` or `-ERR` on invalid arguments for a command) instead of a `+QUEUED` response. See issue #187 and commit 74817b5.
+
+## Future development
+
+Believe me, Predis v1.0.0 is on its way and will be released **really soon**... this time I mean it for real ;-) That said, v0.8 will still be maintaned for a while with a few more patch releases mainly targeted at improving redis-cluster support as much as possible and fixing issues.
+
+## Additional notes
+
+### Downloads
+- [Packagist](http://packagist.org/packages/predis/predis)
+- [PEAR](http://pear.nrk.io/)
+- [TGZ](https://github.com/nrk/predis/tarball/v0.8.6)
+- [ZIP](https://github.com/nrk/predis/zipball/v0.8.6)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/429899/assets,https://api.github.com/repos/nrk/predis/releases/429899,v0.8,https://api.github.com/repos/nrk/predis/tarball/v0.8.6,https://github.com/nrk/predis/releases/tag/v0.8.6,https://api.github.com/repos/nrk/predis/zipball/v0.8.6,v0.8.6,False,False
+150414,2014-01-16T14:13:24Z,2014-01-16T14:30:29Z,Predis v0.8.5,"This is a maintenance release for the 0.8 series with some improvements to existing features. What follows is an overview of the changes and bug fixes introduced in this new release, details are also available in the [CHANGELOG](https://github.com/nrk/predis/blob/v0.8.5/CHANGELOG.md#v085-2014-01-16).
+
+## New features
+
+### Redis commands
+- Added a new server profile for Redis 2.8. The default value for the `profile` client option still targets Redis 2.6 and the `dev` profile now targets Redis 3.0.
+- New commands added to the `2.8` profile: [`SCAN`](http://redis.io/commands/scan), [`SSCAN`](http://redis.io/commands/sscan), [`ZSCAN`](http://redis.io/commands/zscan) and [`HSCAN`](http://redis.io/commands/hscan) to the server profile for Redis 2.8.
+
+### Collection iterators
+
+The new cursor-based iterator commands available starting from Redis 2.8 make it possible to iterate Redis collections without blocking the server but developers still need to implement some logic in their applications to fully leverage them. To ease the usage of such commands we added some abstractions in the `Predis\Collection` namespace in the form of plain old PHP iterators, making it possible to fully iterate Redis collections in your PHP code with something as simple as `foreach`.
+- Keyspace iterator: [`Predis\Collection\Iterator\Keyspace`](https://github.com/nrk/predis/blob/v0.8.5/lib/Predis/Collection/Iterator/Keyspace.php) based on `SCAN`.
+- Set iterator: [`Predis\Collection\Iterator\SetKey`](https://github.com/nrk/predis/blob/v0.8.5/lib/Predis/Collection/Iterator/SetKey.php) based on `SSCAN`.
+- Sorted set iterator: [`Predis\Collection\Iterator\SortedSetKey`](https://github.com/nrk/predis/blob/v0.8.5/lib/Predis/Collection/Iterator/SortedSetKey.php) based on `ZSSCAN`.
+- Hash iterator: [`Predis\Collection\Iterator\HashKey`](https://github.com/nrk/predis/blob/v0.8.5/lib/Predis/Collection/Iterator/HashKey.php) based on `HSCAN`.
+
+Redis do not have a cursor-based iterator for lists but we added an abstraction with [`Predis\Collection\Iterator\ListKey`](https://github.com/nrk/predis/blob/v0.8.5/lib/Predis/Collection/Iterator/ListKey.php) based on `LRANGE` that tries to mimic a similar behavior while not being exactly the same thing.
+
+You can find some [examples here](https://github.com/nrk/predis/blob/v0.8.5/examples/RedisCollectionsIterators.php).
+
+### Raw commands
+
+It is possible to execute _raw commands_ using [`Predis\Command\RawCommand`](https://github.com/nrk/predis/blob/v0.8.5/lib/Predis/Command/RawCommand.php) and a variable list of command arguments. The main difference with the usual approach is that input arguments are not filtered and complex responses are not parsed, which also means arguments must follow the exact same signature of the command as defined by Redis. Obviously there is no need to create and register a new class to use them:
+
+``` php
+$command = Predis\Command\RawCommand::create('SET', 'foo', 'bar');
+$response = $client->executeCommand($command);
+```
+
+Executing commands in this way can be useful to implement internal features, when the user-specified server profile is not accessible or when you need to make sure that your code will not be affected by different argument filtering or response parsing implementations.
+
+This feature will be further improved in the next major release.
+
+## Improvements
+
+### Redis Cluster
+
+Some aspects of our abstraction for Redis Cluster have been dramatically improved or fixed while others (such as silent handling of connection failures) will be addressed in later patch releases.
+- The `ASKING` command is now correctly sent automatically upon `-ASK` redirections.
+- Updated slots maps [can be fetched](https://github.com/nrk/predis/blob/v0.8.5/lib/Predis/Connection/RedisCluster.php#L171-L197) from nodes thanks to the `CLUSTER NODES` command. By default this is a manual operation but [it can be enabled](https://github.com/nrk/predis/blob/v0.8.5/lib/Predis/Connection/RedisCluster.php#L491-L507) to get automatically done upon `-MOVED` redirections.
+- It is possible to [specify a common set of connection parameters](https://github.com/nrk/predis/blob/v0.8.5/lib/Predis/Connection/RedisCluster.php#L509-L525) that are applied to connections created on the fly upon redirections to nodes that are not part of the initial pool.
+
+### Query string parsing for connection parameters
+
+URI parsing now relies on [`parse_str`](http://php.net/manual/en/function.parse-str.php) for the query string part which has a slightly smaller overhead when the number of fields in the querystring grows. Furthermore:
+- Parsing does not break when value of a field contains one or more `=`.
+- Repeated fieldnames using `[]` produce an array of values.
+- Empty or incomplete `key=value` pairs result in an empty string for `key`.
+
+## Deprecations
+
+A couple of methods of `Predis\Client` are now marked as deprecated and will be removed in the next major release:
+- `Predis\Client::multiExec()`: superseded by `Predis\Client::transaction()`.
+- `Predis\Client::pubSub()`: superseded by `Predis\Client::pubSubLoop()`. This change was needed due to the recently introduced [`PUBSUB`](http://redis.io/commands/pubsub) command in Redis 2.8.
+
+## Future development
+
+Aside from a few more tweaks aimed at improving support for the upcoming Redis Cluster there is not much to add or change in the current `v0.8` branch. The library is very stable judging by the history of issues opened during the last months so you can expect a couple of patch releases for `v0.8` until Redis 3.0 but nothing more. The good news is that the release of the next major version is imminent and **Predis will finally hit `v1.0`**! The transition from `v0.8` to `v1.0` will bring a lot of breaking changes required to polish the API of the library and its internals, but the actual impact on your code (that is, if you plan to upgrade) may vary depending on your kind of usage: in simple scenarios where Predis is used as a mere client without relying on its extensibility, it is pretty much possible that nothing will change for you.
+
+You can already start playing with it by requiring `""predis/predis"": ""dev-master""` in `composer.json`. Predis v1.0.0 is planned to be released on the same day of the first beta of Redis Cluster, [10th February 2014](https://twitter.com/antirez/status/421348270448066560).
+
+## Additional notes
+
+### Downloads
+- [Packagist](http://packagist.org/packages/predis/predis)
+- [PEAR](http://pear.nrk.io/)
+- [TGZ](https://github.com/nrk/predis/tarball/v0.8.5)
+- [ZIP](https://github.com/nrk/predis/zipball/v0.8.5)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/150414/assets,https://api.github.com/repos/nrk/predis/releases/150414,v0.8,https://api.github.com/repos/nrk/predis/tarball/v0.8.5,https://github.com/nrk/predis/releases/tag/v0.8.5,https://api.github.com/repos/nrk/predis/zipball/v0.8.5,v0.8.5,False,False
+16617,2013-07-27T09:17:27Z,2013-07-27T09:48:21Z,Predis v0.8.4,"This is a maintenance release for the 0.8 series shipping mostly bug fixes. What follows is an overview of the changes and bug fixes introduced in this new release, details are also available in the [CHANGELOG](https://github.com/nrk/predis/blob/v0.8.4/CHANGELOG.md#v084-2013-07-27).
+
+## Bug fixes and changes
+
+### Redis commands
+- Added [`DUMP`](http://redis.io/commands/dump) and [`RESTORE`](http://redis.io/commands/restore) to the server profile for Redis v2.6. ([see related issue](https://github.com/nrk/predis/issues/108))
+- Fixed [`HMSET`](http://redis.io/commands/hmset) to work with cluster, this bug was apparently introduced in Predis v0.8.0. ([see related issue](https://github.com/nrk/predis/pull/106))
+- Modified [`ZRANGE`](http://redis.io/commands/zrange),  [`ZREVRANGE`](http://redis.io/commands/zrevrange), [`ZRANGEBYSCORE`](http://redis.io/commands/zrangebyscore) and [`ZREVRANGEBYSCORE`](http://redis.io/commands/zrevrangebyscore) to effectively use the `WITHSCORE` modifier only when the value of the option passed to the command is `TRUE`. ([see related pull request](https://github.com/nrk/predis/pull/106))
+
+### Scripted commands and key prefixing
+
+Predis failed to handle falling back from [`EVALSHA`](http://redis.io/commands/evalsha) to [`EVAL`](http://redis.io/commands/eval) using scripted commands with no arguments defined for `KEYS[]` when the client was configured to use key prefixing. ([see related pull request](https://github.com/nrk/predis/pull/109))
+
+### Failing host reported in exception messages
+
+When a connection error occurs, such as when Predis is not able to connect to a server, the exception message now includes the incriminated Redis server: `Connection refused [tcp://127.0.0.1:3322]`. This can be handy to debug or log errors especially when using multiple nodes in a replication or cluster configuration. ([see related pull request](https://github.com/nrk/predis/pull/110))
+
+### DispatcherLoop
+
+The pub/sub-based [DispatcherLoop](https://github.com/nrk/predis/blob/v0.8.4/lib/Predis/PubSub/DispatcherLoop.php) class has been fixed to properly work when using a prefixed client instance. ([see related pull request](https://github.com/nrk/predis/pull/114))
+
+### PhpiredisConnection
+
+This connection backend now uses [gethostbynamel](http://php.net/manual/en/function.gethostbynamel.php) to handle hostnames with multiple IP addresses associated and randomly choses one of them. This is mostly useful to distribute the load on multiple Redis instances configured as read-only slaves sitting behind one single hostname. ([see related pull request](https://github.com/nrk/predis/pull/116))
+
+## Additional notes
+
+### Downloads
+- [Packagist](http://packagist.org/packages/predis/predis)
+- [PEAR](http://pear.nrk.io/)
+- [TGZ](https://github.com/nrk/predis/tarball/v0.8.4)
+- [ZIP](https://github.com/nrk/predis/zipball/v0.8.4)
+",https://api.github.com/users/nrk,17923,nrk,https://api.github.com/repos/nrk/predis/releases/16617/assets,https://api.github.com/repos/nrk/predis/releases/16617,v1.1,https://api.github.com/repos/nrk/predis/tarball/v0.8.4,https://github.com/nrk/predis/releases/tag/v0.8.4,https://api.github.com/repos/nrk/predis/zipball/v0.8.4,v0.8.4,False,False

@@ -1,0 +1,360 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7853336,2017-09-22T15:44:35Z,2017-09-22T15:45:34Z,v0.9.0,"This  release of flannel brings some significant improvements to the vxlan backend.
+* No longer listen for netlink messages. This improves flannel performance at high scale (especially on heavily loaded systems) and minimizes the possibility for dropped traffic when the flannel deamon is stopped (e.g. during upgrades).
+* Fully compatible with previous versions of flannel to allow for easy upgrade
+* Adds support for new ""direct routing"" mode where packets are only VXLAN encapsulated if there isn't a directly connected route to the destination host.
+
+It also adds a retry mechanism to the `--ip-masq` feature to ensure that `iptables` rules are correct.
+
+There are a number of other important bug fixes and improvements. See the complete list below.
+
+Install on kubernetes 
+* `kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.0/Documentation/kube-flannel.yml`
+
+The Docker image can be downloaded from [quay.io](https://quay.io/repository/coreos/flannel?tab=tags)
+
+Please provide feedback through one of the following channels:
+* Slack: #flannel on [Calico Users Slack](https://slack.projectcalico.org)
+* Mailing list: coreos-dev
+* IRC: #coreos on freenode.org
+
+The complete list of PRs in this release
+#808 Always ensure iptables masquerade rules are installed (thanks @julia-stripe)
+#817 Makefile: Stop pulling the unused lib from kube-cross 
+#809 subnet/*: Remove unused reservations code
+#811 Remove Library copy commands from dockefiles (thanks @mkumatag)
+#807 backend/hostgw: Improve robustness, add logging and comments
+#787 backend/vxlan: Add support for ""direct routing"" 
+#803 Fix route deletion when replacing route in hostgw backend (thanks @julia-stripe)
+#800 Add flag validation for subnet-lease-renew-margin (thanks @ruoshan)
+#785 backend/vxlan: simplify vxlan processing
+#791 add ca-certificates (thanks @oilbeater)
+#789 Remove broken reference (thanks @athai)
+#777 main.go: Remove sleep during shutdown
+#776 Remove RevokeLease from manager interface
+#778 Remove wait() from backendmanager. Nothing calls it 
+",https://api.github.com/users/tomdee,6635,tomdee,https://api.github.com/repos/coreos/flannel/releases/7853336/assets,https://api.github.com/repos/coreos/flannel/releases/7853336,master,https://api.github.com/repos/coreos/flannel/tarball/v0.9.0,https://github.com/coreos/flannel/releases/tag/v0.9.0,https://api.github.com/repos/coreos/flannel/zipball/v0.9.0,v0.9.0,False,False
+7658708,2017-09-18T21:30:30Z,2017-09-18T21:35:01Z,v0.9.0-rc1,"This pre release of flannel brings some significant improvements to the vxlan backend.
+* No longer listen for netlink messages. This improves flannel performance at high scale (especially on heavily loaded systems) and minimizes the possibility for dropped traffic when the flannel deamon is stopped (e.g. during upgrades).
+* Fully compatible with previous versions of flannel to allow for easy upgrade
+* Adds support for new ""direct routing"" mode where packets are only VXLAN encapsulated if there isn't a directly connected route to the destination host.
+
+There are a number of other important bug fixes and improvements. See the complete list below.
+
+Install on kubernetes 
+Download and edit the file at `https://raw.githubusercontent.com/coreos/flannel/v0.9.0-rc1/Documentation/kube-flannel.yml` to reference the correct release version.
+
+If you're using RBAC (e.g. if you're using kubeadm) then *also* apply the RBAC file
+
+The Docker image can be downloaded from [quay.io](https://quay.io/repository/coreos/flannel?tab=tags)
+
+Please provide feedback through one of the following channels:
+* Slack: #flannel on [Calico Users Slack](https://slack.projectcalico.org)
+* Mailing list: coreos-dev
+* IRC: #coreos on freenode.org
+
+The complete list of PRs in this release
+#817 Makefile: Stop pulling the unused lib from kube-cross 
+#809 subnet/*: Remove unused reservations code
+#811 Remove Library copy commands from dockefiles (thanks @mkumatag)
+#807 backend/hostgw: Improve robustness, add logging and comments
+#787 backend/vxlan: Add support for ""direct routing"" 
+#803 Fix route deletion when replacing route in hostgw backend (thanks @julia-stripe)
+#800 Add flag validation for subnet-lease-renew-margin (thanks @ruoshan)
+#785 backend/vxlan: simplify vxlan processing
+#791 add ca-certificates (thanks @oilbeater)
+#789 Remove broken reference (thanks @athai)
+#777 main.go: Remove sleep during shutdown
+#776 Remove RevokeLease from manager interface
+#778 Remove wait() from backendmanager. Nothing calls it 
+",https://api.github.com/users/tomdee,6635,tomdee,https://api.github.com/repos/coreos/flannel/releases/7658708/assets,https://api.github.com/repos/coreos/flannel/releases/7658708,master,https://api.github.com/repos/coreos/flannel/tarball/v0.9.0-rc1,https://github.com/coreos/flannel/releases/tag/v0.9.0-rc1,https://api.github.com/repos/coreos/flannel/zipball/v0.9.0-rc1,v0.9.0-rc1,False,True
+6871108,2017-07-11T17:56:38Z,2017-07-11T21:01:22Z,v0.8.0,"This release of flannel brings many new features and improvements. There are some pretty big changes in this release
+- No more multi network support or remote support.
+- Improved Kubernetes scale (fix problem when using kube-subnet-mgr with more than 100 nodes #719 )
+- Lots of little improvements and fixes - see the list below.
+
+Install on kubernetes 
+* `kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.8.0/Documentation/kube-flannel.yml`
+
+If you're using RBAC (e.g. if you're using kubeadm) then *also* apply the RBAC file
+* `kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.8.0/Documentation/kube-flannel-rbac.yml`
+
+The Docker image can be downloaded from [quay.io](https://quay.io/repository/coreos/flannel?tab=tags)
+
+Please provide feedback through one of the following channels:
+* Slack: #flannel on [Calico Users Slack](https://slack.projectcalico.org)
+* Mailing list: coreos-dev
+* IRC: #coreos on freenode.org
+
+The following PRs are in this release:
+
+# New features
+#701 backend/extension: Introduce new extension backend
+#717 aws-vpc: add support for multiple route tables
+#571 Add ali cloud VPC network support
+#754 Added iface-regex option
+#752 flannel reads from created subnet.env file on startup
+#722 add healthz
+
+# Removed features
+#633 Remove the experimental support for multiple networks.
+#606 remote: Remove experimental remote support
+
+# Bug fixes
+#675 subnet/etcdv2: Fix panic from bad error contruction
+#693 Keep route: [ 0.0.0.0/0 via ECS instance ] to work with alicloud DNAT…
+#745 Add iptables rule to prevent masquerade on some external traffic
+#750 Added compatibility check to compare GBP for VXLAN
+
+# Documentation improvements
+#714 docs: adding CNI plugin note.
+#715 docs: adding pointer to reservations.md.
+#713 docs: adding MTU note.
+#679 flannel-docs: Updating flannel Documents files.
+#682 Flannel ReadMe: Added Tom's notes.
+#700 Add templates for PRs/Issues
+#707 Fixes typo
+#702 bill-of-materials: initial commit
+#656 Documentation: Split README into multiple files
+#625 added production users and integrations pages
+#622 Typo corrected in README.md
+
+# Multi platform support
+#703 network order functionality changed based on endianess
+#686 update the LIB_DIR for s390x
+#650 Build tar.gz for ppc64le, arm and arm64 arch
+#547 Modifying pkg/ip/ipnet.go to fix endian problem
+
+# Build changes and small code cleanups
+#689 Add iptables binaries
+#690 Update kube-flannel.yml to use 0.7.1 flannel image
+#687 vendor: remove files not needed for building
+#684 Makefile: add libpthread* to make clean
+#669 Makefile: Fix the releases target
+#662 Makefile: Use $(CURDIR)
+#597 vendor: Revendor with more sensible pinnings
+#645 functional-test: Add a simple bandwidth test
+#658 Fix various little problems found by gometalinter
+#629 Backends: Remove Run() from interface as it's not used
+#697 main.go: Remove a reference to client/server mode
+#631 subnet: Move etcd files into their own package.
+#594 README: Update build instructions
+#575 backend/vxlan: Make variables more verbose
+#744 Makefile: Smaller flanneld binary
+
+# Kubernetes integration changes
+#665 Explicit operator: Exists to allow toleration on masters
+#652 kube-flannel: Add namespace for compatibility with RBAC rules
+#618 Tolerate flannel running on master nodes
+#614 Simplify rbac creation process
+#593 Documentation: Update releases to v0.7.0
+#591 Add Kubernetes RBAC support
+#600 [doc][kube-flannel] set explicit arch on daemonset images
+#729 Allow more events to be buffered before the backend starts",https://api.github.com/users/tomdee,6635,tomdee,https://api.github.com/repos/coreos/flannel/releases/6871108/assets,https://api.github.com/repos/coreos/flannel/releases/6871108,master,https://api.github.com/repos/coreos/flannel/tarball/v0.8.0,https://github.com/coreos/flannel/releases/tag/v0.8.0,https://api.github.com/repos/coreos/flannel/zipball/v0.8.0,v0.8.0,False,False
+6419653,2017-05-17T23:26:12Z,2017-05-17T23:49:22Z,v0.8.0-rc1,"This is an early release candidate for the upcoming flannel v0.8.0 release with the goal of getting community feedback from the new (and removed) features.
+
+Please provide feedback through one of the following channels:
+* Slack: #flannel on [Calico Users Slack](https://slack.projectcalico.org)
+* Mailing list: coreos-dev
+* IRC: #coreos on freenode.org
+
+The following PRs are in this release:
+
+# New features
+#701 backend/extension: Introduce new extension backend
+#717 aws-vpc: add support for multiple route tables
+#571 Add ali cloud VPC network support
+
+# Removed features
+#633 Remove the experimental support for multiple networks.
+#606 remote: Remove experimental remote support
+
+# Bug fixes
+#675 subnet/etcdv2: Fix panic from bad error contruction
+#693 Keep route: [ 0.0.0.0/0 via ECS instance ] to work with alicloud DNAT…
+
+# Documentation improvements
+#714 docs: adding CNI plugin note.
+#715 docs: adding pointer to reservations.md.
+#713 docs: adding MTU note.
+#679 flannel-docs: Updating flannel Documents files.
+#682 Flannel ReadMe: Added Tom's notes.
+#700 Add templates for PRs/Issues
+#707 Fixes typo
+#702 bill-of-materials: initial commit
+#656 Documentation: Split README into multiple files
+#625 added production users and integrations pages
+#622 Typo corrected in README.md
+
+# Multi platform support
+#703 network order functionality changed based on endianess
+#686 update the LIB_DIR for s390x
+#650 Build tar.gz for ppc64le, arm and arm64 arch
+#547 Modifying pkg/ip/ipnet.go to fix endian problem
+
+# Build changes and small code cleanups
+#689 Add iptables binaries
+#690 Update kube-flannel.yml to use 0.7.1 flannel image
+#687 vendor: remove files not needed for building
+#684 Makefile: add libpthread* to make clean
+#669 Makefile: Fix the releases target
+#662 Makefile: Use $(CURDIR)
+#597 vendor: Revendor with more sensible pinnings
+#645 functional-test: Add a simple bandwidth test
+#658 Fix various little problems found by gometalinter
+#629 Backends: Remove Run() from interface as it's not used
+#697 main.go: Remove a reference to client/server mode
+#631 subnet: Move etcd files into their own package.
+#594 README: Update build instructions
+#575 backend/vxlan: Make variables more verbose
+
+# Kubernetes integration changes
+#665 Explicit operator: Exists to allow toleration on masters
+#652 kube-flannel: Add namespace for compatibility with RBAC rules
+#618 Tolerate flannel running on master nodes
+#614 Simplify rbac creation process
+#593 Documentation: Update releases to v0.7.0
+#591 Add Kubernetes RBAC support
+#600 [doc][kube-flannel] set explicit arch on daemonset images",https://api.github.com/users/tomdee,6635,tomdee,https://api.github.com/repos/coreos/flannel/releases/6419653/assets,https://api.github.com/repos/coreos/flannel/releases/6419653,master,https://api.github.com/repos/coreos/flannel/tarball/v0.8.0-rc1,https://github.com/coreos/flannel/releases/tag/v0.8.0-rc1,https://api.github.com/repos/coreos/flannel/zipball/v0.8.0-rc1,v0.8.0-rc1,False,True
+6115677,2017-04-18T22:12:36Z,2017-04-19T02:55:48Z,v0.7.1,"This is primarily a bug fix release which has the following key fixes and improvements.
+
+- switch kube subnet manager to PATCH #681 
+- Build tar.gz for ppc64le, arm and arm64 arch #650
+- backend/hostgw: Fix memory leak #630
+- backend/vxlan: Don't recreate vxlan device on flanneld restart #628
+- Also a number of small PRs for Kubernetes 1.6 compatibility
+
+",https://api.github.com/users/tomdee,6635,tomdee,https://api.github.com/repos/coreos/flannel/releases/6115677/assets,https://api.github.com/repos/coreos/flannel/releases/6115677,v0.7-series,https://api.github.com/repos/coreos/flannel/tarball/v0.7.1,https://github.com/coreos/flannel/releases/tag/v0.7.1,https://api.github.com/repos/coreos/flannel/zipball/v0.7.1,v0.7.1,False,False
+5111293,2017-01-10T18:07:58Z,2017-01-10T18:21:45Z,Kube Subnet Manager,"This release introduces a new experimental feature. The Kubernetes API server can now be used as a datastore instead of etcd. This makes deployment easier as flannel no longer directly relies on the presence of an etcd server. To use it, pass the `-kube-subnet-mgr` option to the flannel daemon.
+
+This release also contains a large number of merged PRs (thanks everyone for all your contributions, please keep them coming) and some other build, documentation and other minor improvements.
+
+## Key PRs merged
+
+kubernetes API server as datastore
+#483 add a subnet manager backed by the kubernetes apiserver
+#564 Improve kube subnet lease handling
+#518 Fix the kube-flannel.yaml in order to work
+
+AWS backend
+#540 AWS VPC backend fixes and cleanups
+#523 aws-vpc: Fix crash when route has vpc-endpoints
+#524 aws-vpc: remove ""blackholes""
+#507 Update aws-vpc-backend.md
+
+Key Bug fixes
+#522 Fixed #521: flanneld hang on at initialEvtsBatch := <-evts because of…
+#495 The docker daemon syntax change addressed
+#576: backend/vxlan: Set the netmask of the IP used for the vxlan device
+
+Logging
+#565 network manager: Improve logging
+#555 vxlan logging verbosity
+#574: backend/vxlan: Improve the comments and logging 
+
+Testing
+#490 Add functional (end-to-end) testing
+#503 Run e2e tests on travis
+",https://api.github.com/users/tomdee,6635,tomdee,https://api.github.com/repos/coreos/flannel/releases/5111293/assets,https://api.github.com/repos/coreos/flannel/releases/5111293,master,https://api.github.com/repos/coreos/flannel/tarball/v0.7.0,https://github.com/coreos/flannel/releases/tag/v0.7.0,https://api.github.com/repos/coreos/flannel/zipball/v0.7.0,v0.7.0,False,False
+4209203,2016-09-22T23:19:14Z,2016-09-22T23:24:11Z,Fix logging issue,"This is a small point release that fixes a logging issue.
+
+For a complete list of changes https://github.com/coreos/flannel/compare/v0.6.1...v0.6.2
+",https://api.github.com/users/tomdee,6635,tomdee,https://api.github.com/repos/coreos/flannel/releases/4209203/assets,https://api.github.com/repos/coreos/flannel/releases/4209203,master,https://api.github.com/repos/coreos/flannel/tarball/v0.6.2,https://github.com/coreos/flannel/releases/tag/v0.6.2,https://api.github.com/repos/coreos/flannel/zipball/v0.6.2,v0.6.2,False,False
+3928470,2016-08-19T17:46:27Z,2016-08-19T18:01:32Z,Now with more pthread,"This is a small point release that adds the pthread library to the busybox-based deploy images.
+
+For a complete list of changes https://github.com/coreos/flannel/compare/v0.6.0...v0.6.1
+",https://api.github.com/users/tomdee,6635,tomdee,https://api.github.com/repos/coreos/flannel/releases/3928470/assets,https://api.github.com/repos/coreos/flannel/releases/3928470,master,https://api.github.com/repos/coreos/flannel/tarball/v0.6.1,https://github.com/coreos/flannel/releases/tag/v0.6.1,https://api.github.com/repos/coreos/flannel/zipball/v0.6.1,v0.6.1,False,False
+3876771,2016-08-12T00:44:52Z,2016-08-12T17:06:12Z,Bug fix and refactoring release,"This is the first release in a while so it's rolling up a large number of small improvements and bug fixes.
+- small docs changes 
+- overhaul of the build system 
+  - experimental support for arm and PPC. The images on quay.io are tagged with the version and architecture. This _may_ change in future so the architecture becomes part of the image name.
+  - image tags have a `v` prefix so they match the reported version and git tag name.
+- improvements to stability and UX tweaks
+- refactoring mainly driven by reservation support
+- some new features
+  - #455 Support VXLAN GBP
+  - #409 Add cli args for etcd basic auth
+  - #369 Add reservations to admin control subnet allocs
+  - #356 Ability to revoke lease
+
+For a complete list of changes https://github.com/coreos/flannel/compare/v0.5.5...v0.6.0
+
+NOTE: The deploy images for this version are broken - use version 0.6.1 instead
+",https://api.github.com/users/tomdee,6635,tomdee,https://api.github.com/repos/coreos/flannel/releases/3876771/assets,https://api.github.com/repos/coreos/flannel/releases/3876771,master,https://api.github.com/repos/coreos/flannel/tarball/v0.6.0,https://github.com/coreos/flannel/releases/tag/v0.6.0,https://api.github.com/repos/coreos/flannel/zipball/v0.6.0,v0.6.0,False,False
+2119780,2015-11-13T02:22:02Z,2015-11-13T03:46:51Z,Bug fix release,"- Bug fix: out of memory crash when vxlan used with bonded interfaces.
+",https://api.github.com/users/eyakubovich,3586053,eyakubovich,https://api.github.com/repos/coreos/flannel/releases/2119780/assets,https://api.github.com/repos/coreos/flannel/releases/2119780,master,https://api.github.com/repos/coreos/flannel/tarball/v0.5.5,https://github.com/coreos/flannel/releases/tag/v0.5.5,https://api.github.com/repos/coreos/flannel/zipball/v0.5.5,v0.5.5,False,False
+1985606,2015-10-19T22:41:01Z,2015-10-19T22:56:34Z,Maintenance release,"While we're waiting for 0.6.0, this release picks few bug fixes and small improvements from master.
+- Use official AWS api libs. Makes flannel work with eu-central-1. Thanks, @kdomanski 
+- In server mode, notify systemd of readiness once the server is listening. Thanks, @ingvagabund
+- Masquerade host to flannel traffic
+- Bug fix: close http connection during watch in client mode. Thanks, @jonboulle  
+",https://api.github.com/users/eyakubovich,3586053,eyakubovich,https://api.github.com/repos/coreos/flannel/releases/1985606/assets,https://api.github.com/repos/coreos/flannel/releases/1985606,master,https://api.github.com/repos/coreos/flannel/tarball/v0.5.4,https://github.com/coreos/flannel/releases/tag/v0.5.4,https://api.github.com/repos/coreos/flannel/zipball/v0.5.4,v0.5.4,False,False
+1685167,2015-08-18T00:48:41Z,2015-08-18T01:09:17Z,Maintenance release,"This release brings bug fixes, a missing feature needed for CNI integration and internal improvements.
+
+New features:
+- `FLANNEL_NETWORK` will be printed to subnet.env with the CIDR value of the whole network. Makes CNI integration possible.
+- Add logos to docs
+
+Bug fixes:
+- Don't propagate own lease notifications to backends.
+- Eliminate race in http request cancellations in the tests.
+- Fix for kernels that report ""special"" ARP entries with nil IP that caused VXLAN to not work
+- mk-docker-opts.sh -- `-m` options was not processed
+
+Internal improvements:
+- Switch to new etcd client lib
+- Switch to using go-iptables lib
+- Switch to using flagutils lib
+",https://api.github.com/users/eyakubovich,3586053,eyakubovich,https://api.github.com/repos/coreos/flannel/releases/1685167/assets,https://api.github.com/repos/coreos/flannel/releases/1685167,master,https://api.github.com/repos/coreos/flannel/tarball/v0.5.3,https://github.com/coreos/flannel/releases/tag/v0.5.3,https://api.github.com/repos/coreos/flannel/zipball/v0.5.3,v0.5.3,False,False
+1584462,2015-07-24T21:15:53Z,2015-07-24T21:25:13Z,NAT support and client/server TLS,"New features:
+- --public-ip allows specifying IP to publish in etcd. This helps with NAT traversal. Note that there's still no encryption so going across the WAN is risky without application level encryption. Thank you, @cusspvz 
+- Communication between client and server (for client/server mode) can optionally be encrypted by TLS. Also supports auth via client side certs.
+- Docs for aws-vpc and gce. Thanks @robszumski and @MohdAhmad 
+
+Bug fixes:
+- Ignore route to local ext IP in hostgw mode. Thank you, @lvlv 
+- Fix seg fault when aws subnet linked to main route table
+",https://api.github.com/users/eyakubovich,3586053,eyakubovich,https://api.github.com/repos/coreos/flannel/releases/1584462/assets,https://api.github.com/repos/coreos/flannel/releases/1584462,master,https://api.github.com/repos/coreos/flannel/tarball/v0.5.2,https://github.com/coreos/flannel/releases/tag/v0.5.2,https://api.github.com/repos/coreos/flannel/zipball/v0.5.2,v0.5.2,False,False
+1518282,2015-07-09T23:04:37Z,2015-07-09T23:16:32Z,Maintenance release,"- aws-vpc -- flannel will disable Source/Dest IP check if granted ec2:ModifyInstanceAttribute permission. Thank, @MohdAhmad 
+- aws-vpc -- flannel won't complain about active route being deleted on flannel restart
+- alloc - fix nil pointer deference bug
+- Socket activation support added to server mode
+- Better build instructions. Thank you, @kayrus 
+",https://api.github.com/users/eyakubovich,3586053,eyakubovich,https://api.github.com/repos/coreos/flannel/releases/1518282/assets,https://api.github.com/repos/coreos/flannel/releases/1518282,master,https://api.github.com/repos/coreos/flannel/tarball/v0.5.1,https://github.com/coreos/flannel/releases/tag/v0.5.1,https://api.github.com/repos/coreos/flannel/zipball/v0.5.1,v0.5.1,False,False
+1462886,2015-06-25T21:28:21Z,2015-06-25T21:53:31Z,"GCE backend, client/server and multi-network modes","New features:
+- GCE backend -- analogous to AWS-VPC backend, this manipulates the GCE routes to provide no-encapsulation data plane. Thank you, @MohdAhmad 
+- Client/Server mode (experimental) -- ability to isolate etcd from nodes by proxying their requests through a server.
+- Multi-network mode (experimental) -- run multiple networks at the same time with a single flannel daemon
+
+Bug fixes and improvements:
+- Error on start if extraneous args are passed in. Thank you, @jayunit100
+- Do not reuse lease if config has changed and is incompatible with the lease.
+- AWS-VPC: Auto-detect route table ID if DescribeInstances permission is granted. Thank you, @MohdAhmad 
+- VXLAN: Statically configure FDB entries. This fixes the first packet dropped issue. Thank you, @titanous and @MohdAhmad
+",https://api.github.com/users/eyakubovich,3586053,eyakubovich,https://api.github.com/repos/coreos/flannel/releases/1462886/assets,https://api.github.com/repos/coreos/flannel/releases/1462886,master,https://api.github.com/repos/coreos/flannel/tarball/v0.5.0,https://github.com/coreos/flannel/releases/tag/v0.5.0,https://api.github.com/repos/coreos/flannel/zipball/v0.5.0,v0.5.0,False,False
+1298644,2015-05-14T22:28:00Z,2015-05-14T23:29:31Z,Maintainance release,"- host-gw backend: routes did not survive interface going down and up (e.g. cable unplug). Thank you, Huang.
+- aws-vpc backend: now supports role based auth in addition to env vars. Thank you, Greg Poirier.
+- fixed problem of flannel failing to work with interfaces that have peer addresses defined.
+- turn on etcd client logging. This will produce a lot of output but better than no output as it now.
+",https://api.github.com/users/eyakubovich,3586053,eyakubovich,https://api.github.com/repos/coreos/flannel/releases/1298644/assets,https://api.github.com/repos/coreos/flannel/releases/1298644,master,https://api.github.com/repos/coreos/flannel/tarball/v0.4.1,https://github.com/coreos/flannel/releases/tag/v0.4.1,https://api.github.com/repos/coreos/flannel/zipball/v0.4.1,v0.4.1,False,False
+1215101,2015-04-24T21:19:28Z,2015-04-25T01:01:17Z,AWS VPC Backend,"- Rohan Singh contributed aws-vpc backend (thanks, Rohan). It works by programming the VPC router to forward a subnet to the VM. It allows for elimination of encapsulation overhead while still providing a machine with full subnet.
+- Switched over to using master branch of go-etcd
+",https://api.github.com/users/eyakubovich,3586053,eyakubovich,https://api.github.com/repos/coreos/flannel/releases/1215101/assets,https://api.github.com/repos/coreos/flannel/releases/1215101,master,https://api.github.com/repos/coreos/flannel/tarball/v0.4.0,https://github.com/coreos/flannel/releases/tag/v0.4.0,https://api.github.com/repos/coreos/flannel/zipball/v0.4.0,v0.4.0,False,False
+1147846,2015-04-10T00:28:35Z,2015-04-10T01:13:53Z,Maintenance release,"- flannel will try to recreate VXLAN device every second on startup. Allows for the interface that it's enslaving to come up after flannel (thank you, John W. Linville)
+- fix for etcd sockets being leaked (thank you, Lv Lv)  
+",https://api.github.com/users/eyakubovich,3586053,eyakubovich,https://api.github.com/repos/coreos/flannel/releases/1147846/assets,https://api.github.com/repos/coreos/flannel/releases/1147846,master,https://api.github.com/repos/coreos/flannel/tarball/v0.3.1,https://github.com/coreos/flannel/releases/tag/v0.3.1,https://api.github.com/repos/coreos/flannel/zipball/v0.3.1,v0.3.1,False,False
+943904,2015-02-12T01:02:09Z,2015-02-12T01:51:42Z,Better IP Masq support and host-gw backend added,"1. --ip-masq now works for all backends. Previously it was only
+   working properly for UDP backend.
+2. Addition of new ""host-gw"" backend -- thank you, Angus Lees. This
+   new backend avoids encapsulation and uses the host's interface as a
+   gateway. As a subnet is added or removed, each flannel daemon will
+   manipulate the host's routing table to reflect the change. As an
+   example, if a host that has an IP 192.168.1.5 adds a flannel subnet
+   10.1.8.0/24, the following route would be added to each host:
+   10.1.8.0/24 via 192.168.1.5 dev eth0
+",https://api.github.com/users/eyakubovich,3586053,eyakubovich,https://api.github.com/repos/coreos/flannel/releases/943904/assets,https://api.github.com/repos/coreos/flannel/releases/943904,master,https://api.github.com/repos/coreos/flannel/tarball/v0.3.0,https://github.com/coreos/flannel/releases/tag/v0.3.0,https://api.github.com/repos/coreos/flannel/zipball/v0.3.0,v0.3.0,False,False
+806656,2014-12-22T23:12:20Z,2014-12-23T23:44:30Z,Addition of VXLAN,"- Added VXLAN backend to move encapsulation into the kernel
+- Support for multiple etcd endpoints
+- Support for TLS between flannel and etcd
+- Support for older version of iptables
+",https://api.github.com/users/eyakubovich,3586053,eyakubovich,https://api.github.com/repos/coreos/flannel/releases/806656/assets,https://api.github.com/repos/coreos/flannel/releases/806656,master,https://api.github.com/repos/coreos/flannel/tarball/v0.2.0,https://github.com/coreos/flannel/releases/tag/v0.2.0,https://api.github.com/repos/coreos/flannel/zipball/v0.2.0,v0.2.0,False,False

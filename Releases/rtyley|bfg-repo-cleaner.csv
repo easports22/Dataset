@@ -1,0 +1,78 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+1899669,2015-09-04T18:08:59Z,2015-10-01T22:41:36Z,Git LFS support,"You can now use the BFG to convert an existing Git repository to the [Git LFS](https://git-lfs.github.com/) format - so all your huge files can be extracted and safely replaced with Git LFS pointer files throughout your repository history. The new command line option is `--convert-to-git-lfs`, and you give it a glob expression, like `*.wav`, just like you do with [`git lfs track`](https://help.github.com/articles/configuring-git-large-file-storage/):
+
+``` bash
+$ java -jar ~/bfg-1.12.5.jar --convert-to-git-lfs '*.wav' --no-blob-protection
+```
+
+This will reduce the size of your core Git repo, while still keeping those files readily available in the secondary Git LFS store.
+
+A full step-by-step example of doing this on the command line:
+
+``` bash
+$ git clone --mirror heavy-repo # a 'bare' repo, with all branches and tags
+$ cd heavy-repo.git # Now is a good time to make a backup!
+
+$ java -jar ~/bfg-1.12.5.jar --convert-to-git-lfs '*.wav' --no-blob-protection
+# the BFG rewrites history, extracting files to lfs/objects and adding .gitattributes for LFS tracking
+$ git reflog expire --expire=now --all && git gc --prune=now
+$ git lfs init
+
+# let's push everything up to your Git LFS-enabled hosting provider:
+$ git remote set-url origin git@github.com:some-org/heavy-repo.git
+$ git push # because you cloned using --mirror, this will push ALL branches and tags
+```
+
+You want to be using a least Git LFS 1.0.0 or above (which includes some [recent changes](https://github.com/github/git-lfs/pull/671#issuecomment-141264785) to improve pushing from bare repos).
+",https://api.github.com/users/rtyley,52038,rtyley,https://api.github.com/repos/rtyley/bfg-repo-cleaner/releases/1899669/assets,https://api.github.com/repos/rtyley/bfg-repo-cleaner/releases/1899669,master,https://api.github.com/repos/rtyley/bfg-repo-cleaner/tarball/v1.12.5,https://github.com/rtyley/bfg-repo-cleaner/releases/tag/v1.12.5,https://api.github.com/repos/rtyley/bfg-repo-cleaner/zipball/v1.12.5,v1.12.5,False,False
+1635822,2015-08-05T21:06:22Z,2015-08-06T08:58:16Z,BFG v1.12.4 - now requires Java 7,"This bumps a few dependency versions, specifically JGit, which now requires Java 7, ending Java 6 support in the BFG. You'll get an immediate`java.lang.UnsupportedClassVersionError` if you try to run BFG v1.12.4 with Java 6.
+
+You can get the latest version of Java (currently Java 8) here:
+- **http://java.com/en/download/manual.jsp**
+
+If you _really_ want to run with Java 6, BFG [v1.12.3](http://repo1.maven.org/maven2/com/madgag/bfg/1.12.3/bfg-1.12.3.jar) is the final version you'll be able to use.
+",https://api.github.com/users/rtyley,52038,rtyley,https://api.github.com/repos/rtyley/bfg-repo-cleaner/releases/1635822/assets,https://api.github.com/repos/rtyley/bfg-repo-cleaner/releases/1635822,master,https://api.github.com/repos/rtyley/bfg-repo-cleaner/tarball/v1.12.4,https://github.com/rtyley/bfg-repo-cleaner/releases/tag/v1.12.4,https://api.github.com/repos/rtyley/bfg-repo-cleaner/zipball/v1.12.4,v1.12.4,False,False
+1143910,2015-04-09T10:08:55Z,2015-04-09T10:11:24Z,Early cut at supporting Git LFS,"This rough cut allows a user to convert a Git repositories history to Git LFS - files are replaced with [pointers](https://github.com/github/git-lfs/blob/5eb9bb01/docs/spec.md#the-pointer), and history is rewritten.
+
+```
+$ java -jar bfg.jar --convert-to-git-lfs -fi *.png --no-blob-protection
+```
+",https://api.github.com/users/rtyley,52038,rtyley,https://api.github.com/repos/rtyley/bfg-repo-cleaner/releases/1143910/assets,https://api.github.com/repos/rtyley/bfg-repo-cleaner/releases/1143910,master,https://api.github.com/repos/rtyley/bfg-repo-cleaner/tarball/git-lfs-alpha,https://github.com/rtyley/bfg-repo-cleaner/releases/tag/git-lfs-alpha,https://api.github.com/repos/rtyley/bfg-repo-cleaner/zipball/git-lfs-alpha,git-lfs-alpha,False,True
+818960,2014-12-30T15:39:04Z,2015-01-01T20:14:58Z,Deleted & changed files now reported!,"This should make seeing what the BFG has got up to a lot easier - the new output looks like this (and it only appears if files _have_ been changed, or deleted, as appropriate).
+
+```
+Changed files
+-------------
+
+    Filename                             Before & After
+    --------------------------------------------------------------------------------------------------
+    CODE.conf                          | e3aa4a56 ⇒ b9241055, 6fd90c18 ⇒ 1f390cd7, ...
+    PROD.conf                          | 5a89032a ⇒ 38193000, 2611394d ⇒ 9c742f65, ...
+
+Deleted files
+-------------
+
+    Filename                     Git id
+    ------------------------------------------------
+    bg.jpg                     | d0ea4091 (2.0 MB)
+    guardian_space002.png      | 24215b1e (1.2 MB)
+```
+",https://api.github.com/users/rtyley,52038,rtyley,https://api.github.com/repos/rtyley/bfg-repo-cleaner/releases/818960/assets,https://api.github.com/repos/rtyley/bfg-repo-cleaner/releases/818960,master,https://api.github.com/repos/rtyley/bfg-repo-cleaner/tarball/v1.12.0,https://github.com/rtyley/bfg-repo-cleaner/releases/tag/v1.12.0,https://api.github.com/repos/rtyley/bfg-repo-cleaner/zipball/v1.12.0,v1.12.0,False,False
+280109,2014-04-20T11:43:34Z,2014-04-20T14:20:59Z,Now with Scala v2.11...,"[The BFG](http://rtyley.github.io/bfg-repo-cleaner/) has been updated to run on the latest Scala release, v2.11!
+
+Other than a detour [to release a v2.11-compatible version of `scala-io`](http://search.maven.org/#search|ga|1|a%3A%22scala-io-file_2.11%22), the upgrade went very smoothly. Benchmarks show no performance regressions, and _the download size is half a megabyte smaller_ :smile: 
+
+Note that although the final v2.11.0 scala-lang artifacts have been tagged and published, they haven't been officially announced yet - the most recent announcement is for [v2.11.0-RC4](http://www.scala-lang.org/news/2014/04/08/release-notes-2.11.0-RC4.html).
+",https://api.github.com/users/rtyley,52038,rtyley,https://api.github.com/repos/rtyley/bfg-repo-cleaner/releases/280109/assets,https://api.github.com/repos/rtyley/bfg-repo-cleaner/releases/280109,master,https://api.github.com/repos/rtyley/bfg-repo-cleaner/tarball/v1.11.5,https://github.com/rtyley/bfg-repo-cleaner/releases/tag/v1.11.5,https://api.github.com/repos/rtyley/bfg-repo-cleaner/zipball/v1.11.5,v1.11.5,False,False
+239503,2014-03-24T22:42:24Z,2014-03-25T09:49:27Z,,"Fixes issues #34, #37.
+",https://api.github.com/users/rtyley,52038,rtyley,https://api.github.com/repos/rtyley/bfg-repo-cleaner/releases/239503/assets,https://api.github.com/repos/rtyley/bfg-repo-cleaner/releases/239503,master,https://api.github.com/repos/rtyley/bfg-repo-cleaner/tarball/v1.11.2,https://github.com/rtyley/bfg-repo-cleaner/releases/tag/v1.11.2,https://api.github.com/repos/rtyley/bfg-repo-cleaner/zipball/v1.11.2,v1.11.2,False,False
+169251,2014-02-01T00:36:51Z,2014-02-01T17:33:31Z,,"[Download The BFG](http://rtyley.github.io/bfg-repo-cleaner/#download)
+
+For any people who've been affected by https://github.com/libgit2/libgit2/pull/2085#issuecomment-33632988 (`git fsck` will show `error in tree xxxxxxx: contains duplicate file entries` in affected repos) - this latest release of The BFG adds a switch to make removing the duplicate tree-entries easy:
+
+```
+$ bfg --fix-filename-duplicates-preferring tree
+```
+
+I've tested this against a copy of the corrupted [CocoaPods/Specs](https://github.com/CocoaPods/Specs/issues/7029#issuecomment-33429321) repo, getting a clean `git fsck` in just over 2 minutes.
+",https://api.github.com/users/rtyley,52038,rtyley,https://api.github.com/repos/rtyley/bfg-repo-cleaner/releases/169251/assets,https://api.github.com/repos/rtyley/bfg-repo-cleaner/releases/169251,master,https://api.github.com/repos/rtyley/bfg-repo-cleaner/tarball/v1.11.1,https://github.com/rtyley/bfg-repo-cleaner/releases/tag/v1.11.1,https://api.github.com/repos/rtyley/bfg-repo-cleaner/zipball/v1.11.1,v1.11.1,False,False

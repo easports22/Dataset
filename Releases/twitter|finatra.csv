@@ -1,0 +1,790 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8294765,2017-10-27T00:34:39Z,2017-10-27T22:14:49Z,Finatra 17.10.0,"We're now using date-based releases! E.g., `YY.MM.patch,` hence this is release `17.10.0`.
+
+### Added
+
+* inject-core: Remove deprecated `c.t.inject.TestMixin#resetMocks`. Properly
+  use `c.t.inject.Mockito` trait in tests. Deprecate resetting of mocks and
+  resettables in `c.t.inject.IntegrationTestMixin`. ``PHAB_ID=D93876``
+
+* finatra-http: Parameterize `@RouteParam`,`@QueryParam`,`@FormParam`, and
+  `@Header` to allow specifying the field name to read from the params or
+  header map. Previously these annotations only looked for values by the
+  case class field name leading to possible ugliness when defining case
+  class fields (especially with `@Header`). ``PHAB_ID=`D94220`
+
+* finatra: Add support for using a `java.lang.annotation.Annotation` instance
+  with the `#bind[T]` testing DSL. This adds a way to bind instances in tests
+  that use the @Named binding annotation. ``PHAB_ID=D91330``
+
+* finatra-http: Allow setting the content type of a Mustache view.
+  ``PHAB_ID=D91857``
+
+### Changed
+
+* From now on, release versions will be based on release date in the format of
+  YY.MM.x where x is a patch number. ``PHAB_ID=D101244``
+
+* finatra-utils: Remove deprecated `ExternalServiceExceptionMatcher`. ``PHAB_ID=D98343``
+
+* finatra-jackson: ScalaType's `isMap` and `isCollection` methods now check that
+  the given object's class is a subclass of `scala.collection.Map[Any, Any]` and
+  `scala.collection.Iterable[Any]`, respectively. Previously the superclasses'
+  packages were unspecified. This is a runtime behavior change.
+  ``PHAB_ID=D93104``
+
+* finatra-http: Require that route URIs and prefixes begin with forward slash (/).
+  ``PHAB_ID=D90895``
+
+* inject-utils: (BREAKING API CHANGE) RichOption toFutureOrFail, toTryOrFail, and
+  toFutureOrElse signature changed to take the fail or else parameter by name.
+  ``PHAB_ID=D89544``
+
+* inject-server: Remove usage of deprecated `c.t.inject.logging.Slf4jBridgeUtility`.
+  Change usages to `c.t.util.logging.Slf4jBridgeUtility`. ``PHAB_ID=D88095``
+
+* finatra-http, inject-thrift-client: Remove netty3 specific types and dependency.
+  In finatra-http, the code using these types is deprecated and can be removed allowing
+  us to remove netty3-specific dependencies. In inject-thrift-client we can default to
+  use the DefaultTimer for the backupRequestFilter method param instead of the
+  HashedWheelTimer. ``PHAB_ID=D88025``
+
+### Fixed
+
+* finatra-http: Parameterized route callback inputs fail because the lookup of a
+  corresponding `MessageBodyManager` reader lookup does not properly handle parameterized 
+  types such as collections. This change updates the `MessageBodyManager` `MessageBodyReader`
+  lookup to take into account parameterized types. This allows for a user to parse a
+  `Seq[T]`, or `Map[K, V]` as a route callback input type using the default Finatra
+  `MessageBodyReader`. ``PHAB_ID=D104277``
+
+* finatra-jackson: Fix issue causing `IllegalArgumentException` from Validations to
+  be swallowed. A catch clause in the `c.t.finatra.json.internal.caseclass.jackson.FinatraCaseClassDeserializer`
+  is too broad as it catches thrown `IllegalArgumentException`s from field validations
+  when the annotation is applied to a field of the incorrect type, e.g., when `@Max` is
+  applied to a String field. ``PHAB_ID=D95306``
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/finatra/releases/8294765/assets,https://api.github.com/repos/twitter/finatra/releases/8294765,develop,https://api.github.com/repos/twitter/finatra/tarball/finatra-17.10.0,https://github.com/twitter/finatra/releases/tag/finatra-17.10.0,https://api.github.com/repos/twitter/finatra/zipball/finatra-17.10.0,finatra-17.10.0,False,False
+7660600,2017-09-06T22:00:35Z,2017-09-06T22:02:17Z,Finatra 2.13.0,"### Added
+
+* inject-server: Add ability to fail embedded server startup on lint rule violation.
+  There is now a flag in the embedded servers that when set to true will fail
+  server startup if a lint rule violation is detected. This will then fail
+  the running test. ``PHAB_ID=D82399``
+
+### Changed
+
+* finatra-http: No longer depend on bijection-util. ``PHAB_ID=D86640``
+
+* finatra-jackson: Deprecate c.t.finatra.json.utils.CamelCasePropertyNamingStrategy.
+  This object was created to reduce ambiguity with previous releases of Jackson in which
+  the default PropertyNamingStrategy was an abstract class with a default of camel case.
+  Users are encouraged to use the Jackson PropertyNamingStrategy 
+  constants directly. ``PHAB_ID=D81707``",https://api.github.com/users/kevinoliver,347229,kevinoliver,https://api.github.com/repos/twitter/finatra/releases/7660600/assets,https://api.github.com/repos/twitter/finatra/releases/7660600,develop,https://api.github.com/repos/twitter/finatra/tarball/finatra-2.13.0,https://github.com/twitter/finatra/releases/tag/finatra-2.13.0,https://api.github.com/repos/twitter/finatra/zipball/finatra-2.13.0,finatra-2.13.0,False,False
+7430271,2017-08-17T01:01:56Z,2017-08-17T18:28:13Z,Finatra 2.12.0,"### Added
+
+* finatra-jackson: Add support for injecting a snake case FinatraObjectMapper by annotating
+  parameters with a new @SnakeCaseMapper binding annotation. ``PHAB_ID=D7798``
+
+### Changed
+
+* finatra-http: Add close hook when constructing a StreamingResponse to allow for resource
+  release without consuming an entire AsyncStream. ``PHAB_ID=D64013``
+
+* finatra-http: Unmarshalling JSON no longer consumes the body of a HTTP Request.
+  ``PHAB_ID=D74519``
+
+* finatra-inject: RetryUtil.retry has been removed because it used a blocking call
+  to Thread.sleep. Blocking Finagle threads results in poor performance and
+  RetryUtil.retryFuture should be used instead. ``PHAB_ID=D73949``",https://api.github.com/users/dschobel,58369,dschobel,https://api.github.com/repos/twitter/finatra/releases/7430271/assets,https://api.github.com/repos/twitter/finatra/releases/7430271,develop,https://api.github.com/repos/twitter/finatra/tarball/finatra-2.12.0,https://github.com/twitter/finatra/releases/tag/finatra-2.12.0,https://api.github.com/repos/twitter/finatra/zipball/finatra-2.12.0,finatra-2.12.0,False,False
+6667165,2017-06-09T19:00:54Z,2017-06-09T20:24:02Z,Finatra 2.11.0,"### Fixed
+
+* finatra-jackson: Fix JSON deserialization of scala.util.Either type in FinatraObjectMapper
+  for Scala 2.12. ``RB_ID=917699``",https://api.github.com/users/roanta,1617360,roanta,https://api.github.com/repos/twitter/finatra/releases/6667165/assets,https://api.github.com/repos/twitter/finatra/releases/6667165,develop,https://api.github.com/repos/twitter/finatra/tarball/finatra-2.11.0,https://github.com/twitter/finatra/releases/tag/finatra-2.11.0,https://api.github.com/repos/twitter/finatra/zipball/finatra-2.11.0,finatra-2.11.0,False,False
+6199392,2017-04-24T19:56:00Z,2017-04-26T18:41:56Z,Finatra 2.10.0,"### Changed
+
+* finatra-http: Increase composability and flexibility of RouteDSL. ``RB_ID=912095``
+
+* inject-app: Run installed modules postInjectorStartup before server function. This makes
+  reasoning about the server lifecycle a bit more straight-forward and simplifies things
+  like the exception manager logic for adding and overridding mappers. ``RB_ID=911965``
+
+* finatra-jackson: Update framework tests to FunSuite ScalaTest testing style. ``RB_ID=911745``
+
+* finatra: Move finatra/benchmarks and finatra/utils framework tests to FunSuite ScalaTest
+  testing style. ``RB_ID=910680``
+
+### Fixed
+
+* finatra-http: Correctly return a JsonParseException when the incoming JSON is not parsable
+  as an expected custom case class request object. ``RB_ID=``
+
+* finatra-http: Ensure underlying members are injected for AbstractControllers. ``RB_ID=911635``
+
+* finatra-jackson: Patch `FinatraDatetimeDeserializer` to support parsing of Long value passed
+  as String, e.g., when parsing a query parameter.``RB_ID=911162``
+
+* finatra: Close embedded server clients on embedded server close. ``RB_ID=910862``",https://api.github.com/users/ryanoneill,1393463,ryanoneill,https://api.github.com/repos/twitter/finatra/releases/6199392/assets,https://api.github.com/repos/twitter/finatra/releases/6199392,develop,https://api.github.com/repos/twitter/finatra/tarball/finatra-2.10.0,https://github.com/twitter/finatra/releases/tag/finatra-2.10.0,https://api.github.com/repos/twitter/finatra/zipball/finatra-2.10.0,finatra-2.10.0,False,False
+5710626,2017-03-11T02:11:54Z,2017-03-11T07:53:57Z,Finatra 2.9.0,"### Changed
+
+* inject-core: (BREAKING API CHANGE) Allow for binding of higher-kinded types when testing.
+  Deprecated `@Bind` mechanism for replacing bound types in an object graph. Now instead of
+  using `@Bind` like this:
+
+  ```
+  class DarkTrafficCanonicalResourceHeaderTest
+    extends FeatureTest
+    with Mockito {
+
+    @Bind
+    @DarkTrafficService
+    val darkTrafficService: Option[Service[Request, Response]] =
+      Some(smartMock[Service[Request, Response]])
+
+    /* mock request */
+    darkTrafficService.get.apply(any[Request]).returns(Future.value(smartMock[Response]))
+
+    override val server = new EmbeddedHttpServer(
+      twitterServer = new DarkTrafficTestServer)
+
+    test(""DarkTrafficServer#has Canonical-Resource header correctly set"") {
+      ...
+   ```
+
+   Users can instead do:
+
+   ```
+   class DarkTrafficCanonicalResourceHeaderTest
+     extends FeatureTest
+     with Mockito {
+
+     val darkTrafficService: Option[Service[Request, Response]] =
+       Some(smartMock[Service[Request, Response]])
+
+     /* mock request */
+     darkTrafficService.get.apply(any[Request]).returns(Future.value(smartMock[Response]))
+
+     override val server = new EmbeddedHttpServer(
+       twitterServer = new DarkTrafficTestServer)
+       .bind[Option[Service[Request, Response]], DarkTrafficService](darkTrafficService)
+
+     test(""DarkTrafficServer#has Canonical-Resource header correctly set"") {
+       ...
+   ```
+
+   This allows for more flexibility (as the binding is now per object graph, rather
+   than per test files) and is less susceptible to errors due to incorrect usage.
+
+   The breaking API change is due to adding this support in the TestInjector, it is
+   now required that users call the `TestInjector#create` method in order to build
+   the injector and that this is done *after* calls to `TestInjector#bind`. Previously,
+   an `Injector` was directly returned from `TestInjector#apply` which is no longer true,
+   thus it may look like your IntegrationTests are broken as you now need to add a
+   call to `TestInjector#create`.
+
+   Additionally, this change updates all of the framework tests in the inject modules to
+   the FunSuite testing style from the deprecated WordSpec testing style. ``RB_ID=910011``
+
+* finatra-thrift: Update framework tests to FunSuite ScalaTest testing style. ``RB_ID=910262``
+
+* inject-core: Move Logging from grizzled-slf4j to util/util-slf4j-api.
+  `c.t.inject.Logger` is now deprecated in favor of `c.t.util.logging.Logger`
+  in util. ``DIFF_ID=D29713``
+
+* finatra-httpclient: Update framework tests to FunSuite ScalaTest testing style. ``RB_ID=909526``
+
+* finatra-http: Update framework tests to FunSuite ScalaTest testing style. ``RB_ID=909349``
+
+* finatra: Bump guava to 19.0. ``RB_ID=907807``
+
+* inject-thrift-client: Various APIs have changed to work with `ThriftMethod.SuccessType`
+  instead of `ThriftMethod.Result`. See `ThriftClientFilterChain`, `Controller`,
+  `ThriftWarmup`, `PossiblyRetryable`. ``RB_ID=908846``",https://api.github.com/users/mosesn,156562,mosesn,https://api.github.com/repos/twitter/finatra/releases/5710626/assets,https://api.github.com/repos/twitter/finatra/releases/5710626,develop,https://api.github.com/repos/twitter/finatra/tarball/finatra-2.9.0,https://github.com/twitter/finatra/releases/tag/finatra-2.9.0,https://api.github.com/repos/twitter/finatra/zipball/finatra-2.9.0,finatra-2.9.0,False,False
+5372803,2017-02-04T01:34:14Z,2017-02-06T16:59:30Z,Finatra 2.8.0,"### Added
+- finatra-http: Add Java support for declaring admin routes. `RB_ID=906264`
+- finatra-http: Add AbstractExceptionMapper for ExceptionMapper usage from Java.
+  Also update the HttpRouter to allow for registration of AbstractExceptionMappers.
+  `RB_ID=902995`
+- finatra-http: Support for JSON Patch (https://tools.ietf.org/html/rfc6902). Utilities are
+  located in package `com.twitter.finatra.http.jsonpatch`. `RB_ID=889152`
+- finatra: Created companion trait mixins for Test/FeatureTest/IntegrationTest/HttpTest.
+  `RB_ID=897778`
+- finatra-http: Support for optional trailing slashes in HTTP routes. Routes can
+  now specify that they allow an optional trailing slash by ending the route URI
+  in the Controller with ""/?"". `RB_ID=893167`
+- finatra-http: Support for Controller route prefixes. This allows users to define a
+  common prefix for a set of routes declaratively inside a controller. `RB_ID=894695`
+
+### Changed
+- finatra-http: Allow routes which begin with ""/admin"" to be exposed on the external
+  interface and routes which DO NOT begin with ""/admin"" to be exposed on the admin interface.
+  NOTE: routes which begin with ""/admin/finatra"" will continue to be on the admin interface
+  only. Routes which begin with ""/admin"" that should be served from the admin interface MUST
+  set the flag ""admin = true"" on the route in the Controller. `RB_ID=905225`
+- finatra: (BREAKING API CHANGE) Move conversions and retry utilities from finatra/utils to finatra/inject/inject-utils.
+  `RB_ID=905109`
+- finatra: (BREAKING API CHANGE) Rename the existing test helper classes to include
+  their current opinionated testing style, ""WordSpec"". These are functionally
+  equivalent as this is just a name change. We also introduce new versions of the
+  test helpers which mix in the recommended FunSuite. Thus it will look like your
+  tests are broken as you will need to update to change to use the new ""WordSpec""
+  classes or changed your testing style to the recommended `FunSuite` style.
+  `DIFF_ID=D19822`
+- inject-core: Remove JUnitRunner from `c.t.inject.Test`. This was only necessary for
+  internal building with pants and is no longer required. The sbt build uses the 
+  ScalaTest runner and is thus not affected. Additionally, update specs2 to 2.4.17 and 
+  to depend on just the `specs2-mock` dependency where needed. `DIFF_ID=D18011`
+
+### Fixed
+- finatra-http: Fix issue where added admin routes did not have their HTTP method
+  correctly specified leading to all routes being defaulted to 'GET'. `RB_ID=905887`
+- finatra-http: Fix for custom request case class collection-type fields which are
+  annotated with either `@RouteParam`, `@QueryParam`, or `@FormParam` to correctly
+  use a specified default value when a value is not sent in the request. `RB_ID=903697`
+- inject-app: Fix TestInjector to properly parse flags. The TestInjector didn't
+  properly handle defaulted boolean flags when defined in Modules. Updated the
+  TestInjector logic to properly parse flags. Fixes [Issue #373](https://github.com/twitter/finatra/issues/373) 
+  `RB_ID=901525`
+- finatra: Correctly filter published tests-javadocs and tests-sources jars for
+  projects. We are incorrectly publishing tests in the sources and javadocs jars
+  for projects which publish a test-jar dependency (http, httpclient, jackson,
+  thrift, util, inject-app, inject-core, inject-modules, and inject-server).
+  `RB_ID=901153`
+",https://api.github.com/users/bryce-anderson,2948506,bryce-anderson,https://api.github.com/repos/twitter/finatra/releases/5372803/assets,https://api.github.com/repos/twitter/finatra/releases/5372803,develop,https://api.github.com/repos/twitter/finatra/tarball/finatra-2.8.0,https://github.com/twitter/finatra/releases/tag/finatra-2.8.0,https://api.github.com/repos/twitter/finatra/zipball/finatra-2.8.0,finatra-2.8.0,False,False
+4975390,2016-12-21T01:25:33Z,2016-12-21T02:01:30Z,Finatra 2.7.0,"### Added
+- finatra-http: Add built-in support for Scala `scala.concurrent.Future`. The
+  CallbackConverter now supports a return type of Scala `scala.concurrent.Future`
+  by using a bijection to convert to a Twitter `c.t.util.Future`. `RB_ID=898147`
+- finatra-http: Support for request forwarding. Requests can be forwarded from
+  one route to another. Forwarded requests will not go through the server's
+  defined filter chain again but will pass through any Controller defined filters
+  on the ""forwarded to"" route. `RB_ID=883224`
+",https://api.github.com/users/jcrossley,8378895,jcrossley,https://api.github.com/repos/twitter/finatra/releases/4975390/assets,https://api.github.com/repos/twitter/finatra/releases/4975390,develop,https://api.github.com/repos/twitter/finatra/tarball/finatra-2.7.0,https://github.com/twitter/finatra/releases/tag/finatra-2.7.0,https://api.github.com/repos/twitter/finatra/zipball/finatra-2.7.0,finatra-2.7.0,False,False
+4737079,2016-11-23T01:07:04Z,2016-11-23T03:08:01Z,Finatra 2.6.0,"### Added
+- finatra: Move the OSS documentation to internal code repository to be co-located with
+  source code. `RB_ID=881112`
+
+### Changed
+- finatra-http: The 'cookie' method of `c.t.finatra.http.response.ResponseBuilder#EnrichedResponse`
+  that takes a Netty 3 cookie instance has been deprecated. Please use the method which takes a
+  Finagle HTTP cookie instead. `RB_ID=888683`
+- finatra-http: Update adding routes to the TwitterServer HTTP Admin Interface to use
+  `c.t.finagle.http.RouteIndex` and remove the `c.t.finatra.http.routing.AdminIndexInfo`.
+  Also relaxed the rules for what routes can be added to the index to include constant
+  /POST routes. Additionally, no longer fail if you define conflicting admin routes --
+  we will now only warn. It is up to the user to not shoot themselves in the foot.
+  `RB_ID=889792`
+- finatra-http: Request in request case classes no longer requires Inject annotation. `RB_ID=888197`
+- inject-utils: Deprecated RootMonitor since finagle DefaultMonitor is implicitly installed
+  and handles all exceptions caught in stack. We provide a monitor method by default is a NullMonitor in
+  `c.t.finatra.thrift.modules.DarkTrafficFilterModule` and `c.t.inject.thrift.modules.FilteredThriftClientModule`,
+  users can handle other exceptions (unhandled by DefaultMonitor) by overriding the monitor method `RB_ID=886773`
+- finatra: We now depend on a fork of libthrift hosted in the Central Repository.
+  The new package lives in the 'com.twitter' organization. This removes the necessity of
+  depending on maven.twttr.com. This also means that eviction will not be automatic and
+  using a newer libthrift library requires manual eviction if artifacts are being pulled
+  in transitively. `RB_ID=885879`
+- inject-thrift-client: (BREAKING API CHANGE) Update filter building API with
+  FilteredThriftClientModule. The `c.t.inject.thrift.filters.ThriftClientFilterChain`
+  builder API has changed along with the underlying mechanisms to support
+  enforcement of a ""correct"" filter order when using the helper methods. Methods
+  have been renamed to a 'with'-syntax to be more inline with other builders and
+  the confusing ""globalFilter"" method to the more verbose but more accurate
+  ""withAgnosticFilter"". `RB_ID=878260`
+- inject-thrift-client: Remove deprecated package aliases. We'd like people to
+  move the correct packages.`RB_ID=879330`
+- finatra-http: (BREAKING API CHANGE) Update StreamingResponse to avoid keeping
+  a reference to the head of the AsyncStream. This resolves the memory leak
+  when streaming an infinite stream. The constructor is now private; use the
+  StreamingResponse object methods that take an AsyncStream by-name instead.
+  `RB_ID=890205`
+
+### Fixed
+- finatra-http: Allow 0,1,t,f as valid boolean values for QueryParam case class requests.
+  `RB_ID=881939`
+
+### Closed
+",https://api.github.com/users/jcrossley,8378895,jcrossley,https://api.github.com/repos/twitter/finatra/releases/4737079/assets,https://api.github.com/repos/twitter/finatra/releases/4737079,develop,https://api.github.com/repos/twitter/finatra/tarball/finatra-2.6.0,https://github.com/twitter/finatra/releases/tag/finatra-2.6.0,https://api.github.com/repos/twitter/finatra/zipball/finatra-2.6.0,finatra-2.6.0,False,False
+4364634,2016-10-12T00:17:08Z,2016-10-12T00:39:48Z,Finatra 2.5.0,"### Added
+- finatra-http: Add DarkTrafficFilterModule symmetric with
+  thrift/DarkTrafficFilterModule. Add DarkTrafficService annotation in
+  finatra-utils and a filter function used for requests annotated with
+  Annotation Type in order to add DarkTrafficFilter. `RB_ID=878079`
+
+### Changed
+- finatra: No longer need to add an additional resolver that points to maven.twttr.com.
+  `RB_ID=878967`
+- inject-thrift-client: Stop counting response failures in the
+  `c.t.inject.thrift.ThriftClientFilterChain` as these are now counted in the
+  `c.t.finagle.thrift.ThriftServiceIface`. `RB_ID=879075`
+- finatra-jackson: Fix issue around JsonProperty annotation empty value. In
+  CaseClassField.jsonNameForField, if the @JsonProperty annotation is used
+  without a value, the property name is interpreted as """". It now follows the
+  default Jackson behavior of using the name field name as the property
+  name when the annotation is empty. `RB_ID=877060`
+- finatra: Correct instances of misspelled word ""converter"". There are
+  several instances where the word ""converter"" is misspelled as ""convertor"".
+  Specifically, TwitterModule.addTypeConvertor has been changed to
+  TwitterModule.addTypeConverter. Other internal renamings are
+  TwitterDurationTypeConverter, JodatimeDurationTypeConverter, and
+  JacksonToGuiceTypeConverter. `RB_ID=877736`
+- finatra: Move installation of the SLF4JBridgeHandler to the constructor of
+  `c.t.inject.server.TwitterServer`. The
+  `c.t.finatra.logging.modules.Slf4jBridgeModule` has been removed as there is
+  now little reason to use it unless you are building an application directly
+  from `c.t.inject.app.App` since the functionality is now provided by default
+  in the constructor of `c.t.inject.server.TwitterServer`. If using
+  `c.t.inject.app.App`, then users can use the
+  `c.t.inject.logging.modules.LoggerModule`. The main advantage is that slf4j
+  bridges are now installed earlier in the application or server lifecycle and
+  thus more of the initialization logging is bridged to the slf4j-api.
+  `RB_ID=870913`
+
+### Fixed
+- finatra-jackson: Test jar is missing files. Classes in the test
+  `c.t.finatra.validation` package were not properly marked for 
+  inclusion in the finatra-jackson tests jar. They've now been added. 
+  `RB_ID=878755`
+",https://api.github.com/users/jcrossley,8378895,jcrossley,https://api.github.com/repos/twitter/finatra/releases/4364634/assets,https://api.github.com/repos/twitter/finatra/releases/4364634,develop,https://api.github.com/repos/twitter/finatra/tarball/finatra-2.5.0,https://github.com/twitter/finatra/releases/tag/finatra-2.5.0,https://api.github.com/repos/twitter/finatra/zipball/finatra-2.5.0,finatra-2.5.0,False,False
+4076283,2016-09-08T00:52:19Z,2016-09-08T01:33:56Z,Finatra 2.4.0,"# Note:
+
+This release fixes a bug in release [`2.3.0`](https://github.com/twitter/finatra/releases/tag/finatra-2.3.0) for HTTP servers which affected routes that returned a simple `String` or a `Map[String, String]`. See: `RB_ID=868480`
+
+### Added
+- finatra-thrift: Enhanced support for Java Thrift services. `RB_ID=868254`
+- finatra-examples: Add web/UI application example. `RB_ID=868027`
+- inject-server: Allow for the ability to disable test logging via System property. `RB_ID=867344`
+
+### Changed
+- finatra-http: Specify HTTP Java API consistently. `RB_ID=868264`
+- inject-core: Clean up inject.Logging trait. Remove dead code from Logging. `RB_ID=868261`
+- finatra-http: Move integration tests to a package under `com.twitter.finatra.http`. `RB_ID=866487`
+
+### Fixed
+- finatra-http: Fix issue with unimplemented methods in NonValidatingHttpHeadersResponse. `RB_ID=868480`
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/finatra/releases/4076283/assets,https://api.github.com/repos/twitter/finatra/releases/4076283,develop,https://api.github.com/repos/twitter/finatra/tarball/finatra-2.4.0,https://github.com/twitter/finatra/releases/tag/finatra-2.4.0,https://api.github.com/repos/twitter/finatra/zipball/finatra-2.4.0,finatra-2.4.0,False,False
+3979118,2016-08-26T03:28:03Z,2016-08-26T03:58:18Z,Finatra 2.3.0,"### Added
+- finatra-thrift: Add non-guice method to add controller to ThriftRouter `RB_ID=863977`
+- finatra-thrift: Add support for a ""dark"" traffic filter in thrift routing. Add a Finatra implementation
+  of the Finagle AbstractDarkTrafficFilter which sub-classes ThriftFilter and will work in the Finatra
+  filter chain. This will allow users to play incoming requests to a configured ""dark"" service. `RB_ID=852338`
+
+### Changed
+- finatra-http: Performance improvements from latest micro-benchmarking run.
+  BREAKING API CHANGE: Removed `HttpHeaders#setDate`, `HttpHeaders#set` and `HttpHeaders#GMT`. `RB_ID=865247`
+- finatra-thrift: Provide access to statsReceiver argument in ThriftClientFilterBuilder. `RB_ID=857286`
+
+### Fixed
+- finatra-http: Add content headers for EmbeddedHttpServer #httpDelete and #httpPatch methods. `RB_ID=862200`
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/finatra/releases/3979118/assets,https://api.github.com/repos/twitter/finatra/releases/3979118,develop,https://api.github.com/repos/twitter/finatra/tarball/finatra-2.3.0,https://github.com/twitter/finatra/releases/tag/finatra-2.3.0,https://api.github.com/repos/twitter/finatra/zipball/finatra-2.3.0,finatra-2.3.0,False,False
+3618075,2016-07-08T16:53:14Z,2016-07-08T18:29:10Z,Finatra 2.2.0,"# Note:
+
+Please note that the published  [groupId](https://maven.apache.org/guides/mini/guide-naming-conventions.html) for all Finatra artifacts **has changed** from `com.twitter.finatra` and `com.twitter.inject` to **just** `com.twitter`. You can find the published v2.2.0 artifacts [here](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.twitter%22%20AND%20v%3A%222.2.0%22).
+
+# Added
+- finatra-thrift: Add python namespace to finatra_thrift_exceptions.thrift. `RB_ID=844668`
+- finatra-http: Support ANY method in HTTP Controllers. Adds support for defining routes which will answer 
+  to ""any"" HTTP method. `RB_ID=830429`
+
+# Changed
+- finatra: Address lifecycle around com.twitter.inject.app.App#appMain.
+  - **BREAKING CHANGE**: EmbeddedApp has been completely re-written to be a better utility for testing command-line applications,
+    as a result there are transparent changes to EmbeddedTwitterServer.
+  - com.twitter.inject.app.App#appMain is now com.twitter.inject.app.App#run and com.twitter.inject.server.TwitterServer#start.
+    #run() is used for ""running"" applications and #start() is used for ""starting"" servers. In the lifecycle TwitterServer implements
+    App#run() as final and simply delegates to the start() method.
+  - Server await callback for adding server Awaitables to a list so that the server will now Await.all on all collected
+    Awaitables.
+  - Added a new TwitterModuleLifecycle method: singletonPostWarmupComplete.
+  - More documentation around server and app Lifecycle methods, their intended usages, and usages of callback functions.`RB_ID=844303`
+- finatra: Narrow visibility on classes/objects in internal packages. Classes/objects in internal packages are not
+  intended for use outside of the framework. `RB_ID=845278`
+- finatra-http: fix HttpHeaders's Date locale problem. `RB_ID=843966`
+- inject-thrift: Address issues with com.twitter.inject.exceptions.PossiblyRetryable. PossiblyRetryable does not correctly
+  determine what is retryable. Updated to correct the logic for better default retry utility. `RB_ID=843428`
+- finatra: finatra: Move com.twitter.finatra.annotations.Flag|FlagImpl to com.twitter.inject.annotations.Flag|FlagImpl. `RB_ID=843383`
+- finatra: Remove com.twitter.inject.conversions.map#atomicGetOrElseUpdate. This was necessary for Scala 2.10 support
+  since #getOrElseUpdate was not atomic until Scala 2.11.6. See: https://github.com/scala/scala/pull/4319. `RB_ID=842684`
+- finatra: Upgrade to Jackson 2.6.5. `RB_ID=836819`
+- inject: Introduce inject/inject-thrift module to undo cyclic dependency introduced in RB 839427. `RB_ID=841128`
+- inject-thrift-client: Improvements to FilteredThriftClientModule to provide finer-grain insight on ThriftClientExceptions.
+  NOTE: previously per-route failure stats were in the form:
+
+```
+route/add1String/GET/status/503/handled/ThriftClientException/Adder/add1String/com.twitter.finatra.thrift.thriftscala.ServerError
+```
+
+  These will now split across per-route and detailed ""service component"" failure stats, e.g.,
+
+```
+  // per-route
+  route/add1String/GET/failure/adder-thrift/Adder/add1String/com.twitter.finatra.thrift.thriftscala.ServerError
+  route/add1String/GET/status/503/mapped/ThriftClientException
+  // service component
+  service/failure/adder-thrift/Adder/add1String/com.twitter.finatra.thrift.thriftscala.ServerError
+```
+
+  Where the latter is in the form ""service/failure/SOURCE/THRIFT_SERVICE_NAME/THRIFT_METHOD/NAME/details"".
+  ""SOURCE"" is by default the thrift client label, however, users are able to map this to something else.`RB_ID=839427`
+- finatra: Renamed Embedded testing utilities constructor args, clientFlags --> flags and extraArgs --> args. `RB_ID=839537`
+- finatra-http: Set Content-Length correctly in EmbeddedHttpServer, to support multi-byte characters
+  in the request body. `RB_ID=837438`
+- finatra-http: No longer special-case NoSuchMethodException in the ExceptionMappingFilter. `RB_ID=837369`
+- finatra-http: Remove deprecated package objects in com.twitter.finatra. Callers should be using code in
+  the com.twitter.finatra.http package. `RB_ID=836194`
+- finatra-http: Removed deprecated ExceptionBarrierFilter. NOTE: The ExceptionBarrierFilter produced stats in the form:
+  ""server/response/status/RESPONSE_CODE"". Using the replacement StatsFilter (in combination with the
+  ExceptionMappingFilter) will produce more granular per-route stats. The comparable stats from the StatsFilter will be
+  in the form: ""route/ROUTE_URI/HTTP_METHOD/status/RESPONSE_CODE"" with an additional aggregated total
+  stat. `RB_ID=836073` E.g,
+
+```
+  server/response/status/200: 5,
+  server/response/status/201: 5,
+  server/response/status/202: 5,
+  server/response/status/403: 5,
+```
+
+  will now be:
+
+```
+  route/bar_uri/GET/status/200: 5,
+  route/bar_uri/GET/status/2XX: 5,
+  route/bar_uri/GET/status/400: 5,
+  route/bar_uri/GET/status/401: 5,
+  route/bar_uri/GET/status/403: 5,
+  route/bar_uri/GET/status/4XX: 15,
+  route/foo_uri/POST/status/200: 5,
+  route/foo_uri/POST/status/2XX: 5,
+  route/foo_uri/POST/status/400: 5,
+  route/foo_uri/POST/status/401: 5,
+  route/foo_uri/POST/status/403: 5,
+  route/foo_uri/POST/status/4XX: 15,
+```
+- finatra: Made implicit classes extend AnyVal for less runtime overhead. `RB_ID=835972`
+- finatra-http: Remove deprecated package objects in com.twitter.finatra. Callers should be using code in
+  the com.twitter.finatra.http package. `RB_ID=836194`
+- finatra: Publish all artifacts under com.twitter organization. `RB_ID=834484`
+- finatra: Update sbt memory settings. `RB_ID=834571`
+- inject-server: Rename com.twitter.inject.server.TwitterServer#run to com.twitter.inject.server.TwitterServer#handle. `RB_ID=833965`
+- finatra-http: Move test utilities in `com.twitter.finatra.http.test.*` to `com.twitter.finatra.http.*`. `RB_ID=833170`
+- finatra: Update SLF4J to version 1.7.21 and Logback to 1.1.7. Also update example
+  logging configurations for best practices. `RB_ID=832633`
+- Builds are now only for Java 8 and Scala 2.11. See the
+  [blog post](https://finagle.github.io/blog/2016/04/20/scala-210-and-java7/) for details. `RB_ID=828898`
+
+# Fixed
+- finatra-examples: Add sbt-revolver to the hello-world example. Fixes [GH-209](https://github.com/twitter/finatra/issues/209). `RB_ID=838215`
+- finatra: Fix to properly support Java controllers that return Futures in their route callbacks. `RB_ID=834467`
+
+# Closed
+- [GH-276](https://github.com/twitter/finatra/issues/276). `RB_ID=836819`
+- [PR-273](https://github.com/twitter/finatra/pull/273). `RB_ID=838215`
+- [PR-324](https://github.com/twitter/finatra/pull/324). `RB_ID=838215`
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/finatra/releases/3618075/assets,https://api.github.com/repos/twitter/finatra/releases/3618075,develop,https://api.github.com/repos/twitter/finatra/tarball/finatra-2.2.0,https://github.com/twitter/finatra/releases/tag/finatra-2.2.0,https://api.github.com/repos/twitter/finatra/zipball/finatra-2.2.0,finatra-2.2.0,False,False
+3113954,2016-04-27T21:44:54Z,2016-04-27T23:13:03Z,Finatra 2.1.6,"### Note: This is the final release that will support Scala 2.10 and Java 7.
+
+### Added
+- finatra-thrift: Add ThriftWarmup for thrift servers. `RB_ID=820771`
+- finatra-inject/inject-server: Register framework in Library registry. `RB_ID=809458`
+- finatra-http: Support for trace, connect & options in RequestBuilder. `RB_ID=811102`
+- finatra-thrift: Allow for thrift server configuration. `RB_ID=811126`
+
+### Changed
+- finatra/twitter-server: Update to register TwitterServer as library in /admin/registry.json. `RB_ID=825129`
+- finatra-inject/inject-server: Deprecate PromoteToOldGenUtils in favor of twitter-server's prebindWarmup event. `RB_ID=819411`
+- finatra-http: Move HttpServer to new Http stack API. `RB_ID=812718`
+
+### Fixed
+- finatra: Revert sbt-scoverage plugin to 1.2.0. `RB_ID=812098`
+- finatra-http: Ensure headers are set correctly in requests and responses. `RB_ID=813969`
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/finatra/releases/3113954/assets,https://api.github.com/repos/twitter/finatra/releases/3113954,develop,https://api.github.com/repos/twitter/finatra/tarball/finatra-2.1.6,https://github.com/twitter/finatra/releases/tag/finatra-2.1.6,https://api.github.com/repos/twitter/finatra/zipball/finatra-2.1.6,finatra-2.1.6,False,False
+2811587,2016-03-15T00:55:57Z,2016-03-15T01:42:03Z,Finatra 2.1.5,"- Move to `develop` branch as default branch for github.
+- Slf4JBridgeModule is added by default and no longer breaks services which use the slf4k-jdk14 logging implementation.
+- Ability to access the finagle request in the ResponseBuilder for templating.
+- Fixed incorrect (or missing) content-type on some http responses.
+- Added ability to register routes into the TwitterServer admin UI.
+- Added PULL_REQUEST_TEMPLATE
+- Fix to support doubles/floats in the jackson Min/Max/Range validations.
+- Updated test jars to **only** contain test utility code.
+
+## [v2.1.5](https://github.com/twitter/finatra/tree/v2.1.5) (2016-03-15)
+
+For a full list of github changes see here:
+
+[v2.1.4...v2.1.5](https://github.com/twitter/finatra/compare/v2.1.4...v2.1.5)
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/finatra/releases/2811587/assets,https://api.github.com/repos/twitter/finatra/releases/2811587,master,https://api.github.com/repos/twitter/finatra/tarball/v2.1.5,https://github.com/twitter/finatra/releases/tag/v2.1.5,https://api.github.com/repos/twitter/finatra/zipball/v2.1.5,v2.1.5,False,False
+2691308,2016-02-25T19:54:48Z,2016-02-25T21:53:37Z,Finatra 2.1.4,"- Full thrift server parity with http servers.
+- finatra-slf4j is now a dependency of finatra-http and finatra-thrift. The [Slf4jBridgeModule](https://github.com/twitter/finatra/blob/master/slf4j/src/main/scala/com/twitter/finatra/logging/modules/Slf4jBridgeModule.scala) is added a framework module (note if you are using slf4j-jdk14 as you logging implementation this will most likely break you). We highly recommend using [Logback](http://twitter.github.io/finatra/user-guide/logging/) as a logging implementation.
+
+For a full list of github changes see here:
+
+[v2.1.3...v2.1.4](https://github.com/twitter/finatra/compare/v2.1.3...v2.1.4)
+
+**Fixed bugs:**
+- Some Scaladoc links are broken on twitter.github.io/finatra [#298](https://github.com/twitter/finatra/issues/298)
+
+**Closed issues:**
+- LoggingMDCFilter lacks documentation [#303](https://github.com/twitter/finatra/issues/303)
+- bug in finatra/examples/hello-world/src/main/resources/logback.xml [#289](https://github.com/twitter/finatra/issues/289)
+- Improve error message when @Header field is missing [#263](https://github.com/twitter/finatra/issues/263)
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/finatra/releases/2691308/assets,https://api.github.com/repos/twitter/finatra/releases/2691308,master,https://api.github.com/repos/twitter/finatra/tarball/v2.1.4,https://github.com/twitter/finatra/releases/tag/v2.1.4,https://api.github.com/repos/twitter/finatra/zipball/v2.1.4,v2.1.4,False,False
+2557676,2016-02-05T03:42:03Z,2016-02-05T04:03:02Z,Finatra 2.1.3,"Improvements and new features from the 2.1.2 release.
+
+For a full list of changes see here:
+
+[v2.1.2...v2.1.3](https://github.com/twitter/finatra/compare/v2.1.2...v2.1.3)
+
+**Closed issues:**
+- Is it possible to have different modules listen in different ports? [#295](https://github.com/twitter/finatra/issues/295)
+- Asynchronous method validations [#292](https://github.com/twitter/finatra/issues/292)
+- if the Cookie contain version='' ,can't get the request.cookies [#290](https://github.com/twitter/finatra/issues/290)
+- Failed to auto configure default logger context [#288](https://github.com/twitter/finatra/issues/288)
+- Inject properties [#287](https://github.com/twitter/finatra/issues/287)
+- sbt compile error on master [#284](https://github.com/twitter/finatra/issues/284)
+- Optionally announce server location on startup [#241](https://github.com/twitter/finatra/issues/241)
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/finatra/releases/2557676/assets,https://api.github.com/repos/twitter/finatra/releases/2557676,master,https://api.github.com/repos/twitter/finatra/tarball/v2.1.3,https://github.com/twitter/finatra/releases/tag/v2.1.3,https://api.github.com/repos/twitter/finatra/zipball/v2.1.3,v2.1.3,False,False
+2262757,2015-12-09T23:06:54Z,2015-12-10T00:17:39Z,Finatra 2.1.2,"Improvements and new features from the 2.1.1 release.
+
+For a full list of changes see here:
+[v2.1.1...v2.1.2](https://github.com/twitter/finatra/compare/v2.1.1...v2.1.2)
+
+**Fixed bugs:**
+- Missing Scaladoc [#279](https://github.com/twitter/finatra/issues/279)
+
+**Closed issues:**
+- Simple hello-world example does not compiled [#274](https://github.com/twitter/finatra/issues/274)
+- Allow overriding of the http service name [#270](https://github.com/twitter/finatra/issues/270)
+- ClassCastException: com.twitter.finatra.logging.FinagleMDCAdapter cannot be cast to ch.qos.logback.classic.util.LogbackMDCAdapter [#256](https://github.com/twitter/finatra/issues/256)
+
+**Merged pull requests:**
+- Support HTTP Patch in httpclient https://github.com/twitter/finatra/commit/34e9ead88fd1c91997d95e280c2f762fcc8e1fe9
+- Improve error message when Header field is missing https://github.com/twitter/finatra/commit/cd232850d9f3e349a95dc54886f533d4fa3360b7
+- Support assertTrue & assertFalse variants for ValidationResult https://github.com/twitter/finatra/commit/3082cf08fba3f327ff99cbd0726bc2d339cb3265
+",https://api.github.com/users/ryanoneill,1393463,ryanoneill,https://api.github.com/repos/twitter/finatra/releases/2262757/assets,https://api.github.com/repos/twitter/finatra/releases/2262757,master,https://api.github.com/repos/twitter/finatra/tarball/v2.1.2,https://github.com/twitter/finatra/releases/tag/v2.1.2,https://api.github.com/repos/twitter/finatra/zipball/v2.1.2,v2.1.2,False,False
+2041910,2015-10-29T19:02:07Z,2015-10-29T19:14:55Z,Finatra 2.1.1,"Improvements and new features from the 2.1.0 release.
+
+For a full list of changes see here:
+https://github.com/twitter/finatra/compare/v2.1.0...v2.1.1
+
+**Closed issues:**
+- Update Startup Test on doc [#261](https://github.com/twitter/finatra/issues/261)
+- Error with simple test using httpPutJson [#257](https://github.com/twitter/finatra/issues/257)
+- appfrog problem with admin server, I only can use one port [#252](https://github.com/twitter/finatra/issues/252)
+- Streaming content every X seconds [#250](https://github.com/twitter/finatra/issues/250)
+- Mustache templates getting stripped  [#112](https://github.com/twitter/finatra/issues/112)
+
+**Merged pull requests:**
+- Remove unnecessary files [#265](https://github.com/twitter/finatra/pull/265) ([cacoco](https://github.com/cacoco))
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/finatra/releases/2041910/assets,https://api.github.com/repos/twitter/finatra/releases/2041910,master,https://api.github.com/repos/twitter/finatra/tarball/v2.1.1,https://github.com/twitter/finatra/releases/tag/v2.1.1,https://api.github.com/repos/twitter/finatra/zipball/v2.1.1,v2.1.1,False,False
+1894107,2015-10-01T02:29:21Z,2015-10-01T03:16:05Z,Finatra 2.1.0,"Improvements and new features from the 2.0.1 release.
+
+For a full list of changes see here:
+https://github.com/twitter/finatra/compare/v2.0.1...v2.1.0
+
+**Merged pull requests:**
+- finatra/inject - Rename InjectUtils to more specific PoolUtils [#258](https://github.com/twitter/finatra/pull/258) ([cacoco](https://github.com/cacoco))
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/finatra/releases/1894107/assets,https://api.github.com/repos/twitter/finatra/releases/1894107,master,https://api.github.com/repos/twitter/finatra/tarball/v2.1.0,https://github.com/twitter/finatra/releases/tag/v2.1.0,https://api.github.com/repos/twitter/finatra/zipball/v2.1.0,v2.1.0,False,False
+1846368,2015-09-21T21:56:51Z,2015-09-21T22:21:17Z,Finatra 2.0.1,"Improvements and fixes from the 2.0.0 release.
+
+For a full list of changes see here:
+https://github.com/twitter/finatra/compare/v2.0.0...v2.0.1
+
+**Closed issues:**
+- Split code into packages/modules [#254](https://github.com/twitter/finatra/issues/254)
+- Support for Scala Future's [#249](https://github.com/twitter/finatra/issues/249)
+- Override TwitterModule in FeatureTest [#233](https://github.com/twitter/finatra/issues/233)
+
+**Merged pull requests:**
+- Update TweetsControllerIntegrationTest.scala [#251](https://github.com/twitter/finatra/pull/251) ([scosenza](https://github.com/scosenza))
+- Update Travis CI to build with java8 fix. [#244](https://github.com/twitter/finatra/pull/244) ([cacoco](https://github.com/cacoco))
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/finatra/releases/1846368/assets,https://api.github.com/repos/twitter/finatra/releases/1846368,master,https://api.github.com/repos/twitter/finatra/tarball/v2.0.1,https://github.com/twitter/finatra/releases/tag/v2.0.1,https://api.github.com/repos/twitter/finatra/zipball/v2.0.1,v2.0.1,False,False
+1791642,2015-09-09T23:52:12Z,2015-09-10T02:14:45Z,Finatra 2.0.0,,https://api.github.com/users/scosenza,1959317,scosenza,https://api.github.com/repos/twitter/finatra/releases/1791642/assets,https://api.github.com/repos/twitter/finatra/releases/1791642,master,https://api.github.com/repos/twitter/finatra/tarball/v2.0.0,https://github.com/twitter/finatra/releases/tag/v2.0.0,https://api.github.com/repos/twitter/finatra/zipball/v2.0.0,v2.0.0,False,False
+1455806,2015-06-24T14:12:34Z,2015-06-24T14:20:25Z,Finatra 1.5.4,"**Please note: this is not the latest release. The latest release is [2.0.0.M2](https://github.com/twitter/finatra/releases/tag/v2.0.0.M2)**
+
+#### SBT
+
+``` scala
+""com.twitter"" %% ""finatra"" % ""1.5.4""
+```
+
+#### Maven
+
+``` xml
+<dependency>
+  <groupId>com.twitter</groupId>
+  <artifactId>finatra_2.10</artifactId>
+  <version>1.5.4</version>
+</dependency>
+```
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/finatra/releases/1455806/assets,https://api.github.com/repos/twitter/finatra/releases/1455806,develop,https://api.github.com/repos/twitter/finatra/tarball/1.5.4,https://github.com/twitter/finatra/releases/tag/1.5.4,https://api.github.com/repos/twitter/finatra/zipball/1.5.4,1.5.4,False,False
+1455799,2015-06-24T14:16:44Z,2015-06-24T14:19:29Z,Finatra 1.6.0,"**Please note: this is not the latest release. The latest release is [2.0.0.M2](https://github.com/twitter/finatra/releases/tag/v2.0.0.M2)**
+
+Release notes: http://twitter.github.io/finatra/blog/2015/01/09/finatra-1-dot-6-0-released/
+
+#### SBT
+
+``` scala
+""com.twitter"" %% ""finatra"" % ""1.6.0""
+```
+
+#### Maven
+
+``` xml
+<dependency>
+  <groupId>com.twitter</groupId>
+  <artifactId>finatra_2.10</artifactId>
+  <version>1.6.0</version>
+</dependency>
+```
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/finatra/releases/1455799/assets,https://api.github.com/repos/twitter/finatra/releases/1455799,develop,https://api.github.com/repos/twitter/finatra/tarball/1.6.0,https://github.com/twitter/finatra/releases/tag/1.6.0,https://api.github.com/repos/twitter/finatra/zipball/1.6.0,1.6.0,False,False
+1410141,2015-06-12T00:00:11Z,2015-06-12T19:05:48Z,Finatra 2.0.0.M2,"Lots of improvements and enhancements to Finatra v2 in this milestone release.
+
+For a full list of changes, see:
+https://github.com/twitter/finatra/compare/v2.0.0.M1...v2.0.0.M2
+
+**Closed issues:**
+- Issue with POST request [#214](https://github.com/twitter/finatra/issues/214)
+- error running example with sbt run: overloaded method value settings with alternatives. [#207](https://github.com/twitter/finatra/issues/207)
+- Was the 1.5.3 release retagged? [#206](https://github.com/twitter/finatra/issues/206)
+- Finatra 1.5.3 and dependencies at Travis CI [#205](https://github.com/twitter/finatra/issues/205)
+- Add an ADOPTERs.md [#204](https://github.com/twitter/finatra/issues/204)
+- connect finagle filter to specific controller [#203](https://github.com/twitter/finatra/issues/203)
+- Does Finatra support Scala 2.11? [#196](https://github.com/twitter/finatra/issues/196)
+- Support multipart PUT requests [#194](https://github.com/twitter/finatra/issues/194)
+
+**Merged pull requests:**
+- Misspelled Word [#212](https://github.com/twitter/finatra/pull/212) ([dgomesbr](https://github.com/dgomesbr))
+- Corrected some spelling mistakes [#210](https://github.com/twitter/finatra/pull/210) ([schmitch](https://github.com/schmitch))
+- Update README.md [#202](https://github.com/twitter/finatra/pull/202) ([scosenza](https://github.com/scosenza))
+- Add a Gitter chat badge to README.md [#201](https://github.com/twitter/finatra/pull/201) ([gitter-badger](https://github.com/gitter-badger))
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/finatra/releases/1410141/assets,https://api.github.com/repos/twitter/finatra/releases/1410141,master,https://api.github.com/repos/twitter/finatra/tarball/v2.0.0.M2,https://github.com/twitter/finatra/releases/tag/v2.0.0.M2,https://api.github.com/repos/twitter/finatra/zipball/v2.0.0.M2,v2.0.0.M2,False,False
+1234545,2015-04-30T00:28:35Z,2015-04-30T00:54:00Z,Finatra 2.0.0.M1,"This is a complete rewrite from the ground-up of Finatra supporting many of the same features as the 1.x releases. This rewrite introduces the use of Google Guice for dependency-injection allowing for more modularity and better testability of services built on Finatra.
+
+Other features include: significant performance improvements, declarative JSON parsing with Jackson and JSR-349 style validations, and logging improvements.
+",https://api.github.com/users/cacoco,613046,cacoco,https://api.github.com/repos/twitter/finatra/releases/1234545/assets,https://api.github.com/repos/twitter/finatra/releases/1234545,master,https://api.github.com/repos/twitter/finatra/tarball/v2.0.0.M1,https://github.com/twitter/finatra/releases/tag/v2.0.0.M1,https://api.github.com/repos/twitter/finatra/zipball/v2.0.0.M1,v2.0.0.M1,False,False
+274079,2014-04-16T05:40:56Z,2014-04-16T05:44:31Z,Finatra 1.5.3,"Release notes: http://finatra.info/blog/releases/2014/04/15/finatra-1.5.3-released.html
+
+### Changelog
+- [330ea28](https://github.com/twitter/finatra/commit/330ea28) Update to finagle 13.1, twitter-server 1.6.1.
+- [268636c](https://github.com/twitter/finatra/commit/268636c), [f541632](https://github.com/twitter/finatra/commit/f541632) Convenience wrappers for Finagle's HTTP status object.
+- [478fbd9](https://github.com/twitter/finatra/commit/478fbd9) Fix string interpolation on Scala 2.9.
+- [6e946ca](https://github.com/twitter/finatra/commit/6e946ca) Fix maxRequestSize config flag.
+- [e485028](https://github.com/twitter/finatra/commit/e485028) Content-Length is correctly set to 0 for empty responses now.
+- [6288fcb](https://github.com/twitter/finatra/commit/6288fcb) Updated legacy SpecHelper to support a body for POST, PUT and OPTIONS methods.
+- [e5b579c](https://github.com/twitter/finatra/commit/e5b579c) response.contentType method on ResponseBuilder.
+- [5615a67](https://github.com/twitter/finatra/commit/5615a67) Use byte length to calculate Content-Length.
+
+#### SBT
+
+``` scala
+""com.twitter"" %% ""finatra"" % ""1.5.3""
+```
+
+#### Maven
+
+``` xml
+<dependency>
+  <groupId>com.twitter</groupId>
+  <artifactId>finatra_2.10</artifactId>
+  <version>1.5.3</version>
+</dependency>
+```
+",https://api.github.com/users/capotej,6135,capotej,https://api.github.com/repos/twitter/finatra/releases/274079/assets,https://api.github.com/repos/twitter/finatra/releases/274079,master,https://api.github.com/repos/twitter/finatra/tarball/1.5.3,https://github.com/twitter/finatra/releases/tag/1.5.3,https://api.github.com/repos/twitter/finatra/zipball/1.5.3,1.5.3,False,False
+170637,2014-02-03T05:55:20Z,2014-02-03T07:38:40Z,Finatra 1.5.2,"Full details here: http://finatra.info/blog/releases/2014/02/02/finatra-1.5.2-released.html
+
+### Changelog
+- [f5c52b](https://github.com/twitter/finatra/commit/f5c52b28d9d6ca20b26b6dac5a964ae90cda45a0) Fixed bug in multipart form uploads that contain both text and file fields.
+- [cbb32a](https://github.com/twitter/finatra/commit/cbb32ac53b472d5866bdde9c9acef24ad8a7c1f9), 
+  [261627](https://github.com/twitter/finatra/commit/2616275dd970a6ce5b018598fd8bd5a13d6069fb) Update mustache.java to 0.8.14.
+- [43b244](https://github.com/twitter/finatra/commit/43b244aeca43a0f71ada196bdb21a06e56037622) Set Content-Length on static file responses.
+- [9c64c6](https://github.com/twitter/finatra/commit/9c64c63519058cd40b6100ac86e35c828ec3801c) New test framework with MockApp.
+- [511b4f](https://github.com/twitter/finatra/commit/511b4fceaf75bb0c23523e5d97a494330a88ae07) Generate bootstrap and bower config files for new apps.
+- [807859](https://github.com/twitter/finatra/commit/807859b4181244c2dc365493866adad4284ea5c9) Update twitter-server to 1.4.1 and finagle-stats to 6.11.1.
+
+#### SBT
+
+``` scala
+""com.twitter"" %% ""finatra"" % ""1.5.2""
+```
+
+#### Maven
+
+``` xml
+<dependency>
+  <groupId>com.twitter</groupId>
+  <artifactId>finatra_2.10</artifactId>
+  <version>1.5.2</version>
+</dependency>
+```
+",https://api.github.com/users/capotej,6135,capotej,https://api.github.com/repos/twitter/finatra/releases/170637/assets,https://api.github.com/repos/twitter/finatra/releases/170637,master,https://api.github.com/repos/twitter/finatra/tarball/1.5.2,https://github.com/twitter/finatra/releases/tag/1.5.2,https://api.github.com/repos/twitter/finatra/zipball/1.5.2,1.5.2,False,False
+145982,2014-01-13T02:16:10Z,2014-01-14T06:36:19Z,Finatra 1.5.1,"Blog post here: http://finatra.info/blog/releases/2014/01/13/finatra-1.5.1-released.html
+
+### Changelog
+- [75ebe3](https://github.com/twitter/finatra/commit/75ebe3c23678bba40cff0493b7f9806cf27de883) Correctly set Content-Length for unicode JSON responses
+- [145981](https://github.com/twitter/finatra/commit/1459817858f6dea218ab7de4861b3bba14ccadbc) Depend on finagle-stats, fixes [#95](https://github.com/twitter/finatra/issues/95)
+- [9037f1](https://github.com/twitter/finatra/commit/9037f13e7fce0dec361e86eb2e0fd6b5e1a5ca74) Enable HTML escaping in mustache templates
+- [83fa4f](https://github.com/twitter/finatra/commit/83fa4f8d286fb21144861303ab4e79eb3250d082) Response tied to originating Request, fixes [#86](https://github.com/twitter/finatra/issues/86)
+- [635b4d](https://github.com/twitter/finatra/commit/635b4dcaaf91ab6d0c39c0c9efb10ab24fa8fd36) Test and fix for setting `logLevel` correctly, fixing [#83](https://github.com/twitter/finatra/issues/83) and [#84](https://github.com/twitter/finatra/issues/84)
+- [a95d3e](https://github.com/twitter/finatra/commit/a95d3e5c5055405958ad8295919fb828bb5748eb) Adds all Admin endpoints, fixes [#74](https://github.com/twitter/finatra/issues/74)
+- [d8c2be](https://github.com/twitter/finatra/commit/d8c2beb4dcc3c4a7439f70b14ca3dd923571e870) `request.routeParams` are now properly url decoded, fixing [#68](https://github.com/twitter/finatra/issues/68)
+",https://api.github.com/users/capotej,6135,capotej,https://api.github.com/repos/twitter/finatra/releases/145982/assets,https://api.github.com/repos/twitter/finatra/releases/145982,master,https://api.github.com/repos/twitter/finatra/tarball/1.5.1,https://github.com/twitter/finatra/releases/tag/1.5.1,https://api.github.com/repos/twitter/finatra/zipball/1.5.1,1.5.1,False,False
+139593,2014-01-08T00:02:31Z,2014-01-07T05:34:58Z,Finatra 1.5.0,"See the [blog post](http://finatra.info/blog/releases/2014/01/06/finatra-1.5.0-released.html) for more details:
+- [6fc3003](https://github.com/BenWhitehead/finatra/commit/6fc3003acf4a22bb5ee82acba6ad15b57a5a9ad3) Add Content-Length to responses.
+- [12feaf](https://github.com/twitter/finatra/commit/12feaf27b56755446bb330ca91caf5ee0ee26fb9) Upgrade to finagle 6.10/twitter-server 1.4.0, fixing [#71](https://github.com/twitter/finatra/issues/71).
+- Finagle 6.10/Twitter-server 1.4.0
+- SBT Support
+- Scala 2.9 and scala 2.10 Support
+
+#### SBT
+
+``` scala
+""com.twitter"" %% ""finatra"" % ""1.5.0""
+```
+
+#### Maven
+
+``` xml
+<dependency>
+  <groupId>com.twitter</groupId>
+  <artifactId>finatra_2.10</artifactId>
+  <version>1.5.0</version>
+</dependency>
+```
+",https://api.github.com/users/capotej,6135,capotej,https://api.github.com/repos/twitter/finatra/releases/139593/assets,https://api.github.com/repos/twitter/finatra/releases/139593,master,https://api.github.com/repos/twitter/finatra/tarball/1.5.0a,https://github.com/twitter/finatra/releases/tag/1.5.0a,https://api.github.com/repos/twitter/finatra/zipball/1.5.0a,1.5.0a,False,False
+92714,2013-11-13T05:24:36Z,2013-11-13T17:35:17Z,Finatra 1.4.1,"- Fixes bug with filters https://github.com/capotej/finatra/pull/67
+- Fixes mustache inheritance https://github.com/capotej/finatra/pull/64
+",https://api.github.com/users/capotej,6135,capotej,https://api.github.com/repos/twitter/finatra/releases/92714/assets,https://api.github.com/repos/twitter/finatra/releases/92714,develop,https://api.github.com/repos/twitter/finatra/tarball/finatra-1.4.1,https://github.com/twitter/finatra/releases/tag/finatra-1.4.1,https://api.github.com/repos/twitter/finatra/zipball/finatra-1.4.1,finatra-1.4.1,False,False
+66235,2013-10-14T03:07:20Z,2013-10-14T03:55:46Z,Finatra 1.4.0,"Finatra is now built on top of [twitter-server](http://twitter.github.io/twitter-server/) and scala 2.10
+
+Highlights:
+- New logging system
+- New configuration system (http://twitter.github.io/twitter-server/Features.html#flags) 
+- New metrics library
+",https://api.github.com/users/capotej,6135,capotej,https://api.github.com/repos/twitter/finatra/releases/66235/assets,https://api.github.com/repos/twitter/finatra/releases/66235,master,https://api.github.com/repos/twitter/finatra/tarball/1.4.0,https://github.com/twitter/finatra/releases/tag/1.4.0,https://api.github.com/repos/twitter/finatra/zipball/1.4.0,1.4.0,False,False
+66157,2013-10-14T00:34:24Z,2013-10-14T00:44:10Z,Finatra 1.3.9,"Note: Okay __this__ is the last 1.3.x release :jack_o_lantern: 
+
+Fixes:
+- FinatraServer can be embedded in a test (https://github.com/capotej/finatra/commit/10692631500af36eb559521b6a4f755692cb02d6)
+- Fixed comparison in FileServer (https://github.com/capotej/finatra/commit/bb38696fdcb49057d938c679366543ad1c84081e)
+",https://api.github.com/users/capotej,6135,capotej,https://api.github.com/repos/twitter/finatra/releases/66157/assets,https://api.github.com/repos/twitter/finatra/releases/66157,master,https://api.github.com/repos/twitter/finatra/tarball/1.3.9,https://github.com/twitter/finatra/releases/tag/1.3.9,https://api.github.com/repos/twitter/finatra/zipball/1.3.9,1.3.9,False,False
+49866,2013-09-22T03:24:02Z,2013-09-22T16:25:46Z,Finatra 1.3.8,"Note: This is the last 1.3.x release, and the last one using scala 2.9.2. Next release is 1.4.0 which is scala 2.10 and based on [Twitter Server](http://twitter.github.io/twitter-server/)
+
+Fixes:
+- SSL/TLS Support
+- Fixed file based logging and support for only logging to STDOUT
+- Remove jerkson dependency
+
+Here's the maven coordinate:
+
+```
+<dependency>
+    <groupId>com.twitter</groupId>
+    <artifactId>finatra</artifactId>
+    <version>1.3.8</version>
+</dependency>
+```
+",https://api.github.com/users/capotej,6135,capotej,https://api.github.com/repos/twitter/finatra/releases/49866/assets,https://api.github.com/repos/twitter/finatra/releases/49866,master,https://api.github.com/repos/twitter/finatra/tarball/1.3.8,https://github.com/twitter/finatra/releases/tag/1.3.8,https://api.github.com/repos/twitter/finatra/zipball/1.3.8,1.3.8,False,False
+13128,2013-07-20T21:21:02Z,2013-07-21T02:09:45Z,Finatra 1.3.7,"Fixes:
+- params with static files now works (#55)
+- options support for routes (#53), thanks @theeffer
+",https://api.github.com/users/capotej,6135,capotej,https://api.github.com/repos/twitter/finatra/releases/13128/assets,https://api.github.com/repos/twitter/finatra/releases/13128,master,https://api.github.com/repos/twitter/finatra/tarball/1.3.7,https://github.com/twitter/finatra/releases/tag/1.3.7,https://api.github.com/repos/twitter/finatra/zipball/1.3.7,1.3.7,False,False

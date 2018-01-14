@@ -1,0 +1,342 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7219113,2017-07-30T07:29:22Z,2017-07-30T07:43:36Z,,"本次更新增加了Downloader模块的一些功能。
+
+#609 修复HttpRequestBody没有默认构造函数导致无法反序列化的bug。
+#631 HttpRequestBody的静态构造函数不再抛出`UnsupportedEncodingException`受检异常。
+
+#571 Page对象增加bytes属性，用于获取二进制数据。下载纯二进制页面时，请设置`request.setBinarayContent(true)`，这样对于二进制内容不会尝试转换为String，减小开销。
+
+#629 在HttpUriRequestConverter中会自动对一些导致URI异常的字符进行转移或过滤。
+
+#610 自动识别编码时，可以识别Content-Type中charset为大写的情况。
+#627 支持为Request单独设置页面编码，兼容同一站点多种编码方式的情况。
+#613 Page对象增加charset属性，其值为request/site中设置的charset，或者为自动检测的charset(未定义时)。
+
+#606 升级jsonpath到2.4.0
+#608 升级jsoup到1.10.3",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/7219113/assets,https://api.github.com/repos/code4craft/webmagic/releases/7219113,master,https://api.github.com/repos/code4craft/webmagic/tarball/WebMagic-0.7.3,https://github.com/code4craft/webmagic/releases/tag/WebMagic-0.7.3,https://api.github.com/repos/code4craft/webmagic/zipball/WebMagic-0.7.3,WebMagic-0.7.3,False,False
+6745956,2017-06-17T08:10:10Z,2017-06-17T08:15:18Z,WebMagic-0.7.2,"此次更新修复了0.7.0-0.7.1版本的若干bug。
+
+1. #594 Request中的HttpRequestBody实现序列化接口。
+2. #596 修复0.7.0开始代理认证无法正确使用的问题。
+3. #601 完善页面状态异常时的错误信息。
+4. #605 修复0.7.0开始重复调用onSuccess和onError函数导致监控出错的问题。
+",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/6745956/assets,https://api.github.com/repos/code4craft/webmagic/releases/6745956,master,https://api.github.com/repos/code4craft/webmagic/tarball/WebMagic-0.7.2,https://github.com/code4craft/webmagic/releases/tag/WebMagic-0.7.2,https://api.github.com/repos/code4craft/webmagic/zipball/WebMagic-0.7.2,WebMagic-0.7.2,False,False
+6597305,2017-06-03T23:52:54Z,2017-06-04T10:28:23Z,WebMagic-0.7.1,"此次更新包含几个比较大的Bugfix，以及一些遗留问题的改进。
+
+* 修复0.7.0引入的RedisScheduler无法使用的bug。#583
+* 注解模式的JsonPath默认会指定source为RawText，不再会出现自动为头尾加了`<html>`标签导致无法解析的情况。#589
+* RegexSelector之前版本默认匹配group1，并通过对无捕获组的正则头尾加括号的形式来统一抽取内容。在0.7.1版本改为不再改变正则，而是通过匹配group0还是group1来实现匹配，见#559。新做法可以减少一些特殊用法的出错几率，例如零宽断言（#556）。 
+* 重构了`ObjectFormatter`部分，修复了ObjectFormatter无法初始化参数的bug。 #570
+
+",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/6597305/assets,https://api.github.com/repos/code4craft/webmagic/releases/6597305,master,https://api.github.com/repos/code4craft/webmagic/tarball/WebMagic-0.7.1,https://github.com/code4craft/webmagic/releases/tag/WebMagic-0.7.1,https://api.github.com/repos/code4craft/webmagic/zipball/WebMagic-0.7.1,WebMagic-0.7.1,False,False
+6529245,2017-05-29T01:36:42Z,2017-05-29T06:14:34Z,WebMagic-0.7.0,"此次更新重写了HttpClientDownloader，完善了POST等其他Http Method的支持，并重写了代理API，更加简单和便于扩展。
+
+## POST支持
+
+* 新的POST API，支持各种RequestBody #513
+
+```java
+Request request = new Request(""http://xxx/path"");
+request.setMethod(HttpConstant.Method.POST);
+request.setRequestBody(HttpRequestBody.json(""{'id':1}"",""utf-8""));
+```
+
+* 移除了老的在request.extra中设置NameValuePair的方式
+* POST请求不再进行去重 #484
+
+## 代理支持
+
+* 新的代理API`ProxyProvider`，支持自由扩展
+* 默认实现SimpleProxyProvider是一个简单的round-robin实现，可以添加任意个数的代理。
+
+```java
+HttpClientDownloader httpClientDownloader = new HttpClientDownloader();
+SimpleProxyProvider proxyProvider = SimpleProxyProvider.from(new Proxy(""127.0.0.1"", 1087), new Proxy(""127.0.0.1"", 1088));
+httpClientDownloader.setProxyProvider(proxyProvider);
+```
+
+* 移除了Site上关于代理配置的setProxy等，代理设置统一到HttpClientDownloader里。
+
+## 新的SimpleHttpClient
+
+* 用作简单的单次下载和解析时，使用SimpleHttpClient可以满足需求
+
+```java
+SimpleHttpClient simpleHttpClient = new SimpleHttpClient();
+GithubRepo model = simpleHttpClient.get(""github.com/code4craft/webmagic"",GithubRepo.class);
+```
+
+## 其他改动
+
+* 为Page中增加状态码和Http头信息 #406 
+* 支持Request级别设置Http Header和Cookie
+* 去掉Site.addStartRequest() , 用Spider.addStartRequest()代替 #494
+* HttpClientDownloader大幅重构，将Request转换抽象到HttpUriRequestConverter(之前继承HttpClientDownloader的实现可能需要做相应修改) #524
+* 将CycleRetry和statusCode的判断逻辑从Downloader中迁移到Spider中 #527
+* 通过Page.isDownloadSuccess而不是Page对象本身为空来判断是否下载失败
+* 为PageModel增加不发现新URL的功能 #575
+* 为Site增加了disableCookieManagement属性，在不想使用cookie时使用 #577",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/6529245/assets,https://api.github.com/repos/code4craft/webmagic/releases/6529245,master,https://api.github.com/repos/code4craft/webmagic/tarball/WebMagic-0.7.0,https://github.com/code4craft/webmagic/releases/tag/WebMagic-0.7.0,https://api.github.com/repos/code4craft/webmagic/zipball/WebMagic-0.7.0,WebMagic-0.7.0,False,False
+5224579,2017-01-21T04:04:12Z,2017-01-21T14:14:14Z,WebMagic 0.6.1,"本次更新修复了一些0.6.0的问题和一些小优化。
+- 修改默认策略为信任所有https证书 #444 @ckex
+- 修复使用startUrls添加url时，如果使用了cookie会出现空指针的问题 #438
+- PhantomJSDownloader支持crawl.js路径自定义 #414 @jsbd
+- POST请求支持302跳转 #443 @xbynet
+
+注：默认信任所有证书会有内容伪造的风险，但是考虑到爬虫的便利性还是加上了，使用者需要自己判断内容安全性。
+",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/5224579/assets,https://api.github.com/repos/code4craft/webmagic/releases/5224579,master,https://api.github.com/repos/code4craft/webmagic/tarball/webmagic-parent-0.6.1,https://github.com/code4craft/webmagic/releases/tag/webmagic-parent-0.6.1,https://api.github.com/repos/code4craft/webmagic/zipball/webmagic-parent-0.6.1,webmagic-parent-0.6.1,False,False
+4822837,2016-12-18T03:20:28Z,2016-12-18T04:00:02Z,WebMagic 0.6.0,"此次更新主要是一些依赖包的升级和bugfix。
+- #290 代理增加用户名密码认证 @hepan
+- #194 重构代理池部分代码，支持自定义代理池 @EdwardsBean 
+- #314 修复低版本json-path依赖2.x的StringUtils导致报错的问题
+- #380 升级fastjson 到1.2.21
+- #301 修复JsonPath在注解模式不可用的问题 @Salon-sai 
+- #377 修复监控模块在URL带有端口时会报错的问题
+- #400 修复FileCacheQueueScheduler的NullPointerException问题  
+- #407 为PhantomJSDownloader添加新的构造函数，支持phantomjs自定义命令 @jsbd
+- #419 修复抓取https链接线程无法结束导致进程一直运行的问题 @cpaladin
+- #374 升级HttpClient到4.5.2，修复一些安全问题
+- #424 去掉Guava依赖
+  
+    因为Guava不同版本兼容性不好，经常导致demo无法运行，所以我最后决定去掉了Guava的依赖。如果使用了`BloomFilterDuplicateRemover`的用户，需要手动依赖Guava包。
+- #426 去掉Avalon相关包
+  
+   Avalon是之前计划的一站式抓取平台。因为有个朋友基于WebMagic做了类似的实现[Gather Platform](https://github.com/gsh199449/spider)，所以Avalon放弃了，转而支持这个项目。WebMagic核心会专注于做应用内的框架。
+",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/4822837/assets,https://api.github.com/repos/code4craft/webmagic/releases/4822837,master,https://api.github.com/repos/code4craft/webmagic/tarball/WebMagic-0.6.0,https://github.com/code4craft/webmagic/releases/tag/WebMagic-0.6.0,https://api.github.com/repos/code4craft/webmagic/zipball/WebMagic-0.6.0,WebMagic-0.6.0,False,False
+2466739,2016-01-21T11:31:50Z,2016-01-21T11:40:00Z,WebMagic 0.5.3,"时隔一年半，作者终于回归了。这个版本主要解决之前的一些BUG，后续会慢慢的继续完善功能。
+- 升级Xsoup到0.3.1，支持//div[contains(@id,'te')]语法。
+- [#245](https://github.com/code4craft/webmagic/pull/245) 升级Jsoup到1.8.3，解决n-th selector二进制不兼容的问题。
+- [#139](https://github.com/code4craft/webmagic/pull/139) 修复JsonFilePipeline保存路径的问题
+- [#144](https://github.com/code4craft/webmagic/pull/149) 修复@TargetUrl增加SourceRegion后取不到链接的问题
+- [#157](https://github.com/code4craft/webmagic/pull/157) 修复FileCacheQueueScheduler中去重偶尔不工作的问题 [@zhugw](https://github.com/zhugw)
+- [#188](https://github.com/code4craft/webmagic/pull/188) 增加重试的间隔时间，默认为1秒 [@edwardsbean](ht[tps* //github.com/edwardsbean)
+- [#193](https://github.com/code4craft/webmagic/pull/193) 修复分页功能MultiPagePipeline可能出现的并发问题 [edwardsbean](https://github.com/edwardsbean)
+- [#198](https://github.com/code4craft/webmagic/pull/198) 修正site.setHttpProxy()不起作用的bug [@okuc](https://github.com/okuc)
+",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/2466739/assets,https://api.github.com/repos/code4craft/webmagic/releases/2466739,master,https://api.github.com/repos/code4craft/webmagic/tarball/webmagic-0.5.3,https://github.com/code4craft/webmagic/releases/tag/webmagic-0.5.3,https://api.github.com/repos/code4craft/webmagic/zipball/webmagic-0.5.3,webmagic-0.5.3,False,False
+356536,2014-06-04T09:35:31Z,2014-06-04T14:20:45Z,WebMagic-0.5.2,"此次主要包括对于Selector部分的重构，以及一些功能的完善和一些Bugfix。
+- 重构了Selector部分，使得结构更清晰，并且能够更好的支持链式的XPath抽取了。 [[Issue #113]](https://github.com/code4craft/webmagic/issues/113) 
+- 支持对于选取出来的结果，进行外部迭代。例如：
+  
+  ``` java
+  List<Selectable> divs = html.xpath(""//div"").nodes();
+  for (Selectable div : divs) {
+      System.out.println(div.xpath(""//h2"").get());
+  }
+  ```
+- 增强自动编码识别机制，现在除了从HTTP头中，还会从HTML Meta信息中判断编码，感谢[@fengwuze](https://github.com/fengwuze) [@sebastian1118](https://github.com/sebastian1118)提交代码和建议。[[Issue #126]](https://github.com/code4craft/webmagic/issues/126)
+- 升级Xsoup版本为0.2.4，增加了判断XPath最终抽取结果(是元素还是属性)的API，完善了一些特殊字符处理的功能。
+- 增加PageMapper功能，以后可以在任何地方使用注解模式来解析页面了！[[Issue #120]](https://github.com/code4craft/webmagic/issues/120) 例如：
+  
+  ``` java
+  public void process(Page page) {
+          //新建Mapper，GithubRepo是一个带注解的POJO
+          PageMapper<GithubRepo> githubRepoPageMapper = new PageMapper<GithubRepo>(GithubRepo.class);
+          //直接解析页面，得到解析后的结果
+          GithubRepo githubRepo = githubRepoPageMapper.get(page);
+          page.putField(""repo"",githubRepo);
+      }
+  ```
+- 增加多个代理以及智能切换的支持，感谢[@yxssfxwzy](https://github.com/yxssfxwzy)  贡献代码，使用Site.setHttpProxyPool可开启此功能。[[Pull #128]](https://github.com/code4craft/webmagic/pull/128)
+  
+  ``` java
+  public void process(Page page) {
+          Site site = Site.me().setHttpProxyPool(
+                  Lists.newArrayList(
+                          new String[]{""192.168.0.2"",""8080""},
+                          new String[]{""192.168.0.3"",""8080""}));
+      }
+  ```
+
+Bugfix:
+- 修复了JsonFilePipeline不能自动创建文件夹的问题。[[Issue #122]](https://github.com/code4craft/webmagic/issues/122)
+- 修复了Jsonp在removePadding时，对于特殊字符匹配不当的问题。[[Issue #124]](https://github.com/code4craft/webmagic/issues/124)
+- 修复了当JsonPathSelector选取的结果是非String类型时，类型转换出错的问题。[[Issue #129]](https://github.com/code4craft/webmagic/issues/129)
+",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/356536/assets,https://api.github.com/repos/code4craft/webmagic/releases/356536,master,https://api.github.com/repos/code4craft/webmagic/tarball/WebMagic-0.5.2,https://github.com/code4craft/webmagic/releases/tag/WebMagic-0.5.2,https://api.github.com/repos/code4craft/webmagic/zipball/WebMagic-0.5.2,WebMagic-0.5.2,False,False
+301019,2014-05-02T16:00:02Z,2014-05-02T22:26:19Z,WebMagic 0.5.1,"此次更新主要包括Scheduler的一些改动，对于自己定制过Scheduler的用户，强烈推荐升级。
+- 修复了RedisScheduler无法去重的BUG，感谢@codev777 仔细测试并发现问题。 #117
+- 对Scheduler进行了重构，新增了接口`DuplicateRemover`，将去重单独抽象出来，以便在同一个Scheduler中选择不同的去重方式。 #118 
+- 增加了BloomFilter去重方式。BloomFilter是一种可以用极少的内存消耗完成大量URL去重的数据结构，缺点是会有少量非重复的URL被判断为重复，导致URL丢失(小于0.5%)。
+
+使用以下的方式即可将默认的HashSet去重改为BloomFilter去重：
+
+``` java
+spider.setScheduler(new QueueScheduler()
+.setDuplicateRemover(new BloomFilterDuplicateRemover(10000000)) //10000000是估计的页面数量
+```
+",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/301019/assets,https://api.github.com/repos/code4craft/webmagic/releases/301019,master,https://api.github.com/repos/code4craft/webmagic/tarball/WebMagic-0.5.1,https://github.com/code4craft/webmagic/releases/tag/WebMagic-0.5.1,https://api.github.com/repos/code4craft/webmagic/zipball/WebMagic-0.5.1,WebMagic-0.5.1,False,False
+290763,2014-04-27T04:52:19Z,2014-04-27T05:10:28Z,WebMaigc-0.5.0,"此次更新主要增加了监控功能，同时重写了多线程部分，使得多线程下性能有了极大的提升。另外还包含注解模式一些优化、多页面的支持等功能。
+
+## 项目总体进展：
+- 官网[webmagic.io](http://webmagic.io/)上线了！同时上线的还有详细版的官方文档[http://webmagic.io/docs](http://webmagic.io/docs)，从此使用更加简单！
+- 新增三名合作开发者@ccliangbo @ouyanghuangzheng @linkerlin  ，一起参与项目的维护。
+- 官方论坛[http://bbs.webmagic.io/](http://bbs.webmagic.io/)和官方QQ群373225642上线，以后会更加重视社区的建设。
+
+## 监控部分：
+- 增加了监控功能，使用JMX可以监控页面数量、爬虫状态，并可以启动和终止爬虫。使用文档：[http://webmagic.io/docs/posts/ch4-basic-page-processor/monitor.html](http://webmagic.io/docs/posts/ch4-basic-page-processor/monitor.html)  #98
+
+## 多线程部分：
+- 重写了多线程部分，修复了多线程下，主分发线程会被工作线程阻塞的问题，使得多线程下效率有了极大的提升，推荐所有用户升级。 #110 
+- 为主线程等待新URL时的wait/notify机制增加了timeout时间，防止少数情况下发生的爬虫卡死的情况。 #111
+
+## 抽取API部分：
+- 增加了JSON的支持，现在可以使用`page.getJson().jsonPath()`来使用jsonPath解析AJAX请求，也可以使用`page.getJson().removePadding().jsonPath()`来解析JSONP请求。 #101
+- 修复一个Selectable的缓存导致两次取出的结果不一致的问题。 #73 感谢@seveniu 发现问题
+- 支持为一个Spider添加多个PageProcessor，并按照URL区分，感谢@sebastian1118 提交patch。使用示例：[PatternProcessorExample](https://github.com/code4craft/webmagic/blob/master/webmagic-extension/src/main/java/us/codecraft/webmagic/example/PatternProcessorExample.java) #86
+- 修复不常用标签无法使用`nth-of-type`选择的问题(例如`//div/svg[2]`) 。#75
+- 修复XPath中包含特殊字符，即使转义也会导致解析失败的问题。#77
+
+## 注解模式：
+- 注解模式现在支持继承了！父类的注解将对子类也有效。#103
+- 修复注解模式下，一个Spider使用多个Model时，可能不生效的问题，感谢 @ccliangbo 发现此问题。#85 
+- 修复sourceRegion中只有一个URL会被抽取出来的问题，感谢@jsinak 发现此问题。#107
+- 修复了自动类型转换Formatter的一个BUG，现在可以自定义Formatter了。如果你不了解Formatter可以看这里：[注解模式下结果的类型转换](http://webmagic.io/docs/posts/ch5-annotation/formatter.html) #100
+
+## 其他组件：
+- Downloader现在支持除了GET之外的其他几种HTTP请求了，包括POST、HEAD、PUT、DELETE、TRACE，感谢@usenrong 提出建议。 #108 
+- 在`Site`中设置Cookie时，可以指定域名，而不是只能使用默认域名了。 #109 
+- `setScheduler()`方法在调用时，如果之前Scheduler已有URL，会先转移到新的Scheduler，避免URL丢失。 #104
+- 在发布包中去掉了`log4j.xml`，避免与用户程序冲突，感谢@cnjavaer 发现问题。 #82
+",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/290763/assets,https://api.github.com/repos/code4craft/webmagic/releases/290763,master,https://api.github.com/repos/code4craft/webmagic/tarball/WebMagic-0.5.0,https://github.com/code4craft/webmagic/releases/tag/WebMagic-0.5.0,https://api.github.com/repos/code4craft/webmagic/zipball/WebMagic-0.5.0,WebMagic-0.5.0,False,False
+221460,2014-03-12T23:49:38Z,2014-03-13T00:28:33Z,WebMaigc-0.4.3,"## Bugfix:
+- Fix cycleRetryTimes does not work #58 #60 #62 @yxssfxwzy
+- Fix NullPointerException in FileCachedQueueScheduler #53 @xuchaoo
+- Fix Selenium does not quit #57 @d0ngw
+
+## Enhancement:
+- Enhance RegexSelector group check #51 @SimpleExpress
+- Add XPath syntax support: #64 
+    contains,or/and,""|""
+- Add text attribute select to CssSelector #66 
+- Change logger to slf4j #55 
+- Update HttpClient version to 4.3.3 #59 
+",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/221460/assets,https://api.github.com/repos/code4craft/webmagic/releases/221460,master,https://api.github.com/repos/code4craft/webmagic/tarball/webmaigc-0.4.3,https://github.com/code4craft/webmagic/releases/tag/webmaigc-0.4.3,https://api.github.com/repos/code4craft/webmagic/zipball/webmaigc-0.4.3,webmaigc-0.4.3,False,False
+110775,2013-12-03T15:35:01Z,2013-12-03T15:43:09Z,webmagic-0.4.2,"Enhancement:
+#45 Remove multi option in ExtractBy. Auto detect whether is multi be field type.
+Bugfix:
+#46 Downloader thread hang up sometiems.
+",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/110775/assets,https://api.github.com/repos/code4craft/webmagic/releases/110775,master,https://api.github.com/repos/code4craft/webmagic/tarball/webmagic-0.4.2,https://github.com/code4craft/webmagic/releases/tag/webmagic-0.4.2,https://api.github.com/repos/code4craft/webmagic/zipball/webmagic-0.4.2,webmagic-0.4.2,False,False
+106189,2013-11-28T05:04:27Z,2013-11-28T05:11:43Z,webmagic-0.4.1,"- Fix some concurrent problem causing the spider not exit after all pages are downloaded. #36 
+- #38 Use algorithm of [https://code.google.com/p/cx-extractor/](https://code.google.com/p/cx-extractor/).
+
+More support for ajax:
+- #39 Parsing html after page.getHtml()
+- #42 Add jsonpath support in annotation mode
+- #35 Add more http info to page
+- #41 Add more status monitor method to Spider  
+",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/106189/assets,https://api.github.com/repos/code4craft/webmagic/releases/106189,master,https://api.github.com/repos/code4craft/webmagic/tarball/webmagic-0.4.1,https://github.com/code4craft/webmagic/releases/tag/webmagic-0.4.1,https://api.github.com/repos/code4craft/webmagic/zipball/webmagic-0.4.1,webmagic-0.4.1,False,False
+86780,2013-11-11T06:33:06Z,2013-11-06T23:54:37Z,webmagic-0.4.0,"### Improve performance of Downloader.
+- Update HttpClient to 4.3.1 and rewrite the code of HttpClientDownloader [#32](https://github.com/code4craft/webmagic/issues/32).
+- Use gzip by default to reduce the transport cost [#31](https://github.com/code4craft/webmagic/issues/31).
+- Enable HTTP Keep-Alive and connection persistence, fix the wrong usage of PoolConnectionManage r[#30](https://github.com/code4craft/webmagic/issues/30).
+
+The performance of Downloader is improved by 90% in my test.Test code: [Kr36NewsModel.java](https://github.com/code4craft/webmagic/blob/master/webmagic-samples/src/main/java/us/codecraft/webmagic/model/samples/Kr36NewsModel.java).
+
+### Add synchronzing API for small task [#28](https://github.com/code4craft/webmagic/issues/28).
+
+``` java
+        OOSpider ooSpider = OOSpider.create(Site.me().setSleepTime(100), BaiduBaike.class);
+        BaiduBaike baike = ooSpider.<BaiduBaike>get(""http://baike.baidu.com/search/word?word=httpclient&pic=1&sug=1&enc=utf8"");
+        System.out.println(baike);
+```
+
+### More config for site
+- Http proxy support by Site.setHttpProxy  [#22](https://github.com/code4craft/webmagic/issues/22).
+- More http header customizing support by Site.addHeader [#27](https://github.com/code4craft/webmagic/issues/27).
+- Allow disable gzip by Site.setUseGzip(false).
+- Move Site.addStartUrl to Spider.addUrl because I think startUrl is more a Spider's property than Site.
+
+### Code refactor in Spider
+- Refactor the multi-thread part of Spider and fix some concurrent problem.
+- Import Google Guava API for simpler code.
+- Allow add request with more information by Spider.addRequest() instead of addUrl [#29](https://github.com/code4craft/webmagic/issues/29).
+- Allow just downloading start urls without spawn urls extracted by Spider.setSpawnUrl(false).
+",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/86780/assets,https://api.github.com/repos/code4craft/webmagic/releases/86780,master,https://api.github.com/repos/code4craft/webmagic/tarball/webmagic-0.4.0,https://github.com/code4craft/webmagic/releases/tag/webmagic-0.4.0,https://api.github.com/repos/code4craft/webmagic/zipball/webmagic-0.4.0,webmagic-0.4.0,False,False
+50068,2013-09-23T05:12:25Z,2013-09-23T05:26:12Z,webmagic-0.3.2,"- #13 Add class cast to annotation crawler.
+- Allow customize class caster by implementing `ObjectFormatter` and register it in `ObjectFormatters.put()`.
+- Fix a thread pool reject exception when call Spider.stop()
+",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/50068/assets,https://api.github.com/repos/code4craft/webmagic/releases/50068,master,https://api.github.com/repos/code4craft/webmagic/tarball/webmagic-0.3.2,https://github.com/code4craft/webmagic/releases/tag/webmagic-0.3.2,https://api.github.com/repos/code4craft/webmagic/zipball/webmagic-0.3.2,webmagic-0.3.2,False,False
+40682,2013-09-08T14:24:58Z,2013-09-08T15:04:04Z,webmagic-0.3.1,"- #26 Bugfix: Annotation extractor does not work.
+- #25 Bugfix: `UrlUtils.canonicalizeUrl` does not work with ""../../"" path.
+- #24 Enhancement: Add stop method to Spider.
+",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/40682/assets,https://api.github.com/repos/code4craft/webmagic/releases/40682,master,https://api.github.com/repos/code4craft/webmagic/tarball/webmagic-parent-0.3.1,https://github.com/code4craft/webmagic/releases/tag/webmagic-parent-0.3.1,https://api.github.com/repos/code4craft/webmagic/zipball/webmagic-parent-0.3.1,webmagic-parent-0.3.1,False,False
+38265,2013-09-04T02:50:56Z,2013-09-04T03:02:13Z,webmagic-0.3.0,"- Change default XPath selector from HtmlCleaner to [Xsoup](https://github.com/code4craft/xsoup).
+  
+  [Xsoup](https://github.com/code4craft/xsoup) is an XPath selector based on Jsoup written by me. It has much better performance than HtmlCleaner.
+  
+  Time of processing a page is reduced from 7~9ms to 0.4ms.
+  
+  If Xsoup is not stable for your usage, just use `Spider.xsoupOff()` to turn off it and report an issue to me!
+- Add cycle retry times for Site.
+  
+  When cycle retry times is set, Spider will put the url which downloading failed  back to scheduler, and retry after a cycle of queue.
+",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/38265/assets,https://api.github.com/repos/code4craft/webmagic/releases/38265,master,https://api.github.com/repos/code4craft/webmagic/tarball/webmagic-0.3.0,https://github.com/code4craft/webmagic/releases/tag/webmagic-0.3.0,https://api.github.com/repos/code4craft/webmagic/zipball/webmagic-0.3.0,webmagic-0.3.0,False,False
+35550,2013-08-11T10:53:13Z,2013-08-30T09:46:27Z,version-0.2.0,"此次更新的主题是""方便""(之前的主题是""灵活"")。
+
+增加了webmagic-extension模块。
+
+增加了注解方式支持，可以通过POJO+注解的方式编写一个爬虫，更符合Java开发习惯。以下是抓取一个博客的完整代码：
+
+``` java
+    @TargetUrl(""http://my.oschina.net/flashsword/blog/\\d+"")
+    public class OschinaBlog {
+
+        @ExtractBy(""//title"")
+        private String title;
+
+        @ExtractBy(value = ""div.BlogContent"",type = ExtractBy.Type.Css)
+        private String content;
+
+        @ExtractBy(value = ""//div[@class='BlogTags']/a/text()"", multi = true)
+        private List<String> tags;
+
+        public static void main(String[] args) {
+            OOSpider.create(Site.me().addStartUrl(""http://my.oschina.net/flashsword/blog""),
+            new ConsolePageModelPipeline(), OschinaBlog.class)
+            .scheduler(new RedisScheduler(""127.0.0.1"")).thread(5).run();
+        }
+
+    }
+```
+
+增加一个Spider.test(url)方法，用于开发爬虫时进行调试。
+
+增加基于redis的分布式支持。
+
+增加XPath2.0语法支持(webmagic-saxon模块)。
+
+增加基于Selenium的浏览器渲染支持，用于抓取动态加载内容(webmagic-selenium模块)。
+
+修复了不支持https的bug。
+
+补充了文档：[webmagic-0.2.0用户手册](http://code4craft.github.io/webmagic/)。
+",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/35550/assets,https://api.github.com/repos/code4craft/webmagic/releases/35550,master,https://api.github.com/repos/code4craft/webmagic/tarball/version-0.2.0,https://github.com/code4craft/webmagic/releases/tag/version-0.2.0,https://api.github.com/repos/code4craft/webmagic/zipball/version-0.2.0,version-0.2.0,False,False
+29667,2013-08-20T15:39:44Z,2013-08-20T15:51:19Z,webmagic-0.2.1,"ComboExtractor support for annotation.
+
+Request priority support (using `PriorityScheduler`).
+
+Complete some I18n work (comments and documents).
+
+More convenient extractor API:
+- Add attribute name select for CSSSelector.
+- Group of regex selector can be specified.
+- Add OrSelector.
+- Add Selectors, import static Selectors.\* for fluent API such as:
+  
+  ```
+  or(regex(""<title>(.*)</title>""), xpath(""//title""), $(""title"")).select(s);
+  ```
+- Add JsonPathSelector for Json parse.
+",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/29667/assets,https://api.github.com/repos/code4craft/webmagic/releases/29667,master,https://api.github.com/repos/code4craft/webmagic/tarball/webmagic-parent-0.2.1,https://github.com/code4craft/webmagic/releases/tag/webmagic-parent-0.2.1,https://api.github.com/repos/code4craft/webmagic/zipball/webmagic-parent-0.2.1,webmagic-parent-0.2.1,False,False
+15353,2013-07-25T05:48:56Z,2013-07-25T05:51:50Z,version-0.1.0,"第一个稳定版本。
+
+修改了若干API，使得可扩展性更强，为每个任务分配一个ID，可以通过ID区分不同任务。
+
+重写了Pipeline接口，将抽取结果集包装到ResultItems对象，而不是通用一个Page对象，便于逻辑分离。
+
+增加下载的重试机制，支持gzip，支持自定义UA/cookie。
+
+增加多线程抓取功能，只需在初始化的时候指定线程数即可。
+
+增加jquery形式的CSS Selector API，可以通过`page.getHtml().$(""div.body"")`形式抽取元素。
+
+完善了文档，架构说明：[webmagic的设计机制及原理-如何开发一个Java爬虫](http://my.oschina.net/flashsword/blog/145796)，Javadoc：[http://code4craft.github.io/webmagic/docs](http://code4craft.github.io/webmagic/docs)。
+",https://api.github.com/users/code4craft,1351884,code4craft,https://api.github.com/repos/code4craft/webmagic/releases/15353/assets,https://api.github.com/repos/code4craft/webmagic/releases/15353,master,https://api.github.com/repos/code4craft/webmagic/tarball/version-0.1.0,https://github.com/code4craft/webmagic/releases/tag/version-0.1.0,https://api.github.com/repos/code4craft/webmagic/zipball/version-0.1.0,version-0.1.0,False,False

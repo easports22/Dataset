@@ -1,0 +1,303 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+4669499,2016-11-15T23:39:55Z,2016-11-15T23:41:54Z,I bet you didn't see this one coming!,"_I_ certainly didn't a month ago.
+
+This is the second release motivated by Nicholas Seriot's [Parsing JSON is a
+Minefield](http://seriot.ch/parsing_json.php) post.
+
+<a id=""org2d233d5""></a>
+
+## Targeting RFC 7159
+
+This release allows scalar values at the top level; as recommended by RFC
+7159, which obsoletes the original RFC 4627. Since it is a change in
+behaviour I chose to bump the major version to 5.
+
+**Please note**: When parsing numbers at the top level there is _no way_ to
+differentiate `42` on its own from `4200` truncated to just the first two
+digits. This problem affects SBJson 5 because it expects to receive input
+bit-by-bit. When SBJson 5 sees ""42"" on its own it returns
+`SBJson5WaitingForData`, since cannot be sure it has seen the full token
+yet, and needs more data to make sure. A workaround for this issue could be
+to append a space or newline to your input if you intend to give SBJson 5
+the whole input in one go. This is not an issue with any of the other JSON
+datatypes because they are either fixed length (`true`, `false`, `null`) or
+have unambigous delimiters at both ends (`[]`, `{}`, `""""`).
+-   https://github.com/stig/json-framework/pull/238
+-   https://github.com/stig/json-framework/pull/239
+
+<a id=""org85c9b5c""></a>
+
+## Rename all classes & public symbols
+
+Because the class names contains the major version number a major-version
+bump necessitates renaming all the classes & enums. The upshoot of this is
+that you can use SBJson 3, 4 **and** 5 in the same application without
+problems. (Though why you would want to I cannot even begin to guess at.)
+-   https://github.com/stig/json-framework/commit/736dbb1c3fe9dfa85e2c89a4a020479ee2a37619
+
+<a id=""orgfdd8578""></a>
+
+## Remove the processBlock: API
+
+This release removes the untested `processBlock:` interface. I believe it
+was a distraction from SBJson's core purpose: to parse & generate JSON.
+Additionally this API had no tests, and the code had a lot of special case
+hooks all over the SBJson*Parser class to do its work.
+
+SBJson actually has two parsers: the low-level SBJson5StreamParser and the
+higher-level SBJson5Parser providing a block interface. I believe it's
+better to just do what the processBlock interface did in SBJson5Parser's
+value block. However, you could also use the stream parser to implement the
+processBlock interface yourself.
+-   https://github.com/stig/json-framework/pull/242
+
+<a id=""org07dd42d""></a>
+
+## Constructor changes for parsers + writers
+
+Since I decided to bump the major version number anyway, I took the
+opportunity to iron out some UI niggles that's been bothering me for a
+while. Now we take options as constructor parameters rather than as
+properties for boh the parsers and writers, to avoid the impression that
+you can (and that it might make sense!) to change these settings during
+parse/generation. It is absolutely not supported, and that should be more
+clear now.
+-   https://github.com/stig/json-framework/pull/243
+-   https://github.com/stig/json-framework/pull/247
+
+<a id=""org2a37011""></a>
+
+## Add a `sbjson` binary for reformatting JSON
+
+This can be useful from a sort of _what would SBJson do?_ point of view. It
+takes some options. Here's the result of invoking it with `--help`:
+
+```
+Usage: sbjson [OPTIONS] [FILES]
+
+Options:
+  --help, -h
+    This message.
+  --verbose, -v
+    Be verbose about which arguments are used
+  --multi-root, -m
+    Accept multiple top-level JSON inputs
+  --unwrap-root, -u
+    Unwrap top-level arrays
+  --max-depth INT, -m INT
+    Change the max recursion limit to INT (default: 32)
+  --sort-keys, -s
+    Sort dictionary keys in output
+  --human-readable, -r
+    Format the JSON output with linebreaks and indents
+
+If no FILES are provided, the program reads standard input.
+```
+
+<a id=""org334ef4c""></a>
+
+## Run `sbjson` under American Fuzzy Lop
+
+To try and shake out any new crashes, I've run the `sbjson` binary alluded
+to above under [American Fuzzy Lop](http://lcamtuf.coredump.cx/afl/). I didn't find any more crashes in the
+parser after fixing the bugs that went into v4.0.4, but wanted to share
+this with you to show I _tried_ to find more bugs before releasing v5.
+
+Here's a snapshot of the latest session I've run:
+
+```
+                       american fuzzy lop 2.35b (master)
+
+┌─ process timing ─────────────────────────────────────┬─ overall results ─────┐
+│        run time : 1 days, 12 hrs, 36 min, 22 sec     │  cycles done : 11     │
+│   last new path : 0 days, 0 hrs, 34 min, 26 sec      │  total paths : 583    │
+│ last uniq crash : none seen yet                      │ uniq crashes : 0      │
+│  last uniq hang : 0 days, 2 hrs, 10 min, 54 sec      │   uniq hangs : 47     │
+├─ cycle progress ────────────────────┬─ map coverage ─┴───────────────────────┤
+│  now processing : 170 (29.16%)      │    map density : 0.39% / 1.49%         │
+│ paths timed out : 0 (0.00%)         │ count coverage : 5.02 bits/tuple       │
+├─ stage progress ────────────────────┼─ findings in depth ────────────────────┤
+│  now trying : splice 7              │ favored paths : 93 (15.95%)            │
+│ stage execs : 5/32 (15.62%)         │  new edges on : 142 (24.36%)           │
+│ total execs : 18.1M                 │ total crashes : 0 (0 unique)           │
+│  exec speed : 282.7/sec             │   total hangs : 297 (47 unique)        │
+├─ fuzzing strategy yields ───────────┴───────────────┬─ path geometry ────────┤
+│   bit flips : 0/678k, 4/677k, 0/677k                │    levels : 15         │
+│  byte flips : 0/84.8k, 0/84.5k, 0/83.9k             │   pending : 31         │
+│ arithmetics : 0/4.72M, 0/16.6k, 0/307               │  pend fav : 0          │
+│  known ints : 0/480k, 0/2.35M, 0/3.69M              │ own finds : 40         │
+│  dictionary : 0/0, 0/0, 2/2.49M                     │  imported : 3          │
+│       havoc : 29/1.25M, 5/753k                      │ stability : 100.00%    │
+│        trim : 11.02%/43.6k, 0.00%                   ├────────────────────────┘
+^C────────────────────────────────────────────────────┘             [cpu: 69%]
+
++++ Testing aborted by user +++
+[+] We're done here. Have a nice day!
+```
+-   https://github.com/stig/json-framework/pull/246
+
+<a id=""org36c06e0""></a>
+
+## Fix bug in unwrapper code that caused arrays to be skipped
+
+Whilst playing with AFL I accidentally found (and fixed) a bug where the
+unwrapRootArray parser would break on any arrays at the next-to-outermost
+level.
+-   https://github.com/stig/json-framework/pull/244
+
+<a id=""org976de12""></a>
+
+## Improved documentation
+
+I've tried to improve the documentation a little, both in README and the API
+documentation in the header files.
+",https://api.github.com/users/stig,45407,stig,https://api.github.com/repos/stig/json-framework/releases/4669499/assets,https://api.github.com/repos/stig/json-framework/releases/4669499,master,https://api.github.com/repos/stig/json-framework/tarball/v5.0.0,https://github.com/stig/json-framework/releases/tag/v5.0.0,https://api.github.com/repos/stig/json-framework/zipball/v5.0.0,v5.0.0,False,False
+4669145,2016-11-15T22:55:08Z,2016-11-15T22:57:41Z,Fix unwrapRootArrayParser,"Fixes an embarrassing bug in the unwrapRootArrayParser that made the parser ignore any output after an array entry at depth 1. (I.e. a direct child of the root array.)
+",https://api.github.com/users/stig,45407,stig,https://api.github.com/repos/stig/json-framework/releases/4669145/assets,https://api.github.com/repos/stig/json-framework/releases/4669145,v4.0.x,https://api.github.com/repos/stig/json-framework/tarball/v4.0.5,https://github.com/stig/json-framework/releases/tag/v4.0.5,https://api.github.com/repos/stig/json-framework/zipball/v4.0.5,v4.0.5,False,False
+4565013,2014-04-16T23:35:15Z,2016-11-03T22:10:49Z,,"Change installation instructions to recommend use of CocoaPods.
+
+Started using http://travis-ci.org to ensure builds are good. This now runs tests for both iOS and OSX build of the library.
+
+Fix method names in API documentation examples.
+
+Modernise and tidy up a bit by:
+- Convert tests to use XCTest rather than OCUnit.
+- Remove unnecessary schemes.
+- Turn on analyze for tests too.
+- Enable modules & drop explicit dependency on Foundation.
+- Make precompiled headers use Foundation/Foundation.h rather than UIKit / Cocoa headers.
+- Upgrade to latest Xcode5.1 recommended settings.
+- Remove annoying (but harmless) warning about ARC retain cycle in tests.
+
+Full list of commits:
+- [`6e28701`](https://github.com/stig/json-framework/commit/6e287015c1f8a5d1dbb052ef9d7abef0339b3cf5) Run tests for both iOS and OSX
+- [`b93a64b`](https://github.com/stig/json-framework/commit/b93a64bc723453534bb3ba891476739791dacf61) Turn on analyze for tests too
+- [`816cca4`](https://github.com/stig/json-framework/commit/816cca44834e8ab6cf275a8779ac6330502c6cdd) Convert OCUnit to XCTest
+- [`0546997`](https://github.com/stig/json-framework/commit/0546997fe2d03f8c3a8c51cca879c66a7338e7f7) Remove unnecessary schemes
+- [`eca32c2`](https://github.com/stig/json-framework/commit/eca32c2b89fda7b6e7d8920952842ff81836638a) Enable Modules
+- [`91be3a7`](https://github.com/stig/json-framework/commit/91be3a760bb19aedc40408817909137121a4ba8b) Upgrade to latest Xcode settings
+- [`f17611c`](https://github.com/stig/json-framework/commit/f17611c31eb8ea14d7d1df215814bec87d2abed0) README updates
+- [`1b60dd1`](https://github.com/stig/json-framework/commit/1b60dd11c1215b608f9731ede6669edba40844e0) Make Podfile documentation a bit clearer
+- [`79c814b`](https://github.com/stig/json-framework/commit/79c814b733e18cc53064a1ef10252c8ab9086b31) Update copyright year
+- [`e1c770c`](https://github.com/stig/json-framework/commit/e1c770c3e1ae9c944b67fb2a3a1fe906c84dbf88) Update README
+- [`0a60393`](https://github.com/stig/json-framework/commit/0a60393fab7f83d1a8be1eed777881e848431dca) Remove annoying (but harmless) warning about ARC retain cycle in tests
+- [`d23adbc`](https://github.com/stig/json-framework/commit/d23adbcd84811688d07911ec75fe70f07168322a) Update README.md
+- [`259fa96`](https://github.com/stig/json-framework/commit/259fa964c5c87a2ed923c7945576cec1dc237a0f) Build-status information from Travis
+- [`8651019`](https://github.com/stig/json-framework/commit/8651019efac64adeaeabcb9b96e46906d382edff) Add shared Xcode schemes for Travis
+- [`f0f1d61`](https://github.com/stig/json-framework/commit/f0f1d61f95ad61427c9e2768aa7c02ea8a4f1ddb) Add .travis.yml to integrate with travis-ci.org
+- [`fb05d7d`](https://github.com/stig/json-framework/commit/fb05d7dc4dc8eb74e19b1d0bde9298b4857a2b50) Clarify example in documentation
+- [`928a69d`](https://github.com/stig/json-framework/commit/928a69d6c2222b1f8f976242720cba2551d3b5f4) Fix documentation
+",https://api.github.com/users/stig,45407,stig,https://api.github.com/repos/stig/json-framework/releases/4565013/assets,https://api.github.com/repos/stig/json-framework/releases/4565013,master,https://api.github.com/repos/stig/json-framework/tarball/v4.0.1,https://github.com/stig/json-framework/releases/tag/v4.0.1,https://api.github.com/repos/stig/json-framework/zipball/v4.0.1,v4.0.1,False,False
+4565006,2015-06-24T17:27:04Z,2016-11-03T22:10:15Z,,"A few patches to address warnings submitted by various people.
+- [`a34295f`](https://github.com/stig/json-framework/commit/a34295f7ff0f26b6fa4c337edeab3581915bd41b) Merge pull request #201 from isimpson/patch-1
+- [`6069c12`](https://github.com/stig/json-framework/commit/6069c1266fc37823540577b565f0dc47b51782f4) Fix semantic issue Xcode warning
+- [`ceaa84a`](https://github.com/stig/json-framework/commit/ceaa84a3d4b23fbb8ca3451dbb494601e8df3e26) Update travis-ci to use a build matrix rather than explicit script
+- [`647ff7e`](https://github.com/stig/json-framework/commit/647ff7e355c3cab39ad6555a50a5299085e6006d) Add semicolons after block - fixes #198
+- [`34b2d47`](https://github.com/stig/json-framework/commit/34b2d47d138195ca5c560dcafecb33cafb9b4100) Update README.md
+- [`f4933c9`](https://github.com/stig/json-framework/commit/f4933c9190d0f7a5bbc4850a15ac3c802cc14df0) Merge pull request #194 from karelia/master
+- [`beed41a`](https://github.com/stig/json-framework/commit/beed41a78921a6ece7fcfa4f642224d8c6269917) Return NULL for invalid chars
+- [`64ea007`](https://github.com/stig/json-framework/commit/64ea007c331318f726d9a32cc807e7838e2e0cf6) Readme update
+- [`e628af0`](https://github.com/stig/json-framework/commit/e628af028549bd11bc3b538392c8fb45e181912b) Slightly saner error handling (thanks AppCode!)
+- [`852f607`](https://github.com/stig/json-framework/commit/852f60714804224cee7d6e5e70f5c4c3d0ef9330) Inline method (thanks AppCode!)
+- [`20a2ece`](https://github.com/stig/json-framework/commit/20a2ecea8deede68d2bebcdfcc49e6b8d9047f14) Add cast to correct unmatched type issue (thanks AppCode!)
+- [`18cbb6c`](https://github.com/stig/json-framework/commit/18cbb6cb5b690130a79ffc4c9ba36cd3b38ac2cb) Fix typos in comments and variable names (thanks AppCode!)
+- [`a90dddf`](https://github.com/stig/json-framework/commit/a90dddf634c45840e97f924b578fb43fcfcf3659) Killed 58 lines of unreachable code (thanks AppCode!)
+- [`024672c`](https://github.com/stig/json-framework/commit/024672c52c9dcac656f3762fa87a27fc8ac57c3e) Simplify expression as suggested by AppCode
+- [`f999088`](https://github.com/stig/json-framework/commit/f99908817d0a4b4828606cc0cf43f6a24b6547bc) Remove broken example (twitter no longer support basic auth)
+- [`dba2719`](https://github.com/stig/json-framework/commit/dba2719a1a60f1aabf93811baff426a9bce552ba) Create a new (external) DisplayPretty project and link to it rather than embed it
+- [`f7ee521`](https://github.com/stig/json-framework/commit/f7ee521bb2db5d77ff41e2db44113c04acde9130) fixup! Extract LICENSE from README again (I changed my mind...)
+- [`59d3810`](https://github.com/stig/json-framework/commit/59d38108e0856d364956274adb8c81a62563464d) Extract LICENSE from README again (I changed my mind...)
+",https://api.github.com/users/stig,45407,stig,https://api.github.com/repos/stig/json-framework/releases/4565006/assets,https://api.github.com/repos/stig/json-framework/releases/4565006,master,https://api.github.com/repos/stig/json-framework/tarball/v4.0.2,https://github.com/stig/json-framework/releases/tag/v4.0.2,https://api.github.com/repos/stig/json-framework/zipball/v4.0.2,v4.0.2,False,False
+4564966,2016-11-03T13:45:47Z,2016-11-03T22:12:15Z,4.0.4: No Crashes On Invalid UTF-8 Found,"Oh, er, well, this is a bit embarrassing. It turns out my tests were insufficently devious, and did not guard against invalid UTF-8 encodings. I thought I could punt on UTF-8 validation and rely on `[NSString initWithBytes:length:encoding]` to do it, but then Nicolas Seriot reported otherwise ([issue #219](https://github.com/stig/json-framework/issues/219)). The result is that this version won't crash on a whole range invalid UTF-8 byte sequences where previous versions crashed did:
+- Flat-out illegal UTF-8 byte values
+- Missing continuation bytes
+- Unexpected continuation bytes
+- Overlong encodings
+- Invalid Unicode code points
+
+After 9 years of calling SBJson a strict JSON parser I've finally implemented UTF-8 validation. Thank you for the learning opportunity Nicolas!
+
+Also in this release:
+- Recreate the project file and targets using Xcode 8.
+- Re-organising the frankly bonkers repo layout to hopefully make it easier for casual contributors to find their way around.
+- Fix the Travis build; this had broken due to bit rot.
+",https://api.github.com/users/stig,45407,stig,https://api.github.com/repos/stig/json-framework/releases/4564966/assets,https://api.github.com/repos/stig/json-framework/releases/4564966,master,https://api.github.com/repos/stig/json-framework/tarball/v4.0.4,https://github.com/stig/json-framework/releases/tag/v4.0.4,https://api.github.com/repos/stig/json-framework/zipball/v4.0.4,v4.0.4,False,False
+3608275,2016-07-07T15:56:46Z,2016-07-07T15:59:52Z,Add Carthage support,"Minor bug fix release.
+- [`207dfa3`](https://github.com/stig/json-framework/commit/207dfa39913644629407028b27386905e39c1698) Adjust Travis CI configuration (#1)
+- [`191b0ad`](https://github.com/stig/json-framework/commit/191b0ad920e2f3e72d806b6dcbd32664c26ea5d3) Rename Carthage Mac target
+- [`23e47df`](https://github.com/stig/json-framework/commit/23e47df2f4f9b95758e910bd2b83abe91551071b) Update README.md
+- [`ed536b5`](https://github.com/stig/json-framework/commit/ed536b56b72c6af27ae339f4bbcc721f47764b33) Add Carthage iOS target
+- [`d53dfe4`](https://github.com/stig/json-framework/commit/d53dfe4242febb8f8e3d18b6401ef283587bcb90) Add repo status to README
+- [`4ca1d84`](https://github.com/stig/json-framework/commit/4ca1d8488576fed943d842c91a69bb4520f2070a) Replace deprecated method with alternative
+- [`d088bd1`](https://github.com/stig/json-framework/commit/d088bd155f26bd875bfd2236ccc6f08f8960e439) Add codecov badge to README
+- [`4e7df93`](https://github.com/stig/json-framework/commit/4e7df93c0226fb0afb2702669103f94c3a6cc438) Make variable private
+- [`2983d71`](https://github.com/stig/json-framework/commit/2983d71f82282af64a9e08c3356c200d388d6f76) Attempt at adding code test coverage metrics
+- [`959f5bd`](https://github.com/stig/json-framework/commit/959f5bd8e08739571913fa25ef0a3b3617e109c8) Make link (hopefully) to LICENCE
+- [`52ab522`](https://github.com/stig/json-framework/commit/52ab522ab8f6c5365e67f2c9066534eae8e3777d) Add a top-level heading to README
+- [`abe079d`](https://github.com/stig/json-framework/commit/abe079d50e3045ee4c2729a2ee9461f6d901a2ab) Update to-date on license
+- [`bff9599`](https://github.com/stig/json-framework/commit/bff9599770e825d8923bd0e732cd8df68aafc4a3) Remove prefix headers
+- [`2fbe784`](https://github.com/stig/json-framework/commit/2fbe7843fe6f921bcf1b91c6db5873b6e909e814) Use Xcodebuild rather than xctool
+- [`5f63aa0`](https://github.com/stig/json-framework/commit/5f63aa035acd3efa6a8e6f2f5251a5816b39516e) Add Gitter URL to README
+",https://api.github.com/users/stig,45407,stig,https://api.github.com/repos/stig/json-framework/releases/3608275/assets,https://api.github.com/repos/stig/json-framework/releases/3608275,master,https://api.github.com/repos/stig/json-framework/tarball/v4.0.3,https://github.com/stig/json-framework/releases/tag/v4.0.3,https://api.github.com/repos/stig/json-framework/zipball/v4.0.3,v4.0.3,False,False
+123887,2013-12-16T23:15:20Z,2013-12-16T23:35:31Z,Version 4.0.0 Final!,"I'm happy to announce the fourth major release of SBJson! As mentioned in [this blog post](http://superloopy.io/articles/2013/what-now-for-sbjson.html) the focus for this release has been on making the chunk-based (aka streaming) API much simpler to use, and I believe this is the case. 
+
+Because this release is not backwards compatible with previous versions all classes, constants & enums were renamed to contain the number 4. This is so that you can use the new APIs while still relying on libraries that bundle older versions of this library.
+
+Remove the old SBJsonParser and created a new chunk-oriented one based on version 3.2's SBJsonStreamParserAdapter.
+
+This release also includes two important parsing fixes related to number parsing. We now support the full range of `unsigned long long` as a proper integer type, and properly support the full range of `double`. In doing so SBJson was changed to never produce a `NSDecimalNumber`, but always return `NSNumber` instances.
+",https://api.github.com/users/stig,45407,stig,https://api.github.com/repos/stig/json-framework/releases/123887/assets,https://api.github.com/repos/stig/json-framework/releases/123887,master,https://api.github.com/repos/stig/json-framework/tarball/v4.0.0,https://github.com/stig/json-framework/releases/tag/v4.0.0,https://api.github.com/repos/stig/json-framework/zipball/v4.0.0,v4.0.0,False,False
+96843,2013-01-04T20:56:37Z,2013-11-18T20:54:54Z,,"**Deprecations**
+- Deprecated the `JSONValue` and `JSONRepresentation` category methods.
+- Deprecated several methods that return an error through an `NSError**` argument.
+
+These will be removed in the next major version release.
+
+**Changes**
+- Absorb LICENSE and INSTALL files into README.
+- Remove the Xcode Workspace from the top-level source checkout; the less
+  clutter the better and this doesn't seem to serve any function.
+- Change to use AppleDoc for creating API documentation. This results in
+  output looking more consistent with Apple's documentation.
+
+**Bugfixes**
+- Replace use of INFINITY with HUGE_VAL where used as double (reported by
+  Antoine Cœur)
+- Correctly parse -0.0 as a JSON number (Cary Yang)
+",https://api.github.com/users/stig,45407,stig,https://api.github.com/repos/stig/json-framework/releases/96843/assets,https://api.github.com/repos/stig/json-framework/releases/96843,master,https://api.github.com/repos/stig/json-framework/tarball/v3.2.0rc1,https://github.com/stig/json-framework/releases/tag/v3.2.0rc1,https://api.github.com/repos/stig/json-framework/zipball/v3.2.0rc1,v3.2.0rc1,False,True
+96839,2013-01-19T23:10:35Z,2013-11-18T20:53:24Z,,"Version 3.2.0 was released, with no changes since rc1.
+",https://api.github.com/users/stig,45407,stig,https://api.github.com/repos/stig/json-framework/releases/96839/assets,https://api.github.com/repos/stig/json-framework/releases/96839,master,https://api.github.com/repos/stig/json-framework/tarball/v3.2.0,https://github.com/stig/json-framework/releases/tag/v3.2.0,https://api.github.com/repos/stig/json-framework/zipball/v3.2.0,v3.2.0,False,False
+95915,2013-11-17T22:15:41Z,2013-11-17T22:19:08Z,SBJson 4.0.0-ALPHA3,"Notable changes since 4.0.0-alpha2:
+- [`f7ef205`](https://github.com/stig/json-framework/commit/f7ef2055e7dbd0e6399f6d0e1f56b8c1666d1ba8) Add documentation for more convenience constructors
+- [`49bcff0`](https://github.com/stig/json-framework/commit/49bcff013f06f32662f295b5101c3623cd1bfaa9) Rename classes, constants & enums to add major version number (4)
+- [`fda671c`](https://github.com/stig/json-framework/commit/fda671c9b20e9e2e316585f0d592b9a787f9deaf) Remove old SBJsonParser and rename SBJsonChunkParser to SBJsonParser
+- [`c053beb`](https://github.com/stig/json-framework/commit/c053beb35378819b04e982a217149857d0ef9f52) Changed secondary init method to be a class method instead
+- [`faaa654`](https://github.com/stig/json-framework/commit/faaa65484b0db1e9d6f5e43132ec19637b50dbae) Remove parser as argument to all its delegate methods
+- [`e8a1444`](https://github.com/stig/json-framework/commit/e8a14447fb5892e2a67983c25a3da0ec91c0c1a4) Move max-depth error handling from stream parser to chunk-parser
+- [`4ef698e`](https://github.com/stig/json-framework/commit/4ef698ec25be25f45de03769c1b0d36327bcf30a) Make SBJsonChunkParser ""immutable"" by removing properties
+- [`d6342f6`](https://github.com/stig/json-framework/commit/d6342f687df42245a298d08bc2a459ce707ba57a) Use the ChunkParser in the DisplayPretty example
+",https://api.github.com/users/stig,45407,stig,https://api.github.com/repos/stig/json-framework/releases/95915/assets,https://api.github.com/repos/stig/json-framework/releases/95915,master,https://api.github.com/repos/stig/json-framework/tarball/v4.0.0-alpha3,https://github.com/stig/json-framework/releases/tag/v4.0.0-alpha3,https://api.github.com/repos/stig/json-framework/zipball/v4.0.0-alpha3,v4.0.0-alpha3,False,True
+93006,2013-11-13T21:59:46Z,2013-11-13T23:30:11Z,SBJson 4.0.0-ALPHA2 is released!,"Notable changes since 4.0.0-alpha:
+- [`d13a5a8`](https://github.com/stig/json-framework/commit/d13a5a8f2e60545b06dc038051cab0bd89d43b35) Support stopping parsing after a certain number of partial documents
+- [`cbdd83c`](https://github.com/stig/json-framework/commit/cbdd83cc0de6a4e99ff84079d83b9c14c448db70) Replace SBJsonStreamParserAdapter with SBJsonChunkParser
+- [`a52fefa`](https://github.com/stig/json-framework/commit/a52fefa1aaf190f8088e257164e8db7deaa3eb73) Update DisplayPretty example to use ARC
+- [`9bedeec`](https://github.com/stig/json-framework/commit/9bedeecb1bf504e3384af6660316461095b9a272) Turn on most sensible warnings
+- [`641f506`](https://github.com/stig/json-framework/commit/641f5064c92973111980586147827aaaca721302) Move properties to be nonatomic, and remove explicit @synthesize declarations
+- [`b41acb1`](https://github.com/stig/json-framework/commit/b41acb10e3f7371a5b2e1c2d2e31d919910122d6) Use weak rather than unsafe_unretained (no longer support iOS < 5)
+- [`c3f7db0`](https://github.com/stig/json-framework/commit/c3f7db04d438e17d41277c6da90de2e8b0777a3c) Make the ""skip outer array"" option of the stream parser easier to understand.
+- [`f342770`](https://github.com/stig/json-framework/commit/f342770a02f2585cd34c1b6943ca45b6ed622710) Move multi-document support chosing to the parser delegate, so decision can be done in the adapter
+- [`28a7c73`](https://github.com/stig/json-framework/commit/28a7c736042d5efa03d6948028c68c56392e4945) Update documentation to remove reference to -autorelease method
+- [`ab11d2b`](https://github.com/stig/json-framework/commit/ab11d2b657798251ba4e0b3605ce0747152eed16) Remove the silly parser/writer Accumulators
+- [`b02a095`](https://github.com/stig/json-framework/commit/b02a095175b38002e128b611c24ffa8e8720ecdb) Avoid warning for Mac OS X build
+",https://api.github.com/users/stig,45407,stig,https://api.github.com/repos/stig/json-framework/releases/93006/assets,https://api.github.com/repos/stig/json-framework/releases/93006,master,https://api.github.com/repos/stig/json-framework/tarball/v4.0.0-alpha2,https://github.com/stig/json-framework/releases/tag/v4.0.0-alpha2,https://api.github.com/repos/stig/json-framework/zipball/v4.0.0-alpha2,v4.0.0-alpha2,False,True
+89429,2013-11-09T23:05:35Z,2013-11-09T23:09:20Z,SBJson 4.0.0-ALPHA is released!,"I'm delighted to announce SBJson 4.0.0-ALPHA. Notable changes since 3.2.0:
+- [#160](https://github.com/stig/json-framework/issues/160) & [#162](https://github.com/stig/json-framework/issues/162) - Remove category &  `...error:(NSError**)error` methods.
+- [#171](https://github.com/stig/json-framework/pull/171) - Support full range of `unsigned long long` as proper integer type.
+- [#128](https://github.com/stig/json-framework/issues/128) - Support full range of `double`. This also removes NSDecimalNumber support.
+- [#180](https://github.com/stig/json-framework/pull/180) - Add @rpath support to SBJson.framework build settings.
+- [#182](https://github.com/stig/json-framework/pull/182) - Add option to process values as they’re parsed.
+
+The main reason for a major version change is the removal of the some methods, to allow focus on streaming as explained in [this blog post](http://superloopy.io/articles/2013/what-now-for-sbjson.html). The change to support the full range of `double` was also significant enough that it might have warranted a major version release on its own.
+
+Several community members have contributed to this release.
+",https://api.github.com/users/stig,45407,stig,https://api.github.com/repos/stig/json-framework/releases/89429/assets,https://api.github.com/repos/stig/json-framework/releases/89429,master,https://api.github.com/repos/stig/json-framework/tarball/v4.0.0-alpha,https://github.com/stig/json-framework/releases/tag/v4.0.0-alpha,https://api.github.com/repos/stig/json-framework/zipball/v4.0.0-alpha,v4.0.0-alpha,False,True

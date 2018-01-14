@@ -1,0 +1,1404 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7463664,2017-08-21T16:39:02Z,2017-08-21T17:02:55Z,circe 0.9.0-M1,"This is the first milestone release for circe 0.9.0, and the first circe release for Cats 1.0.0-MF. There is likely to be one more milestone release (or possibly a release candidate) before 0.9.0 final, and it will probably include a couple of additions and possibly a few more breaking changes (most notably to `BiggerDecimal` in circe-numbers, which is unlikely to affect most users).
+
+While there are a number of breaking changes in this release, most should not affect most users. One prominent exception is the `dropNullKeys` method on `Printer`, which is pretty widely used [and has been renamed](https://github.com/circe/circe/pull/702) to `dropNullValues`.
+
+I'm aiming for next weekend (27 August 2017) for the second milestone, and the first week of September for 0.9.0 final, which means that 0.9.0 may depend on Cats 1.0.0-RC1, but 1.0.0-MF is probably more likely. In the longer term, I'm hoping to publish 0.10.0 (which will include [an overhaul of the way decoding is done](https://github.com/travisbrown/circe-algebra)) by mid-October, and 1.0.0 as soon as possible after Cats 1.0 is released. We use semantic versioning, which will be enforced by MiMa starting at 1.0.0 (which is one of the reasons for all the annoying renaming and shuffling in this release—I don't want to get stuck forever with an API I don't like).
+
+Please use this milestone with caution, and report any issues you run into (either here on GitHub or [on Gitter](https://gitter.im/circe/circe)). 
+
+## Performance
+
+One focus of 0.9.0 is improving runtime performance, and in [our benchmarks](https://github.com/circe/circe-benchmarks) this milestone is quite a bit faster than 0.8.0:
+
+### Results for 0.9.0-M1
+
+```
+Benchmark                            Mode  Cnt      Score     Error  Units
+ReadingBenchmark.readFoosCirce      thrpt   40   3610.520 ±  37.232  ops/s
+ReadingBenchmark.readIntsCirce      thrpt   40  18375.199 ±  57.332  ops/s
+
+WritingBenchmark.writeFoosCirce     thrpt   40   3745.881 ± 141.975  ops/s
+WritingBenchmark.writeIntsCirce     thrpt   40  30295.139 ± 262.251  ops/s
+```
+
+### Results for 0.8.0 (compared to 0.9.0-M1)
+
+```Benchmark                            Mode  Cnt      Score     Error  Units
+ReadingBenchmark.readFoosCirce      thrpt   40   2321.100 ±  14.573  ops/s (-37.5%)
+ReadingBenchmark.readIntsCirce      thrpt   40  17000.038 ±  79.220  ops/s (- 7.5%)
+
+WritingBenchmark.writeFoosCirce     thrpt   40   3104.464 ±  13.952  ops/s (-17.1%)
+WritingBenchmark.writeIntsCirce     thrpt   40  19970.840 ±  69.970  ops/s (-34.1%)
+```
+
+### Results for other Scala JSON libraries (compared to 0.9.0-M1)
+
+```
+Benchmark                            Mode  Cnt      Score     Error  Units
+ReadingBenchmark.readFoosArgonaut   thrpt   40   1450.510 ±  10.015  ops/s (-59.8%)
+ReadingBenchmark.readFoosJson4s     thrpt   40   1175.200 ±  14.908  ops/s (-67.5%)
+ReadingBenchmark.readFoosPlay       thrpt   40   1251.828 ±   6.084  ops/s (-65.3%)
+ReadingBenchmark.readFoosSpray      thrpt   40   2048.340 ±  28.382  ops/s (-43.3%)
+
+ReadingBenchmark.readIntsArgonaut   thrpt   40   8762.412 ± 251.404  ops/s (-52.3%)
+ReadingBenchmark.readIntsJson4s     thrpt   40   5684.703 ±  21.309  ops/s (-69.0%)
+ReadingBenchmark.readIntsPlay       thrpt   40   9435.281 ± 308.286  ops/s (-48.7%)
+ReadingBenchmark.readIntsSpray      thrpt   40  17369.818 ±  47.954  ops/s (- 5.5%)
+
+Benchmark                            Mode  Cnt      Score     Error  Units
+WritingBenchmark.writeFoosArgonaut  thrpt   40   2389.306 ±  75.548  ops/s (-36.2%)
+WritingBenchmark.writeFoosJson4s    thrpt   40   1076.026 ±  30.364  ops/s (-71.3%)
+WritingBenchmark.writeFoosPlay      thrpt   40   1402.058 ±  13.982  ops/s (-62.6%)
+WritingBenchmark.writeFoosSpray     thrpt   40   3215.051 ±  72.822  ops/s (-17.1%)
+
+WritingBenchmark.writeIntsArgonaut  thrpt   40  17469.530 ± 251.703  ops/s (-42.3%)
+WritingBenchmark.writeIntsJson4s    thrpt   40   4444.495 ± 136.907  ops/s (-85.3%)
+WritingBenchmark.writeIntsPlay      thrpt   40   3860.710 ± 114.302  ops/s (-87.3%)
+WritingBenchmark.writeIntsSpray     thrpt   40  18030.909 ±  79.015  ops/s (-40.5%)
+```
+
+So for the first time circe outperforms all other Scala JSON libraries in all of our benchmarks (if only barely, in the case of some of the Spray results). The upcoming 0.9.0 release should increase the throughput a bit further, especially for the integer array reading benchmarks.
+
+## Additions
+
+* New `Json.Folder` for folding `Json` values with fewer allocations (#656).
+* New `Printer#reuseWriters` for `ThreadLocal` string builder caching (#657).
+* New `JsonObject.apply` method (#637).
+* New `:=` syntax for object definitions (#589).
+* New instances for `java.time.Duration` (#636).
+* New circe-numbers-testing module (#652).
+* New `asNull` and `withNull` methods for `Json` (#656).
+* New `Fold[JsonObject, (String, Json)]` instance in circe-optics (#642).
+* New `AsyncParser` parsing mode configuration in circe-streaming (#712).
+* New `transformConstructorNames` configuration option in circe-generic-extras (#648).
+* New number parsing benchmarks (#695).
+* New `JsonObject` benchmarks (#698).
+* New `data` directory with Sonatype download stats (#675).
+
+## Renaming and API changes
+
+* `Printer#dropNullKeys` is now `dropNullValues` (#702).
+* `ACursor#values` and `keys` now return `Iterable`s instead of `Vector`s (#696).
+* `Decoder.decodeCanBuildFrom` has been replaced by `decodeTraversable` and `decodeArray` (#728).
+* `withSnakeCaseKeys` is now `withSnakeCaseMemberNames` (#684).
+* `transformKeys` is now `transformMemberNames` (#684).
+* `JsonObject.from` is now `fromFoldable` (#696).
+* `BiggerDecimal.fromDouble` is now `fromDoubleUnsafe` (#667).
+* `Encoder.forProductN` now takes a function to `ProductN` rather than tuples (#673).
+
+## Deprecations
+
+* The `truncateToX` methods on `JsonNumber` are now deprecated (#706).
+* `ACursor#fields` and `fieldSet` are now deprecated in favor of `keys` (#696).
+
+## Bug fixes
+
+* `maxDigits` is respected in `BiggerDecimal#toBigIntegerWithMaxDigits` (#655).
+* `handleErrorWith` in the `MonadError` instance for `KeyDecoder` now works correctly (#676).
+* Generic derivation doesn't fail for nested sequences of tagged types (#659).
+* Partial decoders work with `-Ypartial-unification` (#728).
+* Fixed new issue with Scala.js tests on 2.10 (#731).
+* Hygiene tests and benchmark modules are now aggregated (#670).
+
+## Other changes
+
+* More instances are serializable (#671).
+* Laws in circe-testing now use `Shrink[Json]` instance (#666).
+* Better error messages for `Decoder.decodeList` (#643).
+* `Decoder#failedWithMessage` includes history (#646).
+
+## Documentation and testing
+
+* Improved documentation for SI-7046 workarounds (#644).
+* Improved `KeyEncoder` documentation (#699).
+* Test reorganization (#669).
+
+## Internal changes
+
+* Performance improvements for `JsonObject` (#696).
+* Performance improvements for `Printer` (#657).
+* Performance improvements for `KeyDecoder` (#694).
+* Renamed `Json` case class members for consistency (#653).
+* Minimized internal use of `Json` constructors (#674).
+* `JsonBigDecimal` now uses Java's `BigDecimal` rather than Scala's (#668).
+* Prefer `underlying` when using Scala's `BigDecimal` and `BigInt` (#689).
+* Prefer unaliased `cats.kernel` imports (#705).
+
+## Updated versions
+
+* Cats to 1.0.0-MF (#724).
+* Scala.js to 0.6.19 (#719).
+* iteratee.io to 0.13.0 (#729).
+
+## New adopters and related projects
+
+* Snowplow Analytics (#634).
+* HolidayCheck (#677).
+* DriveTribe (#716).
+* sttp (#723).
+
+Thanks to all contributors, including [Rafał Krzewski](https://github.com/rkrzewski) (for tracking down a really annoying bug), [Sergey Kolbasov](https://github.com/ImLiar) (for new circe-streaming mode configuration options), [Cyril Ponomaryov](https://github.com/cponomaryov) (for miscellaneous bug fixes and `:=` syntax), [Nathan Kleyn](https://github.com/nathankleyn) (for new circe-generic-extras configuration options), [Luis Angel Vicente Sanchez](https://github.com/lvicentesanchez) (for `forProductN` API improvements), [Sören Brunk](https://github.com/sbrunk) (for new `java.time` instance), and [Dale Wijnand](https://github.com/dwijnand) (for the Cats 1.0.0-MF update).",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/7463664/assets,https://api.github.com/repos/circe/circe/releases/7463664,master,https://api.github.com/repos/circe/circe/tarball/v0.9.0-M1,https://github.com/circe/circe/releases/tag/v0.9.0-M1,https://api.github.com/repos/circe/circe/zipball/v0.9.0-M1,v0.9.0-M1,False,True
+6327199,2017-05-09T13:54:13Z,2017-05-09T16:07:36Z,circe 0.8.0,This release is identical to last week's 0.8.0 [release candidate](https://github.com/circe/circe/releases/tag/v0.8.0-RC1) with the exception of new encoder and decoder instances for `java.time.YearMonth` in circe-java8 (added by [Benedikt Ritter](https://github.com/britter) in #628).,https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/6327199/assets,https://api.github.com/repos/circe/circe/releases/6327199,master,https://api.github.com/repos/circe/circe/tarball/v0.8.0,https://github.com/circe/circe/releases/tag/v0.8.0,https://api.github.com/repos/circe/circe/zipball/v0.8.0,v0.8.0,False,False
+6237452,2017-05-01T00:20:17Z,2017-05-01T01:35:24Z,circe 0.8.0-RC1,"This release (candidate) includes contributions by 25 people, which I believe is a record for the project—thanks to all of you, and especially the 15 or 16 first-time contributors.
+
+There are a couple of reasons this is a release candidate instead of a release. The first is that I'd like to give 2.12 users a chance to kick the tires on the fix for generic derivation for case classes with tagged members (#617). I'd also like to give all users one more chance to complain about the removal of the implicit default configuration in circe-generic-extras (#597), the new, more verbose encoding for scodec's `BitVector` (#551), etc.
+
+If no bugs turn up and nobody complains loudly enough, I'll publish this release as 0.8.0 next Saturday (7 May 2017).
+
+## Bug fixes
+
+This release fixes a bug reported by @felher (#604) that resulted in generic derivation failures on Scala 2.12 for case classes with members tagged with Shapeless's `@@` (and presumably other similar mechanisms). The difference in 2.12 was due to a change in the behavior of the Scala reflection API's `RefinedType` extractor, which is accommodated in #617.
+
+[Cyril Ponomaryov](https://github.com/cponomaryov) fixed a bug (reported by [Giovanni Caporaletti](https://github.com/TrustNoOne) in #578) that could result in spurious decoding failures when using custom decoders for `Option` that are constructed with `emap`.
+
+[Michael Sitko](https://github.com/note) fixed a bug in circe-scodec (reported by [Daniel Urban](https://github.com/durban) in #551) that resulted in bit vectors not being round-trippable because the encoding right-padded the bits to the next byte boundary. We considered adding a header to the encoding to indicate the length, but decided on a more verbose JSON object encoding that specifies the length in a separate field (primarily to avoid confusion that could result when accidentally attempting to decode a `BitVector` as a `ByteVector`). If you need a more concise string representation, please use `ByteVector` instead of `BitVector`.
+
+This release also includes fixes for three number-related bugs that were backported to 0.7 for the [0.7.1 release](https://github.com/circe/circe/releases/tag/v0.7.1).
+
+## Additions
+
+[Alberto Paro](https://github.com/aparo) has added an experimental `@JsonKey` annotation to circe-generic-extras to help with the common use case where individual fields need to be renamed in a way that isn't necessarily systematic (e.g. camel-case to snake-case):
+
+```scala
+scala> import io.circe.generic.extras._, io.circe.generic.extras.defaults._, io.circe.syntax._
+import io.circe.generic.extras._
+import io.circe.generic.extras.defaults._
+import io.circe.syntax._
+
+scala> @ConfiguredJsonCodec case class Bar(@JsonKey(""my-int"") i: Int, s: String)
+defined class Bar
+defined object Bar
+
+scala> Bar(13, ""Qux"").asJson.noSpaces
+res0: String = {""my-int"":13,""s"":""Qux""}
+```
+
+This annotation is somewhat at odds with the [circe design guidelines](https://github.com/circe/circe/blob/master/DESIGN.md), but the circe-generic-extras module is explicitly intended to be a space for experimentation, and if there's evidence that `@JsonKey` is useful and that people want it, it _could_ someday be promoted to circe-generic.
+
+The circe-java8 module is now available for Scala.js, thanks to [Carlos Quiroz](https://github.com/cquiroz/scala-java-time)'s [scala-java-time](https://github.com/cquiroz) library and integration by [Olli Helenius](https://github.com/liff) (#560). Note that this dependency is not necessary for the JVM version of the module, and that it may eventually be dropped for Scala.js (if `java.time` is supported more directly at some point).
+
+## Removals
+
+The circe-generic-extras module no longer provides a default implicit configuration (#597). Users must now provide an instance anywhere they use generically derived codecs, either by defining their own or adding this (new) import:
+
+```scala
+import io.circe.generic.extras.defaults._
+```
+
+I personally see this change as potentially controversial, but nobody complained when it was proposed (and implemented) by [Simon Hafner](https://github.com/reactormonk), and I can see the argument for more explicitness in this respect. The circe-generic-extras module should still be considered experimental, though, and the default instance _may_ be reinstated in a future release.
+
+## Other changes
+
+* Optimized binary printing based on findings in the Finch project by [Vladimir Kostyukov](https://github.com/vkostyukov) (#621).
+* `Encoder` and `Decoder` for `java.time.Period` by [Kacper Gunia](https://github.com/cakper) (#550).
+* Documentation improvements by [Aaron Levin](https://github.com/aaronlevin) (#571).
+* Build updates and improvements by @n4to4 and [Joe Green](https://github.com/ClydeMachine) (#568, #573, #577, #580, #591).
+* Coursier-powered build by [Bruno Bieth](https://github.com/backuitist) (#606).
+* Numerous version updates, including refined (0.6.2 to 0.8.0) and Scala.js (0.6.14 to 0.6.16).
+* Eleven newly listed adopters!
+
+As always thanks to all contributors, bug reporters, question askers, etc.!",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/6237452/assets,https://api.github.com/repos/circe/circe/releases/6237452,master,https://api.github.com/repos/circe/circe/tarball/v0.8.0-RC1,https://github.com/circe/circe/releases/tag/v0.8.0-RC1,https://api.github.com/repos/circe/circe/zipball/v0.8.0-RC1,v0.8.0-RC1,False,True
+5963326,2017-04-04T03:01:33Z,2017-04-04T03:13:12Z,circe 0.7.1,"This patch release fixes several number-related bugs and inconsistencies. It is binary compatible with circe 0.7.0, but note that in some cases (primarily related to `JsonNumber` instances constructed from large `Double` and `Float` values) behavior has been changed.
+
+These bugs should not affect most users, but we still encourage you to update as soon as possible.
+
+## No more runtime exceptions on invalid numbers in JSON strings
+
+The biggest issue fixed in this release is a bug that can cause an exception to be thrown when decoding a JSON string into a numeric type:
+
+```scala
+scala> io.circe.parser.decode[Double](""""""""1."""""""")
+java.lang.NumberFormatException: For input string: ""1.""
+  at java.lang.NumberFormatException.forInputString(NumberFormatException.java:65)
+  at java.lang.Integer.parseInt(Integer.java:580)
+  at java.math.BigInteger.<init>(BigInteger.java:461)
+  ...
+```
+
+Note that this will never happen when decoding a JSON number—you'll only see it when trying to decode a JSON number representing a numeric value that is invalid in this particular way (a trailing `.`, `e`, or `-`).
+
+Thanks to [Sam Schlegel](https://github.com/SamSchlegel) for identifying (#600) and fixing (#601) this bug.
+
+## Properly encoded floats
+
+The second issue is that `Float` values were not being properly encoded:
+
+```scala
+scala> io.circe.Encoder[Float].apply(1.2f)
+res0: io.circe.Json = 1.2000000476837158
+```
+
+The problem here is that many decimal numbers (including 1.2) cannot be represented exactly as `Float` values. Calling `toString` on a `Float` (on the JVM—later in this section we'll see how Scala.js is different) hides this imprecision:
+
+```scala
+scala> 1.2f.toString
+res1: String = 1.2
+```
+
+But if we first convert the `Float` to a `Double`, it shows up:
+
+```scala
+scala> 1.2f.toDouble.toString
+res2: String = 1.2000000476837158
+```
+
+This is what was happening internally in previous circe releases. In the fix provided here, we avoid converting encoded `Float` values to `Double`, which gives us the expected JSON result:
+
+```scala
+scala> io.circe.Encoder[Float].apply(1.2f)
+res0: io.circe.Json = 1.2
+```
+
+Note that the issue is not fixed on Scala.js, where `Float` is [somewhat tricky](https://www.scala-js.org/doc/semantics.html):
+
+> Floats print in a weird way because they are printed as if they were Doubles, which means their lack of precision shows up.
+
+In circe we're not currently trying to work around this limitation of the underlying platform, but you probably shouldn't be using `Float` on Scala.js anyway. See #602 for the details of this decision.
+
+Thanks to [Cary Robbins](https://github.com/carymrobbins) for the report (#594) and fix (#595).
+
+## JSON number equality is actually transitive now
+
+In previous versions there were a couple of ways that the `Eq` instance for `JsonNumber` could give inconsistent results:
+
+```scala
+scala> import cats.syntax.eq._, io.circe.Json
+import cats.syntax.eq._
+import io.circe.Json
+
+scala> val Some(lz) = Json.fromLong(0L).asNumber
+lz: io.circe.JsonNumber = 0
+
+scala> val Some(dz) = Json.fromDouble(0.0).flatMap(_.asNumber)
+dz: io.circe.JsonNumber = 0.0
+
+scala> val Some(nz) = Json.fromDouble(-0.0).flatMap(_.asNumber)
+nz: io.circe.JsonNumber = -0.0
+
+scala> (lz === dz, lz === nz, dz === nz)
+res0: (Boolean, Boolean, Boolean) = (true,true,false)
+```
+
+And:
+
+```scala
+scala> val bigLong = Long.MaxValue
+bigLong: Long = 9223372036854775807
+
+scala> val prettyBigLong = Long.MaxValue - 1L
+prettyBigLong: Long = 9223372036854775806
+
+scala> val Some(bigJson) = Json.fromLong(bigLong).asNumber
+bigJson: io.circe.JsonNumber = 9223372036854775807
+
+scala> val Some(prettyBigJson) = Json.fromLong(prettyBigLong).asNumber
+prettyBigJson: io.circe.JsonNumber = 9223372036854775806
+
+scala> val Some(bigDoubleJson) = Json.fromDouble(bigLong.toDouble).flatMap(_.asNumber)
+bigDoubleJson: io.circe.JsonNumber = 9.223372036854776E18
+
+scala> (bigJson === bigDoubleJson, prettyBigJson === bigDoubleJson, bigJson === prettyBigJson)
+res1: (Boolean, Boolean, Boolean) = (true,true,false)
+```
+
+Both of these cases now give the correct results, distinguishing negative and positive zero and large `Double` values consistently (#605).
+
+## The floating point story more generally
+
+As part of the changes involved in fixing `JsonNumber` equality and the encoding of `Float`, we've settled on a more consistent approach to how floating point numbers are represented. In general for both `Float` and `Double` you will now get the number represented by calling `toString` on the floating point value, not the actual value. This means that in some cases if you encode a `Double` or `Float` and then decode it as a non-floating-point type, you'll get different results than you did in previous circe versions. For example, this is circe 0.7.0:
+
+```scala
+scala> val biggishLong = Long.MaxValue - 525
+biggishLong: Long = 9223372036854775282
+
+scala> val biggishDouble = biggishLong.toDouble
+biggishDouble: Double = 9.2233720368547748E18
+
+scala> io.circe.Json.fromDouble(biggishDouble).flatMap(_.asNumber).flatMap(_.toLong)
+res0: Option[Long] = Some(9223372036854774784)
+```
+
+And 0.7.1:
+
+```scala
+scala> val biggishLong = Long.MaxValue - 525
+biggishLong: Long = 9223372036854775282
+
+scala> val biggishDouble = biggishLong.toDouble
+biggishDouble: Double = 9.2233720368547748E18
+
+scala> io.circe.Json.fromDouble(biggishDouble).flatMap(_.asNumber).flatMap(_.toLong)
+res0: Option[Long] = Some(9223372036854774800)
+```
+
+Note that in both cases we don't get back the `Long` we started with (since `Double` can't represent numbers that big accurately), but in the 0.7.1 case we get back the value that we see when we print `biggishDouble`, and (more importantly) we have a coherent story about how we're handling these horrible things.
+
+## Conclusion
+
+Thanks to everyone who's offered feedback on circe 0.7 over the past couple of months, and especially to Cary Robbins and Sam Schlegel for helping to make JSON numbers a little less painful to work with.",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/5963326/assets,https://api.github.com/repos/circe/circe/releases/5963326,master,https://api.github.com/repos/circe/circe/tarball/v0.7.1,https://github.com/circe/circe/releases/tag/v0.7.1,https://api.github.com/repos/circe/circe/zipball/v0.7.1,v0.7.1,False,False
+5183559,2017-01-17T16:22:35Z,2017-01-17T16:49:39Z,circe 0.7.0,"This release includes the changes from the [first](https://github.com/circe/circe/releases/tag/v0.7.0-M1) and [second](https://github.com/circe/circe/releases/tag/v0.7.0-M2) 0.7.0 milestones, as well as a few other things:
+- Version updates: Cats (from 0.8.1 to 0.9.0), Monocle (to 1.4.0), and Refined (from 0.6.0 to 0.6.2).
+- A new `TimeInstances` trait for `java.time` instances (#545; thanks [Sergey Kolbasov](https://github.com/ImLiar)).
+- Printing optimizations and `ByteBuffer` printing support for Scala.js (#544).
+
+Cumulatively the changes between 0.6 and 0.7 are pretty large, and the discussion of updating in [the M1 release notes](https://github.com/circe/circe/releases/tag/v0.7.0-M1) is likely to be particularly useful for people who are working with cursors directly. If you run into any questions or issues please get in touch on [Gitter](https://gitter.im/circe/circe).
+
+Thanks to all contributors (19+ since 0.6!), reviewers, and feedback-givers, and especially to @jonas and @n4to4 for all their work on the project site, documentation, and build configuration since 0.6.
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/5183559/assets,https://api.github.com/repos/circe/circe/releases/5183559,master,https://api.github.com/repos/circe/circe/tarball/v0.7.0,https://github.com/circe/circe/releases/tag/v0.7.0,https://api.github.com/repos/circe/circe/zipball/v0.7.0,v0.7.0,False,False
+5109135,2017-01-10T14:09:09Z,2017-01-10T14:25:43Z,circe 0.7.0-M2,"This milestone includes all features that are planned for 0.7.0—the only thing we're waiting on is the Cats 0.9.0 release (tracked [here](https://github.com/typelevel/cats/issues/1508)) and some more feedback from people who have tried out the milestones.
+
+## Printing to byte buffers
+
+On the JVM, JSON printers now have a `prettyByteString` method that allows printing a `Json` value directly to a byte buffer (#535 and #537). This addition is designed to support [""string-less encoding""](https://github.com/finagle/finch/issues/676) in Finch, and will be accompanied by [an equivalent method](https://github.com/circe/circe-jackson/pull/11) in circe-jackson.
+
+Thanks to [Vladimir Kostyukov](https://github.com/vkostyukov) and @ImLiar for driving and helping with these `ByteBuffer`-related additions.
+
+## Kicking some modules out of the nest
+
+Three modules have been moved to their own repositories in the circe organization:
+- [circe-spray](https://github.com/circe/circe-spray)
+- [circe-jackson](https://github.com/circe/circe-jackson)
+- [circe-benchmarks](https://github.com/circe/circe-benchmarks)
+
+Among other things, these moves have allowed us to simplify the build by scrapping sbt-doge and to publish circe-jackson artifacts for multiple Jackson versions.
+
+This does mean that there will be a delay between the publication of the modules in this repository and circe-spray and circe-jackson, but we'll aim to keep it small.
+
+Thanks especially to [Jens Raaby](https://github.com/jensraaby) and @n4to4 for helping with these transitions.
+
+## New cursor operation
+
+`ACursor` now has a `values` method that's roughly equivalent to `fields`, but for JSON arrays instead of JSON objects (#535). This gap has come up a few times in conversations on Gitter and elsewhere—thanks to [Eric Torreborre](https://github.com/etorreborre) and others for finally convincing me that we should have it.
+
+## More concise circe-optics indexing
+
+In circe-optics, `JsonPath` (and its `Fold` and `Traversal` cousins) now have `apply` and `applyDynamic` methods that support more concise JSON array indexing. For example, instead of `root.users.index(1)` you can now write `root.users(1)`, and just `root(1)` instead of `root.index(1)`.
+
+Thanks to [Paul Brimicombe](https://github.com/paulbrimicombe) for proposing and implementing these changes (#497 and #506).
+
+## Traits for generic derivers
+
+Both circe-generic and circe-generic-extras now provide an `AutoDerivation` trait that can be mixed into an object that provides other instances. For example, instead of this:
+
+``` scala
+class MyInstances { /* some type class instances here */ }
+object MyInstances extends MyInstances
+
+import MyInstances._
+import io.circe.generic.auto._
+```
+
+You could write this:
+
+``` scala
+import io.circe.generic.AutoDerivation
+
+class MyInstances { /* some type class instances here */ }
+object MyInstances extends MyInstances with AutoDerivation
+
+import MyInstances._
+```
+
+Thanks to [Michael Ledin](https://github.com/mxl) for proposing and implementing this addition (#504).
+
+## De-predef-ication
+
+The project now uses scalac's `-Yno-predef` option to remove the implicit `import scala.Predef._` that Scala source files have by default. This makes the codebase a little more explicit and makes the introduction of operations supported by implicit conversions (which often involve undesirable allocations) easier to notice and avoid.
+
+Thanks to @n4to4 for pushing this effort (started in #320 and #383) over the finish line (#526).
+
+## Truncation actually truncates
+
+Previously the `truncateToX` methods on `JsonNumber` rounded to the nearest whole number:
+
+``` scala
+scala> import io.circe.{ Json, JsonNumber }
+import io.circe.{Json, JsonNumber}
+
+scala> JsonNumber.fromString(""1.5"").map(_.truncateToLong)
+res0: Option[Long] = Some(2)
+
+scala> Json.fromDouble(1.5).flatMap(_.asNumber).map(_.truncateToLong)
+res1: Option[Long] = Some(2)
+
+scala> Json.fromBigDecimal(BigDecimal(1.5)).asNumber.map(_.truncateToLong)
+res2: Option[Long] = Some(2)
+```
+
+This contradicted the API documentation for these methods:
+
+> Truncation means that we round toward zero to the closest valid `scala.Long`.
+
+This release fixes the discrepancy by rounding toward zero (as specified in the docs) instead of to the nearest whole value (#533).
+
+## Other API changes
+- The new `unsafeFilter` method for circe-optics's `JsonPath` that was introduced in 0.7.0-M1 has been renamed to `filterUnsafe` for the sake of consistency (#490).
+- `ArrayEncoder` now has a contravariant functor instance (#491).
+
+## Other optimizations
+- Optimizations for printing (#535).
+- Minor optimizations for `ACursor#downN` and tuple decoders (#492).
+- Minor optimizations for circe-numbers and `JsonNumber` (#494).
+- Syntactic simplification in `Decoder` (#496).
+- String formatting optimizations (#534).
+
+## Other changes to versions, build configuration, and documentation
+- The Scala 2.12 version is now 2.12.1 (#493).
+- The Scala.js version is now 0.6.14 (#527).
+- The Monocle version for circe-optics is updated to 1.4.0-M2 (#532).
+- Build configuration simplifications (#534).
+- Adopted sbt-travisci to avoid duplicating Scala version numbers in build configuration (#499).
+- The project no longer uses sbt-doge (#519).
+- Miscellaneous documentation and metadata improvements (#489, #500, #507, #511, #515, #516, #517, #520).
+
+Thanks to everyone who contributed code or documentation or who offered feedback!
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/5109135/assets,https://api.github.com/repos/circe/circe/releases/5109135,master,https://api.github.com/repos/circe/circe/tarball/v0.7.0-M2,https://github.com/circe/circe/releases/tag/v0.7.0-M2,https://api.github.com/repos/circe/circe/zipball/v0.7.0-M2,v0.7.0-M2,False,True
+4819451,2016-12-02T19:23:17Z,2016-12-02T19:27:54Z,circe 0.7.0-M1,"This milestone release is intended as a preview of changes that will be introduced in 0.7.0 and **should not** be used in production or any other situation where you need things to be correct! The tests pass but there are fairly major internal changes here, and there may be more before 0.7.0 is released (which I'm hoping will happen by the end of next week). So please try out this milestone, but stick with 0.6.1 where it matters for now.
+
+## Upgrading
+
+The biggest change in this release is to the representation of cursor and cursor operations (see #459 for the details). Both have been flattened: `Cursor` and `HistoryOp` are gone entirely, and `HCursor` now extends `ACursor` instead of being wrapped by it.
+
+Many users are likely to be completely unaffected by these rearrangements. The two most common changes that will be necessary are related to the `focus` and `acursor` methods on `HCursor`. The `focus` method on `HCursor` now returns an `Option[Json]` instead of simply `Json`. If you have a cursor that's statically typed as an `HCursor`, you can now call `value` to get access to the `Json` value at the focus directly. If you're calling `c.acursor` on a `c: HCursor`, you can just remove the method call, since the `HCursor` is already an `ACursor`.
+
+`Vector` also now replaces `List` in all API methods related to JSON arrays. You can simply call `toVector` or `toList` as necessary to fit your existing code, or you can rework your existing code to use vectors instead of lists.
+
+If you're currently working with `HistoryOp` or `Cursor` values directly, the upgrade will be a little more work. As always, please ask a question on [Gitter](https://gitter.im/circe/circe) or [Stack Overflow](http://stackoverflow.com/questions/tagged/circe) if you run into problems.
+
+## Why are you doing this to us?
+
+These are big changes, but I think they're worthwhile. For one thing, the pull request introducing the cursor rewrite nets 397 deletions, and the API is a couple of unnecessary types lighter. These changes also significantly improve decoding performance. Here are before-and-after results, with Argonaut and Spray included for comparison:
+
+```
+Benchmark                               Mode  Cnt      Score      Error  Units
+DecodingBenchmark.decodeFoosC (0.6.0)  thrpt   20   4507.107 ±   34.709  ops/s
+DecodingBenchmark.decodeFoosC (new)    thrpt   20   8905.988 ±  135.244  ops/s
+DecodingBenchmark.decodeFoosA          thrpt   20   1493.519 ±   35.113  ops/s
+DecodingBenchmark.decodeFoosS          thrpt   20   9573.566 ±   43.642  ops/s
+
+DecodingBenchmark.decodeIntsC (0.6.0)  thrpt   20  21813.721 ±  202.030  ops/s
+DecodingBenchmark.decodeIntsC (new)    thrpt   20  49015.320 ± 3502.542  ops/s
+DecodingBenchmark.decodeIntsA          thrpt   20   9097.675 ±   57.517  ops/s
+DecodingBenchmark.decodeIntsS          thrpt   20  37520.796 ± 1154.570  ops/s
+```
+
+Most applications won't suddenly be twice as fast, of course (in the [city lots tutorial project](https://github.com/circe/circe/tree/master/examples/sf-city-lots) this only translates into about a 15% improvement in speed, for example), but it's still a pretty big boost, and together with the simplifications I think it's worth it.
+
+## Other changes
+
+There are a few other changes since 0.6.1:
+- Bazillions of negative numbers that nobody cares about can now be decoded as `BigInt`s (#482).
+- `ObjectEncoder` now has a `Contravariant` instance (thanks to @backuitist in #472).
+- `arrFilter` and `objFilter` in circe-optics have now been renamed (to `filterByIndex` and `filterByField`), and new `filter` and `unsafeFilter` methods have been introduced (thanks @julien-truffaut, #473).
+- `truncateToLong` now returns correct results for large values (#480).
+- JSON string values are now parsed as JSON numbers during decoding to integral types, instead of using Scala's `toInt`, etc. (#485).
+
+The project has also moved from my personal GitHub account to a brand new [circe organization](https://github.com/circe)—thanks to @GitHub for helping to make this happen.
+
+Lastly, special thanks go to @jonas for simplifying the build (#474), moving us to @47deg's [sbt-microsites](https://47deg.github.io/sbt-microsites/) (#462), and making many other much-needed documentation improvements.
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/4819451/assets,https://api.github.com/repos/circe/circe/releases/4819451,master,https://api.github.com/repos/circe/circe/tarball/v0.7.0-M1,https://github.com/circe/circe/releases/tag/v0.7.0-M1,https://api.github.com/repos/circe/circe/zipball/v0.7.0-M1,v0.7.0-M1,False,True
+4709484,2016-11-20T16:36:11Z,2016-11-20T16:40:41Z,circe 0.6.1,"This release fixes a bug that caused `HCursor#history` to stack overflow when the history was too long (#458). It also includes some small performance improvements (#457), updates Jawn to 0.10.4 (#449), and follows Cats conventions for POM metadata (#453).
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/4709484/assets,https://api.github.com/repos/circe/circe/releases/4709484,master,https://api.github.com/repos/circe/circe/tarball/v0.6.1,https://github.com/circe/circe/releases/tag/v0.6.1,https://api.github.com/repos/circe/circe/zipball/v0.6.1,v0.6.1,False,False
+4619747,2016-11-10T00:49:53Z,2016-11-10T00:52:54Z,circe 0.6.0,"For a detailed list of the changes and new features in this release, please see the [0.6.0-RC1 release notes](https://github.com/travisbrown/circe/releases/tag/v0.6.0-RC1).
+
+The 0.6.0 release is the same as the release candidate with a few additions, version updates, and some cosmetic renaming:
+- We're now publishing artifacts for Scala 2.12 (in addition to 2.10 and 2.11, but _not_ 2.12.0-RC2).
+- The patch versions for [Cats](https://github.com/typelevel/cats/releases/tag/v0.8.1), Jawn, Monocle, and ScalaCheck are all updated.
+- The new circe-shapeless module has been renamed to circe-shapes (#443).
+- The circe-shapes module now includes coproduct instances, and some `HList` instances have been renamed for consistency with the coproduct ones (#441).
+- `Decoder` has new `decodeList` and `decodeVector` methods, and `Encoder` has `encodeList`, `encodeVector`, and `encodeSet` (#442).
+
+Thanks again to all contributors and to everyone who offered feedback on 0.6.0-RC1.
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/4619747/assets,https://api.github.com/repos/circe/circe/releases/4619747,master,https://api.github.com/repos/circe/circe/tarball/v0.6.0,https://github.com/circe/circe/releases/tag/v0.6.0,https://api.github.com/repos/circe/circe/zipball/v0.6.0,v0.6.0,False,False
+4409174,2016-10-17T19:26:40Z,2016-10-17T19:34:43Z,circe 0.5.4,"This release introduces Scala.js artifacts for circe-optics (thanks, [Eric Merritt](https://github.com/ericbmerritt/)), and includes two backported bug fixes related to JSON number parsing.
+
+While most users should not be affected by these two bugs, we do encourage everyone to update to 0.5.4, which is fully binary compatible with previous 0.5 releases.
+
+The first issue involves very large `BigDecimal` values. If you try to parse a number with an exponent larger than `Int.MaxValue` directly into a `BigDecimal`, you'll get a `NumberFormatException`:
+
+``` scala
+scala> val bigDecimal = BigDecimal(s""1e${ Int.MaxValue.toLong + 1L }"")
+java.lang.NumberFormatException
+  at java.math.BigDecimal.<init>(BigDecimal.java:491)
+...
+```
+
+It is possible to construct large values like this, though, by moving some of the zeros to the left of the decimal point:
+
+``` scala
+scala> val bigDecimal = BigDecimal(s""100e${ Int.MaxValue }"")
+bigDecimal: scala.math.BigDecimal = 1.0E+2147483649
+```
+
+If you have a `BigDecimal` value like this, and you use `BiggerDecimal.fromBigDecimal` to convert it into a `BiggerDecimal`, you'll get an incorrect value in 0.5.3 or earlier:
+
+``` scala
+scala> import io.circe.numbers.{ BiggerDecimal, NumberParsing }
+import io.circe.numbers.BiggerDecimal
+
+scala> val fromBigDecimal = BiggerDecimal.fromBigDecimal(bigDecimal.bigDecimal)
+fromBigDecimal: io.circe.numbers.BiggerDecimal = 1e2147483645
+
+scala> val Some(fromString) = NumberParsing.parseBiggerDecimal(bigDecimal.toString)
+fromString: io.circe.numbers.BiggerDecimal = 1e2147483649
+
+scala> fromBigDecimal == fromString
+res0: Boolean = false
+```
+
+The second bug involves situations where multiples of ten with zeros after a decimal point were not being correctly converted into canonical form. While this does not affect decoding, it does affect equality comparisons for `JsonNumber`:
+
+``` scala
+scala> import io.circe.{ Json, JsonNumber }
+import io.circe.{Json, JsonNumber}
+
+scala> val fromDouble = Json.fromDouble(10.0)
+fromDouble: Option[io.circe.Json] = Some(10.0)
+
+scala> val fromString = Json.fromJsonNumber(JsonNumber.unsafeDecimal(""10.0""))
+fromString: io.circe.Json = 10.0
+
+scala> fromDouble.get == fromString
+res0: Boolean = false
+```
+
+Decoding these values into `Double`, `BigDecimal`, `Long`, or any other representation would result in correct comparisons.
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/4409174/assets,https://api.github.com/repos/circe/circe/releases/4409174,master,https://api.github.com/repos/circe/circe/tarball/v0.5.4,https://github.com/circe/circe/releases/tag/v0.5.4,https://api.github.com/repos/circe/circe/zipball/v0.5.4,v0.5.4,False,False
+4336139,2016-10-07T21:02:12Z,2016-10-07T21:56:49Z,circe 0.5.3,"This release includes backported fixes for three bugs and one entirely new module.
+
+Binary compatibility is now confirmed by [MiMa](https://github.com/typesafehub/migration-manager).
+
+### Bug fixes
+
+In some cases it was possible to inadvertently construct decoders with inconsistent fail-fast and error-accumulating behavior when mapping over an `Option` decoder (#388). This has been fixed by overriding `tryDecodeAccumulating` appropriately in `map` and `flatMap` decoders (#389).
+
+The second bug simply made `Decoder#validate` completely unusable because of an infinitely recursive call that's been removed (#397).
+
+The third bug was that `BiggerDecimal` wasn't `Serializable`. Now it is (#399).
+
+Thanks to [Thomas Dufour](https://github.com/chwthewke), [Julien Jean Paul Sirocchi](https://github.com/sirocchj), and [Jeremy Smith](https://github.com/jeremyrsmith) for the report and fixes.
+
+### New testing module
+
+This release also introduces a new circe-testing module that you can use to test your own circe codecs. Suppose for example that you have a case class like this:
+
+``` scala
+import cats.Eq
+import io.circe.{ Decoder, Encoder }
+
+case class Foo(i: Int, s: String)
+
+object Foo {
+  implicit val decodeFoo: Decoder[Foo] =
+    Decoder.forProduct2(""someNumber"", ""someString"")(Foo.apply)
+
+  implicit val encodeFoo: Encoder[Foo] =
+    Encoder.forProduct2(""someNumber"", ""someString"")(foo => (foo.i, foo.s))
+
+  implicit val eqFoo: Eq[Foo] = Eq.fromUniversalEquals
+}
+```
+
+Now you can add a circe-testing test dependency to your build and write the following:
+
+``` scala
+import io.circe.testing.CodecTests
+import org.scalacheck.Arbitrary
+
+implicit val arbitraryFoo: Arbitrary[Foo] = Arbitrary(
+  for {
+    i <- Arbitrary.arbitrary[Int]
+    s <- Arbitrary.arbitrary[String]
+  } yield Foo(i, s)
+)
+```
+
+And then:
+
+``` scala
+scala> CodecTests[Foo].codec.all.check
++ codec.consistency with accumulating: OK, passed 100 tests.
++ codec.roundTrip: OK, passed 100 tests.
+```
+
+(You can of course check the laws using ScalaTest, Specs 2, or whatever other method you want.)
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/4336139/assets,https://api.github.com/repos/circe/circe/releases/4336139,master,https://api.github.com/repos/circe/circe/tarball/v0.5.3,https://github.com/circe/circe/releases/tag/v0.5.3,https://api.github.com/repos/circe/circe/zipball/v0.5.3,v0.5.3,False,False
+4226355,2016-11-02T22:23:23Z,2016-11-02T22:31:10Z,circe 0.6.0-RC1,"This 0.6.0 release candidate includes several big changes, a couple of new modules, and a handful of smaller fixes and additions.
+
+## Introducing Scala 2.12
+
+We are now publishing artifacts for Scala 2.12.0-RC2. These are available for all circe modules except circe-spray (since Spray [doesn't yet](https://github.com/scala/make-release-notes/blob/2.12.x/projects-2.12.md) support Scala 2.12). Just update your Scala version and you're ready to go (#417).
+
+Note that Scala 2.12 requires Java 8. The circe-optics module now also requires Java 8 on Scala 2.11, since we've updated to Monocle 1.3.1, which now has this requirement (for 2.11 only, not 2.10).
+
+## Why just a candidate?
+
+The primary reason that this is a release candidate is that there are a lot of changes here, and I'd like people to be able to kick the tires (especially on the new generic-extras module) before we put the 0.6.0 stamp on it.
+
+Another reason is that Cats is not yet available for 2.12.0 (only 2.12.0-RC2). This should change soon, and the circe 0.6.0 release will only support 2.12.0 (not 2.12.0-RC2).
+
+Assuming no major issues turn up (and the Cats 2.12.0 artifacts are ready), I'll release 0.6.0 early next week.
+
+## No more Xor
+
+Most of the changes in this release are source compatible—for example, the generic module has been overhauled, but 99.9% of normal usage is unaffected. There's one big exception, though: the decoding result type is now `Either` instead of `Xor`, which Cats removed in 0.8.0 (#424).
+
+If you're on Scala 2.12, in many cases you should be able to upgrade by simply replacing `Xor` with `Either` throughout your code. If you're on 2.10 or 2.11, or if you make use of methods that were on the `Xor` companion object, you'll need to import Cats's `Either` machinery (see the [Cats release notes](https://github.com/typelevel/cats/releases/tag/v0.8.0) for more details).
+
+## Generic derivation overhaul
+
+This release includes major changes to the implementation and arrangement of the generic module (#429). For the most part this shouldn't require any changes in your code, with one exception: derived instances for Shapeless's generic representations (records and coproducts) are no longer directly available. For example, previously you could write this:
+
+``` scala
+scala> import io.circe.generic.auto._, shapeless.record.Record
+import io.circe.generic.auto._
+import shapeless.record.Record
+
+scala> case class Foo(s: String, i: Int)
+defined class Foo
+
+scala> io.circe.Decoder[Foo]
+res0: io.circe.Decoder[Foo] = io.circe.generic.decoding.DerivedDecoder$$anon$1@555bf2d
+
+scala> io.circe.Decoder[Record.`'s -> String, 'i -> Int`.T]
+res1: io.circe.Decoder[shapeless.::[String with shapeless.labelled.KeyTag[Symbol with shapeless.tag.Tagged[String(""s"")],String]...
+```
+
+And circe would happily provide instances for both `Foo` and its generic representation (the `Record` thing). Now you only get the instance for `Foo`.
+
+I'm not aware of anyone actually using this functionality, but if you are, and you need it, skip ahead to the section below on the circe-shapeless module.
+
+There's one other minor change (fixing an oversight): the static return type of the semi-automatic `deriveEncoder` is now `ObjectEncoder` instead of just `Encoder` (#422).
+
+If you notice any other changes in the behavior of circe-generic between 0.5 and 0.6, I'm considering that a bug, and would appreciate a report.
+
+The overhaul accomplishes a couple of things. Most importantly, it makes the new configurable generic derivation (see the next section) possible, with relatively little fragility and duplication. It also has a pretty substantial impact on compile times—compiling circe's own test suite drops from around a minute and fifteen seconds to just under a minute on my machine, and the resulting class files are almost 10% smaller.
+
+## New generic-extras module
+
+### Configurable generic derivation
+
+I've been promising people that this was right around the corner [since January](https://meta.plasm.us/posts/2016/01/14/configuring-generic-derivation/), and it's finally here:
+
+``` scala
+import io.circe.parser.decode, io.circe.syntax._
+import io.circe.generic.extras.Configuration, io.circe.generic.extras.auto._
+
+sealed trait Stuff
+case class Foo(thisIsAString: String, anotherField: Int = 13) extends Stuff
+case class Bar(stuff: Stuff) extends Stuff
+
+implicit val customConfig: Configuration = 
+  Configuration.default.withSnakeCaseKeys.withDefaults.withDiscriminator(""type"")
+
+val doc = """"""{ ""type"": ""Bar"", ""stuff"": { ""type"": ""Foo"", ""this_is_a_string"": ""abc"" }}""""""
+val stuff: Stuff = Bar(Bar(Foo(""xyz"", 23)))
+```
+
+And then:
+
+``` scala
+scala> decode[Stuff](doc)
+res0: Either[io.circe.Error,Stuff] = Right(Bar(Foo(abc,13)))
+
+scala> stuff.asJson
+res2: io.circe.Json =
+{
+  ""stuff"" : {
+    ""stuff"" : {
+      ""this_is_a_string"" : ""xyz"",
+      ""another_field"" : 23,
+      ""type"" : ""Foo""
+    },
+    ""type"" : ""Bar""
+  },
+  ""type"" : ""Bar""
+}
+```
+
+You can even mix and match:
+
+``` scala
+import io.circe.{ Decoder, ObjectEncoder }
+import io.circe.parser.decode, io.circe.syntax._
+import io.circe.generic.extras.Configuration
+import io.circe.generic.extras.auto._
+
+import io.circe.generic.{ semiauto => boring }
+import io.circe.generic.extras.{ semiauto => fancy }
+
+implicit val customConfig: Configuration = 
+  Configuration.default.withSnakeCaseKeys.withDefaults.withDiscriminator(""type"")
+
+sealed trait Stuff
+case class Foo(thisIsAString: String, anotherField: Int = 13) extends Stuff
+case class Bar(thisIsAString: String, anotherField: Int = 13) extends Stuff
+
+object Foo {
+  implicit val decodeBar: Decoder[Bar] = fancy.deriveDecoder
+  implicit val encodeBar: ObjectEncoder[Bar] = fancy.deriveEncoder
+}
+
+object Bar {
+  implicit val decodeBar: Decoder[Bar] = boring.deriveDecoder
+  implicit val encodeBar: ObjectEncoder[Bar] = boring.deriveEncoder
+}
+```
+
+And then:
+
+``` scala
+scala> val foo: Stuff = Foo(""abc"", 123)
+foo: Stuff = Foo(abc,123)
+
+scala> val bar: Stuff = Bar(""xyz"", 987)
+bar: Stuff = Bar(xyz,987)
+
+scala> val fooJson = foo.asJson
+fooJson: io.circe.Json =
+{
+  ""this_is_a_string"" : ""abc"",
+  ""another_field"" : 123,
+  ""type"" : ""Foo""
+}
+
+scala> val barJson = bar.asJson
+barJson: io.circe.Json =
+{
+  ""thisIsAString"" : ""xyz"",
+  ""anotherField"" : 987,
+  ""type"" : ""Bar""
+}
+
+scala> Decoder[Stuff].decodeJson(fooJson)
+res4: io.circe.Decoder.Result[Stuff] = Right(Foo(abc,123))
+
+scala> Decoder[Stuff].decodeJson(barJson)
+res5: io.circe.Decoder.Result[Stuff] = Right(Bar(xyz,987))
+```
+
+And you don't have to worry about issues like [this](https://github.com/travisbrown/circe/pull/164#issuecomment-172724821).
+
+One footnote about encoding with defaults: unlike [argonaut-shapeless](https://github.com/alexarchambault/argonaut-shapeless) and [upickle](https://github.com/lihaoyi/upickle-pprint/), if you have an instance of a case class with a field value that's the same as that field's default value, it _will_ be included in the JSON representation. This allows us to avoid issues related to equality, and seems to me more natural anyway. This is subject to change in a future version, though.
+
+### Enumeration ADTs
+
+Currently the derived codecs for case objects result in either an empty object, or a field with an empty object value, depending on whether the value is statically typed as an ADT leaf or root:
+
+``` scala
+scala> import io.circe.generic.auto._, io.circe.syntax._
+import io.circe.generic.auto._
+import io.circe.syntax._
+
+scala> sealed trait Base; case object Foo extends Base
+defined trait Base
+defined object Foo
+
+scala> Foo.asJson.noSpaces
+res0: String = {}
+
+scala> (Foo: Base).asJson.noSpaces
+res1: String = {""Foo"":{}}
+```
+
+This will probably always be the default behavior, since it's always safe and unambiguous, and since having derived encoders that return JSON values that aren't objects complicates things significantly.
+
+Lots of people have asked for this to be configurable, though, because if you're using a sealed trait of case objects to represent something like an enumeration, you often want the values to be represented as strings. This is now possible with `io.circe.generic.extras.semiauto`:
+
+``` scala
+import io.circe.{ Decoder, Encoder }
+import io.circe.generic.extras.semiauto.{ deriveEnumerationDecoder, deriveEnumerationEncoder }
+import io.circe.jawn._, io.circe.syntax._
+
+sealed trait Suit extends Product with Serializable
+case object Club extends Suit
+case object Heart extends Suit
+case object Spade extends Suit
+case object Diamond extends Suit
+
+object Suit {
+  implicit val decodeSuit: Decoder[Suit] = deriveEnumerationDecoder
+  implicit val encodeSuit: Encoder[Suit] = deriveEnumerationEncoder
+}
+```
+
+And then:
+
+``` scala
+scala> decode[Suit](""\""Club\"""")
+res0: Either[io.circe.Error,Suit] = Right(Club)
+
+scala> List(Heart, Club, Diamond).asJson
+res1: io.circe.Json =
+[
+  ""Heart"",
+  ""Club"",
+  ""Diamond""
+]
+```
+
+If we had any case classes in our `Suit` ADT, the derivation would fail to compile.
+
+Note that this must be explicitly invoked via `deriveEnumerationX`, and will not collide with any automatically derived decoders.
+
+### So why the ""extra"" part?
+
+The approach I've taken to configuration here is at odds with the [design guidelines] for the project, which prohibit using implicit scope for things like configuration. I'm still working on what I see as a more principled approach, and don't want to commit the core `io.circe.generic` module to one approach or the other yet.
+
+Right now `io.circe.generic.extras` is more or less a drop-in replacement for `io.circe.generic` with some extra functionality. It might become `io.circe.generic` before the 1.0 release, or it might remain around as something different, but the approach introduced here will continue to be maintained.
+
+## New circe-shapeless module
+
+As mentioned above, if you actually need encoders or decoders for Shapeless records, you're not entirely out of luck—you can use the new circe-shapeless module, which also provides instances for ordinary (non-record) hlists and Shapeless's `Sized` collections.
+
+If you're wondering whether the `io.circe.shapeless` package name is going to be inconvenient if you import `io.circe._` anywhere and also use Shapeless, you're right. This is part of my ongoing passive-aggressive war against libraries that don't use reverse domain names for their packages. The compiler will help you and there's always `_root_`.
+
+## Decoders and the state monad
+
+The `Decoder` companion object now contains a `state` object with some methods for constructing `StateT[Decoder.Result, ACursor, ?]` values. The primary motivation for this addition is that it makes it easier to define decoders that do not accept ""unused"" fields in a JSON object—see the [pull request description](https://github.com/travisbrown/circe/pull/375) for details and examples. Thanks to @olafurpg for the initial motivation and @liff for writing the tests.
+
+## Scala.js and null
+
+There are two small changes in circe-scalajs. First, when converting `Json` values to JavaScript, a `null` value is no longer converted to `undefined`, but instead to `null`  (thanks to @jimmydivvy in #376).
+
+The second change is that when converting an arbitrary JavaScript value to a JSON value, unknown values now fail the conversion (instead of silently being converted to `null`).
+
+## circe-testing changes
+
+I've added a few new `Arbitrary` and `Cogen` instance to the circe-testing module that was introduced in 0.5.4 (#407). It is also now possible to configure some sizes that aren't tied to the current ScalaCheck size, including the maximum depth of arbitrary JSON objects, and the number of cases to consider when evaluating encoder and decoder equality.
+
+## Version updates
+
+The Cats version is now 0.8.0 (#417). Scala.js has been updated from 0.6.11 to 0.6.13, Jawn from 0.9.0 to 0.10.2, refined from 0.5.0 to 0.6.0, Monocle from 1.2.2 to 1.3.1, and iteratee.io from 0.6.1 to 0.7.0. ScalaTest is now 3.0.0, ScalaCheck is 1.13.3, and Discipline is 0.7.1
+
+## Other changes
+- It's now possible to derive instances using isomorphisms between types with circe-optics (thanks to @andrelfpinto in #395).
+- `Json` now has a `findAllByKey` method (with `\\` as an alias) for recursively searching JSON objects with nested objects and arrays by object field key (thanks to @kevinmeredith in #381).
+- The behavior of the `jsonDouble` prism in circe-optics is changed slightly to make it lawful (#406). These changes involve checking for loss of precision and round-tripping `NaN` through `null`.
+- Some type class instance names have been changed for the sake of consistency (#372).
+- The two traversal methods in `ACursor` that were deprecated in 0.5.0 have been removed (#364).
+- `JsonObject` now has `filter` and `filterKeys` methods for filtering by key and value or just by key (#373).
+- There are now codecs for `java.time.LocalTime` in circe-java8 (thanks to @darienmt in #427).
+
+Thanks to everyone who contributed code, bug reports, or suggestions!
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/4226355/assets,https://api.github.com/repos/circe/circe/releases/4226355,master,https://api.github.com/repos/circe/circe/tarball/v0.6.0-RC1,https://github.com/circe/circe/releases/tag/v0.6.0-RC1,https://api.github.com/repos/circe/circe/zipball/v0.6.0-RC1,v0.6.0-RC1,False,True
+4159208,2016-09-17T14:12:30Z,2016-09-17T14:23:59Z,circe 0.5.2,"This release includes a single change to circe-generic (#366) that does not affect behavior but does speed up compilation for generic derivation in many cases.
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/4159208/assets,https://api.github.com/repos/circe/circe/releases/4159208,master,https://api.github.com/repos/circe/circe/tarball/v0.5.2,https://github.com/circe/circe/releases/tag/v0.5.2,https://api.github.com/repos/circe/circe/zipball/v0.5.2,v0.5.2,False,False
+4046258,2016-09-04T00:53:29Z,2016-09-04T01:06:41Z,circe 0.5.1,"This release contains no changes to 0.5.0 apart from updating the Cats dependency to 0.7.2 so that users who depend on Cats transitively are not exposed to [this bug](https://github.com/typelevel/cats/issues/1346) in Cats 0.7.0.
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/4046258/assets,https://api.github.com/repos/circe/circe/releases/4046258,master,https://api.github.com/repos/circe/circe/tarball/v0.5.1,https://github.com/circe/circe/releases/tag/v0.5.1,https://api.github.com/repos/circe/circe/zipball/v0.5.1,v0.5.1,False,False
+4046077,2016-08-31T19:04:40Z,2016-09-03T23:14:57Z,circe 0.5.0,"## Note
+
+The circe 0.5.0 release depends on Cats 0.7.0, which contains a major bug in the implementation of `combineAll` in the `Monoid` instance for maps. This bug has been fixed in [Cats 0.7.2](https://github.com/typelevel/cats/releases/tag/v0.7.2), and you can safely use this release with Cats 0.7.2 by explicitly specifying your Cats dependencies—just note that if you allow the Cats dependency to be pulled in transitively, you'll get 0.7.0 and the `MapMonoid` bug.
+
+We encourage you to update directly to [circe 0.5.1](https://github.com/travisbrown/circe/releases/tag/v0.5.1), which is fully compatible with 0.5.0 but depends on Cats 0.7.2.
+
+## Bug fixes
+
+This release fixes three bugs:
+- Comparing two zero `BiggerDecimal` values for equality could give incorrect results due to a bug in JDK 7; this has been fixed with a workaround in #348.
+- Some macro hygiene issues have been fixed—thanks [Charles Miller](https://github.com/cmiller-wikia) for reporting this (#298) and [Frank Thomas](https://github.com/fthomas) for fixing it (#299). We have also added a new suite of macro hygiene tests to help avoid problems like this in the future (#300).
+- [Julien Truffaut](https://github.com/julien-truffaut) fixed a bug in `traverse` on `JsonObject` that meant that the order of effects was reversed.
+
+All three bugs are fairly limited in scope (if you're on JDK 8 and not using `-Yno-predef` or calling `traverse` on a `JsonObject,` you are unlikely to be affected), and the fixes will not be backported to 0.4.x or earlier releases. 
+
+## Deprecations
+
+`HCursor`'s `traverseDecode` and `traverseDecodeAccumulating` are now deprecated and will be removed in 0.6 (#353).
+
+## New module
+
+This release includes a new circe-scodec module contributed by [Frank Thomas](https://github.com/fthomas), with codecs for [scodec-bits](https://github.com/scodec/scodec-bits)'s `BitVector` and `ByteVector` (#342).
+
+## Other additions
+- This release includes [Julien Truffaut](https://github.com/julien-truffaut)'s new `JsonPathTraversal` and additions to the `JsonPath` API for circe-optics (#292).
+- [Marius Soutier](https://github.com/mariussoutier) added convenience methods for creating codecs for Scala enumerations (#325).
+- `Decoder` now has a `const` method that provides a more straightforward alternative to `""foo"".pure[Decoder]`, together with a couple of new utility methods related to `Try` (contributed by [Oscar Boykin](https://github.com/johnynek) in #303).
+- [Tom Switzer](https://github.com/tixxit) added a `getOrElse` method for cursors (#338).
+- [Daniel Urban](https://github.com/durban) added a `fold` method for `Context` (#335).
+- There are now `KeyEncoder` and `KeyDecoder` instances for `java.util.UUID` (#309).
+- There is now an `asJsonObject` syntax method for types that have an `ObjectEncoder` instance (#358).
+- It's now possible to use the ""JavaScript selection""-style path printer outside of the context of the `Show` instance for `DecodingFailure` via a new `HistoryOp.opsToPath` method (#267; thanks, [Tobias Johansson](https://github.com/tobias-johansson)).
+
+## Performance improvements
+
+This release includes a number of performance improvements, including much faster decoders for maps and sequences (#353), a few less allocations in various places (#315, #345), and some small changes in `io.circe.Printer` that result in up to a 10% improvement in throughput in some situations (#277).
+
+## Version updates
+
+This release updates the Cats version to 0.7.0, and also includes updates for Jawn (to 0.9.0), Shapeless (to 2.3.2), Refined (to 0.5.0), Monocle (to 1.2.2), Scala.js (to 0.6.10), and iteratee.io (to 0.6.0). There are also several SBT plugin updates (#305).
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/4046077/assets,https://api.github.com/repos/circe/circe/releases/4046077,master,https://api.github.com/repos/circe/circe/tarball/v0.5.0,https://github.com/circe/circe/releases/tag/v0.5.0,https://api.github.com/repos/circe/circe/zipball/v0.5.0,v0.5.0,False,False
+3936427,2016-08-21T23:23:13Z,2016-08-21T23:34:07Z,circe 0.5.0-M3,"## What's missing
+
+This milestone includes all features that are planned for 0.5.0 (configurable generic derivation has been moved to 0.6), and the final 0.5.0 release will be published as soon as [iteratee.io 0.6.0](https://github.com/travisbrown/iteratee) is ready.
+
+## Bug fix
+
+Comparing two zero `BiggerDecimal` values for equality could give incorrect results due to a bug in JDK 7; this has been fixed with a workaround in #348.
+
+## New module
+
+This milestone introduces a new circe-scodec module, with codecs for scodec-bits's `BitVector` and `ByteVector` (#342; thanks, @fthomas!).
+
+## Other additions
+- @mariussoutier added convenience methods for creating codecs for Scala enumerations in #325.
+- @durban introduced a `fold` method for `Context` in #335.
+- @tixxit added a `getOrElse` for cursors in #338.
+
+## Performance improvements
+
+This milestone includes a number of performance improvements, including much faster decoders for maps and sequences (#353), and a few less allocations in various places (#315, #345).
+
+## Deprecations
+
+`HCursor`'s `traverseDecode` and `traverseDecodeAccumulating` are now deprecated and will be removed in 0.6 (#353).
+
+## Version updates
+
+This milestone updates the Cats version to 0.7.0, and also includes updates for Jawn (to 0.9.0), Shapeless (to 2.3.2), and Refined (to 0.5.0).
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/3936427/assets,https://api.github.com/repos/circe/circe/releases/3936427,master,https://api.github.com/repos/circe/circe/tarball/v0.5.0-M3,https://github.com/circe/circe/releases/tag/v0.5.0-M3,https://api.github.com/repos/circe/circe/zipball/v0.5.0-M3,v0.5.0-M3,False,True
+3476999,2016-06-20T00:35:06Z,2016-06-20T00:45:10Z,circe 0.5.0-M2,"## What's missing
+
+This milestone includes all features that are planned for 0.5.0 with the exception of configurable generic derivation (see #164).
+
+## Bug fixes
+
+This release includes a fix (#299) by @fthomas for a macro hygiene bug reported by @cmiller-wikia (#298), along with a new set of macro hygiene compilation tests (#300).
+
+## New features
+
+This release includes @julien-truffaut's new `JsonPathTraversal` and additions to the `JsonPath` API for circe-optics (#292).
+
+There are now `KeyEncoder` and `KeyDecoder` instances for `java.util.UUID` (#309).
+
+`Decoder` now has a `const` method that provides a more straightforward alternative to `""foo"".pure[Decoder]`, together with a couple of new utility methods related to `Try` (contributed by @johnynek in #303). `Decoder.pureEval` also now respects the evaluation strategy of the provided `Eval` (#310).
+
+## Version updates
+
+The Monocle version for circe-optics has been updated from 1.2.1 to 1.2.2, the Scala.js version has been updated from 0.6.9 to 0.6.10, and there are several other SBT plugin updates (#305).
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/3476999/assets,https://api.github.com/repos/circe/circe/releases/3476999,master,https://api.github.com/repos/circe/circe/tarball/v0.5.0-M2,https://github.com/circe/circe/releases/tag/v0.5.0-M2,https://api.github.com/repos/circe/circe/zipball/v0.5.0-M2,v0.5.0-M2,False,True
+3283483,2016-05-23T12:44:22Z,2016-05-23T12:50:47Z,circe 0.5.0-M1,"## What's missing
+
+This milestone includes all features that are planned for 0.5.0 with the exception of configurable generic derivation (see #164) and extensions to the `JsonPath` API in circe-optics (#292).
+
+## Bug fixes
+
+This release includes a fix for a bug in `traverse` on `JsonObject` that resulted in the order of effects being reversed (#293; thanks, @julien-truffaut).
+
+## New features
+
+It's now possible to use the ""JavaScript selection""-style path printer outside of the context of the `Show` instance for `DecodingFailure` via a new `HistoryOp.opsToPath` method (#267; thanks, @tobias-johansson).
+
+## Performance improvements
+
+This release includes some minor changes in `io.circe.Printer` that result in up to a 10% improvement in throughput in some situations (#277).
+
+## Version updates
+
+This release includes version updates for several dependencies, including Cats (from 0.4.1 to 0.6.0), Shapeless (from 2.3.0 to 2.3.1), Scala.js (0.6.8 to 0.6.9), and Monocle (1.2.0 to 1.2.1).
+
+## Other
+
+Some methods that were deprecated in 0.4.0 have been removed (#269). There are also numerous improvements to tests (#275, #278, #291), documentation (#274, #284), and the examples (#268, #276).
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/3283483/assets,https://api.github.com/repos/circe/circe/releases/3283483,master,https://api.github.com/repos/circe/circe/tarball/v0.5.0-M1,https://github.com/circe/circe/releases/tag/v0.5.0-M1,https://api.github.com/repos/circe/circe/zipball/v0.5.0-M1,v0.5.0-M1,False,True
+3024700,2016-04-15T01:48:36Z,2016-04-15T01:52:10Z,circe 0.4.1,"0.4.1 is a bug-fix release that backports #273 to fix an issue where semi-automatic derivation would fail on some generic types:
+
+``` scala
+scala> import io.circe._, io.circe.generic.semiauto._
+import io.circe._
+import io.circe.generic.semiauto._
+
+scala> case class Foo[A](a: A)
+defined class Foo
+
+scala> implicit def decodeFoo[A: Decoder]: Decoder[Foo[A]] = deriveDecoder
+<console>:19: error: could not find Lazy implicit value of type io.circe.generic.decoding.DerivedDecoder[A]
+       implicit def decodeFoo[A: Decoder]: Decoder[Foo[A]] = deriveDecoder
+                                                             ^
+```
+
+The only affected module is circe-generic, and the fix does not break binary compatibility.
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/3024700/assets,https://api.github.com/repos/circe/circe/releases/3024700,master,https://api.github.com/repos/circe/circe/tarball/v0.4.1,https://github.com/circe/circe/releases/tag/v0.4.1,https://api.github.com/repos/circe/circe/zipball/v0.4.1,v0.4.1,False,False
+2986856,2016-04-09T17:32:13Z,2016-04-09T17:36:06Z,circe 0.4.0-RC2,"This is essentially the [first 0.4.0 release candidate](https://github.com/travisbrown/circe/releases/tag/v0.4.0-RC1) with a few additions and changes that I personally need and wanted to see in the the 0.4 release.
+
+The biggest change is that there are now `ArrayEncoder` and `RootEncoder` type classes that extend `Encoder` and witness that an encoder will always return either a JSON array or an array or object respectively (#254). This should not affect existing use of `Encoder` or `ObjectEncoder` in any way, but if you need static evidence that an encoder does one of these other things, you can now have it.
+
+Relatedly, the `@JsonCodec` annotation that was introduced in RC1 now provides encoders that are statically typed as `ObjectEncoder`, not just plain old `Encoder` (#253).
+
+This release candidate also introduces a new circe-spray module that provides a bridge between circe codecs and Spray HTTP's marshalling type classes (#250).
+
+Lastly, I've also added codecs for a few more types in `java.time` to the circe-java8 module (#257), and have moved all of the `java.time` instances from `io.circe.java8` to `io.circe.java8.time`. This is a breaking change, but the update is trivial and `java8` is still in a relatively experimental state.
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/2986856/assets,https://api.github.com/repos/circe/circe/releases/2986856,master,https://api.github.com/repos/circe/circe/tarball/v0.4.0-RC2,https://github.com/circe/circe/releases/tag/v0.4.0-RC2,https://api.github.com/repos/circe/circe/zipball/v0.4.0-RC2,v0.4.0-RC2,False,True
+2941991,2016-04-11T17:10:00Z,2016-04-11T17:14:56Z,circe 0.4.0,"A month and a half ago I wrote the following in the [0.3.0 release notes](https://github.com/travisbrown/circe/releases/tag/v0.3.0):
+
+> 0.3.0 is likely to be a relatively short-lived release, since the current plan is to release 0.4.0 as soon as possible after Shapeless 2.3.0 is out and configurable generic derivation is ready.
+
+Shapeless 2.3.0 has now been [out](http://milessabin.com/blog/2016/02/25/shapeless-2.3.0/) for over a month, and circe still doesn't have configurable generic derivation, so basically nothing is going as planned, but there's a lot of good stuff here anyway.
+
+# Conveniences
+
+This release includes several additions that are designed to make codec definition and use more convenient.
+
+## Codecs for maps with non-string keys
+
+One of the most commonly requested features has been codecs for maps with non-string keys, and this is finally here, thanks to new `KeyEncoder` and `KeyDecoder` type classes by [Pjan Vandaele](https://github.com/pjan) (in #213):
+
+``` scala
+scala> import io.circe.jawn._, io.circe.syntax._
+import io.circe.jawn._
+import io.circe.syntax._
+
+scala> val json = Map('a -> 1, 'b -> 2).asJson
+json: io.circe.Json =
+{
+  ""a"" : 1,
+  ""b"" : 2
+}
+
+scala> decode[Map[Symbol, Int]](json.noSpaces)
+res0: cats.data.Xor[io.circe.Error,Map[Symbol,Int]] = Right(Map('a -> 1, 'b -> 2))
+```
+
+Instances are provided off-the-shelf for symbols and the integral numeric types, and you can easily define your own.
+
+## forProductN helper methods
+
+It's now possible to construct encoders and decoders for case class-like types in a relatively boilerplate-free way without generic derivation (#237):
+
+``` scala
+import io.circe._, io.circe.jawn._, io.circe.syntax._
+
+case class User(id: Long, firstName: String, lastName: String)
+
+object User {
+  implicit val decodeUser: Decoder[User] =
+    Decoder.forProduct3(""id"", ""first_name"", ""last_name"")(User.apply)
+
+  implicit val encodeUser: Encoder[User] =
+    Encoder.forProduct3(""id"", ""first_name"", ""last_name"")(u =>
+      (u.id, u.firstName, u.lastName)
+    )
+}
+```
+
+It's not as clean or as maintainable as generic derivation, but it's less magical, it requires nothing but circe-core, and if you need a custom name mapping it's currently the best solution (until configurable generic derivation is released in 0.5.0).
+
+## @JsonCodec
+
+Thanks to [Dale Wijnand](https://github.com/dwijnand) circe-generic now includes a `@JsonCodec` annotation that simplifies the use of semi-automatic generic derivation (#203):
+
+``` scala
+scala> import io.circe.generic.JsonCodec, io.circe.syntax._
+import io.circe.generic.JsonCodec
+import io.circe.syntax._
+
+scala> @JsonCodec case class Foo(i: Int, s: String)
+defined class Foo
+defined object Foo
+
+scala> Foo(13, ""Qux"").asJson
+res0: io.circe.Json =
+{
+  ""i"" : 13,
+  ""s"" : ""Qux""
+}
+```
+
+This works with both case classes and sealed trait hierarchies (with [one qualification](https://github.com/travisbrown/circe/issues/251)).
+
+# Major changes to APIs and behavior
+
+This change should be mostly source-compatible with 0.3, but there are a few changes to APIs and behavior.
+
+## More sensible optional decoding
+
+[Tyrone Hinderson](https://github.com/ty707) and [Long Cao](https://github.com/longcao) reported a [bug](https://github.com/travisbrown/circe/issues/217) (or at least unexpected behavior) in optional decoders that seemed to call for a fairly major [overhaul](https://github.com/travisbrown/circe/issues/226) of the way decoding works for `Option`. In short, the following now fails:
+
+``` scala
+import io.circe._, io.circe.generic.auto._, io.circe.jawn._
+
+case class Foo(o: Option[Int])
+
+decode[Foo](""null"")
+```
+
+…instead of succeeding with `Foo(None)`.
+
+## Json method name overhaul
+
+The `io.circe.Json` API has received a [major clean-up](https://github.com/travisbrown/circe/pull/210), with many method names being deprecated and replaced with more consistent, intuitive versions. Updating should be a simple matter of doing what the deprecation messages tell you to do.
+
+## RootEncoder
+
+There are now `ArrayEncoder` and `RootEncoder` type classes that extend `Encoder` and witness that an encoder will always return either a JSON array or an array or object respectively (#254). This should not affect existing use of `Encoder` or `ObjectEncoder` in any way, but if you need static evidence that an encoder does one of these other things, you can now have it.
+
+## Error types
+
+`DecodingFailure`'s history is now lazy, and there is a new `Errors` exception type for convenience in situations where you want to aggregate accumulated errors into one exception (#260).
+
+## Accumulating errors while decoding
+
+The `Parser` interface has a new `decodeAccumulating` method for more convenient use of the [error accumulation facilities](https://meta.plasm.us/posts/2015/12/17/error-accumulating-decoders-in-circe/) added in 0.3.0.
+
+# Performance improvements
+
+This release includes two major performance improvement efforts—one primarily focused on compile-time performance, and the other on runtime.
+
+## Overhauled generic derivation
+
+One of the biggest changes in this release is an overhaul of the generic derivation system (#247). For various reasons (outlined in #242) this release no longer depends on [export-hook](https://github.com/milessabin/export-hook) and instead provides its own (much simpler) version of a similar mechanism. We may reintroduce an export-hook dependency before 1.0, but for now this approach is a better fit for our needs, especially with respect to the new configurable derivation now planned for 0.5. 
+
+The new system also uses a few new macros to help make derivation faster and less crash-y on large ADTs. To summarize these improvements: the overhaul speeds up compilation (from ~100s to ~53s for the test suite on my desktop), reduces jar size a bit (from 1152K to 836K for [these Twitter API case classes](https://gist.github.com/travisbrown/f2bb3704202481e6c9f8)), and even has a small effect on runtime performance (higher is better):
+
+```
+[info] Benchmark                                     Mode  Cnt        Score       Error  Units
+[info] CirceDerivationBenchmark.decodeDerived (old) thrpt   40  1281441.475 ±  8085.489  ops/s
+[info] CirceDerivationBenchmark.decodeDerived (new) thrpt   40  1345841.543 ±  6627.257  ops/s
+[info] CirceDerivationBenchmark.encodeDerived (old) thrpt   40  1047943.868 ±  9168.659  ops/s
+[info] CirceDerivationBenchmark.encodeDerived (new) thrpt   40  1118678.877 ±  8278.789  ops/s
+```
+
+None of these changes should have any effect on normal usage.
+
+## Runtime performance
+
+We profiled some common use cases and smoothed out rough edges, resulting in some substantial runtime performance improvements (#233):
+
+```
+DecodingBenchmark.decodeFoosC              thrpt   40     2562.882 ±    23.607  ops/s
+DecodingBenchmark.decodeFoosC              thrpt   40     3590.287 ±    19.077  ops/s
+
+DecodingBenchmark.decodeIntsC              thrpt   40    11709.801 ±    54.986  ops/s
+DecodingBenchmark.decodeIntsC              thrpt   40    17154.936 ±    95.222  ops/s
+
+EncodingBenchmark.encodeFoosC              thrpt   40     6757.780 ±    32.703  ops/s
+EncodingBenchmark.encodeFoosC              thrpt   40     7450.555 ±    43.893  ops/s
+
+EncodingBenchmark.encodeIntsC              thrpt   40    94377.750 ±   814.382  ops/s
+EncodingBenchmark.encodeIntsC              thrpt   40   121730.641 ±   710.014  ops/s
+
+ParsingBenchmark.parseFoosC                thrpt   40     3051.392 ±    21.343  ops/s
+ParsingBenchmark.parseFoosC                thrpt   40     2926.140 ±    46.165  ops/s
+
+ParsingBenchmark.parseIntsC                thrpt   40    14202.027 ±   283.446  ops/s
+ParsingBenchmark.parseIntsC                thrpt   40    12964.576 ±   141.045  ops/s
+
+PrintingBenchmark.printFoosC               thrpt   40     3736.044 ±    56.407  ops/s
+PrintingBenchmark.printFoosC               thrpt   40     4134.720 ±    20.008  ops/s
+
+PrintingBenchmark.printIntsC               thrpt   40    22717.970 ±   142.034  ops/s
+PrintingBenchmark.printIntsC               thrpt   40    24389.645 ±   381.590  ops/s
+```
+
+Each pair of lines shows throughput before and after the changes; higher values are better.
+
+# New or expanded modules
+
+## Spray and circe
+
+This release introduces a new circe-spray module that provides a bridge between circe codecs and [Spray](http://spray.io/) HTTP's marshalling type classes (#250). See the new [todo-spray](https://github.com/travisbrown/circe/tree/master/examples/todo-spray) example for details.
+
+## Java 8 time codecs
+
+I've also added codecs for a few more types in `java.time` to the circe-java8 module (#257), and have moved all of the `java.time` instances from `io.circe.java8` to `io.circe.java8.time`. This is a breaking change, but the update is trivial and circe-java8 is still in a relatively experimental state.
+
+# Other changes
+
+## Human-readable error messages
+
+[Tobias Johansson](https://github.com/tobias-johansson) added a `Show` instance for `DecodingFailure` that provides selector-style paths to error locations (#222):
+
+``` scala
+import cats.data.Validated, cats.std.list._, cats.syntax.foldable._, cats.syntax.show._
+import io.circe.generic.auto._, io.circe.jawn._
+
+case class Foo(i: Int, s: String)
+case class Bar(foo: Foo)
+case class Qux(bar: Bar, name: String)
+
+val Validated.Invalid(result) = decodeAccumulating[Qux](""""""{ ""bar"": { ""foo"": { ""i"": false }}}"""""")
+```
+
+And then:
+
+``` scala
+scala> result.toList.foreach(error => println(error.show))
+DecodingFailure at .bar.foo.i: Int
+DecodingFailure at .bar.foo.s: Attempt to decode value on failed cursor
+DecodingFailure at .name: Attempt to decode value on failed cursor
+```
+
+## Cats type class instances and law checking
+
+Many types now have appropriate Cats type class instances for the first time, with the appropriate laws being checked by Discipline (#244).
+
+## Versions
+
+circe-generic now depends on Shapeless 2.3.0 (#213), and circe-refined depends on refined 0.4.0 (#264).
+
+## Documentation, tests, and benchmarks
+
+Numerous improvements have been made to the tests and API documentation, and [Merlin Göttlinger](https://github.com/mgttlinger) added [picopickle](https://github.com/netvl/picopickle) to the benchmarks (#219).
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/2941991/assets,https://api.github.com/repos/circe/circe/releases/2941991,master,https://api.github.com/repos/circe/circe/tarball/v0.4.0,https://github.com/circe/circe/releases/tag/v0.4.0,https://api.github.com/repos/circe/circe/zipball/v0.4.0,v0.4.0,False,False
+2897581,2016-03-28T04:19:09Z,2016-03-28T05:02:41Z,circe 0.4.0-RC1,"These release notes are an abbreviated version for the first 0.4.0 release candidate—the final release will include a more detailed account.
+
+## Changes
+- Less boilerplate-y semi-automatic generic derivation thanks to [Dale Wijnand](https://github.com/dwijnand): #203
+- Codecs for maps with non-string keys thanks to [Pjan Vandaele](https://github.com/pjan): #213
+- More humane decoding error messages thanks to [Tobias Johansson](https://github.com/tobias-johansson): #222
+- Bug fixes and more consistent behavior for optional decoders thanks to a report from [Tyrone Hinderson](https://github.com/ty707) and [Long Cao](https://github.com/longcao): #228 and #231 
+- Easier codec definitions in circe-core with `forProductN`: #237
+- Lots of renaming for consistency and clarity in the `Json` API: #210 
+- Shapeless version in circe-generic updated to 2.3.0: #213 
+- Major performance improvements driven by profiling common use cases: #233 
+- Addition of [picopickle](https://github.com/netvl/picopickle) to the benchmarks thanks to [Merlin Göttlinger](https://github.com/mgttlinger): #219
+
+## Generic derivation improvements
+
+One of the biggest changes in this release is the overhaul of the generic derivation system in #247. For various reasons (outlined in #242) this release no longer depends on [export-hook](https://github.com/milessabin/export-hook) and instead provides its own (much simpler) version of a similar mechanism. We may reintroduce an export-hook dependency before 1.0, but for now this approach is a better fit for our needs, especially with respect to the new configurable derivation now planned for 0.5. 
+
+The new system also uses a few new macros to help make derivation faster and less crash-y on large ADTs. To summarize these improvements: the overhaul speeds up compilation (from ~100s to ~53s for the test suite on my desktop), reduces jar size a bit (from 1152K to 836K for [these Twitter API case classes](https://gist.github.com/travisbrown/f2bb3704202481e6c9f8)), and even has a small effect on runtime performance (higher is better):
+
+```
+[info] Benchmark                                     Mode  Cnt        Score       Error  Units
+[info] CirceDerivationBenchmark.decodeDerived (old) thrpt   40  1281441.475 ±  8085.489  ops/s
+[info] CirceDerivationBenchmark.decodeDerived (new) thrpt   40  1345841.543 ±  6627.257  ops/s
+[info] CirceDerivationBenchmark.encodeDerived (old) thrpt   40  1047943.868 ±  9168.659  ops/s
+[info] CirceDerivationBenchmark.encodeDerived (new) thrpt   40  1118678.877 ±  8278.789  ops/s
+```
+
+None of these changes should have any effect on normal usage.
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/2897581/assets,https://api.github.com/repos/circe/circe/releases/2897581,master,https://api.github.com/repos/circe/circe/tarball/v0.4.0-RC1,https://github.com/circe/circe/releases/tag/v0.4.0-RC1,https://api.github.com/repos/circe/circe/zipball/v0.4.0-RC1,v0.4.0-RC1,False,True
+2610467,2016-02-14T00:50:01Z,2016-02-14T00:59:44Z,circe 0.3.0,"This release again represents a change of plans—instead of waiting for Shapeless 2.3.0 and ongoing related work in [#164](https://github.com/travisbrown/circe/pull/164), we've decided that it makes sense to get a stable release published before those changes happen.
+
+0.3.0 is likely to be a relatively short-lived release, since the current plan is to release 0.4.0 as soon as possible after Shapeless 2.3.0 is out and configurable generic derivation is ready.
+
+## New modules
+
+This release introduces a number of new modules. Two of these are near (or at) the root of the dependency tree and represent a refactoring of core functionality:
+- [circe-numbers](https://github.com/travisbrown/circe/tree/master/numbers) is a zero-dependency module that supports more responsible representation of JSON numbers (see [#189](https://github.com/travisbrown/circe/pull/189) for discussion). circe-core now depends on circe-numbers.
+- [circe-scalajs](https://github.com/travisbrown/circe/tree/master/numbers) provides a few functions designed to make Scala.js interoperability more convenient.
+
+The rest of the new modules provide more experimental new functionality or interoperability with other libraries:
+- [circe-literal](https://github.com/travisbrown/circe/tree/master/literal) provides a macro-powered JSON string interpolator and codecs for literal values.
+- [circe-jackson](https://github.com/travisbrown/circe/tree/master/numbers) provides Jackson-powered parsing and printing.
+- [circe-refined](https://github.com/travisbrown/circe/tree/master/refined) provides codecs for types with [refined](https://github.com/fthomas/refined) constraints.
+- [circe-streaming](https://github.com/travisbrown/circe/tree/master/streaming) supports streaming parsing and decoding using [iteratee.io](https://github.com/travisbrown/iteratee).
+- [circe-optics](https://github.com/travisbrown/circe/tree/master/streaming) provides [Monocle](https://github.com/julien-truffaut/Monocle) prisms for interacting with JSON documents.
+- [circe-java8](https://github.com/travisbrown/circe/tree/master/java8) provides codecs for `java.time` types.
+
+circe-parse has also been renamed circe-parser, but its role is unchanged.
+
+## Improved support (and decoders) for JSON numbers
+
+The most substantial changes in behavior since 0.2 are related to the decoding of JSON numbers. One serious bug inherited from Argonaut has been fixed (it's no longer possible for user input to result in extremely computationally expensive operations on `BigDecimal` values), it's no longer possible for numeric input to result in runtime exceptions, and a number of small changes have been made to the behavior of the integral decoders. For example, the following now fails instead of returning `32767` (#83):
+
+``` scala
+io.circe.jawn.decode[Short](""32768"")
+```
+
+And the following fails instead of returning `10` (#83):
+
+``` scala
+io.circe.jawn.decode[Int](""10.999"")
+```
+
+The decoders for `Double` and `Float` also now follow the integral decoders in attempting to parse a JSON string:
+
+``` scala
+scala> io.circe.jawn.decode[Double](""\""0.1\"""")
+res0: cats.data.Xor[io.circe.Error,Double] = Right(0.1)
+```
+
+See [#189](https://github.com/travisbrown/circe/pull/189) and [this blog post](https://meta.plasm.us/posts/2016/02/14/json-numbers-in-circe-0.3.0/) for more details.
+
+## Accumulating decoders
+
+The idea is introduced in [this blog post](https://meta.plasm.us/posts/2015/12/17/error-accumulating-decoders-in-circe/): it's now possible to transform a `Decoder[A]` into a new type `AccumulatingDecoder[A]` that accumulates errors whenever possible (assuming the original `Decoder` was defined in such a way as to support this). The behavior for ordinary decoders is completely unchanged, but it's now possible to do the following, for example:
+
+``` scala
+import io.circe._, io.circe.generic.auto._
+
+case class Foo(i: Int, s: String)
+
+Decoder[Foo].accumulating(Json.empty.hcursor)
+```
+
+And get both errors instead of just the first.
+
+## Other changes
+- `Decoder` now has `prepare` and `emap` methods for transforming incoming JSON and successful results ([#123](https://github.com/travisbrown/circe/pull/123)).
+- `Json` now has a `deepMerge` method ([#172](https://github.com/travisbrown/circe/pull/172)).
+- It's now possible to replay history (in the form of a list of operations) against a cursor ([#135](https://github.com/travisbrown/circe/pull/135)).
+- A bug was fixed for `Json`'s `hashCode` ([#142](https://github.com/travisbrown/circe/pull/142)).
+- circe now depends on Cats 0.4.1 and Scala.js 0.6.7 (instead of 0.2.0 and 0.6.5), but these updates have little impact on the public API.
+
+## Deprecations
+- `&&&` and `|||` on `Decoder` (and `|||` on `ACursor`) are now deprecated in favor of `and` and `or`.
+- `+` and `-` on `JsonObject` are being replaced by `add` and `remove`.
+
+The `decoder` and `encoder` methods on `io.circe.generic.semiauto.DerivationHelper` are also now deprecated. Instead of the following:
+
+``` scala
+import io.circe._, io.circe.generic.semiauto._
+
+implicit val fooDecoder: Decoder[Foo] = deriveFor[Foo].decoder
+implicit val fooEncoder: Encoder[Foo] = deriveFor[Foo].encoder
+```
+
+You'd now write:
+
+``` scala
+import io.circe._, io.circe.generic.semiauto._
+
+implicit val fooDecoder: Decoder[Foo] = deriveDecoder[Foo]
+implicit val fooEncoder: Encoder[Foo] = deriveEncoder[Foo]
+```
+
+Or simply:
+
+``` scala
+import io.circe._, io.circe.generic.semiauto._
+
+implicit val fooDecoder: Decoder[Foo] = deriveDecoder
+implicit val fooEncoder: Encoder[Foo] = deriveEncoder
+```
+
+All of the deprecated methods will be removed in 0.4.0.
+
+## Known issues
+- Jawn [currently accepts](https://github.com/non/jawn/issues/47) `-.1` as a JSON number, and circe represents it as a null JSON value. This means that the following will result in `NaN`, not `-0.1` (the behavior in 0.2) or a decoding failure:
+  
+  ``` scala
+  io.circe.jawn.decode[Double](""-.1"")
+  ```
+- The parsing support provided by Scala.js in circe-parser is subject to the limitations of JavaScript's JSON parsing and will lose precision for values that can't be represented exactly as a double precision floating point number. (This is unchanged since 0.2.)
+
+## Contributors
+
+Thanks to the [twelve people](https://github.com/travisbrown/circe/graphs/contributors?from=2015-11-04&to=2016-02-13&type=c) who contributed code and documentation to this release, and to the many, many others who filed issues or offered feedback on [Gitter](https://gitter.im/travisbrown/circe).
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/2610467/assets,https://api.github.com/repos/circe/circe/releases/2610467,master,https://api.github.com/repos/circe/circe/tarball/v0.3.0,https://github.com/circe/circe/releases/tag/v0.3.0,https://api.github.com/repos/circe/circe/zipball/v0.3.0,v0.3.0,False,False
+2135395,2015-11-16T21:29:06Z,2015-11-16T21:37:04Z,circe 0.2.1,"0.2.1 is a bug-fix release that backports #110 to fix an issue that could result in incorrect indentation when using a printer concurrently.
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/2135395/assets,https://api.github.com/repos/circe/circe/releases/2135395,master,https://api.github.com/repos/circe/circe/tarball/v0.2.1,https://github.com/circe/circe/releases/tag/v0.2.1,https://api.github.com/repos/circe/circe/zipball/v0.2.1,v0.2.1,False,False
+2075005,2015-11-05T05:05:14Z,2015-11-05T05:12:11Z,circe 0.2.0,"This release represents a slight change of plans for 0.2—I'd been waiting for the 2.3.0 release of Shapeless (which is used in the `generic` module), but that's no longer really necessary after some recent changes to `generic` and the upgrade to export-hook 1.0.2, so we've decided to release a stable 0.2.0 that depends on Shapeless 2.2.5 and cats 0.2, with circe 0.3 (probably) depending on Shapeless 2.3 and cats 0.3.
+
+The 0.2.0 release introduces Scala.js support and one new module (`parse`) designed to facilitate cross-platform usage. On the JVM the `parse` module will use [Jawn](https://github.com/non/jawn) for parsing, while on Scala.js it will use [`scalajs.js.JSON.parse`](https://github.com/travisbrown/circe/pull/48). JVM-only projects will generally want to continue using the `jawn` module, since it provides a slightly richer API.
+
+One new dependency has been added since 0.1 (for a total of two dependencies for `core`): [export-hook](https://github.com/milessabin/export-hook), which makes generic codec derivation much cleaner, whether it's provided by the `generic` module or other mechanisms (which to my knowledge don't exist yet). Many, many bugs in generic derivation have been fixed since 0.1, in part thanks to the facilities provided by export-hook.
+
+The `generic` module now includes support for deriving ""incomplete"" and patching decoders. This kind of derivation is described [in my blog post here](https://meta.plasm.us/posts/2015/06/21/deriving-incomplete-type-class-instances/) and is demonstrated in [this example project](https://github.com/vkostyukov/finch-101/blob/e1cfff7c5d07c7e0a96b5cddf7ba9488668641d2/src/main/scala/i/f/workshop/finch/Todo.scala#L38) by Vladimir Kostyukov.
+
+The `core` module now provides `Decoder` and `Encoder` [instances for tuples](https://github.com/travisbrown/circe/pull/42) via code generation.
+
+Important data types and type classes are now `Serializable`.
+
+This release also introduces a lot of renaming (the name ""jfc"" is [completely gone](https://github.com/travisbrown/circe/pull/23), `CursorOpElement` is now `CursorOp`, `CursorOp` is now `HistoryOp`, some etc.), and a few type aliases (e.g. `Decode.Result[A]` for `Xor[DecodingFailure, A]`), but these should not affect most normal usage.
+
+There are many miscellaneous improvements to the tests and build configuration.
+
+Thanks to contributors [Alexandre Archambault](https://github.com/alexarchambault), [Vladimir Kostyukov](https://github.com/vkostyukov), [Tagir Magomedov](https://github.com/groz), [Olli Helenius](https://github.com/liff), [Long Cao](https://github.com/longcao), [Otto Chrons](https://github.com/ochrons), [Jon Pretty](https://twitter.com/propensive), and [Erik Osheim](https://github.com/non). Thanks also to [Miles Sabin](https://twitter.com/milessabin) for adding features to export-hook specifically to support the needs of this project, to [Alistair Johnson](https://github.com/InTheNow/) and [Li Haoyi](https://github.com/lihaoyi) for guidance on the Scala.js setup, and to all of our early adopters and experimenters who have helped to make the project better by filing issues or asking questions on [the Gitter channel](https://gitter.im/travisbrown/circe).
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/2075005/assets,https://api.github.com/repos/circe/circe/releases/2075005,master,https://api.github.com/repos/circe/circe/tarball/v0.2.0,https://github.com/circe/circe/releases/tag/v0.2.0,https://api.github.com/repos/circe/circe/zipball/v0.2.0,v0.2.0,False,False
+2072314,2015-11-04T16:34:57Z,2015-11-04T18:27:03Z,circe 0.1.2,"This is a bug-fix release that backports #66 to the 0.1 series.
+
+I've also updated the ScalaCheck dependency since the 1.12.5 snapshot is no longer available.
+",https://api.github.com/users/travisbrown,316049,travisbrown,https://api.github.com/repos/circe/circe/releases/2072314/assets,https://api.github.com/repos/circe/circe/releases/2072314,master,https://api.github.com/repos/circe/circe/tarball/v0.1.2,https://github.com/circe/circe/releases/tag/v0.1.2,https://api.github.com/repos/circe/circe/zipball/v0.1.2,v0.1.2,False,False

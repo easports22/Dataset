@@ -1,0 +1,268 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8263112,2017-10-25T22:16:14Z,2017-10-25T22:28:47Z,"Swift 4, Xcode 9, iOS 11 Support","This release fix some compatibility issue with swift 4, Xcode 9, and iOS 11.
+
+**Also looking for a maintainer!** 
+
+Hero helped me learned a lot about iOS over the last year. Fighting the iOS animation system and dealing with UI bugs has been quite a journey. But I am sorry to say that I do not have to time to maintain this project anymore. The scope of this project has become unmanageable for me to handle. I am looking for a project maintainer to this project and I'm open to transfer this to a public organization instead of under my personal account.
+
+I will still be using Hero in productions, and contribute to critical bug fixes and new iOS release.",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/8263112/assets,https://api.github.com/repos/lkzhao/Hero/releases/8263112,master,https://api.github.com/repos/lkzhao/Hero/tarball/1.0.0,https://github.com/lkzhao/Hero/releases/tag/1.0.0,https://api.github.com/repos/lkzhao/Hero/zipball/1.0.0,1.0.0,False,False
+7128589,2017-07-21T20:24:55Z,2017-07-21T20:27:52Z,1.0.0-alpha.4,* fix a crash when `fullScreenSnapshot` fails to capture. (happens when the app is backgrounded),https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/7128589/assets,https://api.github.com/repos/lkzhao/Hero/releases/7128589,master,https://api.github.com/repos/lkzhao/Hero/tarball/1.0.0-alpha.4,https://github.com/lkzhao/Hero/releases/tag/1.0.0-alpha.4,https://api.github.com/repos/lkzhao/Hero/zipball/1.0.0-alpha.4,1.0.0-alpha.4,False,True
+7086131,2017-07-18T21:31:15Z,2017-07-18T22:17:11Z,1.0.0-alpha.3,"* fix an issue where views that are contained in a transformed view are not animated properly https://github.com/lkzhao/Hero/issues/237
+* less force-unwraps.",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/7086131/assets,https://api.github.com/repos/lkzhao/Hero/releases/7086131,master,https://api.github.com/repos/lkzhao/Hero/tarball/1.0.0-alpha.3,https://github.com/lkzhao/Hero/releases/tag/1.0.0-alpha.3,https://api.github.com/repos/lkzhao/Hero/zipball/1.0.0-alpha.3,1.0.0-alpha.3,False,True
+7048364,2017-07-14T19:37:18Z,2017-07-14T19:42:51Z,1.0.0-alpha.2,"This is the second alpha version for 1.0.0 release. Mostly bug fixes.
+* fix an issue where the duration is incorrect when resuming an animation with delay
+* fix a performance issue with interactive transition
+* remove most of the force unwrapped optional
+* fix a crash where finish/cancel is called before the animation has started.
+* make internal CAMediaTimingFunctions public
+* default container color is now black. to customize, construct your own `HeroTransition` object.
+
+Example project
+* animate tabbar so that it doesnt cover the content
+* add a playground in the example project for quick tests",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/7048364/assets,https://api.github.com/repos/lkzhao/Hero/releases/7048364,master,https://api.github.com/repos/lkzhao/Hero/tarball/1.0.0-alpha.2,https://github.com/lkzhao/Hero/releases/tag/1.0.0-alpha.2,https://api.github.com/repos/lkzhao/Hero/zipball/1.0.0-alpha.2,1.0.0-alpha.2,False,True
+6898420,2017-06-30T20:43:37Z,2017-06-30T20:43:48Z,1.0.0-alpha.1,"Sorry guys for the inactivity with this project. I have been having some other commitments. From now on, I will start maintaining and updating it more often. 
+
+So to prepare for stable release 1.0, there will be a few alpha versions. I will start to clean up issues and start monitor new ones. Feel free to submit anything you have encountered while using the new versions.
+
+#### New Features
+
+* `.useNoSnapshot` will now try to insert the view back to the view hierarchy once the transition completes. So you don't need to manually insert it back.
+  * Note: for views that have collection view or table view as the superview, Hero might not be able to insert it into the correct subview index since the collection view and table view might have altered their subviews during the transition.
+* `.useNoSnapshot` will now animate subview layout changes. Very convenient when you want your custom layout be animated during the transition.
+
+* Added `.whenXXX` modifiers to make hero more declaritive.
+  * instead of conforming to `HeroViewControllerDelegate`, you can now use `.whenPresenting`, `.whenDismissing`, `.whenApearing`, `.whenDisapearing`, `.whenMatched`, or your own conditions with `.when`
+* Added `isHeroEnabledForSubviews` property on UIView. Setting this to true will let Hero skip over the subview tree. This saves a lot of computation time when the subview tree is complex.
+
+* Better support iOS custom keyboard
+* Better support `UIVisualEffectView`
+* You can now create your own instance of `HeroTransition` instead of using `isHeroEnabled` & `Hero.shared`.
+  * just create an instance of `HeroTransition` and assign it to the `transitionDelegate` property of your view controller.
+* Added `viewOrderingStrategy` property to `HeroTransition` which allow you to customize which view controller should be inserted first during the transition.
+* Added `isUserInteractionEnabled` property to `HeroTransition` which allow you to enable user interaction during the transition.
+  * Note: by default, Hero will create snapshot of your views and use them for animation. They don't have the same event handler as your own views. So to enable user interaction, you have to apply `.useNoSnapshot` modifier to the views that you want to enabled user interaction. Also keep in mind that Hero can be in any state when you are handling user interaction. If you want to trigger a new transition, besure to call `cancel(animated: false)` or `finish(animated: false)` before starting the new transition.
+
+* The following methods on `Hero` is removed in favor of creating your custom `HeroTransition` object
+  * `func disableDefaultAnimationForNextTransition()`
+  * `func setDefaultAnimationForNextTransition(_ animation: HeroDefaultAnimationType)`
+  * `func setContainerColorForNextTransition(_ color: UIColor?)`
+
+#### Bug fixes: 
+* fix the ghosting effect where the source view and target view animates at different rate
+* fix tab bar crashes and inconsistency when tapping too fast.
+
+#### Future Roadmap:
+1. Custom snapshot view
+2. Masking support
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/6898420/assets,https://api.github.com/repos/lkzhao/Hero/releases/6898420,master,https://api.github.com/repos/lkzhao/Hero/tarball/1.0.0-alpha.1,https://github.com/lkzhao/Hero/releases/tag/1.0.0-alpha.1,https://api.github.com/repos/lkzhao/Hero/zipball/1.0.0-alpha.1,1.0.0-alpha.1,False,True
+5774909,2017-03-16T22:31:52Z,2017-03-16T22:32:38Z,Bug fixes,"Fix #148 
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5774909/assets,https://api.github.com/repos/lkzhao/Hero/releases/5774909,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.3.6,https://github.com/lkzhao/Hero/releases/tag/0.3.6,https://api.github.com/repos/lkzhao/Hero/zipball/0.3.6,0.3.6,False,False
+5757402,2017-03-15T18:21:38Z,2017-03-15T18:29:26Z,Bug fixes,"* fix a compilation bug with manual install because UIKit not imported in one file.
+* fix .selectedBy animations type not working",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5757402/assets,https://api.github.com/repos/lkzhao/Hero/releases/5757402,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.3.5,https://github.com/lkzhao/Hero/releases/tag/0.3.5,https://api.github.com/repos/lkzhao/Hero/zipball/0.3.5,0.3.5,False,False
+5712145,2017-03-11T16:58:34Z,2017-03-11T16:58:45Z,Better string properties parser & bug fixes,"* added three new string properties to set defaultAnimation
+    * heroModalAnimationTypeString
+    * heroNavigationAnimationTypeString
+    * heroTabBarAnimationTypeString
+
+* new string parser that will give some error feedback
+* fix speed different bug for interaction transition #132 
+* other small bug fixes.",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5712145/assets,https://api.github.com/repos/lkzhao/Hero/releases/5712145,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.3.4,https://github.com/lkzhao/Hero/releases/tag/0.3.4,https://api.github.com/repos/lkzhao/Hero/zipball/0.3.4,0.3.4,False,False
+5572840,2017-02-25T20:52:56Z,2017-02-25T20:54:45Z,Bug fixes,"- added ""contentsRect"" & ""contentsScale"" animation support
+- fix a collection view ghosting effect bug #97 
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5572840/assets,https://api.github.com/repos/lkzhao/Hero/releases/5572840,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.3.3,https://github.com/lkzhao/Hero/releases/tag/0.3.3,https://api.github.com/repos/lkzhao/Hero/zipball/0.3.3,0.3.3,False,False
+5481354,2017-02-16T18:11:28Z,2017-02-16T18:12:00Z,0.3.2,"- new properties for specifying default animations
+
+``` swift
+extension UIViewController {
+  /// default hero animation type for presenting & dismissing modally
+  public var heroModalAnimationType: HeroDefaultAnimationType
+}
+extension UINavigationController {
+  /// default hero animation type for push and pop within the navigation controller
+  public var heroNavigationAnimationType: HeroDefaultAnimationType
+}
+extension UITabBarController {
+  /// default hero animation type for switching tabs within the tab bar controller
+  public var heroTabBarAnimationType: HeroDefaultAnimationType
+}
+```
+- bug fixes https://github.com/lkzhao/Hero/issues/90 https://github.com/lkzhao/Hero/issues/85
+- basic support for animating UIVisualEffectView's effect property in iOS 10
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5481354/assets,https://api.github.com/repos/lkzhao/Hero/releases/5481354,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.3.2,https://github.com/lkzhao/Hero/releases/tag/0.3.2,https://api.github.com/repos/lkzhao/Hero/zipball/0.3.2,0.3.2,False,False
+5433458,2017-02-12T16:19:07Z,2017-02-12T19:16:35Z,Bug fixes,"- fixed a view order issue #85 
+- cleaned up example projects
+- general bug/regression fix for 0.3.0
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5433458/assets,https://api.github.com/repos/lkzhao/Hero/releases/5433458,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.3.1,https://github.com/lkzhao/Hero/releases/tag/0.3.1,https://api.github.com/repos/lkzhao/Hero/zipball/0.3.1,0.3.1,False,False
+5427188,2017-02-11T02:18:20Z,2017-02-11T02:18:41Z,OverFullScreen Support & Default Transition,"- support `.overFullScreen` modalPresentationStyle
+- Implement many new default transitions. (fade was the only default transition before this update)
+  - **.push(direction: Direction)**
+  - **.pull(direction: Direction)**
+  - **.cover(direction: Direction)**
+  - **.uncover(direction: Direction)**
+  - **.slide(direction: Direction)**
+  - **.zoomSlide(direction: Direction)**
+  - **.pageIn(direction: Direction)**
+  - **.pageOut(direction: Direction)**
+- a few new modifiers:
+  - **beginWith(modifiers:[HeroModifier])**
+  - **durationMatchLongest**
+  - **overlay(color:UIColor, opacity:CGFloat)**
+  - **masksToBounds(_ masksToBounds: Bool)**
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5427188/assets,https://api.github.com/repos/lkzhao/Hero/releases/5427188,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.3.0,https://github.com/lkzhao/Hero/releases/tag/0.3.0,https://api.github.com/repos/lkzhao/Hero/zipball/0.3.0,0.3.0,False,False
+5391116,2017-02-08T04:58:39Z,2017-02-08T04:58:59Z,tvOS Support,,https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5391116/assets,https://api.github.com/repos/lkzhao/Hero/releases/5391116,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.2.0,https://github.com/lkzhao/Hero/releases/tag/0.2.0,https://api.github.com/repos/lkzhao/Hero/zipball/0.2.0,0.2.0,False,False
+5386836,2017-02-07T18:52:14Z,2017-02-07T19:22:35Z,Shadow & Border Animation Support. New zPosition modifier behavior.,"- prepare for tvOS release
+- Add new **zPosition** modifier that animates zPosition from/to a given value. The old zPosition & zPositionIfMatched modifiers are removed. If you still want to modify the draw order, set the zPosition property on the view's layer before transition. Check the Apple HomePage Example for how to do this.
+- Add shadow and border animation modifiers:
+  - shadowPath
+  - shadowRadius
+  - shadowOpacity
+  - shadowColor
+  - shadowOffset
+  - borderWidth
+  - borderColor
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5386836/assets,https://api.github.com/repos/lkzhao/Hero/releases/5386836,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.1.9,https://github.com/lkzhao/Hero/releases/tag/0.1.9,https://api.github.com/repos/lkzhao/Hero/zipball/0.1.9,0.1.9,False,False
+5375873,2017-02-06T21:36:51Z,2017-02-06T21:40:12Z,No more zPosition needed!!,"- fix a bug where interactive transition won't start when calling `update(progress:)` with progress = 0
+- Hero can now determine the draw order match more accurately! This **eliminate the need for zPosition modifier** to be used in most cases.
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5375873/assets,https://api.github.com/repos/lkzhao/Hero/releases/5375873,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.1.8,https://github.com/lkzhao/Hero/releases/tag/0.1.8,https://api.github.com/repos/lkzhao/Hero/zipball/0.1.8,0.1.8,False,False
+5362456,2017-02-05T05:51:13Z,2017-02-05T05:52:31Z,Bug fixes,"- fix a zPosition regression introduced in 0.1.5
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5362456/assets,https://api.github.com/repos/lkzhao/Hero/releases/5362456,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.1.7,https://github.com/lkzhao/Hero/releases/tag/0.1.7,https://api.github.com/repos/lkzhao/Hero/zipball/0.1.7,0.1.7,False,False
+5362415,2017-02-05T05:24:20Z,2017-02-05T05:25:54Z,Bug fixes,"- fix a regression introduced in 0.1.5 where animation for matched view might appear inconsistent.
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5362415/assets,https://api.github.com/repos/lkzhao/Hero/releases/5362415,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.1.6,https://github.com/lkzhao/Hero/releases/tag/0.1.6,https://api.github.com/repos/lkzhao/Hero/zipball/0.1.6,0.1.6,False,False
+5362390,2017-02-05T05:08:47Z,2017-02-05T05:12:49Z,Bug fixes & useScaleBasedSizeChange modifier,"## 0.1.5
+- fix a bug where toViewController's delegate callbacks are not being called
+- fix a bug where fromViewController's delegate callbacks receive incorrect parameters.
+- Add **useScaleBasedSizeChange** modifier.
+  
+  Force Hero use scale based size animation. This will convert all `.size` modifier into `.scale` modifier.
+  This is to help Hero animate layers that doesn't support bounds animation. Also gives better performance when animating.
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5362390/assets,https://api.github.com/repos/lkzhao/Hero/releases/5362390,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.1.5,https://github.com/lkzhao/Hero/releases/tag/0.1.5,https://api.github.com/repos/lkzhao/Hero/zipball/0.1.5,0.1.5,False,False
+5361824,2017-02-04T23:51:59Z,2017-02-05T00:05:06Z,Unwind Support & Snapshot Type Modifiers,"## 0.1.4
+- fix a bug where changing orientation doesn't affect previous VC. https://github.com/lkzhao/Hero/issues/60
+- fix a bug where the presented view controller has incorrect frame. https://github.com/lkzhao/Hero/issues/63, https://github.com/lkzhao/Hero/issues/56
+- New **snapshot type** modifiers:
+  - **useOptimizedSnapshot**
+    
+    With this modifier, Hero will create snapshot optimized for different view type when animating.
+    For custom views or views with masking, useOptimizedSnapshot might create snapshots
+    that appear differently than the actual view.
+    In that case, use .useNormalSnapshot or .useSlowRenderSnapshot to disable the optimization.
+  - **useNormalSnapshot**
+    
+    Create snapshot using snapshotView(afterScreenUpdates:).
+  - **useLayerRenderSnapshot**
+    
+    Create snapshot using layer.render(in: currentContext).
+    This is slower than .useNormalSnapshot but gives more accurate snapshot for some views (eg. UIStackView).
+  - **useNoSnapshot**
+    
+    Force Hero to not create any snapshot when animating this view. Hence Hero will animate on the view directly.
+    This will mess up the view hierarchy. Therefore, view controllers have to rebuild its view structure after the transition finishes.
+- New navigation extension on UIViewController (mainly to support **unwinding**):
+  - **func hero_dismissViewController()**
+    
+    Dismiss the current view controller with animation. Will perform a navigationController.popViewController 
+    if the current view controller is contained inside a navigationController.
+  - **func hero_replaceViewController(with:UIViewController)**
+    
+    Replace the current view controller with another VC on the navigation/modal stack.
+  - **func hero_unwindToRootViewController()**
+    
+    Unwind to the root view controller using Hero.
+  - **func hero_unwindToViewController(_ toViewController:)**
+    
+    Unwind to a specific view controller using Hero.
+  - **func hero_unwindToViewController(withSelector: Selector)**
+    
+    Unwind to a view controller that responds to the given selector using Hero.
+  - **func hero_unwindToViewController(withClass: AnyClass)**
+    
+    Unwind to a view controller with given class using Hero.
+  - **func hero_unwindToViewController(withMatchBlock: (UIViewController) -> Bool)**
+    
+    Unwind to a view controller that the match block returns true on.
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5361824/assets,https://api.github.com/repos/lkzhao/Hero/releases/5361824,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.1.4,https://github.com/lkzhao/Hero/releases/tag/0.1.4,https://api.github.com/repos/lkzhao/Hero/zipball/0.1.4,0.1.4,False,False
+5322497,2017-02-01T01:08:32Z,2017-02-01T01:34:20Z,Local coordinate space support + new Apple Homepage Transition example,"- Support **local coordinate space**.
+  
+  | Global coordinate space | Local (parent's) coordinate space |
+  | --- | --- |
+  | Animating views are **not** affected by parent views' attributes | Animating views are affected by parent views' attributes |
+  | When parent view moves, subviews that have its own modifiers do **not** move with the parent view. I.e. they are being taken out of the view hierarchy. | When parent view moves, subviews that have its own modifiers move along with the parent view. I.e. similar to how a view behave when its parent view moves. |
+  | Used for matched views & views with `source` modifier. Global is the default prior to 0.1.3 | Local is the default coordinate space after 0.1.3 |
+- New **useGlobalCoordinateSpace** modifier. Force the view to use global coordinate space. I.e. won't move with its parent view.
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5322497/assets,https://api.github.com/repos/lkzhao/Hero/releases/5322497,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.1.3,https://github.com/lkzhao/Hero/releases/tag/0.1.3,https://api.github.com/repos/lkzhao/Hero/zipball/0.1.3,0.1.3,False,False
+5298331,2017-01-28T21:01:55Z,2017-01-29T21:40:42Z,Bug fixes,"- `HeroPlugin` returning .infinity duration will be treated as wanting interactive transition
+- few bug fixes.
+- Update plugin API protocol to be more concise.
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5298331/assets,https://api.github.com/repos/lkzhao/Hero/releases/5298331,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.1.2,https://github.com/lkzhao/Hero/releases/tag/0.1.2,https://api.github.com/repos/lkzhao/Hero/zipball/0.1.2,0.1.2,False,False
+5164759,2017-01-15T20:16:11Z,2017-01-15T20:21:05Z,0.1.1,"- Swift Package Manager Support, Thanks to [@mRs-](https://github.com/mRs-)
+- Bug fixes #41, #36, & #38
+- Cleaner navigation bar animation.
+- Better alpha animation support.
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5164759/assets,https://api.github.com/repos/lkzhao/Hero/releases/5164759,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.1.1,https://github.com/lkzhao/Hero/releases/tag/0.1.1,https://api.github.com/repos/lkzhao/Hero/zipball/0.1.1,0.1.1,False,False
+5102208,2017-01-09T07:39:53Z,2017-01-09T07:42:44Z,HUGE Update. Revamped Hero Modifier implementation. Bug fixes.,"- add **HeroModifier** class and **HeroTargetState** struct
+  - **HeroModifier** is a swift enum-like class that provides the same functionality of the original string-based **heroModifiers**.
+  - **HeroTargetState** is a struct that holds view state informations. It can be build from **[HeroModifier]**. Mostly used internally and for building **HeroPlugin**.
+- change the original `heroModifiers:String?` to `heroModifierString:String?` **(breaking change!)**
+- add `heroModifiers:[HeroModifier]?` to **UIView**
+- add a shared singleton `Hero` object for controlling the interactive transition. Which can be accessed by `Hero.shared`
+- few changes to the protocols 
+  - protocol **HeroAnimator**
+    
+    ``` swift
+    func temporarilySet(view:UIView, to modifiers:HeroModifiers)
+    // to 
+    func temporarilySet(view:UIView, targetState:HeroTargetState)
+    ```
+  - protocol **HeroViewControllerDelegate**
+    
+    ``` swift
+    @objc optional func wantInteractiveHeroTransition(context:HeroInteractiveContext) -> Bool
+    // to
+    @objc optional func wantInteractiveHeroTransition() -> Bool
+    ```
+  - remove **HeroInteractiveContext** protocol
+- update **HeroPlugin** to conform to the new protocols definitions.
+- rename a few modifiers:
+  - **curve** → **timingFunction**
+  - **sourceID** → **source**
+  - **clearSubviewModifiers** → **ignoreSubviewModifiers**
+- fix a bug with `heroReplaceViewController` API. [PR 30](https://github.com/lkzhao/Hero/pull/30)
+- fix a bug with **UIStackView** not animating correctly. [PR 22](https://github.com/lkzhao/Hero/pull/22)
+- add **recursive** `ignoreSubviewModifiers` modifier
+- add **radial** & **inverseRadial** cascade:
+  
+  <img src=""https://cloud.githubusercontent.com/assets/3359850/21759371/a95e0bea-d5f8-11e6-8568-d0e02ef2b6fe.gif"" width=""200"" />
+
+### To migrate from previous versions:
+
+Do a whole-project **find & replace**(cmd+option+shift+F) for:
+- **heroModifiers** → **heroModifierString**
+- **curve** → **timingFunction**
+- **sourceID** → **source**
+- **clearSubviewModifiers** → **ignoreSubviewModifiers**
+  
+  Remember to also replace these inside the storyboard. In code, please migrate to the new type-safe `heroModifiers`. It provides better type-checking and more functionality.
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5102208/assets,https://api.github.com/repos/lkzhao/Hero/releases/5102208,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.1.0,https://github.com/lkzhao/Hero/releases/tag/0.1.0,https://api.github.com/repos/lkzhao/Hero/zipball/0.1.0,0.1.0,False,False
+5083038,2017-01-06T00:33:55Z,2017-01-06T00:37:42Z,Bug fixes,"- Add live injection example
+- Make `snapshotView` available to all HeroAnimators.
+- Add `heroWillStartTransition` & `heroDidEndTransition` callbacks to `HeroViewControllerDelegate`
+- Fix animation for UIStackView https://github.com/lkzhao/Hero/pull/18
+- Smoother UIImageView animation for bounds change https://github.com/lkzhao/Hero/pull/16
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5083038/assets,https://api.github.com/repos/lkzhao/Hero/releases/5083038,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.0.5,https://github.com/lkzhao/Hero/releases/tag/0.0.5,https://api.github.com/repos/lkzhao/Hero/zipball/0.0.5,0.0.5,False,False
+5062375,2017-01-04T00:46:22Z,2017-01-04T02:04:35Z,Carthage Support,"Not much in this update. just adding Carthage support.
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5062375/assets,https://api.github.com/repos/lkzhao/Hero/releases/5062375,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.0.4,https://github.com/lkzhao/Hero/releases/tag/0.0.4,https://api.github.com/repos/lkzhao/Hero/zipball/0.0.4,0.0.4,False,False
+5042138,2016-12-31T00:22:09Z,2016-12-31T00:23:44Z,0.0.3 Stable,"- Cleaner resume animation after an interactive transition.
+- plugin API: `seekTo(progress:Double)` changed to `seekTo(timePassed:TimeInterval)`
+- plugin API: `resume(progress:Double, reverse:Bool)` changed to `resume(timePassed:TimeInterval, reverse:Bool)`
+- provides dynamic duration by default.
+  [material design(duration & timing)](https://material.io/guidelines/motion/duration-easing.html#duration-easing-dynamic-durations)
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/5042138/assets,https://api.github.com/repos/lkzhao/Hero/releases/5042138,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.0.3,https://github.com/lkzhao/Hero/releases/tag/0.0.3,https://api.github.com/repos/lkzhao/Hero/zipball/0.0.3,0.0.3,False,False
+4975554,2016-12-21T02:28:42Z,2016-12-21T02:33:46Z,0.0.2,"- rename `clearSubviewClasses` to `clearSubviewModifiers`. was a naming mistake.
+- set default animation to be CABasicAnimation with the **Standard Curve** from [material design (easing)](https://material.io/guidelines/motion/duration-easing.html#duration-easing-natural-easing-curves).
+- add the new **arc** effect from [material design (movement)](https://material.io/guidelines/motion/movement.html#movement-movement-within-screen-bounds).
+- add **arc** effect to **Basic**, **Menu**, & **ListToGrid** examples.
+- add the ability to show arc path in the Debug Plugin.
+- ignore `HeroModifiers` for source view when matched with a target view with the same `HeroID`
+- some small optimization & bug fixes
+",https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/4975554/assets,https://api.github.com/repos/lkzhao/Hero/releases/4975554,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.0.2,https://github.com/lkzhao/Hero/releases/tag/0.0.2,https://api.github.com/repos/lkzhao/Hero/zipball/0.0.2,0.0.2,False,True
+4952415,2016-12-18T21:59:30Z,2016-12-18T22:01:44Z,Initial Beta!,,https://api.github.com/users/lkzhao,3359850,lkzhao,https://api.github.com/repos/lkzhao/Hero/releases/4952415/assets,https://api.github.com/repos/lkzhao/Hero/releases/4952415,master,https://api.github.com/repos/lkzhao/Hero/tarball/0.0.1,https://github.com/lkzhao/Hero/releases/tag/0.0.1,https://api.github.com/repos/lkzhao/Hero/zipball/0.0.1,0.0.1,False,True

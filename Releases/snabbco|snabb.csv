@@ -1,0 +1,3209 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7575509,2017-08-30T11:40:28Z,2017-08-30T14:46:58Z,Snabb 2017.08 “Endive”,"This release adds a library of [LPM](https://en.wikipedia.org/wiki/Longest_prefix_match) routines for IPv4 addresses. Endive also includes many various improvements and fixes, including direct access to CPU PMU hardware, MTU support for apps.tap, improved performance for apps.vlan, and extended configuration options for apps.ipv6.nd_light.
+
+### Changes
+
+- #1136 lib.lpm: Longest Prefix Match library for IPv4 addresses
+- #1170 lib.pmu: Enable RDPMC via /sys/devices/cpu/rdpmc
+- #1178 lib.protocol.header: Return nil instead of asserting when a header is too big to overlay
+- #1189 apps.tap: support MTU, augment stats
+- #1191 apps.vlan: improve performance, configurable encapsulation
+- #1193 apps.ipv6.nd_light: added two new configuration options (remote_mac, quit)
+- #1208 Fixes a bug in the IPFIX app's netflow v9 mode
+- #1174 #1176 #1179 #1142 Minor bug fixes and improvements
+
+### Contributors
+
+Alexander Gall (8):
+* 20d59582: Tap: support MTU, augment stats
+* d26fd86f: Fixes/enhancements for iftable_mib.lua
+* ee189643: iftable_mib: streamline processing
+* c6befb8a: nd_light: make app reconfigurable
+* acc3260a: nd_light: add option to reduce verbosity
+* a12ac85f: nd_light: add optional option local_mac
+* ccbe8101: nd_light: fix bug in NS validation
+* da4f98b0: apps.vlan: improve performance, configurable encapsulation
+
+Andy Wingo (46):
+* f601fcf6: intel_mp: Poll more frequently for linkup
+* bf9baa24: Re-introduce 82599 reset into linkup wait loop.
+* d60b1667: Use default hash in IPFIX cache
+* 9c014531: Minor comment fix in ipfix exporter
+* ce65fd97: Split IPv4 and IPv6 collector data paths
+* e6b1d36a: Small IPFIX elements parsing cleanup
+* 47a6188e: IPFIX: Refactor template computation
+* 87945ec7: Add anonymous counters and links
+* 10d7c6fb: IPFIX exporter logic now independent of record types
+* 331840ca: Rename flow key/value to match standard IEs
+* a7d3db16: Join IPFIX apps together
+* fb959e7d: Use generated types in ipfix cache
+* 4aa22c50: Better mocking for ipfix test
+* 318bac76: Join IPFIX meter and exporter apps
+* 4608a95b: Implicitly create cache, and expire records directly
+* 4b9874d5: IPFIX app has single input again
+* 1daf62d9: Separate IPFIX templates into separate file
+* a17a0e91: Fix IPFIX leak
+* 2a9efb6a: Revert anonymous links
+* 03d40754: Pare down info collected by default IPFIX flow sets
+* 26da1174: Try different expiry mechanism
+* ba10cc3f: Remove unused variable
+* 0115e5d0: Configurable template refresh interval
+* 28873226: Remove IPFIX utils module
+* 72bddd84: Clean up IPFIX file header
+* 56914f9f: Clean up FlowSet initialization.
+* c5a9f3ef: Add comments; use float seconds more generally.
+* 734501ae: More IPFIX cleanup
+* 6ac2bf28: Make set of templates configurable
+* 16830a30: Add README.md
+* 1d2d633e: Initial import of lwAFTR IPv4 apps to apps/ipv4
+* ed64366d: Inline needed bits of ipv4_apps into arp.lua
+* 93e1f2d6: Add ARP test
+* d426e2fe: Break ARP app off from lwaftr
+* e8e2f308: Switch lwAFTR over to new ARP app
+* 5d57a657: ARP can assign itself a local MAC address; stamps outgoing traffic
+* e2f5f312: Add ARP README.md
+* 3c570800: Add ARP documentation to the doc build
+* 41c49f21: Fix nits
+* 8880f5e4: Remove unwanted tabs
+* adbd63c3: Integrate ARP into IPFIX
+* b949911f: Remove Ethernet details from IPFIX app
+* 9155b53b: Simplify ""probe"" interface to rely on ARP
+* e31bace7: Add missing imports
+* 6e5a979f: Add documentation for ipfix probe
+* e7bf90eb: Fix nits
+
+Asumu Takikawa (70):
+* b5bfceca: Initial draft of netflow app
+* b6759d35: Add a selftest, support transport ports properly
+* b07d1f0e: Start to implement V9/IPFIX communication code
+* a3042848: Can now export flow records at a very basic level
+* b35fb6b9: Fix uptime calculation for v9 packets
+* e30dc7db: Fix IP checksum computation for exports
+* f2f3421b: Make the exporter slightly more configurable
+* d2eed9ad: Rename apps/program to avoid netflow confusion
+* 4d9965ef: Account for MTU in constructing record packets
+* 2953d562: Make sure to free ignored packets
+* 415b3538: Make selftest pass again
+* 59524277: Rewrite timer-based code in flow_export
+* 6e4e411b: Print a message when selftest succeeds
+* 787fc488: Add a sanity check for flow exporter's ctable
+* 41e023a4: Improve selftest with random packet processing
+* d2c82eb4: Improve selftest by checking number of flows
+* 33f293eb: Fix variables that should have been renamed
+* 4da54b21: Fix flow timestamp code to use the right clock
+* 332c9ee7: Enable idle flow timeout now that it works
+* 1b77271a: Reformat FFI cdefs for flow key/record
+* 1008f5bd: Restructure flow data structures for efficiency
+* ca47cb68: Add an IPv6 test and fix address fields in key
+* 11543f20: Modify IPFIX code to use IANA assignment CSV
+* b6171d66: Fix uptime computation that got out of sync
+* 3374a65e: Add debug printing for flow expiration
+* 43202954: Fix silly boolean/number confusion in ipfix.lua
+* abe9d9ee: Fix typo in ipfix.lua
+* a1f866a7: Improve debug printouts, set it via environment
+* acdb1063: Swap idle and active timeouts
+* 8f890aef: Improve debug messages with datestamp, abstract it
+* 735493b1: Fix active timeout calculation
+* 80026f45: Fix padding bytes and do a minor refactoring
+* 833d1415: Progress towards a robust `snabb flow_export run`
+* 64810934: Make flow timeouts configurable via program flags
+* 8091ffe6: Refactor IPFIX code to use a class & methods
+* 3175097c: Adjust flow export code to allow IPFIX v10 messages
+* b0acf2c7: Refactor write_header arguments in ipfix
+* 6a9d1b22: Adjust default MTU to 512 octets per RFC7011
+* 21f7e93f: Adjust default template refresh per RFC5153
+* 43d2b600: Packets should always be freed at the end
+* d3d00621: Adjust selftest for recent config changes
+* 37f879d7: Use a consistent UDP src port per ""session""
+* 0d11dae7: Fix record data order and do minor refactoring
+* 05820247: Do a major refactoring of the flow exporter into two apps
+* 3805894d: Rename flow export app/program to ipfix
+* 44670416: Add a selftest for apps.ipfix.export
+* ef4e93f4: Move record expiry function back into the meter
+* 38b96ad2: Expire records incrementally instead of on a timer
+* e2243ce6: Rewrite meter code to avoid using header libraries
+* 62a550d3: Improve 'snabb ipfix probe' for benchmarking
+* a0ccddb9: Avoid allocation of flow keys for old flows
+* af63e7e8: Fix bugs in the last commit, zero out the key
+* 3ac87e2e: Pre-allocate both keys and record variables
+* 59d50177: Reduce number of timestamp computations
+* bd89b4d8: Save some space in the flow key representation
+* 8271e429: Use a different hash function for performance
+* 53e04f6a: Use dynasm to speed up the hash function
+* c760913e: Use slightly nicer assembly for hash
+* 9b89c948: Avoid indirection through wrapper methods in cache
+* 79126df5: Fix debug prints that broke from some optimization
+* 60e1a0c2: Add a basic benchmark script for the IPFIX app
+* d8b4cb1b: Fix pcap output for ipfix probe
+* fc5f8ebc: Fix typo in ipfix probe
+* 2f5c77f2: Fix app configuration in ipfix probe
+* 52339879: Add tap IO option for ipfix probe
+* 7ce48da4: Don't read southbound packets until ARP resolved
+* b824190b: Add timeout options to ipfix probe docs
+* 78bdcae3: Add an ipfix test script that uses a collector
+* 4c9c4b82: Improve ipfix collector test
+* 17ac2094: Fix typo in IPFIX v9 mode
+
+Diego Pino Garcia (1):
+* d7181301: Remove src/core/version.lua from .gitignore
+
+Luke Gorrie (5):
+* d01f4167: lib.pmu: Enable RDPMC via /sys/devices/cpu/rdpmc
+* 5fc8a770: .version: Bump to 2017.08
+* fabac149: virtual_ether_mux: Treat vlan=0 as vlan=nil
+* 290c1398: Revert ""virtual_ether_mux: Treat vlan=0 as vlan=nil""
+* ebd0aa91: apps.vlan: Allow vlan=0
+
+Nicola 'tekNico' Larosa (4):
+* 1f1da1b4: Avoid the most repetitive output in tests
+* e2aba33d: Reintroduce deterministic seed report, but only when it is a new one
+* 104502f1: Remove broken attempt to filter output
+* 3b866798: Relax the check on max_displacement in selftest
+
+Pete Bristow (1):
+* 52b63083: initial import of lib.lpm* longest prefix matching lookup routines for IPv4 addresses
+
+ikdc (6):
+* 13aa49ae: Return nil instead of asserting when a header is too big to overlay.
+* 06a42e69: free new header if size is too small
+* 3b359126: document that new_from_mem can return nil
+* 2e0d9529: check that new_from_mem returns non-nil in header subclasses
+* 20a1f190: assert TLV options
+* 22fa8c89: assert miscellaneous uses of new_from_mem
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/7575509/assets,https://api.github.com/repos/snabbco/snabb/releases/7575509,master,https://api.github.com/repos/snabbco/snabb/tarball/v2017.08,https://github.com/snabbco/snabb/releases/tag/v2017.08,https://api.github.com/repos/snabbco/snabb/zipball/v2017.08,v2017.08,False,False
+7096075,2017-07-19T14:41:43Z,2017-07-19T15:29:58Z,Snabb 2017.07 “Dandelion”,"This release adds an optimized implementation of [SipHash](https://131002.net/siphash/) (a fast cryptographic hash function) to Snabb. Dandelion also comes with many goodies such as a command line option to identify the exact version of Snabb executables, as well as improves stack traces for snsh, the interactive Snabb shell. As usual, this release also includes many minor bug fixes, and performance as well as usability improvements.
+
+### Changes
+
+- #1146 Added snabb --version command-line argument
+- #1151 core.shm now creates shared memory objects world-readable
+- #1153 Avoid select() in apps.socket.unix to improve performance
+- #1155 #1166 #1168 lib.ctable now uses SipHash
+- #1159 Improved stack traces for errors in snsh scripts
+- #1171 Fixed a bug in lib.randomseed where it failed to produce a random value when called without a seed
+- #1124 #1161 #1163 #1164 Minor bug fixes and improvements
+
+### Contributors
+
+Andy Wingo (39):
+* 701bbc1: Add core.version module and --version command-line argument
+* fdf662d: Take default version from "".version"" file
+* 6cf8633: Fix core.version generation for clean builds
+* 34a94bd: Avoid rebuilding snabb when nothing changes
+* cbb5331: Allow ""snabbmark hash"" to test different key sizes
+* 97d40c9: Add siphash implementation
+* 429a3b0: Allow customization of number of siphash rounds
+* e50ad4c: Allow specialization of SipHash to fixed-size inputs
+* 2f7983d: Add SipHash1,2 to snabbmark
+* f1b7053: Refactor siphash implementation
+* 1e3ea13: Add SSE and AVX2 parallelism to SipHash
+* da86b3d: Fixups to make AVX2 work also
+* e914c77: fix up generic assembler output, except for avx2
+* fda842d: Use vzeroupper before leaving AVX2
+* 0caaa4b: Add generic X86-64 backend to SipHash assembler
+* 24fca9f: Remove hand-coded SipHash and simplify snabbmark
+* d722f3c: Fix AVX2 result extraction.
+* 18dbf26: siphash: Fall back to SSE if AVX2 unavailable
+* 296073c: siphash: Take a table of options instead of many positional args
+* bf60d21: siphash: Add a function that can hash an immediate
+* 56c0b94: Switch ctable over to SipHash1,2
+* 76cbc59: Integrate multi-hash with ctable lookup streamer
+* d1ab616: Bump binary version for ctable hash change
+* 44bf39b: Fix lwAFTR test to isolate changes between sub-tests
+* 9fdcb99: Fix compilation error with GCC 7.1.0
+* 2fc932b: siphash: Fix load permutation for avx2 u32/u16/u8 loads
+* e9fd2f3: Reassembly tables use default hash function
+* 566d17e: ctable: Automatically detect need for scalar hash
+* 9fa3c24: ctable: Use random key for hash function
+* c6a51cf: Add missing file
+* 45a9b23: Update tarball version number to v2017.07
+* 3cd665c: ctable: reseed hash function on resize
+* 1316a73: ctable: Update documentation.
+* 969b263: Add lib.random_bytes
+* da58b3d: Fix failure message for lwaftr quickcheck
+* a564721: Add new lib.randomseed API
+* f05efe1: Static hash seeds when SNABB_RANDOM_SEED set
+* 23dde76: Add lib.execv; propagate env vars to children
+* 413a108: Fix case in which lib.randomseed didn't do its job
+
+Diego Pino Garcia (3):
+* 83e7efe: Replace AVX2 instruction for AVX equivalent code
+* 1303bdc: Emit AVX2 or AVX instructions depending on architecture
+* 1b29830: Revert ""Emit AVX2 or AVX instructions depending on architecture""
+
+Luke Gorrie (5):
+* 08a3a60: src/Makefile: Add dependency on libluajit.a
+* 9708bfc: core.shm: Make shm objects world-readable
+* 9bc78f0: apps.socket.unix: Rewrote pull/push to avoid select()
+* c6d3a07: README.md: Mention SNABB_SHM_ROOT and SNABB_SHM_KEEP
+* 961fc43: core.shm: /var/run/snabb is owner writable, world readable
+
+Max Rottenkolber (1):
+* 1243b24: snabbmark esp: prevent GC from being invoked by making local vars local
+
+ikdc (2):
+* c6accde: Defer error-handling to main program runner.
+* 38df78d: Use StackTracePlus for tracebacks.
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/7096075/assets,https://api.github.com/repos/snabbco/snabb/releases/7096075,master,https://api.github.com/repos/snabbco/snabb/tarball/v2017.07,https://github.com/snabbco/snabb/releases/tag/v2017.07,https://api.github.com/repos/snabbco/snabb/zipball/v2017.07,v2017.07,False,False
+6815887,2017-06-23T12:36:05Z,2017-06-23T13:56:45Z,Snabb 2017.06 “Carrot”,"This release merges the [multiprocess support](http://snabbco.github.io/sha1/f9b5363a199084e30686c0d35b1b7b07fd09e492.html#multiprocess-operation-core.worker) developed and tested in the last months. Carrot also upstreams many [new features](https://github.com/snabbco/snabb/pull/1133) of the lwAFTR application, including a general library to  configure Snabb applications via [YANG](https://github.com/Igalia/snabb/blob/lwaftr-2017-04-24/src/lib/yang/README.md#snabb-program-configuration-with-yang-libyang). As usual, this release also contains minor bug fixes and optimizations.
+
+### Major Changes
+
+- #1021 Merged multiprocess support
+- #1133 #1148 Upstreamed major lwAFTR updates, notably including `lib.yang`
+
+### Minor Changes
+
+- #1126 net_device: Eliminate fast-path table allocations
+- #1127 Minor documentation fix
+
+### Contributors
+
+Andy Wingo (284):
+* 05f94d7: Move binary_search.dasl to core
+* 21d4e74: Move multi_copy.dasl to core
+* 6608e9e: Whoops, binary_search to lib/, not core/
+* 6cff17c: Whoops, multi_copy to lib/, not core/
+* b5cc8c1: Add streaming lookup to CTable
+* 9c4c31b: Build yang files into ""snabb"" binary
+* 6da1cbd: Fix typo in yang.lua
+* c192058: Yang parser selftest uses bundled yang files
+* aed5d4e: New schema parser
+* dc2d4f2: Uniformly use ""body"" for contained statements
+* 017ee82: Add base IETF yang schemas
+* edf611d: Add linking/partial evaluation phase to yang
+* 54a4f9a: Remove example.yang
+* 6c9fc4e: Add IETF softwire schema and test it
+* 33808e4: Resolve prefixed imported extensions, identities, etc
+* 2744a40: Lazily resolve typedefs and groupings
+* 324d561: Remove data-related facilities from schema2.lua
+* 6ce76cf: Add YANG data parser module
+* 0ff7a43: Yang data parsing/grammar cleanups
+* e95af47: Add yang README.md
+* 36f4ab0: Simplify lib.yang.data interfaces
+* 6bf082e: Rename lib.yang.schema2 to lib.yang.schema
+* 70f3637: Internal yang refactor
+* 0934afb: yang: Primitive types for ipv4 address etc
+* 103b7f3: Fix failing lib.yang.parser test
+* 8c8dc72: Arrange to parse ipv4-address etc as primitive types
+* f803b89: Finish lib.yang README
+* c04ab99: lib.yang.util.tointeger allows for negative int64 min values
+* dfd16f7: Yang primitive value types record their ctypes
+* caa3689: YANG data grammar separates keys, values for tables
+* 2ece77a: Add binary compilation for YANG configuration data
+* 68f6657: Implement compiled configuration loader
+* 9b9eb69: Add choose-representations pass
+* b863974: Rework representation-choosing
+* 7ffbce7: Normalize configuration identifiers
+* 580d8c7: ctable: hash_fn param is optional
+* 6177659: Ctable supports load/save
+* 96b605c: YANG configurations compiled as raw ctables
+* afe6195: Fix nits in yang support
+* 467e0a2: Support cltable, string-keyed tables
+* 69ca0cf: Fix bugs in raw leaf-lists
+* 2c0fab2: Update lib.yang.yang
+* dd5905f: Add auto-compilation interface
+* 93ca00c: Add support to serialize a YANG config as text
+* df8dbf9: Move snabb-softwire.yang to lib/yang
+* 391b766: Rename to snabb-softwire-v1.yang
+* da57ac4: Hyphen-case rather than CamelCase in snabb-softwire-v1
+* cac171c: snabb-softwire-v1: Whitespace/syntax tweaks
+* 352a02f: snabb-softwire: indent and reflow
+* 36c866f: snabb-softwire: Two spaces after period in descriptions
+* 9ffe80d: snabb-softwire: typedefs closer to uses
+* be63713: snabb-softwire: descriptions more declarative
+* 9e4be09: snabb-softwire: Update binding table
+* a6d6723: snabb-softwire: Reorg into ""external"" and ""internal""
+* a766299: Fix snabb-softwire-v1 syntax errors
+* 90add3d: Fix lib.yang.data serialization selftest
+* 387f99f: snabb-softwire: ICMP error limiting on both sides
+* 9f57b65: snabb-softwire: Add reassembly limits
+* cb1e4d7: snabb-softwire: Change softwire leaf members
+* 5f77458: Add another YANG data representation test case
+* f659341: lib.yang IPv4 representation is host-endian uint32
+* 3c163de: Add first pass of snabb lwaftr migrate-configuration
+* 23ff1d8: Fix syntax error in snabb-softwire-v1.yang
+* 987c008: Migrate-configuration quiets binding table loading
+* 2a54416: ctable: hash_fn param is optional
+* ee29d11: Ctable supports load/save
+* 6d93fed: lwaftr binding table uses ctable instead of podhashmap
+* f907489: Bump binding table version
+* 803f10e: Grouping has no type.
+* 0439dab: Fix YANG cltable serialization
+* cba8cee: Rename conf.load_lwaftr_config to load_legacy_lwaftr_config
+* b10a65b: Migrate lwAFTR data plane to use YANG conf
+* 79224b1: Fix snabbvmx, hopefully!
+* 5aec3d9: Trim unused code.
+* 2dedf6a: Conf passed to lwaftr app must be object
+* 957a45a: Fix yang source parser bug for file streams
+* 08b189d: Implement configuration parsing for all yang table types
+* 2788071: Fix integer parsing bug in yang
+* 0e31653: Fix serialization bug in yang code
+* c6a0e85: Fix cltable binary loading in yang
+* 68e325e: Binary configuration saving strips off .conf
+* c82ee04: Implement yang-syntax string serialization
+* 6f4c43e: Migrate ""snabb lwaftr"" to yang configurations
+* fc4c711: Migrate snabbvmx lwaftr to new configuration
+* 8019d7d: Fix ctable lookup_and_copy bug
+* 31beaeb: Add hash and ctable subcommands to snabbmark
+* bf4471a: Remove PodHashMap
+* 1348857: Isolate old-style lwaftr configuration support
+* f916dea: Fix default value bug in yang parser
+* fd65810: snabb-softwire-v1 tweak
+* b7a5774: Omit default values in yang serialization
+* ce3ecc3: Move more legacy code to migrate-configuration
+* 0a92b69: Remove old binding tables
+* 3078cb7: More legacy lwaftr code migration
+* 952c6a4: Fix snabb lwaftr bench
+* 5c5f64a: Update lwaftr docs
+* 3934d6d: More doc tweaks
+* 008f5e5: Update changelog for next lwaftr release
+* b6dbea2: Update README.configuration.md
+* be77b4f: Fix data serialization bugs
+* 8f0c34b: Prune example lwaftr configs
+* 0581a97: Configuration refactor
+* 6de0d32: Fix reconfiguration with reconfig method
+* c04e8e1: Add apps.config.leader
+* 7a1503e: Implement core state machine in config leader
+* a2dd717: First implementation of snabb config get-config
+* 4915d1f: YANG schema support for RPCs and notifications
+* a32210a: Support RPC sequences in parser/printer
+* 48bb8f2: snabb config get-config uses RPC mechanism
+* 253bddf: Add RPC support module
+* 4a52f30: RPC between ""snabb config get-config"" and leader app
+* db25fd6: Config leader manages app graph
+* 58cdaa8: Config leader claims $root/PID/config-leader-socket
+* a968569: Add Hz parameter to config leader
+* 5019508: snabb lwaftr bench uses config leader
+* afc8f2a: Add support for decimal64
+* dece919: Add support for lib.equal comparing int64
+* 2b9d1b8: Add ad-hoc data serialization via yang modules
+* 154c77f: reconfig_app action takes class arg
+* 11ad5b9: Implement encoding for leader-follower protocol
+* d39a368: Implement decoder side of leader-follower protocol
+* 4d39f82: Implement channel for leader-follower messages
+* f29a6a9: Implement follower; wire up leader-follower protocol
+* cdc3881: Serialize {} instead of nil
+* 16db816: lwaftr apps load counters themselves
+* 902dd34: Binary serialization uses alignment of type, not value
+* e81de39: Fix lstruct serialization
+* df3cfd4: Fix lltable loading
+* f8380e9: Improve ad hoc compilation for legacy IPv4 addresses
+* 8866ee2: Avoid too much type generation in yang module
+* 53c2e48: Follower flushes JIT after starting or reconfiguring apps
+* 3f6644d: Make get-config work
+* 2a06489: YANG parser adds location information to result
+* d651693: Schema strips annotations earlier
+* a43c4d5: Schema parsing moving away from mutation
+* b81c495: Config leader checks path
+* fbebbb9: Minor schema refactor
+* ef677e0: Further schema parsing refactors.
+* de24664: Schema parsing refactors redux.
+* 423a032: No more annotation of parser source terms.
+* 5916b09: Fix assert_with_loc bug.
+* 1811923: Implement load-config command
+* 80b4a35: Rename action_queue to action_codec
+* b354d1a: Add apps.config documentation
+* 9256bf8: Add ""snabb config"" README
+* cbca5b9: Call link methods
+* d7194ad: Always unlink endpoints when links go away
+* b551d27: Fix perf hazard in restart_dead_apps
+* c708b62: Simplification in compute_config_actions
+* 4242854: Fix perf hazard in leader socket accept()
+* 50f6441: Rename ""snabb config load-config"" to ""snabb config load""
+* c43e98f: Rename ""snabb config get-config"" to ""snabb config get""
+* 87c887c: Refactor ""snabb config""
+* 346ae47: Refactor ""snabb config load""
+* cf5733f: Further ""snabb config"" refactors
+* c243730: More snabb config refactor
+* 5f8ba0f: ""snabb config"" asks schema from leader if needed
+* 830209d: Update program/config/README.md
+* 8372c4b: Implement ""snabb config set""
+* 8d7eb80: Remove compile-binding-table, control lwaftr commands
+* c4be666: Update generate-binding-table
+* 5316c14: lwaftr supports run-time reconfiguration
+* 20c3bb5: changelog updates
+* ff09ecb: Changelog markdown syntax fix
+* b148b4d: Syntax fix for README.configuration.md
+* c0db108: Version 3.0.0
+* 80e6eca: Allow ability to parse/print non-struct data
+* ad0c2d2: Print to strings via string_output_file()
+* c0eceb0: Prepare ""snabb config get"" for paths
+* 3685310: Fix serialization in program.config.common
+* 3a55f9f: Prepare ""snabb config set"" for paths
+* 791f1a0: Add stub ""snabb config add"", ""snabb config remove""
+* 8bcf520: Rename xpath.lua to path.lua
+* 42faa34: Localize handlers for path.lua:convert_path
+* 5043daf: lib.yang.path test tweaks
+* 8b3f9a3: Precompute path resolvers before running
+* e6f4635: Wire up snabb config get with paths
+* 68a7ab5: Rename parse_string to parse in lib.yang.parser
+* 2d72f21: Add ability to print and parse bare arrays and tables
+* 2691648: Address nits
+* 3a67a93: Add normalize_path
+* f3f6b8b: ""snabb config set"" of paths with leader app support
+* b1301ae: ""snabb config set"" on table/array items
+* 21d1f7d: Fix bug parsing bare arrays and tables
+* 2eeade4: Prepare for add and remove ""snabb config"" commands
+* ba5d3ed: Fix bug in lib.yang.parser.parse_statement_lists
+* 497a1d4: Add support for add-config to leader
+* e3a0e76: Add ""snabb config remove""
+* e3fabe7: Re-enable pcall in leader
+* 9851ec8: Fix a link in program.config.README.md
+* 1e32495: Fix more config README.md links
+* 9c76877: First implementation of ""snabb config listen""
+* 5f10222: Leader doesn't hang up on client after one request
+* 4d6cd79: ""snabb config listen"" validates data
+* 362f2ae: Listener prevents other clients from updating config
+* 2e28e71: Move around READMEs
+* 3fb219e: Update snabb config usage files
+* 85a7dec: Fix YANG parser bug for C comments
+* e15a812: Listener writes output to stdout
+* 4fa5f67: Update ""snabb config"" docs
+* 9341229: Add yang annotations to readme files
+* b013c2e: Fix bugs in config leader for tables
+* fcca73d: Add json read/write tests
+* e479e61: Add ""snabb ps""
+* aacb394: Add 3.0.1 release notes
+* 33677ff: Leader can load schema-specific support module
+* 854cf14: Add lwAFTR v3.0.1 changelog entry
+* 632120b: Fix typo
+* 2eb8aad: snabb ps parses command-line args
+* ef9c5f0: Fix bug in ctable:lookup_and_copy
+* e996224: Add support for fast binding-table updates
+* 5ab2dfc: Remove unused softwire support import
+* bb63b31: Fix parsing of bare YANG scalars
+* 614ed2f: Restart apps when configuration changes in place
+* 5176055: Support alternate schemas in the leader
+* 55409bc: container YANG schema nodes always appear in data
+* 2beb5ee: Update binding-table update fast-path for schema change
+* e5a6915: Fix up data-plane fallout from lwaftr schema change
+* 84b8f6d: Fix up legacy lwaftr migrate-configuration
+* fa65d1e: Fix binding-table self test
+* 3733183: Attempt to fix snabbvmx selftest
+* 0cf1564: Clean up snabbvmx setup fix
+* 939f839: Better support for features
+* 50f9d9f: Visit union type members
+* 6d2add0: Hackily choose first union type member in data grammar
+* 7f0468e: Add support for get-config in terms of ietf-softwire
+* 7d8710b: Initial get-state support over ietf-softwire
+* 6373ca0: ""snabb config"" queries leader for features
+* ff6e330: Fix IPv4 and IPv6 prefix types
+* 4c04f34: Features are only available if they are in capabilities
+* 6ba9d8c: Fix data parsing bugs
+* 74d5758: Fix ""snabb config load""
+* a7072dc: First pass at updates in terms of ietf-softwire
+* 12886da: Fix creation of native binding table from IETF binding table
+* 15edc01: Fix ""add"" on ietf-softwire
+* 76fefdc: Bug fixes to ietf-softwire support
+* 143aa98: Fix default hash function bug in ctable
+* cb14656: Add missing local in ietf softwire support
+* b4b0a72: Fix fast-path bugs in ietf-softwire translator pre_update function
+* 7b464b1: Fix ietf-softwire updates to individual binding table entries
+* f0f7233: Switch to 1-based indexing in snabb-softwire-v1
+* 758e9dc: Add lwAFTR 3.1.0 changelog.
+* c378451: Snabb lwAFTR v3.1.1 change log entry
+* 037aefa: Incrementally lex and parse data
+* f46f113: Micro-optimizations to data parser.
+* 70b5d73: Add a fast path for ctable insert.
+* de2b55d: Use 40% occupancy as a maximum for data ctables.
+* 6d30d1d: Inline another call to check in tointeger
+* a357e11: Fix bug in ctable hash-to-index mapping
+* 3b3b373: Re-enable lwaftr CSV stats
+* 9bea7fe: Unbreak ingress drop monitor.
+* 2d5c76b: Allow for asynchrony between main and worker lwaftr for stats
+* 57aa527: Snabb lwAFTR v3.1.2 change log
+* 15851a8: Schedule main and worker processes on different CPUS.
+* d3928a3: Snabb lwAFTR v3.1.3 change log
+* ae8d769: Ship ""snabb"" binary and snabb-lwaftr symlink.
+* 93ef6bd: Fix killer bug in leader: write beyond array end
+* d1f4515: Fix a couple more instances of the uint8_t[?] bug
+* e7267cc: Snabb lwAFTR v3.1.4 change log
+* 38128e5: Extract json module from ""snabb config listen""
+* d6a5dd9: Add ""snabb config bench""
+* 4ea7fdc: Tighten up ctable interation bounds
+* 6ff54ff: Memoize schema loads
+* 73fc4ea: Add some more memoizations
+* a9a4a55: Inline ""snabb config bench"" args parsing
+* d27a5df: Add pipelining to ""snabb config bench""
+* a2ae3b9: Leader drains pending input from client
+* efabf7f: Fix json lib for flush_to_fd rename
+* 655b799: Improve memoizer; memoize more yang functions
+* ba73125: Be resilient to binary compilation version changes
+* 2c6b469: Leader-follower protocol tweaks
+* 3066149: Cache ctable entry types.
+* d182dc5: Make follower not so thirsty
+* e0c039d: Close pipes before execcing listen
+* 2c16488: Fix snabb config listen for get-state.
+* df3484c: Snabb lwAFTR v3.1.5 change log
+* 0183f43: Snabb lwAFTR v3.1.5 change log
+* 7753e04: Add yang objects to build.
+* 85d18c7: Skip snabbwall tests if libndpi isn't available.
+* 9c812cf: Fix libndpi check
+* 92bfddb: Skip lib.multi_copy selftest if AVX2 unavailable
+* 08f3342: Temporarily disable snabbvmx selftest
+* 7c07e80: Add soaktest to ""snabb lwaftr"" usage.
+* 344e22a: Disable bus-mastering cleanup for intel_mp
+
+Asumu Takikawa (45):
+* 884c938: Fix `snabb config remove` on arrays
+* c6e58c1: Fix typo in `snabb config` README
+* 4ad0c2e: Minor fix to selftest.sh
+* 74bdc74: Generate xpath queries for `snabb config get` test
+* a0c779e: Add test ensuring two config runs yield the same result
+* 56f53d8: Add cleanup code to shutdown lwaftr process for test
+* 0002d5c: Produce ""/"" path instead of """" in base case
+* 69146d2: Abstract out the common prop testing code
+* 56d415b: Add generation of `snabb config set` commands
+* b5a863c: Add a new test for the get-state command
+* 1c4a26f: Make get-state lookups use generated queries too
+* 3b76638: Fix the get-state test to have non-empty query results
+* 7e018bc: Bump get-state test duration
+* ae6c8b9: Add optional query parameter to generate functions
+* 62f97a5: Improve sameval test to be resilient to missing fields
+* d350232: Abstract out the crash checking into common.lua
+* 5cb065e: Generate selectors for list indexing in tests
+* 65af1cd: Test the ietf-softwire config protocol too
+* 815c258: Traverse 'list' nodes for random generation better
+* e42ad26: Adjust how integer values are generated to prefer boundaries
+* 905a151: Prefer lower position arguments
+* d746064: Start to add functions for generating set/add values
+* d938919: Use new set command generation for nocrash test
+* 341cdeb: Initial attempt at generating compound values
+* ece5893: Generate more leaf data types
+* 9b3baf6: Add some comments to genyang.lua
+* 000ae61: Add comments, minor refactoring
+* 4f73d09: Adjust weight for boundary values in number ranges
+* 9f9b74b: Support decimal64 and binary types for test gen
+* b5b7aa1: Run more sameval get/set tests on occasion
+* 854d7e6: Implement enum generation, change error behavior
+* fe83441: Use range statements in YANG types for value gen
+* c9e910f: Validate PCI address for property based tests
+* eaabeea: Don't fail if there isn't a range in the type
+* 463a851: Add code to occasionally ignore bounds
+* 521bdd3: Intentionally generate wrong types occasionally
+* aba11d0: Experiment with `snabb config add` testing
+* 9520fa2: Generate `snabb config remove` commands too
+* f05dee6: Fix selftest for genyang
+* 4b0892c: Generate values/paths for config add/remove better
+* 41a3bcb: Adjust leaf-list case to not always use a selector
+* 0b1417a: Tweak test iterations and timeout
+* f4dae60: Generate 64-bit ranges correctly
+* d2d3bd4: Simplify the function in f4dae60e08c521c8
+* f8a09a1: Delete outdated TODO comment
+
+Christian Graf (5):
+* 528866a:  Changes to be committed: 	modified:   README.troubleshooting.md
+* 30f2ee6: added howto craft packets via scapy tool
+* d48fe99: end-to-end section updated in case counters.lua file is used
+* 995d398: incorporated Diego's comments and simplified the input pcap
+* c1e7eec: incorporating Fix formatting in issue 610 #8 to README.troubleshooting.md
+
+Diego Pino Garcia (82):
+* e2b22a7: Append 'src/' to example.yang filepath if executing snabb from root folder
+* 0888062: Remove duplicated code in SnabbVMX selftests
+* 4be802b: Remove hardcoded constants in nh_fwd
+* c6f9d14: Add SnabbVMX manual
+* a2043ba: Document ingress drop monitor default values
+* 625a818: Allow ingress drop monitor deactivation
+* faa32bf: Add image
+* db2e436: Rename snabb-lwaftr to snabbvmx in Makefile
+* d3b1d95: Redo exit logic in snabbvmx selftest and next_hop
+* 1d1c0c7: Add unit test for ipv4_cache_trigger
+* 9856da7: Add unit test for ipv6_cache_trigger
+* ccce15f: Rewrite of snabbvmx's nexthop selftest.sh
+* c404ea6: Rewrite SnabbVMX's selftest.sh
+* 0e9d548: Allow duration in soaktest.sh
+* 2729db9: Drop origin_packet always
+* 064393a: Wrongly wrote outgoing v4 packets to v6 link
+* f862b77: Increase SnabbVMX nexthop selftest qemu image RAM to 1Gb
+* caa03b8: Check only the VM returned MAC addresses different than nil or zero
+* a0d3ce4: Increase SnabbVMX nexthop selftest qemu image RAM to 1Gb
+* 0ea9f8a: Check only the VM returned MAC addresses different than nil or zero
+* 2185e97: Rename counters to counters_path
+* cbf7400: Store pid as a string
+* 9efc299: Redo by-name query support in 'lwaftr query'
+* eb5088f: Redo by-name query support in 'snabbvmx query'
+* ee95c09: Redo by-name query support in 'snabbvmx top'
+* 97c52b1: Redo by-name query support in 'lwaftr monitor'
+* 2ae3ed3: Cast pid argument to a string
+* b9eee44: Replace functions 'get_pid_by_name' and 'get_name_by_pid'
+* 73e6be9: Exit nicely if couldn't set affinity for a core
+* d1f192c: Remove garbled lwaftr-virt configuration file
+* 951fff8: Show whether a PID is a worker in 'snabb ps'
+* 98216ef: Sort list of pids
+* abb9372: Show PIDs as a tree
+* def9ad0: Mark processes that are addressable by snabb config
+* 71fab70: Remove .dasl extension
+* 1533869: Refactor lwaftrctl
+* c97fcae: Execute make clean in programs containing a Makefile
+* e96d016: Reintroduce lwaftr command
+* 1773310: Replace tabs for spaces
+* c00f2c3: Remove unneeded check
+* b779a2b: Clean up
+* fb52203: Fix tunnel-path-mtu and tunnel-payload-mtu in ietf-softwire
+* 86b9835: Remove end-addr in psid-map
+* b3fdcaf: Remove end-addr from configuration files
+* dd8ef6c: Add selftest
+* 6845bca: Fix error on valid 'snabb config set' invocation
+* 21f6585: lwaftr query selftest
+* 2c36f52: Print NYI error for softwire-num-threshold
+* 8c401dc: Respond to ping6 packets in on-a-stick mode
+* 12e3e3a: Add test ping lwAFTR's V4 and V6 interfaces from a Linux kernel interface
+* 18d635c: Add configuration file
+* 9d90e5d: Skip hw ping to lwAFTR test in CI
+* 64539d4: Snabb lwAFTR v3.1.6 change log
+* fd46085: Revert ""Remove end-addr in psid-map""
+* 7f44e9e: Snabb lwAFTR v3.1.7 change log
+* d1ae27e: Retry ARP and NDP resolution indefinitely
+* df96eac: Refactor selftest
+* 26dc11a: Set random destination port in IPv4 refresh packets
+* 1299a74: Set random source port in IPv4 payload of IPv6 refresh packets
+* 3249679: Remove unused variables
+* 78f88f6: Verify checksum of modified refresh packets
+* aa8d105: Fix run_nohw
+* 88c3f7f: Fix pid in CSVStats
+* 22784fa: Clean up run_nohw
+* c7eb0bd: Add option 'duration' in run_nohw
+* f9d77e4: Rework verbosity option
+* bc9e1bd: Update run_nohw README
+* 942cefd: Add run_nohw to the list of subprograms
+* 1c2c7d5: Add unit test for run_nohw
+* f3a88c3: Update documentation
+* 248ec26: Rework unit test
+* fee3322: Use snabbvmx query instead of next_hop
+* 6edbd9d: Remove snabbvmx nexthop
+* 6d5f80f: Append lwAFTR version number and date to help info
+* 5079948: Reintroduce NDP secondary address test
+* 6993af8: Print out when VM setup is ready
+* 7b55781: Pass SnabbVMX PID to snabb monitor all
+* ab43f22: Delete tap interface before creating it
+* 459e040: Make quickcheck a lwAFTR subprogram
+* 34bdf3e: Add quickcheck README
+* 76afdf7: Refactor quickcheck code
+* e824130: Add quickcheck unit test
+
+Domen Kožar (9):
+* e1332fd: Optionally disable openstack support in Snabb
+* 66903b4: lwaftr: README.virtualization.md: fix formatting
+* 391a353: lwaftrctl: pass $SSH_OPTS to all ssh invocations
+* b375f38: lwaftrctl: invoke screen with -L to enable logging
+* 823776f: lwaftrctl: avoid double sudo
+* 1594d20: lwaftrctl: typo
+* d4efeb7: lwaftrctl: allow setting QEMU_ARGS
+* b9d1c93: lwaftrctl: fix docs
+* 13ed45f: lwaftr: replace tap interface with 9p share
+
+Jessica Tallon (104):
+* 0f13d75: Initial commit of YANG parser
+* 0e3495e: Add statement parser
+* 447f2c5: Add more testing, docs, and fix bug
+* a738eb2: Fix syntax problem and add helper function
+* d5ced20: Remove unnecessary newlines
+* 16a9713: Create a schema parser for YANG
+* 1b50533: Improve schema and data tree builders
+* 23f1060: Fix indentation and few stylistic things
+* 2e107e6: Switch to use syscall.helpers and remove unused meta
+* f3d5e36: Add the missing file descriptor closing
+* cd1fd3d: Add IPv4 and IPv6 box types as well as fixing bugs
+* 4714f6b: Add more statements, fix bugs and add more types
+* 263c0e9: Fix problems brought up in review
+* 90016a9: Fix box problems & make selftest more robust
+* ecee1a5: Initial commit of snabb's lwAFTR YANG config
+* 5c1ab27: Add iterating over YANG data file
+* b5163fa: Fix bug in reading yang data file
+* 6650a13: Add named programs
+* 0ae21b6: Remove unintentional addition of claim_name to example_relay
+* 90a6ada: Replace usage of syscall.util and fix cleanup code
+* 4010061: Add backlink for named programs
+* 4c86315: Refactor top.select_snabb_instance and fix small issues in claim_name
+* 7962515: Fixes error in selftest for core.app
+* 9dfb3c8: Minor cleanup of comment to re-trigger CI bot.
+* c0370a5: Add `snabb config derive-data-format` option
+* f93f1b6: Move data_format into own directory and rename
+* fc75a99: Use core.lib.dogetopt to support -h and --help
+* 66d1cdd: Convert node displaying into data driven code
+* 24484af: Refactor options and data_format config file
+* 6fb48f8: Fix some small code cosmeic issues
+* 03e2d26: Add XPath parser for xpath -> lua path
+* cd6ae3c: Remove unnecessary imports in selftest
+* bf43c21: Fix nits and add resolve to lib.yang.xpath
+* 689e1f4: Fix invalid library references in lib.yang.xpath
+* 491d635: Refactor lib.yang.xpath.convert_path and fix nits
+* fab5d4f: Fix final nits in lib.yang.xpath
+* 45d8bb4: Fix some more nits in lib.yang.xpath brought up by review
+* ca390fe: Tighten up definitions in lib.yang.xpath
+* f35af3a: Fix a bug and use string:split() in lib.yang.xpath
+* 69ac479: Add counters to yang schema
+* d6340ae: Add snabb config get-state as RPC
+* 861989b: Add missing lib.yang.state - oops!
+* f27638e: Add verious fixes for snabb config get-state
+* 1454294: Fix some nits and add selftest
+* ff6c5e4: Add assert in core.lib.files_in_directory for better errors
+* ebd2a4b: Fix bug in core.app where shm.mkdir behavour had changed
+* 1239f67: Refactor out config inheritance from lib.yang.schema.resolver
+* 8ad3595: Change parameter in inherit_config from table to boolean
+* e2a0389: Add assert to ensure config can't be in state data
+* c545c5f: Change use of shallow copy to make more robust
+* ccc176e: Second attempt to fix shallow_copy
+* be12aaa: Support named lwaftr instances and update ps program
+* 1ca6e6e: Add name param to lwaftr run program
+* e8e3128: Remove name leaf from yang
+* ab8841b: Add handler for -n/--name for lwaftr bench
+* 88defd3: Remove code to handle schema defined name for lwaftr
+* b84b46a: Add better documentation for config get-state
+* f078bcb: Fix problem in get-state causing number formatting issues
+* 4e1c534: Add missing lwaftr counters to snabb-softwire-v1
+* e8fce9c: Fixes undefined ""otps"" variable.
+* 7d8160e: Fix #622 Use correct PID when getting state
+* 5c2bebc: Fix -h and --help for the ps program
+* 87055ed: Add tests for snabb config with lwaftr
+* f9efd36: Stop the lwaftr after the get-state command too
+* 84a0ac1: Add forgotten selftest.sh
+* 6e0cd4d: Remove TODO where solution was acceptable
+* 1229706: Add basic error reporting to snabb-softwire-v1
+* 8276021: Fix small cosmetic nits brought in in review
+* 73c6590: Add socket support for snabb config listen
+* 5b4a6d0: Add tests for snabb listen over unix socket
+* 97eeef1: Add snabb config listen test to selftest.sh
+* 0515451: test-config-listen.sh: use skipped test exit code
+* c0866eb: Re-trigger unit tests
+* 7f8d684: #700 - Allow for missing optional containers snabb set
+* 343bd31: #737 - Add name leaf to snabb-softwire-v1
+* fae70ba: #737 - Support name by --name or snabb-softwire-v1
+* 7eb419e: #737 - Add rename program support and fixes bug in claim_name
+* 60af0b1: #737 - Add support for changing name via snabb set
+* 0467caa: #737 - Add documentation for name leaf (inc. presidence)
+* 5355f1b: #737 - Add support for name leaf in ietf-softwire translation
+* 2e2b3d7: #737 - Move name claiming to setup_fn and add unclaim_name
+* 99aff07: #737 - Remove test that successive calls to claim_name fails
+* f19182a: Change configuration.name and improve name changes
+* 9d15cdc: Fix #716 - allow / in yang strings
+* 836ad56: #716 - Fix small nits brought up in review
+* 92ac924: #716 - Fix a few more nits
+* a57d7e3: #716 - Add // comment handling in strings
+* a80f481: #748 - Re-enabled broken tests
+* 8589b56: Fix #748 - Move claim_name to lwaftr_app
+* 73abb70: Fix indentation nit
+* 4c92a0e: Fix #702 - Error when neither of next-hop's leaves are specified
+* fcaa19f: Add test for #727 - check softwires are matched
+* 7236a67: Add validation for softwires using snabb config add
+* 04d9605: Fix pervious config test with new validation
+* 8e6b398: Improve tests for softwire validation
+* 7733f20: Fix #638 - Validate path on snabb config get
+* 20ea537: Fix softwire validation for config and initial start
+* 4fdd863: Add validation functions to generic leader support
+* 85659dd: Fix config validation for non --reconfigurable too
+* 07f1702: Lookup psid entries using rangemap for range support
+* 084bb44: Add snabb set test and fix get_binding_table
+* 828e67a: Fix small nit with validate_config call
+* a08f527: Add test to check list with config false doesn't need ""key""
+* 4385676: Fix #789 - Make ""keys"" optional for list statements with config false
+
+Katerina Barone-Adesi (43):
+* 8310b87: Also run selftest in dasl files
+* 34871fb: Documentation fixes, suggested by Christian Graf
+* 03ad2da: Added documentation on how to run on-a-stick mode
+* 7164c27: Add on-a-stick mixed IPv4 IPv6 benchdata pcap
+* 6991507: Added lib.dirname to channel's mkdir
+* 4e8a94f: Fix typo, idr->dir
+* 9139b8e: Make lwaftr bench multiprocess
+* 0f2d064: Add support for --cpu to bench
+* 56bd304: Added bench support for --reconfigurable
+* d05ae25: Added front-end lwaftr tests
+* 764c971: Make lwaftr run --cpu work with multiprocessing
+* 73cd0c5: Fixed selftest paths to run from make test
+* 79c7073: Added an automated test for snabb config get
+* 4f4f34e: Do not show an empty link report in run
+* 8a147ca: Make lwaftr run --reconfigurable uniprocess
+* 7e7190d: Revert ""Make lwaftr run --reconfigurable uniprocess""
+* 3e32819: Set up 'group' in the leader/parent process
+* 041b0e4: Removed README. prefix from docs
+* 4fd4aa7: Sketch out Igalia's testing strategy
+* 10e84dd: Hard wrap at 80
+* 58315b1: Explained how to test ARP in the wild
+* e99ad1a: Hard word wrap at 80 chars for filter perf doc
+* 3eaf558: Fixed typos, explained modular philosophy
+* 5b1986d: Fix lwaftr query
+* 6f806a9: Disabled finding default Snabb instance
+* a9d3130: Fix byname printing of stats with --reconfigurable
+* 8946b8f: Changed tests to work without load
+* c70c5a7: Allow querying follower by leader pid
+* f4543c1: Don't return bogus values when no pid specified
+* 407d051: Get the right pid, regardless of counter filters
+* 6bf6084: Make filtering work with by-name
+* 72a801e: Test counter name that does not exist
+* b051cf9: Addressed nits
+* b31d1db: removed print
+* c281682: Property-based test: lwaftr run does not crash with get
+* 88e6d02: Close popens
+* c7f669c: Add $ to exit code
+* a28953b: Run property-check lwaftr longer
+* 4d6b157: Sleep for longer before starting test
+* 95e2a66: Added a regression test for end-addr
+* 6a4cd40: Added vlan version of tests
+* 4fbaee1: Reduced the number of globals
+* 8824412: Require link and engine
+
+Luke Gorrie (27):
+* ca490c4: core.memory: Rewrite memory.c in Lua using ljsyscall
+* a85017b: engine: Extend API for spawning a background worker.
+* a7c2194: core.shm: Added shm.alias(newpath, oldpath)
+* edee5b6: program/worker: Added ""worker"" program
+* 42f25ee: program.worker: Removed (for replacement)
+* 4922af8: core.worker: New module to run worker processes
+* 0d717a4: Revert ""engine: Extend API for spawning a background worker.""
+* 6e28390: shm: mkdir() now creates full path
+* f614c6a: core.memory: Manage hugetlb file-backing lifetime
+* 50a446b: hardware.pci: Disable bus mastering on shutdown
+* 9fe91ac: main: Call pci.shutdown() and memory.shutdown()
+* 7fbc1a3: core.memory: Auto-mapping of DMA memory w/ SIGSEGV
+* f4228ca: main: Add SNABB_PROGRAM_LUACODE env var
+* dff8685: core.worker: Add execve()
+* 1e1f889: core.worker: Added simple selftest() function
+* 49a8467: core.worker: Remove CPU core as a parameter
+* 0b366da: shm.alias: Ensure directory for alias exists
+* 7189790: core.main: Report unparsable SNABB_PROGRAM_LUACODE
+* 1ce4ca8: core.worker: Start worker with Lua expression
+* 5393afa: core.worker: cleanup child w/ prctl set_pdeathsig
+* 514784a: core.worker: Updated API & removed dead code
+* 987dd77: core.memory: Retry on hugetlb allocation errors
+* 7adc708: ljsyscall: Add more protection against fd double-close
+* f7cb722: net_device: Eliminate fast-path table allocations
+* 82f3355: README.md: Document core.worker multiprocessing
+* 6d7e516: core.worker: Remove dead code
+* 56a5acf: README.md: Fix multiprocessing diagram syntax
+
+Nicola Larosa (36):
+* c0c64eb: Changes while reviewing
+* 3cd2742: Remove the 'lwaftr generator' command (#508)
+* 3fbce43: In the 'bench' command, use the same option name for the benchmark filename as in the other commands (#514)
+* 8b80812: Fix the bench-file option in the run, run_nohw and transient commands (#524)
+* 8d43cf2: Fix benchmark CSV creation and docs (#526)
+* ac4b0ec: Add Hydra CI docs (#545)
+* 9c07396: Let out-ipv6-* counters also count internally generated ICMPv6 packets, and update docs (#547)
+* 3f7f744: Add an example of running a load generator towards on-a-stick mode (#554)
+* 37ebdba: Add explanation of more Hydra jobset parameters (#563)
+* eaeb65d: Add CSV output to the lwaftr loadtest command (#578)
+* 81c5abb: Add Hydra mode to the lwaftr loadtest command (#583)
+* bfbc37f: Add missing IMIX pcap files (#584)
+* 785221b: Yang config doc fixes (#643)
+* c1008a6: Remove useless pcap files (#667)
+* 54c1283: Remove busywait from main process when leader (#732)
+* aa496be: Automate creation of tarball releases with Hydra (#733)
+* 074adda: Refactor query tests to use common test tooling (#741)
+* 68ec9a2: Rework config tests to use common test tooling (#740)
+* fd9d038: Add a selftest for the lwaftr bench command (#739)
+* 53d3d7a: Bench command: turn off leader busywait, mention --reconfigurable in README (#738)
+* 176773a: Enhance NUMA selftest (#734)
+* 56b9240: Refactor config and query tests (#744)
+* 76b6b19: Stop using tmux in query tests, use shell jobs instead (#746)
+* 0804101: Add v. 1.12.9 of the 'sh' Python library (#750)
+* c1fcfd4: First Python integration test (#751)
+* da1acc6: Add 'run' subcommand test, refactor the 'bench' one (#753)
+* 40a980b: Add a selftest for the ""lwaftr loadtest"" command (#755)
+* 4ea06f2: Add test for 'lwaftr check' subcommand (#760)
+* 9f18b41: Add a selftest for the ""lwaftr monitor"" command (#762)
+* 1b192e0: Improve Python selftests (#763)
+* 22f4a7f: Remove the 'sh' Python library (#771)
+* 44617fc: Convert the ""lwaftr config"" tests to Python (#768)
+* 6a4985b: Convert the ""lwaftr query"" tests to Python (#773)
+* 55defa6: Create the TAP interface in the ""monitor"" subcommand test (#776)
+* cf290d1: Improve calling the superclass classmethod in monitor test (#780)
+* d895395: Remove the default bench.csv filename for benchmark data (#782)
+
+Vincenzo Maffione (1):
+* 6899c68: apps: vhost: README.md: fix typo
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/6815887/assets,https://api.github.com/repos/snabbco/snabb/releases/6815887,master,https://api.github.com/repos/snabbco/snabb/tarball/v2017.06,https://github.com/snabbco/snabb/releases/tag/v2017.06,https://api.github.com/repos/snabbco/snabb/zipball/v2017.06,v2017.06,False,False
+6036112,2017-04-10T14:53:03Z,2017-04-10T18:14:27Z,Snabb 2017.04 “Dragon”,"This release upstreams [Snabbwall](http://snabbwall.org/) into the main Snabb repository. Dragon also brings upgrades of LuaJIT (see what’s [changed](http://www.luatex.org/svn/trunk/source/libs/luajit/LuaJIT-src/doc/changes.html#LuaJIT-2.1.0-beta2)), and pflua. Also noteworthy is a new development branch for supporting the aarch64 architecture.
+
+### Major Changes
+
+* #1116 Upstreamed Snabbwall
+* #1111 Synced with LuaJIT v2.1
+
+### Minor Changes
+
+* #1088 Upgraded pflua
+* #1114 Add development branch for aarch64 support
+* #1115 #1113 #1111 Maintenance
+
+### Contributors
+
+Adrián Pérez de Castro (63):
+* 8c6d135: Support IPv6 in the L7 packet scanner
+* 35179e3: Fix ipv6_addr_cmp(), and add ipv4_addr_cmp()
+* b1a89de: Fix review nits
+* eed5544: Fix offset for extraction of IPv6 source/destination addresses
+* cc8280c: Make lo_addr/hi_addr in flow keys arrays of bytes
+* 0fa645a: Discard Ethernet header when scanning IPv6 headers
+* c71aa04: Add comment for the ihl() function
+* 3a2e73d: Add a selftest() function to apps.wall.scanner
+* 0437b89: Remove unneeded assertions on flow key struct sizes
+* e919482: Combine intermediate hash result while iterating over the input
+* cf2da44: Do not clear the last bit of the calculated hash value
+* a820522: Add a __tostring metamethod for protocol_bitmask values
+* 6e0745a: Change log: Fix formatting.
+* dec356a: Expose the nDPI version and use versioned ndpi.protocol_ids
+* 782a6b6: Cater for differences between nDPI 1.7 and 1.8
+* c977233: Import LuaRocks' .rockspec files
+* 4a909ac: Release version 0.0.3
+* 0ecaffa: SnabWall: Add end spy-pcaps test runner
+* 92fed5c: SnabbWall: Import a bunch of test cases for ""snabb wall spy""
+* afad674: SnabbWall: Print out stats after running ""snabb wall spy"" tests
+* 6dc9db6: Allow iterating over the active flows of a L7 scanner
+* 4f2cf50: wall-spy: Report detected flows at the end of non-verbose runs
+* 77a35df: wall-spy: Rename -v/--verbose flag to -l/--live
+* a9eda11: wall-spy: Rename reporter to LiveReporter
+* d4492d0: wall-spy: Document that the command works with TAP and Intel devices
+* 52625ab: wall-spy: Support packet+byte count statistics
+* 3ec3f1b: Do not pass ""-v"" to ""snabb wall spy"" when running tests
+* 0aa160e: wall-spy: Use correct link name for the RawSocket source
+* 1ae4a77: wall-spy: Properly calculate packets/s and bytes/s stats values
+* 7ba3858: Do not leak packets in apps.wall.util.SouthAndNorth
+* dfc8aa4: First pass at the SnabbWall application API reference documentation
+* ff62edc: wall-spy: Only print master protocol when it is known
+* 439437e: wall-spy: Convert port numbers to host endianness for flow reporting
+* 715c739: Use snabb-wall when installed, to reuse Snabb's command resolution logic
+* 193b490: Docs: Describe Scanner:extract_packet_info() and key objects
+* 157bfdb: Relicense to Apache License 2.0
+* 9c08985: Release version 0.1.0
+* 831f0eb: Generate ndpi/protocol_ids.lua from nDPI headers
+* 823c5ff: Generate ndpi/protocol_ids.lua from nDPI headers
+* 339ce1a: nDPI binding using LuaJIT FFI
+* 03681ce: nDPI FFI binding usage example using libpcap
+* e79a5d0: Add README file
+* 7573b0a: Add optional debugging output to examples/readpcap
+* 71d8cdb: Properly identify TCP/UDP packets for port extraction
+* 2f845cc: Do not hardcode input file for examples/readpcap
+* 59a703c: Make examples/readpcap show flows in terse format
+* 2ec05cb: README: Add brief example usage
+* aab270d: Use ""/usr/bin/env luajit"" in script shebangs
+* 6d1ae32: Remove usage of unexistant ""base_type"" variable
+* eb2518d: Wrap the proper name of the protocol bitmask type
+* bfd172d: Build the ljndpi FFI binding for nDPI into Snabb
+* c11f6e2: Improve README by adding some notes on the API
+* 91c84eb: Add small C-to-Lua examples in README
+* e8acff3: Make README refer to the example program, simplify examples
+* 6b0b927: README: Fix link to ntop documentation downloads
+* 415e404: README: Add authorship info, reorder sections
+* c5f7c11: README: Add paragraph welcoming fedback
+* 21187f8: Release version 0.0.1
+* 3e255be: Add skeleton for the ""snabb wall"" command
+* 0751416: Do not call ffi.gc() with nil function on created values
+* e5589f7: Release version 0.0.2
+* 0c8e946: Remove manual lib/ljndpi import
+* 5763476: Implement the L7Spy application and ""wall spy"" command
+
+Alexandr Kostrikov (1):
+* ecbc4a3: Mailing list is abandoned
+
+Asumu Takikawa (56):
+* da233f0: Merge commit '25289c5797b582a362ae22dad3e1089cc71a0837' into lib/pflua
+* 16acf1e: Update Makefile to build dynasm files in pflua
+* ef5de81: Read a ""native"" config option in pcap_filter
+* d9c63f2: Extend pcap_filter selftest to test native mode
+* 7769e0d: Fix references to intel1/10g apps in `wall spy`
+* 62672d2: First attempt at a l7fw app and filter program
+* 40eeadf: Allow pfmatch actions for l7fw rules
+* 7e6f8dd: Allow pfmatch rules to use the flow packet count
+* 78ee8f0: Have to index handler table by name and count
+* 393b8d2: Only recompile if the pfmatch uses $flow_count
+* fc6149b: Modify pflua to support extra pfmatch arguments
+* ddf1e14: Refactor spy program to allow code sharing
+* 6ac8f23: Make snabb wall filter more complete
+* 698a190: First implementation of reject l7fw policy
+* bafad40: Send ICMP responses only if host ip/mac are set
+* 3a738e6: Output a TCP RST for rejects for TCP traffic
+* f74156b: Add README for `snabb wall filter`
+* f953f7e: Send rejection packets to a separate output port
+* 38dad92: Add support for ICMPv6 responses in l7fw
+* e731778: Enable passing IP & MAC to `snabb wall filter`
+* 675040a: Make `snabb config filter` take a rules argument
+* 30437d0: Add a test script for 'snabb wall filter'
+* 00747e2: Fix incorrect ethernet type for IPv6
+* 4d789d0: Fix incorrect payload calculation for ICMPv6
+* a9c1496: Add unit tests for apps.wall.l7fw
+* b0656f3: Add docs for L7Spy and L7Fw
+* 0aac8a7: Adjust -e and -f flags and document both
+* 102e45c: Add a report option to `snabb config filter`
+* aa408b8: Update test for new `snabb wall filter` report
+* 22e5709: Support logging packet actions to the system log
+* e584403: Simplify handling of extra pflua filter arguments
+* 0c8da90: Move assert statement earlier in the call graph
+* fbcd59d: Lift some constants as definitions
+* 3efcc82: Fix undefined variable in pf.savefile
+* b5352a4: Fix typo in lib.protocol.tcp constructor
+* 8152ad9: Backport pflua fixes from Igalia/pflua
+* 168b1be: Assert that the rules file exists
+* da90ff2: Explicitly require the bit library in l7fw
+* 86e3207: Fix typo in L7Spy API docs
+* b19056b: Add duration arguments for 'snabb wall` commands
+* 33523c4: Fix ""tx""/""rx"" link names that were reversed
+* a77446e: Fix PPS & B/s printouts for `snabb wall spy`
+* 15a90b8: Workaround for intermittent segfaults
+* 90151e6: Move constants to separate module & localize
+* 5680c60: Pre-allocate the flow key objects and rewrite
+* f4e9e1a: Use dynasm to optimize ndpi binding functions
+* aa03883: Add a --cpu option to 'snabb wall filter'
+* 4d1bd21: Report bytes/packets/bps for 'snabb config filter'
+* a45e44c: Add a benchmarking script for 'snabb wall filter'
+* 0e21baf: Fix typo (""nddp"" -> ""ndpp"")
+* 42e2940: Adjust snabbwall test path to work on NixOS
+* f2419ca: Change binary from ""snabbwall"" -> ""snabb-wall""
+* 0e4a2cb: Update .gitignore for ljndpi
+* f4afc0f: Revert Makefile changes for upstreaming Snabbwall
+* 65c77bc: Add an ok printout for l7fw & scanner selftests
+* 0628e24: Add Snabbwall branch info to src/doc/branches.md
+
+Jianbo Liu (1):
+* ae0014d: Add development branch for ARM aarch64 platform
+
+Luke Gorrie (3):
+* 736cc36: Squashed 'lib/luajit/' changes from 2f6b296..d3e36e7
+* 97b8b14: Makefile: Bump luajit version number to beta2
+* 9cdf234: doc/branches.md: Add 'luajit' branch
+
+leenaars (1):
+* ae83a0d: Rename snabb to snabbwall",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/6036112/assets,https://api.github.com/repos/snabbco/snabb/releases/6036112,master,https://api.github.com/repos/snabbco/snabb/tarball/v2017.04,https://github.com/snabbco/snabb/releases/tag/v2017.04,https://api.github.com/repos/snabbco/snabb/zipball/v2017.04,v2017.04,False,False
+5651769,2017-03-06T13:55:40Z,2017-03-06T14:32:46Z,Snabb 2017.03 “Camu”,"This release introduces a new driver for Intel i210 / i350 / 82599 chips that supports [Receive-side Scaling](https://en.wikipedia.org/wiki/Network_interface_controller#RSS), a new algorithm that decides how apps are scheduled by the engine, and a new hash table data type that allows efficient mapping from foreign keys to native Lua values. Furthermore, Camu splits the `lib.timer` facility into two simpler utilities based on the observed use cases: timeouts and throttling. As always, this release contains many miscellaneous bug fixes and improvements.
+
+### Major Changes
+
+* #897 #1086 New `intel_mp` driver with RSS support for Intel i210 / i350 / 82599
+* #1066 #1102 #1108 engine: sort links topologically to determine app scheduling in breathe
+* #1059 Add `lib.cltable`, a data type that associates foreign (FFI) keys with Lua values
+
+### Minor changes
+
+* #1076 Replace `lib.timer` with `lib.timeout` and `lib.throttle`
+* #1077 core.main: swap process hierarchy to simplify implementation, the supervisor process is now a child of the main process
+* #1079 Fix a bug in `lib.ipsec.esp` where the size of the authentication signature was incorrect
+* #1042 #1071 #1078 #1104 #1107 Minor fixes and enhancements
+
+### Contributors
+
+Andy Wingo (12):
+* 68b6498: Add data type mapping between FFI and Lua values
+* 0e95eea: ctable: hash_fn param is optional
+* 1a28ca7: Remove superfluous definition from ctable
+* 9309f35: Fix cltable removal bug and add tests
+* d64e70d: Add iteration test of cltable
+* 60e15a0: Topologically sort app graph
+* e852b85: Visit all nodes with pull functions in graph
+* 5206a0a: Fix snabbvmx selftest
+* 727a326: Remove app_array, link_array
+* de24332: Remove link.{receiving_app,has_new_data}
+* e777817: Fix ingress drop monitor
+* 2b6664c: Sort links instead of apps for breathe order.
+
+Asumu Takikawa (1):
+* bb6b695: Fix typo in lib.protocol.tcp constructor
+
+Luke Gorrie (10):
+* eadeb4c: README.md: Add Snabb logo
+* a233c98: core.lib: Fix timer() to match documentation
+* 186f2ea: core.lib: Add timeout() and throttle() functions
+* bf226af: engine: Make engine.now() work outside of breaths
+* e68f5a5: intel_app: replace lib.timer() with lib.throttle()
+* 37bc6c1: pcap_filter: replace lib.timer() with lib.timeout()
+* 19ad6f0: core.lib: Remove timer()
+* 17afb18: core.main: Make supervisor child process instead of parent
+* 152b403: core.main: prctl supervisor name to ""[snabb sup]""
+* 08817a3: engine: Fix selftest() method for link topology change
+
+Max Rottenkolber (4):
+* ac60a9b: apps.test.synth: send sensible amount of packets per breath. (Send up to pull_npackets+(n-1) instead of pull_npackets*n packets.)
+* d480e47: apps/intel_mp: integrate documentation.
+* 6392134: apps.intel.intel_mp: merge SHM statistics counters (2847e9b).
+* 383b4c4: intel_mp: preserve RAL/H[0] for 82599 and use it get device MAC.
+
+Pete Bristow (27):
+* e758971: rewrite pci.c in lua, support both flocked and unflocked memory maps
+* e120a99: fix build issues
+* 27e4516: move intel1g driver to a new home
+* cdee3fc: rejig intel1g to support multiprocess RSS queues
+* d6b18fb: fix i350 support
+* 9f04635: fix typo in variable names in close_pci_resource
+* 384e445: add speed tests to intel1g
+* 689c2d1: move to 3 space indents
+* 04d2845: Better tests that reliably pass, minor layout changes
+* 4bf42b2: modularise register definitions to support intel 82599
+* aedf75c: split out some reusable functions
+* 39b3fba: working RSS support
+* 5f17ea1: rename from intel1g to intel_mp
+* c2b60ab: Replace all the tests and make them all pass.
+* d34a639: support a configurable mtu, based on PR954
+* 38701dc: move to no HT cpuids
+* 696903a: pull packets from the nic in engine.pull_npackets groups
+* 404adc9: apps.intel.Intel1g has been removed so remove it from documentation
+* d33f1df: intel1g is gone, swap driver reporting to intel_mp
+* 84ece1a: fix spurious test failures when rxq1 is master
+* 916454c: the purpose of this test is to show that 2 queues is faster than 1, sometimes it runs slow in absolute terms which needs timeline  for further investigation, hence the 400000pps test. The test was written on a very fast consumer CPU rather than a slower per core server CPU, 200000 should pass on E5 chips ok
+* a96e483: Only kill snabb processes started from intel_mp/selftest.sh
+* 561f241: lower pps thresholds for selftests, davos is relatively old and slow
+* 89754f2: remove taskset pinning
+* 68d48cc: add a simple benchmarking app
+* 4ebca35: Add 64bit register variants and support for wrapping rather than resetting counter registers
+* 8b664a2: intel.Intel now works for i210/i350/82599, per q stats counters are exported, mac address is export via a counter
+
+Ryan Hartlage (1):
+* ffe36d0: Update build instructions to use new repo name
+
+Timo Buhrmester (2):
+* 3a1f0a5: ipsec: Fix AUTH_SIZE which was supposed to be 12.  Discovered while trying to talk IPsec with Linux.
+* 9cce2c7: Fix minor things that crossed my path
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/5651769/assets,https://api.github.com/repos/snabbco/snabb/releases/5651769,master,https://api.github.com/repos/snabbco/snabb/tarball/v2017.03,https://github.com/snabbco/snabb/releases/tag/v2017.03,https://api.github.com/repos/snabbco/snabb/zipball/v2017.03,v2017.03,False,False
+4594708,2016-11-07T19:18:00Z,2016-11-07T19:58:58Z,Snabb 2016.11 “Babaco”,"This release introduces a new library for managing NUMA pinning from within Snabb, a new design for more efficient shifting and appending to packets, and re-synchronization functionality for our ESP implementation, meaning its conceptually complete. Babaco also synchronizes the lwAFTR application with Igalia, and Snabb NFV has received some love as well. As usual this release contains many miscellaneous bug fixes and improvements.
+
+### Major Changes
+- #1046 #1047 Synchronized lwAFTR program with Igalia
+- #1038 Introduced `lib.numa` for managing NUMA pinning from within Snabb
+- #1032 Introduced new design for shifts and appends in `core.packet`: instead of moving the packet data, it now re-positions the pointer
+- #1000 Implemented re-synchronization in `lib.ipsec.esp`
+
+### Minor Changes
+- #911 Added YANG model for Snabb NFV configuration
+- #1051 Fixed bug in `checksum` method of `lib.protocol.ipv4`
+- #1054 Polished and fixed critical bug in ESP integration for Snabb NFV
+- #1039 Fixed a bug  in Snabb NFV  where redundant reconfiguration occurred
+- #1034 Virtio: use packet shifting to tag packets
+- #1031 Included various missing sections in the Snabb manual
+
+### Contributors
+
+Andy Wingo (85):
+- 4540e60: Add missing lwaftr end-to-end-vlan conf file
+- c91d3a9: RateLimitedRepeater operates real line rate
+- e114ec9: loadtest prints out bitrates with overhead
+- 8260923: PodHashMap: Be more like CTable
+- 36780f5: Add PodHashMap:iterate
+- 7f5cca8: RangeMap: Add :iterate method
+- 231c59e: Add BindingTable:iterate_psid_map
+- 697c560: Add BindingTable:iterate_br_addresses
+- 6d97550: Add BindingTable:iterate_softwires
+- 033e746: Add documentation.
+- 9278eb0: Add BindingTable:dump
+- a051092: Hook up binding table dumping to the lwAFTR
+- dd5e5b3: Fix promise bug with more than one argument.
+- 2c118cd: Loadtest supports different programs
+- 3b1dfb4: Forward-port CHANGELOG.
+- 163e611: Disable JIT flush/drop monitor on loadtest; print ingress drops.
+- e382b30: Update documentation
+- f0d75a3: Add get_mempolicy, set_mempolicy NUMA syscalls
+- af8f015: Add beginnings of NUMA module for Snabb
+- fc0bb6d: Add cpu_get_numa_node
+- 0cb8bd8: Add more NUMA methods
+- a3d8fa4: Add choose_numa_node_for_pci_addresses
+- 449490d: pci_get_numa_node can accept canonical addresses
+- 85f0319: Add numa.check_affinity_for_pci_addresses
+- 806746d: Work around a broken `getcpu'
+- e062328: Use lib.numa in lwaftr run
+- d9390f3: ljsyscall: Fix getcpu()
+- fabb961: ljsyscall: Add migrate_pages.
+- 50a920b: numa: Use ljsyscall's fixed ""getcpu()"" implementation
+- d802b76: numa: Migrate existing pages when binding to NUMA node.
+- 976b5df: lwaftr loadtest uses lib.numa
+- 0f2fa19: More performance documentation updates
+- b792e57: v2.7 changelog
+- e45397a: More helpful jit.flush message
+- d87de59: Fix time printout.
+- eb4aac4: Print troubleshooting link at every jit.flush.
+- 841266d: Change --cpu mentions to taskset/numactl
+- 0c89a4d: v2.8 release notes
+- c9676f6: virtio-net driver: Use C header files
+- e25a6bb: Add some headroom before a packet's data.
+- 0650c04: Disable backpressure on intel driver
+- d6087e5: virtio-net driver: Use direct descriptors
+- da583ac: Fix assumptions that packet == packet.data
+- 30ddd81: Indirect access to packet data
+- fbec950: Bring length back to beginning of struct packet
+- ae121ca: lwaftr is resilient to changes in p.data
+- dfe46a2: Refactor packet headroom mechanism
+- 8c15b78: Add assertions in packet.lua
+- 0e619fe: Adapt virtio to use packet.shift for its headers
+- 57177b2: Bump packet headroom to 64 bytes.
+- 1b401ba: Default headroom in Lua, not C
+- 814b208: v2.9 changelog
+- 780e46a: Refactor ingress drop monitor to have configurable actions
+- c249604: Enable warning ingress drop monitor on the NFV
+- 5540648: snabbnfv traffic: Only re-start engine when configuration changes
+- a2a6713: Add v2.10 changelog.
+- 938594d: Fix assumptions that packet == packet.data
+- 5416f9c: lwaftr is resilient to changes in p.data
+- 71679a5: Implement shiftleft/shiftright by moving packet around
+- c2097d2: Add minimum packet alignment.
+- 998427e: virtio-net driver: Use C header files
+- a5541e5: virtio-net driver: Use direct descriptors
+- 3e61642: Convert lwaftr V4V6, generator, nh_fwd apps to new config
+- c09e62d: Fix name of Join output link.
+- 3f8f337: Supply nh_fwd app with minimal configuration.
+- 93629e0: Add tests.
+- 12f77a3: Fix allocate/new_packet mixup.
+- 7bfbba4: Add get_mempolicy, set_mempolicy NUMA syscalls
+- 9a0abb2: ljsyscall: Fix getcpu()
+- c2f2d3d: ljsyscall: Add migrate_pages.
+- 3b5fe60: Add NUMA module for Snabb
+- 243480d: Remove stale timers code
+- 4b8930d: Revert message change relative to uptream ctable
+- 2567ddc: snabbnfv traffic: Only re-start engine when configuration changes
+- ade4b3e: Reformat performance-tuning.md.  No change.
+- b5a2cde: Merge lwAFTR performance notes to performance-tuning.md
+- eef390a: Tweaks
+- 6c1f585: Refactor ingress drop monitor to have configurable actions
+- de93573: Enable warning ingress drop monitor on the NFV
+- 3489e4b: Address feedback
+- 6bb456f: Address feedback bis
+- 21759e2: Add README.numa.md
+- e115542: Update README.md for packet.shiftleft et al
+- 4b9becf: Fix typos in performance-tuning.md
+- 876addc: Fix shm.exists() check in ingress drop monitor
+
+Diego Pino Garcia (136):
+- 11ff29f: Update and clean up documentation
+- 7ecb418: Monitor ingress packet drops and jit flush if threshold exceeded
+- f9d6289: Remove invalid NDP NS test
+- 6846a3f: NDP: Match Neighbour Solicitation target address to lwAFTR IPv6 address
+- 740f29b: Rename arguments v4-pci and v6-pci to v4 and v6
+- cf46993: Update documentation regarding v4 and v6 arguments
+- c1758a2: Remove short options for arguments v4 and v6
+- 377b121: Add warning message about deprecated arguments '--v4-pci' and '--v6-pci'
+- 018b086: Several improvements in virt/lwaftrctl
+- 9e86b23: Handle NS requests and retries without timers
+- f04e111: Implement next-hop forwarder
+- 7ca5e52: Add nh_fwd unit tests
+- f5eaada: Dump packet in 'od' format
+- 000b99e: Return source ethernet if Target Link is not present
+- 08525dd: Assert destination ethernet address in selftest
+- abe6584: Add Neighbor Advertisement unit test
+- e2bf05c: Clear out Flags in ICMPv4 echo-reply
+- 0b5c313: Add method timer.deactivate(name)
+- 0cae549: Retry Neighbour Solicitations during time limit
+- 5edd4a2: Send NS packet inmediately and retry after every second
+- 21d6145: Refactor dump lwAFTR configuration
+- 481f2b5: Dump binding table to text file
+- 4bbe3a9: Change dump file names format
+- 164dc62: Redo lwAFTR's conf dump selftest
+- 2f829bd: Use conf parser to read conf file in dump.lua's selftest
+- c6788af: Update performance-tunning.md
+- a461a48: Reintroduce v4-pci and v6-pci for backwards compatibility
+- cc677cc: Implement ARP requests retries
+- 223da17: Cleanup of lwaftrctl script
+- 4ad3379: Fix IPSec's esp selftest
+- 06b3483: Adapt lwAFTR counters to new counters API
+- c1ed420: Name parameters in 'snabb_run_and_cmp'
+- 5b8895d: Fix test 'from-to-b4 IPv6 packet NOT found in the binding table'
+- 85299c2: Print error if couldn't find file
+- 7e03587: Add test 'Testing sending non-IPv6 traffic to the IPv6 interface'
+- b727704: Add test 'Testing sending non-IPv4 traffic to the IPv4 interface'
+- dc381f6: Add on-a-stick mode
+- 10331e2: Add lwAFTR monitor program
+- 2b35a95: Add V4V6 selftest
+- c1471a0: Refactor load_check
+- d74c72c: Tag ARP packets as IPv4 packets
+- f8250d9: Add on-a-stick support for 'lwAFTR check'
+- 8aca7e6: Run end-to-end tests in on-a-stick mode too
+- 2959333: Run end-to-end-vlan tests in on-a-stick mode too
+- 719b3ab: Rename 'v4v6' app to 'V4V6'
+- 4fe25a3: Add support for icmpv4_rate_limiter_n_packets and icmpv4_rate_limiter_n_seconds configuration parameters
+- 45a66d4: Refactor transmit_icmpv6_with_rate_limit
+- ad87150: Rate-limiting of ICMPv4 packets
+- 98519bf: Remove 'ingress_drop_monitor' dead code
+- 1119dfb: Import 'lwaftr query' program to lwaftr branch
+- a8353a7: Format numbers with lib.comma_value
+- f20229a: Filter counters to print
+- 30a83b2: Sort counters
+- c880ee8: Align counter values
+- 6de1d4a: Add option to print out all available counter names
+- f915586: Add a flag to allow monitor all packets in on-a-stick mode
+- 696c33e: Add lwaftr nexthop program
+- f4c48d7: Import ipv6_equals
+- a26698d: Fix self.debug comparison
+- 4182e16: Add method 'exists' to core/shm
+- 83dd337: Print out multiple snabb instance pids
+- 32f81df: Move parsing of arguments to parse_args
+- 58691a2: Fetch PID by lwAFTR ID
+- ec6223f: Remove unused variables
+- b69925f: Update lwAFTR query documentation
+- 60aaa9c: Fix counters path
+- 6e5f416: Assert counters were initialized
+- 4132426: Fix initialization of Reassembly/Fragmentation apps
+- b023195: Remove empty counter files
+- ed3d6a1: Rename V4V6 input and output links
+- 6c29222: Import Snabbvmx
+- 4d404dc: Initialize counters and reassembly/fragmentation apps
+- e1e0de4: Add hairpinning queue
+- 29156d0: Add parameter --mirror to Snabbvmx
+- 379b33d: Store lwAFTR ID in shared memory
+- 5ee7afb: Default MTU value 9500 in snabbvmx
+- 4d86ace: Create lwAFTR counters in apps/lwaftr/counters
+- 236cffe: Add documentation for SnabbVMX and fix code issues
+- de87bce: Fix fetch lwAFTR instance by name
+- 0af0f68: Add support of VLAN tagging in on-a-stick mode
+- 41f300f: Pass load_on_a_stick arguments as hash
+- adf5060: Load two virtual NICs if using two different VLAN tags
+- 6b01e0d: Flush ingress-packet-drops to a counter
+- b65a362: Monitor ingress-packet-drops in SnabbVMX
+- 318116e: Use discard attributes to setup ingress-drop-monitor
+- e03efe4: Read ingress-packet-monitor values from SnabbVMX conf file
+- dac8774: Add script tcpreplay
+- 53ba35f: Add Snabbvmx test
+- a2b1fb4: Increase time interval
+- 0f2824e: Clean up tcpreplay.lua script
+- 482a196: Fix vlan assignment
+- 331b40e: Refactor SnabbVMX selftest
+- f23359e: Add VLAN tag testing to SnabbVMX selftest
+- 8bf708f: Add nexthop test datasets and configuration files
+- 9c29680: Add nexthop selftest
+- 24e41f7: Remove unused app 'Repeater'
+- 07426fe: Append .counter suffix if necessary
+- fb2fc13: Import snabbvmx top
+- b2969df: Adapt snabbvmx top
+- e0ce047: Update README
+- 1f62c93: Remove top/util.lua
+- 36cd34b: Select snabb instance per id
+- b0ebb75: Adjust columns width
+- 12a942d: Update README
+- bd5456c: Tidy up top.lua
+- ea2f572: Remove ipv6_address parameter in snabbvmx config file
+- f75c7cb: Add missing file
+- 1b2611b: Fix v4-only and v6-only options
+- 7c695c5: Define LWAFTR_DEBUG env var
+- 6395d10: Centralize packet deallocation in transmit_icmpv4_reply
+- eae3759: Separate test-data from core-end-to-end.sh
+- 2cd9a92: Document test data array entry
+- bd29d04: Call flush_haipin if link is PKT_HAIRPINNED
+- 5aec24e: Add test hairpin queue gets flushed
+- aa70cd5: Add VLAN test
+- 43f4c33: Add program soaktest
+- f9f8639: Add soaktest script for CI testing
+- 65804a8: Move soaktest to own folder
+- a971f6d: Refactored lwaftr check on-a-stick code
+- 4d74ca3: Update README
+- 05674f7: Create counters file if it doesn't exist
+- 96cbe55: Check counters file is a table
+- 0a4bb2e: Append path to conf file
+- 0b2afc4: Fix nexthop test
+- cb527ac: Fix update of ingress-packet-drops counter
+- 7fc9533: Allow empty binding table
+- e421d19: Use lwAFTR inet MAC address as ARP source
+- a6c60ae: Move lwaftr/nexthop to snabbvmx/nexthop
+- c211921: Move apps/nh_fwd/nh_fwd.lua to apps/lwaftr/nh_fwd.lua
+- aba846c: fix nexthop test
+- 21bc5bb: lwAFTR check on-a-stick mode was ignored
+- 7c77ac6: Remove skipped test
+- 111a6b4: Extract common functions from lwaftr check
+- f044d9e: Add SnabbVMX check
+- 5518db2: Add SnabbVMX check test case
+- 08ad8ae: Move fatal, file_exists, dir_exists and nic_exists to lwutil
+- f007d1f: Import missing function fatal
+- d100475: Allow to set monitor by id.
+- d92abf4: Fix print error message
+- 2729c6b: Exit snabbvmx top if selected non-lwaftr instance
+- 4f88d34: Fix reporting of incoming ipv6 packets in packetblaster lwaftr mode
+- 0fb961a: Calculate effective VLAN
+- e0424bd: Use intel10g.ring_buffer_size setter
+- b4a383d: Remove tcpreplay script and use packetblaster --no-loop instead
+- c0ee520: Remove old benchmarking tools
+- b759464: Use ethernet:ntop and ipv6:ntop
+- 4c395fc: Define SKIPPED_CODE in nexthop/selftest.sh
+- 3a36e95: Reset IPv4 checksum before recalculating it
+
+Katerina Barone-Adesi (36):
+- 04b3d8f: Added ARP support to the lwaftr.
+- 7cdd3a5: Added documentation of filter performance
+- cb79190: Fix ICMP error encapsulation to hosts behind B4s
+- 8692f21: Remove phantom IPv4 packets while hairpinning
+- 9e525a6: Added random ejection to ctables
+- 0db5e19: Hardened IPv6 reassembly
+- ee00591: Addressed nits
+- e67046b: Normalize the vlan and non-vlan test suite
+- 6aa512f: Addressed nits
+- 6b522ae: Fixed an erroneous comment (bytes -> bits).
+- a25cfd0: Removed unused global
+- 1ae5334: Hardened IPv4 reassembly. All tests pass.
+- eb31f54: Nits, halved default packet reassembly table size
+- 7334ad8: Remove obsolete l2_size approach
+- 16102b3: Fragmentation counters, for IPv4 and IPv6
+- 1bf66c0: Use lwutil.keys
+- 2d25d80: Move the line-oriented counters towards the edges of the app network
+- 65fc13b: Move ctable changes to a wrapper
+- dbc715a: Document 'check -r'
+- e2d0cba: Got rid of packet.clone_to_memory
+- 168e27a: Removed unused parameter
+- 3461a48: Documented fragment counters and troubleshooting
+- 01eb36c: Rename: needsreassembly -> needs-reassembly
+- 9fe6b79: Rename: randomevicted -> random-evicted
+- 4a0047e: Reverted moving the wire-oriented counters to the edges
+- ec0b434: Dashes strike again
+- 3149a39: Update counter path in docs
+- 3ff3f6d: If there is a br address for a bad softwire, use it
+- fceff6a: Make ntohl/htonl unsigned
+- 6f5a2dc: Renamed var, removed comment about it, per review
+- ccb1222: Added a regression test for issue 453
+- af2ed2e: lwutil refactorings
+- 5f74716: Make the core lwAFTR drop fragments
+- 37bc4f0: Add -D: duration option to check
+- 8448ccd: Fix variable name: self->lwaftr
+- b847569: Addressed review comments
+
+Marcel Wiget (17):
+- 3c3c41b: check and use linux interface via rawSocket
+- 96aeaee: add snabbvmx query (to xml)
+- de05632: snabbvmx query to xml
+- aea673f: fixed path to counters_dir in lwcounter
+- a3d0dc4: no more special treatment for lwaftr app required
+- a6cd1ec: remove unused function read_lwaftr_counters
+- 8a4d9d6: remove reference to unused lwcounter
+- d26fa9e: remove unused variables
+- 592f0cc: fix ipv4 checksum in cache refresh packet
+- f984b76: increment only after all packet sizes are sent
+- 1194c25: ok to have no v4/v6 input/output ports in passthru mode
+- 91c5bdc: sanitize xml tags and include links pci and engine stats
+- 2fbf247: use the correct readme
+- bb521e8: use integer for instance id and add name tag for the nic id
+- 5fb1ad4: using :match() for readability and check if name exists
+- b8953d9: set interface mtu based on lwaftr v4/v6 mtu
+- 025fe10: use lwaftr.constants and adjust mtu in case of vlan, cover interface.mtu
+
+Max Rottenkolber (19):
+- 5c4d5dc: snabbnfv: initial YANG model for configuration.
+- adde897: snabb-nfvconfig.yang: s/gigabytes/gigabits.
+- 3909d47: snabb-nfvconfig.yang: Fix port.tunnel.type description.
+- 4b275a4: snabb-nfvconfig.yang: Add initial revision.
+- 1b08428: lib.ipsec.esp: minor formatting/style.
+- f35f4e9: lib.ipsec.esp: refactor and fixes   - move all resync logic into resync method   - use self.aes_128_gcm.auth_buf for packet regeneration   - remember to free temporary packet used in resync   - move auditing code into audit method   - make auditing configurable as specified in RFC 4303   - only log audits for packets that were actually rejected   - update docs and comments
+- dcd1a45: doc/genbook.sh: add missing apps to documentation.
+- 7cc37b4: documentation: minor formatting fixes.
+- 1bdd98d: README.md: link to documentation.
+- 16fba64: snabbnfv: do not include gbps unit in QoS config options.
+- 9c4a4d1: Rename snabb-nfvconfig.yang to snabb-nfvconfig-v1.yang (version model).
+- 62d5a6f: apps.ipsec.esp: do not keymat for both streams, accepts two key/salt pairs instead. lib.ipsec: get rid of confusing “keymat” term.
+- 8e1461b: lib.ipsec.esp: automatically pad window_size to implementation req.
+- d1012d4: apps.ipsec.esp: refuse to operate with transmit_salt == receive_salt. See https://tools.ietf.org/html/rfc4106#section-10
+- 7598462: …ipsec: fix documentation typos.
+- baabc08: ipsec documentation: use $mdroot, include AES128gcm app docs.
+- 9772042: snabb-nfvconfig-v1.yang: add crypto node.
+- b1b60d2: neutron2snabb: update test fixtures (ignoring the sillyness for now).
+- 1ada400: snabbnfv: support deprecated rx_police_gbps and tx_police_gbps.
+
+Nicola Larosa (30):
+- 4dd9553: Cleanup of the lwaftr app code
+- 2902ff5: Several changes reverted after review
+- dbf5a83: Add loading pf filter definitions from file (#317)
+- 34c401b: Add ingress, egress and hairpin counters, with preliminary testing support
+- 0de9d59: Add documentation for counters, including diagrams and descriptions
+- 6dcac11: Updated text and images
+- a1abc8f: Add drop counters and update all end-to-end tests to check them too
+- ce9a564: Update all end-to-end tests, vlan ones included, so that they check the counters' values too
+- c1d09a5: Moved counters' declaration to a single table, used dashes in all names, no underscores anymore
+- 50a0330: Fix test data filenames, start adding drop counters' tests
+- 8b5260f: Add drop counters' data to the tests, complete counters' renaming
+- 7d39e1d: Implement drop-all counters
+- a78d0c9: Remove TODOs for drop-all counters
+- 1c90f57: Shorten long lines
+- aafa4d9: Remove obsolete tests
+- fd0bfe1: Count hairpinned packets in out-ipv4 too
+- f64f07e: Do not count internally generated ICMPv4 packets in out-ipv4
+- 39cc6e0: Extract the lookup queue from the binding table
+- f78bd20: Add drop counters, with tests
+- fec3c27: Reenable disabled test
+- 92f8886: Add missing drop policy code section, fix one test and add two new ones
+- bbad242: Add docs for the counters
+- ce4edd1: Add a 'snabb lwaftr query' subcommand
+- 92d6f52: Remove conflicts from the counters doc. (#404)
+- cda6ca8: Add Hydra mode and filename support to bench CSV output (#468)
+- 69825fe: Update the 'encapsulate queue to b4' diagram (#474)
+- 7277bec: Make the run, run_nowh and transient lwAftr subcommands output CSV data to a file (#472)
+- 3e4fef1: Add docs for packet reassembly config settings (#478)
+- 0994e88: Remove useless column from benchmark CSV output in Hydra mode (#498)
+- fe28653: Misc. cleanup of the program/lwaftr/ subtree (#501)
+
+Timo Buhrmester (5):
+- ef2b402: lib.ipsec.esp: Anti-replay - resynchronization (RFC 4303 App. A3), more sophisticated approach without duplicating packets/copying data in the normal (non-resync) code paths
+- a6b7714: Eliminate a variable
+- b0ac831: lib.ipsec.esp: Get rid of awkwardly named dual-use variable, slightly improve clarity
+- 38ac409: lib.ipsec.esp: Add another test to verify we do not resync with very old, replayed packets
+- f140d1c: lib.ipsec.esp: Make the resync threshold and depth configurable, add preliminary defaults; document it.
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/4594708/assets,https://api.github.com/repos/snabbco/snabb/releases/4594708,master,https://api.github.com/repos/snabbco/snabb/tarball/v2016.11,https://github.com/snabbco/snabb/releases/tag/v2016.11,https://api.github.com/repos/snabbco/snabb/zipball/v2016.11,v2016.11,False,False
+4333599,2016-10-07T13:33:03Z,2016-10-07T14:02:58Z,Snabb 2016.10 “Ananas”,"This release introduces a new and unified way to declare what configuration parameters your apps accept, and verifies app arguments uniformly. If you are a user of `apps.vpn`, do note that it has been removed in Ananas, and that you should upgrade to use the new and improved implementation in the l2vpn branch. Also noteworthy, packetblaster has gained a new switch for when you just want to transmit a finite burst of packets, instead of transmitting continuously. As usual this release also contains many small bug fixes and improvements.
+
+### Major Changes
+- #1008 Removed `apps.vpn` (obsoleted by the l2vpn program on the l2vpn branch)
+- #1010 Added `--no-loop` switch to `packetplaster replay` for emitting finite bursts of packets
+- #1019 Unified the way apps specify their configuration options, and how they are verified
+
+### Minor Changes
+- #1014 Optimized Tap app
+- #1018 Replaced built-in `assert` with a version that synergizes with ljsyscall
+- #1023 #1024 #1027 Fixed bug where `htonl` performed a signed operation
+- #1005 #1015 #1017 Minor bug fixes and improvements
+
+### Contributors
+
+Alexander Gall (1):
+- fb15c66: Remove apps.vpn
+
+Andy Wingo (3):
+- 8d58c03: Add lib.parameters
+- 823fcb9: Convert rate limiter to use parameters.parse
+- 6d9c784: Add missing include
+
+Diego Pino Garcia (13):
+- a1af15e: Getter/setter ring_buffer_size
+- c304027: Format packetblaster.lua and removed unused variables
+- f3cc41c: Check 'packetblaster replay' arguments should be at least 2
+- fb32e41: Refactor 'packetblaster synth'
+- e58e124: Pass array of options instead of duration
+- 4de74b1: Add switch 'no-loop' to 'packetblaster replay'
+- 7429a78: Initialize loop flag in subprogram
+- 0b035ae: Add --no-loop to 'packetblaster synth'
+- bbdd182: Update 'replay' and 'synth' README
+- 81d1d6a: Remove --no-loop flag in synth
+- c547d90: Properly configure link for Intel82599
+- b73f488: Report LoadGen results in synth.lua
+- 65cdc1c: Cast VLAN tags as int32
+
+Domen Kožar (1):
+- da860a6: manual: support NixOS 16.03 and 16.09 texlive package sets
+
+Katerina Barone-Adesi (2):
+- 83a4216: Make ntohl/htonl unsigned
+- 2194fa5: Added ntohl selftest sanity checks
+
+Max Rottenkolber (15):
+- 598c5d0: core.main: check the return value of fork.
+- eabe7bf: Provide global assert implementation that plays nicely with ljsyscall.
+- 9daa25c: Make use of new assert implementation.
+- 8c5164c: Integrate app arg parsing.
+- 4411ad3: Move lib.assert to core.main, fixing global name space breakage.
+- a3faf0c: config.app: set zone. core.main: print zone in handler.
+- 8593f8e: apps.keyed_ipv6_tunnel: fix typo.
+- 14656c8: intel_app: do not call parse_app_arg in reconfig.
+- 0c1f3b4: apps.test.lwaftr: add missing options to config.
+- def857d: Revert ""config.app: set zone. core.main: print zone in handler.""
+- 82dbe04: core.config: print a helpful error message on failure to configure an app.
+- 52a0bd7: core.lib.parse: improve error messages.
+- 53bc9ac: snabbnfv: do not pass bogus parameter to AES128gcm app.
+- 9236f15: apps.pcap.PcapWriter: add back mode parameter.
+- f0a9bb0: Revert ""Cast VLAN tags as int32"" in favor of #1024, keep test case
+
+Pete Bristow (3):
+- d65e9dc: avoid allocating a packet on every breath
+- f06c88f: Use output rather than out as Joins only output
+- 82eecef: The last fix for allocating on every breath actually broke under load, this one does not
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/4333599/assets,https://api.github.com/repos/snabbco/snabb/releases/4333599,master,https://api.github.com/repos/snabbco/snabb/tarball/v2016.10,https://github.com/snabbco/snabb/releases/tag/v2016.10,https://api.github.com/repos/snabbco/snabb/zipball/v2016.10,v2016.10,False,False
+4039884,2016-09-02T14:34:05Z,2016-09-02T15:25:07Z,Snabb 2016.09 “Zapote”,"This release changes the way Snabb apps utilize links to avoid back pressure, and the default ring size was quadrupled. Most apps no longer avoid overflowing their output links, and therefore excessive packets will be dropped at the link level instead of being buffered ad-hoc by apps. The result is that link statistics now reflect actual congestion, and the performance of the iperf benchmark improved slightly. Zapote also introduces anti-replay protection as well as logging of auditable events for `lib.ipsec.esp` as per RFC 4303, meaning Snabb’s ESP implementation is almost complete. Our vhost_user implementation has seen some major improvements in both performance and stability. A bug on our side of the protocol implementation was fixed that was responsible for crashes with some QEMU versions, and by tweaking how the JIT compiles the vhost_user code the performance of the Snabb-to-DPDK benchmark was improved substantially. Last but not least, this release contains miscellaneous bug fixes and improvements.
+
+### Major Changes
+- #950 Links are now used asynchronously throughout Snabb, and the new variable `engine.pull_npackets` governs how many packets apps pull into the app network on each breath
+- #988 `lib.ipsec.esp` now implements anti-replay protection and logs “auditable” events
+- #1001 The vhost_user implementation was optimized, and its performance improved substantially
+
+### Minor Changes
+- #984 Fixed a bug in our vhost_user implementation that caused crashes with some QEMU versions
+- #990 Added `exists` method to `core.shm` to probe for SHM objects
+- #991 `snabb top` now lists the PIDs of Snabb instances if multiple are detected and no target is specified
+- #985 #986 #996 Minor bug fixes and improvements
+- #966 Various SnabbBot/CI improvements
+
+### Contributors
+
+Diego Pino (3):
+- 0b62e29: Support private repos
+- 1e59dc7: Remove temporary directories if they exist
+- f8443f5: Append CLIENT_ID and CLIENT_SECRET to urls
+
+Diego Pino Garcia (4):
+- 3a254ac: Revert ""Remove temporary directories if they exist""
+- 64491b9: Skip SnabbNFV test if cannot find QEMU image
+- 3ea2348: Add method 'exists' to core/shm
+- bc8c2ab: Print out multiple snabb instance pids
+
+Katerina Barone-Adesi (1):
+- bb9b3c2: Packet.lua: add clone_to_memory
+
+Luke Gorrie (5):
+- d77e43d: vhost_user: Enable/disable vring processing on kick/get_base
+- 2a98aa5: snabbnfv: Update filter.ports config to allow iperf
+- d4b71e6: net_device: Avoid unnecessary checksum calculation
+- 7f1d205: virtio net_device: JIT each connection separately
+- 54ac86d: Revert ""Packet.lua: add clone_to_memory""
+
+Max Rottenkolber (19):
+- 0f654f7: snabb_bot: Dirty fix for GitHub API pagination to get runway.
+- 8ae18fa: snabb_doc: same as previous commit but for SnabbDoc.
+- 1dfa664: lib.ipsec.esp: Test minimum packet sizes.
+- 54e7b90: remove link.full, increase link buffer size, add engine.pull_npackets.
+- a1f60a2: Replace usage of link.full/nwritable with engine.pull_npackets.
+- cca676e: scripts/snabb_doc.sh: push via https.
+- 325ddca: lib.ipsec.seq_no_t: remove unused `full' method.
+- b4a7968: lib.ipsec.esp: refactor track_seq_no.
+- 13a12e9: snabbmark esp: work around anti-replay window.
+- b6bed30: snabb_bot: fix bug where bogus performance regressions where reported.
+- 55b1572: Fix-up Lwaftrgen:pull and basic_apps.Tee.
+- c3c3413: core.link.size must be a power of two.
+- f52861f: Revert ""remove link.full"", document link.nwritable, link.nreadable.
+- 0d40aad: core.shm.exists: document return value type.
+- b11191a: apps.virtio_net: Fix README to correctly reflect role of VirtioNet app.
+- 0214574: core.packet: make packet_t public accoding to documentation.
+- ee57dae: core.packet: document clone_to_memory.
+- 1d2b27e: Revert ""core.packet: make packet_t public accoding to documentation.""
+- cc829d2: core.packet: remove mention of packet_t in favor of “struct packet”.
+
+Timo Buhrmester (7):
+- 4c311c9: lib.ipsec.esp: Anti-replay (RFC 4303 App. A)
+- 363b1bf: Refactoring broke advance_window; fix that
+- 72532f6: lib.ipsec.esp: More thourough testing of the anti-replay facilities
+- 29de34c: lib.ipsec.esp: Reinsert a few comments that got refactored out
+- 54899c0: lib.ipsec.esp: Use core.lib.logger for the auditable events ""integrity error"" and ""replayed""
+- c37e01b: lib.ipsec.esp: One logger per module rather than per decryption context
+- 2e75c11: lib.ipsec.esp: Fix typo
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/4039884/assets,https://api.github.com/repos/snabbco/snabb/releases/4039884,master,https://api.github.com/repos/snabbco/snabb/tarball/v2016.09,https://github.com/snabbco/snabb/releases/tag/v2016.09,https://api.github.com/repos/snabbco/snabb/zipball/v2016.09,v2016.09,False,False
+3801912,2016-08-03T11:28:28Z,2016-08-03T11:49:13Z,Snabb 2016.08 “Yolanda”,"This release adds a handy utility to bind and unbind PCI devices to and from Linux, overhauls Snabb’s shared memory subsystem, and adds software I/O mode to SnabbNFV. The deprecated “data” and “length” functions from `core.packet` were removed. Statistics counters in the `vhost_user` app were removed as well, because they caused a performance regression for which not solution was found yet. As usual, this release also contains many bug fixes and minor improvements.
+
+### Major Changes
+- #971 Added new utility `snabb pci_bind` to help with PCI device management
+- #969 Added software I/O mode to SnabbNFV allowing it to be run without dedicated network hardware
+- #972 Overhauled shared memory subsystem
+
+### Minor Changes
+- #967 Removed deprecated `packet.data` and `packet.length`
+- #968 Fixed bug in `apps.bridge.blooding`
+- #975 Skip Intel1g selftest if required environment variable is empty
+- #979 Added `SNABB_SHM_ROOT` and `SNABB_SHM_KEEP` environment variables
+- #983 Reverted statistics for `apps.vhost.vhost_user` because of performance regression
+
+### Contributors
+
+Diego Pino Garcia (2):
+- 00f6ff6: Fix intel1g selftest
+- bf09217: Replace os.getenv for lib.getenv
+
+Katerina Barone-Adesi (1):
+- dcaf4f9: pci_bind: A utility to bind/unbind PCI cards
+
+Luke Gorrie (2):
+- 78c6764: core.shm: $SNABB_SHM_ROOT overrides /var/run/snabb
+- 5c317aa: main: $SNABB_SHM_KEEP prevents removal of shm dir
+
+Max Rottenkolber (10):
+- a95751f: core.packet: Remove data/length reader functions.
+- 0be75ab: SnabbNFV: Add support for virtual/software I/O mode.
+- 38cf53c: SnabbNFV test reorganization and parameterization.
+- f6ef311: SnabbNFV: make virtio mrg_rxbuf option configurable.
+- 0814fd9: apps.bridge.flooding: Fix regression introduced by 4b4b8ad / #638.
+- 2552468: SnabbNFV: add port option no_indirect_desc.
+- 28a3de1: statistics: introduce shm frame abstraction to eliminate boilerplate code...
+- 70ad231: snabb top: remove obsolete unlinking of runtime files (supervisor).
+- a37441f: snabbnfv: Added symlink to dpdk_bench.sh for Hydra compatibility.
+- 77c0d57: vhost_user: revert statistics.
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/3801912/assets,https://api.github.com/repos/snabbco/snabb/releases/3801912,master,https://api.github.com/repos/snabbco/snabb/tarball/v2016.08,https://github.com/snabbco/snabb/releases/tag/v2016.08,https://api.github.com/repos/snabbco/snabb/zipball/v2016.08,v2016.08,False,False
+3647887,2016-07-13T13:17:32Z,2016-07-13T13:47:01Z,Snabb 2016.07 “Xigua”,"This release introduces a new `link` callback for apps to configure themselves after their links are set up, and a new supervisor process is started alongside the usual Snabb process to clean up after it. SnabbNFV got support for encrypted tunnels, and per-app shared memory counters for statistics and diagnostics were added to many apps. The “length” and “data” functions from `core.packet` were deprecated in favor of exposing the packet ctype and its ABI. As usual, this release also contains many bug fixes and minor improvements.
+
+### Major Changes
+- #905 Introduced `link` callback for apps
+- #930 Added supervisor process to manage Snabb worker process
+- #949 Added ESP (encrypted tunnel) support to SnabbNFV
+- #931 #947 #953 #963  Added shared memory statistics counters for Apps
+
+### Minor Changes
+- #913 Exposed and documented `core.packet` ctype
+- #934 #935 Multiple fixes for Virtio drivers
+- #936 Added “align” argument to `core.memory.dma_alloc`
+- #904 #866 #889 #941 #835 #939 #958 #942 #944 #948 Various bug fixes and improvements
+
+### Contributors
+
+Alexander Gall (1):
+- 900ff8e: Fix interface speed
+
+Andy Wingo (1):
+- 995f9d8: vhost-user: Support operation without MRG_RXBUF.
+
+Diego Pino (1):
+- c86ec3e: Call app:start only if defined
+
+Diego Pino Garcia (4):
+- c3c69d2: Add 'start' method to apps
+- 9dabdd2: Call app.start instead of app_table[name].start
+- 0a5bfac: Remove unassigned initialization
+- 80a7ee7: Trigger start event for each app
+
+Domen Kožar (8):
+- d0cc3c6: default.nix: enable parallel builds
+- 738ef31: Snabb version is now statically stored in .version
+- a119aeb: release.nix: don't rely on SNABB_PCI\* defaults
+- 1feb2c9: release.nix: by default use lugano servers
+- 307b1e1: default.nix: remove .git from source since it's not deterministic
+- 1d4e766: src/Makefile: silence grep
+- 694b1c4: test_env.sh: output kernel console to stdout
+- 1b60645: default.nix: don't hardcode the version
+
+Luke Gorrie (13):
+- b34c3ee: engine: Set shm path to ""app/$name""
+- 80614e1: doc/git-workflow.md: Rewritten based on new experience
+- 12d0009: doc/git-workflow.md: Added section on upstreaming subsystems
+- af8ae46: doc/git-workflow.md: Partly rewritten draft
+- eccb614: doc/git-workflow.md: Created .src.md
+- 113b607: git-workflow.md: Rewrote section on becoming a maintainer
+- 4a37b98: git-workflow.md: Wrote about upstreaming subsystem branches
+- 6c46b5d: doc: Remove stale .images/Branches.png file
+- 4eb21b6: virtio/net_device: Fix bug with mergeable rx buffers
+- e5f23a9: vhost_user: Fix & comment ""feature cache""
+- b20cb17: core.memory: Add 'align' argument to dma_alloc()
+- 398dd16: core.main: Fix bug in SNABB_DEBUG env var handling
+- e81a192: core.timer: Inhibit debug messages
+
+Max Rottenkolber (73):
+- 94ff234: Amendments to #766:  - Use ""apps/"" instead of ""app/"" for uniformity  - Set shm path to ""apps/$name"" when calling `app:stop' too  - Unlink ""apps/$name"" after`app:stop' using `shm.unlink'  - Add a test case to core.app selftest
+- fad0f43: core.counter: Qualify counter names using `shm.resolve'.
+- 7ed4ed0: snabb top: add `--app' option to print app counters.
+- eb9005b: snabb top: unlink own shm tree to avoid clutter.
+- 5fbe0d6: vhost_user: Add RFC 7223 app counters.
+- 8bb3215: Intel_app: Add RFC 7223 app counters.
+- 7a55478: snabb top: Add --link parameter to list link counters.
+- dde5da2: core.app: Put app counters under ""counters/<app>"", update snabb top.
+- 924ff4e: lib.json: Import JSON4Lua 1.0.0, include encode functionality.
+- 8e34093: lib.macaddress: Support numeric initialization; add method to get numeric representation.
+- 5f9efd2: core.link: Create “discontinuity-time” counters.
+- 7b39148: snabb top: add `--yang' option to print YANG model as JSON.
+- e457300: Update CONTRIBUTING.md.
+- 8984741: snabb top --yang: Represent uint64_t as decimal string.
+- ee00d16: [core.lib] Generalize `timer' to optionally accept 'repeating' option and support injecting a function to determine the current time.
+- 45490b8: Revert ""Intel_app: Add RFC 7223 app counters.""
+- f0ed10b: intel_app: expose per-pciaddress statistics in `counters/<pciaddress>'.
+- b853268: core.packet: document ctype and deprecate data and length functions.
+- b11e375: core.packet: properly document shiftleft and shiftight.
+- c186591: lib.protocol.ethernet: Add n_mcast, branch-free Multicast predicate.
+- b09e843: Fix for f0ed10b: require macaddress module.
+- 62e2fbf: Revert ""lib.json: Import JSON4Lua 1.0.0, include encode functionality.""
+- f4834a5: snabb top: revert --yang dump.
+- 793c394: snabbify statistics model.
+- 2b9ef2c: intel_app: add ifTable MIB related counters.
+- e9f5dda: lib.macaddress: add bytes method.
+- 6b12e9c: spin out SNMP code from apps.intel.intel10 to lib.ipc.shmem.iftable_mib.
+- 7c697b6: main: fork into worker and supervisor; perform clean up.
+- be09fe5: main: send HUP instead of KILL.
+- 3db174b: main: return correct exit code.
+- ce2f220: main: supervise xpcall(main, hanlder).
+- 4950cbb: main: check status of S.waitpid.
+- 28c568c: main: cleanup after worker_pid.
+- 4af7091: Remove obsolete `snabb gc'.
+- 1c9f585: Move model.txt to src/doc/statistics.md.
+- 339f8f1: apps.intel_app: Revert rxerrors calculation, remove broken txerrors.
+- 7ec7f80: Revert ""lib.macaddress: add bytes method."" and remove int method.
+- 327804f: doc/statistics.md: remove duplicates.
+- 90fc893: core.app: fix bug in #766 introduced while merging 6cac870a.
+- ceb080f: core.app: fix bug in #766, use app.shmpath during reconfig.
+- d82729a: core.app: fix typo in previous commit.
+- 70b8967: intel1g: canonicalize env var name, document it in testing.md, pass it through dock.sh.
+- 9f48b14: apps.intel.intel1g: use pci.map_pci_memory_locked.
+- ed687f1: main: properly handle unsupported worker states (SIGSTOP/SIGCONT)-
+- db9e343: main: comment syscall usage.
+- c3b8672: Revert 'ed687f19f8459413145fabc56a462d7b38513ba8'.
+- 5eb0f69: core.main: handle SIGSTOP and SIGCONT to worker.
+- 76a5d6e: main: allow setting developer_debug/debug_on_error through environment.
+- 127d21f: main: do not unlink runtime directory in developer_debug mode.
+- 1befce4: remove packet.length/data.
+- 751cc28: apps.bridge.base: use `app:start()' to run post configuration.
+- 11890e6: core.app: edit documentation of app:start().
+- 5488c68: lib.protocol.ethernet: add is_bcast and n_bcast.
+- 9044c6f: apps.vhost.vhost_user: count rxbcast/txbcast.
+- 5a01612: apps.tap.tap: add statistics counters.
+- 6233d15: core.packet: make max_payload public.
+- 788438e: apps.socket.raw: add statistics counters.
+- 7d5b973: Rename app:start from #905 to app:configure.
+- 4dec991: scripts/dock.sh: also pass through SNABB_PCI_INTEL1G1.
+- a9f7011: lib.ipsec.esp: fix regression introduces by previous commit.
+- e60226c: Rename app:configure to app:link.
+- 0f38505: lib.ipsec.esp: Test minimum packet sizes.
+- b8cbd65: SnabbNFV: Add “crypto” tunnel option using lib.ipsec.esp.
+- ab5d1af: scripts/dock.sh: use eugeneia/snabb-nfv-test-vanilla by default.
+- 626c6fc: apps.keyed_ipv6_tunnel: add diagnostics counters.
+- c0f7076: apps.ipsec.esp: add statistics counters.
+- fc7363c: apps.ipv6.nd_light: add statistics counters.
+- 272a0d1: apps.packet_filter: add statistics counters.
+- 506c66b: apps.rate_limiter: add statistics counters.
+- e3fcbbf: Revert ""lib.protocol.ethernet: Add n_mcast, branch-free Multicast predicate."" Reason: its actually slower than the initial naive version.
+- b418f8f: intel_app: fix wrong “speed” counter value.
+- d52d89c: apps.ipv6.nd_light: revise counters, south = rx / north = tx.
+- 905bf8d: vhost/vhost_user: avoid callbacks.
+
+Pete Bristow (2):
+- 7a6296f: Add a test demonstrating pci device ids, with capital A-F
+- 5d6baa4: remove superfluous syscall.sysctl
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/3647887/assets,https://api.github.com/repos/snabbco/snabb/releases/3647887,master,https://api.github.com/repos/snabbco/snabb/tarball/v2016.07,https://github.com/snabbco/snabb/releases/tag/v2016.07,https://api.github.com/repos/snabbco/snabb/zipball/v2016.07,v2016.07,False,False
+3408773,2016-06-09T12:41:02Z,2016-06-09T13:18:48Z,Snabb 2016.06 “Watermelon”,"This release merges the “Lisper” program into upstream, and along with that comes ESP packet encryption support. Also included is a feature to periodically flush the JIT compiler based on load, and a handful of new utility apps. Watermelon also comes with lots of various bug fixes and improvements.
+
+### Major Changes
+- #768 Merged “Lisper” program into upstream
+- #909 #929 Introduced feature that when enabled, reacts to load by flushing the JIT
+- #820 #844 #845 #900 Added support for ESP packet encryption
+
+### Minor Changes
+- #925 Intel82599: default per-queue statistics register
+- #898 Added `Truncate` and `Sample` basic apps
+- #870 Added `bits` and `bytes` methods to `lib.hardware.register`
+- #869 Added `apps.test.delayed_start`
+- #923 #914 #906 Various fixes and enhancements
+
+### Contributors
+
+Andy Wingo (3):
+- 2b8b453: Intel VF interfaces default to statistics counter 0.
+- 2550c50: Fetch VF ingress packet drops from correct queue
+- 9803baf: Remove unneccessary line.
+
+Cosmin Apreutesei (138):
+- 6688336: cosmin's public key
+- 4c1e8a5: lisper (init)
+- a7c1932: unix socket app
+- 654cc55: make snabb exe prefer to load modules from filesystem to built-in ones
+- 5f2fb79: unimportant
+- 1c57cda: unimportant
+- 1361079: unimportant
+- a1b4229: lisper doc: overview
+- fe9604a: LISPER: spec doc update
+- aafcaa2: UnixSocket: packet mode & doc
+- d6c91dc: TAP device I/O app
+- 6830b97: luajit install dir after make
+- 0ce2201: unimportant
+- 288d933: UnixSocket diagram
+- c6d3f1d: tabs -> spaces (sorry)
+- 48b2b77: README.inc == README (not sure yet why we have two identical README files)
+- ea7d665: parse FIB lines and update the FIB table
+- 76043e7: mock-up LISP controller program (sends the same FIB every second)
+- f6e22d4: app for splitting/merging packets on line boundary, useful for implementing ASCII line-based protocols
+- d1d975e: unimportant
+- 508f931: development environment scripts and helper programs using network namespaces (WIP: l2tp.lua doesn't work anymore with namespaces, it was working with containers)
+- 13c2453: README with howto
+- a9be132: filtering extraneous packets (in retrospect, we should have opened a RAW IP socket not an RAW ETH socket)
+- 54e4803: more robust killing; fixed macs of router interfaces
+- 4d75bca: corrected dest. macs to that of the gateway
+- e47c404: shortcut commands to get a shell into the network namespaces
+- 9f74d16: unimportant
+- e127a83: fix: l2tp cookie is 8 bytes
+- d716f82: dev-env: tunnel to lisper instead of p2p
+- 6dbc4fc: prefixed namespace-entering shells with ns*
+- 761320d: lisper data plane app(WIP)
+- a0ba437: lisp: reconnect on disconnect and ignore SIGPIPE
+- 6e61aad: convenience wrappers
+- 85b3af9: lisp made silent
+- dfee5a8: getting there (not very robust right now)...
+- 98a7c89: added link.peek()
+- 96cad15: added app3 to the mix
+- c2e1795: lisp.lua now sends the contents of lisp.fib file
+- a58b0a2: daemons now take start|stop|run arg
+- 766da75: l2tp.lua: indent with spaces
+- b4b6d8f: dev-env doc
+- 1369bab: unimportant
+- 8f30c36: use l2tp_dmac not l2tp_smac when looking up the FIB; assert on IP and MAC args
+- ab9d763: unimportant
+- 8f90777: unimportant
+- 694a341: unimportant
+- 7b75aba: bugfix for incredible silliness
+- f98cc4d: restart command for all scripts
+- 9ef9a35: unimportant
+- 5b180e0: check packet length before parsing
+- 0f0718d: suppress print unless DEBUG defined (make it a bit faster)
+- a3231df: typo
+- c5f7ed7: suppress print (make it a bit faster)
+- 62392c8: forgot to remove app3 namespace
+- ebf46ab: updated fib format
+- 689136d: fixed FIB parser for new format: `<mac>/48 rloc <ip6> <p> <w>, <ip6> <p> <w>, ...`
+- 1e96ea7: pcap-based perf. test (WIP)
+- 170ca7e: Intel10G option for local interface
+- 10d7510: net-bringup made executable
+- bd4987f: --local-pci renamed --network-device, --network-device renamed --network-interface
+- ccc3033: +x on self-executable .lua files
+- 9bb52e5: using /usr/bin/env for NixOS compat
+- 7c6bc7e: WIP
+- b633643: unimportant
+- 0575789: lisp <-> lisper interface spec
+- 4793d00: nd_light doesn't mess with its arg table
+- 722c9e2: unimportant
+- 1e153e2: l2tp demo working again
+- 8599a82: test env. with 2 lispers and 3 l2tp nodes on one side and 2 l2tp nodes on the other side, all on the same iid
+- a0c8f59: added 2 local ethernets to dev-env, one on node4 near lisper4 (ip 10.0.0.3) and one on node8 near lisper8 (ip 10.0.0.7)
+- 155747c: unimportant
+- 1143799: added 2 more eth nodes on each lisper and eth-lisper-eth test
+- 2e6e391: unimportant
+- 5da3add: unimportant
+- e085d7e: tabs->spaces
+- 9fb47ac: intel10g dev-env (wip)
+- db0445b: removed 802.1Q support for raw sockets; added support for Intel10G
+- 7d71e6e: unimportant
+- 3f7caeb: easier setup procedure for intel10g mode
+- 9134003: docs (first draft)
+- 7f81106: unimportant
+- 831285d: unimportant
+- 1f185c7: unimportant
+- fd2286c: unimportant
+- e8e6d2d: removed luajit dependency from dev-env
+- 23a301c: luajit update with upstream LuaJIT/LuaJIT:v2.1
+- b6dc83d: DynASM update from upstream capr/LuaJIT:v2.1-dynasm-luamode
+- 4786a6d: fixed symlinks (oops)
+- 4505936: dev-env: node04 and node08 can have internet via bridging the internet-providing interface on the host
+- 848005d: loading dasm linker from within the snabb exe
+- ba8d15f: dev-env-docker (WIP)
+- a27a36b: forgot .conf files
+- f26f91a: next_hop optional
+- 120ed22: updated ips
+- 4f57aa7: more changes
+- 999a3c0: typo
+- 4ff326d: removed e13
+- d206022: removed e17
+- b8a3353: typo
+- ded4136: typo
+- 6855b07: setvbuff off
+- fa81069: ...
+- af51333: ...
+- c3963e4: bug in debug
+- c53db91: punt MAC addr format fix
+- 6446449: various fixes
+- f86b221: DASM_CHECKS defined in source
+- 9e2e5b6: gen pcacp
+- 9d3fe59: fixed mac format for punt intf.
+- d24a647: fixed iid in lisper04.conf
+- ecf5a7b: LISP_PERFTEST changes
+- 1cac499: brain-typo
+- 3550e8b: unimportant
+- a348987: unimportant
+- 119da25: unimportant
+- 2b3edb8: unimportant
+- 10bc534: ignore invalid rlocs
+- 380eeec: changed punt format to send both smac and dmac
+- 93c514a: removed debug message
+- 15b9431: tonumber on iid from fib
+- ce512a7: hashing by smac..dmac to avoid repeated punting (new requirements from dino)
+- f713d8e: arp_timeout on punting
+- 3526c35: unimportant
+- 2f2c5d9: revert inadvertent changes made to upstream
+- a04d224: removed symlink to packetblaster which confuses CI
+- d4d742a: added testnode 04 back to make dev-env functional again
+- f890ca0: fix for bug that took me 4h to find :(   --- background: never use S.close(f), always use f:close() because S.close(f) doesn't do ffi.gc(f, nil) to prevent double-close by gc
+- 87a6dec: error on transmit failures; use sock:close() instead of S.close() to prevent double-frees
+- 29e071b: error on transmit failures
+- d870d65: use sock:close() instead of S.close() to prevent double-frees
+- 36f4c0a: IPSec ESP encryption
+- c9628a5: dev-env update for testing the encryption
+- a54feeb: small bugfixes and rx/tx stats while running
+- cc0f867: added mention to lisper branch in branches.md
+- 801c62d: replace tunctl with ip tuntap
+- a80d2d1: encryption disabled for now
+- d5dab1f: tabs->spaces; documented the need to copy the args
+- c265ec8: Revert changes to core.main.
+
+Diego Pino (7):
+- 22b4a8f: Monitor ingress packet drops and jit flush if threshold exceeded
+- c694fe7: Call not() and require jit module
+- 0ae9eae: Make 'with_restart' not local
+- 4207165: Revert ""Make 'with_restart' not local""
+- cc94fb7: Move ingress drop monitor code after definition of with_restart
+- 7eb78ca: Set image format as raw
+- 1c161c7: Add ingress_drop_monitor timer
+
+Diego Pino Garcia (2):
+- 6cac870: Wrap 'ingress_packet_drops' call within 'with_restart'
+- 7b768ce: Make ingress drop monitor a timer and enable it only in lwAFTR
+
+Domen Kožar (1):
+- e78b8b2: test_env.sh: set initrd and be able to append kernel params
+
+Jessica Tallon (1):
+- fb493bd: Fix malformed error typo in lib.protocol.ipv4
+
+Luke Gorrie (11):
+- 246f326: apps/ipsec/README.md: Draft spec for IPsec apps (NYI)
+- 733c1a9: unimportant
+- 891246a: VLAN support on dev-env (not yet working)
+- 23d1fdf: ipv4 links in dev-env
+- f2bf581: apps/ipsec/README.md: Draft spec for IPsec apps (NYI)
+- b17ff94: perf test environment with eth-eth pcap
+- 648dede: unix sockets and SIGPERF fix; LISP_PERFTEST env. var
+- ad055a8: loadgen reports RX too
+- a07ab72: print PUNTs and LEARNs always
+- 86300cf: perf test with l2tp random packets
+- 7ac4d6f: esp: Add aesni_encrypt_single_block() asm entry point
+
+Max Rottenkolber (50):
+- e855537: apps/ipsec: Implement ESP (RFC 4303) apps.
+- fcb0b61: apps/ipsec: Add and link with Intel's AES-NI/AES-GCM routines (RFC 4106).
+- 969b53c: apps.ipsec.aes_128_gcm: Verify ICV in decrypt.
+- 6651f01: Update “apps/ipsec/README.md” to match implementation.
+- 348d031: apps/ipsec: Implement ESP (RFC 4303) apps.
+- 5d42a31: apps/ipsec: Add and link with Intel's AES-NI/AES-GCM routines (RFC 4106).
+- d2fb0d2: apps.ipsec.aes_128_gcm: Verify ICV in decrypt.
+- a856bd5: Update “apps/ipsec/README.md” to match implementation.
+- 985c469: Convert IPsec ESP apps to library (lib.ipsec.esp).
+- e1abe8e: lib.ipsec.esp:encapsulate: document clobbering effect.
+- 7d6585b: ipsec.esp: SPI is a required parameter
+- 824a665: Fix several bugs in lib.ipsec.esp:  - transmit truncated 32bit sequence number (don't implement anti-replay on  receiver side for now)  - transmit 64bit IV in front of ciphertext (use 64bit sequence number for IV  value)  - implement minimal padding (ciphertext aligned to 4 byte boundary)
+- a638baa: lib.ipsec.aes_128_gcm: Fix bug in `encrypt' where ICV was written to the wrong place.
+- 3199fed: lib.ipsec.aes_128_gcm: Test using a couple test vectors.
+- 47620a6: lib.ipsec.aes_128_gcm: Add encrypt and decrypt micro benchmarks to selftest.
+- f283daf: lib.protocol.esp: Make `esp_v6_[en|de]crypt' public.
+- 490ccc2: lib.ipsec.esp: Do not throw errors when header parsing fails but instead return nil.
+- e418f7d: Add `snabbmark esp <npackets> <packet-size>'.
+- 70230f5: lib.ipsec.esp: Reuse datagram objects.
+- 061525e: snabbmark esp: Assert successful decapsulation.
+- c23b118: lib.ipsec.esp: Fix bug introduced by 824a665 where AAD was malformed.
+- dc8a404: ipsec.aes_128_gcm: Update tests for c23b118.
+- 321a8b2: lib.ipsec.esp: Partially implement sequence number verification. Fix bug where ESN counter was not properly maintained on the receiver side.
+- 6fae847: lib.ipsec.esp: Add implementation notes.
+- e09230c: ipsec.aes_128_gcm: Add stub and tests for correctly deriving hash subkey.
+- d7eb620: lib.ipsec.aes_128_gcm: Update for aes_128_block.   - Change API of `encrypt' to accept explicit IV   - Replace test vectors with vectors from draft-mcgrew-gcm-test-01.txt     from IETF
+- 86211b5: lib.ipsec: Update documentation to point out what it not implemented... ...and use clearer phrasing in API description.
+- 3289a7a: core.lib: Remove obsolete bswap64.
+- 3b4f93f: .gitmodules: Undo removal.
+- a006bb5: Integrate lib/ipsec documentation.
+- 895d826: Add `packet.resize'.
+- 1369237: lib.ipsec.esp: Use `packet.resize' and raw mangling instead of datagram.
+- 0b24342: snabbmark esp: Operate on single packet. Make mode selectable and profiling optional.
+- 18602d1: lib.ipsec.aes_128_gcm: Use stricter types in DASL exported API.
+- b86ace3: lib.ipsec: Fix memory corruption in `aes_128_gcm.aes_128_block'.
+- 36c3c93: lib.ipsec.seq_no_t: Do not create redundant ctype objects. See: https://github.com/SnabbCo/snabbswitch/pull/612#issuecomment-193662511
+- bc7f8df: lib.ipsec.esp: Replace `check_seq_no' with`track_seq_no' C function.
+- 5e7c86a: lib.ipsec: Use ffi.fill instead of memset.
+- 9dc44a7: packet.resize: fill extended packet data with zeroes.
+- 41de2a2: lib.ipsec.esp: Omit obsolete padding fill.
+- 4ce5eae: #896/apps.test.delayed_start: Remove tabs.
+- 9643866: Amendment to #870, lib.hardware.register: edit documentation, style. Remove misleading return statement (the branch never returns a value).
+- 2428bd3: lib.ipsec.esp: update API.
+- 2d9486a: lib.ipsec.esp: fix bug in encapsulate where packet size was unchecked.
+- c4eff5c: Amendment to #898: edit documentation.
+- 8dde153: process-markdown: fix bug where diagram at EOF was not rendered.
+- fc7659d: Revert ""cosmin's public key""
+- ada027e: Remove leftovers from IPsec merge (abf8e2a).
+- e9c60bf: Revert ""added link.peek()""
+- 6c3c677: Code style.
+
+Pete Bristow (9):
+- 369fb56: basic truncate / sample apps
+- e1f2fa8: delayed_start, stall snabb so that peer NIC drivers can fully initialize
+- 6baa1f3: Feedback in PR869: do not block the whole process
+- ac86e72: bits and bytes
+- 8878939: add bits/byte method to RO/RC registers
+- 41beb99: use ffi.fill
+- 11a19ce: rewrite pci.c in lua, support both flocked and unflocked memory maps
+- 8cea7b5: fix build issues
+- 57c5f12: fix typo in variable names in close_pci_resource
+
+Peter Cawley (1):
+- 2c020d5: DynASM implementation of AES-GCM encryption
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/3408773/assets,https://api.github.com/repos/snabbco/snabb/releases/3408773,master,https://api.github.com/repos/snabbco/snabb/tarball/v2016.06,https://github.com/snabbco/snabb/releases/tag/v2016.06,https://api.github.com/repos/snabbco/snabb/zipball/v2016.06,v2016.06,False,False
+3211645,2016-05-12T13:12:02Z,2016-05-12T13:59:46Z,Snabb 2016.05 “Voavanga”,"This release merges big features developed around the lwAFTR application by Igalia, and comes with a seemingly small but important change in the direction of a stable ABI: the packet free-list is now an FFI object. Also, SnabbNFV has been updated to work with the OpenStack Liberty release. Voavanga also comes with lots of various bug fixes, improvements and documentation additions.
+
+### Major Changes
+- #771 Implemented `core.packet` free-list using FFI cdata objects to provide ABI
+- #775 Update SnabbNFV to be compatible with OpenStack Liberty
+- #863 Added VLAN (un-)tagging apps
+- #847 Added packetblaster lwaftr
+
+### Minor Changes
+- #876 Add Nix expressions to build Snabb
+- #861 Introduced `Match` app for testing purposes
+- #884 `core.packet`: enable overflow check when allocating packets
+- #889 Fix race conditions in `core.memory` and `core.shm`
+- #893 Counters created by `core.counters` are now allowed to be opened for reading multiple times
+- #890 Increase capacity of `core.packet` free-list
+- #882 Intel10G: increase number of transmit/receive descriptors
+- #883 packetblaster: use default number of transmit/receive descriptors
+- #827 Added extensive document about performance tuning
+- #822 Added documentation on Snabb core data structures
+- #764 Removed `lib.bloom_filter`
+- #838 Added a community code of conduct
+- #846 Added trademark policy for “Snabb”
+- #858 #857 #867 #866 #875 #868 #874 #903 Minor fixes and documentation changes
+
+### Contributors
+
+Domen Kožar (6):
+- d68c784: Modify OpenStack table parsing to comply with Liberty release
+- 45708c3: test_env.sh: prefer $SNABB_TEST_FIXTURES over ~/.test_env
+- a357165: Add Nix expressions to build Snabb project
+- 8982625: release.nix: respect bash env, provide fallback values
+- 6cce8f4: release.nix: whitespace
+- e5f4183: Import snabblab docs from the wiki into the manual
+
+Katerina Barone-Adesi (6):
+- 92d53a5: Initial stub on performance tuning
+- e72ec69: Renamed performance tuning file, as per review request
+- 390bfa2: Swapped in lstopo.png, replacing lstopo.pdf
+- dbe9a9a: Initial stub on performance tuning
+- aa1aac9: Renamed performance tuning file, as per review request
+- e1ff0a3: Swapped in lstopo.png, replacing lstopo.pdf
+
+Kristian Larsson (7):
+- e37fd84: Add VLAN related apps
+- 4ab4a92: Spelling fix
+- efdcc2f: Clean up variable names
+- ca86c94: Use lib.htons and friends
+- bb8d373: Remove conf arg
+- ab5d592: Use standard VLAN module
+- 3ba5f4d: Remove VLAN module from lwAFTR
+
+Luke Gorrie (15):
+- 6d46eca: doc/porting.md: Added notes about porting Snabb Switch
+- 4f5174c: core.main: Warn unless running on Linux/x64
+- aba5bbe: doc/porting.md: Rewritten to be less wishy-washy
+- 4f54fa0: core/main.lua: Running on non-Linux/x64 is now an error
+- 52d5dd8: lib.bloom_filter: Removed as dead code
+- 8eb18b1: doc/core-data-structures.md: Describe packet/link/app
+- e33929f: doc/core-data-structures.md: Filename fix
+- 32e1cd8: doc/code-of-conduct.md: Add a community code of conduct
+- 39956e7: doc/trademark: Added tracemark policy
+- 382827d: intel10g: Set num_descriptors = 2048 (was 512)
+- d616abf: packetblaster: Use default number of Intel rx/tx descriptors
+- 1ff037c: core/packet.lua: Enable overflow check when allocating packets
+- b04ff7c: core.packet: Extend max packets from 100K to 1M
+- 2053759: core.memory: Removed redundant sysctl() call
+- 7fddfe8: intel10g: num_descriptors = 1024 (was: 2048)
+
+Marcel Wiget (26):
+- 911acb1: braindump on performance parameters
+- 171b5fc: added info on mlock=on
+- ab7194c: initial import of packetblaster lwaftr
+- df8c732: remove ``` from text
+- 8a5b147: fixes/enhancements based on pull feedback from @dpino
+- c24498a: fix argument pcap file for packetblaster replay
+- 8c51629: update README with --vlan tag option
+- 2a9333e: fix vlan support via vmdq
+- aeb6641: use -4 and -6 short form for --v4only and --v6only
+- b994c84: remove TODO (resolved with previous commit on -4/-6)
+- 6b0a9ca: move redundant report() and is_device_suitable() to packetblaster.lua
+- bed6d79: add simple packetblaster lwaftr selftest
+- 0c6b34b: move shared config_loadgen() into packetblaster.lua
+- dea1ea9: fix typo
+- 2aa88f4: Add option --pcap to write to pcap file
+- 453884b: share run_loadgen() by replay and synth
+- f074d6c: native vlan support without vmdq
+- 7cbd06e: add selftest for lwaftr pcap generation
+- 5a0f793: fix lwaftr pcap generation with count > 1
+- 9a970be: add lwaftr pcap file to compare with in selftest
+- 0aea730: added lwaftr pcap selftest for vlan
+- 1db7b1d: add --tap option and add selftest for it
+- 90ced15: Add support for raw interfaces and VhostUser for lwaftr
+- 294fc3b: braindump on performance parameters
+- afc0bfb: added info on mlock=on
+- 1c023ec: fix indentation
+
+Max Rottenkolber (14):
+- 1b84d20: apps.testsink: Move to apps.test.
+- 85233d6: basic_apps: Document Source configuration and packet contents.
+- 2715120: apps.test.match: Rename testsink to Match, remove harness function.
+- 30e2ea2: apps.test.synth: Use Match in selftest.
+- 56dfb05: apps.keyed_ipv6_tunnel: Use Match in selftest.
+- 2ee238d: apps.socket.raw: Use Match in selftest.
+- f076907: apps.test.synth: Set correct Ethernet type.
+- 3719753: apps.test: document Synth.
+- 29a6767: apps.test.match: Add `modest' option.
+- b1a4f04: apps.tap: Use Match in selftest.
+- 10969b1: apps.tap: do not use `sudo' in selftest.sh.
+- 009bb7e: snabb_bot: Use PR base as moving target instead of CURRENT.
+- 3f5c889: apps.vlan: canonicalize documentation.
+- 34bf3e6: src/Makefile: Fix for target obj/doc/snabb.pdf.
+
+Nicola 'tekNico' Larosa (2):
+- 248a0a3: Allow opening counters multiple times
+- 34aa994: Fixed even moar conflicts
+
+Pete Bristow (6):
+- 8021119: match pci addresses with hex a-f in it
+- 314c308: use CC env var for gcc command if available
+- 9f9775d: lua supports %x to match a hex digit
+- cbe97a4: fix a couple of race conditions triggered when starting many snabb processes
+- 519311b: the sysctl system call is deprecated, http://man7.org/linux/man-pages/man2/sysctl.2.html
+- 96e8bf6: Add test sink a basic pcap replay testing framework
+
+R. Matthew Emerson (4):
+- 7ea1bc3: Implement freelist with FFI cdata object instead of Lua table
+- 499a579: Don't require the freelist module in modules that don't use it.
+- 47b9b37: Remove freelist.lua.  Inline its functionality into packet.lua.
+- 28593e6: Use uint64_t for nfree and max in freelist structure.
+
+ReadmeCritic (1):
+- df502dc: Update README URLs based on HTTP redirects
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/3211645/assets,https://api.github.com/repos/snabbco/snabb/releases/3211645,master,https://api.github.com/repos/snabbco/snabb/tarball/v2016.05,https://github.com/snabbco/snabb/releases/tag/v2016.05,https://api.github.com/repos/snabbco/snabb/zipball/v2016.05,v2016.05,False,False
+3059513,2016-04-20T12:09:10Z,2016-04-20T12:15:24Z,Snabb 2016.04.1 “Uvilla” (update),"This bug fix release amends #887 which fixes problems in the documentation build chain as well as some terminology in the main README.
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/3059513/assets,https://api.github.com/repos/snabbco/snabb/releases/3059513,master,https://api.github.com/repos/snabbco/snabb/tarball/v2016.04.1,https://github.com/snabbco/snabb/releases/tag/v2016.04.1,https://api.github.com/repos/snabbco/snabb/zipball/v2016.04.1,v2016.04.1,False,False
+2955653,2016-04-05T13:49:03Z,2016-04-05T14:33:00Z,Snabb 2016.04 “Uvilla”,"This release brings huge technical as well as organizational advancements. Igalia's “4-over-6 AFTR” application was merged into the upstream tree, and with it come some nifty general purpose features such as a core library for profiling latencies of Snabb applications. By the way, we no longer say “Snabb Switch”; from now on the project is known simply as “Snabb”. During this release cycle we have set up many new subsystem and maintenance branches, and established a great network of maintainers to help scale Snabb development efforts. Uvilla also comes with plenty of minor bug fixes and many notable documentation improvements.
+
+### Major Changes
+- #802 Merged Igalia's lightweight 4-over-6 AFTR application
+- #795 Added `core.histogram` for measuring latencies, and use it to profile latency of breathe loop
+- #852 Change project name from “Snabb Switch” to simply “Snabb”
+
+### Minor Changes
+- #794 Changed `core.shm` API to allow for more fine-grained control
+- #781 Added `packet.shiftright`
+- #818 Added `doc/in-a-nutshell.md`: Snabb in a Nutshell guide
+- #829 Create _all_ documentation build artifacts on-demand
+- #805 #806 #834 #856 Introduced SnabbDoc: documentation CI service
+- #787 #791 #799 #819 #830 #833 Minor bug fixes and documentation improvements
+- #800 #803 #810 #811 #826 #828 Added many new subsystem and maintenance branches
+
+### Contributors
+
+Andy Wingo (13):
+- 5306f25: Add packet.shiftright
+- 9fe397e: Replace shm.map with separate create() and open()
+- 42e9286: shm.open does not truncate file
+- 7c6255f: Fix spelling of ""hierarchical"".
+- b027b02: Fix permissions when opening writable shm files
+- aff2b83: Measure latency of app.breathe()
+- 9e79a1f: Express histogram:summarize, :report in terms of :iterate
+- f9abfd5: Move histogram:summarize to snabb top
+- 1fe832c: Updated histogram documentation.
+- 89b0c5b: Rename histogram.count to histogram.total.
+- 05b87f7: Adapt to feedback regarding iterate() return vals
+- 396a132: More named constants, fewer magical numbers.
+- 5c337d0: Add lwaftr branch.
+
+Cosmin Apreutesei (1):
+- d194467: added mention to lisper branch in branches.md
+
+Diego Pino Garcia (3):
+- e483d6b: Return from VirtioNet:pull if link is nil
+- da65030: Print out error message in case PCAP could open file
+- b22e287: Add configurable parameter 'overwrite'
+
+Domen Kožar (2):
+- d5d107e: tests require root access
+- 75604d3: add nix maintainer branch
+
+Katerina Barone-Adesi (2):
+- f473f75: Added kbara-next to branches.md
+- 8364729: Import lightweight 4-over-6 AFTR
+
+Luke Gorrie (24):
+- aa579dc: snabbswitch.c: Compile error on non-64bit platforms
+- 329315e: core/snabbswitch.c: Require 64-bit word size at compile time
+- 854af02: branches.md: Added mellanox and multiproc branches
+- ebe29f5: branches.md: Fix URL for mellanox and multiproc
+- 11cc9e4: branches.md: Add kbara-next
+- 95ac5b5: branches.md: Remove duplicate entry for kbara-next
+- bfaa718: doc/in-a-nutshell.md: High-level overview
+- 16ab7fb: branches.md: Add branch pdf-manual
+- c7b776b: branches.md: Fix url for pdf-manual
+- 7f62f8f: Documentation: Remove build artifacts from repo
+- 073d5d4: Makefile, genbook.sh: Output processed markdown in obj/
+- 86734c8: src/Makefile: Build manual in obj/doc/
+- 35a2422: .gitignore: Add .images directories
+- 3507e16: doc/template.latex: Updated to suit recent pandoc
+- 64ee8af: scripts/process-markdown: New takes output file arg
+- 19ffe84: scripts/process-markdown: Fix usage of readlink
+- 06c27c6: branches.md: 'documentation' replaces 'documentation-fixups'
+- a599210: Everywhere: Shorten ""Snabb Switch"" to ""Snabb""
+- 15f3eff: Removed src/scripts/sysv
+- fbbe1dc: src/Makefile: Drop symlink snabbswitch->snabb
+- bee3627: src/Makefile: Rename documentation snabbswitch.\* to snabb.*
+- 82f73f4: neutron_sync_agent.sh: s/snabbswitch/snabb/ in default dirs
+- d654230: lwaftr: Shorten ""snabbswitch"" to ""snabb""
+- 5254016: Replace 'snabbswitch' with 'snabb'
+
+Marcel Wiget (1):
+- 203badc: increase timeout for link_up to 1 second (from 250ms)
+
+Max Rottenkolber (14):
+- 6da7093: documentation-guide: Update according to #743.
+- 96a2931: documentation-guide: Add general style guide.
+- 3b9233c: documentation-guide: Be concise in “General Considerations” primer.
+- 3734760: Add minimal CONTRIBUTING.md.
+- 940c741: CONTRIBUTING.md: explain motivation for wip/sketch PRs.
+- e5b0d07: CONTRIBUTING.md: Remove paragraph on cross referencing. Rationale: people are smart and will figure.
+- 2815ba4: CONTRIBUTING.md: Do not implicitly encourage copyright notices.
+- 192fbf7: doc/style.css: Put ToC into a left column.
+- ea89065: Add scripts/snabb_doc.sh.
+- a4b9275: snabb_doc: fetch PR head.
+- 0ea56fd: Add ipsec branch.
+- 5e350a9: scripts/snabb_doc.sh: Update for #829.
+- 22d653f: snabb_doc: Add proper parentheses.
+- 5534b88: [snabb_doc] Fix for #855.
+
+yu-kasuya (1):
+- 0a6bca8: FIX snabbnfv getting-started.md
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/2955653/assets,https://api.github.com/repos/snabbco/snabb/releases/2955653,master,https://api.github.com/repos/snabbco/snabb/tarball/v2016.04,https://github.com/snabbco/snabb/releases/tag/v2016.04,https://api.github.com/repos/snabbco/snabb/zipball/v2016.04,v2016.04,False,False
+2721754,2016-03-01T19:35:34Z,2016-03-01T19:54:09Z,Snabb Switch 2016.03 “Tamarillo”,"This release introduces a fast generic hash table for use with “cdata” objects. Tamarillo also extends program name parsing for “busybox”-style executables and adds recognition for the Intel X520 2-port adapter. Also included are various minor bug fixes and improvements.
+
+### Major Changes
+- #722 Added `lib.ctable` module providing a fast hash table for `cdata` objects
+- #742 Extended program name parsing to allow shipping nicely named executables
+
+### Minor Changes
+- #737 Use `/usr/bin/env` in shebangs
+- #731 Recognize new Intel X520 2-port adapter as compatible with `Intel10G` app
+- #707 Optimized JIT trace behavior in tail calls
+- #700 Use stricter types for memory page pointers
+- #747 #743 #762 #763 Various bug fixes and documentation improvements
+
+### Contributors
+
+Adrián Pérez de Castro (1):
+- 5f45d3a: Pass only interface name to syscall.util.if_nametoindex()
+
+Andy Wingo (13):
+- 9a1294c: Don't count tail calls towards loop unroll limit.
+- bf2d58a: Add lib.ctable module.
+- 9666348: Makefile can process any .md.src to an .md, not just README.md
+- bea68b1: Better equality procedures for 2-byte/6-byte keys; more standard hash functions
+- fe70ccf: Add documentation for lib.ctable.
+- 586f0b7: Add wingo-next to branches.md.
+- 27b82d5: Fix typo.
+- c587728: Fix another typo.
+- bc2fda2: Revert ""Makefile can process any .md.src to an .md, not just README.md""
+- 5b9400a: Move ctable documentation to src/lib/README.md, fix nits
+- 8f535be: Map `snabb-lwaftr' argv[0] to programs.lwaftr
+- 08c31ef: lib.equal can compare cdata
+- 08e3a0c: Add ""dist"" target to makefile
+
+Kacper Wysocki (1):
+- 080fba5: page pointers portable to 32bit platforms
+
+Luke Gorrie (12):
+- 1f83b5c: Globally use '#!/usr/bin/env <shell>' hashbang line
+- 071aaf7: src/README.md: Simplify core.memory API
+- 7bf8b3e: virtio/net_device.lua: Remove unused code
+- 9afeb74: Rename all README.md.src files to README.src.md
+- 70f207f: Clearly mark all Apache 2.0 licensed code as such
+- adddf0b: snabbnfv: Shrink pcap files to reduce repo size
+- 3c07928: README: Remove deprecation of memory.huge_page_size
+- a0bc118: src/README.md: Fixed to match README.src.md
+- 23347b3: lib/README.md: Renamed to lib/README.ctable.md
+- 41d24e8: lib/README.pmu.md: New README file
+- 7e63b78: lib/README.checksum.md: New file
+- a490d68: doc/genbook.sh: Updated paths to lib/ README files
+
+Marcel Wiget (1):
+- 61fa43f: Adding detection of Intel X520 2-port 10GE card
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/2721754/assets,https://api.github.com/repos/snabbco/snabb/releases/2721754,master,https://api.github.com/repos/snabbco/snabb/tarball/v2016.03,https://github.com/snabbco/snabb/releases/tag/v2016.03,https://api.github.com/repos/snabbco/snabb/zipball/v2016.03,v2016.03,False,False
+2529813,2016-02-01T14:17:41Z,2016-02-01T14:45:12Z,Snabb Switch 2016.02 “Starfruit”,"This release introduces a new app that implements “virtio-net” and an extension to packetblaster which enables it to send synthesized packets of arbitrary sizes. Starfruit also brings further improvements to our Intel 1G driver and synchronizes Snabb Switch's LuaJIT and DynASM dependencies with upstream, adding support for new CPU instructions when using DynASM. As usual, the release also brings a handful of minor bug fixes and enhancements.
+
+### Major Changes
+- #681 Added `VirtioNet` app, an implementation of the virtio-net driver part of the [virtio specification](http://docs.oasis-open.org/virtio/virtio/v1.0/csprd04/virtio-v1.0-csprd04.html)
+- #727 Added functionality to packetblaster that lets send synthesized packet sequences (instead of packets read from a PCAP file)
+
+### Minor Changes
+- #683 Further improvements to our Intel 1G driver (i350, i210)
+- #724 Synchronized lib/luajit and DynASM-Luamode with LuaJIT/LuaJIT:v2.1 (this adds support for using a range of new instructions via DynASM)
+- #726 #717 #694 #697 #633 #699 Various bug fixes and documentation improvements
+
+### Contributors
+
+Cosmin Apreutesei (3):
+- 20329bf: DynASM update from upstream capr/LuaJIT:v2.1-dynasm-luamode
+- 1b5dca0: loading dasm linker from within the snabb exe
+- 65e9e3c: DASM_CHECKS defined in source
+
+Felix Geißler (15):
+- ceb8696: Added apps.test.synth.Synth app.
+- aa5d13f: Fixed 'load_string' in core.lib.
+- 3cf1f47: Fixed the usage of lib.load_string in selftest of program.snabbnfv.neutron2snabb.neutron2snabb.
+- c603530: Added selftest to apps.test.synth.
+- 3ee37c1: Added the possibility to synthetisize packets in packetblaster by using apps.test.synth.
+- c9ce1a7: Split packetblaster in two parts: replay (replay a PCAP-file) and synth (synthetisize packets).
+- 81c7f6a: Added a check for SIZE and DURATION to check if the args are numbers.
+- 5eede86: packetblaster: Removed -p option.
+- d0ad471: apps.test.synth: Added support for sequences of packet sizes. packetblaster: Modified the -S parameter to get multiple packet sizes separated by commas. Updated documentation.
+- 2c0da6e: packetblaster: Fixed a bug where packetblaster read the first argument as filename.
+- c0a1fe3: bench: Added packetblaster-synth-64.
+- 3bca427: packetblaster: Modified selftest to test both replay and synth mode.
+- 6d1e48b: Cleanup packetblaster test and benchmark scripts.
+- 0fdf885: packetblaster: fixed selftest
+- 2858fd0: packetblaster: Fixed long command line arguments.
+
+Kacper Wysocki (1):
+- 56f3464: make PREFIX work like expected, and use DESTDIR for that
+
+Luke Gorrie (3):
+- 30a9b34: core.engine: Enable selftest() method
+- edd74ab: README.md: Fix and update packetblaster example
+- 9a31a6f: engine: Detect bad return value from app start() method
+
+Max Rottenkolber (4):
+- 598092b: [core.app] Fix rreporting when `use_restart = true'.
+- ca99c76: Add `max-next' to branches.md.
+- 054bf34: basic.basic_apps.Source: Fix misleading documentation.
+- 003dfd1: Squashed 'lib/luajit/' changes from 55c3b29..2f6b296
+
+Nikolay Nikolaev (12):
+- 7c99720: checksum: functions to fill the partial checksum
+- 394783a: packet: add a metatable to the packet ctype
+- ae618e8: lib: dynamic ctype definition functions
+- a2ac869: virtio: rename virtq to virtq_device
+- c428eea: net_device: allow disabling of MRG_RXBUF option
+- cfa7169: VirtioNet: introduce the user-space virtio-net driver
+- e7eaf46: Fixes for pull request remarks
+- 4b07c3a: packet: revert metatable and dump method
+- 6786d4d: checksum: use ipsum and fix styling issue
+- 7e1a7f4: packet: revert `physical` function
+- 6387869: Style fixes: indentation and comments
+- ac4e765: relocate fstruct and friends in lib.virtio
+
+Rolf Sommerhalder (61):
+- 1f13eb1: comment stuff in attic to prevent make
+- de4ffe7: port print_status() from intel82573.lua
+- eb458ae: add print_stats
+- b894ca8: Receiver Enable was missing
+- 0481435: Force EEE Auto-negotiation
+- 9f90b2d: move rxenable
+- 3a4fb84: rename vars from l to li, lo
+- 0a75675: rewrite receiver without rxnext
+- f384ddc: add some debug output
+- 13d7faf: correct RDLEN, TDLEN in Bytes
+- 778c028: show model instead of hex device IDs (which 'lspci -nn' shows as well)
+- e1039d9: add parameter checking
+- afe72b5: add README.\* from lukego's intel1g branch
+- 355604f: add README.\* from lukego's intel1g branch
+- 8aad217: add more checks
+- 3f9ef89: revert intel10g driver name which breaks CI
+- bcdc170: init receiver
+- 0a7c331: some cleanup and comments
+- 93a5779: more stats output for Rx debugging
+- 4c8bf1e: fix RXDCTL.ENABLE bit position
+- 591d6e3: increase rx buffer to 10kB, use SRRCTL instead of RCTL
+- 40b5246: remove dead code which emulates NIC HW receiver
+- 805f691: manage receive packet buffers
+- 83ce59e: selftest() kind of working for first time
+- 8f8122b: add counters
+- 07c3b70: add and check sequence numbers in packet.data
+- 1dfce9b: add PCI IDs for i210, i350 from 'lspci -nn'
+- 5af9cea: add i210, loopback
+- bd2d196: add initPHY()
+- f81ebc5: transmitter to test PHY/MAC
+- eccf0fd: skeletton for program
+- 51a514d: Intel1g Tx to test MAC/PHY
+- eea0a98: working with Sink instead of intel1g
+- f840249: debug
+- 8c67d41: wrap up
+- 3b4884a: testing program & app, derived from example_sprayer
+- 376ce60: working program txintel1g skeletton
+- 38c0a60: capitalize Intel1g table (module) to differentiate from path/file
+- e0624e8: cleanup debug code
+- 85bce67: try PHY loopback to test read/writePHY()
+- dd0fd30: working PHY loopback
+- 9487b06: fix readPHY() OpCode, PHY Status output
+- 1a2b0e8: save progress
+- e76b5d8: working MAC & PHY with debug mess (WIP)
+- 46b4ac2: selftest() supports two loopback modes now
+- 9526e05: some cleanup, before re-structuring
+- dc09daa: some re-structuring
+- c342a09: more re-structuring
+- 8f9f151: add PHY ID for i350
+- fc8f5c5: more cleanup
+- afa99d5: sync from dev branch intel1g_rs_i210
+- bf074d8: snabbmark work between two intel1g ports
+- db5badf: add Intel1g:report()
+- 620f02e: instrument with addtl counters, from solarflare.lua
+- c0f256a: add packet loss calc
+- 01e3204: add stats from source, sink
+- 9a2a954: add summary stats
+- b2253f6: pull() drops rx frames when there is no link to a sink
+- f19c5c1: fix documentation, e.g. make README.md from .src
+- a1228b4: back out debug code, see #683
+- 37d6996: really back out all debug code, see #683
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/2529813/assets,https://api.github.com/repos/snabbco/snabb/releases/2529813,master,https://api.github.com/repos/snabbco/snabb/tarball/v2016.02,https://github.com/snabbco/snabb/releases/tag/v2016.02,https://api.github.com/repos/snabbco/snabb/zipball/v2016.02,v2016.02,False,False
+2375555,2016-01-05T16:07:42Z,2016-01-05T16:41:22Z,Snabb Switch 2016.01 “Rambutan”,"This release introduces a new app for integrating Linux “Tap” devices and a driver for Intel 1G network chips. Rambutan also features a reimplementation of the `RawSocket` app using ljsyscall and makes Snabb Switch build with Musl libc. As usual, the release also brings a handful of minor bug fixes and enhancements.
+
+### Major Changes
+- #675 Added a `Tap` app for integrating with Linux “Tap” devices.
+- #683 Added a driver for Intel 1G hardware (i350, i210)
+
+### Minor Changes
+- #655 Reimplementation of `RawSocket` app using ljsyscall instead of C FFI calls
+- #682 Make Snabb Switch build with Musl libc
+- #659 #678  #679 Various bug fixes and enhancements
+
+### Contributors
+
+Antonio Fischetti (1):
+- bffaccd: Fix to adapt to the latest NIC driver changes
+
+Diego Pino Garcia (8):
+- 782e9b3: Add pointer to int casting of T->mcode in setintfield call
+- 70c05c7: Remove apps/socket/io.{c,h}
+- f975447: Remove lib/raw/raw.{c,h}
+- d153be8: Implement RawSocket using ljsyscall
+- bbff56a: Merge RawSocketDev into RawSocket
+- e522ee7: Avoid memory leak on error in RawSocket:receive
+- 8ebd725: Use packet API to access data and length
+- b4d6f08: Raise exception on error
+
+Justin Cormack (1):
+- e09f698: Portability fixes to build on Musl libc as well as glibc
+
+Luke Gorrie (1):
+- 9d52295: cherry pick & merge from lukego's cc71f53aef3c4ecedaac2a65eac9682c1dd6e4f3
+
+Max Rottenkolber (4):
+- 83868b8: core.shm: Assert return value of `mkdir(2)' when creating shm root.
+- d32aef5: lib.hardware.pci: Make device_info throw error when device by pciaddress does not exist.
+- e880a1b: packetblaster: Bail out when no suitable PCI devices were selected.
+- 3a60141: snabbnfv traffic: Warn when configuration does not exist.
+
+Pete Bristow (4):
+- a0096d3: first approximation tap app
+- db55852: Switch apps/tap from using lib/macaddress to lib/protocol/ethernet Add a selftest for apps/tap and supporting pcap Export TEST_SKIPPED from Makefile so it can be used in selftest.sh
+- ce8eaee: changes to protocol/ethernet.lua arent needed for tap, so revert them
+- df6cb66: free packet before erroring to avoid resource leak if the app is restarted
+
+Rolf Sommerhalder (6):
+- a4ce9bb: import lukego's intel1g
+- ca8199d: import lukego's old intel82574L for reference only
+- e24257f: additional diag output
+- a2c17ee: populate attic from branch igbe
+- 5bafc64: sync from intel1g_rs_i210 and cleanup
+- 09ac90a: PCI IDs for i210, i350
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/2375555/assets,https://api.github.com/repos/snabbco/snabb/releases/2375555,master,https://api.github.com/repos/snabbco/snabb/tarball/v2016.01,https://github.com/snabbco/snabb/releases/tag/v2016.01,https://api.github.com/repos/snabbco/snabb/zipball/v2016.01,v2016.01,False,False
+2234383,2015-12-04T15:01:45Z,2015-12-04T15:15:01Z,Snabb Switch 2015.12 “Quince”,"With this release brings bug fixes and minor enhancements to Snabb Switch and its continuous integration infrastructure. 
+
+### Changes
+- #667 SnabbBot now tests pull request heads merged with master
+- #669 Add support for specifying short/canonical PCI address
+- #654 #668 #664 #652 #672 Various bug fixes and enhancements
+
+### Contributors
+
+Andy Wingo (1):
+- 4dad68d: Fix bugs in PMU code
+
+Diego Pino Garcia (2):
+- 443081a: Use %x wildcard where possible
+- 1316582: Replace all-zero MAC address for 02:00:00:00:00:00
+
+Luke Gorrie (3):
+- 27c1e6d: lib.pci: Support short/canonical (""01:00.0"") addresses
+- 735a90c: packetblaster: Match command line with qualified PCI addresses
+- ec8be10: lib/hardware/README.md: Document pci.canonical() and pci.qualified()
+
+Max Rottenkolber (5):
+- 681129b: SnabbBot: Compare PR merged with CURRENT to CURRENT instead of head to base. CURRENT defaults to master.
+- 7a07f3d: SnabbBot: Document system requirements.
+- feeca91: nd_light: Fix use after free bug in neighbor solicitation.
+- 0fdafdb: nd_light: Fix missing negation in previous commit.
+- 8a88beb: Add 128, 512, 1500 and 9000 byte packet test dumps.
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/2234383/assets,https://api.github.com/repos/snabbco/snabb/releases/2234383,master,https://api.github.com/repos/snabbco/snabb/tarball/v2015.12,https://github.com/snabbco/snabb/releases/tag/v2015.12,https://api.github.com/repos/snabbco/snabb/zipball/v2015.12,v2015.12,False,False
+2076682,2015-11-05T10:48:17Z,2015-11-05T12:04:38Z,Snabb Switch 2015.11 “Papaya”,"With this release comes an overhaul of Snabb Switch's protocol library, a faster implementation of the Learning Bridge App and a revised CI tool chain. Papaya also introduces many small enhancements and upgrades  DynASM to version 1.4.
+
+### Major Changes
+- #637 Overhaul of `lib.protocol` improving the efficiency of several datagram operations
+- #638 Faster implementation of the Learning Bridge App
+- #626 Overhaul of Snabb Switch's CI (SnabbBot), now supporting multiple instances and running tests within Docker containers
+
+### Minor Changes
+- #636 Improvements to `lib.lua` including widespread adoption of rate limited logging facility
+- #640 “Program names” facility extended to allow for hyphens and automatic shortening
+- #649 Upgrade to DynASM 1.4 adding AVX2 instructions
+- #646 Minor documentation improvements
+
+### Contributors
+
+Alexander Gall (17):
+- 339a80a: New implementation of the learning bridge app
+- d372624: Untabify core/lib.lua
+- fadf244: Cache bit in core.lib
+- 4665cdf: Use pure Lua endian conversion throughout
+- 6a2d0f1: Rate-limit discard messages in logger
+- 787d8d2: Include lib.logger default and auto-throttle settings in the API
+- c67235b: Use logger in intel10g and nd_light apps
+- 5c116c8: lib.protocol overhaul
+- ea3b2cf: Add delayed commit semantics to lib.protocol.datagram
+- 14d900f: Add instance recycling to class.lua
+- d3d200f: Obsolete datagram:reuse() by instance recycling
+- 18c4436: Initialize token buckets with the maximum number of tokens
+- 644a250: Add selftest for nd_light
+- 6ef703d: Add day of the week to the standard logger time stamp
+- 211ea6b: Fix token_bucket:rate() code and description to match the intended behaviour
+- 4b4b8ad: Handle the case when no config table is supplied
+- dfe59aa: Remove eq32(), explicitely require the BitOp module
+
+Cosmin Apreutesei (1):
+- 49fe13c: DynASM 1.4 upgrade/merge
+
+Diego Pino Garcia (6):
+- 250e8bc: Allow hyphens in program name
+- cbfd314: Usage should return exit with status code 0 if help requested
+- 59249e7: Refine regexp
+- fde42c1: Change logic of infering program name
+- 8a0fa48: Reintroduced funtion 'exit' as it is used by snabbmark
+- 137f386: Fix typo
+
+Max Rottenkolber (26):
+- 8eff509: Normalize environment variables used in test suite.
+- 131890c: Introduce core.lib.getenv, a version of getenv that returns nil if the value of a requested environment variable is the empy string. Use core.lib.getenv where required.
+- 2384a59: Replace scripts/cperf with `make benchmarks'.
+- f19ef3c: Add timeout to bench/snabbnfv-loadgen-dpdk.
+- 85ee1fa: Define SKIPPED_CODE in snabbnfv/packetblaster_bench.sh
+- 4bc7df9: test_env: Use assets built by snabbswitch-docker, move pcap dumps to program/snabbnfv/test_fixtures.
+- b3501fd: Add scripts/dock.sh.
+- 29857ed: Simplify SnabbBot: Have it use `make benchmakrs' and`scripts/dock.sh'.
+- 2e2874e: Fix bug in SnabbBot's post_status.
+- 832d55f: Use /usr/bin/env in dock.sh
+- 52b68c8: Renamed incorrectly named src/doc/documentation-guide.mk2 to src/doc/documentation-guide.md.
+- 543a50b: scripts/dock.sh: Use `--rm' to delete container after run and inject DOCKERFLAGS into docker invocation.
+- 49c1334: Use SAMPLESIZE environment variable in scripts/bench.sh and compute standard deviation. Show standard deviation in SnabbBot performance regression check and default to SAMPLESIZE=5.
+- 0e4f7a0: Fix bug in scripts/bench.sh, rename SAMPLESIZE to SNABB_PERF_SAMPLESIZE and add it to scripts/dock.sh.
+- c03ac4d: Fixup to previous commit.
+- a2f7080: Use standard POSIX(?) awk syntax in src/scripts/bench.sh
+- 69c98c4: Use /usr/bin/env in SnabbBot.
+- e93cdd5: SnabbBot be explicit about when `dock_make test_ci' exit code !=0.
+- b197e3f: SnabbBot: Fix SD formatting and build within container.
+- bc756b0: SnabbBot: Include PCI hardware information in report.
+- 98f0b6e: Benchmarks: Don't attempt to run intel specific benchmarks with non-intel hardware.
+- 5b99acd: apps.solarflare: Document OpenOnload dependency.
+- cf06995: SnabbBot: Do not ERROR when a benchmark fails for both BASE and HEAD.
+- c62c0d4: test_env: Use QEMU environment variable and default to qemu in PATH.
+- 016b1ed: test_env: Update README.
+- e77c092: Update doc/testing.md
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/2076682/assets,https://api.github.com/repos/snabbco/snabb/releases/2076682,master,https://api.github.com/repos/snabbco/snabb/tarball/v2015.11,https://github.com/snabbco/snabb/releases/tag/v2015.11,https://api.github.com/repos/snabbco/snabb/zipball/v2015.11,v2015.11,False,False
+1912238,2015-10-05T14:15:40Z,2015-10-05T14:53:54Z,Snabb Switch 2015.10 “Olive”,"This release adds a build to target to produce compressed Snabb Switch binaries, promiscuous support for Snabb NFV and a new trace-oriented profiler. Olive also introduces a handful of important performance improvements, new debugging facilities and fixes various bugs.
+
+### Major Changes
+- #610 Added targets to build compressed binaries (using UPX)
+- #604 Added promiscuous mode to Snabb NFV
+- #623 Added traceprof: a new trace-oriented profiler for LuaJIT
+
+### Minor Changes
+- #612 #628 Performance optimizations in Intel10G driver
+- #617 #639 Use Git subtree instead of Git submodule for dependencies
+- #619 #620 #621 Enhanced Snabb Switch profiling capabilities
+- #614 #632 Enhancements to `lib.pmu`
+- #629 snsh: Added '-q' to break program to REPL via keyboard
+- #630 Documentation fixes
+
+### Contributors
+
+Marcel Wiget (1):
+- 0a3e398: Allow snabbnfv to pass all traffic on an Ethernet port to a single virtual machine
+
+Alexander Gall (1):
+- 2e67903: Avoid ctype diversity for registers in intel10g
+
+Luke Gorrie (26):
+- 3291eb3: Makefile: Shrink 'snabb' from 2MB to 0.6MB with UPX
+- ee0ebbe: pmu_x86: Fix bug where machine code gets GC'd
+- 52806ea: pmu: Minor improvements to reporting interface
+- 0a3e398: Merge PR #604 (snabbnfv promisc mode) into next
+- f0f5f9b: lib.pmu: Fixed bug that required affinity to CPU core 0
+- 3139933: deps: Removed all submodules
+- 532f9f4: Squashed 'lib/luajit/' content from commit 55c3b29
+- 77c63c9: Squashed 'lib/pflua/' content from commit cc651ae
+- ec17feb: Squashed 'lib/ljsyscall/' content from commit d78235c
+- 401932e: Updated build scripts for subtree-based libararies
+- d78d7a9: READMEs: '--recursive' no longer needed for git-clone
+- 065979c: jit.p: Add support for profiling at trace granularity
+- 53aedce: jit.p: Add CPU performance counters as profiler source
+- a212176: jit.p: Enhance 'v' mode of profiler
+- ef49da4: jit.util.traceinfo(): Include mcode, mcloop, szmcode
+- d467236: lib.traceprof: New profiler (alternative to jit.p)
+- 51ddd8e: snsh: Add '-jtprof' to enable traceprof profiling
+- 0ba096c: lib.traceprof: Include inter-trace linkage
+- ddabbd6: intel10g: Enable TX prefetch for 14.8 Mpps
+- c29f053: intel10g: Fix error in tx prefetch enable for VF mode
+- dd53917: snsh: Added '-q' to break program to REPL via keyboard
+- 8e7c32c: src/README.md: Document engine.configure() multiple calls
+- 63d3158: lib.pmu.writemsr(): Improve error message
+- f87990e: snsh: Changed --sigquit-repl (-q) to --sigquit=repl (-qrepl)
+- 1192957: lib/ljsyscall: Remove dangling git submodules
+- 5451d6d: lib/pflua: Remove dangling git submodule
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/1912238/assets,https://api.github.com/repos/snabbco/snabb/releases/1912238,master,https://api.github.com/repos/snabbco/snabb/tarball/v2015.10,https://github.com/snabbco/snabb/releases/tag/v2015.10,https://api.github.com/repos/snabbco/snabb/zipball/v2015.10,v2015.10,False,False
+1768375,2015-09-04T10:49:10Z,2015-09-04T11:27:28Z,"Snabb Switch 2015.09 ""Nutmeg""","This release adds support for the Intel 82599 T3 and Intel X540 chips and Intel “PMU” CPU profiling. Also new is the `--busy` option for `snabbnfv traffic`, which makes it run with minimum latency.  Nutmeg also includes bug minor fixes and improvements and upgrades to LuaJit v2.0.4-330-g5feb63a.
+
+### Major Changes
+- #569 #598 Added Intel 82599 T3 and Intel X540 support
+- #597 Added “Performance Monitoring Unit” counter support
+- #591 Added -b/--busy option to snabbnfv traffic to force running in busy loop
+
+### Minor Changes
+- #594 deps/luajit: Switch to `SnabbCo/Luajit:snabb` branch and upgrade to LuaJit `v2.0.4-330-g5feb63a`
+- #602 Fix bug in `lib.protocol.ipv4` header initialization
+- #599 Add tests for TCP abd IPv4 checksum methods of `lib.protocol`
+
+### Contributors
+
+Diego Pino Garcia (3):
+- 2e51ce6: Add 82559 T3 to the list of supported cards
+- 6c0a07a: Add a 2 seconds pause before running some tests in intel_app selftest
+- 5722ae8: Add TCP and IPv4 checksum calculation tests
+
+Luke Gorrie (20):
+- b944ae3: intel_app: Added comment about Intel T3 NIC sleep
+- 1a9619b: lib.pci: Added Solarflare NIC model name
+- f65aae6: snabbnfv traffic: Added -b/--busy option
+- 6ed0a79: deps/luajit: Switch to own snabb branch
+- ac27099: deps/luajit: Update to release v2015.08-snabb
+- 582e069: branches.md: Remove obsolete lukego/nfv branch
+- 9d734d8: generate-pmu.sh: CPU perf event code generator
+- 91a516f: lib.pmu_cpu: Module generated by generate-pmu.sh
+- 2fcd543: dasm_x86: Added RDPMC instruction
+- b7a2e9b: pmu_x86.dasl: Added PMU asm support code
+- a2da1e3: lib.pmu: New module. Documented interface NYI
+- 453df8e: lib.pmu: Full API implementation
+- bb8ca5a: lib.pmu: Added measure() and improved API
+- acbf993: deps/luajit: Switch to 5feb63a4
+- 6eb1710: src/Makefile: fix luajit expected version
+- fc59f26: lib.pmu: Use floats to avoid truncation in ratios
+- a11bd90: pmu_x86: Disable debug (disasm dump)
+- 88b027e: lib.pmu: Treat event names as Lua patterns
+- 9d9336e: lib.pmu: Fix - make event list optional
+- a1d21ce: lib.pci: Support Intel X540 with intel_app
+
+Tim LaBerge (1):
+- 97352cf: Fix ipv4 header initialization.
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/1768375/assets,https://api.github.com/repos/snabbco/snabb/releases/1768375,master,https://api.github.com/repos/snabbco/snabb/tarball/v2015.09,https://github.com/snabbco/snabb/releases/tag/v2015.09,https://api.github.com/repos/snabbco/snabb/zipball/v2015.09,v2015.09,False,False
+1625710,2015-08-04T11:40:49Z,2015-08-04T11:48:47Z,"Snabb Switch 2015.08 ""Mango""","This release adds a _firehose_ program that lets you excute C callback functions on live traffic and replaces the C-based dynasm assembler with its Lua-based counterpart. It also introduces the _top_ and _gc_ programs which let you monitor running Snabb Switch instances and clean up stale runtime files respectively. To support _top_, new core modules `core.shm` and `core.counter` were introduced which let you expose arbitrary shared-memory regions from your apps and programs in a organized but flexible way. Mango also fixes many bugs, extends the documentation with a detailed Snabb NFV ""Getting Started"" guide and upgrades the Pflua dependency.
+
+# Major Changes
+- #542 Upgraded pflua to 5e2c56b
+- #563 Added `snsh -p` option to run a different program
+- #557 Added `firehose` program (execute C callback functions directly
+  on live traffic)
+- #575 dynasm: Switch from C-based assembler to Lua-based assembler
+- #568 #556 #558 #582 #586 Added `top` program that acts as a realtime
+  monitor for running Snabb Switch instances
+
+# Minor Changes
+- #548 Fix performance regression in `packetblaster`
+- #573 Optimize murmur hash library
+- #547 Include DPDK/packetblaster based performance test in CI
+- #580 Fix checksum related performance regression
+- #581 Fix big in IPv4 peude-header construction  
+- #576 #562 #549 #551 #552 #545 #585 Minor bug fixes and clean ups
+- #577 New Snabb NFV ""Getting Started"" guide, documentation fixes and
+  additions
+
+# Contributors
+
+Alexander Gall (3):
+- 449e75d: Speed up Murmur hash functions
+- 2cd63ca: Fix typos in hash base class
+- fe1d59c: Fix bug in IPv4 pseudo-header construction
+
+Luke Gorrie (27):
+- 207df7d: deps/pflua: Upgrade to latest master (5e2c56b)
+- 7bc538f: engine: Add engine.busyloop option
+- 52d2b3e: packetblaster: s/app/engine/
+- 55e6dd7: packetblaster: Fix to avoid starvation
+- 2ca43e8: src/README: Update example app network diagram
+- 8db4e9f: core.memory: Remove dma_min_addr and dma_max_addr
+- 928703b: Makefile: Remove unused targets
+- 4c3b8a5: Makefile: Fetch git submodules serially
+- 63064ee: build: Fix generation of programs.inc
+- 8ecc0c0: ipv6:pton: Fix error on invalid address
+- 3100960: Add new program 'firehose'
+- 8d30613: vhost.h, vhost_user.h: Use more explicit types
+- 99f501e: Add 'snsh -p' argument to run a different program
+- 1b85163: core.counter: Add double-buffering
+- f69b42c: core.counter: Rename publish() to commit()
+- 4bc6784: core.counter: Fixes for double-buffering extension
+- 2534e5f: core.counter: Update selftest for double-buffering
+- ca6d988: firehose: Document -r/--ring-size argument
+- 0f53630: Import Cosmin Apreutesei's Lua-based dynasm.
+- e346e37: dynasm: Switch from C-based asm to Lua-based asm
+- 26f91a2: Makefile: Fix ""clean"" target to remove deps/*.vsn
+- 6a4062d: lib.checksum: Add (failing) unit test for TCP csum
+- a225750: arch/{sse2,avx2}: Fix checksum type declarations
+- 750559d: checksum: Remove unused fn tcp_pseudo_checksum()
+- 84b497a: checksum: pseudo_header_initial() host byte order
+- 13177af: lib.checksum: Fix broken selftest_ipv4_tcp()
+- fd4749c: src/Makefile: Add 'make submods'
+
+Marcel Wiget (8):
+- b39e57e: initial draft
+- b20657e: fixed some typos and formatting
+- 3827a2d: Fixed typos and formatting
+- c512bef: updated reference to documentation
+- 4b1a82a: editorial and markup fixes
+- d698ac8: fixed wording
+- 2355de2: Describe how-to bind 10GbE port back to host OS
+- d7343d6: Update authorized_keys
+
+Max Rottenkolber (29):
+- aee2cf0: [test_env] Don't specifically select tmux window.
+- eccddca: [test_env] Add packetblaster and qemu_dpdk wrappers.
+- 9663aec: [test_env] Added snabbnfv_bench function.
+- 5bd5a25: [snabbnfv] Added packetblaster_bench.sh script.
+- 3044faa: [cperf] Added loadgen-snabb-nic-guest benchmark.
+- 1da904f: Document bridge apps.
+- 7063865: Revert ""Merge branch 'restore-snabbtop' into next""
+- b2cc0fa: [core.counter] Move `struct counter` to core/counter.h.
+- a3ffff3: [core.counter] Allow passing of readonly option to core.shm.
+- 9977f24: [core.counter] Make the `value` parameter to `add` default to 1.
+- 490eae6: [core.app] Initialize reportedfreebits and reportedfreebytes.
+- 874e48b: [core] Port core.app/core.packet/core.link to use core.counter.
+- 1c9c26a: [RateLimiter] Fix selftest.
+- b351682: [RawSocket] Fix selftest.
+- 6d66741: [Intel82599] Fix selftest.
+- 099d0cf: [PcapFilter] Fix selftest.
+- b38d609: Added gc program.
+- 8d0c256: Added top program.
+- 7144c05: [snabbmark] Fix snabbmark.
+- f43eb8b: [snabbnfv traffic] Fix benchmark mode.
+- a237863: Fix error in bridge app documentation.
+- d472f63: Break long lines in snabbnfv/doc/getting-started.md.
+- f97c72c: Edit typos, capitalization, style, grammar, ... in snabbnfv/doc/getting-started.md
+- 7aea5c6: Fix typos in src/doc/getting-started.md.
+- 08b9e4f: [core.counter] Fix bug in counter.delete where it failed to mark public/private record as deleted.
+- 0df7f4a: [core.shm] Create root directory with mode ""rwxrwxrwt"".
+- 026441c: [top] Fix bug in link counter deallocation.
+- 2989465: [core.counter] Only unlink counters in delete when they were opened for writing.
+- 0be2443: [snabbnfv traffic] Fix bug where in benchmark mode, engine.breaths was attempted to be accessed directly.
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/1625710/assets,https://api.github.com/repos/snabbco/snabb/releases/1625710,master,https://api.github.com/repos/snabbco/snabb/tarball/v2015.08,https://github.com/snabbco/snabb/releases/tag/v2015.08,https://api.github.com/repos/snabbco/snabb/zipball/v2015.08,v2015.08,False,False
+1504171,2015-07-07T09:48:45Z,2015-07-07T09:54:28Z,"Snabb Switch v2015.07.1 ""Lime"" update 1","Branches merged:
+- 1ab4652 Merge branch 'fixes' into master
+- 88f4306 Merge PR #545 (create /var/run/snabb) into fixes
+- 1eefbe8 Merge updated PR #541 (app report fix) into fixes
+- 659cb5c Merge PR #541 (app report fixes) into fixes
+- 92007fc Merge PR #540 (vhost_user report fix) into fixes
+
+Changes included:
+
+```
+$ git shortlog --no-merges v2015.07..v2015.07.1
+Max Rottenkolber (5):
+      [core.app packetblaster] Remove `engine.report_each_app'     (superseded by `engine.report_apps'.
+      [core.app] Fix #537 (Catch errors during app reports and print     warning instead of fatal exit.)
+      [snabbnfv traffic] Fix #538 (default settings should not print     app and link reports).
+      [vhost_user] Do not crash when `report()' is called while unconnected.
+      [core.app] Fixup: Wrongfully called `app.report' without     supplying app object.
+
+Nikolay Nikolaev (1):
+      Ensure /var/run/snabb exists
+```
+",https://api.github.com/users/lukego,13791,lukego,https://api.github.com/repos/snabbco/snabb/releases/1504171/assets,https://api.github.com/repos/snabbco/snabb/releases/1504171,master,https://api.github.com/repos/snabbco/snabb/tarball/v2015.07.1,https://github.com/snabbco/snabb/releases/tag/v2015.07.1,https://api.github.com/repos/snabbco/snabb/zipball/v2015.07.1,v2015.07.1,False,False
+1488104,2015-07-02T11:39:16Z,2015-07-02T12:00:10Z,"Snabb Switch 2015.07 ""Lime""","This release introduces core modules to support IPC between multiple Snabb Switch instances, adds a rate limited logging facility to the core library and replaces the previously used integration testing framework with a simpler alternative. Lime also fixes bugs in code and documentation and upgrades its LuaJIT and Pflua dependencies.
+
+# Major Changes
+- #513 Added `core.shm` and `core.counter` for Snabb Switch IPC
+- 8335386 Added a rate limited logging facility (`logger_new`) to `core.lib`
+- #525 Replaced `bench_env` with `test_env`
+
+# Minor Changes
+- #520 Upgraded LuaJIT and Pflua dependencies
+- #530 #526 Added a benchmark and basic selftest for `snabb packetblaster`
+- #531 Fix a race condition in NFV selftest
+- #493 #500 #510 #524 #526 Various bug fixes
+- #534 #515 Minor documentation fixes and coding style fixes
+
+# Contributors
+
+Alexander Gall (2):
+- 8335386: Add a simple rate-limited logging facility
+- efc1344: Improved logger
+
+Javier Guerra (1):
+- d6dd62c: remove mixed tabs/space
+
+Luke Gorrie (20):
+- ab563cc: Makefile: Fix dependency error that broke 'make -j'
+- 7e468a0: luajit: upgrade feb 2015 (04dc64b) to may 2015 (5de95ed)
+- 1c9090a: pflua: Upgrade from 13b194e (May 6) to 2752395 (May 26)
+- 0b09ea2: core.shm: shared memory alternative to ffi.new()
+- e219930: core.shm: Redesigned and reworked
+- 8d455f3: core.shm: Fixed file descriptor leak
+- 9f5f1ad: Revert ""Merge PR #507 (pflua upgrade) into next""
+- 1ab03b4: core.shm: Extended names - ""//foo"", ""/foo"", and ""foo""
+- d684e31: Revert ""Revert ""Merge PR #472 into next""""
+- fdbadc4: core.shm: Fix and cleanup for object name expansion
+- 2b376f1: core.counter: Simple counter built on core.shm
+- ffb4cf1: core.shm: Fix bug in resolve()
+- c99b36a: core.shm: Add alias() and children()
+- 20b6aa9: Upgrade LuaJIT to fe56522 (June 13)
+- e52c77a: src/Makefile: Fix expected luajit version
+- e7c8d6d: Revert ""Revert ""Merge PR #507 (pflua upgrade) into next""""
+- 0900bb7: Remove scripts/bench_env
+- 9c8b102: intel10g: Fix RX DMA corruption in SF mode
+- 095bd91: packetblaster: Fixed broken intel.loadgen app
+- 299cdfe: packetblaster: Added simple selftest.sh
+
+Max Rottenkolber (27):
+- 99b7bec: Added lib.ipc.fs: A central Snabb Switch filesystem layout for runtime resources.
+- caf80c6: [core.app top] Update core.app and snabb top to use lib.ipc.fs.
+- bb0331f: [top] Do not retry top:attach.
+- 35059c8: [top] Improve usage information.
+- cc07235: Added gc program to cleanup stale runtime files.
+- 5b45313: [bench_env] Run `snabb gc' on exit.
+- 1bdce8b: Added experimental test_env.
+- 0d89dd0: Port snabbnfv/selftest.sh to test_env.
+- d8c2a27: [snabbnfv] Fix bugs in selftest.sh error handling.
+- 7bf8b03: [test_env] Provide mac and ip functions.
+- c0b3941: [snabbnfv] Update selftest fuzz mode for test_env.
+- e49066a: [test_env] use wget(1) to fetch assets from Snabb Lab.
+- e699ed5: [test_env] Update documentation.
+- fad41c3: [test_env] Use gzipped disk image.
+- 95515ea: Move apps/README.\* to apps/basic/.
+- b1964c8: Fixup references in program/snabbnfv/README.*
+- f6c50f8: [snabbnfv] Make selftest.sh return SKIPPED_CODE when parameters are missing.
+- 269d4a8: Fix ill-formatted src/apps/README.*
+- 06a5cab: [snabbnfv] Fixup typos in last commit.
+- 632e0ef: [test_env] Lower case script local variables (qemu_mq).
+- 11a0658: Move test_env to program/snabbnfv/test_env.
+- 1e9b37a: [test_env] Use tmux(1) instead of shell background jobs.
+- 935e34d: [test_env] Create explicitly named tmux windows.
+- 1d37914: [test_env] Accept both PCI addresses and NUMA node indexes.
+- 49e9210: [packetblaster] Add --duration option.
+- 0213478: [cperf] Added scripts/cperf/benchmarks/packetblaster-64.
+- bc39050: [nfvconfig] Have selftest retry the ND check a few times to avoid fail due to a race.
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/1488104/assets,https://api.github.com/repos/snabbco/snabb/releases/1488104,master,https://api.github.com/repos/snabbco/snabb/tarball/v2015.07,https://github.com/snabbco/snabb/releases/tag/v2015.07,https://api.github.com/repos/snabbco/snabb/zipball/v2015.07,v2015.07,False,False
+1360502,2015-06-01T09:39:15Z,2015-06-01T10:37:12Z,"Snabb Switch 2015.06 ""Kiwi""","This release improves the Intel 82599 driver, the Snabb NFV framework and our generic checksum implementation. Kiwi also fixes bugs, adds and improves documentation and introduces a new formalized Git workflow to help scale Snabb Switch development.
+
+# Major Changes
+- #475 #477 Added support for 64-bit RC registers to Intel 82599 driver
+- #485 #497 Established new Git workflow
+- #494 Changed `lib.checksum` API
+
+# Minor Changes
+- #502 Better error handling during startup
+- #469 Automatically set `kernel.shmmax` and `vm.nr_hugepages` to Snabb Switch's requirements
+- #467 Make app links accessible by index
+- #464 #470 #473 #474 #479 #511 Documentation improvements
+- #463 Fix bug where `engine.now` could return false
+- #460 Improve SIMD code portability
+- #459  #486 #487 #488 #489 #490 #491 #492 #499 #501 Bug fixes and improvements for Snabb NFV
+
+# Contributions
+
+Alexander Gall (10):
+- dd709ee: Pass config for 82599 driver down to intel10g module
+- 27c1091: Support configurable MTU in Intel82599 driver
+- 628ee50: Implement most of SNMP ifTable and ifXTable for intel10g
+- 323a22a: Fix regression introduced with 27c1091
+- eae22eb: Disable discard of giant frames on TX in intel10g
+- c52ad03: 64-bit enhancments for RC registers
+- 479868e: Add support for HC counters in ifMIB
+- 2deca0b: Modify checksum API
+- 5cc2c1f: Apply new IP checksum API
+- 55f323f: Fix type casts for commit 5cc2c1f
+
+Edward Hope-Morley (1):
+- 7d3313a: Fix neutron2snabb parser db schema
+
+Luke Gorrie (27):
+- 1f1bf01: neutron_sync_master: Remove Neutron QoS from default tables
+- 9617846: Moved SIMD code into arch/avx2.c and arch/sse2.c
+- cd1ffc1: Upgrade pflua for a bug fix
+- 0b422a7: Fix problem where engine.now() could return false
+- 870ed37: Rewrote top-level README.md
+- c4a7885: core: Use the array part of app.input and app.output tables
+- cfbebe5: memory: Force the kernel to enable working HugeTLB allocation
+- dec0a64: core.memory: Fix selftest() broken by previous commit
+- cb5db6c: main: Improve command-line handling and usage string
+- d8ab0b7: README: Add ""Get involved"" section + minor edits
+- 1a6c4e5: README: Update Getting Started link to be in tree
+- a4c983e: Improve handling of program list (for snabb --help)
+- 0a126b5: register.lua: Remove jit.off() voodoo
+- 638c3e0: Added doc/branches.md: List of active development branches
+- 625e961: neutron2snabb: Fix for security group -> pflua translation
+- 5ccb235: neutron2snabb: Added automatic database schema detection
+- 4892f3e: neutron2snabb: Fix selftest for security group translation
+- 3028b34: snabbnfv traffic: Check PCI device exists and is supported
+- 7a9573b: neutron_sync_agent.sh: Fix to use qualified paths
+- 6d828eb: neutron_sync_master: Include *.sql table definitions
+- e528b62: Document git workflow with new 'next' and 'fixes' branches
+- 106d545: neutron2snabb: Fix schema selftest to find database files
+- cbe9307: git-workflow.md: Edited and expanded
+- f1536d6: snabb: Detect errors during startup
+- 053bf6c: core.startup: Use exit status 1 for unhandled exceptions
+- eaa408d: Makefile: Avoid nonportable 'basename -a'
+- 554de84: Revert ""Merge PR #472 into next""
+
+Max Rottenkolber (21):
+- 89b462a: Move `apps/sprayer' to`program/example' and convert scripts to programs.
+- eb0d275: Flattened the `program/example/*' programs.
+- 072a5ee: [program/example-*] Remove boilerplate.
+- 4b63119: [getting-started] Simplify examples and describe them in detail in `src/doc/getting-started.md'.
+- 163e5d2: [program/example*] Don't use dashes in names.
+- d7d612d: Import ""Documentation Guide"" from Wiki.
+- dc47f0c: [documentation guide] Mention different target audiences for documentation.
+- 3ded11b: [neutron-sync-master] Only amend commit when SQL dump actually changes.
+- c71117f: [neutron-sync-*] Don't print command outputs and print timestamped log messages instead.
+- d1878ce: [neutron-sync-agent] Don't try to generate configurations if repository coild not be successfully cloned.
+- 6f0aa5a: [neutron-sync-agent] Add TMP_DIR and SYNC_PORT options.
+- ae8b95c: [neutron-sync-agent] Do not treat ""$TMP_DIR/*"" as file in `$TMP_DIR' is empty.
+- 0ecaef5: [neutron-sync-agent] Only try updating confs when `git diff' return 1 as opposed to failing with other error codes (>1).
+- def450b: [neutron2snabb] Recover selftest.sh (should have really been in 7e9477b)
+- 5895894: [neutron-sync-*] Do not hide output of neutron2snabb and mysqldump.
+- 87ecfb4: [neutron_sync_master] Update default tables in Lua wrapper.
+- 6707e55: [neutron-sync-master] Remove the '-t' that prevents the table info from being stored in *.sql. Add '--skip-dump-date' so that these files don't include a timestamp that makes it look like something changes between runs.
+- 343f66e: [neutron-sync-agent] Less verbose `git clone' and`git fetch'.
+- 77d33c7: [snabbnfv] Import documentation from snabb-nfv Wiki.
+- 2bed92c: [snabbnfv] Deleted outdated src/program/snabbnfv/doc/neutron-configuration.md.
+
+Stevan Markovic (1):
+- c87a36b:  Add sm101 to authorized_keys.
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/1360502/assets,https://api.github.com/repos/snabbco/snabb/releases/1360502,master,https://api.github.com/repos/snabbco/snabb/tarball/v2015.06,https://github.com/snabbco/snabb/releases/tag/v2015.06,https://api.github.com/repos/snabbco/snabb/zipball/v2015.06,v2015.06,False,False
+1313055,2015-05-18T15:53:58Z,2015-05-19T14:30:39Z,Snabb NFV v2015.05.nfv1,"This is an update release based on `v2015.05` and containing changes from the `nfv` branch that increase the robustness of Snabb NFV.
+",https://api.github.com/users/lukego,13791,lukego,https://api.github.com/repos/snabbco/snabb/releases/1313055/assets,https://api.github.com/repos/snabbco/snabb/releases/1313055,nfv,https://api.github.com/repos/snabbco/snabb/tarball/v2015.05.nfv1,https://github.com/snabbco/snabb/releases/tag/v2015.05.nfv1,https://api.github.com/repos/snabbco/snabb/zipball/v2015.05.nfv1,v2015.05.nfv1,False,False
+1260151,2015-05-05T15:39:16Z,2015-05-05T18:22:24Z,"Snabb Switch 2015.05 ""Jojoba""","This release replaces the `PacketFilter` app with the new `PcapFilter` app which is based on [pflua](https://github.com/Igalia/pflua). Jojoba also brings improvements in our vhost-user and stateful packet filtering implementations along with some minor additions and bug fixes.
+
+# Major Changes
+- #444 Replaced `PacketFilter` app with `PcapFilter` based on [pflua](https://github.com/Igalia/pflua)
+
+# Minor Changes
+- #440 Hardened vhost-user implementation
+- #445 Added `attach` method to `lib.ipc.shmem`
+- #449 Fixed bug related to usage of `clock_gettime(2)`
+- #452 snabbnfv traffic: Add -D/--debug-report-interval parameter to display periodic debug information
+- #453 Made stateful packet filtering more DoS resilent
+- #454 #457 #458 Minor bug fixes and documentation updates
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/1260151/assets,https://api.github.com/repos/snabbco/snabb/releases/1260151,master,https://api.github.com/repos/snabbco/snabb/tarball/v2015.05,https://github.com/snabbco/snabb/releases/tag/v2015.05,https://api.github.com/repos/snabbco/snabb/zipball/v2015.05,v2015.05,False,False
+1114884,2015-04-01T11:19:31Z,2015-04-01T12:41:44Z,"Snabb Switch 2015.04 ""Itapalm""","This release introduces a new network interface device driver for Solarflare NICs of the SFN7xxx series. Itapalm also brings improvements in packet check sum offloading by exploiting SIMD features of modern processors as well a many small bug fixes and improvements to the Snabb Switch core and NFV components.
+
+# Major Changes
+- #409 #404 Added Solarflare NIC device driver
+- #411 #414 Added SIMD based check sum calculation
+- #403 Implemented Stateful/Stateless Packet Filtering a per Neutron API
+
+# Minor Changes
+- #433 Measure throughput in ""frees per second"" and perform dynamic idling
+- #430 Added keyed IPv6 tunnel to the `lib.protocol` framework
+- #427 Rudimentary support for ifTable MIB in Intel10G driver
+- #412 Added a new mtu=1500/iperf based benchmark
+- #407 PacketFilter: Allow ARP packets through for IP rules
+- #396 #400 #399 #397 #398 #392 #413 #423 #415 #417 #416 #418 #420 #419 #421 #422 #423 #428 #429 #431 #426 #437 #434 #435 Various bug fixes, minor improvements and performance improvements
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/1114884/assets,https://api.github.com/repos/snabbco/snabb/releases/1114884,master,https://api.github.com/repos/snabbco/snabb/tarball/v2015.04,https://github.com/snabbco/snabb/releases/tag/v2015.04,https://api.github.com/repos/snabbco/snabb/zipball/v2015.04,v2015.04,False,False
+1007923,2015-03-02T14:47:16Z,2015-03-03T14:53:31Z,Obsolete! Superseded by v2015.03.1,"This tag was created prematurely, please refer to [v2015.03.1](https://github.com/SnabbCo/snabbswitch/releases/tag/v2015.03.1) instead.
+
+Sorry for the inconvenience.
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/1007923/assets,https://api.github.com/repos/snabbco/snabb/releases/1007923,master,https://api.github.com/repos/snabbco/snabb/tarball/v2015.03,https://github.com/snabbco/snabb/releases/tag/v2015.03,https://api.github.com/repos/snabbco/snabb/zipball/v2015.03,v2015.03,False,False
+1003135,2015-03-03T14:43:11Z,2015-03-02T15:51:10Z,"Snabb Switch 2015.03.1 ""Huckleberry""","This release introduces an immensely progressive transition from ""zero copy"" to embracing copying (of packets) as a reaction to increasing cache bandwidths in modern CPUs. _Huckleberry_ also brings  a ""busybox-style"" CLI, a shared memory IPC mechanism, stateful packet filtering to Snabb NFV and many smaller but equally essential bug fixes and improvements.
+
+## Major Changes
+- #364 #365 #374 ""Straightline"" redesign: Packets are now copied instead of being passed around (zero-copy) in order to make use of increasing cache bandwidths in modern CPUs. dramatically simplifying a lot of core code paths
+- #363 Added support for building standalone SnabbSwitch applications and restructured build to produce a ""busybox style"" binary
+- #348 Added IPC facility based on file-backed shared memory
+- #344 #375  Added stateful packet filtering
+
+## Minor Changes
+- #356 Added fuzzer for NFV configurations
+- #369 Use [ljsyscall](http://www.myriabit.com/ljsyscall/) to replace tedious C code
+- #343 `neutron-sync-agent` and `neutron-sync-master` use constant space
+- #360 #367 #373 Improved `apps.intel` initializtion sequence
+- #342 Change configurations on-the-fly while running NFV selftest
+- #341 Add support for jit.dump and jit.profile to a file
+- #359 Improved `snabb` binary portability
+- #379 #377 Improved NFV selftest
+- #382 Improved and documented the `lib.hardware` modules
+- #381 Initialize DMA memory more deliberately
+- #380 #384 Minor cleanups and fixes
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/1003135/assets,https://api.github.com/repos/snabbco/snabb/releases/1003135,master,https://api.github.com/repos/snabbco/snabb/tarball/v2015.03.1,https://github.com/snabbco/snabb/releases/tag/v2015.03.1,https://api.github.com/repos/snabbco/snabb/zipball/v2015.03.1,v2015.03.1,False,False
+909821,2015-01-19T16:15:59Z,2015-02-02T19:33:47Z,"Snabb Switch 2015.02 ""Ginberry""","This release introduces an integration test suite based on real-world use cases, improves
+performance in some areas, adds a comprehensive user manual and an intro
+guide, extends the Snabb NFV component, fixes bugs and polishes the code
+base.
+- #240 Improved Intel 10-G driver
+- #271 Improved Neutron driver (neutron-sync-master and neutron-sync-agent)
+- #280 Introduced NFV integration test suite (lib/nfv/selftest.sh)
+- #291 Improved (performance of the) virtio interface
+- #286 Added Virtio jumbo frame support
+- #283 Improved Neutron NFV driver implementation
+- #245 Added egress filters to NFV system
+- #292 Improved RateLimiter App
+- #333 Introduced a Bloom filter based ""Learning bridge"" App (apps/bridge)
+- #334 Added an interactive REPL to the snabb executable (-R option to snabb)
+- #337 Improved timer performance
+- #338 #345 Added comprehensive documentation and Jeff's ""Getting Started"" guide
+- #337 #281 #273 #279 #274 #297 #300 #293 #303 #310 #313 #319 #325 #315 #324 #331 #328 #339 Many small bug fixes and refactorings improving code consistency
+",https://api.github.com/users/eugeneia,4933566,eugeneia,https://api.github.com/repos/snabbco/snabb/releases/909821/assets,https://api.github.com/repos/snabbco/snabb/releases/909821,master,https://api.github.com/repos/snabbco/snabb/tarball/v2015.02,https://github.com/snabbco/snabb/releases/tag/v2015.02,https://api.github.com/repos/snabbco/snabb/zipball/v2015.02,v2015.02,False,False
+563995,2014-09-17T13:55:48Z,2014-09-17T14:00:41Z,Snabb Switch v2014.09.1: Feijoa update 1,"Maintenance release to v2014.09.1.
+",https://api.github.com/users/lukego,13791,lukego,https://api.github.com/repos/snabbco/snabb/releases/563995/assets,https://api.github.com/repos/snabbco/snabb/releases/563995,master,https://api.github.com/repos/snabbco/snabb/tarball/v2014.09.1,https://github.com/snabbco/snabb/releases/tag/v2014.09.1,https://api.github.com/repos/snabbco/snabb/zipball/v2014.09.1,v2014.09.1,False,False
+529053,2014-09-05T07:32:07Z,2014-09-05T11:16:05Z,"Snabb Switch 2014.09 ""Feijoa""","This release focuses on bug fixes, improved test coverage, and robustness to errors.
+
+New features:
+- #241 Automatically restart apps on errors
+- #239 Intel10G: Set transmit rate priority for queues.
+- #242 IPv6 neighbour discovery capability
+
+Optimization work:
+- #237 Performance regression tests for the app network (re)configuration subsystem
+- #238 Intel10G optimization for better JIT behavior with large packets.
+
+Robustness and bug fixes:
+- #250 `neutron2snabb` updated to match latest Snabb NFV Neutron database format.
+- #250 `neutron2snabb` unit test.
+- #253 `neutron2snabb` temporarily disable Security Group (requires compatibility fix).
+- #234 Intel10G fix behaviour when all hardware queues are used up
+- #244 PcapReader fix premature garbage collection bug
+- #248 `neutron-sync-agent` accept configuration updates that rewrite history (e.g. new master).
+- #249 Fix `vhost_user` code path exercised when KVM is disabled in QEMU.
+",https://api.github.com/users/lukego,13791,lukego,https://api.github.com/repos/snabbco/snabb/releases/529053/assets,https://api.github.com/repos/snabbco/snabb/releases/529053,master,https://api.github.com/repos/snabbco/snabb/tarball/v2014.09,https://github.com/snabbco/snabb/releases/tag/v2014.09,https://api.github.com/repos/snabbco/snabb/zipball/v2014.09,v2014.09,False,False
+483553,2014-08-11T08:19:04Z,2014-08-11T13:01:43Z,"Snabb Switch 2014.08 ""Erdbeere""","This release improves test infrastructure, improves compatibility, and increases performance.
+
+New features:
+- #228 SysV init scripts for the Snabb NFV programs.
+- #232 Watchdog safety feature to automatically terminate a hung switch.
+- #235 SnabbBot CI: Automatic performance regression tests on pull request.
+
+Big changes:
+- #236 Replaced third-party TravisCI with our own SnabbBot CI.
+- #229 NFV performance optimizations for line rate at 256-byte packet size.
+
+Small changes:
+- #225 Compatibility with the final QEMU 2.1 release.
+- #230 DPDK guest compatibility fix.
+- #223 L2TPv3 fix for interoperability with Cisco ASR9000.
+",https://api.github.com/users/lukego,13791,lukego,https://api.github.com/repos/snabbco/snabb/releases/483553/assets,https://api.github.com/repos/snabbco/snabb/releases/483553,master,https://api.github.com/repos/snabbco/snabb/tarball/v2014.08,https://github.com/snabbco/snabb/releases/tag/v2014.08,https://api.github.com/repos/snabbco/snabb/zipball/v2014.08,v2014.08,False,False
+406958,2014-07-02T08:33:40Z,2014-07-02T10:16:48Z,"Snabb Switch 2014.07 ""Durian""","This release achieves practical NFV performance over Virtio-net: approaching 10G line rate for 256-byte average packet size.
+
+New features:
+- #187 Support reconnect to an existing vhost-user socket on snabbswitch restart.
+- #195 #196 #215 #220 Benchmarking support for NFV workloads with N x 10G Virtio-net including DPDK-based guests, CPU/NUMA affinity tuning, etc.
+
+Big changes:
+- #189 #201 #213 Fast-path optimizations.
+- #211 Optimize address translation cache for 1GB large pages.
+- #221 Optimized L2VPN code including packet encode/decode library.
+
+Small changes:
+- #204 Update vhost-user to match the version upstreamed into QEMU.
+- #200 Fixes to Virtio-net driver.
+",https://api.github.com/users/lukego,13791,lukego,https://api.github.com/repos/snabbco/snabb/releases/406958/assets,https://api.github.com/repos/snabbco/snabb/releases/406958,master,https://api.github.com/repos/snabbco/snabb/tarball/v2014.07,https://github.com/snabbco/snabb/releases/tag/v2014.07,https://api.github.com/repos/snabbco/snabb/zipball/v2014.07,v2014.07,False,False
+351402,2014-06-02T07:09:46Z,2014-06-02T07:34:48Z,"Snabb Switch 2014.06 ""Cherry""","Snabb Switch release for June 2014.
+
+New features:
+- #161 Intel10G: Added support for Jumbo frames and scatter-gather I/O.
+- #172 Added ""Fuzz Tester"" app for testing apps that perform I/O to a network.
+- #177 Intel10G: Add hardware rate policing support.
+- #178 Benchmark for performance of basic app network operations.
+- #180 OpenStack Neutron agents for Snabb Switch to execute OpenStack network definitions.
+- #185 NFV performance benchmarking environment.
+
+Big changes:
+- #167 #176 Intel10G: VMDq fixes to support switching traffic between local VMs.
+- #173 Virtio-net performance optimizations.
+- #174 Virtio-net add support for non-zero-copy code path.
+
+Small changes:
+- #163 Fixed hard-coded PCI device paths in test cases.
+- #165 Packet Filter: Disable JIT. This is a workaround for a bug that is not found yet.
+- #166 Upgrade to the latest LuaJIT.
+- #175 Fix for ""-jp="" profiler argument parsing.
+- #181 Collection of minor bug fixes.
+",https://api.github.com/users/lukego,13791,lukego,https://api.github.com/repos/snabbco/snabb/releases/351402/assets,https://api.github.com/repos/snabbco/snabb/releases/351402,master,https://api.github.com/repos/snabbco/snabb/tarball/v2014.06,https://github.com/snabbco/snabb/releases/tag/v2014.06,https://api.github.com/repos/snabbco/snabb/zipball/v2014.06,v2014.06,False,False
+297384,2014-04-30T23:01:29Z,2014-05-01T09:42:08Z,"Snabb Switch 2014.05 ""Banana""","Snabb Switch release for May 2014.
+
+New features:
+1. 8d4b6bd48670dc55cbd0498de18a120c5b489587 Added Keyed IPv6 Tunnel (L2-in-L3) support.
+2. 6dd9a29efb63aa677748a0766846001cbe229e58 Added VPN (GRE-over-IPv6) support including library for packet manipulation.
+3. 1e98af1d318a39a62c8b62c230a1b9769b86c899 Added CSV app for dumping app/link information to CSV files.
+
+Big changes:
+1. c244ac4e9cecb3de6848961c394fb67aec318996 Extensively fixed and enhanced Virtio/vhost_user I/O.
+2. 7f66da7b31385eb3f9a509fa38146c0a426597b0 Enhanced Intel 10G (82599) driver including multiqueue/VMDq support.
+3. 04473e253da772ba9971a473e168aea78b49f4e8 Added Travis-CI continuous integration support with Github integration.
+4. 5443082da32d722688f9178ddf4577c9b6c8768c Created the App API v0.1.
+
+Small changes:
+1. 0e4e7a6e916d1dc1069edc1a2141bf2046ae7197 Renamed executable from `snabbswitch` to simply `snabb`.
+2. de02db6c2403369596feacb3fd7211b2636a10b5 Enhanced stack traces in error message (-P argument).
+3. c72460c47c388bfe915cc7236bfa46cbf13d8a08 Profiler ""zone"" support to report each app separately (-jp=z argument).
+4. c2d9bdd `#!/usr/bin/env snabb` script support.
+5. 66c16e9 Better error message when git submodules are missing.
+6. a3059f2 Better error message when started as non-root user.
+7. cbed6e5 Enable LuaJIT `perf` and `gdb` integration.
+
+See also the [Full Change List](https://github.com/SnabbCo/snabbswitch/compare/v2014.04...v2014.05).
+",https://api.github.com/users/lukego,13791,lukego,https://api.github.com/repos/snabbco/snabb/releases/297384/assets,https://api.github.com/repos/snabbco/snabb/releases/297384,master,https://api.github.com/repos/snabbco/snabb/tarball/v2014.05,https://github.com/snabbco/snabb/releases/tag/v2014.05,https://api.github.com/repos/snabbco/snabb/zipball/v2014.05,v2014.05,False,False
+251234,2014-04-01T15:12:33Z,2014-04-01T15:19:35Z,"Snabb Switch 2014.04 ""Apricot""","Snabb Switch release for April 2014.
+",https://api.github.com/users/lukego,13791,lukego,https://api.github.com/repos/snabbco/snabb/releases/251234/assets,https://api.github.com/repos/snabbco/snabb/releases/251234,master,https://api.github.com/repos/snabbco/snabb/tarball/v2014.04,https://github.com/snabbco/snabb/releases/tag/v2014.04,https://api.github.com/repos/snabbco/snabb/zipball/v2014.04,v2014.04,False,False

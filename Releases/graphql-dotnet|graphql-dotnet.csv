@@ -1,0 +1,692 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7862527,2017-09-23T00:02:34Z,2017-09-23T00:13:00Z,Version 2.0.0-alpha-797,"This release fixes a number of issues in the 2.0 milestone:
+
+* Make metrics more thread safe #390
+* Stop treating Date/Decimal scalars as built-in types in SchemaPrinter #378
+* Remove input/output interfaces for now #335
+* First take on adding path to errors #415",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/7862527/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/7862527,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v2.0.0-alpha-797,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v2.0.0-alpha-797,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v2.0.0-alpha-797,v2.0.0-alpha-797,False,True
+7858603,2017-09-22T15:33:43Z,2017-09-22T17:50:21Z,Version 2.0.0-alpha-793,This release includes fixes for parsing data for cultures other than `en-US`. #434 @pekkah ,https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/7858603/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/7858603,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v2.0.0-alpha-793,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v2.0.0-alpha-793,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v2.0.0-alpha-793,v2.0.0-alpha-793,False,True
+7776928,2017-09-16T00:50:58Z,2017-09-16T00:54:36Z,Version 2.0.0-alpha-783,"More detailed release notes and documentation updates in the works.
+
+A few highlights:
+
+* Some methods have been marked `obsolete` and will be removed in a future version
+* Parser support for `null` keyword
+* Subscription Executor
+* Ability to build schemas using GraphQL Schema syntax
+
+### Hello World
+
+```csharp
+var schema = Schema.For(@""
+  type Query {
+    hello: String
+  }
+"");
+
+var root = new { Hello = ""Hello World!"" };
+var result = schema.Execute(_ =>
+{
+  _.Query = ""{ hello }"";
+  _.Root = root;
+});
+
+Console.WriteLine(result);
+```
+
+### Handler/Endpoints
+
+```csharp
+public class Droid
+{
+  public string Id { get; set; }
+  public string Name { get; set; }
+}
+
+public class Query
+{
+  [GraphQLMetadata(""hero"")]
+  public Droid GetHero()
+  {
+    return new Droid { Id = ""123"", Name = ""R2-D2"" };
+  }
+}
+
+var schema = Schema.For(@""
+  type Droid {
+    id: String
+    name: String
+  }
+
+  type Query {
+    hero: Droid
+  }
+"", _ => {
+    _.Types.Include<Query>();
+});
+
+var result = schema.Execute(_ =>
+{
+  _.Query = ""{ hero { id name } }"";
+});
+```
+
+### Parameters
+
+```csharp
+public class Droid
+{
+  public string Id { get; set; }
+  public string Name { get; set; }
+}
+
+public class Query
+{
+  private List<Droid> _droids = new List<Droid>
+  {
+    new Droid { Id = ""123"", Name = ""R2-D2"" }
+  };
+
+  [GraphQLMetadata(""hero"")]
+  public Droid GetHero(string id)
+  {
+    return _droids.FirstOrDefault(x => x.Id == id);
+  }
+}
+
+var schema = Schema.For(@""
+  type Droid {
+    id: String
+    name: String
+  }
+
+  type Query {
+    hero(id: String): Droid
+  }
+"", _ => {
+    _.Types.Include<Query>();
+});
+
+string id = ""123"";
+var result = schema.Execute(_ =>
+{
+  _.Query = $""{{ hero(id: \""{id}\"") {{ id name }} }}"";
+});
+```",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/7776928/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/7776928,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v2.0.0-alpha-783,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v2.0.0-alpha-783,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v2.0.0-alpha-783,v2.0.0-alpha-783,False,True
+7645876,2017-09-05T23:46:18Z,2017-09-05T23:54:06Z,Version 0.17.3.768,* Added support for `ExposeExceptions`.  This will expose the stacktrace of exceptions in errors. @mahald   #392 ,https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/7645876/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/7645876,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.17.3,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.17.3,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.17.3,v0.17.3,False,False
+7258854,2017-08-02T15:52:48Z,2017-08-02T16:01:59Z,Version 0.17.2.752,"* Add `DelegateFieldModelBinderResolver` and associated `FieldDelegate<TGraphType>` #380 via @Giorgi 
+* Add overload to `ResolveFieldContext.GetArgument` which takes a `Type` #380 via @Giorgi 
+* Add `ToInputs(this JObject obj)` via @joemcbride",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/7258854/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/7258854,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.17.2,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.17.2,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.17.2,v0.17.2,False,False
+7023201,2017-07-13T04:35:55Z,2017-07-13T04:42:03Z,Version 0.17.1.727,* Fixes a bug introduced in 0.17.0 where error locations were not being properly serialized #371  via @bittercoder,https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/7023201/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/7023201,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.17.1,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.17.1,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.17.1,v0.17.1,False,False
+6987532,2017-07-10T16:25:32Z,2017-07-10T16:29:49Z,Version 0.17.0.711,"# Breaking Changes
+* Print ""data"" in result even if there are errors #366 via @drobertson123
+
+# Bug Fixes
+* Print DefaultValue in SchemaPrinter via @tlil
+* Ensure not to double-register interface instances via @tlil ",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/6987532/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/6987532,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.17.0,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.17.0,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.17.0,v0.17.0,False,False
+6970020,2017-07-07T18:54:01Z,2017-07-07T20:14:44Z,Version 0.16.1.705,* Add access to `Errors` collection in field middleware/resolvers https://github.com/graphql-dotnet/graphql-dotnet/pull/342 - @Cooke,https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/6970020/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/6970020,e982fd4643a835c40a03d8bf66aa2d365375f310,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.16.1.705,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.16.1.705,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.16.1.705,v0.16.1.705,False,False
+6953573,2017-07-06T15:36:36Z,2017-07-06T15:56:13Z,Version 0.16.0.703,"* Compile and reuse expression to increase performance #347 via @dlukez 
+* Add `List<>` types support in `Field(x => x.MyList)` syntax #359 via @rmc00 ",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/6953573/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/6953573,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.16.0.703,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.16.0.703,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.16.0.703,v0.16.0.703,False,False
+6229718,2017-04-29T02:52:09Z,2017-04-29T02:58:57Z,Version 0.16.0.697 Alpha,This is a pre-release version after updating to VS2017 tooling.  Many thanks to @OlegZee for the initial conversion.,https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/6229718/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/6229718,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.16.0.697,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.16.0.697,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.16.0.697,v0.16.0.697,False,True
+5622606,2017-03-02T17:40:44Z,2017-03-02T18:08:00Z,Version 0.15.1.678,"This release fixes a regression with Dates when used in inputs.  #289 - thanks to @Ingr for reporting and @mamasselin @cstlaurent for fixing!
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/5622606/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/5622606,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.15.1.678,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.15.1.678,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.15.1.678,v0.15.1.678,False,False
+5569465,2017-02-25T00:40:32Z,2017-02-25T01:13:10Z,Version 0.15.0.671,"- Add the ability to change how field names are converted (if at all).  By default it should convert them as it is currently, with camelCase field names using `CamelCaseFieldNameConverter`.  This can be changed by setting the `FieldNameConverter` property in the execution configuration.
+- BREAKING CHANGES:
+  - The `DocumentWriter` no longer uses `CamelCasePropertyNamesContractResolver`.
+  - Because of the previous use of `CamelCasePropertyNamesContractResolver`, Aliases would get converted to camelCase.  Aliases now do not get converted and will be returned exactly as they are requested.
+- Note: You can write your own `IFieldNameConverter` - keep in mind that some field names, such as those used by introspection, need to remain camelCase for tools like GraphiQL to work.
+
+``` csharp
+var result = await Executer.ExecuteAsync(_ =>
+{
+    _.Schema = Schema;
+    _.Query = query;
+    _.FieldNameConverter = new PascalCaseFieldNameConverter();
+});
+```
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/5569465/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/5569465,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.15.0.671,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.15.0.671,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.15.0.671,v0.15.0.671,False,False
+5568334,2017-02-24T22:10:33Z,2017-02-24T22:28:47Z,Version 0.14.7.667,"- Fix #252 - reuse of schema could cause stackoverflow with field middleware - @mxhammons 
+- Fix #271 - allow passing of DateTime value as a string - @mamasselin 
+- Make a few extension methods such as `GetValue` and `ToDictionary` public - @joemcbride
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/5568334/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/5568334,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.14.7.667,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.14.7.667,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.14.7.667,v0.14.7.667,False,False
+5269446,2017-01-26T00:11:14Z,2017-01-26T00:34:04Z,Version 0.14.6.657,"- Add `DecimalValue` to the AST and `DecimalGraphType` - @ManuelDeLeon 
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/5269446/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/5269446,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.14.6.657,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.14.6.657,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.14.6.657,v0.14.6.657,False,False
+5200594,2017-01-18T19:41:08Z,2017-01-19T00:31:18Z,Version 0.14.5.654,"- Update error messages for validating input variables - @jquense
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/5200594/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/5200594,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.14.5.654,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.14.5.654,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.14.5.654,v0.14.5.654,False,False
+5157194,2017-01-13T22:16:31Z,2017-01-13T22:26:56Z,Version 0.14.4.649,"- Fix issue where a nullable enum type would return a default value instead of null
+- Fix issue where non-null and list types would attempt to be registered as root types with the schema when using instance-based type creation
+- Added the ability to create unions using instance-based type creation
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/5157194/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/5157194,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.14.4.649,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.14.4.649,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.14.4.649,v0.14.4.649,False,False
+5002796,2016-12-23T20:14:58Z,2016-12-23T20:21:11Z,Version 0.14.1.638,"- Fixes an issue with array inference #243 
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/5002796/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/5002796,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.14.1.638,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.14.1.638,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.14.1.638,v0.14.1.638,False,False
+4800760,2016-11-30T23:36:01Z,2016-11-30T23:55:13Z,Version 0.14.0.633,"Major release with lots of features and updates!  Thanks to @tlil87 @jquense @dNetGuru @dlukez for their contributions.
+
+### Additions
+- Documentation!  There is now some basic documentation [available here](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/docs)
+- The preferred way to configure the execution engine has changed.  Please use the configuration action or the `ExecutionParameters` overloads for `ExecuteAsync`.  The old `ExecuteAsync` with a ton of optional parameters will be deprecated in a future release.
+
+``` csharp
+var schema = new Schema { Query = new StarWarsQuery() };
+
+var result = await new DocumentExecuter().ExecuteAsync( _ =>
+{
+  _.Schema = schema;
+  _.Query = @""
+      query {
+        hero {
+          id
+          name
+        }
+      }
+    "";
+}).ConfigureAwait(false);
+
+var json = new DocumentWriter(indent: true).Write(result);
+```
+- Add query complexity analysis
+- The core engine now supports both Type based and Instance based registration
+- Add Metadata dictionaries to fields and objects
+- Add field middleware
+- Basic Metrics are now being tracked and field level metrics can be enabled with the new `InstrumentFieldsMiddleware` field middleware
+
+``` csharp
+var result = await _executer.ExecuteAsync(_ =>
+{
+    _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
+}).ConfigureAwait(false);
+```
+- Make `GraphTypesLookup` more thread safe
+- Add `EnumerationGraphType<TEnum>`
+
+### Fixes
+- Fix bug when trying to register an interface type on `ObjectGraphType<T>`
+- Fix issue where an already faulted task would attempt to be awaited
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/4800760/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/4800760,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.14.0.633,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.14.0.633,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.14.0.633,v0.14.0.633,False,False
+4669788,2016-11-16T00:08:41Z,2016-11-16T00:23:08Z,Version 0.13.1.601,"- Add `UserContext` to `DocumentExecutor`
+- Add `Document` to `ResolveFieldContext`
+- Fix bug with `DateTime` input values
+- Fix bug when trying to register an Interface
+- Add support for `float` and `decimal` for property expressions
+
+```
+Field(x => x.AFloat);
+Field(x => x.ADecimal);
+```
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/4669788/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/4669788,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.13.1.601,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.13.1.601,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.13.1.601,v0.13.1.601,False,False
+4395047,2016-10-14T21:37:11Z,2016-10-14T21:59:38Z,Version 0.13.0.562,"This release upgrades GraphQL-Parser to 2.0 and downgrades the project to Net Standard 1.1.
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/4395047/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/4395047,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.13.0.562,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.13.0.562,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.13.0.562,v0.13.0.562,False,False
+4336326,2016-10-07T18:57:19Z,2016-10-07T19:04:25Z,Version 0.12.3.556,"Official 0.12 release!
+
+Many thanks to @jquense, @kamil-mrzyglod, @holm0563, @cdroulers, @randyridge 
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/4336326/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/4336326,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.12.3.556,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.12.3.556,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.12.3.556,v0.12.3.556,False,False
+4335506,2016-10-07T17:20:13Z,2016-10-07T17:28:09Z,Version 0.12.2.550,"- Update `Connection` on `ObjectGraphType` to only require `IGraphType`.
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/4335506/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/4335506,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.12.2.550,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.12.2.550,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.12.2.550,v0.12.2.550,False,True
+4325926,2016-10-06T18:22:28Z,2016-10-06T18:25:48Z,Version 0.12.1.545,"- Relax the type restriction on Relay types.  #188 
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/4325926/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/4325926,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.12.1.545,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.12.1.545,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.12.1.545,v0.12.1.545,False,True
+4156225,2016-09-16T18:31:44Z,2016-09-16T21:07:53Z,Version 0.12.0.538,"This version adds 4.5 and 4.5.2 to the list of supported runtimes
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/4156225/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/4156225,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.12.0.538,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.12.0.538,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.12.0.538,v0.12.0.538,False,True
+4155252,2016-09-16T18:31:44Z,2016-09-16T18:59:58Z,Version 0.12.0.536,,https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/4155252/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/4155252,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.12.0.536,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.12.0.536,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.12.0.536,v0.12.0.536,False,True
+3995101,2016-08-29T05:11:19Z,2016-08-29T05:19:32Z,Version 0.12.0.511,"Initial support for .NET Core
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3995101/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3995101,dotnet-core,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.12.0.511,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.12.0.511,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.12.0.511,v0.12.0.511,False,True
+3990347,2016-08-27T18:09:42Z,2016-08-27T18:12:41Z,Version 0.11.0.493,"- A few minor updates to introspection
+- The language AST types have been moved from `GraphQL.Language` to `GraphQL.Language.AST`.
+- This release adds a new lexer and parser for the GraphQL language.  The AntlrDocumentBuilder is now deprecated in favor of the GraphQLDocumentBuilder.  This new lexer and parser are written in C# and have no other dependencies.  It is also slightly faster than the AntlrDocumentBuilder.  The AntlrDocumentBuilder will be removed in the next major release.
+- The new parser can be found at [graphql-dotnet/parser](http://github.com/graphql-dotnet/parser).
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3990347/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3990347,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.11.0.493,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.11.0.493,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.11.0.493,v0.11.0.493,False,False
+3988746,2016-08-27T04:18:33Z,2016-08-27T04:22:03Z,Version 0.10.3.478,"- Add provided non-null arguments validation rule
+- Add possible fragment spreads validation rule
+- Add fields on correct type validation rule
+- Add fragments on composite types validation rule
+- Add no fragment cycles validation rule
+- Update StringGraphType to not trim a single quote value
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3988746/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3988746,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.10.3.478,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.10.3.478,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.10.3.478,v0.10.3.478,False,False
+3932724,2016-08-20T16:58:31Z,2016-08-20T17:02:00Z,Version 0.10.2.436,"- Add known argument names validation rule
+- Add known directives validation rule
+- Add known fragment names validation rule
+- Add unique variable names validation rule
+- Add unique fragment names validation rule
+- Add unique argument names validation rule
+- Add no unused variables validation rule
+- Add no unused fragments validation rule
+- Add support for IEnumerable<T> in retrieving query arguments
+- Add support for inline fragments without a type definition
+- Update internal async code
+- Fix bug where variable validation would fail for non-null and list variables
+- Fix bug in DateGraphType where culture-specific dates would fail to parse
+- Fix bug in DateGraphType where UTC information would not be retained when used as a query argument
+- Fix bug in Antlr parser where double numbers could lose precision
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3932724/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3932724,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.10.2.436,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.10.2.436,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.10.2.436,v0.10.2.436,False,False
+3776968,2016-07-30T19:36:28Z,2016-07-30T19:42:14Z,Version 0.10.1.349,"- Fix validation check for non-null input types
+- Add Unique input field names validation rule
+- Add Variables are input types validation rule
+- Add Known type names validation rule
+- Add Default values of correct type validation rule
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3776968/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3776968,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.10.1.349,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.10.1.349,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.10.1.349,v0.10.1.349,False,False
+3715309,2016-07-22T02:39:42Z,2016-07-22T02:45:16Z,Version 0.10.0.325,"- Nuget package structure has changed - the DLLs now reside in a net45 folder
+- Created new build process to help expedite deployment of new versions
+- Fixed a bug where type names with beginning or ending spaces would not get resolved
+
+You can download a nuget for new builds via AppVeyor Artifacts tab: https://ci.appveyor.com/project/graphql-dotnet-ci/graphql-dotnet/history
+
+Or the AppVeyor nuget feed: https://ci.appveyor.com/nuget/graphql-dotnet
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3715309/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3715309,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.10.0.325,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.10.0.325,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.10.0.325,v0.10.0.325,False,False
+3715266,2016-07-22T02:22:57Z,2016-07-22T02:29:31Z,Version 0.10.0.323,"- Use v0.10.0.325
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3715266/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3715266,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.10.0.323,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.10.0.323,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.10.0.323,v0.10.0.323,False,False
+3509304,2016-06-23T14:56:37Z,2016-06-23T14:58:53Z,Version 0.9.3,"- Add NoUndefinedVariables rule
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3509304/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3509304,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.9.3,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.9.3,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.9.3,v0.9.3,False,False
+3473708,2016-06-18T15:01:14Z,2016-06-18T15:02:35Z,Version 0.9.2,"- Add VariablesInAllowedPosition validation rule
+- Update GetArgument<T> in FieldBuilder to delegate to Argument<T> on ResolveFieldContext
+- FloatGraphType will now try to convert int and long values
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3473708/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3473708,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.9.2,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.9.2,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.9.2,v0.9.2,False,False
+3432938,2016-06-13T15:27:22Z,2016-06-13T15:38:32Z,Version 0.9.1,"- Fix issues when trying to cast between int/long in Argument
+- Fixed an issue where long values were not initialized properly in the GraphQLVisitor
+- Throw exception if argument doesn't exist
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3432938/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3432938,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.9.1,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.9.1,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.9.1,v0.9.1,False,False
+3414676,2016-06-10T03:41:02Z,2016-06-10T03:41:05Z,Version 0.9.0,"- Change how types are registered - only register the root type, not every permutation
+- When a ListGraphType or NonNullGraphType type is requested via FindType, that type is created on the fly.
+- Attempt to trim list/non-null type names when finding type by name
+- Provide public list of core rules
+- Fix a bug where Schema would not properly dispose
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3414676/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3414676,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.9.0,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.9.0,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.9.0,v0.9.0,False,False
+3414003,2016-06-10T00:13:31Z,2016-06-10T00:12:55Z,Version 0.8.2,"- Fixes a bug with EnumerationGraphType and input variables
+- Fixes a bug where float values would not be created
+- Add ArgumentsOfCorrectType validation rule
+- Add AstPrinter
+- Add overload to DocumentExecutor where validation rules can be
+  provided
+- Refactor ToObject to support enums, guids, nullable lists, and
+  nested lists
+- Add overload to QueryArguments which takes params
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3414003/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3414003,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.8.2,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.8.2,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.8.2,v0.8.2,False,False
+3400397,2016-06-08T14:32:50Z,2016-06-08T14:33:54Z,Version 0.8.1,"Fixes an issue with `IdGraphType`.
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3400397/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3400397,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.8.1,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.8.1,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.8.1,v0.8.1,False,False
+3393392,2016-06-07T19:04:56Z,2016-06-07T19:07:42Z,Version 0.8.0,"## Major updates with breaking changes!
+
+See the [v0.8.0 upgrade guide](http://github.com/graphql-dotnet/graphql-dotnet/blob/master/upgrade-guides/v0.8.0.md) for more information.
+- The core language has been revamed to provide additional metadata such as line numbers and AST types.
+- Coerce on Scalar types has been replaced by parseValue, parseLiteral, and serialize.
+- Several fixes around the use of enums.
+- The following validation rules have been added:
+  - Unique operation names
+  - Lone anonymous operations
+  - Scalar leafs
+
+These language updates should allow the Validation feature to be completed.
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3393392/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3393392,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.8.0,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.8.0,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.8.0,v0.8.0,False,False
+3372293,2016-06-04T00:17:51Z,2016-06-04T00:18:01Z,Version 0.7.1,"- Add RegisterType and AdditionalTypes to ISchema
+- Change how ExecutionResult is serialized, which should now conform to the spec with a lowercase ""message""
+- Add ObjectGraphType.Interface(Type)
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3372293/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3372293,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.7.1,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.7.1,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.7.1,v0.7.1,False,False
+3372154,2016-06-03T23:08:13Z,2016-06-03T23:42:44Z,Version 0.8.0-alpha,"### Major update with breaking changes!
+- The core language has been revamed to provide additional metadata such as line numbers and AST types.
+- Coerce on Scalar types has been replaced by parseValue, parseLiteral, and serialize.
+- Several fixes around the use of enums.
+
+These language updates should allow the Validation feature to be completed.
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3372154/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3372154,language,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.8.0-alpha,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.8.0-alpha,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.8.0-alpha,v0.8.0-alpha,False,True
+3365087,2016-06-03T06:37:10Z,2016-06-03T06:45:41Z,Version 0.7.0,"- Add RegisterType and AdditionalTypes to ISchema
+- Change how ExecutionResult is serialized, which should now conform to the spec with a lowercase ""message""
+- Add ObjectGraphType.Interface(Type)
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3365087/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3365087,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.7.0,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.7.0,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.7.0,v0.7.0,False,False
+3207220,2016-05-12T00:15:16Z,2016-05-12T00:16:55Z,Version 0.6.6,"- Updated `FloatGraphType` to use `double` instead of `float` to meet the GraphQL spec.
+- Added a way to register additional types to the schema that may not be explicitly exposed in the graph.
+
+```
+public class MySchema : Schema
+{
+  public MySchema()
+  {
+    RegisterType<MyOtherType>();
+    RegisterTypes(typeof(MyOtherType), typeof(AnotherType));
+  }
+}
+```
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3207220/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3207220,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.6.6,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.6.6,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.6.6,v0.6.6,False,False
+3082001,2016-04-22T23:39:12Z,2016-04-22T23:41:46Z,Version 0.6.5,"- Fix a regression with `ofType` in Introspection.
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3082001/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3082001,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.6.5,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.6.5,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.6.5,v0.6.5,False,False
+3052559,2016-04-19T15:29:10Z,2016-04-19T15:30:33Z,Version 0.6.4,"- Fix an issue where `ofType` on `__Type` in Introspection was not behaving properly.
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3052559/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/3052559,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.6.4,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.6.4,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.6.4,v0.6.4,False,False
+2967043,2016-04-06T20:18:42Z,2016-04-06T20:22:18Z,Version 0.6.3,"Fix a threading issue with GraphTypesLookup.
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/2967043/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/2967043,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.6.3,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.6.3,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.6.3,v0.6.3,False,False
+2870086,2016-03-23T06:58:16Z,2016-03-23T07:15:47Z,Version 0.6.2,"Adds `SchemaPrinter` which prints the shorthand schema syntax for a given schema.
+
+```
+var printer = new SchemaPrinter(new StarWarsSchema(...));
+Console.WriteLine(printer.Print());
+
+enum Episode {
+  NEWHOPE
+  EMPIRE
+  JEDI
+}
+
+interface Character {
+  id: String!
+  name: String
+  friends: [Character]
+  appearsIn: [Episode]
+}
+
+type Droid implements Character {
+  id: String!
+  name: String
+  friends: [Character]
+  appearsIn: [Episode]
+  primaryFunction: String
+}
+
+type Human implements Character {
+  id: String!
+  name: String
+  friends: [Character]
+  appearsIn: [Episode]
+  homePlanet: String
+}
+
+type Query {
+  hero: Character
+  human(id: String!): Human
+  droid(id: String!): Droid
+}
+```
+
+You can also print the shorthand for introspection.
+
+```
+var schema = new Schema
+{
+  Query = new ObjectGraphType
+  {
+    Name = ""Root""
+  }
+};
+
+var printer = new SchemaPrinter(schema);
+Console.WriteLine(printer.PrintIntrospectionSchema());
+
+enum __TypeKind {
+  SCALAR
+  OBJECT
+  INTERFACE
+  UNION
+  ENUM
+  INPUT_OBJECT
+  LIST
+  NON_NULL
+}
+
+type __Directive {
+  name: String!
+  description: String
+  args: [__InputValue!]!
+  onOperation: Boolean!
+  onFragment: Boolean!
+  onField: Boolean!
+}
+
+type __EnumValue {
+  name: String!
+  description: String
+  isDeprecated: String!
+  deprecationReason: String
+}
+
+type __Field {
+  name: String!
+  description: String
+  args: [__InputValue!]!
+  type: __Type!
+  isDeprecated: Boolean!
+  deprecationReason: String
+}
+
+type __InputValue {
+  name: String!
+  description: String
+  type: __Type!
+  defaultValue: String
+}
+
+type __Schema {
+  types: [__Type!]!
+  queryType: __Type!
+  mutationType: __Type
+  directives: [__Directive!]!
+}
+
+type __Type {
+  kind: __TypeKind!
+  name: String
+  description: String
+  fields(includeDeprecated: Boolean = false): [__Field!]
+  interfaces: [__Type!]
+  possibleTypes: [__Type!]
+  enumValues(includeDeprecated: Boolean = false): [__EnumValue!]
+  inputFields: [__InputValue!]
+  ofType: __Type
+}
+```
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/2870086/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/2870086,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.6.2,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.6.2,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.6.2,v0.6.2,False,False
+2865190,2016-03-22T17:04:56Z,2016-03-22T17:07:26Z,Version 0.6.1,"- Internalizes Newtonsoft types on DocumentWriter
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/2865190/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/2865190,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.6.1,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.6.1,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.6.1,v0.6.1,False,False
+2861068,2016-03-22T08:33:19Z,2016-03-22T08:34:59Z,Version 0.6.0,"#### Changes
+- `GetArgument()` wasn't using the `FieldDefinition`'s default value for an argument correctly. Added method signature for using the `FieldDefinition` default, and one for overriding the value
+- `ConnectionType<T>`, `EdgeType<T>` and `PageInfoType` implementations have been separated from their backing data objects. Improved and more consistent Relay-specific helper functions for these will be transitioned over to graphql-dotnet/conventions
+- Moved Relay-specific type structures to the `GraphQL.Types.Relay` namespace
+- Removed `new()` constraint on connections and edges
+- Exposing `ResolveFieldContext` in `FieldBuilder` and `ConnectionBuilder` (and consequently also the `CancellationToken`, etc.)
+- Added new scalar type `DecimalGraphType`
+- Added support for deprecation of `EnumerationGraphType` members
+- Added a range of unit tests for the above
+- Implemented `IdGraphType.Coerce()`
+- `IntGraphType.Coerce()` can now also deal with `long` integers
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/2861068/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/2861068,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.6.0,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.6.0,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.6.0,v0.6.0,False,False
+2748448,2016-03-04T21:39:23Z,2016-03-04T21:40:56Z,Version 0.5.1,"- Add `IsTypeOf`
+- `GraphQLAbstractType` now has a `PossibleTypes` property which is a list of graph types of all possible types that abstract type could be.
+- The `PossibleTypes` collection is populated on bootstrap of the Schema.
+
+`IsTypeOf` allows you to replace usages of `ResolveType`.  It allows you to place the type check within the specific object graph type.  This makes it so each interface or union type does not need to have a specific check for each of their possible types.
+
+``` csharp
+// old way with ResolveType
+public class NamedType : InterfaceGraphType
+{
+    public NamedType(DogType dogType, CatType catType, PersonType personType)
+    {
+        Name = ""Named"";
+
+        Field<StringGraphType>(""name"");
+
+        ResolveType = obj =>
+        {
+           if (obj is Dog)
+           {
+               return dogType;
+           }
+
+           if (obj is Cat)
+           {
+               return catType;
+           }
+
+           if (obj is Person)
+           {
+               return personType;
+           }
+
+           return null;
+        };
+    }
+}
+
+public class DogType : ObjectGraphType
+{
+    public DogType()
+    {
+        Name = ""Dog"";
+
+        Field<StringGraphType>(""name"");
+        Field<BooleanGraphType>(""barks"");
+
+        Interface<NamedType>();
+    }
+}
+
+public class CatType : ObjectGraphType
+{
+    public CatType()
+    {
+        Name = ""Cat"";
+
+        Field<StringGraphType>(""name"");
+        Field<BooleanGraphType>(""meows"");
+
+        Interface<NamedType>();
+    }
+}
+
+public class PetType : UnionGraphType
+{
+    public PetType(DogType dogType, CatType catType)
+    {
+        Name = ""Pet"";
+
+        Type<DogType>();
+        Type<CatType>();
+
+        ResolveType = obj =>
+        {
+           if (obj is Dog)
+           {
+               return dogType;
+           }
+
+           if (obj is Cat)
+           {
+               return catType;
+           }
+
+           return null;
+        };
+    }
+}
+
+public class PersonType : ObjectGraphType
+{
+    public PersonType()
+    {
+        Name = ""Person"";
+
+        Field<StringGraphType>(""name"");
+        Field<ListGraphType<PetType>>(""pets"");
+        Field<ListGraphType<NamedType>>(""friends"");
+
+        Interface<NamedType>();
+    }
+}
+
+// new way with IsTypeOf
+public class NamedType : InterfaceGraphType
+{
+    public NamedType()
+    {
+        Name = ""Named"";
+
+        Field<StringGraphType>(""name"");
+    }
+}
+
+public class DogType : ObjectGraphType
+{
+    public DogType()
+    {
+        Name = ""Dog"";
+
+        Field<StringGraphType>(""name"");
+        Field<BooleanGraphType>(""barks"");
+
+        Interface<NamedType>();
+
+        IsTypeOf = value => value is Dog;
+    }
+}
+
+public class CatType : ObjectGraphType
+{
+    public CatType()
+    {
+        Name = ""Cat"";
+
+        Field<StringGraphType>(""name"");
+        Field<BooleanGraphType>(""meows"");
+
+        Interface<NamedType>();
+
+        IsTypeOf = value => value is Cat;
+    }
+}
+
+public class PetType : UnionGraphType
+{
+    public PetType()
+    {
+        Name = ""Pet"";
+
+        Type<DogType>();
+        Type<CatType>();
+    }
+}
+
+public class PersonType : ObjectGraphType
+{
+    public PersonType()
+    {
+        Name = ""Person"";
+
+        Field<StringGraphType>(""name"");
+        Field<ListGraphType<PetType>>(""pets"");
+        Field<ListGraphType<NamedType>>(""friends"");
+
+        Interface<NamedType>();
+
+        IsTypeOf = value => value is Person;
+    }
+}
+```
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/2748448/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/2748448,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.5.1,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.5.1,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.5.1,v0.5.1,False,False
+2728576,2016-03-02T16:14:34Z,2016-03-02T16:18:05Z,Version 0.5.0,"- Add Union support
+- Add GraphQLAbstractType which both interface and union types inherit from
+- CHANGE: only return field if source object contains that field
+- CHANGE: Return null instead of an empty list when introspecting (to match the spec) - fields, interfaces, enums, input values
+- CHANGE: GraphType now implements Equals, based on the Name of the type
+- Fix: Ensure fragments are only visited once during an execution path
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/2728576/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/2728576,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.5.0,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.5.0,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.5.0,v0.5.0,False,False
+2324956,2015-12-22T01:02:38Z,2015-12-22T01:03:30Z,Version 0.4.1,"- Add additional fields to FieldResolveContext
+- Fix bug with input objects and variables
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/2324956/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/2324956,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.4.1,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.4.1,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.4.1,v0.4.1,False,False
+2276312,2015-12-12T00:35:07Z,2015-12-12T00:45:13Z,Version 0.4.0,"- Lots of bug fixes.
+- Async
+- Mutations
+- Input objects
+- Skeleton of Relay connections
+- DateGraphType
+- ISchema interface
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/2276312/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/2276312,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.4.0,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.4.0,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.4.0,v0.4.0,False,False
+1726486,2015-08-26T16:38:36Z,2015-08-26T16:42:24Z,Version 0.3.0,"- BREAKING CHANGE: The way field registration works has changed. Only `Field<T>` registration is now supported.  This was to support introspection.
+- Added introspection support.
+- Antrl/JSON.NET types are now marked as internal.
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/1726486/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/1726486,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.3.0,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.3.0,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.3.0,v0.3.0,False,False
+1547180,2015-07-16T16:49:38Z,2015-07-16T16:53:34Z,Version 0.2.0,"- Added fragment execution
+- Added @include/@skip directives
+- Added the ability to specifiy a root object
+- Added interfaces IDocumentExecuter, IDocumentBuilder, IDocumentWriter, IDocumentValidation
+- Changed DocumentWriter to default to unformatted JSON
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/1547180/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/1547180,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.2.0,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.2.0,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.2.0,v0.2.0,False,False
+1527122,2015-07-12T21:20:34Z,2015-07-12T22:22:48Z,Version 0.1.1,"- Simplified type registration
+- Updated to latest directives format
+- Added using query arguments
+- Added using query variables
+- Added objects as inputs and fixed some issues with inputs as variables
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/1527122/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/1527122,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.1.1,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.1.1,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.1.1,v0.1.1,False,False
+1513737,2015-07-09T04:20:11Z,2015-07-09T04:23:22Z,Version 0.1.0,"Initial release.
+",https://api.github.com/users/joemcbride,255007,joemcbride,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/1513737/assets,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/releases/1513737,master,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/tarball/v0.1.0,https://github.com/graphql-dotnet/graphql-dotnet/releases/tag/v0.1.0,https://api.github.com/repos/graphql-dotnet/graphql-dotnet/zipball/v0.1.0,v0.1.0,False,False

@@ -1,0 +1,646 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8205669,2017-10-21T08:41:28Z,2017-10-21T07:56:37Z,v2.10.0,"## Release Notes
+
+This is a source only release. Please contact your distribution maintainers for updates to precompiled binaries.
+
+* Removed VS2013 MSBuild files. Use CMake with the ""Visual Studio 12 2013"" generator.
+* Added VS2017 MSBuild files for convenience. It is highly recommended to use [vcpkg](https://github.com/Microsoft/vcpkg) or CMake instead to build the product library.
+* Added UWP versions of the Windows Store samples for VS2017.
+* Updated minimum required cmake version to 3.0.
+* Added CMake config-file support to installation. This should be consumed by doing:
+```cmake
+find_package(cpprestsdk REQUIRED)
+target_link_libraries(my_executable PRIVATE cpprestsdk::cpprest)
+```
+* Fixed several race conditions and memory leaks in the ASIO `http_client`.
+* Fixed process termination bug around certain exceptional cases in all `http_client`s.
+* Improved handling of `/Zcwchar_t-` on MSVC. That doesn't make it a good idea.
+* Fixed use-after-free in the Windows Desktop `http_client` exposed by VS2017.
+* Totally overhaul the CMake buildsystem for much better support of Windows and more shared code between platforms.
+* PR#550 adds all remaining official HTTP status codes to `http::status_codes`.
+* PR#563 wraps SSL errors on Windows Desktop in `http_exception`s, with more readable descriptions.
+* PR#562 and PR#307 fixes building with LibreSSL.
+* PR#551 adds convenience wrappers `json::value::has_T_field(T)` for inspecting object values.
+* PR#549 fixes a race condition in the ASIO client during header parsing.
+* PR#495 fixes a memory leak during proxy autodetection on Windows Desktop.
+* PR#496 and PR#500 expand proxy autodetection to also consider Internet Explorer settings on Windows Desktop.
+* PR#498 fixes error when handling responses of type NoContent, NotModified, or from 100 to 199.
+* PR#398 enables specifying the User Agent used in OAuth2 requests.
+* PR#494 improves the BingRequest sample's handling of proxies.
+* PR#516 enables certificate revocation checks on Windows Desktop.
+* PR#502 improves compatibility with glibc 2.26.
+* PR#507 adds `http_request::get_remote_address()` to expose the client's IP address for `http_listener`.
+* PR#521 enables use of empty passwords on Windows in `web::credentials`.
+* PR#526 and PR#285 improve compatibility with openssl 1.1.0.
+* PR#527 fixes a bug in the ASIO `http_client` where the proxy is passed the same credentials as the target host.
+* PR#504 makes `uri_builder::to_string()` and `uri_builder::to_uri()` `const`.
+* PR#446 adds handling for the host wildchar `+` to the ASIO `http_listener`.
+* PR#465 improves compatibility with clang on Linux.
+* PR#454 improves compatibility with icc 17.0.
+* PR#487 fixes static library builds of `test_runner` on non-Windows platforms.
+* PR#415 handles malformed URL requests to the ASIO `http_listener` instead of crashing.
+* PR#393 fixes a race condition in the websocketpp `websocket_client`.
+* PR#259 fixes several races in the ASIO `http_listener` which result in memory leaks or use after free of the connection objects.
+* PR#376 adds `http_client_config::set_nativesessionhandle_options()` which enables customization of the session handle on Windows Desktop.
+* PR#365 updates our convenience OpenSSL build scripts for Android to use openssl 1.0.2k.
+* PR#336 makes the ASIO `http_client` more consistent with the Windows clients by not appending the port when it is default. This improves compatibility with AWS S3.
+* PR#251 dramatically improves UTF8/16 conversions from 6s per 1MB to 3s per 1GB (2000x improvement).
+* PR#246 enables TLS 1.1 and 1.2 on Windows 7 and Windows 8.
+* PR#308 enables limited IPv6 support to `http_client` and `http_server`, depending on the underlying platform.
+* PR#309 fixes a bug in base64 encoding that previously read beyond the input array, causing segfaults/AVs.
+* PR#233 adds compression support (deflate and gzip) for Windows Desktop and ASIO `http_client`s based on Zlib.
+* PR#218 fixes a memory leak in the UWP `http_client` when processing headers.
+* PR#260 fixes inappropriate handling of certain connections errors in the ASIO `http_listener`.",https://api.github.com/users/ras0219-msft,12301622,ras0219-msft,https://api.github.com/repos/Microsoft/cpprestsdk/releases/8205669/assets,https://api.github.com/repos/Microsoft/cpprestsdk/releases/8205669,master,https://api.github.com/repos/Microsoft/cpprestsdk/tarball/v2.10.0,https://github.com/Microsoft/cpprestsdk/releases/tag/v2.10.0,https://api.github.com/repos/Microsoft/cpprestsdk/zipball/v2.10.0,v2.10.0,False,False
+2700080,2016-10-18T19:30:28Z,2016-10-20T23:03:08Z,v2.9.0,"### Release Notes
+
+**Linux**
+- Merged #70 & #65 which should fix building on CentOS/RedHat.
+- #143 Work around SSL compression methods memory leak in ASIO.
+- #82 Fixed ambiguous call to begin when using with boost library.
+- #117 Fix header reading on linux listener using HTTPS.
+- #97 Add support for basic authentication.
+- #206 remove warnings-errors for system-headers under linux; honour http_proxy env-variable.
+
+**OSX**
+- #114 Removed redundant std::move() that was causing errors on Xcode 7.3 gcc.
+- #140 Fix returning std::move causing build failure on osx.
+
+**Android**
+- #137 Fix android build script for linux, remove libiconv dependency.
+
+**Windows**
+- #150 Add static library for windows xp.
+- #115 Added projects which target v140_xp to resolve Issue#113.
+- #71 Add a project for compiling as a static lib.
+
+**WebSockets**
+- #102 Added websocket_client_config option for ssl verify mode.
+- #217 Fixed race condition in Casablanca WinRT Websocket client.
+
+**http_client**
+- #131 Update to include access control allow origin.
+- #156 add host based connection pool map on non windows http_clients.
+- #161 Header parsing assumes whitespace after colon.
+- #146 Fix ambiguous reference to ‘credentials’
+
+**Uri**
+- #149 Some perf improvements for uri related code.
+
+**Json**
+- #86 Fix obtaining raw string_t pointer from temporary.
+- #96 Fix typo hexidecimal/hexadecimal.
+- #116 Fixing latin1 to UTF-16 convertion.
+
+**pplx**
+- #47 Fixing .then to work with movable-only types.
+
+**Misc**
+- Switched license from Apache 2.0 to MIT
+- Streamlined development model by removing the ""development"" branch. Please make PRs against master form this point forward and use tags to retrieve a specific stable version.
+",https://api.github.com/users/alexkaratarakis,128712,alexkaratarakis,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2700080/assets,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2700080,development,https://api.github.com/repos/Microsoft/cpprestsdk/tarball/v2.9.0,https://github.com/Microsoft/cpprestsdk/releases/tag/v2.9.0,https://api.github.com/repos/Microsoft/cpprestsdk/zipball/v2.9.0,v2.9.0,False,False
+2693266,2016-02-26T03:45:24Z,2016-02-26T19:43:59Z,v2.8.0,"### Release Notes
+
+**oauth 1.0**
+- Merged #66 which adds proxy support for oauth1_config class.
+
+**oauth 2.0**
+- Merged #1 which adds proxy support for token_from_code and token_from_refresh methods.
+- Merged #38: Include cpprest/details/web_utilities.h to bring in the definition for web_proxy.
+
+**http_client**
+- Merged #39: Add TLS extension SNI for boost asio based http_client. Resolves #35.
+- Merged #40 which allows specifying a host header in http requests.
+- Merged #41 which adds HTTP and HTTPS client proxy support for non-Windows platforms.
+- Merged #55 which fixes a bug where http_client_asio took forever to cancel.
+
+**http_listener**
+- Merged #16: win32 http_listener response refactor.
+
+**iOS**
+- Merged #23 which fixes build errors on iOS. Resolves #12.
+
+**Windows**
+- Merged #26: Static lib compilation for UWP.
+
+**Websockets**
+-  Merged #30 which adds a CPPREST_EXCLUDE_WEBSOCKETS option to CMake to allow removing all OpenSSL and Boost dependencies.
+-  Merged #37 which fixes C4592 warning under Visual Studio 2015 Update 1 in websockets++. Resolves #34.
+
+**Buildsystem**
+- a075fb2b fixes issues with MSBuild's multicore switch (/m).
+- Merged #30 which adds PCH support for the Visual Studio generator via CMake.
+
+**Miscellaneous**
+- Merged #17 which removes an unused variable in streams.h .
+- Merged #20 which adds unsolicited pong support with integration tests.
+- Merged #43 which fixes compilation on FreeBSD.
+",https://api.github.com/users/alexkaratarakis,128712,alexkaratarakis,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2693266/assets,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2693266,master,https://api.github.com/repos/Microsoft/cpprestsdk/tarball/v2.8.0,https://github.com/Microsoft/cpprestsdk/releases/tag/v2.8.0,https://api.github.com/repos/Microsoft/cpprestsdk/zipball/v2.8.0,v2.8.0,False,False
+2163402,2013-05-22T18:59:04Z,2015-11-20T22:34:31Z,,"### Release Notes
+
+This release stabilizes several APIs, fixes multiple customer reported issues and adds the following improvements:  
+- One msi for each Visual Studio release.  
+- Minor additions to stream buffers.  
+- Added the ability to programmatically control chunk size in http_client API.  
+- NuGet support to ease project setup and SDK servicing. [https://nuget.org/packages/cpprestsdk/](https://nuget.org/packages/cpprestsdk/)  
+
+<u>A note on breaking changes:</u> while we will make every attempt to minimize the number of breaking changes between each release of Casablanca, we cannot guarantee that there will be no breaking changes in a given update. Your code will need to be recompiled after picking up a new version of the code, and it may need some editing in order to continue to work.
+",https://api.github.com/users/alexkaratarakis,128712,alexkaratarakis,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163402/assets,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163402,master,https://api.github.com/repos/Microsoft/cpprestsdk/tarball/v1.0.0,https://github.com/Microsoft/cpprestsdk/releases/tag/v1.0.0,https://api.github.com/repos/Microsoft/cpprestsdk/zipball/v1.0.0,v1.0.0,False,False
+2163393,2013-07-08T21:35:54Z,2015-11-20T22:33:02Z,,"### Release Notes
+
+Release Notes:
+-   [HTTP listener library](https://casablanca.codeplex.com/wikipage?title=HTTP%20Listener) (http_listener.h, this is still in the incubation phase under the experimental namespace )
+-   Support for Windows Phone 8 (Incubation phase, has not undergone rigorous testing)
+-   Added progress reporting capabilities to http client requests
+-   Fixed several customer reported issues
+
+Breaking changes:  
+[Added new subfolders to make header files less generic](https://casablanca.codeplex.com/workitem/5):
+-   compat
+-   pplx
+-   cpprest
+
+[File name changes to reflect versioning](https://casablanca.codeplex.com/wikipage?title=Versioning&version=18)
+",https://api.github.com/users/alexkaratarakis,128712,alexkaratarakis,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163393/assets,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163393,master,https://api.github.com/repos/Microsoft/cpprestsdk/tarball/v1.1.0,https://github.com/Microsoft/cpprestsdk/releases/tag/v1.1.0,https://api.github.com/repos/Microsoft/cpprestsdk/zipball/v1.1.0,v1.1.0,False,False
+2163383,2013-08-22T06:16:02Z,2015-11-20T22:31:27Z,,"### Release Notes
+
+The following is a list of the major aspects of this release:  
+-   Adding support for HTTPS for the Linux version of the library
+-   Adding experimental support for Windows XP (client features only)
+-   Some performance improvements, especially JSON parsing
+-   Added size() and has_size() to stream buffers
+-   Side-by-side installation with v1.1
+-   As always, bug fixes
+
+We are labeling this release 'Beta' since there are features that are still experimental, i.e. haven't been tested in depth:  
+-   Windows Phone 8
+-   Windows XP client features
+-   http_listener
+
+**Note on Visual Studio 2010 support**  
+
+Our plan is to make this the last release that supports Visual Studio 2010. We're planning to add support for Visual Studio 2013 in the next release. However, if VS 2010 is still important to you, let us know: [https://casablanca.codeplex.com/discussions](https://casablanca.codeplex.com/discussions)
+",https://api.github.com/users/alexkaratarakis,128712,alexkaratarakis,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163383/assets,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163383,master,https://api.github.com/repos/Microsoft/cpprestsdk/tarball/v1.2.0,https://github.com/Microsoft/cpprestsdk/releases/tag/v1.2.0,https://api.github.com/repos/Microsoft/cpprestsdk/zipball/v1.2.0,v1.2.0,False,False
+2163376,2013-10-14T19:29:12Z,2015-11-20T22:29:40Z,,"### Release Notes
+
+This release fixes multiple customer reported issues as well as the following:
+-   Full support for Dev12 binaries and project files
+-   Full support for Windows XP
+-   New sample highlighting the Client and Server APIs : BlackJack
+-   Expose underlying native handle to set custom options on http_client
+-   Improvements to Listener Library
+
+**Note:** Dev10 binaries have been dropped as of this release, however the Dev10 project files are still available in the Source Code
+",https://api.github.com/users/alexkaratarakis,128712,alexkaratarakis,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163376/assets,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163376,master,https://api.github.com/repos/Microsoft/cpprestsdk/tarball/v1.3.0,https://github.com/Microsoft/cpprestsdk/releases/tag/v1.3.0,https://api.github.com/repos/Microsoft/cpprestsdk/zipball/v1.3.0,v1.3.0,False,False
+2163362,2013-11-14T23:08:09Z,2015-11-20T22:26:49Z,,"### Release Notes
+
+This is a point release that fixes the following issues with 1.3:  
+- Two additional APIs to determine whether a json::value is a integer number or a double number (this fix was requested by a partner team at Microsoft)  
+- Fix an issue with Casablanca WinRT binaries that caused them to be rejected by the App Store.
+",https://api.github.com/users/alexkaratarakis,128712,alexkaratarakis,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163362/assets,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163362,master,https://api.github.com/repos/Microsoft/cpprestsdk/tarball/v1.3.1,https://github.com/Microsoft/cpprestsdk/releases/tag/v1.3.1,https://api.github.com/repos/Microsoft/cpprestsdk/zipball/v1.3.1,v1.3.1,False,False
+2163354,2013-12-06T20:23:15Z,2015-11-20T22:25:32Z,,"### Release Notes
+
+Do you like having to mess with setting up header file includes, library, and dll paths? Consider trying out using our [Nuget package](https://casablanca.codeplex.com/wikipage?title=Using%20NuGet%20to%20add%20the%20C%2b%2b%20REST%20SDK%20to%20a%20VS%20project&referringTitle=Documentation) instead of our MSI. Whether you target desktop, XP, Windows store, Windows Phone all you have to do is just reference the package and you are ready to go.  
+
+Please note XP and Windows Phone 8 development are only supported with Visual Studio 2012.  
+
+In addition to the regular bug fixing this release includes the following:  
+-   Json performance improvements, 3x to 4x improvements for parsing, 2x to 3x for serialization. With more improvements coming in future releases.
+-   Added line/column information for Json parsing.
+-   Added timeout options to http_listener - only implemented on Windows so far.
+-   Added XP and Windows Phone 8 support to our Nuget package for VS 2012.
+-   Added a new http_listener sample CasaLens.
+-   Added project files for samples for VS 2013.
+",https://api.github.com/users/alexkaratarakis,128712,alexkaratarakis,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163354/assets,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163354,master,https://api.github.com/repos/Microsoft/cpprestsdk/tarball/v1.4.0,https://github.com/Microsoft/cpprestsdk/releases/tag/v1.4.0,https://api.github.com/repos/Microsoft/cpprestsdk/zipball/v1.4.0,v1.4.0,False,False
+2163286,2014-03-19T23:46:11Z,2015-11-20T22:17:45Z,,"### Release Notes
+
+Starting with 2.0.0 we are only distributing Windows binaries through our [NuGet package](https://casablanca.codeplex.com/wikipage?title=Using%20NuGet%20to%20add%20the%20C%2b%2b%20REST%20SDK%20to%20a%20VS%20project&referringTitle=Documentation). This allows us to be more efficient and not maintain an MSI. We also feel it gives users a better experience not having to mess with include paths, libs, and dlls.  
+
+Here is a summary of the changes for this release, please note for the first time we made a couple of breaking API changes in our JSON library. We take breaking changes very seriously and believe these are valuable improvements that allow us to continue to expand and improve the API moving forward.  
+
+## Misc
+-   General bug fixes – including many reported on CodePlex
+-   Removed MSIs – now only distributing Windows binaries through NuGet
+-   Added Visual Studio debugger natvis file to NuGet package
+-   Added support for cmake for non-Windows platforms
+
+## WebSockets
+-   Added initial Beta implementation for WebSockets on Windows store, other platforms will come in future releases
+
+## Platform Support
+-   Added support for OS X
+-   Added support for iOS
+
+## Http Client
+-   Added support for request cancellation through cancellation_tokens for Windows platforms, others will be added in the future
+
+## Json
+-   Added 64 bit integer support. There is a new class json::number that can be retrieved with the json::value::as_number() API. It contains methods for testing and getting a number as int32, uint32, int64, and uint64.
+-   Changed the underlying storage for arrays and added a new class json::array for operations specific to arrays. Can be obtained from the json::value::as_array() API.
+-   Changed the underlying storage for objects and added a new class json::object for operations specific to objects. Can be obtained from the json::value::as_object() API.
+-   **Breaking Change** - Changed how iteration over json arrays and objects is performed. No longer is an iterator of std::pair<json::value, json::value> returned. Instead there is a separate iterator for arrays and objects on the json::array and json::object class respectively. This allows us to make performance improvements and continue to adjust accordingly. The array iterator returns json::values, and the object iterator now returns std::pair<string_t, json::value>.
+-   25% to 30% improvement for parsing and traversing the object model
+-   **Breaking Change** - Const overload of index operator[] on json::value – in prior releases the behavior of the const/non-const overloads where different. This is inconsistent and confusing. The operator[] now can always end up modifying the underlying internal storage so is never const. If you want true const semantics, the json::value::at(…) API can be used.
+-   Deprecated a couple of inconsistent/confusing or bad performance APIs, all have functional replacements
+  -   json::value::to_string() – this API really performance serialization and is easy to confuse with json::value::as_string(). The replacement is json::value::serialize().
+  -   json::value::get(…) – this API had bad performance since it returned a json::value with value semantics. It also can be confusing to use if you think you are modifying the underlying internal data. Instead use operator[] or json::value::at(…).
+
+## Uris
+-   Performance improvement avoiding std::isalnum’s global lock
+-   Moved URI functionality from web::http namespace to just under web. For backwards compatibility using statements have been inserted for customers directly using from http_client.h.
+
+## Http Listener
+-   Breaking Change - Removed pipeline staging feature. It was fundamentally broken and didn’t work at all for processing responses.
+-   Fixed issues with the close semantics of shutting down a listener.
+
+## Streams
+-   Deprecated ‘blittable’ versions of stream read/write. This API is dangerous and only works for trivial types on single byte character streams. It also has bad performance. The functionality can easily be accomplished with the other read/write overloads or getn/putn directly on the stream buffer.
+
+## VS solution files and samples
+-   Cleaned up our solution files and build instructions for all the platforms a bit
+-   Made sure project files exist for both Visual Studio 2012 and 2013, when appropriate
+",https://api.github.com/users/alexkaratarakis,128712,alexkaratarakis,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163286/assets,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163286,master,https://api.github.com/repos/Microsoft/cpprestsdk/tarball/v2.0.0,https://github.com/Microsoft/cpprestsdk/releases/tag/v2.0.0,https://api.github.com/repos/Microsoft/cpprestsdk/zipball/v2.0.0,v2.0.0,False,False
+2163250,2014-04-03T02:53:01Z,2015-11-20T22:15:58Z,,"### Release Notes
+
+This is a point release that fixes the following customer reported issues:  
+- Precision issue with parsing doubles in the JSON library.  
+- http_client was not properly detecting the message body length when indicated by closing connection.  
+- Query strings were encoded twice at the listener side.  
+- Large file size of the CppRest Nuget package.  
+
+Also, please note that we are only distributing Windows binaries through our [NuGet package](https://casablanca.codeplex.com/wikipage?title=Using%20NuGet%20to%20add%20the%20C%2b%2b%20REST%20SDK%20to%20a%20VS%20project&referringTitle=Documentation).
+",https://api.github.com/users/alexkaratarakis,128712,alexkaratarakis,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163250/assets,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163250,master,https://api.github.com/repos/Microsoft/cpprestsdk/tarball/v2.0.1,https://github.com/Microsoft/cpprestsdk/releases/tag/v2.0.1,https://api.github.com/repos/Microsoft/cpprestsdk/zipball/v2.0.1,v2.0.1,False,False
+2163170,2014-06-11T20:57:53Z,2015-11-20T22:06:07Z,,"### Release Notes
+
+Here is a summary of the changes included in this release:  
+
+**Websockets Beta on non-Windows store platforms:**  
+We now have initial beta implementation of websockets on all platforms: Linux, OS X, iOS, Windows Desktop.  
+This library is written on top of Websocketpp, which uses boost. Hence you will need the Boost packages to build the C++ REST SDK on Windows. The ""How to setup, build, and run tests on Windows"" page describes how to fetch the Boost dependencies.  
+
+**Windows Phone 8.1 support:**  
+Windows Phone 8.1 binaries will be shipped with our NuGet Package.  
+
+**Additional features:**
+-   HTTPS support for http_listener on Windows.
+-   Updated the Linux/OS X/iOS binary name to include the versioning.
+-   Added XP support for 2013.
+-   Additional Websockets features on Windows store: Added support for sending HTTP headers, authentication, proxies.
+-   Miscellaneous bug fixes in streams, http_listener and other code cleanup.
+
+A highlight of this release is it includes community contributions for some Casablanca features. A special thanks to the contributors for helping improve Casablanca for everyone. If you are interested in making contributions, contact us at askcasablanca at Microsoft dot com.  
+
+Going forward, we will be doing all development publicly on CodePlex. This implies:
+-   The “development” branch will always be up-to-date with our latest changes.
+-   We will actively track the features and bug fixes that we are working on under the CodePlex:Issues section.
+",https://api.github.com/users/alexkaratarakis,128712,alexkaratarakis,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163170/assets,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163170,master,https://api.github.com/repos/Microsoft/cpprestsdk/tarball/v2.1.0,https://github.com/Microsoft/cpprestsdk/releases/tag/v2.1.0,https://api.github.com/repos/Microsoft/cpprestsdk/zipball/v2.1.0,v2.1.0,False,False
+2163145,2014-08-18T15:35:06Z,2015-11-20T22:02:05Z,,"### Release Notes
+
+### Features
+
+**oAuth** _(experimental)_
+-   Added library support for oAuth 2.0 and 1.0 in an experimental namespace while we fine tune the API.
+
+**Android**
+-   Added support for the Android platform. Please note SSL certification validation for the http_client isn't implemented yet, so using https with the http_client will fail during handshake unless certification validation is disabled. Will be fixed in next release, [bug 242](https://casablanca.codeplex.com/workitem/242). UPDATE: Please note this has been fixed in the development branch now.
+
+### Bug Fixes & Improvements
+
+**Linux**
+-   Updated to requirements for Boost to version 1.54 and Ubuntu 14.04.
+
+**OS X, iOS**
+-   Replace internally to use boost locks instead of from standard library due to [bug](https://casablanca.codeplex.com/workitem/199).
+
+**http_client**
+-   Improve timeouts to be reset and work properly when data is still being written.
+-   Added configuration option to buffer request body data on Windows Desktop. This can be helpful for situations where authentication challenges might occur.
+-   Improved performance of Windows Desktop client significantly when dealing with HTTP responses if setting the chunksize appropriately.
+-   Removed http_response::error_code() API. This was bad API that shouldn't have existed. Error codes are reported through http_exception with a std::error_code.
+-   Added option to extract_string and extract_json to force regardless of Content-Type header and treat as UTF-8.
+-   Added tcp socket connection pooling on our non-Windows http_client implementation.
+-   Implemented http_client cancellation on Linux/iOS/OS X.
+-   Implemented SSL server certificate checking for iOS/OS X.
+
+**http_listener**
+-   Fix a merge error that accidentally removed https support on Windows.
+-   Improve close semantics so you no longer have to make sure to respond to all requests and destroy all http_request/http_response instances, [bug 205](https://casablanca.codeplex.com/workitem/205).
+-   Fix an issue where an error during processing could cause a hang on iOS/OS X/Linux.
+
+**websocket client**
+-   Adding support for Windows Phone 8.1.
+-   BREAKING API CHANGE - Removed the APIs for sending message fragments, we only support sending full messages.
+-   BREAKING API CHANGE - moved specifying the host URI from the constructor to the connect API.
+
+**json**
+-   Added application/x-json to known MIME types. [Bug 197](https://casablanca.codeplex.com/workitem/197).
+
+**miscellaneous**
+-   Changes to make work for FreeBSD 10+
+-   Added options to cmake for building samples, tests, separately
+-   Removed a bunch of unnecessary defines from the Linux/apple/windows compat header files.
+",https://api.github.com/users/alexkaratarakis,128712,alexkaratarakis,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163145/assets,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163145,master,https://api.github.com/repos/Microsoft/cpprestsdk/tarball/v2.2.0,https://github.com/Microsoft/cpprestsdk/releases/tag/v2.2.0,https://api.github.com/repos/Microsoft/cpprestsdk/zipball/v2.2.0,v2.2.0,False,False
+2163125,2014-11-21T22:27:56Z,2015-11-20T21:57:45Z,,"### Release Notes
+
+#### Please note this will be the last release that we include binaries for Visual Studio 2012 in our NuGet package.
+
+**http_client**
+-   Implemented server certificate verification on Android. [#242](https://casablanca.codeplex.com/workitem/242)
+-   Added usage of Boost ssl::context::default_workarounds for compatibility with somewhat broken servers.
+-   Fixed issue with server certification verification if multiple requests are made on iOS, OS X, and Android.
+-   Remove unnecessary setting of Content-Length header in HTTP requests to zero.
+-   Updated documentation for http_request default constructor and made default to the HTTP GET method to avoid ambiguity. [#273](https://casablanca.codeplex.com/workitem/273)
+-   For sending request bodies added overloads on Windows for directly working with UTF-8 strings. This saves copies and extra moves on many platforms.
+-   Fixed several issues around timeouts and cancellation with the Boost based implementation. Also addressed several places timeouts weren't being handle properly. [#280](https://casablanca.codeplex.com/workitem/280)
+-   Improved error messages with WinHttp based implementation to include error code and message in the exception what() string.
+-   Fixed an issue where a blocking wait was being used to close the response stream and any exceptions coming out of the returned task were not handled.
+
+**websocket_client**
+-   All of the websocket features have been moved out of the experimental namespace.
+-   Implemented 'wss' support for Android/iOS/OSX/Linux/Windows desktop. [#255](https://casablanca.codeplex.com/workitem/255)
+-   HTTP headers for initial HTTP request can be specified now on the non-winrt implementation as well. [#251](https://casablanca.codeplex.com/workitem/251)
+-   Added subprotocol API support. New APIs exist on <span class=""codeInline"">websocket_client_config</span> class. [206](https://casablanca.codeplex.com/workitem/206)
+-   Added overloads for <span class=""codeInline"">websocket_outgoing_msg::set_utf8_message() and websocket_outgoing_msg::set_binary_message()</span> which allows the user to not specify stream length. [#152](https://casablanca.codeplex.com/workitem/152)
+-   Poco is no longer used as test server for WinRT tests, Websocketpp is used in all cases. [#221](https://casablanca.codeplex.com/workitem/221)
+-   Improved parameter passing in many locations, adding r-value references for string message data.
+-   Improved error messages with both the websocketpp and winrt implementations.
+-   Updated websocketpp library to 0.3.0 version.
+-   Added a Visual Studio visualizer for websockets. [#120](https://casablanca.codeplex.com/workitem/120)
+-   Fixed spelling mistake on an API. Renamed websocket_incoming_message::messge_type() to websocket_incoming_message::message_type().
+-   Storage improvements on websocket message classes. Saving a heap allocation, a pointer, and a size_t.
+-   Fixed connection abort\disconnect issue in winrt implementation. [#181](https://casablanca.codeplex.com/workitem/181)
+
+**http_listener**
+-   Initiating multiple <span class=""codeInline"">close()</span> calls on an <span class=""codeInline"">http_listener</span> no longer results in a race condition. Note: <span class=""codeInline"">~http_listener</span> does invoke <span class=""codeInline"">close()</span>, even though the user should close it before destruction. [#192](https://casablanca.codeplex.com/workitem/192)
+
+**streams**
+-   Writing to standard C++ I/O streams with <span class=""codeInline"">read_to_end()</span> will now throw an exception if it fails. [#244](https://casablanca.codeplex.com/workitem/244)
+-   Fixed reading files larger than 4GB on Windows, if on 64bit. [#161](https://casablanca.codeplex.com/workitem/161)
+-   Including the <span class=""codeInline"">streams.h</span> header file no longer injects a specialization into <span class=""codeInline"">std::</span>. [#125](https://casablanca.codeplex.com/workitem/125)
+-   Fixed several places that could cause blocking waits. [#135](https://casablanca.codeplex.com/workitem/135)
+-   Removed an unnecessary size_t from container buffer, saving space.
+
+**json**
+-   Adding the ability to perform exception free parsing. All the parsing APIs now take a std::error_code as a second parameter by reference.
+-   Fixed issues around JSON library assuming the current local is ""C"". [#118](https://casablanca.codeplex.com/workitem/118)
+-   Added overload when constructing json string values to indicate whether or not the string contains any characters that need to be escaped. If the string is known to not contain any characters that need escaping, then the performance is better.
+-   Fixed issue with Unicode escaping for code points over 127. [#252](https://casablanca.codeplex.com/workitem/252)
+
+**misc**
+-   The <span class=""codeInline"">run_tests.sh</span> script has been removed. The tests can be run by invoking the testrunner directly. [#182](https://casablanca.codeplex.com/workitem/182)
+-   Various reference documentation improvements.
+-   Updated .gitignore to account for NuGet packages directory. [#282](https://casablanca.codeplex.com/workitem/282)
+-   Passwords are now stored in memory encrypted. The API web::credentials::password() has been deprecated.
+-   Renamed some folders to use lower case names.
+
+**Windows**
+-   Added support for Visual Studio 2015 for desktop applications. [#278](https://casablanca.codeplex.com/workitem/278). Please note websockets are not included with Visual Studio 2015 yet.
+-   Added support for Windows Phone 8.1 Silverlight. [#227](https://casablanca.codeplex.com/workitem/227)
+-   Fixed issue with the XP project file not loading correctly in the solution. [#262](https://casablanca.codeplex.com/workitem/262)
+-   Visual Studio project files have there packages.config separated out, only pulling in the exact NuGet packages necessary for that project now. [#285](https://casablanca.codeplex.com/workitem/285)
+-   Added OpenSSL as a new dependency on Windows desktop, for secure websockets. Due to the unconditional dependency this causes the OpenSSL dlls by default to be included in the Windows Store app package. There are a variety of ways to temporarily to work around this issue. The vcxproj file can be directly edited to remove importing the OpenSSL targets file. Or the NuGet package can be installed from the using the [NuGet package manager console](http://docs.nuget.org/docs/start-here/Using-the-Package-Manager-Console) to avoid the dependencies:
+  -   Install-Package -Id cpprestsdk -IgnoreDependencies
+
+**Android**
+-   Updated to Android NDK r10.
+-   Moved from using gcc to clang.
+-   Moved to produce a static library as the default instead of a shared library.
+-   Added a [NuGet package](https://www.nuget.org/packages/cpprestsdk.android/) for cross platform development with [Visual Studio 2015](http://blogs.msdn.com/b/vcblog/archive/2014/11/12/cross-platform-mobile-development-with-visual-c.aspx), currently only supporting the ARM architecture.
+
+**iOS**
+-   Updated iOS 8 SDK.
+-   Updated iOS build script to use a patch to fix the Boost version used to be 1.56.
+",https://api.github.com/users/alexkaratarakis,128712,alexkaratarakis,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163125/assets,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163125,master,https://api.github.com/repos/Microsoft/cpprestsdk/tarball/v2.3.0,https://github.com/Microsoft/cpprestsdk/releases/tag/v2.3.0,https://api.github.com/repos/Microsoft/cpprestsdk/zipball/v2.3.0,v2.3.0,False,False
+2163116,2014-12-23T20:34:10Z,2015-11-20T21:55:35Z,,"### Release Notes
+
+**oauth**
+-   Fixed memory leak with OAuth 1 in the success case. [#321](https://casablanca.codeplex.com/workitem/321?FocusElement=CommentTextBox)
+-   OAuth1 added support for parameters in POST request body if Content-Type is application/x-www-form-urlencoded.
+-   OAuth1 fixed some parameters which were incorrectly encoded twice.
+-   OAuth1 added support for additional provider parameters on the token.
+
+**websocket_client**
+-   Added a new websocket_client class, websocket_client_class, that supports using callbacks instead for receiving messages and when the connection is closed. [#15](https://casablanca.codeplex.com/workitem/163)
+-   Fixed issues around the websocket_client destructor taking the loader lock causing hangs/crashes if dynamically loading/unloading in a dll at runtime on Windows. [#309](http://ttps://casablanca.codeplex.com/workitem/309), [#233](https://casablanca.codeplex.com/workitem/233)
+-   Fixed memory leaks coming from OpenSSL when using secure websocket client.
+
+**http_client**
+-   Fixed http_client constructor taking parameters by value and performing a lot of moves and sometimes copying again. Now everything cleaner is passed by const reference. In the future if performance critical another overload can be added.
+-   Removed unnecessary exception_ptr stored per request on all but WinRT platforms, saving space.
+-   Misc cleanup in asio based http_client, renaming classes to not contain 'linux', making more data/methods private, removing some unnecessary usage of shared_ptr parameters and unnecessary indirection.
+-   Fixed memory leak in asio based http_client with 'https' requests. [#326](https://casablanca.codeplex.com/workitem/326)
+-   Fixed race condition in asio based http_client when obtaining a connection from the connection pool. [#320](https://casablanca.codeplex.com/workitem/320?FocusElement=CommentTextBox)
+-   Deprecated http_client_config::set_guarantee_order(...) option. It is confusing and simplifies the implementation if removed. If request ordering is a requirement it can always be done manually with task continuations. In the future a better option to expose would be to configure the max number of allowed concurrent connections.
+-   Fixed an issue in Boost based http_client where connections that encounter an error were being pooled for reuse. Now all connections that hit any errors are properly shutdown and closed.
+
+**http_listener**
+-   Updated to Boost based implementation to include underlying Boost error code in exceptions. [#224](https://casablanca.codeplex.com/workitem/224)
+-   Updated a bunch of parameters in Boost based implementation to pass by const reference instead of by value.
+-   Fixed problem in Boost based implementation where if an error occurred while processing the request body then the event from http_request::content_ready() won't be signaled. [#220](https://casablanca.codeplex.com/workitem/220)
+
+**uri**
+-   Fixed issue with uri_builder not including user information when calling to_string() and to_uri(). [#329](https://casablanca.codeplex.com/workitem/329)
+
+**json**
+-   Fixed a small memory leak in locale support for json library.
+
+**miscellaneous**
+-   Moved all the non public headers under the cpprest include folder into a details subfolder.
+-   Removed a bunch of unnecessary pragma warning suppressions. This removes a ton of warnings when using Clang.
+-   Renamed a bunch of source files to better reflect their contents. For example http_linux.cpp is now http_client_asio.cpp.
+-   Cleaned up and combined the *_compat.h header files into one more manageable file making it easier to share settings.
+-   Removed a bunch of unnecessary macros/defines.
+-   Public API code documentation improvements for reference docs.
+-   Fixed a conversion bug in datetime::utc_now() causing the seconds to be off potentially by 100 nanoseconds.
+-   Added /detectleaks option for TestRunner when running on Windows.
+
+**Windows**
+-   Updated all the solution files to use the VS2013 shared projects feature. With this change all the source code is present in the IDE regardless of the platform. Now it is easier to develop in VS for other platforms as well.
+-   Removed the _MS_WINDOWS macro, _WIN32 should be used instead.
+-   Updated NuGet package to include CPPREST_TARGET_XP define if targeting XP, otherwise http_client_config size mismatches can occur leading to crashes.
+-   Fixed an issue with _PHONE8_ define causing problems if not defined when targeting Windows Phone 8. The macro has now been removed.
+-   We now statically link with OpenSSL on Windows and so our NuGet package no longer has the OpenSSL dependency. This makes deployment easier for customers. [#308](https://casablanca.codeplex.com/workitem/308?FocusElement=CommentTextBox)
+-   Worked around a VS2015 compiler devirtualization bug causing AVs, using /d2notypeopt. [#314](https://casablanca.codeplex.com/workitem/314), [#315](https://casablanca.codeplex.com/workitem/315)
+-   Changed name of powershell VS setup script for VS2015.
+
+**Android**
+-   Added Android vcxproj files for Visual Studio and included them in the solution files.
+-   Fixed incorrect _M_ARM macro check that lead to websockets being excluded on Android.
+-   Added support for the Windows x86 emulator. Android NuGet package now contains binaries for it as well.
+-   Fixed lots of warning with Clang, turned on treating warnings as errors when building on Windows. [#323](https://casablanca.codeplex.com/workitem/323)
+-   Added vxproj files for tests and an Android test runner.
+
+**iOS**
+-   Added a XCode unit test bridge to enable easily running tests for iOS. Can be used from command line with xcodebuild. [#105](https://casablanca.codeplex.com/workitem/105)
+",https://api.github.com/users/alexkaratarakis,128712,alexkaratarakis,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163116/assets,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163116,master,https://api.github.com/repos/Microsoft/cpprestsdk/tarball/v2.4.0,https://github.com/Microsoft/cpprestsdk/releases/tag/v2.4.0,https://api.github.com/repos/Microsoft/cpprestsdk/zipball/v2.4.0,v2.4.0,False,False
+2163106,2015-03-18T20:39:39Z,2015-11-20T21:53:05Z,,"### Release Notes
+
+**NuGet Packages**  
+The NuGet packages have been significantly restructured. Instead of having one massive package containing binaries for all the different platforms we support, each individual Visual Studio project file now produces its own package. For example for Windows desktop using the v120 toolset the following package contains everything you need:  
+
+> [cpprestsdk.v120.windesktop.msvcstl.dyn.rt-dyn](https://www.nuget.org/packages/cpprestsdk.v120.windesktop.msvcstl.dyn.rt-dyn/)
+
+Another example, for Windows store applications with the v120 toolset the following package contains everything you need:  
+
+> [cpprestsdk.v120.winapp.msvcstl.dyn.rt-dyn](https://www.nuget.org/packages/cpprestsdk.v120.winapp.msvcstl.dyn.rt-dyn/)
+
+Splitting into smaller package allows users to pick only the binaries that are actually needed saving download time and storage space. As part of this we've stopped stripping symbols so our packages contain full pdbs. If you download the source code from CodePlex you have full source code debugging.  
+
+For backwards compatibility, and ease of use for people who want everything in one download, each individual package is pulled together into an aggregate package containing all the packages as dependencies.  
+
+> [cpprestsdk](https://www.nuget.org/packages/cpprestsdk/)
+
+Please note binaries for Visual Studio 2012 have been removed from the Nuget package. The project files still are in the repository and remaining building. At a future release we will remove the project files as well.  
+
+**Android**
+-   Fixed issue in CMakeLists.txt where parenthesis were incorrectly used instead of brackets.
+-   Fixed issue in CMakeLists.txt where pplxlinux.cpp source file was missing.
+-   Added Android TestRunner packing androidproj to build.
+
+**Windows**
+-   Fixed several code analysis warnings.
+-   Updating NuGet package for missing OpenSSL license, also patched 2.4.0's NuGet package.
+-   Fixed not working on XP issue because of crypto API. [#331](https://casablanca.codeplex.com/workitem/331), [#334](https://casablanca.codeplex.com/workitem/334)
+-   Fixed several functions missing an explicit calling convention. This caused problems if you changed the calling convention from the cdecl.
+-   Added support for Windows on Devices/Galileo. [#217](https://casablanca.codeplex.com/workitem/217)
+-   Added option to force using PPLX on Windows threadpool instead of PPL on the Concurrency Runtime. Library can be rebuilt using CPPREST_FORCE_PPLX macro. For some scenarios with lots of tasks this can lead to performance improvements and better CPU utilization. With VS2015 PPL tasks run on the Windows threadpool by default. [#341](https://casablanca.codeplex.com/workitem/341)
+-   Updated all binaries to use whole program optimizations, slightly decreasing binary size and small potential performance improvements.
+-   Merged pull request adding support for CMake for Windows desktop.
+
+**OSX**
+-   Merged a pull request to work around a FindOpenSSL.cmake issue, enabling it to find Homebrew's copy.
+-   Added support for iOS 64bit simulator. [#196](https://casablanca.codeplex.com/workitem/196)
+
+**websocket_client**
+-   Fixed a race condition in Websocket++ based implementation during websocket client destructor which would sometimes result in an AV/Segfault.
+-   Added proxy support for Websocket++ based implementation.
+-   Added support for Server Name Indication (SNI) to Websocket++ based implementation.
+-   Updated server certificate verification to accept SERVER_GATED_CRYPTO and SGC_NETSCAPE usage for Websocket++ based implementation on Windows.
+
+**pplx**
+-   Merged a pull request lazy instantiating the underlying threadpool used. Allows for forking processes in certain circumstances. [#68](https://casablanca.codeplex.com/workitem/68)
+
+**http_client**
+-   Made std::function parameter to http_client::add_handler passed by const reference.
+-   Fixed invalid check in WinHTTP based implementation causing autologon security level to be high if credentials are not provided.
+-   Added extract_utf8string and extract_utf16string to http_request and http_response classes. This allows uses either UTF-8 or UTF-16, instead of utility::string_t, more efficiently regardless of the platform.
+-   Implemented native handle API for non-Windows platforms exposing Boost.Asio structures. This allows for configuring additional options like client certificates for example. [#168](https://casablanca.codeplex.com/workitem/168)
+-   Fixed bug in Boost.Asio based implementation that incorrectly caused multiple handshakes to occur when reusing connections with HTTPS.
+-   Fixed bug incorrectly setting the Content-Length header when not using the ""C"" locale.
+
+**json**
+-   Fixed issue where the JSON library assumes char is a signed type, however C++ doesn't guarantee this. On ARM with Clang for example char is an unsigned type. This lead to incorrect parsing.
+
+**miscellaneous**
+-   Merged pull request adding http_constants.dat to be installed with 'make install'.
+-   Deprecated utility function web::http::bind, this was an implementation detail and really never should have been part of the API.
+-   Added overloads that accept a std::locale for utility::conversions::print_string and utility::conversions::scan_string.
+-   Fixed several locations where a stringstream was being used and assumed the ""C"" locale was set.
+-   Merged pull request fixing bug with nullptr from SafeInt3.hpp with GCC. [#340](https://casablanca.codeplex.com/workitem/340)
+-   Moved internal safeint types to msl::safeint3 namespace to avoid conflicting with Visual Studio versions. [#216](https://casablanca.codeplex.com/workitem/216)
+
+**tests**
+-   Fixed race conditions in close_callback_client_from_server
+-   Added proper synchronization to test_websocket_server (preventing some race conditions). [#305](https://casablanca.codeplex.com/workitem/305)
+",https://api.github.com/users/alexkaratarakis,128712,alexkaratarakis,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163106/assets,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163106,master,https://api.github.com/repos/Microsoft/cpprestsdk/tarball/v2.5.0,https://github.com/Microsoft/cpprestsdk/releases/tag/v2.5.0,https://api.github.com/repos/Microsoft/cpprestsdk/zipball/v2.5.0,v2.5.0,False,False
+2163080,2015-06-01T17:35:58Z,2015-11-20T21:49:12Z,,"### Release Notes
+
+**streams**
+-   Deprecated the streambuf::putn API. In some cases with file streams this API makes a copy. To be more efficient and not break existing code a new function putn_nocopy has been created. This makes it clear to users they need to ensure the pointer data provided is valid until the returned task is completed.
+-   File streams cleanup improvements: replacing C style casts, updating some shared_ptr parameters to const reference, and removed unnecessary data structures saving heap allocations and space. Fixes [#353](https://casablanca.codeplex.com/workitem/353), [#126](https://casablanca.codeplex.com/workitem/126)
+
+**json**
+-   Added ability to erase elements from a json array or object. [#147](http://casablanca.codeplex.com/workitem/147)
+-   Added missing static factories for working with 64bit integers to the json::value class. [#351](http://casablanca.codeplex.com/workitem/351)
+-   Fixed improper serialization of control characters that should always be Unicode escaped.
+-   Fixed issue with parsing and then serializing not properly escaping necessary characters if parsed originally from a stream. [#259](https://casablanca.codeplex.com/workitem/259)
+-   Updated json::value::as_number() and json::value::as_string() to return by const reference.
+-   Made json::object copy constructor not private. Also removed a few unnecessary copy constructors and stick with compiler generated.
+
+**http_listener**
+-   Fixed potential crash on Windows that could occur in some cases if the client sent and invalid URI. [#267](http://casablanca.codeplex.com/workitem/267)
+-   Fixed potential hang on Windows if running on a single core machine. [#106](https://casablanca.codeplex.com/workitem/106)
+-   Merged [pull request](https://casablanca.codeplex.com/SourceControl/network/forks/gandziej/issue375/contribution/8194#!/tab/changes) fixing issue with listeners not being properly remove if port is in use on non-Windows. [#375](http://casablanca.codeplex.com/workitem/375)
+
+**websocket_client**
+-   Updated Websocket++ version to 0.5.1.
+-   Added tests for Windows Runtime websockets client. [#223](https://casablanca.codeplex.com/workitem/223)
+-   Removed unnecessary extra event in Windows Runtime implementation from websocket client.
+
+**oauth 2.0**
+-   Allow conversions for the OAuth 'expires_in' field from a JSON string value to a numeric value. [#381](https://casablanca.codeplex.com/workitem/381)
+
+**pplx**
+-   Merged [pull request](https://casablanca.codeplex.com/SourceControl/network/forks/LeonidCSIT/379/contribution/8218) fixing deadlock if an exception occurs while trying to schedule a task. [#379](https://casablanca.codeplex.com/workitem/379)
+
+**miscellaneous**
+-   Updated some code documentation comments to improve reference documentation.
+-   Merged [pull request](https://casablanca.codeplex.com/SourceControl/network/forks/tiki4/centos7/contribution/8119) qualifying web::credentials namespace in http_client authentication_tests.cpp to avoid collisions with OpenSSL.
+-   Fixed locale based test cases to silently pass if the necessary locale isn't installed on the machine. [#354](http://casablanca.codeplex.com/workitem/354)
+-   Removed a bunch of unnecessary MSBuild properties from test vcxproj files. [#264](https://casablanca.codeplex.com/workitem/264)
+-   Changed safeint.hpp to use pragma once instead of ifdef guard.
+
+**Windows**
+-   Removed DllMain and global process exiting flag as no longer needed.
+-   Removed Visual Studio 2012 project files. VS2012 is no longer supported.
+-   Added support for Visual Studio 2015 RC, preview is no longer supported.
+-   Fixed problem with CasaLens sample not compiling due to std::bind with some versions of Visual Studio 2015.
+-   Removed a bunch of Windows specific string conversion code, replaced with C++ standard equivalent.
+-   Fixed a potential deadlock on Windows XP when using CPPREST_FORCE_PPLX. [#374](https://casablanca.codeplex.com/workitem/374?FocusElement=CommentTextBox)
+-   Updated to Boost version 1.58.
+-   Updated to OpenSSL version 1.0.2a.
+-   Added support for Universal Windows Platform (UWP).
+-   Added support for websockets with Windows Desktop with Visual Studio 2015. [#277](https://casablanca.codeplex.com/workitem/277)
+-   Merged [pull request](https://casablanca.codeplex.com/SourceControl/network/forks/jrudd/Development/contribution/8231) adding version information to the dlls. [#318](https://casablanca.codeplex.com/workitem/318)
+
+**iOS**
+-   Updated Boost dependency to version 1.57.
+-   Improvements to script for building Boost, including no longer building for OS X, adding x86_64 simulator, and always using latest iOS SDK available on the machine. [#196](https://casablanca.codeplex.com/workitem/196)
+-   Removed dependency on Boost.Locale and libiconv, replaced with C++ standard equivalent.
+-   Fixed issue including CMakeLists.txt from another CMake project. [#372](https://casablanca.codeplex.com/workitem/372)
+
+**Ubuntu**
+-   Fixed remaining warnings with GCC and removed warning suppression in CMakeLists.txt. [#253](https://casablanca.codeplex.com/workitem/253)
+-   Removed dependency on Boost.Locale and libiconv.
+
+**Android**
+-   Removed dependency on Boost.Locale and libiconv.
+-   Added a workaround using -funwind-tables compilation option since not included by default with Visual Studio Android support. [#388](https://casablanca.codeplex.com/workitem/388)
+",https://api.github.com/users/alexkaratarakis,128712,alexkaratarakis,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163080/assets,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2163080,master,https://api.github.com/repos/Microsoft/cpprestsdk/tarball/v2.6.0,https://github.com/Microsoft/cpprestsdk/releases/tag/v2.6.0,https://api.github.com/repos/Microsoft/cpprestsdk/zipball/v2.6.0,v2.6.0,False,False
+2157150,2015-11-21T02:07:02Z,2015-11-23T20:17:43Z,v2.7.0,"### Release Notes
+
+**websockets**
+-   Merged [pull request](https://casablanca.codeplex.com/SourceControl/network/forks/LocutusOfBorg/casablanca2/contribution/8257) allowing through CMake to use an external version of Websocket++. [#294](https://casablanca.codeplex.com/workitem/294)
+-   Fixed potential AV with the Windows Runtime websocket client, if the task returned from the close function wasn't waited to complete before running the destructor.
+-   Merged [pull request](https://casablanca.codeplex.com/SourceControl/network/forks/jicailiu/xsapi/contribution/8357) fixing potential AV with the Windows Runtime websocket_client, if the destructor was run without the user waiting on the task returned from connect to complete. Technically users should always make sure to wait for the connection to succeed or fail, this just helps incase that wasn't done.
+-   Merged [pull request](https://github.com/Microsoft/cpprestsdk/pull/1) for Adding proxy support for token_from_code and token_from_refresh methods.
+
+**http_client**
+-   Merged [pull request](https://casablanca.codeplex.com/SourceControl/network/forks/kreuzerkrieg/casablancatimeout/contribution/8363) adding support for timeouts down to the microsecond level. Please note not all platforms support this fine granularity, some only down to milliseconds.
+-   Fixed issue where Boost.Asio based http_client incorrectly used the http_client_config timeout setting for determining how long to keep around connections in the pool before closing.
+
+**http_listener**
+-   Fixed bug with Boost.Asio based http_listener where the incoming request body stream write head wasn't closed. [#325](https://casablanca.codeplex.com/workitem/325)
+-   Merged [pull request](https://casablanca.codeplex.com/SourceControl/network/forks/evanc/mshpccasablanca/contribution/8481) to enable https listener and client ca
+
+**uri_builder**
+-   Updated uri_builder::append_query API that operators on a provided key and value to percent encode the '&', ';', '=' characters to avoid any confusion. [#396](https://casablanca.codeplex.com/workitem/396)
+
+**miscellaneous**
+-   Fixed issue with utf16_to_utf8 utility function when encoding certain surrogate pairs. [#392](https://casablanca.codeplex.com/workitem/392)
+-   Merged a couple of pull requests ([here](https://casablanca.codeplex.com/SourceControl/network/forks/LocutusOfBorg/casablanca2/contribution/8258), [here](https://casablanca.codeplex.com/SourceControl/network/forks/LocutusOfBorg/casablanca2/contribution/8259), and [here](https://casablanca.codeplex.com/SourceControl/network/forks/LocutusOfBorg/casablanca2/contribution/8262)) fixing several issues with arm64. [#312](https://casablanca.codeplex.com/workitem/312), [#291](https://casablanca.codeplex.com/workitem/291)
+-   Merged [pull request](https://casablanca.codeplex.com/SourceControl/network/forks/LocutusOfBorg/casablanca2/contribution/8260) fixing double include issues when building with CMake.
+-   Merged [pull request](https://casablanca.codeplex.com/SourceControl/network/forks/LocutusOfBorg/casablanca2/contribution/8263) fixing cast issue on FreeBSD.
+-   Removed unnecessary heap allocation and cleaned up a bit the scoped_c_thread_locale::c_locale() implementation.
+
+**Windows**
+-   Removed some unnecessary _MSC_VER macro checks as Visual Studio 2012 is no longer supported.
+-   Fixed several incorrect assumptions of thread safe function local static initialization with Visual Studio 2013. [#391](https://casablanca.codeplex.com/workitem/391)
+-   Updated OpenSSL dependency to version 1.0.2d. [#398](https://casablanca.codeplex.com/workitem/398)
+
+**Android**
+-   Removed unused files for building libiconv from Build_android folder.
+-   Fixed the NuGet Package issue for Android on VS2015, [#400](https://casablanca.codeplex.com/workitem/400)
+
+**iOS**
+-   Added .gitignore to the Build_iOS folder to ignore the downloaded build dependencies. [#373](https://casablanca.codeplex.com/workitem/373)
+",https://api.github.com/users/alexkaratarakis,128712,alexkaratarakis,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2157150/assets,https://api.github.com/repos/Microsoft/cpprestsdk/releases/2157150,development,https://api.github.com/repos/Microsoft/cpprestsdk/tarball/v2.7.0,https://github.com/Microsoft/cpprestsdk/releases/tag/v2.7.0,https://api.github.com/repos/Microsoft/cpprestsdk/zipball/v2.7.0,v2.7.0,False,False

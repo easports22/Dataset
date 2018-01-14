@@ -1,0 +1,147 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7957995,2017-10-02T00:26:03Z,2017-10-02T00:28:21Z,0.5.14  Faster loading for complex dependency trees,"Figwheel inherited a topo sort algorithm from the CLJS compiler. It
+turned out that this graph sorting algorithm missed a very important
+optimization, which is fixed in this release. If you have project that
+has a lot of namespaces and have experienced slower load times when
+you change a file that is deeper in your dependency chain, you should
+notice a big improvement when using this release.
+
+Added JavaScript environment hooks for tools like `re-natal` to
+customize the websocket implementation and the script loading behavior.
+
+* improved topo-sort algorithm
+* CLJS compile option: the `:entries` key is no longer required in the
+  `:modules` configs
+* new `:repl-eval-timeout` allows you to increase or lower the
+  Figwheel REPL eval timeout as a top level config setting
+* added `goog.global.FIGWHEEL_WEBSOCKET_CLASS` to allow one to
+  override or supply a websocket implementation for the figwheel
+  client
+* added `goog.global.FIGWHEEL_IMPORT_SCRIPT` to allow one to override
+  or supply a function to the figwheel client, that is responsible for
+  loading a namespace into the JavaScript runtime.
+* added two new namespaces that can be supplied the ClojureScript
+  compiler's `:preloads` option.
+  
+  The two namespaces are only different in that one set's up figwheel
+  while the other both sets up and starts figwheel. These are
+  currently meant to clean up how the figwheel client is injected into
+  the build. The next release of Figwheel will do away with generating
+  a small ClojureScript file to inject the Figwheel client into build.
+  - `figwheel.connect` which will take a configuration from
+    `:external-tooling` > `:figwheel/config` and supply a
+    `figwheel.connect/start` function which contains the supplied
+    config options. This function is exported so that it can be easily
+    called from JavaScript.
+  - `figwheel.preload` which simply calls the above `figwheel.connect/start`
+    function",https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/7957995/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/7957995,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/v0.5.14,https://github.com/bhauman/lein-figwheel/releases/tag/v0.5.14,https://api.github.com/repos/bhauman/lein-figwheel/zipball/v0.5.14,v0.5.14,False,False
+7523353,2017-08-16T22:01:08Z,2017-08-25T13:09:58Z,Small updates,"## 0.5.13 Small updates
+
+* remove the use of a deprecated Google Closure library function 
+  goog.net.jsloader.load
+* add CLJS compile option `:process-shim` to validation code",https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/7523353/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/7523353,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/v0.5.13,https://github.com/bhauman/lein-figwheel/releases/tag/v0.5.13,https://api.github.com/repos/bhauman/lein-figwheel/zipball/v0.5.13,v0.5.13,False,False
+3615761,2016-07-08T13:26:04Z,2016-07-08T13:32:38Z,Fix :open-command,"## 0.5.4-7 fix :open-command
+- PR #449 Arguments to open-file-command must be strings, not numeric.
+",https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/3615761/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/3615761,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/v0.5.4-7,https://github.com/bhauman/lein-figwheel/releases/tag/v0.5.4-7,https://api.github.com/repos/bhauman/lein-figwheel/zipball/v0.5.4-7,v0.5.4-7,False,False
+3615551,2016-07-08T13:07:00Z,2016-07-08T13:08:51Z,allow figwheel system to take the result of (config/fetch-config) ,"## 0.5.4-6 update sidecar system apis to handle result of fetch-config
+- PR #447 change the validator to allow ES6 and :no-transpile 
+- #440 allow figwheel system to take the result of (config/fetch-config) 
+",https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/3615551/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/3615551,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/v0.5.4-6,https://github.com/bhauman/lein-figwheel/releases/tag/v0.5.4-6,https://api.github.com/repos/bhauman/lein-figwheel/zipball/v0.5.4-6,v0.5.4-6,False,False
+3504104,2016-06-22T23:24:02Z,2016-06-23T00:34:52Z,0.5.4-4 added :preloads compiler option,"- added validation support for `:preloads` compiler option
+- ! removed compojure as a dependency
+  Figwheel used compojure in its server to handle routing
+  this was overkill. It complicated the routing while adding an unneeded dependency.
+  Strange things where happening when `wrap-reload` was being used in an
+  embedded `:ring-handler`.  
+  There is so little routing functionality in figwheel that I just created
+  what was needed with simple ring middleware. If the behavior of your
+  :ring-handler changes (routes not being resolved, bad headers etc.)
+  please let me know.  For reference here is the commit:
+  https://github.com/bhauman/lein-figwheel/commit/f027b10188ed9d1baa6ec04bbdd14e6a493f68b0
+- improved the resiliency of the plugin around bad initial config data.
+  The lein plugin uses config data from the `project.clj` before it has been
+  validated, I added some extra safe guards to protect against start up errors
+",https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/3504104/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/3504104,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/v0.5.4-4,https://github.com/bhauman/lein-figwheel/releases/tag/v0.5.4-4,https://api.github.com/repos/bhauman/lein-figwheel/zipball/v0.5.4-4,v0.5.4-4,False,False
+3443315,2016-06-14T19:03:48Z,2016-06-14T19:05:36Z,Improvements around starting figwheel from the REPL,"- I added back `figwheel-sidecar/get-project-builds` which was removed in 0.5.4
+  its now here to stay.
+
+#### Improved the expressiveness of (start-figwheel!)
+
+before `(start-figwheel!)` only optionally took a configuration. Now it
+takes optional build-ids as well.
+
+So you can do this:
+
+```
+(start-fighweel! ""dev"" ""admin"")
+```
+
+And it will pull in the config from the environment and start
+autobuilding the supplied build ids.
+
+Or you can supply a config and build ids ...
+
+```
+(start-fighweel!
+  {:figwheel-options {:server-port 4000}
+   :all-builds [{:id ...}]}
+   ""dev"" ""admin"")
+```
+
+I have also beefed up the error checking and feedback around this call.
+",https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/3443315/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/3443315,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/v0.5.4-3,https://github.com/bhauman/lein-figwheel/releases/tag/v0.5.4-3,https://api.github.com/repos/bhauman/lein-figwheel/zipball/v0.5.4-3,v0.5.4-3,False,False
+3425207,2016-06-12T02:06:48Z,2016-06-12T02:17:07Z,Error messages and more,"This is the most solid release of Figwheel so far ... enjoy!!
+
+#### Code context in Errors and Warnings
+
+This means you will see the compile errors and warnings displayed
+along with the offending code and a pointer to the position of the
+failure. This is a fairly big improvement. I've found that even for
+simple errors that I've become accustomed to, the new errors tend to
+beam the information in much more quickly.
+
+The code pointers are rough at times and no code context information
+will displayed if Figwheel doesn't get any line and column information
+from the compiler.
+
+The display of these errors can still be improved further, and I plan
+to do so.  I just wanted to get the bits hooked up and a decent
+display out the door first.
+
+Please see the CHANGES.md file, there are a lot of improvements....
+",https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/3425207/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/3425207,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/v0.5.4,https://github.com/bhauman/lein-figwheel/releases/tag/v0.5.4,https://api.github.com/repos/bhauman/lein-figwheel/zipball/v0.5.4,v0.5.4,False,False
+2873756,2016-03-23T16:03:59Z,2016-03-23T16:05:04Z,Configuration Validation," added a fairly comprehensive configuration validation that is triggered
+ when running 'lein figwheel' - there is a large surface area here so if
+ you discover problems please report them
+",https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/2873756/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/2873756,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/v0.5.1,https://github.com/bhauman/lein-figwheel/releases/tag/v0.5.1,https://api.github.com/repos/bhauman/lein-figwheel/zipball/v0.5.1,v0.5.1,False,False
+2496000,2016-01-26T19:03:32Z,2016-01-26T19:06:57Z,More work on dependency conflicts,"- adding system asserts to ensure and warn if not using Java 1.8 or Clojure 1.7.0
+- adding polling option for hawk file watcher; just add :hawk-options {:watcher :polling} to base figwheel config
+",https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/2496000/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/2496000,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/v0.5.0-5,https://github.com/bhauman/lein-figwheel/releases/tag/v0.5.0-5,https://api.github.com/repos/bhauman/lein-figwheel/zipball/v0.5.0-5,v0.5.0-5,False,False
+2478365,2016-01-23T01:02:38Z,2016-01-23T01:05:51Z,Fixes Dependency Conflicts,"This is a quick release that fixes dependency conflicts.
+",https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/2478365/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/2478365,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/v0.5.0-4,https://github.com/bhauman/lein-figwheel/releases/tag/v0.5.0-4,https://api.github.com/repos/bhauman/lein-figwheel/zipball/v0.5.0-4,v0.5.0-4,False,False
+2395222,2016-01-08T16:15:24Z,2016-01-08T16:24:21Z,Incremental bug fix release,"- change repl-api commands like `figwheel-start!` so that they don't return the SystemMap
+  as this was behaving badly in various REPL configurations 28e03af
+- figwheel-running? checks if figwheel is actually running now bb146e1
+- guard access to localStorage on client fdb49a2
+- Print exception when requiring ring handler fails f663acc
+- add support for notify-command back a475c59
+- Add exclusions to fix sidecar confusing dependencies b263835
+- For custom ring handler, bind to var, not to its value 789ff03
+- create directories for logfile ce39ac0
+",https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/2395222/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/2395222,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/v0.5.0-3,https://github.com/bhauman/lein-figwheel/releases/tag/v0.5.0-3,https://api.github.com/repos/bhauman/lein-figwheel/zipball/v0.5.0-3,v0.5.0-3,False,False
+2179216,2015-11-24T17:45:48Z,2015-11-24T17:52:59Z,Incremental bug fix release ,"## 0.5.0-2
+- bumping http-kit to 0.2.19 get's rid of nasty exit exception
+- fix REPL helpers check for figwheel's running status
+- fixed REPL problem where pprint would produce extra output
+",https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/2179216/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/2179216,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/v0.5.0-2,https://github.com/bhauman/lein-figwheel/releases/tag/v0.5.0-2,https://api.github.com/repos/bhauman/lein-figwheel/zipball/v0.5.0-2,v0.5.0-2,False,False
+2127056,2015-11-14T18:29:57Z,2015-11-14T18:51:56Z,Small updates to 0.5.0,,https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/2127056/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/2127056,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/v0.5.0-1,https://github.com/bhauman/lein-figwheel/releases/tag/v0.5.0-1,https://api.github.com/repos/bhauman/lein-figwheel/zipball/v0.5.0-1,v0.5.0-1,False,False
+2122241,2015-11-13T14:40:58Z,2015-11-13T15:00:53Z,Major Refactor,,https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/2122241/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/2122241,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/0.5.0,https://github.com/bhauman/lein-figwheel/releases/tag/0.5.0,https://api.github.com/repos/bhauman/lein-figwheel/zipball/0.5.0,0.5.0,False,False
+2058342,2015-11-02T17:43:05Z,2015-11-02T17:36:27Z,Internal refactor,,https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/2058342/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/2058342,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/0.5.0old-SNAPSHOT,https://github.com/bhauman/lein-figwheel/releases/tag/0.5.0old-SNAPSHOT,https://api.github.com/repos/bhauman/lein-figwheel/zipball/0.5.0old-SNAPSHOT,0.5.0old-SNAPSHOT,False,True
+1305711,2015-05-17T19:29:11Z,2015-05-17T19:30:01Z,Release 0.3.3,,https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/1305711/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/1305711,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/0.3.3,https://github.com/bhauman/lein-figwheel/releases/tag/0.3.3,https://api.github.com/repos/bhauman/lein-figwheel/zipball/0.3.3,0.3.3,False,False
+1305624,2015-05-17T18:36:22Z,2015-05-17T18:37:08Z,Version 0.3.2,,https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/1305624/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/1305624,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/0.3.2,https://github.com/bhauman/lein-figwheel/releases/tag/0.3.2,https://api.github.com/repos/bhauman/lein-figwheel/zipball/0.3.2,0.3.2,False,False
+1048749,2015-03-13T21:00:23Z,2015-03-13T21:19:40Z,First non snapshot release.,,https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/1048749/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/1048749,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/0.2.5,https://github.com/bhauman/lein-figwheel/releases/tag/0.2.5,https://api.github.com/repos/bhauman/lein-figwheel/zipball/0.2.5,0.2.5,False,False
+949365,2015-02-13T03:18:48Z,2015-02-13T13:45:20Z,REPL Source map support,,https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/949365/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/949365,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/v0.2.4-snap,https://github.com/bhauman/lein-figwheel/releases/tag/v0.2.4-snap,https://api.github.com/repos/bhauman/lein-figwheel/zipball/v0.2.4-snap,v0.2.4-snap,False,False
+923400,2015-02-05T18:07:25Z,2015-02-05T21:06:41Z,Supports Node.js,,https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/923400/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/923400,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/v0.2.3-snap,https://github.com/bhauman/lein-figwheel/releases/tag/v0.2.3-snap,https://api.github.com/repos/bhauman/lein-figwheel/zipball/v0.2.3-snap,v0.2.3-snap,False,False
+865385,2015-01-19T18:43:19Z,2015-01-19T21:42:22Z,CLJS Repl release,,https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/865385/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/865385,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/v0.2.2-snap,https://github.com/bhauman/lein-figwheel/releases/tag/v0.2.2-snap,https://api.github.com/repos/bhauman/lein-figwheel/zipball/v0.2.2-snap,v0.2.2-snap,False,False
+831212,2015-01-07T02:39:13Z,2015-01-07T14:24:38Z,watch multiple builds,,https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/831212/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/831212,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/v0.2.1-snap,https://github.com/bhauman/lein-figwheel/releases/tag/v0.2.1-snap,https://api.github.com/repos/bhauman/lein-figwheel/zipball/v0.2.1-snap,v0.2.1-snap,False,False
+799147,2014-12-19T21:19:09Z,2014-12-19T21:20:33Z,0.2.0 Snapshot,,https://api.github.com/users/bhauman,2624,bhauman,https://api.github.com/repos/bhauman/lein-figwheel/releases/799147/assets,https://api.github.com/repos/bhauman/lein-figwheel/releases/799147,master,https://api.github.com/repos/bhauman/lein-figwheel/tarball/v0.2.0-snap,https://github.com/bhauman/lein-figwheel/releases/tag/v0.2.0-snap,https://api.github.com/repos/bhauman/lein-figwheel/zipball/v0.2.0-snap,v0.2.0-snap,False,False

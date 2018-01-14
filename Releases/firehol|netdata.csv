@@ -1,0 +1,996 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7784228,2017-09-17T16:55:51Z,2017-09-17T17:07:02Z,,"
+### New to netdata? Check its demo: [https://my-netdata.io](http://my-netdata.io)
+
+> [![User Base](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=persons&label=user%20base&units=null&value_color=blue&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![Monitored Servers](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=machines&label=servers%20monitored&units=null&value_color=orange&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![Sessions Served](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_sessions&label=sessions%20served&units=null&value_color=yellowgreen&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry)
+> 
+> [![New Users Today](http://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=persons&after=-86400&options=unaligned&group=incremental-sum&label=new%20users%20today&units=null&value_color=blue&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![New Machines Today](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=machines&group=incremental-sum&after=-86400&options=unaligned&label=servers%20added%20today&units=null&value_color=orange&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![Sessions Today](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_sessions&after=-86400&group=incremental-sum&options=unaligned&label=sessions%20served%20today&units=null&value_color=yellowgreen&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry)
+
+---
+
+netdata v1.8.0 released.
+
+This release focuses on metrics streaming improvements and containers monitoring.
+
+As always, this netdata is the fastest and the more stable netdata ever! **Update now!**
+
+[To install or update netdata, click here](https://github.com/firehol/netdata/wiki/Installation)!
+
+
+## key streaming improvements
+
+#### bug fix: streaming slaves consuming 100% CPU
+
+netdata, as a slave, was not handling all the error cases properly, resulting in 100% cpu utilization of a single core, under certain conditions. Especially under FreeBSD and macOS slaves, these conditions were always met, so using FreeBSD or macOS as netdata slaves, was completely broken.
+
+#### bug fix: missing alarm notifications on netdata masters
+
+netdata was incorrectly messing cached alarm state data between the alarms of the mirrored hosts, resulting in alarm notifications not dispatched under certain conditions. This was affecting only netdata masters (ie. netdata servers with more than one host databases, with health monitoring enabled). The alarms were generated and were visible at the dashboards, but the notifications were not always sent.
+
+#### bug fix: streamed charts with duplicate names
+
+There was a minor issue with charts that were created with name aliases. When these charts were streamed from netdata slaves to netdata masters, they ended up with duplicate chart names (ie instead of `type.name` they had `type.type.name`).
+
+---
+
+## key containers monitoring improvements
+
+- **Container network interfaces are now moved to the container section** and they are rendered from the container view point (i.e. `sent` = what the container sent) - no more `veth*` garbage on the dashboard.
+
+- The interfaces also appear as `eth0` (or whatever the container sees) and they are inside the container section of the dashboard. netdata maps each `veth*` interface to the right container, using plain `cgroups` features, so this works for all container managers (docker, lxc, etc).
+
+- Eliminated the nested containers shown under certain versions of `lxc`.
+
+- Also, containers and VMs now have summary gauges on the dashboard
+
+   ![image](https://user-images.githubusercontent.com/2662304/30249219-3e032246-9640-11e7-9f37-4d78f280a74d.png)
+
+---
+
+## key plugins improvements
+
+#### python.d.plugin now supports HTTP keep-alive
+
+netdata now uses `urllib3` (shipped with netdata for both python v2 and v3) for URLService based plugins.
+
+This enables HTTP `keep-alive` on all connections, which allows netdata to have permanent connections to third party web applications.
+
+Fixed by @l2isbad 
+
+---
+
+## compatibility enhancements
+
+- better support for Oracle Linux, by @schindlerd 
+- better support for Alpine Linux
+- various fixes at the build procedure for macOS
+- `fping` can now run as non-root, in static binary netdata packages
+
+## netdata generic enhancements
+
+- netdata can now listen on UNIX domain sockets (`.sock` files). This allows a local web server and netdata to communicate bypassing the network stack (for netdata set `bind to = unix:/path/to/netdata.sock` - this option supports multiple arguments, so netdata can listen to multiple unix sockets and tcp sockets, at the same time).
+
+- netdata was assuming that the JSON representation of a chart would at most be 1024 bytes, and it was generating **corrupted JSON** output when any chart was exceeding that limit. Removed the limitation (ie. now there is no limit).
+
+- netdata was crashing while starting, if **no usable disks were found**.
+
+- systemd `netdata.service` now allows setting negative netdata OOM score and restarts netdata if it crashes. The new `netdata.service` is not automatically installed when updating netdata. Either delete `/etc/systemd/system/netdata.service` and then update/re-install netdata, or copy the file by hand.
+
+- minor fixes at the installer, by @vincele
+
+---
+
+## new plugins
+
+- Added Intel CPU temperature charts on FreeBSD and macOS, by @vlvkobal 
+- Added CPU thermal throttling charts on Linux (useful on physical servers and possibly laptops)
+- Added `chrony` plugin, by @domschl
+- Added [Stiebel Eltron](https://github.com/firehol/netdata/blob/master/node.d/README.md#stiebel-eltron) plugin to collect metrics from heat pumps and hot water installations from Stiebel Eltron ISG @BrainDoctor
+
+## improved plugins
+
+- `web_log` bugfixes, enhancements and optimizations (including `squid` logs), by @l2isbad 
+- `web_log` now enables parsing HTTP/2 logs in `custom_log_format`, by @Funzinator
+- `redis` bugfixes, by @l2isbad 
+- `haproxy` bugfixes, by @l2isbad 
+- `elasticsearch` bugfixes and optimizations, by @l2isbad 
+- `rabbitmq` bugfixes and optimizations, by @l2isbad 
+- `mdstat` bugfixes, by @JeffHenson
+- `tomcat` improvements, by @Wing924
+- `mysql` improvements, by @alibo and @l2isbad 
+- `dovecot` improvements
+- `postgres` improvements, by @facetoe
+- `cpufreq` fixed a bug that prevented `accurate` reporting of CPU frequencies. `accurate` works with the `acpi-cpufreq` driver and calculates the average CPU clock of the CPUs utilizing the accounting per frequency, as reported by the kernel, by @tycho
+- `cpuidle` performance improvements (faster under load) by @tycho 
+- `fail2ban` bugfixes, by @l2isbad 
+- `SNMP` plugin new uses latest `net-snmp` and the corrupted 64 bit counters encountered under certain node.js version is now fixed.
+
+---
+
+## dashboard improvements
+
+- `easypiecharts` and `gauges` can now render arbitrary ranges and animate clock wise or counter clock wise.
+
+- traditionally netdata was using 1024 bits = 1 kilobit. It is fixed: 1000 bits = 1 kilobit.
+
+- netdata charts should now work on wordpress pages.
+
+---
+
+## alarms and notifications
+
+- `alarm-notify.sh` now supports debug mode, showing the exact commands it runs to send notifications, when `export NETDATA_ALARM_NOTIFY_DEBUG=1`
+
+- `alarm-notify.sh` now supports setting the sender email address of the emails it sends.
+
+- emails sent by `alarm-notify.sh` now include headers to reduce the possibility of them being scored as spam, by @Ferroin 
+
+- network related alarms got new thresholds and improved badges
+
+- netdata now detects if the system has been suspended and pauses all alarms for 60 seconds on resume, to prevent false alarms (no more false alarms on laptops when they resume).
+
+- netdata alarms now support filtering based on hostname and O/S (linux, freebsd, macos). This means that netdata masters, can now support alarms for slaves of any O/S (i.e. a Linux netdata master can handle alarms for a FreeBSD slave).
+
+- netdata slack notifications now show the host sent the alarm. In the image below, the alarm is about `bangalore`, and is sent by `netdata-build-server` (at the lower left corner):
+
+   ![image](https://user-images.githubusercontent.com/2662304/30249624-55a62bf2-9648-11e7-8e85-730395a8e0bf.png)
+
+---
+
+## statsd
+
+- the number of fractional points supported by statsd is now configurable (1 to 7).
+- 95th percentile calculation on statsd histograms and timers, was incorrectly averaging the values. It is now fixed.
+- statsd metrics with non ASCII text were processed by the statsd server, but were breaking JSON data generated by netdata. Fixed it by replacing all invalid characters.
+",https://api.github.com/users/firehol-automation,32034679,firehol-automation,https://api.github.com/repos/firehol/netdata/releases/7784228/assets,https://api.github.com/repos/firehol/netdata/releases/7784228,master,https://api.github.com/repos/firehol/netdata/tarball/v1.8.0,https://github.com/firehol/netdata/releases/tag/v1.8.0,https://api.github.com/repos/firehol/netdata/zipball/v1.8.0,v1.8.0,False,False
+7057011,2017-07-16T19:21:18Z,2017-07-16T20:12:51Z,v1.7.0,"
+### New to netdata? Check its demo: [https://my-netdata.io](http://my-netdata.io)
+
+> [![User Base](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=persons&label=user%20base&units=null&value_color=blue&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![Monitored Servers](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=machines&label=servers%20monitored&units=null&value_color=orange&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![Sessions Served](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_sessions&label=sessions%20served&units=null&value_color=yellowgreen&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry)
+> 
+> [![New Users Today](http://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=persons&after=-86400&options=unaligned&group=incremental-sum&label=new%20users%20today&units=null&value_color=blue&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![New Machines Today](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=machines&group=incremental-sum&after=-86400&options=unaligned&label=servers%20added%20today&units=null&value_color=orange&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![Sessions Today](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_sessions&after=-86400&group=incremental-sum&options=unaligned&label=sessions%20served%20today&units=null&value_color=yellowgreen&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry)
+
+---
+
+This is release v1.7 of netdata.
+
+netdata is still spreading fast: we are at **320.000 users** and **132.000 servers**! Almost 100k new users, 52k new installations and 800k docker pulls since the previous release 4 and a half months ago! netdata user base grows at about **1000 new users and 600 new servers _per day_**! Thank you! You are awesome!
+
+> The next release (v1.8) will be focused on providing a **global health monitoring service**, for all netdata users, **for free**! Read more about it [here](https://github.com/firehol/netdata/issues/2466). We need supporters for this cause. Join us!
+
+### highlights of netdata v1.7
+
+1. netdata is now a (very fast) fully featured **statsd** server and the only one with automatic visualization: push a statsd metric and hit F5 on the netdata dashboard: your metric visualized. It also supports synthetic charts, defined by you, so that you can correlate and visualize your application the way you like it.
+
+2. netdata got **new installation options** - it is now [easier than ever to install netdata](https://github.com/firehol/netdata/wiki/Installation#linux-one-liner) - we also distribute a **[statically linked netdata x86_64 binary](https://github.com/firehol/netdata/wiki/Installation#x86_64-pre-built-binary-for-any-linux)**, including key dependencies (like `bash`, `curl`, etc) that can run everywhere a Linux kernel runs (CoreOS, CirrOS, etc).
+
+3. **metrics streaming and replication** has been improved significantly. All known issues have been solved and key enhancements have been added. headless collectors and proxies can now send metrics to backends when `data source = as collected`.
+
+4. **backends** have got quite a few enhancements, including **host tags**, **metrics filtering**  at the netdata side and sending of chart and dimension names instread of IDs; **[prometheus](https://github.com/firehol/netdata/wiki/Using-Netdata-with-Prometheus)** support has been re-written to utilize more prometheus features and provide more flexibility and integration options. **IF YOU UPDATE FROM NETDATA 1.6 PLEASE CHECK YOUR DASHBOARDS, SINCE MANY METRICS HAVE CHANGED NAMES**.
+
+5. netdata now monitors **ZFS** (on Linux and FreeBSD), **ElasticSearch**, **RabbitMQ**, **Go** applications (via `expvar`), **ipfw** (on FreeBSD 11), **samba**, **squid logs** (with `web_log` plugin!).
+
+6. netdata **dashboard loading times** have been improved significantly (hit F5 a few times on a netdata dashboard - it is now amazingly fast), to support dashboards with thousands of charts.
+
+7. netdata alarms now support [custom hooks](https://github.com/firehol/netdata/blob/e980060b2d0724a6ea220a7a1005e2fd094db3ec/conf.d/health_alarm_notify.conf#L318-L365), so you can run whatever you like in parallel with netdata alarms.
+
+8. As usual, this release brings dozens more improvements, enhancements and compatibility fixes.
+
+
+## netdata is now a fully featured **statsd** server
+
+netdata is now a fully featured **statsd** server. It can collect statsd formatted metrics, visualize them on its dashboards, stream them to other netdata servers or archive them to backend time-series databases.
+
+netdata statsd is fast. It can collect more than 1.200.000 metrics per second on modern hardware, more than 200Mbps of sustained statsd traffic. netdata statsd is inside netdata. This provides a distributed statsd implementation.
+
+netdata also supports statsd **synthetic charts**: You can create dedicated sections on the dashboard to render the charts. You can control everything: the main menu, the submenus, the charts, the dimensions on each chart, etc.
+
+[Read more about netdata statsd](https://github.com/firehol/netdata/wiki/statsd)
+
+#### counters
+
+- Scope: **count the events of something** (e.g. number of file downloads)
+- Format: `name:INTEGER|c` or `name:INTEGER|C` or `name|c`
+- statsd increments the counter by the `INTEGER` number supplied (positive, or negative).
+
+![image](https://cloud.githubusercontent.com/assets/2662304/26131553/4a26d19c-3aa3-11e7-94e8-c53b5ed6ebc3.png)
+
+#### gauges
+
+- Scope: **report the value of something** (e.g. cache memory used by the application server)
+- Format: `name:FLOAT|g`
+- statsd remembers the last value supplied, and can increment or decrement the latest value if `FLOAT` begins with ` + ` or ` - `.
+
+![image](https://cloud.githubusercontent.com/assets/2662304/26131575/5d54e6f0-3aa3-11e7-9099-bc4440cd4592.png)
+
+#### histograms
+
+- Scope: **statistics on a size of events** (e.g. statistics on the sizes of files downloaded)
+- Format: `name:FLOAT|h`
+- statsd maintains a list of all the values supplied and provides statistics on them.
+
+![image](https://cloud.githubusercontent.com/assets/2662304/26131587/704de72a-3aa3-11e7-9ea9-0d2bb778c150.png)
+
+The same chart with `sum` unselected, to show the detail of the dimensions supported:
+![image](https://cloud.githubusercontent.com/assets/2662304/26131598/8076443a-3aa3-11e7-9ffa-ea535aee9c9f.png)
+
+#### meters
+
+This is identical to `counter`.
+
+- Scope: **count the events of something** (e.g. number of file downloads)
+- Format: `name:INTEGER|m` or `name|m` or just `name`
+- statsd increments the counter by the `INTEGER` number supplied (positive, or negative).
+
+![image](https://cloud.githubusercontent.com/assets/2662304/26131605/8fdf5a06-3aa3-11e7-963f-7ecf207d1dbc.png)
+
+#### sets
+
+- Scope: **count the unique occurrences of something** (e.g. unique filenames downloaded, or unique users that downloaded files)
+- Format: `name:TEXT|s`
+- statsd maintains a unique index of all values supplied, and reports the unique entries in it.
+
+![image](https://cloud.githubusercontent.com/assets/2662304/26131612/9eaa7b1a-3aa3-11e7-903b-d881e9a35be2.png)
+
+#### timers
+
+- Scope: **statistics on the duration of events** (e.g. statistics for the duration of file downloads)
+- Format: `name:FLOAT|ms`
+- statsd maintains a list of all the values supplied and provides statistics on them.
+
+![image](https://cloud.githubusercontent.com/assets/2662304/26131620/acbea6a4-3aa3-11e7-8bdd-4a8996847767.png)
+
+The same chart with the `sum` unselected:
+![image](https://cloud.githubusercontent.com/assets/2662304/26131629/bc34f2d2-3aa3-11e7-8a07-f2fc94ba4352.png)
+
+---
+
+## dashboard improvements
+
+There have been significant optimizations to the loading times of the dashboard. The dashboard loads instantly now, even when there are several hundreds of charts in it (hit F5 on the dashboard - it is super fast).
+
+For those who know: we eliminated most browser reflows, by refactoring the way the charts are initialized and splitting initialization in 2 phases. Unfortunately we had to re-shape gauge and easypiecharts, so pay some attention to your custom dashboards after updating.
+
+We now use **natural sorting** on the dashboard elements (i.e. instead of 1, 10, 2, 3 we get 1, 2, 3, 10).
+
+There have been dozens of performance improvements on the netdata dashboard. Like all the previous releases, **this release makes netdata the fastest netdata** so far!
+
+## new installation methods
+
+- Single line installation on Linux
+- Static 64bit packages for Linux
+- Improved support for Red Hat Enterprise Linux @racciari, 
+- Improved support for Amazon Machine Image
+- Improved support for Centos @n0coast
+- Many more installer/updater improvements @nielsAD, @mfurlend
+
+## Streaming
+
+- improved self cleanup of obsolete charts and hosts at a central netdata.
+- **host tags** are now propagated from netdata to netdata while streaming metrics.
+- log error when multiple clients are streaming the metrics of the same host.
+- dozens more streaming improvements and bugfixes.
+
+## Backends
+
+- New **[prometheus](https://github.com/firehol/netdata/wiki/Using-Netdata-with-Prometheus)** backend, supporting all the features of the others backends netdata supports. The new format changed the names of metrics, so if you use grafana or other tools you will have to update your queries.
+- Prometheus and opentsdb now support **host tags** (advanced ephemeral nodes monitoring)
+- Metrics sent to backends with data source `average`, `sum` or `volume` (from the netdata database) are now more accurate.
+- Added `contrib/nc-backend.sh`, a script that can act as a fallback backend for graphite, opentsdb and compatibles.
+- netdata nodes without a database (slaves and proxies) can now send `as collected` metrics to backends.
+
+## New and improved plugins
+
+- **Go** apps monitoring via `expvar`  ! @kralewitz
+- **ElasticSearch** monitoring ! @l2isbad 
+- **RabbitMQ** monitoring ! @l2isbad 
+- **ipfw** monitoring under FreeBSD 11 ! @vlvkobal 
+- **ZFS** monitoring under FreeBSD (@vlvkobal) and Linux !
+- **samba** monitoring ! @ntlug 
+- `web_log` plugin can now monitor **squid logs** too ! @l2isbad 
+- `web_log` plugin can now monitor **apache cache logs** too (removed old `apache_cache` plugin) @l2isbad 
+- many more `web_log` improvements - `web_log` is now a lot more powerful! @l2isbad
+- `python.d.plugin` `LogService` now supports monitoring web log files matching a pattern @l2isbad 
+- disk monitoring under Linux now utilizes `/dev/mapper` names. It also has improved docker compatibility.
+- `haproxy` improvements @l2isbad 
+- `dns_query_time` plugin to monitor the response time of nameservers @l2isbad 
+- Fronius Solar @BrainDoctor 
+- better support for monitoring Proxmox/qemu @efaden and libvirt/qemu VMs
+- `cpufreq` improvements @l2isbad 
+- `smartd_log` improvements @pkoenig10 
+- `bind_rndc` rewritten @l2isbad 
+- `lighttpd` improvements (part of the `apache` plugin)
+- `isc_dhcpd` improvements @l2isbad 
+- `fping` improvements
+- `apps.plugin` improvements (added many more applications to monitor, notably **hadoop** and friends, improved compatibility)
+- `freeipmi` improvements
+- `mdstat` improvements @l2isbad 
+- `mysql` improvements @alibo 
+- `redis` improvements @l2isbad 
+- `postgres` rds fixes @facetoe 
+- `fail2ban` improvements @l2isbad 
+- `idlejitter` rewritten
+- `openvpn` improvements @l2isbad 
+- `numa` improvements @Benje06
+
+## New and improved alarms
+
+- `alarm-notify.sh` now supports [custom notification methods](https://github.com/firehol/netdata/blob/e980060b2d0724a6ea220a7a1005e2fd094db3ec/conf.d/health_alarm_notify.conf#L318-L365) (you can hook whatever you like to netdata alarms).
+- email notifications are now multipart (have both HTML and text versions in them)
+- low memory alarm now excludes ZFS ARC.
+- improved discord notifications.
+- improved telegraf notifications @alibo 
+- `lighttpd` alarm
+- `mongodb` alarm @jnogol 
+
+## Other improvements
+
+- memory mode `ram` utilizes KSM (kernel memory deduper).
+- many memory mode `map` improvements for faster operation with huge databases.
+- netdata is now even faster on FreeBSD, thank to several optimization made by @vlvkobal 
+- netdata can now be compiled with `clang`, even on FreeBSD
+- netdata can now be compiled on FreeBSD 10.3
+",https://api.github.com/users/philwhineray,1271051,philwhineray,https://api.github.com/repos/firehol/netdata/releases/7057011/assets,https://api.github.com/repos/firehol/netdata/releases/7057011,master,https://api.github.com/repos/firehol/netdata/tarball/v1.7.0,https://github.com/firehol/netdata/releases/tag/v1.7.0,https://api.github.com/repos/firehol/netdata/zipball/v1.7.0,v1.7.0,False,False
+5807468,2017-03-20T18:27:50Z,2017-03-20T18:36:43Z,v1.6.0,"
+### New to netdata? Check its demo: [https://my-netdata.io](http://my-netdata.io)
+
+> [![User Base](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=persons&label=user%20base&units=null&value_color=blue&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![Monitored Servers](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=machines&label=servers%20monitored&units=null&value_color=orange&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![Sessions Served](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_sessions&label=sessions%20served&units=null&value_color=yellowgreen&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry)
+> 
+> [![New Users Today](http://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=persons&after=-86400&options=unaligned&group=incremental-sum&label=new%20users%20today&units=null&value_color=blue&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![New Machines Today](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=machines&group=incremental-sum&after=-86400&options=unaligned&label=servers%20added%20today&units=null&value_color=orange&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![Sessions Today](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_sessions&after=-86400&group=incremental-sum&options=unaligned&label=sessions%20served%20today&units=null&value_color=yellowgreen&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry)
+> 
+> Release announced on [twitter](https://twitter.com/linuxnetdata/status/843895489431044097), [hacker news](https://news.ycombinator.com/item?id=13916596), [reddit r/linux](https://www.reddit.com/r/linux/comments/60idga/netdata_the_opensource_realtime_performance/),  [reddit r/sysadmin](https://www.reddit.com/r/sysadmin/comments/60ieet/netdata_the_opensource_realtime_performance/), [reddit r/linuxadmin](https://www.reddit.com/r/linuxadmin/comments/60iebz/netdata_the_opensource_realtime_performance/), [reddit r/freebsd](https://www.reddit.com/r/freebsd/comments/60ie8j/netdata_the_opensource_realtime_performance/)  [reddit r/devops](https://www.reddit.com/r/devops/comments/60mrwv/netdata_the_opensource_realtime_performance_and/) [reddir r/homelab](https://www.reddit.com/r/homelab/comments/60jc00/netdata_the_opensource_realtime_performance/)  [facebook](https://www.facebook.com/linuxnetdata/posts/1721842394773573:0)
+
+## birthday release: **1 year netdata**
+
+netdata was first published on **March 30th, 2016**.
+It has been a crazy year since then:
+
+<p align=""center"">
+<b>225.000</b> unique netdata users<br/>
+<i>currently, at 1.000 new unique users per day</i>
+<br/>&nbsp;<br/>
+<b>80.000</b> unique netdata installations<br/>
+<i>currently, at 500 new unique installations per day</i>
+<br/>&nbsp;<br/>
+<b>610.000</b> docker pulls on docker hub<br/>
+<br/>
+<b>4.000.000</b> netdata sessions served<br/>
+<i>currently, at 15.000 unique netdata sessions served per day</i>
+<br/>&nbsp;<br/>
+<b>20.000</b> github stars<br/>
+<br/>
+Thank you!<br/>
+You are <b>awesome</b>!<br/>
+</p>
+
+## Central netdata is here!
+
+This is the first release that supports real-time streaming of metrics between netdata servers.
+
+netdata can now be:
+
+- **autonomous host monitoring** (like it always has been)
+- **headless data collector** (collect and stream metrics in real-time to another netdata)
+- **headless proxy** (collect metrics from multiple netdata and stream them to another netdata)
+- **store and forward proxy** (like **headless proxy**, but with a local database)
+- **central database** (metrics from multiple hosts are aggregated)
+
+metrics databases can be configured on all nodes and each node maintaining a database may have a **different retention** policy and possibly run (even different) **alarms** on them.
+
+<p align=""center"">
+<img src=""https://cloud.githubusercontent.com/assets/2662304/23629551/bb1fd9c2-02c0-11e7-90f5-cab5a3ed4c53.png""/>
+</p>
+
+There are 4 settings that control what netdata can be:
+
+1. `[global].memory mode` in `netdata.conf`, controls if a netdata will maintain a **local database** and the type of it. For more information check [Running a dedicated central netdata server](https://github.com/firehol/netdata/wiki/Memory-Requirements#running-a-dedicated-central-netdata-server).
+
+2. `[web].mode` in `netdata.conf`, controls if netdata will **expose its API**, and the type of web server to enable (single or multi-threaded). Check [netdata.conf configuration for streaming](https://github.com/firehol/netdata/wiki/Replication-Overview#netdataconf-configuration).
+
+3. `[stream].enabled` in `stream.conf`, controls if netdata will **stream its metrics to another netdata**. Check [stream.conf for sending metrics](https://github.com/firehol/netdata/wiki/Replication-Overview#streaming-configuration).
+
+4. `[API KEY].enabled` in `stream.conf`, controls if netdata will **accept metrics from other netdata**. Check [stream.conf for receiving metrics](https://github.com/firehol/netdata/wiki/Replication-Overview#options-for-the-receiving-node).
+
+Using the above, we support a lot of different configurations, like these:
+
+target | memory<br/>mode | web<br/>mode | stream<br/>enabled | send to<br/>backend | local<br/>alarms | local<br/>dashboard
+-------|:-----------:|:---:|:------:|:-------:|:---------:|:----:
+**headless collector**|`none`|`none`|`yes`|not possible|not possible|no
+**headless proxy**|`none`|not `none`|`yes`|not possible|not possible|no
+**proxy with db**|not `none`|not `none`|`yes`|possible|possible|yes
+**central netdata**|not `none`|not `none`|`no`|possible|possible|yes
+
+
+### monitoring ephemeral nodes
+
+netdata now supports monitoring autoscaled ephemeral nodes, that are started and stopped on demand (their IP is not known). 
+
+<p align=""center"">
+<img src=""https://cloud.githubusercontent.com/assets/2662304/23627295/e3569adc-02b8-11e7-9d55-4014bf98c1b3.png""/>
+</p>
+
+When the ephemeral nodes start streaming metrics to the central netdata, the central netdata will show register them at `my-netdata` menu on the dashboard, like this:
+
+<p align=""center"">
+<img src=""https://cloud.githubusercontent.com/assets/2662304/24080824/24cd2d3c-0caf-11e7-909d-a8dd1dbb95d7.png""/>
+</p>
+
+You can see this live at [https://build.my-netdata.io](https://build.my-netdata.io) (this server may not always be available for demo).
+
+For more information check: [monitoring ephemeral nodes](https://github.com/firehol/netdata/wiki/monitoring-ephemeral-nodes).
+
+### monitoring ephemeral containers and VM guests
+
+netdata now cleans up container, guest VM, network interfaces and mounted disk metrics, disabling automatically their alarms too.
+
+For more information check [monitoring ephemeral containers](https://github.com/firehol/netdata/wiki/monitoring-ephemeral-containers).
+
+## apps.plugin ported for FreeBSD
+
+**[Vladimir Kobal](https://github.com/vlvkobal)** has ported `apps.plugin` to FreeBSD.
+
+netdata can now provide `Applications`, `Users` and `User Groups` under FreeBSD too:
+
+Also, the CPU utilization of netdata under FreeBSD, is now a lot less compared to netdata v1.5.
+
+See it live at our **[FreeBSD demo server](http://freebsd.my-netdata.io/#menu_apps)**.
+
+## web_log plugin
+
+[Ilya Mashchenko](https://github.com/l2isbad) has done a wonderful job creating a **unified web log parsing plugin** for all kinds of web server logs. With it, netdata provides real-time performance information and health monitoring alarms for web applications and web sites!
+
+Requests by http status:
+![image](https://cloud.githubusercontent.com/assets/2662304/22902194/ea0affc6-f23c-11e6-85f1-a4951dd4bb40.png)
+
+Requests by http status code family:
+![image](https://cloud.githubusercontent.com/assets/2662304/22901883/dea7d33a-f23b-11e6-960d-00a913b58936.png)
+
+Requests by http status code:
+![image](https://cloud.githubusercontent.com/assets/2662304/22901965/1a5d84ba-f23c-11e6-9d38-3deebcc8b879.png)
+
+Requests bandwidth:
+![image](https://cloud.githubusercontent.com/assets/2662304/22902266/245141d6-f23d-11e6-90f9-98729733e0da.png)
+
+Requests timings:
+![image](https://cloud.githubusercontent.com/assets/2662304/22902283/369e3f92-f23d-11e6-9359-53e5d4ecb18e.png)
+
+URL patterns of interest (you configure the patterns):
+![image](https://cloud.githubusercontent.com/assets/2662304/22902302/4d25bf06-f23d-11e6-844d-18c0876bdc3d.png)
+
+Requests by http method:
+![image](https://cloud.githubusercontent.com/assets/2662304/22902323/5ee376d4-f23d-11e6-8457-157d3f438843.png)
+
+Requests by IP version:
+![image](https://cloud.githubusercontent.com/assets/2662304/22902370/7091a770-f23d-11e6-8cd2-74e9a67b1397.png)
+
+Number of unique clients:
+![image](https://cloud.githubusercontent.com/assets/2662304/22902384/835aa168-f23d-11e6-914f-cfc3f06eaff8.png)
+
+and a lot more, including **alarms**:
+
+
+alarm|description|minimum<br/>requests|warning|critical
+:-------|-------|:------:|:-----:|:------:
+`1m_redirects`|The ratio of HTTP redirects (3xx except 304) over all the requests, during the last minute.<br/>&nbsp;<br/>*Detects if the site or the web API is suffering from too many or circular redirects.*<br/>&nbsp;<br/>(i.e. **oops!** *this should not redirect clients to itself*)|120/min|&gt; 20%|&gt; 30%
+`1m_bad_requests`|The ratio of HTTP bad requests (4xx) over all the requests, during the last minute.<br/>&nbsp;<br/>*Detects if the site or the web API is receiving too many bad requests, including `404`, not found.*<br/>&nbsp;<br/>(i.e. **oops!** *a few files were not uploaded*)|120/min|&gt; 30%|&gt; 50%
+`1m_internal_errors`|The ratio of HTTP internal server errors (5xx), over all the requests, during the last minute.<br/>&nbsp;<br/>*Detects if the site is facing difficulties to serve requests.*<br/>&nbsp;<br/>(i.e. **oops!** *this release crashes too much*)|120/min|&gt; 2%|&gt; 5%
+`5m_requests_ratio`|The percentage of successful web requests of the last 5 minutes, compared with the previous 5 minutes.<br/>&nbsp;<br/>*Detects if the site or the web API is suddenly getting too many or too few requests.*<br/>&nbsp;<br/>(i.e. too many = **oops!** *we are under attack*)<br/>(i.e. too few = **oops!** *call the network guys*)|120/5min|&gt; double or &lt; half|&gt; 4x or &lt; 1/4x
+`web_slow`|The average time to respond to requests, over the last 1 minute, compared to the average of last 10 minutes.<br/>&nbsp;<br/>*Detects if the site or the web API is suddenly a lot slower.*<br/>&nbsp;<br/>(i.e. **oops!** *the database is slow again*)|120/min|&gt; 2x|&gt; 4x
+`1m_successful`|The ratio of successful HTTP responses (1xx, 2xx, 304) over all the requests, during the last minute.<br/>&nbsp;<br/>*Detects if the site or the web API is performing within limits.*<br/>&nbsp;<br/>(i.e. **oops!** *help us God!*)|120/min|&lt; 85%|&lt; 75%
+
+For more information check: **[the spectacles of a web server log file](https://github.com/firehol/netdata/wiki/The-spectacles-of-a-web-server-log-file)**.
+
+## backends
+
+netdata can now archive metrics to `JSON` backends (both push, by @lfdominguez, and pull modes).
+
+## IPMI monitoring
+
+netdata now has an IPMI plugin (based on [freeipmi](https://www.gnu.org/software/freeipmi/)) for monitoring **server hardware**.
+
+The plugin creates (up to) 8 charts, based on the information collected from IPMI:
+
+1. number of sensors by state
+2. number of events in SEL
+3. Temperatures CELCIUS
+4. Temperatures FAHRENHEIT
+5. Voltages
+6. Currents
+7. Power
+8. Fans
+
+It also supports alarms (including the number of sensors in **critical** state):
+
+![image](https://cloud.githubusercontent.com/assets/2662304/23674138/88926a20-037d-11e7-89c0-20e74ee10cd1.png)
+
+For more information, check [monitoring IPMI](https://github.com/firehol/netdata/wiki/monitoring-IPMI).
+
+## New Plugins
+
+**[Ilya Mashchenko](https://github.com/l2isbad)** builds python data collection plugins for netdata at an wonderfull rate! **He rocks!**
+
+- **web_log** for monitoring in real-time all kinds of web server log files @l2isbad
+- **freeipmi** for monitoring IPMI (server hardware)
+- **nsd** (the [name server daemon](https://www.nlnetlabs.nl/projects/nsd/)) @383c57
+- **mongodb** @l2isbad
+- **smartd_log** (monitoring disk S.M.A.R.T. values) @l2isbad
+
+
+## Improved Plugins
+
+- **nfacct** reworked and now collects connection tracker information using netlink.
+- **ElasticSearch** re-worked @l2isbad
+- **mysql** re-worked to allow faster development of custom mysql based plugins (MySQLService) @l2isbad
+- **SNMP**
+- **tomcat** @NMcCloud
+- **ap** (monitoring hostapd access points)
+- **php_fpm** @l2isbad
+- **postgres** @l2isbad
+- **isc_dhcpd** @l2isbad
+- **bind_rndc** @l2isbad
+- **numa**
+- **apps.plugin** improvements and freebsd support @vlvkobal
+- **fail2ban** @l2isbad
+- **freeradius** @l2isbad
+- **nut** (monitoring UPSes)
+- **tc** (Linux QoS) now works on qdiscs instead of classes for the same result (a lot faster) @t-h-e
+- **varnish** @l2isbad
+
+## New and Improved Alarms
+- **web_log**, many alarms to detect common web site/API issues
+- **fping**, alarms to detect packet loss, disconnects and unusually high latency
+- **cpu**, cpu utilization alarm now ignores `nice`
+
+## New and improved alarm notification methods
+- **HipChat** to allow hosted HipChat @frei-style
+- **discordapp** @lowfive
+
+## Dashboard Improvements
+- dashboard now works on HiDPi screens
+- dashboard now shows version of netdata
+- dashboard now resets charts properly
+- dashboard updated to use latest gauge.js release
+
+## Other Improvements
+- thanks to @rlefevre netdata now uses a lot of different high resolution system clocks.
+
+netdata has received a lot more improvements from many more  contributors! (it was really a lot of work to dig into git log to collect all the above, so forgive me if I forgot to mention a few contributions and contributors).
+
+Thank you all!
+",https://api.github.com/users/philwhineray,1271051,philwhineray,https://api.github.com/repos/firehol/netdata/releases/5807468/assets,https://api.github.com/repos/firehol/netdata/releases/5807468,master,https://api.github.com/repos/firehol/netdata/tarball/v1.6.0,https://github.com/firehol/netdata/releases/tag/v1.6.0,https://api.github.com/repos/firehol/netdata/zipball/v1.6.0,v1.6.0,False,False
+5232788,2017-01-22T19:50:08Z,2017-01-22T21:28:30Z,v1.5.0,"### New to netdata? Check its demo: [http://my-netdata.io](http://my-netdata.io)
+
+> [![User Base](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=persons&label=user%20base&units=null&value_color=blue&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![Monitored Servers](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=machines&label=servers%20monitored&units=null&value_color=orange&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![Sessions Served](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_sessions&label=sessions%20served&units=null&value_color=yellowgreen&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry)
+> 
+> [![New Users Today](http://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=persons&after=-86400&options=unaligned&group=incremental-sum&label=new%20users%20today&units=null&value_color=blue&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![New Machines Today](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=machines&group=incremental-sum&after=-86400&options=unaligned&label=servers%20added%20today&units=null&value_color=orange&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![Sessions Today](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_sessions&after=-86400&group=incremental-sum&options=unaligned&label=sessions%20served%20today&units=null&value_color=yellowgreen&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry)
+> 
+> Release announced on [twitter](https://twitter.com/linuxnetdata/status/823844302698713088), [hacker news](https://news.ycombinator.com/item?id=13470333), [reddit r/linux](https://www.reddit.com/r/linux/comments/5pvgar/netdata_the_opensource_realtime_performance/),  [reddit r/sysadmin](https://www.reddit.com/r/sysadmin/comments/5pvg5n/netdata_the_opensource_realtime_performance/), [reddit r/linuxadmin](https://www.reddit.com/r/linuxadmin/comments/5pvgfb/netdata_the_opensource_realtime_performance/), [reddit r/freebsd](https://www.reddit.com/r/freebsd/comments/5pvgk8/netdata_the_realtime_performance_monitoring/)
+
+Yet another release that makes netdata the fastest netdata ever!
+
+This is probably the release with the largest changeset so far. A lot of work, by a lot of people made this release possible!
+
+## FreeBSD, MacOS and FreeNAS
+
+**[Vladimir Kobal](https://github.com/vlvkobal)** has done a magnificent work porting netdata to FreeBSD and MacOS.
+
+Everything works:
+- cpu and interrupts, memory, disks (performance and space monitoring)
+- network interfaces and softnet
+- IPv4 and IPv6 metrics
+- processes and context switches
+- IPC (queues, semaphores, shared memory)
+- and of course all the netdata external plugins
+
+**Wow!** Check it live on FreeBSD, at **[https://freebsd.my-netdata.io/](https://freebsd.my-netdata.io/)**
+
+## Backends
+
+netdata supports **[data archiving to backend databases](https://github.com/firehol/netdata/wiki/netdata-backends)**:
+- Graphite
+- OpenTSDB
+- Prometheus
+
+and of course all the compatible ones (KairosDB, InfluxDB, Blueflood, etc)
+
+![image](https://cloud.githubusercontent.com/assets/2662304/20649711/29f182ba-b4ce-11e6-97c8-ab2c0ab59833.png)
+
+With this feature netdata can interface with your existing devops infrastructure and allow you to visualize its metrics with other tools, like grafana.
+
+## New Plugins
+
+**[Ilya Mashchenko](https://github.com/l2isbad)** has created most of the python data collection plugins in this release! He rocks!
+- **Systemd Services** (real-time monitoring of the resource utilization of all systemd services, using cgroups!)
+- **FPing** (network latency and jitter monitoring with netdata!)
+- **Postgres** databases            @facetoe, @moumoul
+- **Vanish** disk cache (v3 and v4) @l2isbad
+- **ElasticSearch**                 @l2isbad
+- **HAproxy**                       @l2isbad
+- **FreeRadius**                    @l2isbad, @lgz
+- **mdstat** (RAID)                 @l2isbad
+- **ISC bind** (via rndc)           @l2isbad
+- **ISC dhcpd**                     @l2isbad, @lgz
+- **Fail2Ban**                      @l2isbad
+- **OpenVPN** status log            @l2isbad, @lgz
+- **NUMA** memory                   @tycho
+- **CPU Idle States**                      @tycho
+- **gunicorn**                  @deltaskelta
+- **ECC memory hardware errors**
+- **IPC** semaphores
+- **uptime** ( with a nice badge too: [![uptime badge](https://registry.my-netdata.io/api/v1/badge.svg?chart=system.uptime&v42)](https://registry.my-netdata.io/) )
+
+## Improved Plugins
+- **netfilter conntrack**
+- **MySQL/MariaDB** (replication)           @l2isbad
+- **ipfs**                          @pjz
+- **cpufreq**                       @tycho
+- **hddtemp**                       @l2isbad
+- **sensors**                       @l2isbad
+- **nginx**                         @leolovenet
+- **nginx_log**                     @paulfantom
+- **phpfpm**                        @leolovenet
+- **redis**                         @leolovenet
+- **dovecot**                       @justohall
+- **cgroups**
+- **disk space**
+- **apps.plugin**
+- **/proc/interrupts**              @rlefevre
+- **/proc/softirqs**                @rlefevre
+- **/proc/vmstat**       (system memory charts)
+- **/proc/net/snmp6**    (IPv6 charts)
+- **/proc/self/meminfo** (system memory charts)
+- **/proc/net/dev**      (network interfaces)
+- **tc**                 (linux QoS)
+
+## New and Improved Alarms
+- **MySQL/MariaDB** alarms (incl. replication)
+- **IPFS** alarms
+- **HAproxy** alarms
+- **UDP buffer** alarms
+- **TCP AttemptFails**
+- **ECC memory alarms**
+- **netfilter connections** alarms
+
+## New Alarm Notification Methods
+- **messagebird.com**               @tech-no-logical
+- **pagerduty.com**                 @jimcooley
+- **pushbullet.com**                @tperalta82
+- **twilio.com**                    @shadycuz
+- **HipChat**
+- **kafka**
+
+## Shell Integration
+
+Shell scripts can now query netdata easily!
+
+``` sh
+eval ""$(curl -s 'http://localhost:19999/api/v1/allmetrics')""
+```
+
+after this command, all the netdata metrics are exposed to shell. Check:
+
+``` sh
+# source the metrics
+eval ""$(curl -s 'http://localhost:19999/api/v1/allmetrics')""
+
+# let's see if there are variables exposed by netdata for system.cpu
+set | grep ""^NETDATA_SYSTEM_CPU""
+
+NETDATA_SYSTEM_CPU_GUEST=0
+NETDATA_SYSTEM_CPU_GUEST_NICE=0
+NETDATA_SYSTEM_CPU_IDLE=95
+NETDATA_SYSTEM_CPU_IOWAIT=0
+NETDATA_SYSTEM_CPU_IRQ=0
+NETDATA_SYSTEM_CPU_NICE=0
+NETDATA_SYSTEM_CPU_SOFTIRQ=0
+NETDATA_SYSTEM_CPU_STEAL=0
+NETDATA_SYSTEM_CPU_SYSTEM=1
+NETDATA_SYSTEM_CPU_USER=4
+NETDATA_SYSTEM_CPU_VISIBLETOTAL=5
+
+# let's see the total cpu utilization of the system
+echo ${NETDATA_SYSTEM_CPU_VISIBLETOTAL}
+5
+
+# what about alarms?
+set | grep ""^NETDATA_ALARM_SYSTEM_SWAP_""
+NETDATA_ALARM_SYSTEM_SWAP_RAM_IN_SWAP_STATUS=CRITICAL
+NETDATA_ALARM_SYSTEM_SWAP_RAM_IN_SWAP_VALUE=53
+NETDATA_ALARM_SYSTEM_SWAP_USED_SWAP_STATUS=CLEAR
+NETDATA_ALARM_SYSTEM_SWAP_USED_SWAP_VALUE=51
+
+# let's get the current status of the alarm 'ram in swap'
+echo ${NETDATA_ALARM_SYSTEM_SWAP_RAM_IN_SWAP_STATUS}
+CRITICAL
+
+# is it fast?
+time curl -s 'http://localhost:19999/api/v1/allmetrics' >/dev/null
+
+real  0m0,070s
+user  0m0,000s
+sys   0m0,007s
+
+# it is...
+# 0.07 seconds for curl to be loaded, connect to netdata and fetch the response back...
+```
+
+The `_VISIBLETOTAL` variable sums up all the dimensions of each chart.
+
+The format of the variables is:
+
+`NETDATA_${chart_id^^}_${dimension_id^^}=""${value}""`
+
+The `value` is rounded to the closest integer, since shell script cannot process decimal numbers.
+
+## Dashboard Improvements
+- dashboard is now faster on firefox, safari, opera, edge (edge is still the slowest)
+- dashboard charts legends now have bigger fonts
+- SHIFT + mousewheel to zoom charts, works on all browsers
+- perfect-scrollbar on the dashboard
+- dashboard 4K resolution fixes
+- dashboard compatibility fixes for embedding charts in third party web sites
+- charts on custom dashboards can have common min/max even if they come from different netdata servers
+- alarm log is now saved and loaded back so that the alarm history is available at the dashboard
+
+## Other Improvements
+- python.d.plugin has received way to many improvements from many contributors!
+- charts.d.plugin can now be forked to support multiple independent instances
+- registry has been re-factored to lower its memory requirements (required for the public registry)
+- simple patterns in cgroups, disks and alarms
+- netdata-installer.sh can now correctly install netdata in containers
+- supplied logrotate script compatibility fixes
+- spec cleanup                  @breed808
+- clocks and timers reworked    @rlefevre
+
+netdata has received a lot more improvements from many more  contributors! (it was really a lot of work to dig into git log to collect all the above, so forgive me if I forgot to mention a few contributions and contributors).
+
+Thank you all!
+",https://api.github.com/users/ktsaou,2662304,ktsaou,https://api.github.com/repos/firehol/netdata/releases/5232788/assets,https://api.github.com/repos/firehol/netdata/releases/5232788,master,https://api.github.com/repos/firehol/netdata/tarball/v1.5.0,https://github.com/firehol/netdata/releases/tag/v1.5.0,https://api.github.com/repos/firehol/netdata/zipball/v1.5.0,v1.5.0,False,False
+4294281,2016-10-03T22:53:42Z,2016-10-03T23:02:23Z,v1.4.0,"### New to netdata? Check its demo: [http://my-netdata.io](http://my-netdata.io)
+
+> [![User Base](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=persons&label=user%20base&units=null&value_color=blue&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![Monitored Servers](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=machines&label=servers%20monitored&units=null&value_color=orange&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![Sessions Served](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_sessions&label=sessions%20served&units=null&value_color=yellowgreen&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry)
+> 
+> [![New Users Today](http://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=persons&after=-86400&options=unaligned&group=incremental-sum&label=new%20users%20today&units=null&value_color=blue&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![New Machines Today](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=machines&group=incremental-sum&after=-86400&options=unaligned&label=servers%20added%20today&units=null&value_color=orange&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry) [![Sessions Today](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_sessions&after=-86400&group=incremental-sum&options=unaligned&label=sessions%20served%20today&units=null&value_color=yellowgreen&precision=0&v42)](https://registry.my-netdata.io/#menu_netdata_submenu_registry)
+> 
+> Release announced on [Hacker News](https://news.ycombinator.com/item?id=12633821)
+> Release announced on [reddit r/linux](https://www.reddit.com/r/linux/comments/55qmvn/netdata_the_opensource_realtime_performance_and/)
+> Release announced on [reddit r/sysadmin](https://www.reddit.com/r/sysadmin/comments/55qplu/just_released_netdata_v140/)
+> Release announced on [twitter](https://twitter.com/linuxnetdata/status/783211824711884800)
+
+### At a glance
+- **the fastest netdata ever** (with a better look too)!
+- improved **IoT** and **containers** support!
+- **alarms** improved in almost **every** way!
+- new plugins:
+  - softnet netdev,
+  - extended TCP metrics,
+  - UDPLite
+  - NFS v2, v3 client (server was there already),
+  - NFS v4 server & client,
+  - APCUPSd,
+  - RetroShare
+- improved plugins:
+  - mysql,
+  - cgroups,
+  - hddtemp,
+  - sensors,
+  - phpfm,
+  - tc (QoS)
+
+### In detail
+
+#### improved alarms!
+
+Many new alarms have been added to detect common kernel configuration errors and old alarms have been re-worked to avoid notification floods.
+
+Alarms now support:
+- **notification hysteresis** (both static and **dynamic**)
+  
+  ![image](https://cloud.githubusercontent.com/assets/2662304/19057563/6ace3096-89d9-11e6-98f8-4da9d62a575f.png)
+- notification **self-cancellation**, and
+- **dynamic thresholds** based on current alarm status
+  
+  ![image](https://cloud.githubusercontent.com/assets/2662304/19057546/43f8a366-89d9-11e6-9833-6d15da3faa8f.png)
+
+Also, a new alarms log:
+
+![image](https://cloud.githubusercontent.com/assets/2662304/19057499/f2138fca-89d8-11e6-8513-4f717c0fb861.png)
+
+#### improved alarm notifications
+
+netdata now supports:
+- email notifications
+- **slack.com** notifications on slack channels
+- **pushover.net** notifications (mobile push notifications)
+- **telegram.org** notifications
+
+For all the above methods, netdata supports **role-based** notifications, with **multiple recipients** for each role and **severity filtering** per recipient!
+
+Also, netdata support **HTML5 notifications**, while the dashboard is open in a browser window (no need to be the active one).
+
+![image](https://cloud.githubusercontent.com/assets/2662304/18407279/82bac6a6-7714-11e6-847e-c2e84eeacbfb.png)
+
+All notifications (HTML5, emails, slack, pushover, telegram) are now **clickable** to get to the chart that raised the alarm.
+
+#### other improvements
+- improved **IoT** support!
+  
+  netdata builds and runs with musl libc and runs on systems based on busybox.
+- improved **containers** support!
+  
+  netdata runs on **alpine** linux (a low profile linux distribution used in containers).
+- Dozens of other improvements and bugfixes
+
+---
+
+netdata 1.4.0 - download release tarfiles from http://firehol.org/download/netdata/releases/v1.4.0
+",https://api.github.com/users/ktsaou,2662304,ktsaou,https://api.github.com/repos/firehol/netdata/releases/4294281/assets,https://api.github.com/repos/firehol/netdata/releases/4294281,master,https://api.github.com/repos/firehol/netdata/tarball/v1.4.0,https://github.com/firehol/netdata/releases/tag/v1.4.0,https://api.github.com/repos/firehol/netdata/zipball/v1.4.0,v1.4.0,False,False
+3990816,2016-08-27T21:32:28Z,2016-08-27T21:48:47Z,v1.3.0,"### New to netdata? Check its demo: [http://my-netdata.io](http://my-netdata.io)
+
+> [![User Base](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=persons&label=user%20base&units=null&value_color=blue&precision=0&v41)](https://registry.my-netdata.io/#netdata_registry) [![Monitored Servers](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=machines&label=servers%20monitored&units=null&value_color=orange&precision=0&v41)](https://registry.my-netdata.io/#netdata_registry) [![Sessions Served](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_sessions&label=sessions%20served&units=null&value_color=yellowgreen&precision=0&v41)](https://registry.my-netdata.io/#netdata_registry)
+> 
+> [![New Users Today](http://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=persons&after=-86400&options=unaligned&group=incremental-sum&label=new%20users%20today&units=null&value_color=blue&precision=0&v41)](https://registry.my-netdata.io/#netdata_registry) [![New Machines Today](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_entries&dimensions=machines&group=incremental-sum&after=-86400&options=unaligned&label=servers%20added%20today&units=null&value_color=orange&precision=0&v41)](https://registry.my-netdata.io/#netdata_registry) [![Sessions Today](https://registry.my-netdata.io/api/v1/badge.svg?chart=netdata.registry_sessions&after=-86400&group=incremental-sum&options=unaligned&label=sessions%20served%20today&units=null&value_color=yellowgreen&precision=0&v41)](https://registry.my-netdata.io/#netdata_registry)
+
+### At a glance
+1. netdata has **[health monitoring / alarms](https://github.com/firehol/netdata/wiki/health-monitoring)**!
+2. netdata **[generates badges](https://github.com/firehol/netdata/wiki/Generating-Badges)** that can be embeded anywhere!
+3. netdata plugins are now written in python!
+4. new plugins: redis, memcached, nginx_log, ipfs, apache_cache
+
+> IMPORTANT:
+> Since netdata now uses python plugins, new packages are
+> required to be installed on a system to allow it work.
+> For more information, please check the **[installation page](https://github.com/firehol/netdata/wiki/Installation)**.
+
+### In detail
+
+#### netdata has alarms!
+
+Based on the [POLL we made on github](https://github.com/firehol/netdata/issues/436), health monitoring was the winner. **So here it is!**
+
+netdata now has a **[powerful health monitoring](https://github.com/firehol/netdata/wiki/health-monitoring)** system embedded.
+
+![image](https://cloud.githubusercontent.com/assets/2662304/18042169/f002baa8-6dc7-11e6-801d-8ec8e45453ae.png)
+
+#### netdata has badges!
+
+netdata can **[generate badges](https://github.com/firehol/netdata/wiki/Generating-Badges)** with live information from the collected metrics.
+
+#### netdata plugins are now written in python!
+
+Thanks to the great work of Paweł Krupa (@paulfantom), most BASH plugins have been ported to python.
+
+The new python.d.plugin supports both **python2** and **python3** and data collection from multiple sources for all modules.
+
+The following pre-existing modules have been ported to python:
+- apache
+- cpufreq
+- example
+- exim
+- hddtemp
+- mysql
+- nginx
+- phpfm
+- postfix
+- sensors
+- squid
+- tomcat
+
+The following new modules have been added:
+- apache_cache
+- dovecot
+- ipfs
+- memcached
+- nginx_log
+- redis
+
+#### other data collectors
+
+Thanks to @simonnagl netdata now reports disk space usage.
+
+#### other improvements
+- dashboards now transfer certain settings from server to server when changing servers via the my-netdata menu.
+  
+  The settings transferred are the dashboard theme, the online help status and current pan and zoom timeframe of the dashboard.
+- API improvements:
+  - reduction functions now support 'min', 'sum' and 'incremental-sum'.
+  - netdata now offers a multi-threaded and a single threaded web server (single threaded is better for IoT).
+- apps.plugin improvements:
+  - can now run with command line argument 'without-files' to prevent it from enumating all the open files/sockets/pipes of all running processes.
+  - apps.plugin now scales the collected values to match the
+    the total system usage.
+  - apps.plugin can now report guest CPU usage per process.
+  - repeating errors are now logged once per process.
+- netdata now runs with IDLE process priority (lower than nice 19)
+- netdata now instructs the kernel to kill it first when it starves for memory.
+- netdata listens for signals:
+  - SIGHUP to netdata instructs it to re-open its log files (new logrotate file added too).
+  - SIGUSR1 to netdata saves the database
+  - SIGUSR2 to netdata reloads health / alarms configuration
+- netdata can now bind to multiple IPs and ports.
+- netdata now has new systemd service file (it starts as user netdata and does not fork).
+- Dozens of other improvements and bugfixes
+
+netdata 1.3.0 - download release tarfiles from http://firehol.org/download/netdata/releases/v1.3.0
+",https://api.github.com/users/ktsaou,2662304,ktsaou,https://api.github.com/repos/firehol/netdata/releases/3990816/assets,https://api.github.com/repos/firehol/netdata/releases/3990816,master,https://api.github.com/repos/firehol/netdata/tarball/v1.3.0,https://github.com/firehol/netdata/releases/tag/v1.3.0,https://api.github.com/repos/firehol/netdata/zipball/v1.3.0,v1.3.0,False,False
+3236530,2016-05-16T20:05:58Z,2016-05-16T20:18:06Z,v1.2.0,"### Netdata demo sites: [http://my-netdata.io](http://my-netdata.io)
+
+### At a glance
+1. netdata now is **30% faster** !
+2. netdata now has a **[registry](https://github.com/firehol/netdata/wiki/mynetdata-menu-item)** (**[my-netdata](https://github.com/firehol/netdata/wiki/mynetdata-menu-item)** dashboard menu) !
+3. netdata now monitors **Linux Containers** (cgroups, docker, lxc, etc) !
+
+> IMPORTANT:
+> This version requires libuuid. The package you need to build netdata is:
+> - uuid-dev (debian/ubuntu), or
+> - libuuid-devel (centos/fedora/redhat)
+
+### In detail
+
+#### netdata is now 30% faster !
+- Patches submitted by @fredericopissarra improved overall netdata performance by 10%.
+- A new improved search function in the internal indexes made all searches faster by 50%, resulting in about 20% better performance for the core of netdata.
+- More efficient threads locking in key components contributed to the overall speed up.
+
+#### netdata now has a **[central registry](https://github.com/firehol/netdata/wiki/mynetdata-menu-item)** !
+
+   The central registry tracks all your netdata servers and bookmarks them for you at the **[my-netdata](https://github.com/firehol/netdata/wiki/mynetdata-menu-item)** menu on all dashboards.
+
+   Every netdata can act as a registry, but there is also a global registry provided for free for all netdata users!
+
+#### netdata now monitors **Linux Containers** !
+
+   docker, lxc, or anything else. For each container it monitors CPU, RAM, DISK I/O (network interfaces were already monitored).
+
+#### Other improvements
+- apps.plugin: now uses linux capabilities by default without setuid to root
+- netdata has now an improved signal handler thanks to @simonnagl
+- API: new improved CORS support
+- SNMP: counter64 support fixed
+- MYSQL: more charts, about QCache, MyISAM key cache, InnoDB buffer pools, open files
+- DISK charts now show mount point when available
+- Dashboard: improved support for older web browsers and mobile web browsers (thanks to @simonnagl)
+- Multi-server dashboards now allow de-coupled refreshes for each chart, so that if one netdata has a network latency the other charts are not affected
+- Dozens of other improvements, optimizations and bug-fixes.
+
+netdata 1.2.0 - download release tarfiles also from http://firehol.org/download/netdata/releases/v1.2.0
+",https://api.github.com/users/ktsaou,2662304,ktsaou,https://api.github.com/repos/firehol/netdata/releases/3236530/assets,https://api.github.com/repos/firehol/netdata/releases/3236530,master,https://api.github.com/repos/firehol/netdata/tarball/v1.2.0,https://github.com/firehol/netdata/releases/tag/v1.2.0,https://api.github.com/repos/firehol/netdata/zipball/v1.2.0,v1.2.0,False,False
+3062921,2016-04-20T19:03:16Z,2016-04-20T19:09:33Z,v1.1.0,"netdata 1.1.0 - download release tarfiles from http://firehol.org/download/netdata/releases/v1.1.0
+
+Dozens of commits that improve netdata in several ways:
+
+### Data collection
+- added IPv6 monitoring
+- added SYNPROXY DDoS protection monitoring
+- apps.plugin: added charts for users and user groups
+- apps.plugin: grouping of processes now support patterns
+- apps.plugin: now it is faster, after the new features added
+- better auto-detection of partitions for disk monitoring
+- better fireqos intergation for QoS monitoring
+- squid monitoring now uses squidclient
+- SNMP monitoring now supports 64bit counters
+
+### API
+- fixed issues in CSV output generation
+- netdata can now be restricted to listen on a specific IP (API and web server)
+
+### Core
+- added error log flood protection
+
+### Web Dashboard
+- better error handling when the netdata server is unreachable
+- each chart now has a toolbox
+- on-line help support
+- check for netdata updates button
+- added example /tv.html dashboard
+- now compiles with musl libc (alpine linux)
+
+### Packaging
+- added debian packaging
+- support non-root installations
+- the installer generates uninstall script
+",https://api.github.com/users/ktsaou,2662304,ktsaou,https://api.github.com/repos/firehol/netdata/releases/3062921/assets,https://api.github.com/repos/firehol/netdata/releases/3062921,master,https://api.github.com/repos/firehol/netdata/tarball/v1.1.0,https://github.com/firehol/netdata/releases/tag/v1.1.0,https://api.github.com/repos/firehol/netdata/zipball/v1.1.0,v1.1.0,False,False
+2867176,2016-03-22T21:04:43Z,2016-03-22T21:24:07Z,v1.0.0,"netdata 1.0.0 - download release tarfiles from http://firehol.org/download/netdata/releases/v1.0.0
+",https://api.github.com/users/ktsaou,2662304,ktsaou,https://api.github.com/repos/firehol/netdata/releases/2867176/assets,https://api.github.com/repos/firehol/netdata/releases/2867176,master,https://api.github.com/repos/firehol/netdata/tarball/v1.0.0,https://github.com/firehol/netdata/releases/tag/v1.0.0,https://api.github.com/repos/firehol/netdata/zipball/v1.0.0,v1.0.0,False,False
+2583020,2016-02-09T22:40:08Z,2016-02-09T22:46:12Z,netdata v1.0rc,,https://api.github.com/users/ktsaou,2662304,ktsaou,https://api.github.com/repos/firehol/netdata/releases/2583020/assets,https://api.github.com/repos/firehol/netdata/releases/2583020,master,https://api.github.com/repos/firehol/netdata/tarball/v1.0rc,https://github.com/firehol/netdata/releases/tag/v1.0rc,https://api.github.com/repos/firehol/netdata/zipball/v1.0rc,v1.0rc,False,True
+1870402,2015-09-23T19:22:32Z,2015-09-25T22:01:16Z,Stable release v0.2,,https://api.github.com/users/ktsaou,2662304,ktsaou,https://api.github.com/repos/firehol/netdata/releases/1870402/assets,https://api.github.com/repos/firehol/netdata/releases/1870402,master,https://api.github.com/repos/firehol/netdata/tarball/v0.2,https://github.com/firehol/netdata/releases/tag/v0.2,https://api.github.com/repos/firehol/netdata/zipball/v0.2,v0.2,False,True

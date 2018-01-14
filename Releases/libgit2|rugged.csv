@@ -1,0 +1,275 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+2745122,2016-03-04T15:18:15Z,2016-03-04T15:23:09Z,Rugged v0.24.0,"This updates the bundled libgit2 to [version 0.24.0](https://github.com/libgit2/libgit2/releases/tag/v0.24.0).
+",https://api.github.com/users/ethomson,1130014,ethomson,https://api.github.com/repos/libgit2/rugged/releases/2745122/assets,https://api.github.com/repos/libgit2/rugged/releases/2745122,master,https://api.github.com/repos/libgit2/rugged/tarball/v0.24.0,https://github.com/libgit2/rugged/releases/tag/v0.24.0,https://api.github.com/repos/libgit2/rugged/zipball/v0.24.0,v0.24.0,False,False
+1916196,2015-10-06T07:32:56Z,2015-10-06T07:57:51Z,Rugged 0.23.2,"## Changes since Rugged 0.23.2
+-   Update bundled libgit2 to 0.23.3.
+  
+  See https://github.com/libgit2/libgit2/releases/tag/v0.23.3
+  for a list of fixed issues and new features.
+  
+  _Arthur Schreiber_
+",https://api.github.com/users/arthurschreiber,2195,arthurschreiber,https://api.github.com/repos/libgit2/rugged/releases/1916196/assets,https://api.github.com/repos/libgit2/rugged/releases/1916196,maint/v0.23,https://api.github.com/repos/libgit2/rugged/tarball/v0.23.3,https://github.com/libgit2/rugged/releases/tag/v0.23.3,https://api.github.com/repos/libgit2/rugged/zipball/v0.23.3,v0.23.3,False,False
+1305380,2015-05-06T17:58:26Z,2015-05-17T16:09:12Z,Rugged 0.22.2,"## Changes since Rugged 0.21
+-   Update bundled libgit2 to 0.22.2.
+  
+  See https://github.com/libgit2/libgit2/releases/tag/v0.22.0,
+  https://github.com/libgit2/libgit2/releases/tag/v0.22.1 and
+  https://github.com/libgit2/libgit2/releases/tag/v0.22.2 for a list
+  of fixed issues and new features.
+  
+  _Arthur Schreiber_
+-   Add `Rugged::Tree#count_recursive`.
+  
+  This counts all blobs in a tree, recursively, with an optional limit
+  to bail early. This allows asking things like: ""Are there more
+  than 1 million files in this repo?"" in a very performant way.
+  
+  Fixes #464.
+  
+  _Andy Delcambre_
+-   Add missing handling of libgit2 errors in `Rugged::BranchCollection#each`
+  and `Rugged::BranchCollection#each_name`.
+  
+  Fixes #457.
+  
+  _aiionx_
+-   The `Rugged::Tree::Builder` API was changed to account for libgit2 changes.
+  
+  When creating a new `Rugged::Tree::Builder` instance through
+  `Rugged::Tree::Builder.new` you have to pass a repository instance,
+  while `Rugged::Tree::Builder#write` does not take any arguments anymore.
+  
+  _Vicent Martí_
+-   Add alternative backend support (experimental).
+  
+  Bare repositories can now be stored using an alternative backend.
+  
+  Fixes #410.
+  
+  _Viktor Charypar_
+-   Replace `Remote#rename!` with `RemoteCollection#rename`.
+  
+  This brings the `RemoteCollection` more in line with the API of
+  `ReferenceCollection` and `BranchCollection`.
+  
+  _Arthur Schreiber_
+-   Remove URL validation from `Remote#url=`, `Remote#push_url=`,
+  `RemoteCollection#create_anonymous` and `RemoteCollection#create`,
+  as the underlying function `git_remote_supported_url()` was removed
+  from libgit2.
+  
+  _Arthur Schreiber_
+-   Add `Repository#merge_bases`.
+  
+  This returns an array containing all merge bases between one or
+  multiple commits.
+  
+  _Arthur Schreiber_
+-   Add submodule support.
+  
+  Expose git submodules functionality through `Rugged::Submodule` and
+  `Rugged::SubmoduleCollection`.
+  
+  _Nikolai Vladimirov_
+-   Add `Rugged::Walker#push_range`.
+  
+  _Evgeniy Sokovikov_
+-   Implement `Rugged::Blob::HashSignature` and `Rugged::Blob#hashsig`.
+  
+  Allows similarity detection of `Rugged::Blob` instances against other blobs or
+  arbitrary strings.
+  
+  _Vicent Martí_
+-   Add `Rugged::Repository#attributes`.
+  
+  This method allows accessing the attributes for different path names as
+  specified by `.gitattributes` files.
+  
+  _Vicent Martí_
+-   Add `Rugged::TagCollection#create_annotation`.
+  
+  This method allows the creation of a tag object, but without creating
+  a tag reference.
+  
+  _Charlie Somerville_
+-   Add `Rugged::Repository#cherrypick`.
+  
+  _Arthur Schreiber_
+-   Add `Rugged::Repository#descendant_of?`
+  
+  _Jake Douglas_
+-   `Rugged::Index#read_tree` now actually checks that the given object is a
+  `Rugged::Tree` instance.
+  
+  Fixes #401.
+  
+  _Andy Delcambre_
+-   Add `Rugged::Repository#expand_oids`.
+  
+  This allows expanding a list of shortened SHA1 strings, optionally restricting
+  the expansion to a specific object type.
+  
+  _Vicent Martí_
+-   Add `Rugged::Remote#check_connection`.
+  
+  This is useful if one needs to check if it is possible to fetch/push
+  from/to the remote.
+  
+  Basically, it is analogue to `git fetch --dry-run` and `git push --dry-run`.
+  
+  _Dmitry Medvinsky_
+-   Remove defunct `Rugged::Diff::Line#hunk` and `Rugged::Diff::Line#owner`.
+  
+  Fixes #390.
+  
+  _Arthur Schreiber_
+-   Remove `Rugged::Diff#tree` and change `Rugged::Diff#owner` to return the
+  repository that the `Rugged::Diff` object belongs to.
+  
+  We need to keep a reference from the `Rugged::Diff` to the repository to
+  ensure that the underlying libgit2 data does not get freed accidentally.
+  
+  Fixes #389.
+  
+  _Arthur Schreiber_
+-   Add `#additions` and `#deletions` to `Rugged::Patch`.
+  
+  _Mindaugas Mozūras_
+",https://api.github.com/users/arthurschreiber,2195,arthurschreiber,https://api.github.com/repos/libgit2/rugged/releases/1305380/assets,https://api.github.com/repos/libgit2/rugged/releases/1305380,master,https://api.github.com/repos/libgit2/rugged/tarball/v0.22.2,https://github.com/libgit2/rugged/releases/tag/v0.22.2,https://api.github.com/repos/libgit2/rugged/zipball/v0.22.2,v0.22.2,False,False
+1032129,2015-03-10T00:57:27Z,2015-03-10T01:03:33Z,Rugged 0.22.1b1,"## Changes since Rugged 0.21
+-   Add `Rugged::Tree#count_recursive`.
+  
+  This counts all blobs in a tree, recursively, with an optional limit
+  to bail early. This allows asking things like: ""Are there more
+  than 1 million files in this repo?"" in a very performant way.
+  
+  Fixes #464.
+  
+  _Andy Delcambre_
+-   Update bundled libgit2 to 0.22.1.
+  
+  See https://github.com/libgit2/libgit2/releases/tag/v0.22.0 and
+  https://github.com/libgit2/libgit2/releases/tag/v0.22.1 for a list
+  of fixed issues and new features.
+  
+  _Arthur Schreiber_
+-   Add missing handling of libgit2 errors in `Rugged::BranchCollection#each`
+  and `Rugged::BranchCollection#each_name`.
+  
+  Fixes #457.
+  
+  _aiionx_
+-   The `Rugged::Tree::Builder` API was changed to account for libgit2 changes.
+  
+  When creating a new `Rugged::Tree::Builder` instance through
+  `Rugged::Tree::Builder.new` you have to pass a repository instance,
+  while `Rugged::Tree::Builder#write` does not take any arguments anymore.
+  
+  _Vicent Martí_
+-   Add alternative backend support (experimental).
+  
+  Bare repositories can now be stored using an alternative backend.
+  
+  Fixes #410.
+  
+  _Viktor Charypar_
+-   Replace `Remote#rename!` with `RemoteCollection#rename`.
+  
+  This brings the `RemoteCollection` more in line with the API of
+  `ReferenceCollection` and `BranchCollection`.
+  
+  _Arthur Schreiber_
+-   Remove URL validation from `Remote#url=`, `Remote#push_url=`,
+  `RemoteCollection#create_anonymous` and `RemoteCollection#create`,
+  as the underlying function `git_remote_supported_url()` was removed
+  from libgit2.
+  
+  _Arthur Schreiber_
+-   Add `Repository#merge_bases`.
+  
+  This returns an array containing all merge bases between one or
+  multiple commits.
+  
+  _Arthur Schreiber_
+-   Add submodule support.
+  
+  Expose git submodules functionality through `Rugged::Submodule` and
+  `Rugged::SubmoduleCollection`.
+  
+  _Nikolai Vladimirov_
+-   Add `Rugged::Walker#push_range`.
+  
+  _Evgeniy Sokovikov_
+-   Implement `Rugged::Blob::HashSignature` and `Rugged::Blob#hashsig`.
+  
+  Allows similarity detection of `Rugged::Blob` instances against other blobs or
+  arbitrary strings.
+  
+  _Vicent Martí_
+-   Add `Rugged::Repository#attributes`.
+  
+  This method allows accessing the attributes for different path names as
+  specified by `.gitattributes` files.
+  
+  _Vicent Martí_
+-   Add `Rugged::TagCollection#create_annotation`.
+  
+  This method allows the creation of a tag object, but without creating
+  a tag reference.
+  
+  _Charlie Somerville_
+-   Add `Rugged::Repository#cherrypick`.
+  
+  _Arthur Schreiber_
+-   Add `Rugged::Repository#descendant_of?`
+  
+  _Jake Douglas_
+-   `Rugged::Index#read_tree` now actually checks that the given object is a
+  `Rugged::Tree` instance.
+  
+  Fixes #401.
+  
+  _Andy Delcambre_
+-   Add `Rugged::Repository#expand_oids`.
+  
+  This allows expanding a list of shortened SHA1 strings, optionally restricting
+  the expansion to a specific object type.
+  
+  _Vicent Martí_
+-   Add `Rugged::Remote#check_connection`.
+  
+  This is useful if one needs to check if it is possible to fetch/push
+  from/to the remote.
+  
+  Basically, it is analogue to `git fetch --dry-run` and `git push --dry-run`.
+  
+  _Dmitry Medvinsky_
+-   Remove defunct `Rugged::Diff::Line#hunk` and `Rugged::Diff::Line#owner`.
+  
+  Fixes #390.
+  
+  _Arthur Schreiber_
+-   Remove `Rugged::Diff#tree` and change `Rugged::Diff#owner` to return the
+  repository that the `Rugged::Diff` object belongs to.
+  
+  We need to keep a reference from the `Rugged::Diff` to the repository to
+  ensure that the underlying libgit2 data does not get freed accidentally.
+  
+  Fixes #389.
+  
+  _Arthur Schreiber_
+-   Add `#additions` and `#deletions` to `Rugged::Patch`.
+  
+  _Mindaugas Mozūras_
+",https://api.github.com/users/arthurschreiber,2195,arthurschreiber,https://api.github.com/repos/libgit2/rugged/releases/1032129/assets,https://api.github.com/repos/libgit2/rugged/releases/1032129,master,https://api.github.com/repos/libgit2/rugged/tarball/v0.22.1b1,https://github.com/libgit2/rugged/releases/tag/v0.22.1b1,https://api.github.com/repos/libgit2/rugged/zipball/v0.22.1b1,v0.22.1b1,False,True
+862369,2015-01-18T19:51:29Z,2015-01-18T20:02:58Z,Rugged 0.21.4,"-   Update bundled libgit2 to 0.21.4.
+  
+  See https://github.com/libgit2/libgit2/releases/tag/v0.21.4 for a list
+  of fixed issues.
+",https://api.github.com/users/arthurschreiber,2195,arthurschreiber,https://api.github.com/repos/libgit2/rugged/releases/862369/assets,https://api.github.com/repos/libgit2/rugged/releases/862369,master,https://api.github.com/repos/libgit2/rugged/tarball/v0.21.4,https://github.com/libgit2/rugged/releases/tag/v0.21.4,https://api.github.com/repos/libgit2/rugged/zipball/v0.21.4,v0.21.4,False,False
+711543,2014-11-17T22:06:44Z,2014-11-17T22:10:46Z,Rugged 0.21.2,"-   Update bundled libgit2 to 0.21.2 (from 0.21.0).
+  
+  See https://github.com/libgit2/libgit2/releases/tag/v0.21.1 and
+  https://github.com/libgit2/libgit2/releases/tag/v0.21.2 for a list
+  of fixed issues.
+",https://api.github.com/users/arthurschreiber,2195,arthurschreiber,https://api.github.com/repos/libgit2/rugged/releases/711543/assets,https://api.github.com/repos/libgit2/rugged/releases/711543,master,https://api.github.com/repos/libgit2/rugged/tarball/v0.21.2,https://github.com/libgit2/rugged/releases/tag/v0.21.2,https://api.github.com/repos/libgit2/rugged/zipball/v0.21.2,v0.21.2,False,False

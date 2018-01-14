@@ -1,0 +1,196 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7913955,2017-09-27T17:18:59Z,2017-09-27T17:43:07Z,Release v1.0.4,"## Changelog
+
+### Go Version
+- 1.8.3
+
+### Added
+- ARM64v8 build. Thanks to @vielmetti for the contribution (#567)
+- Custom Authorization through Options. Thanks to @cdevienne (#576)
+- Systemd unit file. Thanks to @RedShift1 (#587)
+
+### Improved
+- Clarification about token usage. Thanks to @sarbash for the contribution (#563)
+
+### Changed
+- TCP Accept errors are now logged as Error, not Debug. Thanks @ripienaar (#584)
+
+### Fixed
+- Subscriptions not closed in cluster when using Auto-Unsubscribe. Thanks to @ingosus (#551)
+- String escape behavior in config files. Thanks to @WDevereux for the report (#556)
+- Use of `*` and `>` as literals in subjects. Thanks to @s921102002 for the report (#561, #573)
+- Configuration file options override from command line not always working (#578)
+- Server fails to start if configuration file references hosts in “routes” that are not resolvable on startup. Thanks to @brunomcustodio for the report (#578)
+- Server not printing name of some of the cipher suites (#592)
+
+
+### Complete Changes
+
+https://github.com/nats-io/gnatsd/compare/v1.0.2...v1.0.4
+",https://api.github.com/users/nats-ci-user,24446847,nats-ci-user,https://api.github.com/repos/nats-io/gnatsd/releases/7913955/assets,https://api.github.com/repos/nats-io/gnatsd/releases/7913955,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v1.0.4,https://github.com/nats-io/gnatsd/releases/tag/v1.0.4,https://api.github.com/repos/nats-io/gnatsd/zipball/v1.0.4,v1.0.4,False,False
+7099343,2017-07-19T19:37:02Z,2017-07-19T19:44:05Z,Release v1.0.2,"## Changelog
+
+### Go Version
+- 1.7.6
+
+### Fixed
+- Windows Docker Images failure to start with error: “The service process could not connect to the service controller” (#544)
+- Unnecessary attempt to reconnect a route. When server B connected to A and B was then shutdown, A would try to reconnect to B once, although the route was implicit (#547)
+
+### Complete Changes
+
+https://github.com/nats-io/gnatsd/compare/v1.0.0...v1.0.2
+",https://api.github.com/users/nats-ci-user,24446847,nats-ci-user,https://api.github.com/repos/nats-io/gnatsd/releases/7099343/assets,https://api.github.com/repos/nats-io/gnatsd/releases/7099343,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v1.0.2,https://github.com/nats-io/gnatsd/releases/tag/v1.0.2,https://api.github.com/repos/nats-io/gnatsd/zipball/v1.0.2,v1.0.2,False,False
+7017039,2017-07-12T16:41:01Z,2017-07-12T16:50:49Z,Release v1.0.0,"## Changelog
+
+Great community effort! Special thanks to Elton Stoneman (@sixeyed) for his help in verifying that the Windows Docker images build properly!
+
+### Go Version
+- 1.7.6
+
+### Added
+- Ability to configure number of connect retries for implicit routes. Thanks to @joelanford for reporting an issue leading to this PR (#409)
+- `GetTLSConnectionState()` in `ClientAuth` interface. This returns the TLS `ConnectionState` if TLS is enabled. Thanks to @cdevienne (#385)
+- Windows Event logging (#413)
+- `curve_preference` parameter to specify the preferred order (#412)
+- ChaCha cipher (#415)
+- `write_deadline` parameter to make the deadline when flushing messages to clients configurable (#421, #488)
+- Reject clients connecting to route’s listen port (#424)
+- Support for authentication token in configuration file. Thanks to @qrpike for the report (#465)
+- Ability to get the server’s HTTP Handler (#481)
+- `MonitorAddr()` and `ClusterAddr()` return the monitoring an route listener respectively (#512)
+- Configuration Reload (#499, #503, #506, #515, #519, #523, #524)
+
+### Removed
+- Global logger (#501)
+- Auth package and `Server.SetClientAuthMethod()` and `Server.SetRouteAuthMethod()` (#474)
+
+### Improved
+- Parsing of subscription IDs for routes. Thanks to @miraclesu (#478)
+- Handling of escaped substrings. Thanks to @ericpromislow (#482)
+
+### Fixed
+- Possible data races with /varz and /subsz monitoring endpoints (#445)
+- PINGs not sent to TLS Connections (clients or routes). Thanks to @stefanschneider for the report (#459)
+- Not all executables statically linked when release issued. Thanks to @leifg for the report (#471)
+- Check for negative offset and/or limit when processing /connz monitoring endpoint (#492)
+- Authorization timeout and TLS. Prevents errors such as `tls: oversized record received` (#493)
+- Unexpected behavior when providing both HTTP and HTTPS monitoring ports (#497)
+- HTTP Server not shutdown on server shutdown if HTTP server is started manually (#498)
+- Possible DATA RACE when polling the routez endpoint and a route disconnects (#540)
+
+### Complete Changes
+
+https://github.com/nats-io/gnatsd/compare/v0.9.6...v1.0.0
+",https://api.github.com/users/nats-ci-user,24446847,nats-ci-user,https://api.github.com/repos/nats-io/gnatsd/releases/7017039/assets,https://api.github.com/repos/nats-io/gnatsd/releases/7017039,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v1.0.0,https://github.com/nats-io/gnatsd/releases/tag/v1.0.0,https://api.github.com/repos/nats-io/gnatsd/zipball/v1.0.0,v1.0.0,False,False
+4935680,2016-12-15T23:05:32Z,2016-12-15T23:16:46Z,Release v0.9.6,"## Changelog
+
+## Go Version
+- 1.7.4
+
+### Added
+- Support for Go 1.7
+- [Staticcheck](https://github.com/dominikh/go-staticcheck) verifications in Travis
+- Ability to configure ping_interval and ping_max in configuration file (#372)
+- Support for integer suffixes, e.g. 1k 8mb, etc.. (#377)
+- Support for ‘include’ to configuration files (#378)
+- Ability to make server re-open log file using SIGUSR1 - for log rotation (#379,#382)
+- Support for `max_connections` parameter (#387, #389)
+
+### Updated
+- Docker build to use go 1.7.4
+- Generate syslog tag based on executable/link name (#362)
+
+### Fixed
+- Client certificate was required but not verified even when configuration parameter `verify` was set to true (#337)
+- Non-ASCII quotes in monitoring’s HTML output (#353)
+- It was possible to configure `max_connections` in previous releases, but it had no effect (#387, #389)
+- Non flags in command line parameters would cause the server to ignore remaining flags but not report an error (#393)
+
+### Removed
+- `MaxPending` option and `max_pending_size`, `max_pending` configuration parameters. Those were never used (#383)
+
+### Complete Changes
+
+https://github.com/nats-io/gnatsd/compare/v0.9.4...v0.9.6
+",https://api.github.com/users/nats-ci-user,24446847,nats-ci-user,https://api.github.com/repos/nats-io/gnatsd/releases/4935680/assets,https://api.github.com/repos/nats-io/gnatsd/releases/4935680,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v0.9.6,https://github.com/nats-io/gnatsd/releases/tag/v0.9.6,https://api.github.com/repos/nats-io/gnatsd/zipball/v0.9.6,v0.9.6,False,False
+3918220,2016-08-18T15:40:09Z,2016-08-18T15:46:59Z,Release v0.9.4,"## Changelog
+
+### Go Version
+- 1.6.3
+
+### Added
+- Option to disable advertisement of cluster IP addresses to clients.
+
+### Changed
+- HTTP host, if not specified, now defaults to client’s host (`-a` command line or `Options.Host`)
+
+### Fixed
+- When server listens to all interfaces (0.0.0.0 or ::), it now advertises only global IPs instead of all resolved IPs (which included link local IPs).
+- You can now specify an IPv6 address int the `-cluster` URL.
+- Server could panic when user would poll Varz from monitoring port concurrently with other endpoints (Varz or others). 
+- Data race with unsubscribe and connection close
+
+### Complete changes
+
+https://github.com/nats-io/gnatsd/compare/v0.9.2...v0.9.4
+",https://api.github.com/users/derekcollison,90097,derekcollison,https://api.github.com/repos/nats-io/gnatsd/releases/3918220/assets,https://api.github.com/repos/nats-io/gnatsd/releases/3918220,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v0.9.4,https://github.com/nats-io/gnatsd/releases/tag/v0.9.4,https://api.github.com/repos/nats-io/gnatsd/zipball/v0.9.4,v0.9.4,False,False
+3840439,2016-08-08T20:57:23Z,2016-08-08T21:08:49Z,Release v0.9.2,"## Changelog
+
+### Go Version
+- 1.6.3
+
+### Added
+- Multi-user and authorization
+- Cluster discovery pushed to clients
+
+### Updated
+- Dockerfile to use go 1.6.3
+- Clustering section in README
+
+### Improved
+- Route performance for larger messages
+
+### Fixed
+- Route/Cluster command line parameters/Options override
+- Protocol parser to prevent memory attacks
+
+### Complete changes
+
+https://github.com/nats-io/gnatsd/compare/v0.8.1...v0.9.2
+",https://api.github.com/users/derekcollison,90097,derekcollison,https://api.github.com/repos/nats-io/gnatsd/releases/3840439/assets,https://api.github.com/repos/nats-io/gnatsd/releases/3840439,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v0.9.2,https://github.com/nats-io/gnatsd/releases/tag/v0.9.2,https://api.github.com/repos/nats-io/gnatsd/zipball/v0.9.2,v0.9.2,False,False
+3412393,2016-06-09T19:49:53Z,2016-06-09T19:56:19Z,Release v0.8.1,"## Changelog
+
+### Go Version
+- 1.6.2
+
+Bug fix release.
+",https://api.github.com/users/derekcollison,90097,derekcollison,https://api.github.com/repos/nats-io/gnatsd/releases/3412393/assets,https://api.github.com/repos/nats-io/gnatsd/releases/3412393,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v0.8.1,https://github.com/nats-io/gnatsd/releases/tag/v0.8.1,https://api.github.com/repos/nats-io/gnatsd/zipball/v0.8.1,v0.8.1,False,False
+3187845,2016-05-09T19:47:55Z,2016-05-09T19:54:04Z,Release v0.8.0,"## Changelog
+
+### Go Version
+- 1.6.2
+
+### Changes
+- [Cluster Auto-Discovery](https://github.com/nats-io/gnatsd/blob/master/README.md#clustering) via seed hosts. 
+- [Monitoring](https://github.com/nats-io/gnatsd/blob/master/README.md#monitoring) updates for **varz** and **connz**.
+- Performance improvements in publish, subscribe and queue subscriptions.
+- New automated release process.
+- Vendor support and upgrade to Go 1.6.2 for supported release builds.
+- Official support for Windows.
+- Removed original hash and hashmap code, new 3 layer sublist cache design.
+- Various bug fixes.
+- Complete details - https://github.com/nats-io/gnatsd/compare/v0.7.2...v0.8.0
+",https://api.github.com/users/derekcollison,90097,derekcollison,https://api.github.com/repos/nats-io/gnatsd/releases/3187845/assets,https://api.github.com/repos/nats-io/gnatsd/releases/3187845,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v0.8.0,https://github.com/nats-io/gnatsd/releases/tag/v0.8.0,https://api.github.com/repos/nats-io/gnatsd/zipball/v0.8.0,v0.8.0,False,False
+2261356,2015-12-09T19:43:18Z,2015-12-09T19:46:41Z,Release v0.7.2,None,https://api.github.com/users/derekcollison,90097,derekcollison,https://api.github.com/repos/nats-io/gnatsd/releases/2261356/assets,https://api.github.com/repos/nats-io/gnatsd/releases/2261356,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v0.7.2,https://github.com/nats-io/gnatsd/releases/tag/v0.7.2,https://api.github.com/repos/nats-io/gnatsd/zipball/v0.7.2,v0.7.2,False,False
+2231049,2015-12-04T00:03:37Z,2015-12-04T00:04:56Z,Release v0.7.0,None,https://api.github.com/users/derekcollison,90097,derekcollison,https://api.github.com/repos/nats-io/gnatsd/releases/2231049/assets,https://api.github.com/repos/nats-io/gnatsd/releases/2231049,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v0.7.0,https://github.com/nats-io/gnatsd/releases/tag/v0.7.0,https://api.github.com/repos/nats-io/gnatsd/zipball/v0.7.0,v0.7.0,False,False
+1834723,2015-09-18T14:46:20Z,2015-09-18T14:49:06Z,Release v0.6.8,None,https://api.github.com/users/derekcollison,90097,derekcollison,https://api.github.com/repos/nats-io/gnatsd/releases/1834723/assets,https://api.github.com/repos/nats-io/gnatsd/releases/1834723,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v0.6.8,https://github.com/nats-io/gnatsd/releases/tag/v0.6.8,https://api.github.com/repos/nats-io/gnatsd/zipball/v0.6.8,v0.6.8,False,False
+1711287,2015-08-23T21:22:46Z,2015-08-23T21:35:08Z,Release v0.6.6,"I recut this release with Go1.4.2 since there are issues with Go1.5.
+",https://api.github.com/users/derekcollison,90097,derekcollison,https://api.github.com/repos/nats-io/gnatsd/releases/1711287/assets,https://api.github.com/repos/nats-io/gnatsd/releases/1711287,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v0.6.6,https://github.com/nats-io/gnatsd/releases/tag/v0.6.6,https://api.github.com/repos/nats-io/gnatsd/zipball/v0.6.6,v0.6.6,False,False
+1645152,2015-08-08T05:14:28Z,2015-08-08T05:34:02Z,Release v0.6.4,None,https://api.github.com/users/derekcollison,90097,derekcollison,https://api.github.com/repos/nats-io/gnatsd/releases/1645152/assets,https://api.github.com/repos/nats-io/gnatsd/releases/1645152,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v0.6.4,https://github.com/nats-io/gnatsd/releases/tag/v0.6.4,https://api.github.com/repos/nats-io/gnatsd/zipball/v0.6.4,v0.6.4,False,False
+1644858,2015-08-08T00:42:30Z,2015-08-08T00:43:42Z,Release v0.6.2,None,https://api.github.com/users/derekcollison,90097,derekcollison,https://api.github.com/repos/nats-io/gnatsd/releases/1644858/assets,https://api.github.com/repos/nats-io/gnatsd/releases/1644858,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v0.6.2,https://github.com/nats-io/gnatsd/releases/tag/v0.6.2,https://api.github.com/repos/nats-io/gnatsd/zipball/v0.6.2,v0.6.2,False,False
+1425009,2015-06-16T23:50:57Z,2015-06-16T23:52:31Z,Release v0.6.0,None,https://api.github.com/users/derekcollison,90097,derekcollison,https://api.github.com/repos/nats-io/gnatsd/releases/1425009/assets,https://api.github.com/repos/nats-io/gnatsd/releases/1425009,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v0.6.0,https://github.com/nats-io/gnatsd/releases/tag/v0.6.0,https://api.github.com/repos/nats-io/gnatsd/zipball/v0.6.0,v0.6.0,False,False
+549504,2014-09-10T23:35:18Z,2014-09-10T23:43:10Z,Release v0.5.6,None,https://api.github.com/users/derekcollison,90097,derekcollison,https://api.github.com/repos/nats-io/gnatsd/releases/549504/assets,https://api.github.com/repos/nats-io/gnatsd/releases/549504,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v0.5.6,https://github.com/nats-io/gnatsd/releases/tag/v0.5.6,https://api.github.com/repos/nats-io/gnatsd/zipball/v0.5.6,v0.5.6,False,False
+452209,2014-07-25T23:30:16Z,2014-07-26T00:04:31Z,Release v0.5.4,None,https://api.github.com/users/zquestz,83898,zquestz,https://api.github.com/repos/nats-io/gnatsd/releases/452209/assets,https://api.github.com/repos/nats-io/gnatsd/releases/452209,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v0.5.4,https://github.com/nats-io/gnatsd/releases/tag/v0.5.4,https://api.github.com/repos/nats-io/gnatsd/zipball/v0.5.4,v0.5.4,False,False
+378212,2014-04-25T18:30:12Z,2014-06-17T01:11:01Z,Release v0.5.1,,https://api.github.com/users/zquestz,83898,zquestz,https://api.github.com/repos/nats-io/gnatsd/releases/378212/assets,https://api.github.com/repos/nats-io/gnatsd/releases/378212,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v0.5.1,https://github.com/nats-io/gnatsd/releases/tag/v0.5.1,https://api.github.com/repos/nats-io/gnatsd/zipball/v0.5.1,v0.5.1,False,False
+378211,2014-04-30T21:19:25Z,2014-06-17T01:10:40Z,Release v0.5.2,,https://api.github.com/users/zquestz,83898,zquestz,https://api.github.com/repos/nats-io/gnatsd/releases/378211/assets,https://api.github.com/repos/nats-io/gnatsd/releases/378211,master,https://api.github.com/repos/nats-io/gnatsd/tarball/v0.5.2,https://github.com/nats-io/gnatsd/releases/tag/v0.5.2,https://api.github.com/repos/nats-io/gnatsd/zipball/v0.5.2,v0.5.2,False,False

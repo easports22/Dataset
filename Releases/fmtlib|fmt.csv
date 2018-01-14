@@ -1,0 +1,491 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+6852721,2017-06-27T17:02:24Z,2017-06-27T17:06:02Z,4.0.0,"* Removed old compatibility headers `cppformat/*.h` and CMake options ([#527](https://github.com/pull/527)). Thanks [@maddinat0r (Alex Martin)](https://github.com/maddinat0r).
+
+* Added `string.h` containing `fmt::to_string()` as alternative to `std::to_string()` as well as other string writer functionality (#326 and #441):
+  
+  ```c++
+  #include ""fmt/string.h""
+  
+  std::string answer = fmt::to_string(42);
+  ```
+  Thanks to [@glebov-andrey (Andrey Glebov)](https://github.com/glebov-andrey).
+
+* Moved `fmt::printf()` to new `printf.h` header and allowed `%s` as generic specifier (#453), made `%.f` more conformant to regular `printf()` (#490), added custom writer support (#476) and implemented missing custom argument formatting (#339 and #340):
+  
+  ```c++
+  #include ""fmt/printf.h""
+  
+  // %s format specifier can be used with any argument type.
+  fmt::printf(""%s"", 42);
+  ```
+  Thanks [@mojoBrendan](https://github.com/mojoBrendan), [@manylegged (Arthur Danskin)](https://github.com/manylegged) and [@spacemoose (Glen Stark)](https://github.com/spacemoose). See also #360, #335 and #331.
+
+* Added `container.h` containing a `BasicContainerWriter` to write to containers like `std::vector` (#450). Thanks [@polyvertex (Jean-Charles Lefebvre)](https://github.com/polyvertex).
+
+* Added `fmt::join()` function that takes a range and formats its elements separated by a given string (#466):
+  
+  ```c++
+  #include ""fmt/format.h""
+  
+  std::vector<double> v = {1.2, 3.4, 5.6};
+  // Prints ""(+01.20, +03.40, +05.60)"".
+  fmt::print(""({:+06.2f})"", fmt::join(v.begin(), v.end(), "", ""));
+  ```
+  Thanks [@olivier80](https://github.com/olivier80).
+
+* Added support for custom formatting specifications to simplify customization of built-in formatting (#444). Thanks [@polyvertex (Jean-Charles Lefebvre)](https://github.com/polyvertex). See also #439.
+
+* Added `fmt::format_system_error()` for error code formatting (#323 and #526). Thanks [@maddinat0r (Alex Martin)](https://github.com/maddinat0r).
+
+* Added thread-safe `fmt::localtime()` and `fmt::gmtime()` as replacement for the standard version to `time.h` (#396). Thanks [@codicodi](https://github.com/codicodi).
+
+* Internal improvements to `NamedArg` and `ArgLists` (#389 and #390). Thanks [@chronoxor](https://github.com/chronoxor).
+
+* Fixed crash due to bug in `FormatBuf` (#493). Thanks [@effzeh](https://github.com/effzeh). See also #480 and #491.
+
+* Fixed handling of wide strings in `fmt::StringWriter`.
+
+* Improved compiler error messages (#357).
+
+* Fixed various warnings and issues with various compilers (#494, #499, #483, #519, #485, #482, #475, #473 and #414). Thanks [@chronoxor](https://github.com/chronoxor), [@zhaohuaxishi](https://github.com/zhaohuaxishi), [@pkestene (Pierre Kestener)](https://github.com/pkestene), [@dschmidt (Dominik Schmidt)](https://github.com/dschmidt) and [@0x414c (Alexey Gorishny)](https://github.com/0x414c) .
+
+* Improved CMake: targets are now namespaced (#511 and #513), supported header-only `printf.h` (#354), fixed issue with minimal supported library subset (#418, #419 and #420). Thanks [@bjoernthiel (Bjoern Thiel)](https://github.com/bjoernthiel), [@niosHD (Mario Werner)](https://github.com/niosHD), [@LogicalKnight (Sean LK)](https://github.com/LogicalKnight) and [@alabuzhev (Alex Alabuzhev)](https://github.com/alabuzhev).
+
+* Improved documentation. Thanks to [@pwm1234 (Phil)](https://github.com/pwm1234) for #393.
+
+",https://api.github.com/users/foonathan,9192733,foonathan,https://api.github.com/repos/fmtlib/fmt/releases/6852721/assets,https://api.github.com/repos/fmtlib/fmt/releases/6852721,release-4.0,https://api.github.com/repos/fmtlib/fmt/tarball/4.0.0,https://github.com/fmtlib/fmt/releases/tag/4.0.0,https://api.github.com/repos/fmtlib/fmt/zipball/4.0.0,4.0.0,False,False
+6713507,2017-06-14T16:05:24Z,2017-06-14T16:08:47Z,3.0.2,"* Added `FMT_VERSION` macro (#411).
+
+* Used `FMT_NULL` instead of literal `0` (#409). Thanks [@alabuzhev (Alex Alabuzhev)](https://github.com/alabuzhev).
+
+* Added extern templates for `format_float` (#413).
+
+* Fixed implicit conversion issue (#507).
+
+* Fixed signbit detection (#423).
+
+* Fixed naming collision (#425).
+
+* Fixed missing intrinsic for C++/CLI (#457). Thanks [@calumr (Calum Robinson)](https://github.com/calumr)
+
+* Fixed Android detection (#458). Thanks [@Gachapen (Magnus Bjerke Vik)](https://github.com/Gachapen).
+
+* Use lean `windows.h` if not in header-only mode (#503). Thanks [@Quentin01 (Quentin Buathier)](https://github.com/Quentin01).
+
+* Fixed issue with CMake exporting C++11 flag (#445). Thanks [@EricWF (Eric)](https://github.com/EricWF).
+
+* Fixed issue with nvcc and MSVC compiler bug and MinGW (#505).
+
+* Fixed DLL issues (#469 and #502). Thanks [@richardeakin (Richard Eakin)](https://github.com/richardeakin) and [@AndreasSchoenle (Andreas Schönle)](https://github.com/AndreasSchoenle).
+
+* Fixed test compilation under FreeBSD (#433).
+
+* Fixed various warnings (#403, #410 and #510). Thanks [@Lecetem](https://github.com/Lectem), [@chenhayat (Chen Hayat)](https://github.com/chenhayat) and [@trozen](https://github.com/trozen).
+
+* Removed redundant include (#479).
+
+* Fixed documentation issues.
+
+",https://api.github.com/users/foonathan,9192733,foonathan,https://api.github.com/repos/fmtlib/fmt/releases/6713507/assets,https://api.github.com/repos/fmtlib/fmt/releases/6713507,release-3.0,https://api.github.com/repos/fmtlib/fmt/tarball/3.0.2,https://github.com/fmtlib/fmt/releases/tag/3.0.2,https://api.github.com/repos/fmtlib/fmt/zipball/3.0.2,3.0.2,False,False
+4534530,2016-11-01T08:24:49Z,2016-11-01T08:47:10Z,3.0.1,"- Fixed handling of thousands seperator (#353)
+- Fixed handling of `unsigned char` strings (#373)
+- Corrected buffer growth when formatting time (#367)
+- Removed warnings under MSVC and clang (#318, #250, also merged #385 and #361). Thanks [@jcelerier (Jean-Michaël Celerier)](https://github.com/jcelerier) and [@nmoehrle (Nils Moehrle)](https://github.com/nmoehrle).
+- Fixed compilation issues under Android (#327, #345 and #381), FreeBSD (#358), Cygwin (#388), MinGW (#355) as well as other issues (#350, #366, #348, #402, #405). Thanks to [@dpantele (Dmitry)](https://github.com/dpantele), [@hghwng (Hugh Wang)](https://github.com/hghwng), [@arvedarved (Tilman Keskinöz)](https://github.com/arvedarved), [@LogicalKnight (Sean)](https://github.com/LogicalKnight) and [@JanHellwig (Jan Hellwig)](https://github.com/janhellwig).
+- Fixed some documentation issues and extended specification (#320, #333, #347, #362). Thanks to [@smellman (Taro Matsuzawa aka. btm)](https://github.com/smellman).
+",https://api.github.com/users/foonathan,9192733,foonathan,https://api.github.com/repos/fmtlib/fmt/releases/4534530/assets,https://api.github.com/repos/fmtlib/fmt/releases/4534530,release,https://api.github.com/repos/fmtlib/fmt/tarball/3.0.1,https://github.com/fmtlib/fmt/releases/tag/3.0.1,https://api.github.com/repos/fmtlib/fmt/zipball/3.0.1,3.0.1,False,False
+3178119,2016-05-07T16:50:47Z,2016-05-07T17:07:32Z,3.0.0,"- The project has been renamed from C++ Format (cppformat) to fmt for consistency with the used namespace and macro prefix (#307). Library headers are now located in the `fmt` directory:
+  
+  ``` c++
+  #include ""fmt/format.h""
+  ```
+  
+  Including `format.h` from the `cppformat` directory is deprecated but works via a proxy header which will be removed in the next major version.The documentation is now available at [http://fmtlib.net](http://fmtlib.net).
+- Added support for [strftime](http://en.cppreference.com/w/cpp/chrono/c/strftime)-like [date and time formatting](http://fmtlib.net/3.0.0/api.html#date-and-time-formatting) (#283):
+  
+  ``` c++
+  #include ""fmt/time.h""
+  
+  std::time_t t = std::time(nullptr);
+  // Prints ""The date is 2016-04-29."" (with the current date)
+  fmt::print(""The date is {:%Y-%m-%d}."", *std::localtime(&t));
+  ```
+- `std::ostream` support including formatting of user-defined types that provide overloaded `operator<<` has been moved to `fmt/ostream.h`:
+  
+  ``` c++
+  #include ""fmt/ostream.h""
+  
+  class Date {
+    int year_, month_, day_;
+  public:
+    Date(int year, int month, int day) : year_(year), month_(month), day_(day) {}
+  
+    friend std::ostream &operator<<(std::ostream &os, const Date &d) {
+      return os << d.year_ << '-' << d.month_ << '-' << d.day_;
+    }
+  };
+  
+  std::string s = fmt::format(""The date is {}"", Date(2012, 12, 9));
+  // s == ""The date is 2012-12-9""
+  ```
+- Added support for [custom argument formatters](http://fmtlib.net/3.0.0/api.html#argument-formatters) (#235).
+- Added support for locale-specific integer formatting with the `n` specifier (#305):
+  
+  ``` c++
+  std::setlocale(LC_ALL, ""en_US.utf8"");
+  fmt::print(""cppformat: {:n}\n"", 1234567); // prints 1,234,567
+  ```
+- Sign is now preserved when formatting an integer with an incorrect `printf` format specifier (#265):
+  
+  ``` c++
+  fmt::printf(""%lld"", -42); // prints -42
+  ```
+  
+  Note that it would be an undefined behavior in `std::printf`.
+- Length modifiers such as `ll` are now optional in printf formatting functions and the correct type is determined automatically (#255):
+  
+  ``` c++
+  fmt::printf(""%d"", std::numeric_limits<long long>::max());
+  ```
+  
+  Note that it would be an undefined behavior in `std::printf`.
+- Added initial support for custom formatters (#231).
+- Fixed detection of user-defined literal support on Intel C++ compiler (#311, #312). Thanks to [@dean0x7d (Dean Moldovan)](https://github.com/dean0x7d) and [@speth (Ray Speth)](https://github.com/speth).
+- Reduced compile time (#243, #249, #317):![](https://cloud.githubusercontent.com/assets/4831417/11614060/b9e826d2-9c36-11e5-8666-d4131bf503ef.png)![](https://cloud.githubusercontent.com/assets/4831417/11614080/6ac903cc-9c37-11e5-8165-26df6efae364.png)Thanks to [@dean0x7d (Dean Moldovan)](https://github.com/dean0x7d).
+- Compile test fixes (#313). Thanks to [@dean0x7d (Dean Moldovan)](https://github.com/dean0x7d).
+- Documentation fixes (#239, #248, #252, #258, #260, #301, #309). Thanks to [@ReadmeCritic](https://github.com/ReadmeCritic) [@Gachapen (Magnus Bjerke Vik)](https://github.com/Gachapen) and [@jwilk (Jakub Wilk)](https://github.com/jwilk).
+- Fixed compiler and sanitizer warnings (#244, #256, #259, #263, #274, #277, #286, #291, #296, #308) Thanks to [@mwinterb](https://github.com/mwinterb), [@pweiskircher (Patrik Weiskircher)](https://github.com/pweiskircher), [@Naios](https://github.com/Naios).
+- Improved compatibility with Windows Store apps (#280, #285) Thanks to [@mwinterb](https://github.com/mwinterb).
+- Added tests of compatibility with older C++ standards (#273). Thanks to [@niosHD](https://github.com/niosHD).
+- Fixed Android build (#271). Thanks to [@newnon](https://github.com/newnon).
+- Changed `ArgMap` to be backed by a vector instead of a map. (#261, #262). Thanks to [@mwinterb](https://github.com/mwinterb).
+- Added `fprintf` overload that writes to a `std::ostream` (#251). Thanks to [nickhutchinson (Nicholas Hutchinson)](https://github.com/nickhutchinson).
+- Export symbols when building a Windows DLL (#245). Thanks to [macdems (Maciek Dems)](https://github.com/macdems).
+- Fixed compilation on Cygwin (#304).
+- Implemented a workaround for a bug in Apple LLVM version 4.2 of clang (#276).
+- Implemented a workaround for Google Test bug #705 on gcc 6 (#268). Thanks to [octoploid](https://github.com/octoploid).
+- Removed Biicode support because the latter has been discontinued.
+",https://api.github.com/users/vitaut,576385,vitaut,https://api.github.com/repos/fmtlib/fmt/releases/3178119/assets,https://api.github.com/repos/fmtlib/fmt/releases/3178119,master,https://api.github.com/repos/fmtlib/fmt/tarball/3.0.0,https://github.com/fmtlib/fmt/releases/tag/3.0.0,https://api.github.com/repos/fmtlib/fmt/zipball/3.0.0,3.0.0,False,False
+2996577,2016-04-11T19:17:15Z,2016-04-11T19:19:47Z,2.1.1,"- The install location for generated CMake files is now configurable via the `FMT_CMAKE_DIR` CMake variable (#299). Thanks to [@niosHD](https://github.com/niosHD).
+- Documentation fixes (#252).
+",https://api.github.com/users/vitaut,576385,vitaut,https://api.github.com/repos/fmtlib/fmt/releases/2996577/assets,https://api.github.com/repos/fmtlib/fmt/releases/2996577,release,https://api.github.com/repos/fmtlib/fmt/tarball/2.1.1,https://github.com/fmtlib/fmt/releases/tag/2.1.1,https://api.github.com/repos/fmtlib/fmt/zipball/2.1.1,2.1.1,False,False
+2855153,2016-03-21T14:58:24Z,2016-03-21T15:00:24Z,2.1.0,"- Project layout and build system improvements (#267):
+  - The code have been moved to the `cppformat` directory. Including `format.h` from the top-level directory is deprecated but works via a proxy header which will be removed in the next major version.
+  - C++ Format CMake targets now have proper interface definitions.
+  - Installed version of the library now supports the header-only configuration.
+  - Targets `doc`, `install`, and `test` are now disabled if C++ Format is included as a CMake subproject. They can be enabled by setting `FMT_DOC`, `FMT_INSTALL`, and `FMT_TEST` in the parent project.
+  
+  Thanks to [@niosHD](https://github.com/niosHD).
+",https://api.github.com/users/vitaut,576385,vitaut,https://api.github.com/repos/fmtlib/fmt/releases/2855153/assets,https://api.github.com/repos/fmtlib/fmt/releases/2855153,release,https://api.github.com/repos/fmtlib/fmt/tarball/2.1.0,https://github.com/fmtlib/fmt/releases/tag/2.1.0,https://api.github.com/repos/fmtlib/fmt/zipball/2.1.0,2.1.0,False,False
+2802089,2016-03-13T17:19:25Z,2016-03-13T17:20:35Z,2.0.1,"- Improved CMake find and package support (#264). Thanks to [@niosHD](https://github.com/niosHD).
+- Fix compile error with Android NDK and mingw32 (#241). Thanks to [@Gachapen (Magnus Bjerke Vik)](https://github.com/Gachapen).
+- Documentation fixes (#248, #260).
+",https://api.github.com/users/vitaut,576385,vitaut,https://api.github.com/repos/fmtlib/fmt/releases/2802089/assets,https://api.github.com/repos/fmtlib/fmt/releases/2802089,release,https://api.github.com/repos/fmtlib/fmt/tarball/2.0.1,https://github.com/fmtlib/fmt/releases/tag/2.0.1,https://api.github.com/repos/fmtlib/fmt/zipball/2.0.1,2.0.1,False,False
+2213988,2015-12-01T15:33:30Z,2015-12-01T15:36:32Z,2.0.0,"## General
+- [Breaking] Named arguments (#169, #173, #174):
+  
+  ``` c++
+  fmt::print(""The answer is {answer}."", fmt::arg(""answer"", 42));
+  ```
+  
+  Thanks to [@jamboree](https://github.com/jamboree).
+- [Experimental] User-defined literals for format and named arguments (#204, #206, #207):
+  
+  ``` c++
+  using namespace fmt::literals;
+  fmt::print(""The answer is {answer}."", ""answer""_a=42);
+  ```
+  
+  Thanks to [@dean0x7d (Dean Moldovan)](https://github.com/dean0x7d).
+- [Breaking] Formatting of more than 16 arguments is now supported when using variadic templates (#141). Thanks to [@Shauren](https://github.com/Shauren).
+- Runtime width specification (#168):
+  
+  ``` c++
+  fmt::format(""{0:{1}}"", 42, 5); // gives ""   42""
+  ```
+  
+  Thanks to [@jamboree](https://github.com/jamboree).
+- [Breaking] Enums are now formatted with an overloaded `std::ostream` insertion operator (`operator<<`) if available (#232).
+- [Breaking] Changed default `bool` format to textual, ""true"" or ""false"" (#170):
+  
+  ``` c++
+  fmt::print(""{}"", true); // prints ""true""
+  ```
+  
+  To print `bool` as a number use numeric format specifier such as `d`:
+  
+  ``` c++
+  fmt::print(""{:d}"", true); // prints ""1""
+  ```
+- `fmt::printf` and `fmt::sprintf` now support formatting of `bool` with the `%s` specifier giving textual output, ""true"" or ""false"" (#223):
+  
+  ``` c++
+  fmt::printf(""%s"", true); // prints ""true""
+  ```
+  
+  Thanks to [@LarsGullik](https://github.com/LarsGullik).
+- [Breaking] `signed char` and `unsigned char` are now formatted as integers by default (#217).
+- [Breaking] Pointers to C strings can now be formatted with the `p` specifier (#223):
+  
+  ``` c++
+  fmt::print(""{:p}"", ""test""); // prints pointer value
+  ```
+  
+  Thanks to [@LarsGullik](https://github.com/LarsGullik).
+- [Breaking] `fmt::printf` and `fmt::sprintf` now print null pointers as `(nil)` and null strings as `(null)` for consistency with glibc (#226). Thanks to [@LarsGullik](https://github.com/LarsGullik).
+- [Breaking] `fmt::(s)printf` now supports formatting of objects of user-defined types that provide an overloaded `std::ostream` insertion operator (`operator<<`) (#201):
+  
+  ``` c++
+  fmt::printf(""The date is %s"", Date(2012, 12, 9));
+  ```
+- [Breaking] The `Buffer` template is now part of the public API and can be used to implement custom memory buffers (#140). Thanks to [@polyvertex (Jean-Charles Lefebvre)](https://github.com/polyvertex).
+- [Breaking] Improved compatibility between `BasicStringRef` and [std::experimental::basic_string_view](http://en.cppreference.com/w/cpp/experimental/basic_string_view) (#100, #159, #183):
+  - Comparison operators now compare string content, not pointers
+  - `BasicStringRef::c_str` replaced by `BasicStringRef::data`
+  - `BasicStringRef` is no longer assumed to be null-terminated
+  
+  References to null-terminated strings are now represented by a new class, `BasicCStringRef`.
+- Dependency on pthreads introduced by Google Test is now optional (#185).
+- New CMake options `FMT_DOC`, `FMT_INSTALL` and `FMT_TEST` to control generation of `doc`, `install` and `test` targets respectively, on by default (#197, #198, #200). Thanks to [@maddinat0r (Alex Martin)](https://github.com/maddinat0r).
+- `noexcept` is now used when compiling with MSVC2015 (#215). Thanks to [@dmkrepo (Dmitriy)](https://github.com/dmkrepo).
+- Added an option to disable use of `windows.h` when `FMT_USE_WINDOWS_H` is defined as 0 before including `format.h` (#171). Thanks to [@alfps (Alf P. Steinbach)](https://github.com/alfps).
+- [Breaking] `windows.h` is now included with `NOMINMAX` unless `FMT_WIN_MINMAX` is defined. This is done to prevent breaking code using `std::min` and `std::max` and only affects the header-only configuration (#152, #153, #154). Thanks to [@DevO2012](https://github.com/DevO2012).
+- Improved support for custom character types (#171). Thanks to [@alfps (Alf P. Steinbach)](https://github.com/alfps).
+- Added an option to disable use of IOStreams when `FMT_USE_IOSTREAMS` is defined as 0 before including `format.h` (#205, #208). Thanks to [@JodiTheTigger](https://github.com/JodiTheTigger).
+- Improved detection of `isnan`, `isinf` and `signbit`.
+
+## Optimization
+- Made formatting of user-defined types more efficient with a custom stream buffer (#92, #230). Thanks to [@NotImplemented](https://github.com/NotImplemented).
+- Further improved performance of `fmt::Writer` on integer formatting and fixed a minor regression. Now it is ~7% faster than `karma::generate` on Karma's benchmark (#186).
+- [Breaking] Reduced [compiled code size](https://github.com/cppformat/cppformat#compile-time-and-code-bloat) (#143, #149).
+
+## Distribution
+- [Breaking] Headers are now installed in `${CMAKE_INSTALL_PREFIX}/include/cppformat` (#178). Thanks to [@jackyf (Eugene V. Lyubimkin)](https://github.com/jackyf).
+- [Breaking] Changed the library name from `format` to `cppformat` for consistency with the project name and to avoid potential conflicts (#178). Thanks to [@jackyf (Eugene V. Lyubimkin)](https://github.com/jackyf).
+- C++ Format is now available in [Debian](https://www.debian.org/) GNU/Linux ([stretch](https://packages.debian.org/source/stretch/cppformat), [sid](https://packages.debian.org/source/sid/cppformat)) and derived distributions such as [Ubuntu](https://launchpad.net/ubuntu/+source/cppformat) 15.10 and later (#155):
+  
+  ```
+  $ sudo apt-get install libcppformat1-dev
+  ```
+  
+  Thanks to [@jackyf (Eugene V. Lyubimkin)](https://github.com/jackyf).
+- [Packages for Fedora and RHEL](https://admin.fedoraproject.org/pkgdb/package/cppformat/) are now available. Thanks to Dave Johansen.
+- C++ Format can now be installed via [Homebrew](http://brew.sh/) on OS X (#157):
+  
+  ```
+  $ brew install cppformat
+  ```
+  
+  Thanks to [@ortho](https://github.com/ortho), Anatoliy Bulukin.
+
+## Documentation
+- Migrated from ReadTheDocs to GitHub Pages for better responsiveness and reliability (#128). New documentation address is [http://cppformat.github.io/](http://cppformat.github.io/).
+- Added [Building the documentation](http://cppformat.github.io/dev/usage.html#building-the-documentation) section to the documentation.
+- Documentation build script is now compatible with Python 3 and newer pip versions. (#189, #209). Thanks to [@JodiTheTigger](https://github.com/JodiTheTigger) and [@xentec](https://github.com/xentec).
+- Documentation fixes and improvements (#36, #75, #125, #160, #161, #162, #165, #210). Thanks to [@syohex (Syohei YOSHIDA)](https://github.com/syohex) and bug reporters.
+- Fixed out-of-tree documentation build (#177). Thanks to [@jackyf (Eugene V. Lyubimkin)](https://github.com/jackyf).
+
+## Fixes
+- Fixed `initializer_list` detection (#136). Thanks to [@Gachapen (Magnus Bjerke Vik)](https://github.com/Gachapen).
+- [Breaking] Fixed formatting of enums with numeric format specifiers in `fmt::(s)printf` (#131, #139):
+  
+  ``` c++
+  enum { ANSWER = 42 };
+  fmt::printf(""%d"", ANSWER);
+  ```
+  
+  Thanks to [@Naios](https://github.com/Naios).
+- Improved compatibility with old versions of MinGW (#129, #130, #132). Thanks to [@cstamford (Christopher Stamford)](https://github.com/cstamford).
+- Fixed a compile error on MSVC with disabled exceptions (#144).
+- Added a workaround for broken implementation of variadic templates in MSVC2012 (#148).
+- Placed the anonymous namespace within `fmt` namespace for the header-only configuration (#171). Thanks to [@alfps (Alf P. Steinbach)](https://github.com/alfps).
+- Fixed issues reported by Coverity Scan (#187, #192).
+- Implemented a workaround for a name lookup bug in MSVC2010 (#188).
+- Fixed compiler warnings (#95, #96, #114, #135, #142, #145, #146, #158, #163, #175, #190, #191, #194, #196, #216, #218, #220, #229, #233, #234, #236). Thanks to [@seanmiddleditch (Sean Middleditch)](https://github.com/seanmiddleditch), [@dixlorenz (Dix Lorenz)](https://github.com/dixlorenz), [@CarterLi (李通洲)](https://github.com/CarterLi), [@Naios](https://github.com/Naios), [@fmatthew5876 (Matthew Fioravante)](https://github.com/fmatthew5876), [@LevskiWeng (Levski Weng)](https://github.com/LevskiWeng), [@rpopescu](https://github.com/rpopescu), [@gabime (Gabi Melman)](https://github.com/gabime), [@cubicool (Jeremy Moles)](https://github.com/cubicool), [@jkflying (Julian Kent)](https://github.com/jkflying), [@LogicalKnight (Sean L)](https://github.com/LogicalKnight), [@inguin (Ingo van Lil)](https://github.com/inguin) and [@Jopie64 (Johan)](https://github.com/Jopie64).
+- Fixed portability issues (mostly causing test failures) on ARM, ppc64, ppc64le, s390x and SunOS 5.11 i386 ( #138, #179, #180, #202, #225, [Red Hat Bugzilla Bug 1260297](https://bugzilla.redhat.com/show_bug.cgi?id=1260297)). Thanks to [@Naios](https://github.com/Naios), [@jackyf (Eugene V. Lyubimkin)](https://github.com/jackyf) and Dave Johansen.
+- Fixed a name conflict with macro `free` defined in `crtdbg.h` when `_CRTDBG_MAP_ALLOC` is set (#211).
+- Fixed shared library build on OS X (#212). Thanks to [@dean0x7d (Dean Moldovan)](https://github.com/dean0x7d).
+- Fixed an overload conflict on MSVC when `/Zc:wchar_t-` option is specified (#214). Thanks to [@slavanap (Vyacheslav Napadovsky)](https://github.com/slavanap).
+- Improved compatibility with MSVC 2008 (#236). Thanks to [@Jopie64 (Johan)](https://github.com/Jopie64).
+- Improved compatibility with bcc32 (#227).
+- Fixed `static_assert` detection on Clang (#228). Thanks to [@dean0x7d (Dean Moldovan)](https://github.com/dean0x7d).
+",https://api.github.com/users/vitaut,576385,vitaut,https://api.github.com/repos/fmtlib/fmt/releases/2213988/assets,https://api.github.com/repos/fmtlib/fmt/releases/2213988,master,https://api.github.com/repos/fmtlib/fmt/tarball/2.0.0,https://github.com/fmtlib/fmt/releases/tag/2.0.0,https://api.github.com/repos/fmtlib/fmt/zipball/2.0.0,2.0.0,False,False
+1023613,2015-03-06T16:33:25Z,2015-03-06T16:33:52Z,1.1.0,"-   Added `BasicArrayWriter`, a class template that provides operations for formatting and writing data into a fixed-size array ([#105](https://github.com/cppformat/cppformat/issues/105) and [#122](https://github.com/cppformat/cppformat/issues/122)):
+  
+  ``` sourceCode
+  char buffer[100];
+  fmt::ArrayWriter w(buffer);
+  w.write(""The answer is {}"", 42);
+  ```
+-   Added [0 A.D.](http://play0ad.com/) and [PenUltima Online (POL)](http://www.polserver.com/) to the list of notable projects using C++ Format.
+-   C++ Format now uses MSVC intrinsics for better formatting performance ([#115](https://github.com/cppformat/cppformat/pull/115), [#116](https://github.com/cppformat/cppformat/pull/116), [#118](https://github.com/cppformat/cppformat/pull/118) and [#121](https://github.com/cppformat/cppformat/pull/121)). Previously these optimizations where only used on GCC and Clang. Thanks to [@CarterLi](https://github.com/CarterLi) and [@objectx](https://github.com/objectx).
+-   CMake install target ([#119](https://github.com/cppformat/cppformat/pull/119)). Thanks to [@TrentHouliston](https://github.com/TrentHouliston).
+  
+  You can now install C++ Format with `make install` command.
+-   Improved [Biicode](http://www.biicode.com/) support ([#98](https://github.com/cppformat/cppformat/pull/98) and [#104](https://github.com/cppformat/cppformat/pull/104)). Thanks to [@MariadeAnton](https://github.com/MariadeAnton) and [@franramirez688](https://github.com/franramirez688).
+-   Improved support for bulding with [Android NDK](https://developer.android.com/tools/sdk/ndk/index.html) ([#107](https://github.com/cppformat/cppformat/pull/107)). Thanks to [@newnon](https://github.com/newnon).
+  
+  The [android-ndk-example](https://github.com/cppformat/android-ndk-example) repository provides and example of using C++ Format with Android NDK:
+  
+  ![image](https://raw.githubusercontent.com/cppformat/android-ndk-example/master/screenshot.png)
+-   Improved documentation of `SystemError` and `WindowsError` ([#54](https://github.com/cppformat/cppformat/issues/54)).
+-   Various code improvements ([#110](https://github.com/cppformat/cppformat/pull/110), [#111](https://github.com/cppformat/cppformat/pull/111) [#112](https://github.com/cppformat/cppformat/pull/112)). Thanks to [@CarterLi](https://github.com/CarterLi).
+-   Improved compile-time errors when formatting wide into narrow strings ([#117](https://github.com/cppformat/cppformat/issues/117)).
+-   Fixed `BasicWriter::write` without formatting arguments when C++11 support is disabled ([#109](https://github.com/cppformat/cppformat/issues/109)).
+-   Fixed header-only build on OS X with GCC 4.9 ([#124](https://github.com/cppformat/cppformat/issues/124)).
+-   Fixed packaging issues ([#94](https://github.com/cppformat/cppformat/issues/94)).
+-   Fixed warnings in GCC, MSVC and Xcode/Clang ([#95](https://github.com/cppformat/cppformat/issues/95), [#96](https://github.com/cppformat/cppformat/issues/96) and [#114](https://github.com/cppformat/cppformat/pull/114)).
+-   Added [changelog](https://github.com/cppformat/cppformat/blob/master/ChangeLog.rst) ([#103](https://github.com/cppformat/cppformat/issues/103)).
+",https://api.github.com/users/vitaut,576385,vitaut,https://api.github.com/repos/fmtlib/fmt/releases/1023613/assets,https://api.github.com/repos/fmtlib/fmt/releases/1023613,master,https://api.github.com/repos/fmtlib/fmt/tarball/1.1.0,https://github.com/fmtlib/fmt/releases/tag/1.1.0,https://api.github.com/repos/fmtlib/fmt/zipball/1.1.0,1.1.0,False,False
+922227,2015-02-05T16:42:25Z,2015-02-05T16:45:03Z,1.0.0,"- Add support for a header-only configuration when `FMT_HEADER_ONLY` is defined before including `format.h`:
+  
+  ```
+  #define FMT_HEADER_ONLY
+  #include ""format.h""
+  ```
+- Compute string length in the constructor of `BasicStringRef` instead of the `size` method (#79). This eliminates size computation for string literals on reasonable optimizing compilers.
+- Fix formatting of types with overloaded `operator <<` for `std::wostream` (#86):
+  
+  ```
+  fmt::format(L""The date is {0}"", Date(2012, 12, 9));
+  ```
+- Fix linkage of tests on Arch Linux (#89).
+- Allow precision specifier for non-float arguments (#90): 
+  
+  ```
+  fmt::print(""{:.3}\n"", ""Carpet""); // prints ""Car""
+  ```
+- Fix build on Android NDK (#93)
+- Improvements to documentation build procedure.
+- Remove `FMT_SHARED` CMake variable in favor of standard [`BUILD_SHARED_LIBS`](http://www.cmake.org/cmake/help/v3.0/variable/BUILD_SHARED_LIBS.html).
+- Fix error handling in `fmt::fprintf`.
+- Fix a number of warnings.
+",https://api.github.com/users/vitaut,576385,vitaut,https://api.github.com/repos/fmtlib/fmt/releases/922227/assets,https://api.github.com/repos/fmtlib/fmt/releases/922227,master,https://api.github.com/repos/fmtlib/fmt/tarball/1.0.0,https://github.com/fmtlib/fmt/releases/tag/1.0.0,https://api.github.com/repos/fmtlib/fmt/zipball/1.0.0,1.0.0,False,False
+593297,2014-10-25T17:27:49Z,2014-10-27T15:36:32Z,0.12.0,"- [Breaking] Improved separation between formatting and buffer management. `Writer` is now a base class that cannot be instantiated directly. The new `MemoryWriter` class implements the default buffer management with small allocations done on stack. So `fmt::Writer` should be replaced with `fmt::MemoryWriter` in variable declarations.
+  Old code:
+  
+  ```
+  fmt::Writer w;
+  ```
+  
+  New code: 
+  
+  ```
+  fmt::MemoryWriter w;
+  ```
+  
+  If you pass `fmt::Writer` by reference, you can continue to do so:
+  
+  ```
+  void f(fmt::Writer &w);
+  ```
+  
+  This doesn't affect the formatting API.
+- Support for custom memory allocators (https://github.com/cppformat/cppformat/issues/69)
+- Formatting functions now accept `signed char` and `unsigned char` strings as arguments (https://github.com/cppformat/cppformat/issues/73):
+  
+  ```
+  auto s = format(""GLSL version: {}"", glGetString(GL_VERSION)); 
+  ```
+- Reduced code bloat. According to the new [benchmark results](https://github.com/cppformat/cppformat#compile-time-and-code-bloat), cppformat is close to `printf` and by the order of magnitude better than Boost Format in terms of compiled code size.
+- Improved appearance of the documentation on mobile by using the [Sphinx Bootstrap theme](http://ryan-roemer.github.io/sphinx-bootstrap-theme/):
+
+| Old | New |
+| :-: | :-: |
+| ![screenshot_2014-10-20-09-00-17](https://cloud.githubusercontent.com/assets/576385/4792130/cd256436-5de3-11e4-9a62-c077d0c2b003.png) | ![screenshot_2014-10-20-09-01-12](https://cloud.githubusercontent.com/assets/576385/4792131/cd29896c-5de3-11e4-8f59-cac952942bf0.png) |
+",https://api.github.com/users/vitaut,576385,vitaut,https://api.github.com/repos/fmtlib/fmt/releases/593297/assets,https://api.github.com/repos/fmtlib/fmt/releases/593297,master,https://api.github.com/repos/fmtlib/fmt/tarball/0.12.0,https://github.com/fmtlib/fmt/releases/tag/0.12.0,https://api.github.com/repos/fmtlib/fmt/zipball/0.12.0,0.12.0,False,False
+422468,2014-08-21T15:51:45Z,2014-08-21T16:03:43Z,0.11.0,"- Safe printf implementation with a POSIX extension for positional arguments:
+  
+  ```
+  fmt::printf(""Elapsed time: %.2f seconds"", 1.23);
+  fmt::printf(""%1$s, %3$d %2$s"", weekday, month, day);
+  ```
+- Arguments of `char` type can now be formatted as integers (https://github.com/cppformat/cppformat/issues/55):
+  
+  ```
+  fmt::format(""0x{0:02X}"", 'a');
+  ```
+- Deprecated parts of the API removed.
+- The library is now built and tested on MinGW with Appveyor in addition to existing test platforms Linux/GCC, OS X/Clang, Windows/MSVC.
+",https://api.github.com/users/vitaut,576385,vitaut,https://api.github.com/repos/fmtlib/fmt/releases/422468/assets,https://api.github.com/repos/fmtlib/fmt/releases/422468,master,https://api.github.com/repos/fmtlib/fmt/tarball/v0.11.0,https://github.com/fmtlib/fmt/releases/tag/v0.11.0,https://api.github.com/repos/fmtlib/fmt/zipball/v0.11.0,v0.11.0,False,False
+405126,2014-07-01T14:19:42Z,2014-07-01T14:23:16Z,0.10.0,"**Improved API**
+- All formatting methods are now implemented as variadic functions instead of using `operator<<` for feeding arbitrary arguments into a temporary formatter object. This works both with C++11 where variadic templates are used and with older standards where variadic functions are emulated by providing lightweight wrapper functions defined with the `FMT_VARIADIC` macro. You can use this macro for defining your own portable variadic functions:
+  
+  ``` c++
+  void report_error(const char *format, const fmt::ArgList &args) {
+    fmt::print(""Error: {}"");
+    fmt::print(format, args);
+  }
+  FMT_VARIADIC(void, report_error, const char *)
+  
+  report_error(""file not found: {}"", path);
+  ```
+  
+  Apart from a more natural syntax, this also improves performance as there is no need to construct temporary formatter objects and control arguments' lifetimes. Because the wrapper functions are very ligthweight, this doesn't cause code bloat even in pre-C++11 mode.
+- Simplified common case of formatting an `std::string`. Now it requires a single function call:
+  
+  ``` c++
+  std::string s = format(""The answer is {}."", 42);
+  ```
+  
+  Previously it required 2 function calls:
+  
+  ``` c++
+  std::string s = str(Format(""The answer is {}."") << 42);
+  ```
+  
+  Instead of unsafe `c_str` function, `fmt::Writer` should be used directly to bypass creation of `std::string`:
+  
+  ``` c++
+  fmt::Writer w;
+  w.write(""The answer is {}."", 42);
+  w.c_str();  // returns a C string
+  ```
+  
+  This doesn't do dynamic memory allocation for small strings and is less error prone as the lifetime of the string is the same as for `std::string::c_str` which is well understood (hopefully).
+- Improved consistency in naming functions that are a part of the public API. Now all public functions are lowercase following the standard library conventions. Previously it was a combination of lowercase and CapitalizedWords. Issue https://github.com/cppformat/cppformat/issues/50.
+- Old functions are marked as deprecated and will be removed in the next release.
+
+**Other Changes**
+- Experimental support for printf format specifications (work in progress):
+  
+  ``` c++
+  fmt::printf(""The answer is %d."", 42);
+  std::string s = fmt::sprintf(""Look, a %s!"", ""string"");
+  ```
+- Support for hexadecimal floating point format specifiers `a` and `A`:
+  
+  ``` c++
+  print(""{:a}"", -42.0); // Prints -0x1.5p+5
+  print(""{:A}"", -42.0); // Prints -0X1.5P+5
+  ```
+- CMake option `FMT_SHARED` that specifies whether to build format as a shared library (off by default).
+",https://api.github.com/users/vitaut,576385,vitaut,https://api.github.com/repos/fmtlib/fmt/releases/405126/assets,https://api.github.com/repos/fmtlib/fmt/releases/405126,master,https://api.github.com/repos/fmtlib/fmt/tarball/0.10.0,https://github.com/fmtlib/fmt/releases/tag/0.10.0,https://api.github.com/repos/fmtlib/fmt/zipball/0.10.0,0.10.0,False,False
+285891,2014-05-13T16:28:53Z,2014-05-13T16:30:51Z,0.9.0,"- More efficient implementation of variadic formatting functions.
+- <code>Writer::Format</code> now has a variadic overload:
+  
+  <pre>
+  Writer out;
+  out.Format(""Look, I'm {}!"", ""variadic"");
+  </pre>
+- For efficiency and consistency with other overloads, variadic overload of the <code>Format</code> function now returns <code>Writer</code> instead of <code>std::string</code>. Use the <code>str</code> function to convert it to <code>std::string</code>:
+  
+  <pre>
+  std::string s = str(Format(""Look, I'm {}!"", ""variadic""));
+  </pre>
+- Replaced formatter actions with output sinks: <code>NoAction</code> -> <code>NullSink</code>, <code>Write</code> -> <code>FileSink</code>, <code>ColorWriter</code> -> <code>ANSITerminalSink</code>. This improves naming consistency and shouldn't affect client code unless these classes are used directly which should be rarely needed.
+- Added <code>ThrowSystemError</code> function that formats a message and throws <code>SystemError</code> containing the formatted message and system-specific error description. For example, the following code
+  
+  <pre>
+  FILE *f = fopen(filename, ""r"");
+  if (!f)
+      ThrowSystemError(errno, ""Failed to open file '{}'"") &lt;&lt; filename;
+  </pre>
+  
+  will throw <code>SystemError</code> exception with description <code>""Failed to open file '&lt;filename>': No such file or directory""</code> if file doesn't exist.
+- Support for AppVeyor continuous integration platform.
+- <code>Format</code> now throws <code>SystemError</code> in case of I/O errors.
+- Improve test infrastructure. Print functions are now tested by redirecting the output to a pipe.
+",https://api.github.com/users/vitaut,576385,vitaut,https://api.github.com/repos/fmtlib/fmt/releases/285891/assets,https://api.github.com/repos/fmtlib/fmt/releases/285891,master,https://api.github.com/repos/fmtlib/fmt/tarball/0.9.0,https://github.com/fmtlib/fmt/releases/tag/0.9.0,https://api.github.com/repos/fmtlib/fmt/zipball/0.9.0,0.9.0,False,False
+273370,2014-04-15T06:28:11Z,2015-02-07T15:13:07Z,0.8.0,"Initial release
+",https://api.github.com/users/vitaut,576385,vitaut,https://api.github.com/repos/fmtlib/fmt/releases/273370/assets,https://api.github.com/repos/fmtlib/fmt/releases/273370,master,https://api.github.com/repos/fmtlib/fmt/tarball/0.8.0,https://github.com/fmtlib/fmt/releases/tag/0.8.0,https://api.github.com/repos/fmtlib/fmt/zipball/0.8.0,0.8.0,False,False

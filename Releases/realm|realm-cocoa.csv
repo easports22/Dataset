@@ -1,0 +1,1807 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8262095,2017-10-25T20:37:55Z,2017-10-25T21:04:32Z,v3.0.1,"### Bugfixes
+
+* Explicitly exclude KVO-generated object subclasses from the schema.
+* Fix regression where the type of a Realm model class is not properly determined, causing crashes
+  when a type value derived at runtime by `type(of:)` is passed into certain APIs.
+* Fix a crash when an `Object` subclass has implicitly ignored `let`
+  properties.
+* Fix several cases where adding a notification block from within a
+  notification callback could produce incorrect results.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/8262095/assets,https://api.github.com/repos/realm/realm-cocoa/releases/8262095,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v3.0.1,https://github.com/realm/realm-cocoa/releases/tag/v3.0.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v3.0.1,v3.0.1,False,False
+8140340,2017-10-16T21:01:35Z,2017-10-16T21:19:34Z,v3.0.0,"### Breaking Changes
+* iOS 7 is no longer supported.
+* Synchronized Realms require a server running Realm Object Server v2.0 or higher.
+* Computed properties on Realm object types are detected and no
+  longer added to the automatically generated schema.
+* The Objective-C and Swift `create(_:, value: update:)` APIs now
+  correctly nil out nullable properties when updating an existing
+  object when the `value` argument specifies nil or `NSNull` for
+  the property value.
+* `-[RLMRealm addOrUpdateObjects:]` and `-[RLMRealm deleteObjects:]` now
+  require their argument to conform to `NSFastEnumeration`, to match similar
+  APIs that also take collections.
+* The way interactive sync errors (client reset and permission denied)
+  are delivered to the user has been changed. Instead of a block which can
+  be invoked to immediately delete the offending Realm file, an opaque
+  token object of type `RLMSyncErrorActionToken` will be returned in the
+  error object's `userInfo` dictionary. This error object can be passed
+  into the new `+[RLMSyncSession immediatelyHandleError:]` API to delete
+  the files.
+* The return types of the `SyncError.clientResetInfo()` and
+  `SyncError.deleteRealmUserInfo()` APIs have been changed. They now return
+  `RLMSyncErrorActionToken`s or `SyncError.ActionToken`s instead of closures.
+* The class methods `Object.className()`, `Object.objectUtilClass()`, and
+  the property `Object.isInvalidated` can no longer be overriden.
+* The callback which runs when a sync user login succeeds or fails
+  now runs on the main queue by default, or can be explicitly specified
+  by a new `callbackQueue` parameter on the `{RLM}SyncUser.logIn(...)` API.
+* Fix empty strings, binary data, and null on the right side of `BEGINSWITH`,
+  `ENDSWITH` and `CONTAINS` operators in predicates to match Foundation's
+  semantics of never matching any strings or data.
+* Swift `Object` comparison and hashing behavior now works the same way as
+  that of `RLMObject` (objects are now only considered equatable if their
+  model class defines a primary key).
+* Fix the way the hash property works on `Object` when the object model has
+  no primary key.
+* Fix an issue where if a Swift model class defined non-generic managed
+  properties after generic Realm properties (like `List<T>`), the schema
+  would be constructed incorrectly. Fixes an issue where creating such
+  models from an array could fail.
+* Loosen `RLMArray` and `RLMResults`'s generic constraint from `RLMObject` to
+  `NSObject`. This may result in having to add some casts to disambiguate
+  types.
+* Remove `RLMSyncPermissionResults`. `RLMSyncPermission`s are now vended out
+  using a `RLMResults`. This results collection supports all normal collection
+  operations except for setting values using key-value coding (since
+  `RLMSyncPermission`s are immutable) and the property aggregation operations.
+* `RLMSyncUserInfo` has been significantly enhanced. It now contains metadata
+  about a user stored on the Realm Object Server, as well as a list of all user account
+  data associated with that user.
+* Starting with Swift 4, `List` now conforms to `MutableCollection` instead of
+  `RangeReplaceableCollection`. For Swift 4, the empty collection initializer has been
+  removed, and default implementations of range replaceable collection methods that
+  make sense for `List` have been added.
+* `List.removeLast()` now throws an exception if the list is empty, to more closely match
+  the behavior of the standard library's `Collection.removeLast()` implementation.
+* `RealmCollection`'s associated type `Element` has been renamed `ElementType`.
+* The following APIs have been renamed:
+
+| Old API                                                     | New API                                                        |
+|:------------------------------------------------------------|:---------------------------------------------------------------|
+| `NotificationToken.stop()`                                  | `NotificationToken.invalidate()`                               |
+| `-[RLMNotificationToken stop]`                              | `-[RLMNotificationToken invalidate]`                           |
+| `RealmCollection.addNotificationBlock(_:)`                  | `RealmCollection.observe(_:)`                                  |
+| `RLMSyncProgress`                                           | `RLMSyncProgressMode`                                          |
+| `List.remove(objectAtIndex:)`                               | `List.remove(at:)`                                             |
+| `List.swap(_:_:)`                                           | `List.swapAt(_:_:)`                                            |
+| `SyncPermissionValue`                                       | `SyncPermission`                                               |
+| `RLMSyncPermissionValue`                                    | `RLMSyncPermission`                                            |
+| `-[RLMSyncPermission initWithRealmPath:userID:accessLevel]` | `-[RLMSyncPermission initWithRealmPath:identity:accessLevel:]` |
+| `RLMSyncPermission.userId`                                  | `RLMSyncPermission.identity`                                   |
+| `-[RLMRealm addOrUpdateObjectsInArray:]`                    | `-[RLMRealm addOrUpdateObjects:]`                              |
+
+* The following APIs have been removed:
+
+| Removed API                                                  | Replacement                                                                               |
+|:-------------------------------------------------------------|:------------------------------------------------------------------------------------------|
+| `Object.className`                                           | None, was erroneously present.                                                            |
+| `RLMPropertyTypeArray`                                       | `RLMProperty.array`                                                                       |
+| `PropertyType.array`                                         | `Property.array`                                                                          |
+| `-[RLMArray sortedResultsUsingProperty:ascending:]`          | `-[RLMArray sortedResultsUsingKeyPath:ascending:]`                                        |
+| `-[RLMCollection sortedResultsUsingProperty:ascending:]`     | `-[RLMCollection sortedResultsUsingKeyPath:ascending:]`                                   |
+| `-[RLMResults sortedResultsUsingProperty:ascending:]`        | `-[RLMResults sortedResultsUsingKeyPath:ascending:]`                                      |
+| `+[RLMSortDescriptor sortDescriptorWithProperty:ascending:]` | `+[RLMSortDescriptor sortDescriptorWithKeyPath:ascending:]`                               |
+| `RLMSortDescriptor.property`                                 | `RLMSortDescriptor.keyPath`                                                               |
+| `AnyRealmCollection.sorted(byProperty:ascending:)`           | `AnyRealmCollection.sorted(byKeyPath:ascending:)`                                         |
+| `List.sorted(byProperty:ascending:)`                         | `List.sorted(byKeyPath:ascending:)`                                                       |
+| `LinkingObjects.sorted(byProperty:ascending:)`               | `LinkingObjects.sorted(byKeyPath:ascending:)`                                             |
+| `Results.sorted(byProperty:ascending:)`                      | `Results.sorted(byKeyPath:ascending:)`                                                    |
+| `SortDescriptor.init(property:ascending:)`                   | `SortDescriptor.init(keyPath:ascending:)`                                                 |
+| `SortDescriptor.property`                                    | `SortDescriptor.keyPath`                                                                  |
+| `+[RLMRealm migrateRealm:configuration:]`                    | `+[RLMRealm performMigrationForConfiguration:error:]`                                     |
+| `RLMSyncManager.disableSSLValidation`                        | `RLMSyncConfiguration.enableSSLValidation`                                                |
+| `SyncManager.disableSSLValidation`                           | `SyncConfiguration.enableSSLValidation`                                                   |
+| `RLMSyncErrorBadResponse`                                    | `RLMSyncAuthErrorBadResponse`                                                             |
+| `RLMSyncPermissionResults`                                   | `RLMResults`                                                                              |
+| `SyncPermissionResults`                                      | `Results`                                                                                 |
+| `RLMSyncPermissionChange`                                    | `-[RLMSyncUser applyPermission:callback]` / `-[RLMSyncUser deletePermission:callback:]`   |
+| `-[RLMSyncUser permissionRealmWithError:]`                   | `-[RLMSyncUser retrievePermissionsWithCallback:]`                                         |
+| `RLMSyncPermissionOffer`                                     | `-[RLMSyncUser createOfferForRealmAtURL:accessLevel:expiration:callback:]`                |
+| `RLMSyncPermissionOfferResponse`                             | `-[RLMSyncUser acceptOfferForToken:callback:]`                                            |
+| `-[NSError rlmSync_clientResetBlock]`                        | `-[NSError rlmSync_errorActionToken]` / `-[NSError rlmSync_clientResetBackedUpRealmPath]` |
+| `-[NSError rlmSync_deleteRealmBlock]`                        | `-[NSError rlmSync_errorActionToken]`                                                     |
+
+### Enhancements
+* `List` can now contain values of types `Bool`, `Int`, `Int8`, `Int16`,
+  `Int32`, `Int64`, `Float`, `Double`, `String`, `Data`, and `Date` (and
+  optional versions of all of these) in addition to `Object` subclasses.
+  Querying `List`s containing values other than `Object` subclasses is not yet
+  implemented.
+* `RLMArray` can now be constrained with the protocols `RLMBool`, `RLMInt`,
+  `RLMFloat`, `RLMDouble`, `RLMString`, `RLMData`, and `RLMDate` in addition to
+  protocols defined with `RLM_ARRAY_TYPE`. By default `RLMArray`s of
+  non-`RLMObject` types can contain null. Indicating that the property is
+  required (by overriding `+requiredProperties:`) will instead make the values
+  within the array required. Querying `RLMArray`s containing values other than
+  `RLMObject` subclasses is not yet implemented.
+* Add a new error code to denote 'permission denied' errors when working
+  with synchronized Realms, as well as an accompanying block that can be
+  called to inform the binding that the offending Realm's files should be
+  deleted immediately. This allows recovering from 'permission denied'
+  errors in a more robust manner. See the documentation for
+  `RLMSyncErrorPermissionDeniedError` for more information.
+* Add Swift `Object.isSameObject(as:_)` API to perform the same function as
+  the existing Objective-C API `-[RLMObject isEqualToObject:]`.
+* Opening a synced Realm whose local copy was created with an older version of
+  Realm Mobile Platfrom when a migration is not possible to the current version
+  will result in an `RLMErrorIncompatibleSyncedFile` / `incompatibleSyncedFile`
+  error. When such an error occurs, the original file is moved to a backup
+  location, and future attempts to open the synchronized Realm will result in a new
+  file being created. If you wish to migrate any data from the backup Realm you can
+  open it using the backup Realm configuration available on the error object.
+* Add a preview of partial synchronization. Partial synchronization allows a
+  synchronized Realm to be opened in such a way that only objects requested by
+  the user are synchronized to the device. You can use it by setting the
+  `isPartial` property on a `SyncConfiguration`, opening the Realm, and then
+  calling `Realm.subscribe(to:where:callback:)` with the type of object you're
+  interested in, a string containing a query determining which objects you want
+  to subscribe to, and a callback which will report the results. You may add as
+  many subscriptions to a synced Realm as necessary.
+
+### Bugfixes
+* Realm no longer throws an ""unsupported instruction"" exception in some cases
+  when opening a synced Realm asynchronously.
+* Realm Swift APIs that filter or look up the index of an object based on a
+  format string now properly handle optional arguments in their variadic argument
+  list.
+* `-[RLMResults<RLMSyncPermission *> indexOfObject:]` now properly accounts for access
+  level.
+* Fix a race condition that could lead to a crash accessing to the freed configuration object
+  if a default configuration was set from a different thread.
+* Fixed an issue that crash when enumerating after clearing data during migration.
+* Fix a bug where a synced Realm couldn't be reopened even after a successful client reset
+  in some cases.
+* Fix a bug where the sync subsystem waited too long in certain cases to reconnect to the server.
+* Fix a bug where encrypted sync-related metadata was incorrectly deleted from upgrading users,
+  resulting in all users being logged out.
+* Fix a bug where permission-related data continued to be synced to a client even after the user
+  that data belonged to logged out.
+* Fix an issue where collection notifications might be delivered inconsistently if a notification
+  callback was added within another callback for the same collection.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/8140340/assets,https://api.github.com/repos/realm/realm-cocoa/releases/8140340,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v3.0.0,https://github.com/realm/realm-cocoa/releases/tag/v3.0.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v3.0.0,v3.0.0,False,False
+8122110,2017-10-14T21:49:54Z,2017-10-14T22:11:01Z,v3.0.0-rc.2,"### Enhancements
+* Reinstate `RLMSyncPermissionSortPropertyUserID` to allow users to sort permissions
+  to their own Realms they've granted to others.
+
+### Bugfixes
+* `-[RLMResults<RLMSyncPermission *> indexOfObject:]` now properly accounts for access
+  level.
+* Fix a race condition that could lead to a crash accessing to the freed configuration object
+  if a default configuration was set from a different thread.
+* Fixed an issue that crash when enumerating after clearing data during migration.
+* Fix a bug where a synced Realm couldn't be reopened even after a successful client reset
+  in some cases.
+* Fix a bug where the sync subsystem waited too long in certain cases to reconnect to the server.
+* Fix a bug where encrypted sync-related metadata was incorrectly deleted from upgrading users,
+  resulting in all users being logged out.
+* Fix a bug where permission-related data continued to be synced to a client even after the user
+  that data belonged to logged out.
+* Fix an issue where collection notifications might be delivered inconsistently if a notification
+  callback was added within another callback for the same collection.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/8122110/assets,https://api.github.com/repos/realm/realm-cocoa/releases/8122110,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v3.0.0-rc.2,https://github.com/realm/realm-cocoa/releases/tag/v3.0.0-rc.2,https://api.github.com/repos/realm/realm-cocoa/zipball/v3.0.0-rc.2,v3.0.0-rc.2,False,True
+7986608,2017-10-03T23:30:15Z,2017-10-03T23:50:46Z,v3.0.0-rc.1,"### Breaking Changes
+* Remove `RLMSyncPermissionSortPropertyUserID` to reflect changes in how the
+  Realm Object Server reports permissions for a user.
+* Remove `RLMSyncPermissionOffer` and `RLMSyncPermissionOfferResponse` classes
+  and associated helper methods and functions. Use the
+  `-[RLMSyncUser createOfferForRealmAtURL:accessLevel:expiration:callback:]`
+  and `-[RLMSyncUser acceptOfferForToken:callback:]` methods instead.
+
+### Bugfixes
+
+* The keychain item name used by Realm to manage the encryption keys for
+  sync-related metadata is now set to a per-app name based on the bundle
+  identifier. Keys that were previously stored within the single, shared Realm
+  keychain item will be transparently migrated to the per-application keychain
+  item.
+* Fix downloading of the Realm core binaries when Xcode's command-line tools are
+  set as the active developer directory for command-line interactions.
+* Fix a crash that could occur when resolving a ThreadSafeReference to a `List`
+  whose parent object had since been deleted.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/7986608/assets,https://api.github.com/repos/realm/realm-cocoa/releases/7986608,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v3.0.0-rc.1,https://github.com/realm/realm-cocoa/releases/tag/v3.0.0-rc.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v3.0.0-rc.1,v3.0.0-rc.1,False,True
+7919781,2017-09-28T02:46:07Z,2017-09-28T03:03:24Z,v2.10.2,"### Bugfixes
+
+* The keychain item name used by Realm to manage the encryption keys for
+  sync-related metadata is now set to a per-app name based on the bundle
+  identifier. Keys that were previously stored within the single, shared Realm
+  keychain item will be transparently migrated to the per-application keychain
+  item.
+* Fix downloading of the Realm core binaries when Xcode's command-line tools are
+  set as the active developer directory for command-line interactions.
+* Fix a crash that could occur when resolving a ThreadSafeReference to a `List`
+  whose parent object had since been deleted.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/7919781/assets,https://api.github.com/repos/realm/realm-cocoa/releases/7919781,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.10.2,https://github.com/realm/realm-cocoa/releases/tag/v2.10.2,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.10.2,v2.10.2,False,False
+7863648,2017-09-23T06:34:21Z,2017-09-23T06:54:37Z,v3.0.0-beta.4,"### Breaking Changes
+
+* Rename `List.remove(objectAtIndex:)` to `List.remove(at:)` to match the name
+  used by 'RangeReplaceableCollection'.
+* Rename `List.swap()` to `List.swapAt()` to match the name used by 'Array'.
+* Loosen `RLMArray` and `RLMResults`'s generic constraint from `RLMObject` to
+  `NSObject`. This may result in having to add some casts to disambiguate
+  types.
+* Remove `RLMPropertyTypeArray` in favor of a separate bool `array` property on
+  `RLMProperty`/`Property`.
+* Remove `RLMSyncPermissionResults`. `RLMSyncPermission`s are now vended out
+  using a `RLMResults`. This results collection supports all normal collection
+  operations except for setting values using KVO (since `RLMSyncPermission`s are
+  immutable) and the property aggregation operations.
+* `RealmCollection`'s associated type `Element` has been renamed `ElementType`.
+* Realm Swift collection types (`List`, `Results`, `AnyRealmCollection`, and
+  `LinkingObjects` have had their generic type parameter changed from `T` to
+  `Element`).
+* `RealmOptional`'s generic type parameter has been changed from `T` to `Value`.
+* `RLMSyncUserInfo` has been significantly enhanced. It now contains metadata
+  about a user stored on the Realm Object Server, as well as a list of all user account
+  data associated with that user.
+* Starting with Swift 4, `List` now conforms to `MutableCollection` instead of
+  `RangeReplaceableCollection`. For Swift 4, the empty collection initializer has been
+  removed, and default implementations of range replaceable collection methods that
+  make sense for `List` have been added.
+* `List.removeLast()` now throws an exception if the list is empty, to more closely match
+  the behavior of the standard library's `Collection.removeLast()` implementation.
+
+### Enhancements
+
+* `List` can now contain values of types `Bool`, `Int`, `Int8`, `Int16`,
+  `Int32`, `Int64`, `Float`, `Double`, `String`, `Data`, and `Date` (and
+  optional versions of all of these) in addition to `Object` subclasses.
+  Querying `List`s containing values other than `Object` subclasses is not yet
+  implemented.
+* `RLMArray` can now be constrained with the protocols `RLMBool`, `RLMInt`,
+  `RLMFloat`, `RLMDouble`, `RLMString`, `RLMData`, and `RLMDate` in addition to
+  protocols defined with `RLM_ARRAY_TYPE`. By default `RLMArray`s of
+  non-`RLMObject` types can contain null. Indicating that the property is
+  required (by overriding `+requiredProperties:`) will instead make the values
+  within the array required. Querying `RLMArray`s containing values other than
+  `RLMObject` subclasses is not yet implemented.
+* Opening a synced Realm whose local copy was created with an older version of
+  Realm Mobile Platfrom when a migration is not possible to the current version
+  will result in an `RLMErrorIncompatibleSyncedFile` / `incompatibleSyncedFile`
+  error. When such an error occurs, the original file is moved to a backup
+  location, and future attempts to open the synchronized Realm will result in a new
+  file being created. If you wish to migrate any data from the backup Realm you can
+  open it using the backup Realm configuration available on the error object.
+* Add preview support for partial synchronization. Partial synchronization is
+  allows a synchronized Realm to be opened in such a way that only objects
+  requested by the user are synchronized to the device. You can use it by setting
+  the `isPartial` property on a `SyncConfiguration`, opening the Realm, and then
+  calling `Realm.subscribe(to:where:callback:)` with the type of object you're
+  interested in, a string containing a query determining which objects you want
+  to subscribe to, and a callback which will report the results. You may add as
+  many subscriptions to a synced Realm as necessary.
+
+### Bugfixes
+
+* Realm Swift APIs that filter or look up the index of an object based on a
+  format string now properly handle optional arguments in their variadic argument
+  list.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/7863648/assets,https://api.github.com/repos/realm/realm-cocoa/releases/7863648,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v3.0.0-beta.4,https://github.com/realm/realm-cocoa/releases/tag/v3.0.0-beta.4,https://api.github.com/repos/realm/realm-cocoa/zipball/v3.0.0-beta.4,v3.0.0-beta.4,False,True
+7762268,2017-09-15T00:07:53Z,2017-09-15T00:27:33Z,v2.10.1,"Swift binaries are now produced for Swift 3.0, 3.0.1, 3.0.2, 3.1, 3.2 and 4.0.
+
+### Enhancements
+
+* Auxiliary files are excluded from backup by default.
+
+### Bugfixes
+
+* Fix more cases where assigning an RLMArray property to itself would clear the
+  RLMArray.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/7762268/assets,https://api.github.com/repos/realm/realm-cocoa/releases/7762268,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.10.1,https://github.com/realm/realm-cocoa/releases/tag/v2.10.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.10.1,v2.10.1,False,False
+7502503,2017-08-24T00:28:16Z,2017-08-24T00:57:15Z,v3.0.0-beta.3,"### Breaking Changes
+
+* iOS 7 is no longer supported.
+* Computed properties on Realm object types are detected and no
+  longer added to the automatically generated schema.
+* `-[RLMRealm addOrUpdateObjectsInArray:]` has been renamed to
+  `-[RLMRealm addOrUpdateObjects:]` for consistency with similar methods
+  that add or delete objects.
+* `-[RLMRealm addOrUpdateObjects:]` and `-[RLMRealm deleteObjects:]` now
+  require their argument to conform to `NSFastEnumeration`, to match similar
+  APIs that also take collections.
+* Remove deprecated `{RLM}SyncPermission` and `{RLM}SyncPermissionChange`
+  classes.
+* `{RLM}SyncPermissionValue` has been renamed to just `{RLM}SyncPermission`.
+  Its `userId` property has been renamed `identity`, and its
+  `-initWithRealmPath:userID:accessLevel:` initializer has been renamed
+  `-initWithRealmPath:identity:accessLevel:`.
+* Remove deprecated `-[RLMSyncUser permissionRealmWithError:]` and
+  `SyncUser.permissionRealm()` APIs. Use the new permissions system.
+* Remove deprecated error `RLMSyncErrorBadResponse`. Use
+  `RLMSyncAuthErrorBadResponse` instead.
+* The way interactive sync errors (client reset and permission denied)
+  are delivered to the user has been changed. Instead of a block which can
+  be invoked to immediately delete the offending Realm file, an opaque
+  token object of type `RLMSyncErrorActionToken` will be returned in the
+  error object's `userInfo` dictionary. This error object can be passed
+  into the new `+[RLMSyncSession immediatelyHandleError:]` API to delete
+  the files.
+* Remove `-[NSError rlmSync_clientResetBlock]` and
+  `-[NSError rlmSync_deleteRealmBlock]` APIs.
+* The return types of the `SyncError.clientResetInfo()` and
+  `SyncError.deleteRealmUserInfo()` APIs have been changed. They now return
+  `RLMSyncErrorActionToken`s or `SyncError.ActionToken`s instead of closures.
+* The (erroneously added) instance property `Object.className` has been
+  removed.
+* The class methods `Object.className()`, `Object.objectUtilClass()`, and
+  the property `Object.isInvalidated` can no longer be overriden.
+* The callback which runs when a sync user login succeeds or fails
+  now runs on the main queue by default, or can be explicitly specified
+  by a new `callbackQueue` parameter on the `{RLM}SyncUser.logIn(...)` API.
+* Rename `{RLM}NotificationToken.stop()` to `invalidate()` and
+  `{RealmCollection,SyncPermissionResults}.addNotificationBlock(_:)` to
+  `observe(_:)` to mirror Foundation's new KVO APIs.
+* The `RLMSyncProgress` enum has been renamed `RLMSyncProgressMode`.
+* Remove deprecated `{RLM}SyncManager.disableSSLValidation` property. Disable
+  SSL validation on a per-Realm basis by setting the `enableSSLValidation`
+  property on `{RLM}SyncConfiguration` instead.
+* Fix empty strings, binary data, and null on the right side of `BEGINSWITH`,
+  `ENDSWITH` and `CONTAINS` operators in predicates to match Foundation's
+  semantics of never matching any strings or data.
+* Swift `Object` comparison and hashing behavior now works the same way as
+  that of `RLMObject` (objects are now only considered equatable if their
+  model class defines a primary key).
+* Fix the way the hash property works on `Object` when the object model has
+  no primary key.
+* Fix an issue where if a Swift model class defined non-generic managed
+  properties after generic Realm properties (like `List<T>`), the schema
+  would be constructed incorrectly. Fixes an issue where creating such
+  models from an array could fail.
+
+### Enhancements
+
+* Add Swift `Object.isSameObject(as:_)` API to perform the same function as
+  the existing Objective-C API `-[RLMObject isEqualToObject:]`.
+* Expose additional authentication-related errors that might be reported by
+  a Realm Object Server.
+* An error handler can now be registered on `{RLM}SyncUser`s in order to
+  report authentication-related errors that affect the user.
+
+### Bugfixes
+
+* Sync users are now automatically logged out upon receiving certain types
+  of errors that indicate they are no longer logged into the server. For
+  example, users who are authenticated using third-party credentials will find
+  themselves logged out of the Realm Object Server if the third-party identity
+  service indicates that their credential is no longer valid.
+* Address high CPU usage and hangs in certain cases when processing collection
+  notifications in highly-connected object graphs.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/7502503/assets,https://api.github.com/repos/realm/realm-cocoa/releases/7502503,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v3.0.0-beta.3,https://github.com/realm/realm-cocoa/releases/tag/v3.0.0-beta.3,https://api.github.com/repos/realm/realm-cocoa/zipball/v3.0.0-beta.3,v3.0.0-beta.3,False,True
+7471126,2017-08-22T00:44:38Z,2017-08-22T01:10:49Z,v2.10.0,"### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Expose additional authentication-related errors that might be reported by
+  a Realm Object Server.
+* An error handler can now be registered on `{RLM}SyncUser`s in order to
+  report authentication-related errors that affect the user.
+
+### Bugfixes
+
+* Sorting Realm collection types no longer throws an exception on iOS 7.
+* Sync users are now automatically logged out upon receiving certain types
+  of errors that indicate they are no longer logged into the server. For
+  example, users who are authenticated using third-party credentials will find
+  themselves logged out of the Realm Object Server if the third-party identity
+  service indicates that their credential is no longer valid.
+* Address high CPU usage and hangs in certain cases when processing collection
+  notifications in highly-connected object graphs.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/7471126/assets,https://api.github.com/repos/realm/realm-cocoa/releases/7471126,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.10.0,https://github.com/realm/realm-cocoa/releases/tag/v2.10.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.10.0,v2.10.0,False,False
+7247967,2017-08-01T20:12:23Z,2017-08-01T20:39:14Z,v2.9.1,"### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* The `shouldCompactOnLaunch` block is no longer invoked if the Realm at that
+  path is already open on other threads.
+* Fix an assertion failure in collection notifications when changes are made to
+  the schema via sync while the notification block is active.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/7247967/assets,https://api.github.com/repos/realm/realm-cocoa/releases/7247967,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.9.1,https://github.com/realm/realm-cocoa/releases/tag/v2.9.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.9.1,v2.9.1,False,False
+7196159,2017-07-27T17:19:33Z,2017-07-27T18:09:54Z,v3.0.0-beta.2,"### Breaking Changes
+
+* Remove the following deprecated Objective-C APIs:
+  `-[RLMArray sortedResultsUsingProperty:ascending:]`,
+  `-[RLMCollection sortedResultsUsingProperty:ascending:]`,
+  `-[RLMResults sortedResultsUsingProperty:ascending:]`,
+  `+[RLMSortDescriptor sortDescriptorWithProperty:ascending:]`,
+  `RLMSortDescriptor.property`.
+  These APIs have been superseded by equivalent APIs that take
+  or return key paths instead of property names.
+* Remove the following deprecated Objective-C API:
+  `+[RLMRealm migrateRealm:configuration:]`.
+  Please use `+[RLMRealm performMigrationForConfiguration:error:]` instead.
+* Remove the following deprecated Swift APIs:
+  `AnyRealmCollection.sorted(byProperty:, ascending:)`,
+  `LinkingObjects.sorted(byProperty:, ascending:)`,
+  `List.sorted(byProperty:, ascending:)`,
+  `Results.sorted(byProperty:, ascending:)`,
+  `SortDescriptor.init(property:, ascending:)`,
+  `SortDescriptor.property`.
+  These APIs have been superseded by equivalent APIs that take
+  or return key paths instead of property names.
+* The Objective-C and Swift `create(_:, value: update:)` APIs now
+  correctly nil out nullable properties when updating an existing
+  object when the `value` argument specifies nil or `NSNull` for
+  the property value.
+
+### Enhancements
+
+* It is now possible to create and log in multiple Realm Object Server users
+  with the same identity if they originate from different servers. Note that
+  if the URLs are different aliases for the same authentication server each
+  user will still be treated as separate (e.g. they will have their own copy
+  of each synchronized Realm opened using them). It is highly encouraged that
+  users defined using the access token credential type be logged in with an
+  authentication server URL specified; this parameter will become mandatory
+  in a future version of the SDK.
+* Add `-[RLMSyncUser retrieveInfoForUser:identityProvider:completion:]`
+  API allowing administrator users to retrieve information about a user based
+  on their provider identity (for example, a username). Requires any edition
+  of the Realm Object Server 1.8.2 or later.
+
+### Bugfixes
+
+* Realm no longer throws an ""unsupported instruction"" exception in some cases
+  when opening a synced Realm asynchronously.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/7196159/assets,https://api.github.com/repos/realm/realm-cocoa/releases/7196159,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v3.0.0-beta.2,https://github.com/realm/realm-cocoa/releases/tag/v3.0.0-beta.2,https://api.github.com/repos/realm/realm-cocoa/zipball/v3.0.0-beta.2,v3.0.0-beta.2,False,True
+7181138,2017-07-26T20:12:06Z,2017-07-26T20:41:19Z,v2.9.0,"### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Add a new error code to denote 'permission denied' errors when working
+  with synchronized Realms, as well as an accompanying block that can be
+  called to inform the binding that the offending Realm's files should be
+  deleted immediately. This allows recovering from 'permission denied'
+  errors in a more robust manner. See the documentation for
+  `RLMSyncErrorPermissionDeniedError` for more information.
+* Add `-[RLMSyncPermissionValue initWithRealmPath:username:accessLevel:]`
+  API allowing permissions to be applied to a user based on their username
+  (usually, an email address). Requires any edition of the Realm Object
+  Server 1.6.0 or later.
+* Improve performance of creating Swift objects which contain at least one List
+  property.
+* It is now possible to create and log in multiple Realm Object Server users
+  with the same identity if they originate from different servers. Note that
+  if the URLs are different aliases for the same authentication server each
+  user will still be treated as separate (e.g. they will have their own copy
+  of each synchronized Realm opened using them). It is highly encouraged that
+  users defined using the access token credential type be logged in with an
+  authentication server URL specified; this parameter will become mandatory
+  in a future version of the SDK.
+* Add `-[RLMSyncUser retrieveInfoForUser:identityProvider:completion:]`
+  API allowing administrator users to retrieve information about a user based
+  on their provider identity (for example, a username). Requires any edition
+  of the Realm Object Server 1.8.2 or later.
+
+### Bugfixes
+
+* `List.description` now reports the correct types for nested lists.
+* Fix unmanaged object initialization when a nested property type returned
+  `false` from `Object.shouldIncludeInDefaultSchema()`.
+* Don't clear RLMArrays on self-assignment.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/7181138/assets,https://api.github.com/repos/realm/realm-cocoa/releases/7181138,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.9.0,https://github.com/realm/realm-cocoa/releases/tag/v2.9.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.9.0,v2.9.0,False,False
+7070458,2017-07-17T21:32:02Z,2017-07-17T22:04:26Z,v3.0.0-beta,"Synchronized Realms require a server running Realm Object Server v2.0 or higher.
+
+### Enhancements
+
+* Add a new error code to denote 'permission denied' errors when working
+  with synchronized Realms, as well as an accompanying block that can be
+  called to inform the binding that the offending Realm's files should be
+  deleted immediately. This allows recovering from 'permission denied'
+  errors in a more robust manner. See the documentation for
+  `RLMSyncErrorPermissionDeniedError` for more information.
+* Add `-[RLMSyncPermissionValue initWithRealmPath:username:accessLevel:]`
+  API allowing permissions to be applied to a user based on their username
+  (usually, an email address). Requires any edition of the Realm Object
+  Server 1.6.0 or later.
+* Improve performance of creating Swift objects which contain at least one List
+  property.
+
+### Bugfixes
+
+* `List.description` now reports the correct types for nested lists.
+* Fix unmanaged object initialization when a nested property type returned
+  `false` from `Object.shouldIncludeInDefaultSchema()`.
+* Don't clear RLMArrays on self-assignment.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/7070458/assets,https://api.github.com/repos/realm/realm-cocoa/releases/7070458,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v3.0.0-beta,https://github.com/realm/realm-cocoa/releases/tag/v3.0.0-beta,https://api.github.com/repos/realm/realm-cocoa/zipball/v3.0.0-beta,v3.0.0-beta,False,True
+6776063,2017-06-20T17:15:20Z,2017-06-20T17:49:15Z,v2.8.3,"### Bugfixes
+
+* Properly update RealmOptional properties when adding an object with `add(update: true)`.
+* Add some missing quotes in error messages.
+* Fix a performance regression when creating objects with primary keys.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/6776063/assets,https://api.github.com/repos/realm/realm-cocoa/releases/6776063,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.8.3,https://github.com/realm/realm-cocoa/releases/tag/v2.8.3,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.8.3,v2.8.3,False,False
+6760362,2017-06-16T22:50:08Z,2017-06-19T15:59:02Z,v2.8.2,"### Bugfixes
+
+* Fix an issue where synchronized Realms would eventually disconnect from the
+  remote server if the user object used to define their sync configuration
+  was destroyed.
+* Restore support for changing primary keys in migrations (broken in 2.8.0).
+* Revert handling of adding objects with nil properties to a Realm to the
+  pre-2.8.0 behavior.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/6760362/assets,https://api.github.com/repos/realm/realm-cocoa/releases/6760362,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.8.2,https://github.com/realm/realm-cocoa/releases/tag/v2.8.2,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.8.2,v2.8.2,False,False
+6687517,2017-06-12T20:33:10Z,2017-06-12T21:06:35Z,v2.8.1,"Add support for building with Xcode 9 Beta 1.
+
+### Bugfixes
+
+* Fix setting a float property to NaN.
+* Fix a crash when using compact on launch in combination with collection
+  notifications.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/6687517/assets,https://api.github.com/repos/realm/realm-cocoa/releases/6687517,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.8.1,https://github.com/realm/realm-cocoa/releases/tag/v2.8.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.8.1,v2.8.1,False,False
+6591764,2017-06-02T22:05:16Z,2017-06-02T22:36:43Z,v2.8.0,"### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Enable encryption on watchOS.
+* Add `-[RLMSyncUser changePassword:forUserID:completion:]` API to change an
+  arbitrary user's password if the current user has administrative privileges
+  and using Realm's 'password' authentication provider.
+  Requires any edition of the Realm Object Server 1.6.0 or later.
+
+### Bugfixes
+
+* Suppress `-Wdocumentation` warnings in Realm C++ headers when using CocoaPods
+  with Xcode 8.3.2.
+* Throw an appropriate error rather than crashing when an RLMArray is assigned
+  to an RLMArray property of a different type.
+* Fix crash in large (>4GB) encrypted Realm files.
+* Improve accuracy of sync progress notifications.
+* Fix an issue where synchronized Realms did not connect to the remote server
+  in certain situations, such as when an application was offline when the Realms
+  were opened but later regained network connectivity.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/6591764/assets,https://api.github.com/repos/realm/realm-cocoa/releases/6591764,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.8.0,https://github.com/realm/realm-cocoa/releases/tag/v2.8.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.8.0,v2.8.0,False,False
+6269350,2017-05-03T17:32:35Z,2017-05-03T18:03:38Z,v2.7.0,"### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Use reachability API to minimize the reconnection delay if the network
+  connection was lost.
+* Add `-[RLMSyncUser changePassword:completion:]` API to change the current
+  user's password if using Realm's 'password' authentication provider.
+  Requires any edition of the Realm Object Server 1.4.0 or later.
+* `{RLM}SyncConfiguration` now has an `enableSSLValidation` property
+  (and default parameter in the Swift initializer) to allow SSL validation
+  to be specified on a per-server basis.
+* Transactions between a synced Realm and a Realm Object Server can now
+  exceed 16 MB in size.
+* Add new APIs for changing and retrieving permissions for synchronized Realms.
+  These APIs are intended to replace the existing Realm Object-based permissions
+  system. Requires any edition of the Realm Object Server 1.1.0 or later.
+
+### Bugfixes
+
+* Support Realm model classes defined in Swift with overridden Objective-C
+  names (e.g. `@objc(Foo) class SwiftFoo: Object {}`).
+* Fix `-[RLMMigration enumerateObjects:block:]` returning incorrect `oldObject`
+  objects when enumerating a class name after previously deleting a `newObject`.
+* Fix an issue where `Realm.asyncOpen(...)` would fail to work when opening a
+  synchronized Realm for which the user only had read permissions.
+* Using KVC to set a `List` property to `nil` now clears it to match the
+  behavior of `RLMArray` properties.
+* Fix crash from `!m_awaiting_pong` assertion failure when using synced Realms.
+* Fix poor performance or hangs when performing case-insensitive queries on
+  indexed string properties that contain many characters that don't differ
+  between upper and lower case (e.g., numbers, punctuation).",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/6269350/assets,https://api.github.com/repos/realm/realm-cocoa/releases/6269350,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.7.0,https://github.com/realm/realm-cocoa/releases/tag/v2.7.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.7.0,v2.7.0,False,False
+6152567,2017-04-21T18:12:59Z,2017-04-21T18:46:05Z,v2.6.2,"### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix an issue where calling `Realm.asyncOpen(...)` with a synchronized Realm
+  configuration would fail with an ""Operation canceled"" error.
+* Fix initial collection notification sometimes not being delivered for synced
+  Realms.
+* Fix circular links sometimes resulting in objects not being marked as
+  modified in change notifications.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/6152567/assets,https://api.github.com/repos/realm/realm-cocoa/releases/6152567,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.6.2,https://github.com/realm/realm-cocoa/releases/tag/v2.6.2,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.6.2,v2.6.2,False,False
+6116408,2017-04-19T00:24:13Z,2017-04-19T00:53:29Z,v2.6.1,"### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix an issue where calling `Realm.asyncOpen(...)` with a synchronized Realm
+  configuration would crash in error cases rather than report the error.
+  This is a small source breaking change if you were relying on the error
+  being reported to be a `Realm.Error`.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/6116408/assets,https://api.github.com/repos/realm/realm-cocoa/releases/6116408,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.6.1,https://github.com/realm/realm-cocoa/releases/tag/v2.6.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.6.1,v2.6.1,False,False
+6112033,2017-04-18T16:33:41Z,2017-04-18T17:05:01Z,v2.6.0,"### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Add a `{RLM}SyncUser.isAdmin` property indicating whether a user is a Realm
+  Object Server administrator.
+* Add an API to asynchronously open a Realm and deliver it to a block on a
+  given queue. This performs all work needed to get the Realm to
+  a usable state (such as running potentially time-consuming migrations) on a
+  background thread before dispatching to the given queue. In addition,
+  synchronized Realms wait for all remote content available at the time the
+  operation began to be downloaded and available locally.
+* Add `shouldCompactOnLaunch` block property when configuring a Realm to
+  determine if it should be compacted before being returned.
+* Speed up case-insensitive queries on indexed string properties.
+* Add RLMResults's collection aggregate methods to RLMArray.
+* Add support for calling the aggregate methods on unmanaged Lists.
+
+### Bugfixes
+
+* Fix a deadlock when multiple processes open a Realm at the same time.
+* Fix `value(forKey:)`/`value(forKeyPath:)` returning incorrect values for `List` properties.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/6112033/assets,https://api.github.com/repos/realm/realm-cocoa/releases/6112033,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.6.0,https://github.com/realm/realm-cocoa/releases/tag/v2.6.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.6.0,v2.6.0,False,False
+5990988,2017-04-05T20:16:43Z,2017-04-05T20:46:47Z,v2.5.1,"### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix CocoaPods installation with static libraries and multiple platforms.
+* Fix uncaught ""Bad version number"" exceptions on the notification worker thread
+  followed by deadlocks when Realms refresh.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/5990988/assets,https://api.github.com/repos/realm/realm-cocoa/releases/5990988,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.5.1,https://github.com/realm/realm-cocoa/releases/tag/v2.5.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.5.1,v2.5.1,False,False
+5903816,2017-03-29T04:58:49Z,2017-03-29T05:28:21Z,v2.5.0,"Files written by Realm this version cannot be read by earlier versions of Realm.
+Old files can still be opened and files open in read-only mode will not be
+modified.
+
+If using synchronized Realms, the Realm Object Server must be running version
+1.3.0 or later.
+
+Swift binaries are now produced for Swift 3.0, 3.0.1, 3.0.2 and 3.1.
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Add support for multi-level object equality comparisons against `NULL`.
+* Add support for the `[d]` modifier on string comparison operators to perform
+  diacritic-insensitive comparisons.
+* Explicitly mark `[[RLMRealm alloc] init]` as unavailable.
+* Include the name of the problematic class in the error message when an
+  invalid property type is marked as the primary key.
+
+### Bugfixes
+
+* Fix incorrect column type assertions which could occur after schemas were
+  merged by sync.
+* Eliminate an empty write transaction when opening a synced Realm.
+* Support encrypting synchronized Realms by respecting the `encryptionKey` value
+  of the Realm's configuration.
+* Fix crash when setting an `{NS}Data` property close to 16MB.
+* Fix for reading `{NS}Data` properties incorrectly returning `nil`.
+* Reduce file size growth in cases where Realm versions were pinned while
+  starting write transactions.
+* Fix an assertion failure when writing to large `RLMArray`/`List` properties.
+* Fix uncaught `BadTransactLog` exceptions when pulling invalid changesets from
+  synchronized Realms.
+* Fix an assertion failure when an observed `RLMArray`/`List` is deleted after
+  being modified.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/5903816/assets,https://api.github.com/repos/realm/realm-cocoa/releases/5903816,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.5.0,https://github.com/realm/realm-cocoa/releases/tag/v2.5.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.5.0,v2.5.0,False,False
+5729938,2017-03-13T20:29:23Z,2017-03-13T20:57:15Z,v2.4.4,"### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Add `(RLM)SyncPermission` class to allow reviewing access permissions for
+  Realms. Requires any edition of the Realm Object Server 1.1.0 or later.
+* Further reduce the number of files opened per thread-specific Realm on macOS,
+  iOS and watchOS.
+
+### Bugfixes
+
+* Fix a crash that could occur if new Realm instances were created while the
+  application was exiting.
+* Fix a bug that could lead to bad version number errors when delivering
+  change notifications.
+* Fix a potential use-after-free bug when checking validity of results.
+* Fix an issue where a sync session might not close properly if it receives
+  an error while being torn down.
+* Fix some issues where a sync session might not reconnect to the server properly
+  or get into an inconsistent state if revived after invalidation.
+* Fix an issue where notifications might not fire when the children of an
+  observed object are changed.
+* Fix an issue where progress notifications on sync sessions might incorrectly
+  report out-of-date values.
+* Fix an issue where multiple threads accessing encrypted data could result in
+  corrupted data or crashes.
+* Fix an issue where certain `LIKE` queries could hang.
+* Fix an issue where `-[RLMRealm writeCopyToURL:encryptionKey:error]` could create
+  a corrupt Realm file.
+* Fix an issue where incrementing a synced Realm's schema version without actually
+  changing the schema could cause a crash.",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/5729938/assets,https://api.github.com/repos/realm/realm-cocoa/releases/5729938,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.4.4,https://github.com/realm/realm-cocoa/releases/tag/v2.4.4,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.4.4,v2.4.4,False,False
+5516497,2017-02-21T02:51:04Z,2017-02-21T03:18:05Z,v2.4.3,"### API Breaking Changes
+- None.
+
+### Enhancements
+- Avoid copying copy-on-write data structures, which can grow the file, when the
+  write does not actually change existing values.
+- Improve performance of deleting all objects in an RLMResults.
+- Reduce the number of files opened per thread-specific Realm on macOS.
+- Improve startup performance with large numbers of `RLMObject`/`Object`
+  subclasses.
+
+### Bugfixes
+- Fix synchronized Realms not downloading remote changes when an access token
+  expires and there are no local changes to upload.
+- Fix an issue where values set on a Realm object using `setValue(value:, forKey:)`
+  that were not themselves Realm objects were not properly converted into Realm
+  objects or checked for validity.
+- Fix an issue where `-[RLMSyncUser sessionForURL:]` could erronenously return a
+  non-nil value when passed in an invalid URL.
+- `SyncSession.Progress.fractionTransferred` now returns 1 if there are no
+  transferrable bytes.
+- Fix sync progress notifications registered on background threads by always
+  dispatching on a dedicated background queue.
+- Fix compilation issues with Xcode 8.3 beta 2.
+- Fix incorrect sync progress notification values for Realms originally created
+  using a version of Realm prior to 2.3.0.
+- Fix LLDB integration to be able to display summaries of `RLMResults` once more.
+- Reject Swift properties with names which cause them to fall in to ARC method
+  families rather than crashing when they are accessed.
+- Fix sorting by key path when the declared property order doesn't match the order
+  of properties in the Realm file, which can happen when properties are added in
+  different schema versions.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/5516497/assets,https://api.github.com/repos/realm/realm-cocoa/releases/5516497,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.4.3,https://github.com/realm/realm-cocoa/releases/tag/v2.4.3,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.4.3,v2.4.3,False,False
+5310274,2017-01-30T23:21:31Z,2017-01-31T01:18:41Z,v2.4.2,"### Bugfixes
+- Fix an issue where RLMRealm instances could end up in the autorelease pool
+  for other threads.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/5310274/assets,https://api.github.com/repos/realm/realm-cocoa/releases/5310274,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.4.2,https://github.com/realm/realm-cocoa/releases/tag/v2.4.2,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.4.2,v2.4.2,False,False
+5289291,2017-01-27T19:39:06Z,2017-01-27T20:05:38Z,v2.4.1,"### Bugfixes
+- Fix an issue where authentication tokens were not properly refreshed
+  automatically before expiring.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/5289291/assets,https://api.github.com/repos/realm/realm-cocoa/releases/5289291,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.4.1,https://github.com/realm/realm-cocoa/releases/tag/v2.4.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.4.1,v2.4.1,False,False
+5282345,2017-01-27T05:28:16Z,2017-01-27T05:54:59Z,v2.4.0,"This release drops support for compiling with Swift 2.x.
+Swift 3.0.0 is now the minimum Swift version supported.
+
+### API Breaking Changes
+- None.
+
+### Enhancements
+- Add change notifications for individual objects with an API similar to that
+  of collection notifications.
+
+### Bugfixes
+- Fix Realm Objective-C compilation errors with Xcode 8.3 beta 1.
+- Fix several error handling issues when renewing expired authentication
+  tokens for synchronized Realms.
+- Fix a race condition leading to bad_version exceptions being thrown in
+  Realm's background worker thread.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/5282345/assets,https://api.github.com/repos/realm/realm-cocoa/releases/5282345,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.4.0,https://github.com/realm/realm-cocoa/releases/tag/v2.4.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.4.0,v2.4.0,False,False
+5203693,2017-01-19T09:10:56Z,2017-01-19T09:36:50Z,v2.3.0,"### Sync Breaking Changes
+- Make `SyncPermissionChange`'s `id` property a primary key.
+
+### API Breaking Changes
+- None.
+
+### Enhancements
+- Add `SyncPermissionOffer` and `SyncPermissionOfferResponse` classes to allow
+  creating and accepting permission change events to synchronized Realms between
+  different users.
+- Support monitoring sync transfer progress by registering notification blocks
+  on `SyncSession`. Specify the transfer direction (`.upload`/`.download`) and
+  mode (`.reportIndefinitely`/`.forCurrentlyOutstandingWork`) to monitor.
+
+### Bugfixes
+- Fix a call to `commitWrite(withoutNotifying:)` committing a transaction that
+  would not have triggered a notification incorrectly skipping the next
+  notification.
+- Fix incorrect results and crashes when conflicting object insertions are
+  merged by the synchronization mechanism when there is a collection
+  notification registered for that object type.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/5203693/assets,https://api.github.com/repos/realm/realm-cocoa/releases/5203693,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.3.0,https://github.com/realm/realm-cocoa/releases/tag/v2.3.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.3.0,v2.3.0,False,False
+5145928,2017-01-12T21:01:22Z,2017-01-12T21:27:55Z,v2.2.0,"### Sync Breaking Changes (In Beta)
+- Underlying sync engine upgraded to version BETA-6.5.
+- Sync-related error reporting behavior has been changed. Errors not related
+  to a particular user or session are only reported if they are classed as
+  'fatal' by the underlying sync engine.
+
+### API Breaking Changes
+- The following Objective-C APIs have been deprecated in favor of newer or preferred versions:
+
+| Deprecated API | New API |
+| :-- | :-- |
+| `-[RLMArray sortedResultsUsingProperty:]` | `-[RLMArray sortedResultsUsingKeyPath:]` |
+| `-[RLMCollection sortedResultsUsingProperty:]` | `-[RLMCollection sortedResultsUsingKeyPath:]` |
+| `-[RLMResults sortedResultsUsingProperty:]` | `-[RLMResults sortedResultsUsingKeyPath:]` |
+| `+[RLMSortDescriptor sortDescriptorWithProperty:ascending]` | `+[RLMSortDescriptor sortDescriptorWithKeyPath:ascending:]` |
+| `RLMSortDescriptor.property` | `RLMSortDescriptor.keyPath` |
+- The following Swift APIs have been deprecated in favor of newer or preferred versions:
+
+| Deprecated API | New API |
+| :-- | :-- |
+| `LinkingObjects.sorted(byProperty:ascending:)` | `LinkingObjects.sorted(byKeyPath:ascending:)` |
+| `List.sorted(byProperty:ascending:)` | `List.sorted(byKeyPath:ascending:)` |
+| `RealmCollection.sorted(byProperty:ascending:)` | `RealmCollection.sorted(byKeyPath:ascending:)` |
+| `Results.sorted(byProperty:ascending:)` | `Results.sorted(byKeyPath:ascending:)` |
+| `SortDescriptor(property:ascending:)` | `SortDescriptor(keyPath:ascending:)` |
+| `SortDescriptor.property` | `SortDescriptor.keyPath` |
+
+### Enhancements
+- Introduce APIs for safely passing objects between threads. Create a
+  thread-safe reference to a thread-confined object by passing it to the
+  `+[RLMThreadSafeReference referenceWithThreadConfined:]`/`ThreadSafeReference(to:)`
+  constructor, which you can then safely pass to another thread to resolve in
+  the new Realm with `-[RLMRealm resolveThreadSafeReference:]`/`Realm.resolve(_:)`.
+- Realm collections can now be sorted by properties over to-one relationships.
+
+### Bugfixes
+- Setting `deleteRealmIfMigrationNeeded` now also deletes the Realm if a file
+  format migration is required, such as when moving from a file last accessed
+  with Realm 0.x to 1.x, or 1.x to 2.x.
+- Fix queries containing nested `SUBQUERY` expressions.
+- Fix spurious incorrect thread exceptions when a thread id happens to be
+  reused while an RLMRealm instance from the old thread still exists.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/5145928/assets,https://api.github.com/repos/realm/realm-cocoa/releases/5145928,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.2.0,https://github.com/realm/realm-cocoa/releases/tag/v2.2.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.2.0,v2.2.0,False,False
+4963253,2016-12-20T00:27:47Z,2016-12-20T00:53:43Z,v2.1.2,"This release adds binary versions of Swift 3.0.2 frameworks built with Xcode 8.2.
+
+### Sync Breaking Changes (In Beta)
+- Rename occurences of ""iCloud"" with ""CloudKit"" in APIs and comments to match
+  naming in the Realm Object Server.
+
+### API Breaking Changes
+- None.
+
+### Enhancements
+- Add support for 'LIKE' queries (wildcard matching).
+
+### Bugfixes
+- Fix authenticating with CloudKit.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/4963253/assets,https://api.github.com/repos/realm/realm-cocoa/releases/4963253,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.1.2,https://github.com/realm/realm-cocoa/releases/tag/v2.1.2,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.1.2,v2.1.2,False,False
+4822361,2016-12-03T00:41:01Z,2016-12-03T01:05:14Z,v2.1.1,"### Enhancements
+- Add `RealmSwift.ObjectiveCSupport.convert(object:)` methods to help write
+  code that interoperates between Realm Objective-C and Realm Swift APIs.
+- Throw exceptions when opening a Realm with an incorrect configuration, like:
+  - `readOnly` set with a sync configuration.
+  - `readOnly` set with a migration block.
+  - migration block set with a sync configuration.
+- Greatly improve performance of write transactions which make a large number of
+  changes to indexed properties, including the automatic migration when opening
+  files written by Realm 1.x.
+
+### Bugfixes
+- Reset sync metadata Realm in case of decryption error.
+- Fix issue preventing using synchronized Realms in Xcode Playgrounds.
+- Fix assertion failure when migrating a model property from object type to
+  `RLMLinkingObjects` type.
+- Fix a `LogicError: Bad version number` exception when using `RLMResults` with
+  no notification blocks and explicitly called `-[RLMRealm refresh]` from that
+  thread.
+- Logged-out users are no longer returned from `+[RLMSyncUser currentUser]` or
+  `+[RLMSyncUser allUsers]`.
+- Fix several issues which could occur when the 1001st object of a given type
+  was created or added to an RLMArray/List, including crashes when rerunning
+  existing queries and possibly data corruption.
+- Fix a potential crash when the application exits due to a race condition in
+  the destruction of global static variables.
+- Fix race conditions when waiting for sync uploads or downloads to complete
+  which could result in crashes or the callback being called too early.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/4822361/assets,https://api.github.com/repos/realm/realm-cocoa/releases/4822361,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.1.1,https://github.com/realm/realm-cocoa/releases/tag/v2.1.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.1.1,v2.1.1,False,False
+4704029,2016-11-18T22:54:28Z,2016-11-18T23:28:32Z,v2.1.0,"### API breaking changes
+- None.
+
+### Enhancements
+- Add the ability to skip calling specific notification blocks when committing
+  a write transaction.
+
+### Bugfixes
+- Deliver collection notifications when beginning a write transaction which
+  advances the read version of a Realm (previously only Realm-level
+  notifications were sent).
+- Fix some scenarios which would lead to inconsistent states when using
+  collection notifications.
+- Fix several race conditions in the notification functionality.
+- Don't send Realm change notifications when canceling a write transaction.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/4704029/assets,https://api.github.com/repos/realm/realm-cocoa/releases/4704029,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.1.0,https://github.com/realm/realm-cocoa/releases/tag/v2.1.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.1.0,v2.1.0,False,False
+4659866,2016-11-15T05:03:25Z,2016-11-15T06:30:14Z,v2.0.4,"### API breaking changes
+- Remove `RLMAuthenticationActions` and replace
+  `+[RLMSyncCredential credentialWithUsername:password:actions:]` with
+  `+[RLMSyncCredential credentialsWithUsername:password:register:]`.
+- Rename `+[RLMSyncUser authenticateWithCredential:]` to
+  `+[RLMSyncUser logInWithCredentials:]`.
+- Rename ""credential""-related types and methods to
+  `RLMSyncCredentials`/`SyncCredentials` and consistently refer to credentials
+  in the plural form.
+- Change `+[RLMSyncUser all]` to return a dictionary of identifiers to users and
+  rename to:
+  - `+[RLMSyncUser allUsers]` in Objective-C.
+  - `SyncUser.allUsers()` in Swift 2.
+  - `SyncUser.all` in Swift 3.
+- Rename `SyncManager.sharedManager()` to `SyncManager.shared` in Swift 3.
+- Change `Realm.Configuration.syncConfiguration` to take a `SyncConfiguration`
+  struct rather than a named tuple.
+- `+[RLMSyncUser logInWithCredentials:]` now invokes its callback block on a
+  background queue.
+
+### Enhancements
+- Add `+[RLMSyncUser currentUser]`.
+- Add the ability to change read, write and management permissions for
+  synchronized Realms using the management Realm obtained via the
+  `-[RLMSyncUser managementRealmWithError:]` API and the
+  `RLMSyncPermissionChange` class.
+
+### Bugfixes
+- None.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/4659866/assets,https://api.github.com/repos/realm/realm-cocoa/releases/4659866,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.0.4,https://github.com/realm/realm-cocoa/releases/tag/v2.0.4,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.0.4,v2.0.4,False,False
+4504792,2016-10-27T20:56:51Z,2016-10-27T21:25:26Z,v2.0.3,"This release adds binary versions of Swift 3.0.1 frameworks built with Xcode 8.1
+GM seed.
+
+### API breaking changes
+- None.
+
+### Enhancements
+- None.
+
+### Bugfixes
+- Fix a `BadVersion` exception caused by a race condition when delivering
+  collection change notifications.
+- Fix an assertion failure when additional model classes are added and
+  `deleteRealmIfMigrationNeeded` is enabled.
+- Fix a `BadTransactLog` exception when deleting an `RLMResults` in a synced
+  Realm.
+- Fix an assertion failure when a write transaction is in progress at the point
+  of process termination.
+- Fix a crash that could occur when working with a `RLMLinkingObject` property
+  of an unmanaged object.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/4504792/assets,https://api.github.com/repos/realm/realm-cocoa/releases/4504792,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.0.3,https://github.com/realm/realm-cocoa/releases/tag/v2.0.3,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.0.3,v2.0.3,False,False
+4315594,2016-10-05T23:54:44Z,2016-10-06T00:21:52Z,v2.0.2,"This release is not protocol-compatible with previous version of the Realm
+Mobile Platform.
+
+### API breaking changes
+- Rename Realm Swift's `User` to `SyncUser` to make clear that it relates to the
+  Realm Mobile Platform, and to avoid potential conflicts with other `User` types.
+
+### Bugfixes
+- Fix Realm headers to be compatible with pre-C++11 dialects of Objective-C++.
+- Fix incorrect merging of RLMArray/List changes when objects with the same
+  primary key are created on multiple devices.
+- Fix bad transaction log errors after deleting objects on a different device.
+- Fix a BadVersion error when a background worker finishes running while older
+  results from that worker are being delivered to a different thread.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/4315594/assets,https://api.github.com/repos/realm/realm-cocoa/releases/4315594,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.0.2,https://github.com/realm/realm-cocoa/releases/tag/v2.0.2,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.0.2,v2.0.2,False,False
+4278053,2016-09-30T21:12:41Z,2016-09-30T21:43:26Z,v2.0.1,"### Bugfixes
+- Fix an assertion failure when opening a Realm file written by a 1.x version
+  of Realm which has an indexed nullable int or bool property.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/4278053/assets,https://api.github.com/repos/realm/realm-cocoa/releases/4278053,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.0.1,https://github.com/realm/realm-cocoa/releases/tag/v2.0.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.0.1,v2.0.1,False,False
+4240376,2016-09-27T12:48:01Z,2016-09-27T13:20:28Z,v2.0.0,"This release introduces support for the Realm Mobile Platform!
+See https://realm.io/news/introducing-realm-mobile-platform/ for an overview
+of these great new features.
+
+### API breaking changes
+- By popular demand, `RealmSwift.Error` has been moved from the top-level
+  namespace into a `Realm` extension and is now `Realm.Error`, so that it no
+  longer conflicts with `Swift.Error`.
+- Files written by Realm 2.0 cannot be read by 1.x or earlier versions. Old
+  files can still be opened.
+
+### Enhancements
+- The .log, .log_a and .log_b files no longer exist and the state tracked in
+  them has been moved to the main Realm file. This reduces the number of open
+  files needed by Realm, improves performance of both opening and writing to
+  Realms, and eliminates a small window where committing write transactions
+  would prevent other processes from opening the file.
+
+### Bugfixes
+- Fix an assertion failure when sorting by zero properties.
+- Fix a mid-commit crash in one process also crashing all other processes with
+  the same Realm open.
+- Properly initialize new nullable float and double properties added to
+  existing objects to null rather than 0.
+- Fix a stack overflow when objects with indexed string properties had very
+  long common prefixes.
+- Fix a race condition which could lead to crashes when using async queries or
+  collection notifications.
+- Fix a bug which could lead to incorrect state when an object which links to
+  itself is deleted from the Realm.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/4240376/assets,https://api.github.com/repos/realm/realm-cocoa/releases/4240376,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v2.0.0,https://github.com/realm/realm-cocoa/releases/tag/v2.0.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v2.0.0,v2.0.0,False,False
+4157056,2016-09-16T22:32:35Z,2016-09-16T23:12:20Z,v1.1.0,"This release brings official support for Xcode 8, Swift 2.3 and Swift 3.0.
+Prebuilt frameworks are now built with Xcode 7.3.1 and Xcode 8.0.
+
+### API breaking changes
+- Deprecate `migrateRealm:` in favor of new `performMigrationForConfiguration:error:` method
+  that follows Cocoa's NSError conventions.
+- Fix issue where `RLMResults` used `id`instead of its generic type as the return
+  type of subscript.
+
+### Enhancements
+- Improve error message when using NSNumber incorrectly in Swift models.
+- Further reduce the download size of the prebuilt static libraries.
+- Improve sort performance, especially on non-nullable columns.
+- Allow partial initialization of object by `initWithValue:`, deferring
+  required property checks until object is added to Realm.
+
+### Bugfixes
+- Fix incorrect truncation of the constant value for queries of the form
+  `column < value` for `float` and `double` columns.
+- Fix crash when an aggregate is accessed as an `Int8`, `Int16`, `Int32`, or `Int64`.
+- Fix a race condition that could lead to a crash if an RLMArray or List was
+  deallocated on a different thread than it was created on.
+- Fix a crash when the last reference to an observed object is released from
+  within the observation.
+- Fix a crash when `initWithValue:` is used to create a nested object for a class
+  with an uninitialized schema.
+- Enforce uniqueness for `RealmOptional` primary keys when using the `value` setter.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/4157056/assets,https://api.github.com/repos/realm/realm-cocoa/releases/4157056,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v1.1.0,https://github.com/realm/realm-cocoa/releases/tag/v1.1.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v1.1.0,v1.1.0,False,False
+3652984,2016-07-13T23:54:16Z,2016-07-14T00:17:21Z,v1.0.2,"### API breaking changes
+- Attempting to add an object with no properties to a Realm now throws rather than silently
+  doing nothing.
+
+### Enhancements
+- Swift: A `write` block may now `throw`, reverting any changes already made in
+  the transaction.
+- Reduce address space used when committing write transactions.
+- Significantly reduce the download size of prebuilt binaries and slightly
+  reduce the final size contribution of Realm to applications.
+- Improve performance of accessing RLMArray properties and creating objects
+  with List properties.
+
+### Bugfixes
+- Fix a crash when reading the shared schema from an observed Swift object.
+- Fix crashes or incorrect results when passing an array of values to
+  `createOrUpdate` after reordering the class's properties.
+- Ensure that the initial call of a Results notification block is always passed
+  .Initial even if there is a write transaction between when the notification
+  is added and when the first notification is delivered.
+- Fix a crash when deleting all objects in a Realm while fast-enumerating query
+  results from that Realm.
+- Handle EINTR from flock() rather than crashing.
+- Fix incorrect behavior following a call to `[RLMRealm compact]`.
+- Fix live updating and notifications for Results created from a predicate involving
+  an inverse relationship to be triggered when an object at the other end of the relationship
+  is modified.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/3652984/assets,https://api.github.com/repos/realm/realm-cocoa/releases/3652984,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v1.0.2,https://github.com/realm/realm-cocoa/releases/tag/v1.0.2,https://api.github.com/repos/realm/realm-cocoa/zipball/v1.0.2,v1.0.2,False,False
+3427412,2016-06-12T18:06:28Z,2016-06-12T18:31:59Z,v1.0.1,"### API breaking changes
+- None.
+
+### Enhancements
+- Significantly improve performance of opening Realm files, and slightly
+  improve performance of committing write transactions.
+
+### Bugfixes
+- Swift: Fix an error thrown when trying to create or update `Object` instances via
+  `add(:_update:)` with a primary key property of type `RealmOptional`.
+- Xcode playground in Swift release zip now runs successfully.
+- The `key` parameter of `Realm.objectForPrimaryKey(_:key:)`/ `Realm.dynamicObjectForPrimaryKey(_:key:)`
+  is now marked as optional.
+- Fix a potential memory leak when closing Realms after a Realm file has been
+  opened on multiple threads which are running in active run loops.
+- Fix notifications breaking on tvOS after a very large number of write
+  transactions have been committed.
+- Fix a ""Destruction of mutex in use"" assertion failure after an error while
+  opening a file.
+- Realm now throws an exception if an `Object` subclass is defined with a managed Swift `lazy` property.
+  Objects with ignored `lazy` properties should now work correctly.
+- Update the LLDB script to work with recent changes to the implementation of `RLMResults`.
+- Fix an assertion failure when a Realm file is deleted while it is still open,
+  and then a new Realm is opened at the same path. Note that this is still not
+  a supported scenario, and may break in other ways.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/3427412/assets,https://api.github.com/repos/realm/realm-cocoa/releases/3427412,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v1.0.1,https://github.com/realm/realm-cocoa/releases/tag/v1.0.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v1.0.1,v1.0.1,False,False
+3302538,2016-05-25T12:02:40Z,2016-05-25T12:22:53Z,v1.0.0,"No changes since 0.103.2.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/3302538/assets,https://api.github.com/repos/realm/realm-cocoa/releases/3302538,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v1.0.0,https://github.com/realm/realm-cocoa/releases/tag/v1.0.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v1.0.0,v1.0.0,False,False
+3299151,2016-05-25T03:13:08Z,2016-05-25T03:33:08Z,v0.103.2,"### API breaking changes
+- None.
+
+### Enhancements
+- Improve the error messages when an I/O error occurs in `writeCopyToURL`.
+
+### Bugfixes
+- Fix an assertion failure which could occur when opening a Realm after opening
+  that Realm failed previously in some specific ways in the same run of the
+  application.
+- Reading optional integers, floats, and doubles from within a migration block
+  now correctly returns `nil` rather than 0 when the stored value is `nil`.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/3299151/assets,https://api.github.com/repos/realm/realm-cocoa/releases/3299151,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.103.2,https://github.com/realm/realm-cocoa/releases/tag/v0.103.2,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.103.2,v0.103.2,False,False
+3266416,2016-05-19T23:46:05Z,2016-05-20T00:05:09Z,v0.103.1,"### API breaking changes
+- None.
+
+### Enhancements
+- None.
+
+### Bugfixes
+- Fix a bug that sometimes resulted in a single object's NSData properties
+  changing from `nil` to a zero-length non-`nil` NSData when a different object
+  of the same type was deleted.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/3266416/assets,https://api.github.com/repos/realm/realm-cocoa/releases/3266416,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.103.1,https://github.com/realm/realm-cocoa/releases/tag/v0.103.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.103.1,v0.103.1,False,False
+3256461,2016-05-18T22:22:50Z,2016-05-18T22:42:54Z,v0.103.0,"### API breaking changes
+- All functionality deprecated in previous releases has been removed entirely.
+- Support for Xcode 6.x & Swift prior to 2.2 has been completely removed.
+- `RLMResults`/`Results` now become empty when a `RLMArray`/`List` or object
+  they depend on is deleted, rather than throwing an exception when accessed.
+- Migrations are no longer run when `deleteRealmIfMigrationNeeded` is set,
+  recreating the file instead.
+
+### Enhancements
+- Added `invalidated` properties to `RLMResults`/`Results`, `RLMLinkingObjects`/`LinkingObjects`,
+  `RealmCollectionType` and `AnyRealmCollection`. These properties report whether the Realm
+  the object is associated with has been invalidated.
+- Some `NSError`s created by Realm now have more descriptive user info payloads.
+
+### Bugfixes
+- None.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/3256461/assets,https://api.github.com/repos/realm/realm-cocoa/releases/3256461,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.103.0,https://github.com/realm/realm-cocoa/releases/tag/v0.103.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.103.0,v0.103.0,False,False
+3224572,2016-05-13T23:03:07Z,2016-05-13T23:56:31Z,v0.102.1,"### API breaking changes
+- None.
+
+### Enhancements
+- Return `RLMErrorSchemaMismatch` error rather than the more generic `RLMErrorFail`
+  when a migration is required.
+- Improve the performance of allocating instances of `Object` subclasses
+  that have `LinkingObjects` properties.
+
+### Bugfixes
+- `RLMLinkingObjects` properties declared in Swift subclasses of `RLMObject`
+  now work correctly.
+- Fix an assertion failure when deleting all objects of a type, inserting more
+  objects, and then deleting some of the newly inserted objects within a single
+  write transaction when there is an active notification block for a different
+  object type which links to the objects being deleted.
+- Fix crashes and/or incorrect results when querying over multiple levels of
+  `LinkingObjects` properties.
+- Fix opening read-only Realms on multiple threads at once.
+- Fix a `BadTransactLog` exception when storing dates before the unix epoch (1970-01-01).
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/3224572/assets,https://api.github.com/repos/realm/realm-cocoa/releases/3224572,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.102.1,https://github.com/realm/realm-cocoa/releases/tag/v0.102.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.102.1,v0.102.1,False,False
+3189259,2016-05-09T23:08:37Z,2016-05-09T23:50:07Z,v0.102.0,"### API breaking changes
+- None.
+
+### Enhancements
+- Add a method to rename properties during migrations:
+  - Swift: `Migration.renamePropertyForClass(_:oldName:newName:)`
+  - Objective-C: `-[RLMMigration renamePropertyForClass:oldName:newName:]`
+- Add `deleteRealmIfMigrationNeeded` to
+  `RLMRealmConfiguration`/`Realm.Configuration`. When this is set to `true`,
+  the Realm file will be automatically deleted and recreated when there is a
+  schema mismatch rather than migrated to the new schema.
+
+### Bugfixes
+- Fix `BETWEEN` queries that traverse `RLMArray`/`List` properties to ensure that
+  a single related object satisfies the `BETWEEN` criteria, rather than allowing
+  different objects in the array to satisfy the lower and upper bounds.
+- Fix a race condition when a Realm is opened on one thread while it is in the
+  middle of being closed on another thread which could result in crashes.
+- Fix a bug which could result in changes made on one thread being applied
+  incorrectly on other threads when those threads are refreshed.
+- Fix crash when migrating to the new date format introduced in 0.101.0.
+- Fix crash when querying inverse relationships when objects are deleted.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/3189259/assets,https://api.github.com/repos/realm/realm-cocoa/releases/3189259,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.102.0,https://github.com/realm/realm-cocoa/releases/tag/v0.102.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.102.0,v0.102.0,False,False
+3161265,2016-05-04T20:53:40Z,2016-05-04T23:11:54Z,v0.101.0,"### API breaking changes
+- Files written by this version of Realm cannot be read by older versions of
+  Realm. Existing files will automatically be upgraded when they are opened.
+
+### Enhancements
+- Greatly improve performance of collection change calculation for complex
+  object graphs, especially for ones with cycles.
+- NSDate properties now support nanoseconds precision.
+- Opening a single Realm file on multiple threads now shares a single memory
+  mapping of the file for all threads, significantly reducing the memory
+  required to work with large files.
+- Crashing while in the middle of a write transaction no longer blocks other
+  processes from performing write transactions on the same file.
+- Improve the performance of refreshing a Realm (including via autorefresh)
+  when there are live Results/RLMResults objects for that Realm.
+
+### Bugfixes
+- Fix an assertion failure of ""!more_before || index >= std::prev(it)->second)""
+  in `IndexSet::do_add()`.
+- Fix a crash when an `RLMArray` or `List` object is destroyed from the wrong
+  thread.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/3161265/assets,https://api.github.com/repos/realm/realm-cocoa/releases/3161265,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.101.0,https://github.com/realm/realm-cocoa/releases/tag/v0.101.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.101.0,v0.101.0,False,False
+3130615,2016-04-29T19:21:46Z,2016-04-29T19:39:54Z,v0.100.0,"### API breaking changes
+- `-[RLMObject linkingObjectsOfClass:forProperty]` and `Object.linkingObjects(_:forProperty:)`
+  are deprecated in favor of properties of type `RLMLinkingObjects` / `LinkingObjects`.
+
+### Enhancements
+- The automatically-maintained inverse direction of relationships can now be exposed as
+  properties of type `RLMLinkingObjects` / `LinkingObjects`. These properties automatically
+  update to reflect the objects that link to the target object, can be used in queries, and
+  can be filtered like other Realm collection types.
+- Queries that compare objects for equality now support multi-level key paths.
+
+### Bugfixes
+- Fix an assertion failure when a second write transaction is committed after a
+  write transaction deleted the object containing an RLMArray/List which had an
+  active notification block.
+- Queries that compare `RLMArray` / `List` properties using != now give the correct results.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/3130615/assets,https://api.github.com/repos/realm/realm-cocoa/releases/3130615,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.100.0,https://github.com/realm/realm-cocoa/releases/tag/v0.100.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.100.0,v0.100.0,False,False
+3097439,2016-04-26T07:19:58Z,2016-04-26T07:37:01Z,v0.99.1,"### API breaking changes
+- None.
+
+### Enhancements
+- None.
+
+### Bugfixes
+- Fix a scenario that could lead to the assertion failure
+  ""m_advancer_sg->get_version_of_current_transaction() ==
+  new_notifiers.front()->version()"".
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/3097439/assets,https://api.github.com/repos/realm/realm-cocoa/releases/3097439,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.99.1,https://github.com/realm/realm-cocoa/releases/tag/v0.99.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.99.1,v0.99.1,False,False
+3081310,2016-04-22T20:58:37Z,2016-04-22T21:17:56Z,v0.99.0,"### API breaking changes
+- Deprecate properties of type `id`/`AnyObject`. This type was rarely used,
+  rarely useful and unsupported in every other Realm binding.
+- The block for `-[RLMArray addNotificationBlock:]` and
+  `-[RLMResults addNotificationBlock:]` now takes another parameter.
+- The following Objective-C APIs have been deprecated in favor of newer or preferred versions:
+
+| Deprecated API | New API |
+| :-- | :-- |
+| `-[RLMRealm removeNotification:]` | `-[RLMNotificationToken stop]` |
+| `RLMRealmConfiguration.path` | `RLMRealmConfiguration.fileURL` |
+| `RLMRealm.path` | `RLMRealmConfiguration.fileURL` |
+| `RLMRealm.readOnly` | `RLMRealmConfiguration.readOnly` |
+| `+[RLMRealm realmWithPath:]` | `+[RLMRealm realmWithURL:]` |
+| `+[RLMRealm writeCopyToPath:error:]` | `+[RLMRealm writeCopyToURL:encryptionKey:error:]` |
+| `+[RLMRealm writeCopyToPath:encryptionKey:error:]` | `+[RLMRealm writeCopyToURL:encryptionKey:error:]` |
+| `+[RLMRealm schemaVersionAtPath:error:]` | `+[RLMRealm schemaVersionAtURL:encryptionKey:error:]` |
+| `+[RLMRealm schemaVersionAtPath:encryptionKey:error:]` | `+[RLMRealm schemaVersionAtURL:encryptionKey:error:]` |
+- The following Swift APIs have been deprecated in favor of newer or preferred versions:
+
+| Deprecated API | New API |
+| :-- | :-- |
+| `Realm.removeNotification(_:)` | `NotificationToken.stop()` |
+| `Realm.Configuration.path` | `Realm.Configuration.fileURL` |
+| `Realm.path` | `Realm.Configuration.fileURL` |
+| `Realm.readOnly` | `Realm.Configuration.readOnly` |
+| `Realm.writeCopyToPath(_:encryptionKey:)` | `Realm.writeCopyToURL(_:encryptionKey:)` |
+| `schemaVersionAtPath(_:encryptionKey:error:)` | `schemaVersionAtURL(_:encryptionKey:)` |
+
+### Enhancements
+- Add information about what rows were added, removed, or modified to the
+  notifications sent to the Realm collections.
+- Improve error when illegally appending to an `RLMArray` / `List` property from a default value
+  or the standalone initializer (`init()`) before the schema is ready.
+
+### Bugfixes
+- Fix a use-after-free when an associated object's dealloc method is used to
+  remove observers from an RLMObject.
+- Fix a small memory leak each time a Realm file is opened.
+- Return a recoverable `RLMErrorAddressSpaceExhausted` error rather than
+  crash when there is insufficient available address space on Realm
+  initialization or write commit.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/3081310/assets,https://api.github.com/repos/realm/realm-cocoa/releases/3081310,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.99.0,https://github.com/realm/realm-cocoa/releases/tag/v0.99.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.99.0,v0.99.0,False,False
+3032245,2016-04-15T22:57:19Z,2016-04-15T23:09:58Z,v0.98.8,"### API breaking changes
+- None.
+
+### Enhancements
+- None.
+
+### Bugfixes
+- Fixed a bug that caused some encrypted files created using
+  `-[RLMRealm writeCopyToPath:encryptionKey:error:]` to fail to open.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/3032245/assets,https://api.github.com/repos/realm/realm-cocoa/releases/3032245,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.98.8,https://github.com/realm/realm-cocoa/releases/tag/v0.98.8,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.98.8,v0.98.8,False,False
+3016238,2016-04-14T01:41:54Z,2016-04-14T02:29:41Z,v0.98.7,"### API breaking changes
+- None.
+
+### Enhancements
+- None.
+
+### Bugfixes
+- Mark further initializers in Objective-C as NS_DESIGNATED_INITIALIZER to prevent that these aren't
+  correctly defined in Swift Object subclasses, which don't qualify for auto-inheriting the required initializers.
+- `-[RLMResults indexOfObjectWithPredicate:]` now returns correct results
+  for `RLMResults` instances that were created by filtering an `RLMArray`.
+- Adjust how RLMObjects are destroyed in order to support using an associated
+  object on an RLMObject to remove KVO observers from that RLMObject.
+- `-[RLMResults indexOfObjectWithPredicate:]` now returns the index of the first matching object for a
+  sorted `RLMResults`, matching its documented behavior.
+- Fix a crash when canceling a transaction that set a relationship.
+- Fix a crash when a query referenced a deleted object.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/3016238/assets,https://api.github.com/repos/realm/realm-cocoa/releases/3016238,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.98.7,https://github.com/realm/realm-cocoa/releases/tag/v0.98.7,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.98.7,v0.98.7,False,False
+2886795,2016-03-25T07:56:59Z,2016-03-25T08:09:25Z,v0.98.6,"Prebuilt frameworks are now built with Xcode 7.3.
+
+### API breaking changes
+- None.
+
+### Enhancements
+- None.
+
+### Bugfixes
+- Fix running unit tests on iOS simulators and devices with Xcode 7.3.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/2886795/assets,https://api.github.com/repos/realm/realm-cocoa/releases/2886795,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.98.6,https://github.com/realm/realm-cocoa/releases/tag/v0.98.6,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.98.6,v0.98.6,False,False
+2811546,2016-03-15T00:59:00Z,2016-03-15T01:11:31Z,v0.98.5,"### API breaking changes
+- None.
+
+### Enhancements
+- None.
+
+### Bugfixes
+- Fix a crash when opening a Realm on 32-bit iOS devices.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/2811546/assets,https://api.github.com/repos/realm/realm-cocoa/releases/2811546,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.98.5,https://github.com/realm/realm-cocoa/releases/tag/v0.98.5,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.98.5,v0.98.5,False,False
+2789603,2016-03-11T01:35:34Z,2016-03-11T01:46:21Z,v0.98.4,"### API breaking changes
+- None.
+
+### Enhancements
+- None.
+
+### Bugfixes
+- Properly report changes made by adding an object to a Realm with
+  addOrUpdate:/createOrUpdate: to KVO observers for existing objects with that
+  primary key.
+- Fix crashes and assorted issues when a migration which added object link
+  properties is rolled back due to an error in the migration block.
+- Fix assertion failures when deleting objects within a migration block of a
+  type which had an object link property added in that migration.
+- Fix an assertion failure in `Query::apply_patch` when updating certain kinds
+  of queries after a write transaction is committed.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/2789603/assets,https://api.github.com/repos/realm/realm-cocoa/releases/2789603,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.98.4,https://github.com/realm/realm-cocoa/releases/tag/v0.98.4,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.98.4,v0.98.4,False,False
+2699819,2016-02-26T21:37:37Z,2016-02-26T21:48:51Z,v0.98.3,"### Enhancements
+- Initializing the shared schema is 3x faster.
+
+### Bugfixes
+- Using Realm Objective-C from Swift while having Realm Swift linked no longer causes that the
+  declared `ignoredProperties` are not taken into account.
+- Fix assertion failures when rolling back a migration which added Object link
+  properties to a class.
+- Fix potential errors when cancelling a write transaction which modified
+  multiple `RLMArray`/`List` properties.
+- Report the correct value for inWriteTransaction after attempting to commit a
+  write transaction fails.
+- Support CocoaPods 1.0 beginning from prerelease 1.0.0.beta.4 while retaining
+  backwards compatibility with 0.39.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/2699819/assets,https://api.github.com/repos/realm/realm-cocoa/releases/2699819,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.98.3,https://github.com/realm/realm-cocoa/releases/tag/v0.98.3,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.98.3,v0.98.3,False,False
+2643707,2016-02-18T20:34:18Z,2016-02-18T20:51:32Z,v0.98.2,"### API breaking changes
+- None.
+
+### Enhancements
+- Aggregate operations (`ANY`, `NONE`, `@count`, `SUBQUERY`, etc.) are now supported for key paths
+  that begin with an object relationship so long as there is a `RLMArray`/`List` property at some
+  point in a key path.
+- Predicates of the form `%@ IN arrayProperty` are now supported.
+
+### Bugfixes
+- Use of KVC collection operators on Swift collection types no longer throws an exception.
+- Fix reporting of inWriteTransaction in notifications triggered by
+  `beginWriteTransaction`.
+- The contents of `List` and `Optional` properties are now correctly preserved when copying
+  a Swift object from one Realm to another, and performing other operations that result in a
+  Swift object graph being recursively traversed from Objective-C.
+- Fix a deadlock when queries are performed within a Realm notification block.
+- The `ANY` / `SOME` / `NONE` qualifiers are now required in comparisons involving a key path that
+  traverse a `RLMArray`/`List` property. Previously they were only required if the first key in the
+  key path was an `RLMArray`/`List` property.
+- Fix several scenarios where the default schema would be initialized
+  incorrectly if the first Realm opened used a restricted class subset (via
+  `objectClasses`/`objectTypes`).
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/2643707/assets,https://api.github.com/repos/realm/realm-cocoa/releases/2643707,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.98.2,https://github.com/realm/realm-cocoa/releases/tag/v0.98.2,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.98.2,v0.98.2,False,False
+2590468,2016-02-10T22:07:57Z,2016-02-10T22:25:53Z,v0.98.1,"### Bugfixes
+- Fix crashes when deleting an object containing an `RLMArray`/`List` which had
+  previously been queried.
+- Fix a crash when deleting an object containing an `RLMArray`/`List` with
+  active notification blocks.
+- Fix duplicate file warnings when building via CocoaPods.
+- Fix crash or incorrect results when calling `indexOfObject:` on an
+  `RLMResults` derived from an `RLMArray`.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/2590468/assets,https://api.github.com/repos/realm/realm-cocoa/releases/2590468,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.98.1,https://github.com/realm/realm-cocoa/releases/tag/v0.98.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.98.1,v0.98.1,False,False
+2557580,2016-02-05T00:35:05Z,2016-02-05T03:14:20Z,v0.98.0,"### API breaking changes
+- `+[RLMRealm realmWithPath:]`/`Realm.init(path:)` now inherits from the default
+  configuration.
+- Swift 1.2 is no longer supported.
+
+### Enhancements
+- Add `addNotificationBlock` to `RLMResults`, `Results`, `RLMArray`, and
+  `List`, which calls the given block whenever the collection changes.
+- Do a lot of the work for keeping `RLMResults`/`Results` up-to-date after
+  write transactions on a background thread to help avoid blocking the main
+  thread.
+- `NSPredicate`'s `SUBQUERY` operator is now supported. It has the following limitations:
+  - `@count` is the only operator that may be applied to the `SUBQUERY` expression.
+  - The `SUBQUERY(…).@count` expression must be compared with a constant.
+  - Correlated subqueries are not yet supported.
+
+### Bugfixes
+- None.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/2557580/assets,https://api.github.com/repos/realm/realm-cocoa/releases/2557580,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.98.0,https://github.com/realm/realm-cocoa/releases/tag/v0.98.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.98.0,v0.98.0,False,False
+2519470,2016-01-29T20:55:02Z,2016-01-29T21:53:48Z,v0.97.1,"### API breaking changes
+- None.
+
+### Enhancements
+- Swift: Added `Error` enum allowing to catch errors e.g. thrown on initializing
+  `RLMRealm`/`Realm` instances.
+- Fail with `RLMErrorFileNotFound` instead of the more generic `RLMErrorFileAccess`,
+  if no file was found when a realm was opened as read-only or if the directory part
+  of the specified path was not found when a copy should be written. 
+- Greatly improve performance when deleting objects with one or more indexed
+  properties.
+- Indexing `BOOL`/`Bool` and `NSDate` properties are now supported.
+- Swift: Add support for indexing optional properties.
+
+### Bugfixes
+- Fix incorrect results or crashes when using `-[RLMResults setValue:forKey:]`
+  on an RLMResults which was filtered on the key being set.
+- Fix crashes when an RLMRealm is deallocated from the wrong thread.
+- Fix incorrect results from aggregate methods on `Results`/`RLMResults` after
+  objects which were previously in the results are deleted.
+- Fix a crash when adding a new property to an existing class with over a
+  million objects in the Realm.
+- Fix errors when opening encrypted Realm files created with writeCopyToPath.
+- Fix crashes or incorrect results for queries that use relationship equality
+  in cases where the `RLMResults` is kept alive and instances of the target class
+  of the relationship are deleted.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/2519470/assets,https://api.github.com/repos/realm/realm-cocoa/releases/2519470,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.97.1,https://github.com/realm/realm-cocoa/releases/tag/v0.97.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.97.1,v0.97.1,False,False
+2307293,2015-12-17T19:51:05Z,2015-12-17T20:12:39Z,v0.97.0,"### API breaking changes
+- All functionality deprecated in previous releases has been removed entirely.
+- Add generic type annotations to NSArrays and NSDictionaries in public APIs.
+- Adding a Realm notification block on a thread not currently running from
+  within a run loop throws an exception rather than silently never calling the
+  notification block.
+
+### Enhancements
+- Support for tvOS.
+- Support for building Realm Swift from source when using Carthage.
+- The block parameter of `-[RLMRealm transactionWithBlock:]`/`Realm.write(_:)` is 
+  now marked as `__attribute__((noescape))`/`@noescape`.
+- Many forms of queries with key paths on both sides of the comparison operator
+  are now supported.
+- Add support for KVC collection operators in `RLMResults` and `RLMArray`.
+- Fail instead of deadlocking in `+[RLMRealm sharedSchema]`, if a Swift property is initialized
+  to a computed value, which attempts to open a Realm on its own.
+
+### Bugfixes
+- Fix poor performance when calling `-[RLMRealm deleteObjects:]` on an
+  `RLMResults` which filtered the objects when there are other classes linking
+  to the type of the deleted objects.
+- An exception is now thrown when defining `Object` properties of an unsupported
+  type.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/2307293/assets,https://api.github.com/repos/realm/realm-cocoa/releases/2307293,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.97.0,https://github.com/realm/realm-cocoa/releases/tag/v0.97.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.97.0,v0.97.0,False,False
+2237480,2015-12-05T01:10:09Z,2015-12-05T01:22:00Z,v0.96.3,"### Enhancements
+- Queries are no longer limited to 16 levels of grouping.
+- Rework the implementation of encrypted Realms to no longer interfere with
+  debuggers.
+
+### Bugfixes
+- Fix crash when trying to retrieve object instances via `dynamicObjects`.
+- Throw an exception when querying on a link providing objects, which are from a different Realm.
+- Return empty results when querying on a link providing an unattached object.
+- Fix crashes or incorrect results when calling `-[RLMRealm refresh]` during
+  fast enumeration.
+- Add `Int8` support for `RealmOptional`, `MinMaxType` and `AddableType`.
+- Set the default value for newly added non-optional NSData properties to a
+  zero-byte NSData rather than nil.
+- Fix a potential crash when deleting all objects of a class.
+- Fix performance problems when creating large numbers of objects with
+  `RLMArray`/`List` properties.
+- Fix memory leak when using Object(value:) for subclasses with
+  `List` or `RealmOptional` properties.
+- Fix a crash when computing the average of an optional integer property.
+- Fix incorrect search results for some queries on integer properties.
+- Add error-checking for nil realm parameters in many methods such as
+  `+[RLMObject allObjectsInRealm:]`.
+- Fix a race condition between commits and opening Realm files on new threads
+  that could lead to a crash.
+- Fix several crashes when opening Realm files.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/2237480/assets,https://api.github.com/repos/realm/realm-cocoa/releases/2237480,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.96.3,https://github.com/realm/realm-cocoa/releases/tag/v0.96.3,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.96.3,v0.96.3,False,False
+2022203,2015-10-26T22:38:25Z,2015-10-26T22:41:23Z,v0.96.2,"Prebuilt frameworks are now built with Xcode 7.1.
+
+### Bugfixes
+- Fix ignoring optional properties in Swift.
+- Fix CocoaPods installation on case-sensitive file systems.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/2022203/assets,https://api.github.com/repos/realm/realm-cocoa/releases/2022203,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.96.2,https://github.com/realm/realm-cocoa/releases/tag/v0.96.2,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.96.2,v0.96.2,False,False
+1992689,2015-10-20T23:38:57Z,2015-10-20T23:40:00Z,v0.96.1,"### API breaking changes
+- None.
+
+### Enhancements
+- None.
+
+### Bugfixes
+- Support assigning `Results` to `List` properties via KVC.
+- Honor the schema version set in the configuration in `+[RLMRealm migrateRealm:]`.
+- Fix crash when using optional Int16/Int32/Int64 properties in Swift.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/1992689/assets,https://api.github.com/repos/realm/realm-cocoa/releases/1992689,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.96.1,https://github.com/realm/realm-cocoa/releases/tag/v0.96.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.96.1,v0.96.1,False,False
+1961928,2015-10-14T20:37:01Z,2015-10-14T20:37:58Z,v0.96.0,"- No functional changes since beta2.
+
+# 0.96.0-beta2 Release notes (2015-10-08)
+
+### Bugfixes
+- Add RLMOptionalBase.h to the podspec.
+
+# 0.96.0-beta Release notes (2015-10-07)
+
+### API breaking changes
+- CocoaPods v0.38 or greater is now required to install Realm and RealmSwift
+  as pods.
+
+### Enhancements
+- Functionality common to both `List` and `Results` is now declared in a
+  `RealmCollectionType` protocol that both types conform to.
+- `Results.realm` now returns an `Optional<Realm>` in order to conform to
+  `RealmCollectionType`, but will always return `.Some()` since a `Results`
+  cannot exist independently from a `Realm`.
+- Aggregate operations are now available on `List`: `min`, `max`, `sum`,
+  `average`.
+- Committing write transactions (via `commitWrite` / `commitWriteTransaction` and
+  `write` / `transactionWithBlock`) now optionally allow for handling errors when
+  the disk is out of space.
+- Added `isEmpty` property on `RLMRealm`/`Realm` to indicate if it contains any
+  objects.
+- The `@count`, `@min`, `@max`, `@sum` and `@avg` collection operators are now
+  supported in queries
+
+### Bugfixes
+- Fix assertion failure when inserting NSData between 8MB and 16MB in size.
+- Fix assertion failure when rolling back a migration which removed an object
+  link or `RLMArray`/`List` property.
+- Add the path of the file being opened to file open errors.
+- Fix a crash that could be triggered by rapidly opening and closing a Realm
+  many times on multiple threads at once.
+- Fix several places where exception messages included the name of the wrong
+  function which failed.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/1961928/assets,https://api.github.com/repos/realm/realm-cocoa/releases/1961928,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.96.0,https://github.com/realm/realm-cocoa/releases/tag/v0.96.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.96.0,v0.96.0,False,False
+1921347,2015-10-06T23:40:49Z,2015-10-07T00:00:39Z,v0.96.0-beta,"### API breaking changes
+- CocoaPods v0.38 or greater is now required to install Realm and RealmSwift
+  as pods.
+- Files created with this version of Realm cannot be opened with previous versions of Realm.
+
+### Enhancements
+- Functionality common to both `List` and `Results` is now declared in a
+  `RealmCollectionType` protocol that both types conform to.
+- `Results.realm` now returns an `Optional<Realm>` in order to conform to
+  `RealmCollectionType`, but will always return `.Some()` since a `Results`
+  cannot exist independently from a `Realm`.
+- Aggregate operations are now available on `List`: `min`, `max`, `sum`,
+  `average`.
+- Committing write transactions (via `commitWrite` / `commitWriteTransaction` and
+  `write` / `transactionWithBlock`) now optionally allow for handling errors when
+  the disk is out of space.
+- Added `isEmpty` property on `RLMRealm`/`Realm` to indicate if it contains any
+  objects.
+
+### Bugfixes
+- Fix assertion failure when inserting NSData between 8MB and 16MB in size.
+- Fix assertion failure when rolling back a migration which removed an object
+  link or `RLMArray`/`List` property.
+- Add the path of the file being opened to file open errors.
+- Fix a crash that could be triggered by rapidly opening and closing a Realm
+  many times on multiple threads at once.
+- Fix several places where exception messages included the name of the wrong
+  function which failed.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/1921347/assets,https://api.github.com/repos/realm/realm-cocoa/releases/1921347,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.96.0-beta,https://github.com/realm/realm-cocoa/releases/tag/v0.96.0-beta,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.96.0-beta,v0.96.0-beta,False,True
+1915271,2015-10-06T00:48:02Z,2015-10-06T01:08:52Z,v0.95.3,"### Bugfixes
+- Compile iOS Simulator framework architectures with `-fembed-bitcode-marker`.
+- Fix crashes when the first Realm opened uses a class subset and later Realms
+  opened do not.
+- Fix inconsistent errors when `Object(value: ...)` is used to initialize the
+  default value of a property of an `Object` subclass.
+- Throw an exception when a class subset has objects with array or object
+  properties of a type that are not part of the class subset.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/1915271/assets,https://api.github.com/repos/realm/realm-cocoa/releases/1915271,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.95.3,https://github.com/realm/realm-cocoa/releases/tag/v0.95.3,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.95.3,v0.95.3,False,False
+1865287,2015-09-25T01:01:24Z,2015-09-25T01:02:02Z,v0.95.2,"- Enable bitcode for iOS and watchOS frameworks.
+- Build libraries with Xcode 7 final rather than the GM.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/1865287/assets,https://api.github.com/repos/realm/realm-cocoa/releases/1865287,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.95.2,https://github.com/realm/realm-cocoa/releases/tag/v0.95.2,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.95.2,v0.95.2,False,False
+1858896,2015-09-23T23:14:10Z,2015-09-23T23:29:32Z,v0.95.1,"### Enhancements
+- Add missing KVO handling for moving and exchanging objects in `RLMArray` and
+  `List`.
+
+### Bugfixes
+- Setting the primary key property on persisted `RLMObject`s / `Object`s
+  via subscripting or key-value coding will cause an exception to be thrown.
+- Fix crash due to race condition in `RLMRealmConfiguration` where the default
+  configuration was in the process of being copied in one thread, while
+  released in another.
+- Fix crash when a migration which removed an object or array property is
+  rolled back due to an error.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/1858896/assets,https://api.github.com/repos/realm/realm-cocoa/releases/1858896,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.95.1,https://github.com/realm/realm-cocoa/releases/tag/v0.95.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.95.1,v0.95.1,False,False
+1721342,2015-08-25T18:42:00Z,2015-08-25T18:42:48Z,v0.95.0,"### API breaking changes
+- The following APIs have been deprecated in favor of the new `RLMRealmConfiguration` class in Realm Objective-C:
+
+| Deprecated API | New API |
+| :-- | :-- |
+| `+[RLMRealm realmWithPath:readOnly:error:]` | `+[RLMRealm realmWithConfiguration:error:]` |
+| `+[RLMRealm realmWithPath:encryptionKey:readOnly:error:]` | `+[RLMRealm realmWithConfiguration:error:]` |
+| `+[RLMRealm setEncryptionKey:forRealmsAtPath:]` | `-[RLMRealmConfiguration setEncryptionKey:]` |
+| `+[RLMRealm inMemoryRealmWithIdentifier:]` | `+[RLMRealm realmWithConfiguration:error:]` |
+| `+[RLMRealm defaultRealmPath]` | `+[RLMRealmConfiguration defaultConfiguration]` |
+| `+[RLMRealm setDefaultRealmPath:]` | `+[RLMRealmConfiguration setDefaultConfiguration:]` |
+| `+[RLMRealm setDefaultRealmSchemaVersion:withMigrationBlock]` | `RLMRealmConfiguration.schemaVersion` and `RLMRealmConfiguration.migrationBlock` |
+| `+[RLMRealm setSchemaVersion:forRealmAtPath:withMigrationBlock:]` | `RLMRealmConfiguration.schemaVersion` and `RLMRealmConfiguration.migrationBlock` |
+| `+[RLMRealm migrateRealmAtPath:]` | `+[RLMRealm migrateRealm:]` |
+| `+[RLMRealm migrateRealmAtPath:encryptionKey:]` | `+[RLMRealm migrateRealm:]` |
+- The following APIs have been deprecated in favor of the new `Realm.Configuration` struct in Realm Swift for Swift 1.2:
+
+| Deprecated API | New API |
+| :-- | :-- |
+| `Realm.defaultPath` | `Realm.Configuration.defaultConfiguration` |
+| `Realm(path:readOnly:encryptionKey:error:)` | `Realm(configuration:error:)` |
+| `Realm(inMemoryIdentifier:)` | `Realm(configuration:error:)` |
+| `Realm.setEncryptionKey(:forPath:)` | `Realm(configuration:error:)` |
+| `setDefaultRealmSchemaVersion(schemaVersion:migrationBlock:)` | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock` |
+| `setSchemaVersion(schemaVersion:realmPath:migrationBlock:)` | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock` |
+| `migrateRealm(path:encryptionKey:)` | `migrateRealm(configuration:)` |
+- The following APIs have been deprecated in favor of the new `Realm.Configuration` struct in Realm Swift for Swift 2.0:
+
+| Deprecated API | New API |
+| :-- | :-- |
+| `Realm.defaultPath` | `Realm.Configuration.defaultConfiguration` |
+| `Realm(path:readOnly:encryptionKey:) throws` | `Realm(configuration:) throws` |
+| `Realm(inMemoryIdentifier:)` | `Realm(configuration:) throws` |
+| `Realm.setEncryptionKey(:forPath:)` | `Realm(configuration:) throws` |
+| `setDefaultRealmSchemaVersion(schemaVersion:migrationBlock:)` | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock` |
+| `setSchemaVersion(schemaVersion:realmPath:migrationBlock:)` | `Realm.Configuration.schemaVersion` and `Realm.Configuration.migrationBlock` |
+| `migrateRealm(path:encryptionKey:)` | `migrateRealm(configuration:)` |
+- `List.extend` in Realm Swift for Swift 2.0 has been replaced with `List.appendContentsOf`,
+  mirroring changes to `RangeReplaceableCollectionType`.
+- Object properties on `Object` subclasses in Realm Swift must be marked as optional,
+  otherwise a runtime exception will be thrown.
+
+### Enhancements
+- Persisted properties of `RLMObject`/`Object` subclasses are now Key-Value
+  Observing compliant.
+- The different options used to create Realm instances have been consolidated
+  into a single `RLMRealmConfiguration`/`Realm.Configuration` object.
+- Enumerating Realm collections (`RLMArray`, `RLMResults`, `List<>`,
+  `Results<>`) now enumerates over a copy of the collection, making it no
+  longer an error to modify a collection during enumeration (either directly,
+  or indirectly by modifying objects to make them no longer match a query).
+- Improve performance of object insertion in Swift to bring it roughly in line
+  with Objective-C.
+- Allow specifying a specific list of `RLMObject` / `Object` subclasses to include
+  in a given Realm via `RLMRealmConfiguration.objectClasses` / `Realm.Configuration.objectTypes`.
+
+### Bugfixes
+- Subscripting on `RLMObject` is now marked as nullable.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/1721342/assets,https://api.github.com/repos/realm/realm-cocoa/releases/1721342,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.95.0,https://github.com/realm/realm-cocoa/releases/tag/v0.95.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.95.0,v0.95.0,False,False
+1653542,2015-08-10T23:40:52Z,2015-08-10T23:44:16Z,v0.94.1,"### API breaking changes
+- Building for watchOS requires Xcode 7 beta 5.
+
+### Enhancements
+- `Object.className` is now marked as `final`.
+
+### Bugfixes
+- Fix crash when adding a property to a model without updating the schema
+  version.
+- Fix unnecessary redownloading of the core library when building from source.
+- Fix crash when sorting by an integer or floating-point property on iOS 7.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/1653542/assets,https://api.github.com/repos/realm/realm-cocoa/releases/1653542,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.94.1,https://github.com/realm/realm-cocoa/releases/tag/v0.94.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.94.1,v0.94.1,False,False
+1604501,2015-07-29T22:15:57Z,2015-07-29T22:16:42Z,v0.94.0,"### API breaking changes
+- None.
+
+### Enhancements
+- Reduce the amount of memory used by RLMRealm notification listener threads.
+- Avoid evaluating results eagerly when filtering and sorting.
+- Add nullability annotations to the Objective-C API to provide enhanced compiler
+  warnings and bridging to Swift.
+- Make `RLMResult`s and `RLMArray`s support Objective-C generics.
+- Add support for building watchOS and bitcode-compatible apps.
+- Make the exceptions thrown in getters and setters more informative.
+- Add `-[RLMArray exchangeObjectAtIndex:withObjectAtIndex]` and `List.swap(_:_:)`
+  to allow exchanging the location of two objects in the given `RLMArray` / `List`.
+- Added anonymous analytics on simulator/debugger runs.
+- Add `-[RLMArray moveObjectAtIndex:toIndex:]` and `List.move(from:to:)` to
+  allow moving objects in the given `RLMArray` / `List`.
+
+### Bugfixes
+- Processes crashing due to an uncaught exception inside a write transaction will
+  no longer cause other processes using the same Realm to hang indefinitely.
+- Fix incorrect results when querying for < or <= on ints that
+  require 64 bits to represent with a CPU that supports SSE 4.2.
+- An exception will no longer be thrown when attempting to reset the schema
+  version or encryption key on an open Realm to the current value.
+- Date properties on 32 bit devices will retain 64 bit second precision.
+- Wrap calls to the block passed to `enumerate` in an autoreleasepool to reduce
+  memory growth when migrating a large amount of objects.
+- In-memory realms no longer write to the Documents directory on iOS or
+  Application Support on OS X.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/1604501/assets,https://api.github.com/repos/realm/realm-cocoa/releases/1604501,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.94.0,https://github.com/realm/realm-cocoa/releases/tag/v0.94.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.94.0,v0.94.0,False,False
+1411063,2015-06-12T21:32:08Z,2015-06-12T22:07:12Z,v0.93.2,"### Bugfixes
+- Fixed an issue where the packaged OS X Realm.framework was built with
+  `GCC_GENERATE_TEST_COVERAGE_FILES` and `GCC_INSTRUMENT_PROGRAM_FLOW_ARCS`
+  enabled.
+- Fix a memory leak when constructing standalone Swift objects with NSDate
+  properties.
+- Throw an exception rather than asserting when an invalidated object is added
+  to an RLMArray.
+- Fix a case where data loss would occur if a device was hard-powered-off
+  shortly after a write transaction was committed which had to expand the Realm
+  file.
+",https://api.github.com/users/realm-ci,7657856,realm-ci,https://api.github.com/repos/realm/realm-cocoa/releases/1411063/assets,https://api.github.com/repos/realm/realm-cocoa/releases/1411063,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.93.2,https://github.com/realm/realm-cocoa/releases/tag/v0.93.2,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.93.2,v0.93.2,False,False
+1354164,2015-05-29T18:08:51Z,2015-05-29T18:24:30Z,v0.93.1,"### Bugfixes
+- Objects are no longer copied into standalone objects during object creation. This fixes an issue where nested objects with a primary key are sometimes duplicated rather than updated.
+- Comparison predicates with a constant on the left of the operator and key path on the right now give correct results. An exception is now thrown for predicates that do not yet support this ordering.
+- Fix some crashes in `index_string.cpp` with int primary keys or indexed int properties.
+",https://api.github.com/users/tgoyne,408944,tgoyne,https://api.github.com/repos/realm/realm-cocoa/releases/1354164/assets,https://api.github.com/repos/realm/realm-cocoa/releases/1354164,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.93.1,https://github.com/realm/realm-cocoa/releases/tag/v0.93.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.93.1,v0.93.1,False,False
+1344435,2015-05-27T18:56:01Z,2015-05-27T19:06:57Z,v0.93.0,"### API breaking changes
+- Schema versions are now represented as `uint64_t` (Objective-C) and `UInt64` (Swift) so that they have
+  the same representation on all architectures.
+
+### Enhancements
+- Swift: `Results` now conforms to `CVarArgType` so it can
+  now be passed as an argument to `Results.filter(_:...)`
+  and `List.filter(_:...)`.
+- Swift: Made `SortDescriptor` conform to the `Equatable` and
+  `StringLiteralConvertible` protocols.
+- Int primary keys are once again automatically indexed.
+- Improve error reporting when attempting to mark a property of a type that
+  cannot be indexed as indexed.
+
+### Bugfixes
+- Swift: `RealmSwift.framework` no longer embeds `Realm.framework`,
+  which now allows apps using it to pass iTunes Connect validation.
+",https://api.github.com/users/jpsim,474794,jpsim,https://api.github.com/repos/realm/realm-cocoa/releases/1344435/assets,https://api.github.com/repos/realm/realm-cocoa/releases/1344435,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.93.0,https://github.com/realm/realm-cocoa/releases/tag/v0.93.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.93.0,v0.93.0,False,False
+1339812,2015-05-26T17:14:18Z,2015-05-26T21:13:38Z,v0.92.4,"### API breaking changes
+- None.
+
+### Enhancements
+- Swift: Made `Object.init()` a required initializer.
+- `RLMObject`, `RLMResults`, `Object` and `Results` can now be safely
+  deallocated (but still not used) from any thread.
+- Improve performance of `-[RLMArray indexOfObjectWhere:]` and `-[RLMArray
+  indexOfObjectWithPredicate:]`, and implement them for standalone RLMArrays.
+- Improved performance of most simple queries.
+
+### Bugfixes
+- The interprocess notification mechanism no longer uses dispatch worker threads, preventing it from
+  starving other GCD clients of the opportunity to execute blocks when dozens of Realms are open at once.
+",https://api.github.com/users/jpsim,474794,jpsim,https://api.github.com/repos/realm/realm-cocoa/releases/1339812/assets,https://api.github.com/repos/realm/realm-cocoa/releases/1339812,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.92.4,https://github.com/realm/realm-cocoa/releases/tag/v0.92.4,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.92.4,v0.92.4,False,False
+1294066,2015-05-13T21:47:59Z,2015-05-13T21:59:26Z,v0.92.3,"### API breaking changes
+- Swift: `Results.average(_:)` now returns an optional, which is `nil` if and only if the results set is empty.
+
+### Enhancements
+- Swift: Added `List.invalidated`, which returns if the given `List` is no longer safe to be accessed, and is analogous to `-[RLMArray isInvalidated]`.
+- Assertion messages are automatically logged to Crashlytics if it's loaded into the current process to make it easier to diagnose crashes.
+
+### Bugfixes
+- Swift: Enumerating through a standalone `List` whose objects themselves have list properties won't crash.
+- Swift: Using a subclass of `RealmSwift.Object` in an aggregate operator of a predicate no longer throws a spurious type error.
+- Fix incorrect results for when using OR in a query on a `RLMArray`/`List<>`.
+- Fix incorrect values from `[RLMResults count]`/`Results.count` when using `!=` on an int property with no other query conditions.
+- Lower the maximum doubling threshold for Realm file sizes from 128MB to 16MB to reduce the amount of wasted space.
+",https://api.github.com/users/tgoyne,408944,tgoyne,https://api.github.com/repos/realm/realm-cocoa/releases/1294066/assets,https://api.github.com/repos/realm/realm-cocoa/releases/1294066,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.92.3,https://github.com/realm/realm-cocoa/releases/tag/v0.92.3,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.92.3,v0.92.3,False,False
+1277234,2015-05-08T23:55:10Z,2015-05-09T00:14:46Z,v0.92.2,"### API breaking changes
+- None.
+
+### Enhancements
+- Exceptions raised when incorrect object types are used with predicates now contain more detailed information.
+- Added `-[RLMMigration deleteDataForClassName:]` and `Migration.deleteData(_:)` 
+  to enable cleaning up after removing object subclasses
+
+### Bugfixes
+- Prevent debugging of an application using an encrypted Realm to work around
+  frequent LLDB hangs. Until the underlying issue is addressed you may set
+  `REALM_DISABLE_ENCRYPTION=YES` in your application's environment variables to
+  have requests to open an encrypted Realm treated as a request for an
+  unencrypted Realm.
+- Linked objects are properly updated in `createOrUpdateInRealm:withValue:`.
+- List properties on Objects are now properly initialized during fast enumeration.
+",https://api.github.com/users/jpsim,474794,jpsim,https://api.github.com/repos/realm/realm-cocoa/releases/1277234/assets,https://api.github.com/repos/realm/realm-cocoa/releases/1277234,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.92.2,https://github.com/realm/realm-cocoa/releases/tag/v0.92.2,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.92.2,v0.92.2,False,False
+1268643,2015-05-07T00:20:24Z,2015-05-07T03:34:41Z,v0.92.1,"### API breaking changes
+- None.
+
+### Enhancements
+- `-[RLMRealm inWriteTransaction]` is now public.
+- Realm Swift is now available on CoocaPods.
+
+### Bugfixes
+- Force code re-signing after stripping architectures in `strip-frameworks.sh`.
+",https://api.github.com/users/jpsim,474794,jpsim,https://api.github.com/repos/realm/realm-cocoa/releases/1268643/assets,https://api.github.com/repos/realm/realm-cocoa/releases/1268643,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.92.1,https://github.com/realm/realm-cocoa/releases/tag/v0.92.1,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.92.1,v0.92.1,False,False
+1262851,2015-05-05T20:29:03Z,2015-05-06T01:00:59Z,v0.92.0,"### API breaking changes
+- Migration blocks are no longer called when a Realm file is first created.
+- The following APIs have been deprecated in favor of newer method names:
+
+| Deprecated API | New API |
+| :-- | :-- |
+| `-[RLMMigration createObject:withObject:]` | `-[RLMMigration createObject:withValue:]` |
+| `-[RLMObject initWithObject:]` | `-[RLMObject initWithValue:]` |
+| `+[RLMObject createInDefaultRealmWithObject:]` | `+[RLMObject createInDefaultRealmWithValue:]` |
+| `+[RLMObject createInRealm:withObject:]` | `+[RLMObject createInRealm:withValue:]` |
+| `+[RLMObject createOrUpdateInDefaultRealmWithObject:]` | `+[RLMObject createOrUpdateInDefaultRealmWithValue:]` |
+| `+[RLMObject createOrUpdateInRealm:withObject:]` | `+[RLMObject createOrUpdateInRealm:withValue:]` |
+
+### Enhancements
+- `Int8` properties defined in Swift are now treated as integers, rather than
+  booleans.
+- NSPredicates created using `+predicateWithValue:` are now supported.
+
+### Bugfixes
+- Compound AND predicates with no subpredicates now correctly match all objects.
+",https://api.github.com/users/jpsim,474794,jpsim,https://api.github.com/repos/realm/realm-cocoa/releases/1262851/assets,https://api.github.com/repos/realm/realm-cocoa/releases/1262851,master,https://api.github.com/repos/realm/realm-cocoa/tarball/v0.92.0,https://github.com/realm/realm-cocoa/releases/tag/v0.92.0,https://api.github.com/repos/realm/realm-cocoa/zipball/v0.92.0,v0.92.0,False,False

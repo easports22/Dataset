@@ -1,0 +1,383 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7737099,2017-09-13T11:57:33Z,2017-09-13T12:01:12Z,Mongoose 6.9,"API changes:
+ * `MG_ENABLE_CALLBACK_USERDATA` - if set, changes signature of event handler function to include user_data argument. Disabled by default for now, in the future this will become the default.
+ *  `mg_set_nameserver()` - specify DNS server to use
+ * `mg_assemble_uri()` - assemble a URI from parts
+ *  `mg_connect_ws()` now accepts `http://` URLs
+
+Bug fixes:
+ * Fix parsing of MQTT QoS > 0 PUBLISH messages
+ * Fix MQTT PUB{ACK,REC,REL,COMP} and UNSUBACK flags
+ * Properly shut down the SSL connection (send ""close notify"" TLS message)
+ * Fix `mg_get_http_var()` return value
+ * Fix MQTT handshake; change client protocol to version 3.1.1
+ * Fix Handling of multiple MQTT messages per RECV event
+ * Update to make lwip_net_if thread-safe
+ * Use DhcpNameServer on Windows
+ * Fix MQTT message parsing issues
+ * Fix DNS name uncompression that could lead to infinite loop
+ * Fix WS frame reassembly issues
+
+https://github.com/cesanta/mongoose/pull/855",https://api.github.com/users/rojer,531307,rojer,https://api.github.com/repos/cesanta/mongoose/releases/7737099/assets,https://api.github.com/repos/cesanta/mongoose/releases/7737099,master,https://api.github.com/repos/cesanta/mongoose/tarball/6.9,https://github.com/cesanta/mongoose/releases/tag/6.9,https://api.github.com/repos/cesanta/mongoose/zipball/6.9,6.9,False,False
+6440411,2017-05-11T10:07:09Z,2017-05-19T09:41:56Z,Mongoose 6.8,"- Client support for TLS PSK
+- Multipart handling fixes
+- LWIP driver fixes
+- UDP crashes on LWIP fixes
+- Removed mg_enable_multithreading. Added example for multithreaded usage, https://github.com/cesanta/mongoose/tree/dev/examples/multithreaded
+",https://api.github.com/users/cpq,601816,cpq,https://api.github.com/repos/cesanta/mongoose/releases/6440411/assets,https://api.github.com/repos/cesanta/mongoose/releases/6440411,dev,https://api.github.com/repos/cesanta/mongoose/tarball/6.8,https://github.com/cesanta/mongoose/releases/tag/6.8,https://api.github.com/repos/cesanta/mongoose/zipball/6.8,6.8,False,False
+5171480,2017-01-17T09:08:53Z,2017-01-16T15:09:47Z,Mongoose 6.7,"# New platforms supported
+
+A bunch of new platforms are now supported by Mongoose:
+- **Windows CE 6.0**: See [example](https://github.com/cesanta/mongoose/tree/master/examples/WinCE/http_server);
+- **TI Tiva TM4C129**: See [example](https://github.com/cesanta/mongoose/tree/master/examples/TM4C129/ccs);
+- **PIC32 Harmony TCP/IP**:  In addition to ""bare metal"", Mongoose is now able to use PIC32 Harmony TCP/IP Stack. Checkout example [here](https://github.com/cesanta/mongoose/tree/master/examples/PIC32/http_server/firmware);
+- **nRF 51/52**: Find example for nRF 51 [here](https://github.com/cesanta/mongoose/tree/master/examples/nRF51) and for nRF52 [here](https://github.com/cesanta/mongoose/tree/master/examples/nRF52);
+- **mbed**: Mongoose is now can be a part of a project based on mbed. Checkout example [here](https://github.com/cesanta/mongoose/tree/master/examples/mbed);
+- **ESP32**: Mongoose 6.7 can be compiled for ESP32 platform.
+
+# Other new features
+- **NXP Kinetis K64** support improved: New example is [here](https://github.com/cesanta/mongoose/tree/master/examples/NXP_K64);
+- **mbedTLS** native support: In addition to OpenSSL, Mongoose 6.7 can use mbedTLS;
+- **SNTP client added**: Mongoose 6.7 for working with Internet time servers.
+
+# A lot of improvements and bugfixes
+
+See a list of closed issues [here](https://github.com/cesanta/mongoose/issues?utf8=%E2%9C%93&q=is%3Aissue%20is%3Aclosed%20).
+",https://api.github.com/users/alashkin,5459304,alashkin,https://api.github.com/repos/cesanta/mongoose/releases/5171480/assets,https://api.github.com/repos/cesanta/mongoose/releases/5171480,master,https://api.github.com/repos/cesanta/mongoose/tarball/6.7,https://github.com/cesanta/mongoose/releases/tag/6.7,https://api.github.com/repos/cesanta/mongoose/zipball/6.7,6.7,False,False
+4366535,2016-10-12T10:06:27Z,2016-10-12T08:18:53Z,Mongoose 6.6,"# Changes
+
+## STM32 support added
+
+Mongoose 6.6 can be built and run on STM32 microcontrollers. Check out the new example [here](https://github.com/cesanta/mongoose/tree/master/examples/STM32F4_CC3100) for an MQTT Client for STM32. The example runs through how to build an MQTT client for STM32 with TI CC3100 WIFI as network module.
+
+## PIC32 support added
+
+We’ve also added PIC32 support to Mongoose. And just as for STM32, we have a new example [here](https://github.com/cesanta/mongoose/tree/master/examples/PIC32/) for you to follow here. It runs through how an MQTT Client is intended for running on PIC32 (MX series with TI CC3100 as a network module).
+
+## TI CC3200 support improved
+
+We have improved the already support TI CC3200. Here, the TI Compiler on docker image was updated to version 5.8.2. 
+
+## New API introductions
+
+We want to make Mongoose as simple as possible to use. Check out the new API we’ve added in 6.6: 
+- `mg_http_send_redirect` -  sends a redirect response 
+- `mg_http_serve_file` - serves a specific file with a given MIME type and optional extra headers.
+- `MG_F_ENABLE_BROADCAST` - new flag, allows to send broadcast messages
+- `MG_EV_SSI_CALL_CTX` - new event, the variant of MG_EV_SSI_CALL with context of the SSI call being processed in addition to the tag argument.
+
+## New Examples
+
+We mentioned the STM32 an PIC32 examples already, but they are not all! Check out these additional examples to help you get started with your embedded project: 
+- [DLL/SO building example](https://github.com/cesanta/mongoose/tree/master/examples/dll) 
+- [Simple SSL Web Server: shows how to build a http server with SSL support](https://github.com/cesanta/mongoose/tree/master/examples/simplest_web_server_ssl)
+- [A cookie auth and session management example](https://github.com/cesanta/mongoose/tree/master/examples/cookie_auth) 
+- [Multicast server demo](https://github.com/cesanta/mongoose/tree/master/examples/mcast_udp_server) 
+
+## Bugfixes
+
+We always improve bugs along the way between releases. If you come across anything, let us know in our forum. 
+- Use gethostbyname to resolve `hocalhost` if resolving via /etc/hosts failed. (especially useful for Windows users)
+- Fixed a lot of errors and warning in MSVC compilation
+- Fixed bug in multithreaded mode support:
+  - Copy flags for accepted connection
+  - Use user timeout in multithreading polling
+- Smaller bug fixes
+
+## Documentation
+
+We want you to be able to find all the answers you need in our documentation. That’s why we try to improve it as best we can. So you’ll see that we have more clear and structured documentation available as well as explanations for each example added directly in our documentation section. 
+
+# Binaries
+
+Windows and Mac binaries are available for download from the [website](https://www.cesanta.com/products/binary).
+
+# Licensing
+
+Mongoose is available under GPLv2. Commercial use requires a license, please [contact us](https://www.cesanta.com/contact) for terms.
+
+# Support
+
+Community support can be found on [our forum](https://forum.cesanta.com). Commercial support options are available separately by contacting us.
+",https://api.github.com/users/alashkin,5459304,alashkin,https://api.github.com/repos/cesanta/mongoose/releases/4366535/assets,https://api.github.com/repos/cesanta/mongoose/releases/4366535,master,https://api.github.com/repos/cesanta/mongoose/tarball/6.6,https://github.com/cesanta/mongoose/releases/tag/6.6,https://api.github.com/repos/cesanta/mongoose/zipball/6.6,6.6,False,False
+3638663,2016-07-12T13:20:04Z,2016-07-12T13:50:40Z,Mongoose 6.5,"# Changes
+- Improved TI CC3200 support
+  - Newly-rewritten SimpleLink socket handler
+  - Added support for SSL
+  - NWP restart hook: sl_restart_cb should be invoked by the user to re-init listeners after NWP restart
+- Dedicated JSON Library 
+  - Support for JSON serialisation/deserialisation has been moved back to a dedicated library ([Frozen](https://github.com/cesanta/frozen)). It has seen major improvements - printf/scanf like API has been implemented, making parsing and emitting JSON easy and convenient. Users that need JSON functionality are encouraged to check out Frozen.
+  - JSON-RPC support is no longer available as part of Mongoose
+- CGI: REMOTE_ADDR and SERVER_PORT variables are now passed to the scripts
+- Fixed a memory leak in mg_connect_ws_opt
+- Fixed issues with HTTP keep-alive connections
+- Other minor fixes
+
+# Binaries
+
+Windows and Mac binaries are available for download from the [website](https://www.cesanta.com/products/binary).
+
+# Licensing
+
+Mongoose is available under GPLv2. Commercial use requires a license, please [contact us](https://www.cesanta.com/contact) for terms.
+
+# Support
+
+Community support can be found on [our forum](https://forum.cesanta.com). Commercial support options are available separately by contacting us.
+",https://api.github.com/users/rojer,531307,rojer,https://api.github.com/repos/cesanta/mongoose/releases/3638663/assets,https://api.github.com/repos/cesanta/mongoose/releases/3638663,master,https://api.github.com/repos/cesanta/mongoose/tarball/6.5,https://github.com/cesanta/mongoose/releases/tag/6.5,https://api.github.com/repos/cesanta/mongoose/zipball/6.5,6.5,False,False
+3002525,2016-04-12T13:21:12Z,2016-04-12T14:14:30Z,Mongoose 6.4,"# New features and API changes
+- [Multipart upload streaming](https://blog.cesanta.com/big-upload-example-mongoose-more-than-an-embedded-web-server) - a way to process multipart requests (like file uploads) without fully buffering them
+- [mg_register_http_endpoint](https://docs.cesanta.com/mongoose/dev/#/c-api/http.h/mg_register_http_endpoint/) - an easy to use way to handle requests to specific URIs
+- [mg_parse_uri](https://docs.cesanta.com/mongoose/dev/#/c-api/http.h/mg_parse_uri/) - a new function to parse URIs, used internally and available publicly
+- [mg_bind_opt](https://docs.cesanta.com/mongoose/dev/#/c-api/http.h/mg_bind_opt/) and [mg_connect_opt](https://docs.cesanta.com/mongoose/dev/#/c-api/http.h/mg_connect_opt/) now take SSL-related options
+- [mg_connect_http_opt](https://docs.cesanta.com/mongoose/dev/#/c-api/http.h/mg_connect_http_opt/) and [mg_connect_ws_opt](https://docs.cesanta.com/mongoose/dev/#/c-api/http.h/mg_connect_ws_opt/) API calls have been added, with SSL-related options initially
+- Support for [TI CC3200](http://www.ti.com/product/CC3200) and [MSP432](http://www.ti.com/lsds/ti/microcontrollers_16-bit_32-bit/msp/low_power_performance/msp432p4x/overview.page); For both Mongoose now has example CCS projects that can be imported and used right away ([CC3200](https://github.com/cesanta/mongoose/tree/master/examples/CC3200/ccs), [MSP432](https://github.com/cesanta/mongoose/tree/master/examples/MSP432/ccs)).
+
+# Bug fixes and improvements
+- A number of fixes in handling of UDP, added [an example](https://github.com/cesanta/mongoose/tree/master/examples/udp_echo_server).
+- Fix MQTT parsing of nullary commands.
+- Adjust poll timeout if there are pending timers.
+
+# Licensing
+
+Mongoose is available under GPLv2. Commercial use requires a license, please [contact us](https://www.cesanta.com/contact) for terms.
+
+# Support
+
+Community support can be found on [our forum](https://forum.cesanta.com). Commercial support options are available separately by contacting us.
+",https://api.github.com/users/rojer,531307,rojer,https://api.github.com/repos/cesanta/mongoose/releases/3002525/assets,https://api.github.com/repos/cesanta/mongoose/releases/3002525,master,https://api.github.com/repos/cesanta/mongoose/tarball/6.4,https://github.com/cesanta/mongoose/releases/tag/6.4,https://api.github.com/repos/cesanta/mongoose/zipball/6.4,6.4,False,False
+2783393,2016-03-08T07:44:23Z,2016-03-10T10:29:27Z,Mongoose 6.3,"This release concerns commercial users only. From this release on, there are no separation for lite/standard/premium version.
+
+Technical changes (bugfixes, new features) are scheduled for the next 6.4 release in mid-April.
+",https://api.github.com/users/cpq,601816,cpq,https://api.github.com/repos/cesanta/mongoose/releases/2783393/assets,https://api.github.com/repos/cesanta/mongoose/releases/2783393,master,https://api.github.com/repos/cesanta/mongoose/tarball/6.3,https://github.com/cesanta/mongoose/releases/tag/6.3,https://api.github.com/repos/cesanta/mongoose/zipball/6.3,6.3,False,False
+2410816,2016-01-11T09:27:55Z,2016-01-12T08:58:09Z,,"# What's new in the Mongoose Library
+- WebDAV support improvements. With a just a couple of lines of code your web server is ready to serve WebDAV and can be mounted as a network drive in very different clients, like Finder on MacOS, Explorer on Windows and Nemo, Nautilus (and others) on Linux. Just add `dav_document_root` to initialization parameters and your are ready to go. See [simplest_web_server example](https://github.com/cesanta/mongoose/blob/master/examples/simplest_web_server/simplest_web_server.c).
+- Timer support. Mongoose 6.2 introduces new event - `MG_EV_TIMER`. With event and new API function `mg_set_timer` things like connection timeout (and a lot of another timeout-related features) can be easily implemented. Call `mg_set_timer(my_connection, time(NULL) + N)` and my_connection will receive MG_EV_TIMER once N seconds is elapsed. Sub-second precision is also supported, and the `mg_time` function which returns current time as a fraction floating point value has been added.
+  See [API documentation](https://www.cesanta.com/developer/mongoose#_mg_set_timer) for more details.
+
+Other changes:
+- `MG_EV_CLOSE` is now always delivered before connection is destroyed. This should simplify cleanup.
+- New API function: `mg_url_decode` to decode URL-encoded string.
+- g++ and Microsoft Visual Studio support was improved
+",https://api.github.com/users/rojer,531307,rojer,https://api.github.com/repos/cesanta/mongoose/releases/2410816/assets,https://api.github.com/repos/cesanta/mongoose/releases/2410816,master,https://api.github.com/repos/cesanta/mongoose/tarball/6.2,https://github.com/cesanta/mongoose/releases/tag/6.2,https://api.github.com/repos/cesanta/mongoose/zipball/6.2,6.2,False,False
+2205162,2015-11-30T12:27:59Z,2015-11-30T12:30:43Z,Mongoose 6.1,"# What's new in the Mongoose Library
+- Native support for [PicoTCP embedded TCP/IP stack](http://www.picotcp.com) 
+- Native support for [LWIP embedded TCP/IP stack](https://en.wikipedia.org/wiki/LwIP)
+- Native support for ESP8266 SDK (see [example](https://github.com/cesanta/mongoose/tree/master/examples/ESP8266_RTOS))
+- Native support for CC3200 FreeRTOS SDK
+- Added ability to specify extra headers for `mg_serve_http()` - that implements e.g. [CORS](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing) on server side
+- Added ability for automatic port-based redirects, for HTTP->HTTPS redirects
+- Multiple bigfixes
+
+# Mongoose editions
+
+For commercial use, Mongoose is available in three editions:
+- Mongoose Lite: Cross platform integration, SSL/TLS, HTTP support
+- Mongoose: Mongoose Lite + HTTP CGI, HTTP SSI, HTTP Digest Auth, WebSocket support
+- Mongoose Premium: Mongoose + Plain TCP, UDP, JSON-RPC, MQTT, DNS, CoAP support
+",https://api.github.com/users/cpq,601816,cpq,https://api.github.com/repos/cesanta/mongoose/releases/2205162/assets,https://api.github.com/repos/cesanta/mongoose/releases/2205162,master,https://api.github.com/repos/cesanta/mongoose/tarball/6.1,https://github.com/cesanta/mongoose/releases/tag/6.1,https://api.github.com/repos/cesanta/mongoose/zipball/6.1,6.1,False,False
+2202109,2013-01-18T10:43:52Z,2015-11-29T10:26:58Z,Mongoose 3.6,"- Fixed source code archive (main.c was missing)
+- Extended Windows GUI functionality:
+- Added ""Start browser"" systray popup menu item
+- Enhanced configuration editor
+- Renamed config options:
+  - `put_delete_passwords_file` -> `put_delete_auth_file`
+  - `global_passwords_file` -> `global_auth_file`
+  -  `select()` changed to `poll()`, to avoid big file descriptor `FD_SET` problem on UNIX
+- Couple of bugfixes, thanks to contributors
+",https://api.github.com/users/cpq,601816,cpq,https://api.github.com/repos/cesanta/mongoose/releases/2202109/assets,https://api.github.com/repos/cesanta/mongoose/releases/2202109,master,https://api.github.com/repos/cesanta/mongoose/tarball/3.6,https://github.com/cesanta/mongoose/releases/tag/3.6,https://api.github.com/repos/cesanta/mongoose/zipball/3.6,3.6,False,False
+2202107,2013-02-05T18:00:49Z,2015-11-29T10:26:07Z,Mongoose 3.7,"- Added ""redirect to SSL port"" functionality, e.g. if you specify
+    `-listening_ports 8080r,8043s`
+    then all requests to HTTP port 8080 will be redirected to HTTPS port 8043
+- Added `mg_download()` API, an HTTP client interface!
+- Lua server pages now must output HTTP headers -- full control for Lua
+- Added pre-built binary for MacOS, with initial GUI support
+- API change: got rid of events, moved to struct `mg_callbacks`
+- Bugfixes, thanks to contributors
+",https://api.github.com/users/cpq,601816,cpq,https://api.github.com/repos/cesanta/mongoose/releases/2202107/assets,https://api.github.com/repos/cesanta/mongoose/releases/2202107,master,https://api.github.com/repos/cesanta/mongoose/tarball/3.7,https://github.com/cesanta/mongoose/releases/tag/3.7,https://api.github.com/repos/cesanta/mongoose/zipball/3.7,3.7,False,False
+2202105,2014-01-06T14:58:21Z,2015-11-29T10:25:29Z,Mongoose 5.0,"- Internal core has been changed from blocking, thread-per-connection to
+    non-blocking, asynchronous, one thread for all.
+- API modification for server creation and response creation. That allowed
+   keep-alive support for dynamic requests, boosting the embedded performance
+   to 100+ thousands requests per second on a single core
+   (as measured on my development MacBook laptop)
+- Unified handling of POST requests and Websocket requests by putting a
+  payload into `conn->content`, `conn->content_len` attributes.
+  That simplified user code and eliminated the need of `mg_read()`,
+  since mongoose buffers all data prior to calling the callback
+- Keep-alive support is the default
+- Dropped SSI support and throttling support
+- Several configuraition parameters are gone:
+  -  `cgi_environment` (replaced with MONGOOSE_CGI),
+  -  `protect_uri` (not useful)
+  -  `ssi_pattern` (SSI support is gone)
+  -  `throttle` (throttling support is gone)
+  -  `error_log_file` (not used)
+  -   `enable_keep_alive` (enabled by default)
+  -   `listening_ports` (renamed to listening_port)
+  -   `num_threads` (core has changed to single thread)
+  -   `put_delete_auth_file` (renamed to dav_auth_file)
+  -   `authentication_domain` (renamed to auth_domain)
+- Due to the async, non-blocking nature of the core, few restrictions
+    are now in place:
+  - user callbacks must not block
+  - POST and Websocket data are now buffered, and cannot be huge
+- mongoose is now capable on listening on only one port
+",https://api.github.com/users/cpq,601816,cpq,https://api.github.com/repos/cesanta/mongoose/releases/2202105/assets,https://api.github.com/repos/cesanta/mongoose/releases/2202105,master,https://api.github.com/repos/cesanta/mongoose/tarball/5.0,https://github.com/cesanta/mongoose/releases/tag/5.0,https://api.github.com/repos/cesanta/mongoose/zipball/5.0,5.0,False,False
+2202100,2014-01-10T22:37:26Z,2015-11-29T10:24:30Z,Mongoose 5.1,"- CGI-related bugs where fixed, primarily for Windows platform
+- Bugs on Windows related to UNICODE support were fixed
+- Added a feature to support ""error pages"" through redirect.
+    Done using `-url_redirects` option, details are on
+    http://cesanta.com/docs/Options.shtml
+",https://api.github.com/users/cpq,601816,cpq,https://api.github.com/repos/cesanta/mongoose/releases/2202100/assets,https://api.github.com/repos/cesanta/mongoose/releases/2202100,master,https://api.github.com/repos/cesanta/mongoose/tarball/5.1,https://github.com/cesanta/mongoose/releases/tag/5.1,https://api.github.com/repos/cesanta/mongoose/zipball/5.1,5.1,False,False
+2202099,2014-02-01T15:17:13Z,2015-11-29T10:23:58Z,Mongoose 5.2,"- Windows binary made fully UNICODE aware. In previous versions,
+    the presence of non-ASCII chars in document root, CGI script name,
+    or directory name might have broken Mongoose as stand-alone
+    or as Windows service. Now Mongoose works with non-ASCII paths properly.
+    Internally, Mongoose uses UTF8 encoding. When making WinAPI calls,
+    mongoose converts UTF8 strings to wide chars and calls UNICODE API.
+- Enhanced authorization API by providing `mg_set_auth_handler()` and
+    `mg_authorize_digest()`
+- Removed `mg_add_uri_handler()`, added `mg_set_request_handler()`.
+    There is only oneURI handler that handles all requests, just like in 4.x.
+    The reason for this change is to provide an ability to catch all URIs,
+    and at the same time signal Mongoose to continue handling specific URIs.
+- Added `mg_parse_multipart()` API for file uploads.
+    Note that the restriction on uploading huge files still exists,
+    and will be eliminated in the next release.
+- Allowing mongoose to bind to port 0, in which case it'll bind to any
+    random unused port.
+- Moved `idle_timeout_ms` run-time option to compile-time flag
+- Added asynchronous HTTP client, not documented yet. Documentation and
+    examples are coming in the next couple of weeks. Async Websocket client
+    is scheduled for the next release. See usage examples at `unit_test.c`
+- Windows and MacOS pre-built binaries are now split to free and paid ones,
+  paid binaries include CGI, SSL, Lua, Sqlite, support and updates.
+  Linux pre-built binary includes all functionality and is free, and will
+  continue to be free.  Source code for Windows and MacOS GUI is closed.
+  Disclaimer: source code for the command line stand-alone server,
+  as well as Mongoose library itself, will never be closed.
+- Multiple bug fixes and minor enhancements
+",https://api.github.com/users/cpq,601816,cpq,https://api.github.com/repos/cesanta/mongoose/releases/2202099/assets,https://api.github.com/repos/cesanta/mongoose/releases/2202099,master,https://api.github.com/repos/cesanta/mongoose/tarball/5.2,https://github.com/cesanta/mongoose/releases/tag/5.2,https://api.github.com/repos/cesanta/mongoose/zipball/5.2,5.2,False,False
+2202095,2014-03-10T11:21:52Z,2015-11-29T10:22:48Z,Mongoose 5.3,"## Changes in Libmongoose library:
+- Moved to the evented API. Updated API documentation is at
+     http://cesanta.com/docs/Embed.shtml
+     http://cesanta.com/docs/API.shtml
+-  Added `MG_LUA` event for exporting custom variables to the Lua environment
+-  Added virtual hosts capability, see `url_rewrites` option description at
+     http://cesanta.com/docs/Options.shtml
+-  Added mjpg serving example
+-  Cleaned up and documented HTTP client API, with unit tests
+-  Added `mg_wakeup_server()` to awaken `mg_poll_server()`
+    from another thread
+-  Moved Mongoose IO core to [https://github.com/cesanta/net_skeleton](Net Skeleton)
+-  Added connection hexdump functionality for developers
+-  Bug fixes
+
+## Changes in pre-compiled binaries:
+-  New awesome Mongoose logos by our designer Katrin - thanks Katrin!
+      Check them out at http://cesanta.com/products.shtml
+-  Added Lua Server Pages support to the free version, quick intro is at
+      http://cesanta.com/docs/Lua.shtml
+-  Added quick ""Set shared directory"" menu item to set `document_root`
+-  Added SSI support to the Pro version
+-  Removed SSL support from the Pro version
+",https://api.github.com/users/cpq,601816,cpq,https://api.github.com/repos/cesanta/mongoose/releases/2202095/assets,https://api.github.com/repos/cesanta/mongoose/releases/2202095,master,https://api.github.com/repos/cesanta/mongoose/tarball/5.3,https://github.com/cesanta/mongoose/releases/tag/5.3,https://api.github.com/repos/cesanta/mongoose/zipball/5.3,5.3,False,False
+2202093,2014-07-28T11:19:00Z,2015-11-29T10:22:06Z,Mongoose 5.4,"## Changes in Libmongoose library:
+- Added `hexdump_file` option for low-level request/reply debugging
+- Added `mg_template()` API function for generating HTML pages from
+  templates with expansions
+- Fixed `struct mg_connection::local_ip` handling, `mg_set_option()`
+  behavior with NULL values
+- Added `mg_send_file()` call to send arbitrary file to the client
+- Added `mg_terminate_ssl()` for SSL termination functionality
+- Added HTTP proxy support, `enable_proxy` config option
+- Added `mg_next()` for iterating over existing active connections
+- Added client-side SSL auth, `ssl_ca_certificate` option
+- Added `mg_wakeup_server_ex()` for pushing messages to existing connections
+- Added `MG_WS_HANDSHAKE` and `MG_WS_CONNECT` events that are sent on
+   Websocket handshake is connection establishment, respectively
+- Removed server-side Lua support
+- Filesystem access, reading from socket/SSL performance improvements
+- DAV PROPFIND memory leak fixed
+- Added `big_upload.c` and enhanced `upload.c` example
+- Added `proxy.c` example that demonstrates proxy functionality and SSE pushes
+- Added `websocket2.c` example that shows simple web chat implementation
+  over websockets
+- Various minor fixes
+
+## Changes in pre-compiled binaries:
+- Created HTML administration console
+- When server is started, browser is started automatically
+- Fixed directory listing bug when directory contains `#` character
+- Removed built-in Lua Server Pages in the binary, and instead
+  added Mongoose + Lua developer bundle which has Lua Server Pages support.
+  That also solves external Lua modules loading problem.
+",https://api.github.com/users/cpq,601816,cpq,https://api.github.com/repos/cesanta/mongoose/releases/2202093/assets,https://api.github.com/repos/cesanta/mongoose/releases/2202093,master,https://api.github.com/repos/cesanta/mongoose/tarball/5.4,https://github.com/cesanta/mongoose/releases/tag/5.4,https://api.github.com/repos/cesanta/mongoose/zipball/5.4,5.4,False,False
+2202092,2014-10-28T11:42:47Z,2015-11-29T10:21:25Z,Mongoose 5.5,"## Changes in Libmongoose library:
+- Added new API function: `mg_forward()` for proxying functionality
+- Added new API function: `mg_send_file_data()` for sending file data
+- Added new utility API functions: `mg_mmap() and mg_munmap()`
+- Changed the way SSL settings are handled: removed `ssl_certificate` and
+  `ssl_ca_certificate` options, and instead made `listening_port` accept
+  `ssl://PORT:SSL_CERT:CA_CERT` notation
+- Added ability to listen on multiple ports, see `listening_port` documentation
+- Added `enable_proxy` option
+- Added [cookie_authentication](https://github.com/cesanta/mongoose/tree/master/examples/cookie_authentication) example
+- Added [websocket_ssl_proxy](https://github.com/cesanta/mongoose/tree/master/examples/websocket_ssl_proxy) example
+- Added [http_client](https://github.com/cesanta/mongoose/tree/master/examples/http_client) example
+- Increased default 'idle connection' timeout from 30 to 300 seconds
+- Fixed MinGW build
+- Refactored all examples, put each in it's own directory with dedicated build
+- Many smaller bugfixed, including SSL, CGI, API, proxy, etc
+
+## Changes in pre-compiled binaries:
+- Support for multiple listening ports
+- Fixed CGI handling for scripts that specify interpreter in the hashbang line
+",https://api.github.com/users/cpq,601816,cpq,https://api.github.com/repos/cesanta/mongoose/releases/2202092/assets,https://api.github.com/repos/cesanta/mongoose/releases/2202092,master,https://api.github.com/repos/cesanta/mongoose/tarball/5.5,https://github.com/cesanta/mongoose/releases/tag/5.5,https://api.github.com/repos/cesanta/mongoose/zipball/5.5,5.5,False,False
+2202090,2015-03-18T17:25:46Z,2015-11-29T10:20:26Z,Mongoose 5.6 ,"## Changes in Libmongoose library:
+- Added `-dav_root` configuration option that gives an ability to mount
+  a different root directory (not document_root)
+- Fixes for build under Win23 and MinGW
+- Bugfix: Double dots removal
+- Bugfix: final chunked response double-send
+- Fixed compilation in 64-bit environments
+- Added OS/2 compatibility
+- Added `getaddrinfo()` call and `NS_ENABLE_GETADDRINFO`
+- Various SSL-related fixes
+- Added integer overflow protection in `iobuf_append()` and `deliver_websocket_frame()`
+- Fixed NetBSD build
+- Enabled `NS_ENABLE_IPV6` build for Visual Studio 2008+
+- Enhanced comma detection in `parse_header()`
+- Fixed unchanged memory accesses on ARM
+- Added ability to use custom memory allocator through NS_MALLOC, NS_FREE, NS_REALLOC
+
+## Changes in Mongoose binary:
+- Added `-start_browser` option to disable automatic browser launch
+- Added experimental SSL support. To listen on HTTPS port, use `ssl://PORT:SSL_CERT` format. For example, to listen on HTTP port 8080 and HTTPS port 8043, use `-listening_port 8080,ssl://8043:ssl_cert.pem`
+",https://api.github.com/users/cpq,601816,cpq,https://api.github.com/repos/cesanta/mongoose/releases/2202090/assets,https://api.github.com/repos/cesanta/mongoose/releases/2202090,master,https://api.github.com/repos/cesanta/mongoose/tarball/5.6,https://github.com/cesanta/mongoose/releases/tag/5.6,https://api.github.com/repos/cesanta/mongoose/zipball/5.6,5.6,False,False
+1842500,2015-09-21T14:29:28Z,2015-09-21T10:01:40Z,Mongoose 6.0,"# Overview
+
+This is a major release of Mongoose. It brings new capabilities, making Mongoose a multi-protocol network library rather then only HTTP/Websocket. That means more flexible and rich API. New Mongoose API is not backward-compatible with pre-6.0 versions.
+
+# What's New
+- Support for plain TCP, plain UDP
+- Support for Websocket client 
+- JSON-RPC client, JSON-RPC server
+- MQTT client, MQTT broker
+- CoAP client, CoAP server
+- DNS client, DNS server, async DNS resolver
+- SSL layer improvements, including modern cryptography support
+- New API
+
+# Architecture notes
+
+Pre-6.0 Mongoose was hiding the implementation from the user. Like, internal connection structures, sockets, etc. Mongoose 6.0 opens everything to the user. This has it's pro and cons. The decision to open the guts of the library is to provide power users to take full control over the IO engine. Basic use cases are well covered by the example that are provided in abundance.
+
+# Mongoose Editions
+
+Mongoose is available in three editions to suit your integration needs: 
+- Mongoose Lite:        Cross platform integration, SSL/TLS, HTTP support 
+- Mongoose:         Mongoose Lite + HTTP CGI, HTTP SSI, HTTP Digest Auth, WebSocket support 
+- Mongoose Premium: Mongoose + Plain TCP, UDP, JSON-RPC, MQTT, DNS, CoAP support
+",https://api.github.com/users/cpq,601816,cpq,https://api.github.com/repos/cesanta/mongoose/releases/1842500/assets,https://api.github.com/repos/cesanta/mongoose/releases/1842500,master,https://api.github.com/repos/cesanta/mongoose/tarball/6.0,https://github.com/cesanta/mongoose/releases/tag/6.0,https://api.github.com/repos/cesanta/mongoose/zipball/6.0,6.0,False,False

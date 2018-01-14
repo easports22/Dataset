@@ -1,0 +1,236 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7625620,2017-09-07T13:33:34Z,2017-09-07T14:55:11Z,Scala Native 0.3.3,"This release focuses on performance and library improvements, keeping backwards binary compatibility with previous releases in 0.3.x series. 
+
+# Performance improvements 👟
+
+This release provides a number of performance tweaks to reduce overhead of stack traces, equality comparisons and boxing of primitives:
+
+#963 #995 Cache stack trace elements (by @Duhemm)
+#982 Short-circuit virtual dispatch for `==` and `##` (by @densh)
+#990 Avoid virtual dispatch in default implementation of `==` and `##` (by @densh)
+#997 `== null` must not call equals (by @densh)
+#1000 Cache primitive numeric boxes (by @densh)
+
+The combination of these changes provides up to 5x reduction of running time on some of our benchmarks:
+
+<img width=""866"" alt=""screen shot 2017-09-06 at 10 22 38"" src=""https://user-images.githubusercontent.com/320966/30101694-90f81804-92ed-11e7-81cd-75b7f009017a.png"">
+
+ (Running time per benchmark, normalized by 0.3.2, `nativeGC := ""immix""`, `nativeMode := ""release""`.)
+
+# Library improvements 📚
+
+As part of the GSoC, @asoltysik has contributed initial support for server and client sockets from `java.net`:
+
+#914 Implementation of TCP Sockets and InetSocketAddress (by @asoltysik)
+#917 Server socket implementation (by @asoltysik)
+
+Another major area of improvements is near-complete support for `java.util.zip` and `java.util.jar` APIs contributed by @Duhemm from the Scala Center: 
+
+#933 Add support for `java.util.zip.Checked{Input, Output}Stream` (by @Duhemm)
+#935 Add support for `java.util.zip.{ZipFile, ZipEntry}`  (by @Duhemm)
+#942 Add support for manipulating JAR files with `java.util.jar` (by @Duhemm)
+#964 Add support for `java.util.zip.Zip{Input, Output}Stream` (by @Duhemm)
+#966 Add support for `java.util.jar.Jar{Input, Output}Stream` (by @Duhemm)
+
+Additionally there is also improved support for:
+
+#931 Add support for `java.io.PushbackInputStream` (by @Duhemm)
+#938 Port `BufferedOutputStream` from Apache Harmony  (by @Duhemm)
+#976 Add support for `scala.Enumeration` (by @Duhemm)
+#985 Add support for `scala.util.Properties` (by @Duhemm)
+
+Thanks to these changes we could run scalac (with minimal modifications) compiled ahead-of-time:
+
+<blockquote class=""twitter-tweet"" data-lang=""en""><p lang=""en"" dir=""ltr"">It&#39;s been a while since our last update. Here is a sneak peak on what <a href=""https://twitter.com/mnduhem"">@mnduhem</a> and <a href=""https://twitter.com/den_sh"">@den_sh</a> have been secretly hacking on lately. <a href=""https://t.co/UduPKctQme"">pic.twitter.com/UduPKctQme</a></p>&mdash; Scala Native (@scala_native) <a href=""https://twitter.com/scala_native/status/893192456002469888"">August 3, 2017</a></blockquote>
+
+# Stub linking 🔗 
+
+This release changes the way we link unimplemented parts of the `java.*` space. Previously we would unconditionally link all the stubbed methods, potentially causing failures at runtime (by throwing `scala.NotImplementedError`.) 
+
+Now, those methods are marked as `@stub`-s and are not linked by default. To enable stub linking one must explicitly specify it in their builds:
+
+```
+nativeLinkStubs := true
+```
+
+By default stubs are not linked and are shown as linking errors. This is a build-breaking change for existing projects that used to rely on the old linking behavior.
+
+# Bugfixes and  tooling improvements 🐛 🔧
+
+#700 #921 Improve unicode handling in regular expressions (by @matil019)
+#817 Maintain a fixed-size cache of compiled RE2 patterns (by @matil019)
+#871 Silence stderr of `which` during linking (by @matil019)
+#911 Build fails if there are no sources in src/main/scala (by @ekrich)
+#928 Improve performance of NIR code generation (by @densh)
+#941 Make sure we deterministically produce the same binaries (by @densh)
+#952 Update the nativeGC settingKey description (by @xuwei-k)
+#969 Fix curMethodThis in tailrec methods (by @densh)
+#972 Add `@stub` annotation to mark stubs (by @Duhemm)
+#977 Fixes build if a parent directory is called `gc` (by @ekrich)
+#1001 Implement j.l.a.RetentionPolicy to fix javalib incremental compilation (by @matil019)
+
+# Contributors 👥
+
+According to git shortlog -sn --no-merges v0.3.2..v0.3.3, 6 people contributed to this release: 
+Denys Shabalin, Martin Duhem, matil019, Andrzej Sołtysik, Eric K Richardson, Kenji Yoshida
+
+Thank you all! ✨ 🍰 ✨",https://api.github.com/users/densh,320966,densh,https://api.github.com/repos/scala-native/scala-native/releases/7625620/assets,https://api.github.com/repos/scala-native/scala-native/releases/7625620,master,https://api.github.com/repos/scala-native/scala-native/tarball/v0.3.3,https://github.com/scala-native/scala-native/releases/tag/v0.3.3,https://api.github.com/repos/scala-native/scala-native/zipball/v0.3.3,v0.3.3,False,False
+7319435,2017-08-08T16:02:38Z,2017-08-08T16:03:02Z,Scala Native 0.3.2,"This release focuses on bufixes for issues discovered in 0.3.x series and library improvements. For full changelog in 0.3.x series see [0.3.0](https://github.com/scala-native/scala-native/releases/tag/v0.3.0) and [0.3.1](https://github.com/scala-native/scala-native/releases/tag/v0.3.1) announcements.
+
+# Library improvements 📚
+
+#722 Add bindings for `complex.h ` (by @ekrich)
+#804 Add support for `java.util.Formatter` (by @matil019)
+#807 Add support for `java.net.InetAddress` (by @asoltysik)
+#907 Add support `java.util.zip.GZIP{Input, Output}Stream` (by @Duhemm)
+
+# Bugfixes 🐛
+
+#147 Finalize is officially not going to be supported (by @densh)
+#640 Add support for C escape sequences (by @matil019)
+#886 Fix regression in regular expression matching (by @muxanick)
+#896 Fix infinite recursion in `java.util.regex.Matcher` (by @atty303)
+#901 Don't include class files inside of the javalib artifact (by @densh)
+
+# Contributors 👥
+
+According to git shortlog -sn --no-merges v0.3.1..v0.3.2, 7 people contributed to this release: Denys Shabalin, matil019, AGAWA Koji, Martin Duhem, Mike Samsonov, Eric K Richardson, Andrzej Sołtysik.
+
+Thank you all! ✨ 🍰 ✨",https://api.github.com/users/densh,320966,densh,https://api.github.com/repos/scala-native/scala-native/releases/7319435/assets,https://api.github.com/repos/scala-native/scala-native/releases/7319435,master,https://api.github.com/repos/scala-native/scala-native/tarball/v0.3.2,https://github.com/scala-native/scala-native/releases/tag/v0.3.2,https://api.github.com/repos/scala-native/scala-native/zipball/v0.3.2,v0.3.2,False,False
+6878870,2017-06-29T16:06:02Z,2017-06-29T16:09:14Z,Scala Native 0.3.1,"This release focuses on fixes for issues discovered in 0.3.0. For full release notes see [original 0.3.0 announcement](https://github.com/scala-native/scala-native/releases/tag/v0.3.0).
+
+# Bugfixes 🐛 
+
+#818 InputStreamReader/OutputStreamWriter should throw NPE if null is passed to constructor (by @allanrenucci)
+#837 Add support for testOnly (by @Duhemm)
+#842 sbt-scala-native generate invalid code when there is no tests (by @xuwei-k)
+#848 FileWriter fails to create a new file (by @allanrenucci)
+#849 Random without a seed is deterministic (by @ekrich)
+#850 ArrayList should throw exception with negative initial capacity (by @densh)
+#851 AbstractList.addAll doesn't work (by @densh)
+#852 Nondeterministic argonaut test failure in MacOS (by @muxanick)
+#863 Unit tests fail due to new test harness in Travis CI (by @Duhemm)
+#870 Performance regression in 0.3.0 (by @densh)
+#878 Make ArrayList throw exceptions as specified in JDK Javadoc (by @matil019)
+
+# Contributors 👥
+
+According to git shortlog -sn --no-merges v0.3.0..v0.3.1, 7 people contributed to this release: Denys Shabalin, Mike Samsonov, Kenji Yoshida, Martin Duhem, Allan Renucci, Eric K Richardson, matil019.
+
+Thank you all! ✨ 🍰 ✨",https://api.github.com/users/densh,320966,densh,https://api.github.com/repos/scala-native/scala-native/releases/6878870/assets,https://api.github.com/repos/scala-native/scala-native/releases/6878870,master,https://api.github.com/repos/scala-native/scala-native/tarball/v0.3.1,https://github.com/scala-native/scala-native/releases/tag/v0.3.1,https://api.github.com/repos/scala-native/scala-native/zipball/v0.3.1,v0.3.1,False,False
+6682189,2017-06-15T12:25:57Z,2017-06-15T14:00:08Z,Scala Native 0.3.0,"# New garbage collector 🗑️♻️
+
+(Contributed by @LukasKellenberger in #726)
+
+The main highlight of the release is our new garbage collector called Immix based on [1]. Compared to our current garbage collector the differences and similarities are the following:
+
+* **Tracing garbage collection.** Both collectors rely on tracing to perform garbage collection. This means that the collector has no runtime overhead in-between garbage collection cycles unlike some other automatic memory management schemes like reference counting.
+
+* **Precise heap data layout.** Immix relies on precise knowledge of the layout of objects on the heap. In comparison, our integration with Boehm is fully conservative.
+
+* **Conservative roots.** To keep the compiler interface simple and to avoid requiring newer versions of LLVM with latest GC intrinsics we keep root scanning conservative. Typically this has negligible performance overhead but precludes objects referred from the roots to be moved around. 
+
+* **Bump allocation.** Unlike most mark-and-sweep implementations, Immix doesn't rely on free lists to allocate memory. Instead, it has a multi-level data structure for the heap that allows for bump allocation across contiguous areas of memory that speeds up allocation considerably.
+
+On all of our throughput benchmarks Immix performs much better than Boehm:
+
+![2017-06-01-fast-startup-and-low-latency 001](https://user-images.githubusercontent.com/320966/27076935-da893400-502e-11e7-8a6b-546d99cac2fe.png)
+
+Here you see running time of our benchmarks (less is better), normalized by the running time with garbage collector turned off. Average GC overhead went down from 100% to 10% with some benchmarks seeing close to 5x improvements.
+
+Immix can enabled in opt-in fashion by adding the following setting in your sbt build:
+
+```
+nativeGC := ""immix""
+```
+
+Boehm remains as the default garbage collector until our immix implementation matures.
+
+[1] [Stephen M. Blackburn and Kathryn S. McKinley. 2008. Immix: a mark-region garbage collector with space efficiency, fast collection, and mutator performance. In Proceedings of the 29th ACM SIGPLAN Conference on Programming Language Design and Implementation (PLDI '08). ACM, New York, NY, USA, 22-32.](http://users.cecs.anu.edu.au/~steveb/pubs/papers/immix-pldi-2008.pdf)
+
+# Sbt test framework integration ☑️
+
+(Contributed by @Duhemm in #755)
+
+We extend our sbt integration to support sbt test frameworks. This means that starting with 0.3, as soon as a testing framework an all of its dependencies are published for the Scala Native platform, one can use them to compile and run Native-compiled test suites.
+
+# Sbt cross project feature completeness 🎌
+
+(Contributed by @sjrd in https://github.com/scala-native/sbt-crossproject/pull/38)
+
+[sbt-crossproject](https://github.com/scala-native/sbt-crossproject) is a an sbt plugin that automates cross-compilation and cross-publishing across the three major Scala platforms: JVM, JS and Native. We are happy to announce it's second release: `0.2.0`. This release is feature complete with the respect to the original cross projects from Scala.js 0.6.x. New-style cross projects are now used on the master branch of Scala.js (to be released as part of the upcoming `1.0` release.)
+
+# Library improvements 📚
+
+#558 Add support for `java.net.URI` (by @asoltysik)
+#694 Add support for a large subset of `java.nio.*` (by @Duhemm)
+#701 Add flush to `java.io.FileOutputStream` (by @ekrich)
+#724 Make `java.lang.StackTraceElement` closer to Java's impl (by @Duhemm)
+#734 Add support for Zone allocation (by @densh)
+#743 Add suport for `java.util.zip.*` (by @Duhemm)
+#761 Add support for `java.util.ArrayList ` (by @matil019)
+#758 Add bindings for POSIX `socket.h` (by @Duhemm)
+#771 Add bindings for POSIX `errno.h` (by @rwhaling)
+
+# Tooling improvements 🔧
+
+#339 Add support for sbt testing interface (by @Duhemm)
+#652 Add new `sbt new` template (by @MasseGuillaume and @densh)
+#686 Implements selector-based row displacement for trait method dispatch, decreasing the size of the generated binaries by up to a factor 5x in some cases (by @densh)
+#833 Make sure zlib, re2 and boehm dependencies are truly optional (by @densh)
+
+# Bugfixes and perfomance improvements 🐛 👟
+
+#128 New garbage collector: Immix (by @LukasKellenberger and @densh)
+#596 System nanotime test sometimes fails (by @muxanick)
+#667 Make sure linker doesn't under-approximate in cases of complex trait inheritance (by @densh)
+#679 Names in LLVM IR must escape quote character (by @muxanick)
+#695 Fix handling of this in loops generated by tailrec (by @densh)
+#760 `java.io.FileDescriptor.valid` should check that file descriptors are actually valid (by @Duhemm)
+#762 Compiler tries to box short into int (by @densh)
+#765 `java.io.FileInputStream` constructor should throw `java.io.FileNotFoundException` on invalid file names (by @mccartney)
+#770 FileWriter ignores -1 result from open (by @mccartney)
+#794 Signature of `java.util.Arrays.asList` is wrong (by @hwielenberg)
+#799 Up to 15x faster `java.io.BufferedReader.readLine` (by @densh)
+#803 String concat must always convert null arguments to `""null""` string (by @densh)
+#809 Scala hash code must return 0 on null values (by @densh)
+#819 Fix the resource leak of `java.io.InputStreamReader.close` (by @matil019)
+#820 `java.io.FileInputStream.available` should throw `java.io.IOException` after closed (by @matil019)
+#822 Fix the resource leak of `java.io.BufferedReader.close` (by @matil019)
+
+# Contributors 👥
+
+According to git shortlog -sn --no-merges v0.2.1..v0.3.0, 14 people contributed to this release: Denys Shabalin, Martin Duhem, Jonas Fonseca, matil019, Lukas Kellenberger, Eric K Richardson, Mike Samsonov, Greg Oledzki, Shunsuke Otani, Andrzej Sołtysik, Tim Nieradzik, Henning Wielenberg, Richard Whaling, Guillaume Massé.
+
+Thank you all! ✨ 🍰 ✨",https://api.github.com/users/densh,320966,densh,https://api.github.com/repos/scala-native/scala-native/releases/6682189/assets,https://api.github.com/repos/scala-native/scala-native/releases/6682189,master,https://api.github.com/repos/scala-native/scala-native/tarball/v0.3.0,https://github.com/scala-native/scala-native/releases/tag/v0.3.0,https://api.github.com/repos/scala-native/scala-native/zipball/v0.3.0,v0.3.0,False,False
+6210510,2017-04-27T15:50:44Z,2017-04-28T09:53:21Z,Scala Native 0.2.1,"This is a follow-up hotfix release that addresses a single issue: #673. 
+
+# Changes
+
+#674 (by @densh) warn but not error if older JVM is found.
+
+# Full change log
+
+To see the full list of changes in 0.2 series see [the original 0.2.0 announcement](https://github.com/scala-native/scala-native/releases/tag/v0.2.0).
+",https://api.github.com/users/densh,320966,densh,https://api.github.com/repos/scala-native/scala-native/releases/6210510/assets,https://api.github.com/repos/scala-native/scala-native/releases/6210510,master,https://api.github.com/repos/scala-native/scala-native/tarball/v0.2.1,https://github.com/scala-native/scala-native/releases/tag/v0.2.1,https://api.github.com/repos/scala-native/scala-native/zipball/v0.2.1,v0.2.1,False,False
+6198066,2017-04-26T18:42:30Z,2017-04-26T18:45:21Z,Scala Native 0.2.0,"We're happy to announce the second release of Scala Native toolchain. 0.2 focuses on coverage and stability of the core libraries.
+
+# Release Highlights
+
+* #574 (by @Duhemm from Scala Center, @cedricviaccoz and @Korf74) adds initial support for File I/O APIs in `java.io.*` namespace. 
+* #588 (by @MasseGuillaume from Scala Center) introduces support for `java.util.regex.*` via bindings to [Google's RE2](https://github.com/google/re2) regular expression engine. [See docs section on the difference wrt reference regular expressions](http://www.scala-native.org/en/latest/lib/javalib.html#regular-expressions-java-util-regex).
+* #618 #621 (by @densh) adds initial support for Scala's Futures. Current implementation is similar to the one in Scala.js and relies on a single-threaded event loop for the default execution context. 
+* #539 (by @LukasKellenberger) adds a new `nativeGC` sbt setting. This setting lets you turn off the garbage collection altogether. This setting is going to be used a switch between different GC implementations in the future. [See docs section about this setting.](http://www.scala-native.org/en/latest/user/sbt.html#garbage-collectors)
+* #624 (by @jonas) adds support for substraction on `native.Ptr[T]`.
+* #560 #663 (by @fommil and @densh) clarifies licensing relationship with 3-rd party projects that are used in Scala Native.
+* #573 #616 #651 (by @ekrich, @jonas and @densh) improves implementation of `java.lang.{String, Character}`.
+* #602 (by @ekrich) adds initial support for `java.util.Date`.
+* #549 #591 #606 #622 #659 (by @jonas, @asoltysik, @fduraffourg, @brad-rathke and @densh) improves coverage of `java.lang.System` APIs by adding support for environment variables and properties, improve I/O with stdin/stdout/strerr streams.
+* #661 #665 (by @densh) adds support for cross-publishing between 2.11.8 and 2.11.11 Scala versions. 
+* #565 #568 #570 #630 #639 #653 (by @MasseGuillaume, @jonas, @xuwei-k and @densh) improves sbt integration.
+
+# Contributors
+
+According to `git shortlog -sn --no-merges v0.1.0..v0.2.0`, 17 people contributed to this release: Denys Shabalin, Jonas Fonseca, Guillaume Massé, Martin Duhem, Lukas Kellenberger, Andrzej Sołtysik, Eric K Richardson, Remi, Florian Duraffour, Brad Rathke, Richard Whaling, Ruben Berenguel M, Sam Halliday, Shunsuke Otani, Cedric Viaccoz, Kenji Yoshida, Ignat Loskutov. 
+
+Thank you all! ✨ 🍰 ✨ ",https://api.github.com/users/densh,320966,densh,https://api.github.com/repos/scala-native/scala-native/releases/6198066/assets,https://api.github.com/repos/scala-native/scala-native/releases/6198066,master,https://api.github.com/repos/scala-native/scala-native/tarball/v0.2.0,https://github.com/scala-native/scala-native/releases/tag/v0.2.0,https://api.github.com/repos/scala-native/scala-native/zipball/v0.2.0,v0.2.0,False,False

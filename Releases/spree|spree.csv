@@ -1,0 +1,2312 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8196595,2017-10-20T12:16:05Z,2017-10-20T13:11:31Z,Version 3.4.1,"This patch release contains bug fixes backported from master. We'd like to thank all the contributors who made this happen 👍
+
+### CMD
+
+* fixed extension generator (https://github.com/spree/spree/commit/dd8adde75745728894a4b1cf59c7575d7a8e527d)",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/8196595/assets,https://api.github.com/repos/spree/spree/releases/8196595,3-4-stable,https://api.github.com/repos/spree/spree/tarball/v3.4.1,https://github.com/spree/spree/releases/tag/v3.4.1,https://api.github.com/repos/spree/spree/zipball/v3.4.1,v3.4.1,False,False
+8096169,2017-10-12T14:08:27Z,2017-10-12T14:20:15Z,Version 3.4.0,"## Major/New Features
+
+**Spree 3.4** is a smaller release to lay the groundwork for major new features described in [Spree Development Roadmap](https://github.com/spree/spree/milestones?direction=asc&sort=due_date&state=open). It also contains number of bug fixes and improvements besides described in this document.
+
+### Enhanced codebase quality
+
+We've removed tons of unused & deprecated code and on top of that, we've updated RuboCop rules and tidied up the code quality of all Spree modules.
+
+Contributed to [Spark Solutions](https://github.com/spree/spree/issues/8268)
+
+### Enhanced Segment.com integration
+
+We've added [Segment.com integration in Spree 3.3](https://guides.spreecommerce.org/release_notes/spree_3_3_0.html#segmentcom-tracker-integration) but it was still limited. Since then we've put a lot of work to implement tracking of nearly all e-commerce events supported by Segment.com.
+
+Contributed to [Spark Solutions](https://github.com/spree/spree/issues/8264)
+
+### Updated User Documentation
+
+We've updated the entire [User section](https://guides.spreecommerce.org/user/) of [Spree Documentation](https://guides.spreecommerce.org/) also adding new content describing new features like [Store Credits](https://guides.spreecommerce.org/user/configuring_store_credit_categories.html).
+
+This is part of our [Guides 2.0 project](https://github.com/spree/spree/issues/8270)
+
+Contributed by [Spark Solutions](https://github.com/spree/spree/pull/8256)
+
+### Searchable Documentation
+
+Thanks to cooperation with [Algolia DocSearch](https://community.algolia.com/docsearch/) you can easily search the entire [Spree Documentation](https://guides.spreecommerce.org/).
+
+This is part of our [Guides 2.0 project](https://github.com/spree/spree/issues/8270)
+
+Contributed by [Spark Solutions](https://github.com/spree/spree/pull/8300)
+
+### Spree Demo
+
+You can fire up the newest fully functional version of Spree on Heroku with a just one click :)
+
+[Try it out!](https://heroku.com/deploy?template=https://github.com/spree/spree)
+
+Contributed by [Spark Solutions](https://github.com/spree/spree/pull/8266)
+
+### Spree Frontend views exporter
+
+You can easily copy all of the default spree views into your project with just one command line:
+
+```bash
+rails g spree:frontend:copy_views
+```
+
+We hope will make frontend customization easier.
+
+Contributed by [Spark Solutions](https://github.com/spree/spree/issues/8265)
+
+## Upgrade
+
+### Update Gemfile
+
+```ruby
+gem 'spree', '~> 3.4.0'
+gem 'spree_auth_devise', '~> 3.3'
+gem 'spree_gateway', '~> 3.3'
+```
+
+### Update your extensions
+
+We're changing how extensions dependencies work. Previously you had to match extension branch to Spree branch. Starting from Spree 3.2 release `master` branch of all `spree-contrib` extensions should work with Spree >= `3.1` and < `4.0`. Please change your extensions in Gemfile eg.:
+
+from:
+
+```ruby
+gem 'spree_braintree_vzero', github: 'spree-contrib/spree_braintree_vzero', branch: '3-1-stable'
+```
+
+to:
+
+```ruby
+gem 'spree_braintree_vzero', github: 'spree-contrib/spree_braintree_vzero'
+```
+
+### Run `bundle update`
+
+### Install missing migrations
+
+```bash
+rails spree:install:migrations
+rails spree_auth:install:migrations
+rails spree_gateway:install:migrations
+```
+
+### Run migrations
+
+```bash
+rails db:migrate
+```
+
+### Other Gotchas
+
+#### Migrate Spree::Taxon icons to Spree Assets
+
+We changed `Spree::Taxon` icon to use `Spree::Asset` to unify attachment usage across all Spree models. If you were using icon images in `Spree::Taxon` please run this to migrate your icons:
+
+```bash
+rails db:migrate_taxon_icons
+```
+
+
+#### Noteworthy Changes
+
+Also please review each of the noteworthy changes, and ensure your customizations or extensions are not affected. If you are affected by a change and have any of your own tips please submit a PR to help the next person!
+
+## Full Changelog
+
+You can view the full changes using [Github Compare](https://github.com/spree/spree/compare/3-3-stable...3-4-stable).
+
+## Noteworthy Changes
+
+* Moved Admin Panel account menu into Spree core and redesigning it
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8249)
+
+* Better multi store support for Spree frontend (use `current_store` with `last_incomplete_spree_order`)
+
+  [Alexandre Ferraille](https://github.com/spree/spree/pull/8078)
+
+* Added OptionTypes & OptionValues API V1 Documentation
+
+  [Yatindra Rao](https://github.com/spree/spree/pull/8394)
+
+* Removed previously deprecated `Shipment#editable_by?` & `Shipment#send_shipped_email`
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8276)
+
+* Removed previously deprecated `Variant#having_orders` & `Variant#on_backorder`
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8277)
+
+* Removed previously deprecated `DelegateBelongsTo`
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8275)
+
+* Updated `Address#require_phone?` to use `address_requires_phone` preference
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8290)
+
+* Performance optimization - replaced `pluck.sum` and `map.sum` with `sum`
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8283)
+
+* Performance optimization - replaced `.count > 0` with `.exists?`
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8282)
+
+* Removed previously deprecated `Calculator::PercentPerItem`
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8314)
+
+* Removed deprecated `StoreHelper` from frontend
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8316)
+
+* Removed deprecated `TestingSupport::MicroData`
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8315)
+
+* Deprecated `ContentController#show`
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8379)
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/8096169/assets,https://api.github.com/repos/spree/spree/releases/8096169,master,https://api.github.com/repos/spree/spree/tarball/v3.4.0,https://github.com/spree/spree/releases/tag/v3.4.0,https://api.github.com/repos/spree/spree/zipball/v3.4.0,v3.4.0,False,False
+7990710,2017-10-04T09:38:37Z,2017-10-04T09:40:09Z,Version 3.4.0.rc2,For changes please refer to https://github.com/spree/spree/blob/master/guides/content/release_notes/3_4_0.md,https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/7990710/assets,https://api.github.com/repos/spree/spree/releases/7990710,master,https://api.github.com/repos/spree/spree/tarball/v3.4.0.rc2,https://github.com/spree/spree/releases/tag/v3.4.0.rc2,https://api.github.com/repos/spree/spree/zipball/v3.4.0.rc2,v3.4.0.rc2,False,True
+7856372,2017-09-22T14:43:13Z,2017-09-22T15:00:08Z,Version 3.1.10,"### Core 
+
+* fixed: check if database connection exists before executing queries on initialize (https://github.com/spree/spree/pull/8348/commits/e0f9e5922042858043316cfdb9e3b37fc2396b78)",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/7856372/assets,https://api.github.com/repos/spree/spree/releases/7856372,3-1-stable,https://api.github.com/repos/spree/spree/tarball/v3.1.10,https://github.com/spree/spree/releases/tag/v3.1.10,https://api.github.com/repos/spree/spree/zipball/v3.1.10,v3.1.10,False,False
+7851600,2017-09-22T08:37:04Z,2017-09-22T08:38:50Z,Version 3.4.0.rc1,For changes please refer to https://github.com/spree/spree/blob/master/guides/content/release_notes/3_4_0.md,https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/7851600/assets,https://api.github.com/repos/spree/spree/releases/7851600,master,https://api.github.com/repos/spree/spree/tarball/v3.4.0.rc1,https://github.com/spree/spree/releases/tag/v3.4.0.rc1,https://api.github.com/repos/spree/spree/zipball/v3.4.0.rc1,v3.4.0.rc1,False,True
+7707460,2017-09-11T09:36:27Z,2017-09-11T13:22:39Z,Version 3.3.1,"This patch release contains bug fixes backported from master. We'd like to thank all the contributors who made this happen 👍
+
+### All
+
+* Fixed: include fixtures in spree gem builds (3b7a1e795688443ade01104d55e19288042d5d24)
+
+### Core
+* Fixed Override ActiveRecord belongs_to_required_by_default mattr_accessor (b5ee48a8d66b79ae5de568ec57538d63c6cda1ec)
+
+### API
+
+* Fixes #8292 use Rails 5.1.4 to fix distinct issues with Postgres (328ba952e7712e9beda8f954021536f46ee57199)",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/7707460/assets,https://api.github.com/repos/spree/spree/releases/7707460,3-3-stable,https://api.github.com/repos/spree/spree/tarball/v3.3.1,https://github.com/spree/spree/releases/tag/v3.3.1,https://api.github.com/repos/spree/spree/zipball/v3.3.1,v3.3.1,False,False
+7707345,2017-09-11T12:08:29Z,2017-09-11T13:15:01Z,Version 3.2.4,"This release contains numerous bug fixes backported from master. We'd like to thank all the contributors who made this happen 👍
+
+### All
+
+* Fixed: include fixtures in spree gem builds (26c154ee31789a563298e7f23d7bd1d99aa675af)",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/7707345/assets,https://api.github.com/repos/spree/spree/releases/7707345,3-2-stable,https://api.github.com/repos/spree/spree/tarball/v3.2.4,https://github.com/spree/spree/releases/tag/v3.2.4,https://api.github.com/repos/spree/spree/zipball/v3.2.4,v3.2.4,False,False
+7706582,2017-09-11T10:55:03Z,2017-09-11T12:16:36Z,Version 3.1.8,"This patch release contains bug fixes backported from Spree 3.2 and 3.3. We'd like to thank all the contributors who made this happen 👍
+
+### All
+
+* Fixed: include fixtures in spree gem builds  (https://github.com/spree/spree/commit/8993c6be8348c778bf69ad1e5b779b17be8831fd)
+
+### Core
+
+* Updated `kaminari` to `~> 1.0.1` (https://github.com/spree/spree/commit/042d4bccbe366a563c8d346ce69b909e5b8bc325)
+* Loosen `ffaker` dependency to `~> 2.2` (https://github.com/spree/spree/commit/d6ff6a7d36b90bd3714f6477f67a7c5a97c9af6d)
+* Fixed `shipping_methods` association in `Zone` model (155dc6b2dd5508ada4efc1b887016d82ea69521f)
+
+### Admin Panel
+
+* Fixed: reimbursement cancel button exception (b943e2a67097548e5a53e6c659c3ccacd64f738b)
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/7706582/assets,https://api.github.com/repos/spree/spree/releases/7706582,3-1-stable,https://api.github.com/repos/spree/spree/tarball/v3.1.8,https://github.com/spree/spree/releases/tag/v3.1.8,https://api.github.com/repos/spree/spree/zipball/v3.1.8,v3.1.8,False,False
+7475880,2017-08-22T10:23:34Z,2017-08-22T10:56:45Z,Version 3.3.0,"We're super happy to announce **Spree 3.3** release with many new great features & fixes contributed by the Spree Community :tada: :tada: :tada:
+
+## Major/New Features
+
+### Rails 5.1 support
+
+`Spree 3.3` is now compatible with `Rails 5.1` compared to `3.2` which used to run on `Rails 5.0`.
+Thanks to that you can start using all of the [new great features available in Rails 5](http://edgeguides.rubyonrails.org/5_1_release_notes.html)
+
+Contributed by [Josh Powell](https://github.com/joshRpowell) & [Spark Solutions](http://sparksolutions.co) & [John Hawthorn](https://github.com/jhawthorn)
+
+### Ruby 2.4 support
+
+Spree now works with Ruby `2.2` (`>= 2.2.7`), `2.3.x` and `2.4.x`.
+
+Contributed by [Spark Solutions](https://github.com/spree/spree/pull/7934)
+
+### Segment.com tracker integration
+
+We've extended Tracker system to include other trackers besides Google Analytics.
+First of the bunch is [Segment](http://segment.com/) which enables you to
+connect your store with over 200 analytics engines, CRMs, live chats, remarketing platforms,
+A/B systems and much more. Now in Spree out of the box! No additional development required!
+
+Developed during a [Spree hackaton](https://www.facebook.com/sparksolutions.co/posts/496593110678871).
+
+Contributed by [Spark Solutions](https://github.com/spree/spree/pull/8157)
+
+### Preventing duplicate values for number fields
+
+We've added unique indexes and uniqueness validation on `number` field for those models:
+
+* `CustomerReturn`
+* `Order`
+* `Payment`
+* `Reimbursement`
+* `ReturnAuthorization`
+* `Shipment`
+* `StockTransfer`
+
+This change will fix records with duplicate numbers. Migration scripts we're take care of that.
+
+**WARNING** migration process can take considerable amount of time, depending on volume of your data
+
+Contributed by [Spark Solutions](https://github.com/spree/spree/pull/7870)
+
+### Added missing indexes and unique indexes
+
+Besides number fields we've added multiple regular & unique indexes that were missing. This will keep data consistency of your app in check and also will boost it performance.
+
+Contributed by [Spark Solutions](https://github.com/spree/spree/pull/7905)
+
+
+### Add `quantity` to inventory units and split on demand
+
+Optimising Shipments and Inventory Units.
+
+* Creates a single `inventory_unit` per `state`, per `line_item`, per `stock_location` with a `quantity` field indicating inventory units in that state.
+* Adds a `return_quantity` field in `ReturnAuthorization` indicating the number of units to be returned/exchanged.
+* Split inventory unit to extract the portion/quantity that needs to be returned. This might be further split depending upon stock availability at the time of generating return.
+* Changes prioritizer and adjuster to maximise the number of `on_hand` items from available stocks in multiple `stock_locations`
+* Change `splitters/weight.rb` to use **Worst Fit** algo.
+
+Contributed by [Vinsol](https://github.com/spree/spree/pull/7790)
+
+### Better Store Credits management in customer Frontend and Admin Panel
+
+Store credit removal feature on spree front-end for partially paid order (with store credit payments). User can remove its store credit payment if additional payment is required/
+
+Admin user can do the same from Admin Panel.
+
+Contributed by [Vinsol](https://github.com/spree/spree/pull/8026)
+
+## Upgrade
+
+### Update your Rails version to 5.1
+
+Please follow the
+[official Rails guide](http://edgeguides.rubyonrails.org/upgrading_ruby_on_rails.html#upgrading-from-rails-5-0-to-rails-5-1)
+to upgrade your store.
+
+### Update Gemfile
+
+```ruby
+gem 'spree', '~> 3.3.0'
+gem 'spree_auth_devise', '~> 3.3'
+gem 'spree_gateway', '~> 3.3'
+```
+
+### Update your extensions
+
+We're changing how extensions dependencies work. Previously you had to match
+extension branch to Spree branch. Starting from Spree 3.2 release `master` branch of all
+`spree-contrib` extensions should work with Spree >= `3.1` and < `4.0`. Please change
+your extensions in Gemfile eg.:
+
+from:
+
+```ruby
+gem 'spree_braintree_vzero', github: 'spree-contrib/spree_braintree_vzero', branch: '3-1-stable'
+```
+
+to:
+
+```ruby
+gem 'spree_braintree_vzero', github: 'spree-contrib/spree_braintree_vzero'
+```
+
+### Run `bundle update`
+
+### Install missing migrations
+
+```bash
+rails spree:install:migrations
+rails spree_auth:install:migrations
+rails spree_gateway:install:migrations
+```
+
+### Run migrations
+
+```bash
+rails db:migrate
+```
+
+### Other Gotchas
+
+#### Include `UserMethods` in your `User` class
+
+With this release we're not including this automatically. You need to do it manually if you're not using `spree_auth_devise`.
+
+You need to include `Spree::UserMethods` in your user class, eg.
+
+```ruby
+class User
+  include UserAddress
+  include UserMethods
+  include UserPaymentSource
+end
+```
+
+#### Update `aws-sdk` gem to `>= 2.0`
+
+Spree 3.3 comes with paperclip 5.1 support so if you're using Amazon S3 storage you need to change in your Gemfile, from:
+
+
+```ruby
+gem 'aws-sdk', '< 2.0'
+```
+
+to:
+
+```ruby
+gem 'aws-sdk', '>= 2.0'
+```
+
+and run `bundle update aws-sdk`
+
+In your paperclip configuration you also need to specify
+`s3_region` attribute eg. https://github.com/spree/spree/blame/master/guides/content/developer/customization/s3_storage.md#L27
+
+Seel also [RubyThursday episode](https://rubythursday.com/episodes/ruby-snack-27-upgrade-paperclip-and-aws-sdk-in-prep-for-rails-5) walkthrough of upgrading paperclip in your project.
+
+#### Add jquery.validate to your project if you've used it directly from Spree
+
+If your application.js file includes line
+ `//= require jquery.validate/jquery.validate.min`
+you will need to add it this file manually to your project because this library was
+[removed from Spree in favour of native HTML5 validation](https://github.com/spree/spree/pull/8173).
+
+#### Noteworthy Changes
+
+Also please review each of the noteworthy changes, and ensure your customizations
+or extensions are not effected. If you are affected by a change, and have any
+of your own tips please submit a PR to help the next person!
+
+## Full Changelog
+
+You can view the full changes using [Github Compare](https://github.com/spree/spree/compare/3-2-stable...3-3-stable).
+
+## Noteworthy Changes
+
+* Removed `jquery.validate` in favour of HTML5 validation for address on checkout
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8173)
+
+* Remove frontend routes from core, to allow usage without default Spree frontend
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8172)
+
+* Use HTML5 `email_field` on frontend checkout
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8160)
+
+* Frontend views cleanup
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8174)
+
+* `acts_as_list` index starts from 1
+
+  [Sai Ram Kunala](https://github.com/spree/spree/pull/7785) & [Jonathan Kelley](https://github.com/spree/spree/issues/7996)
+
+* API: Remove core dependency on api user db column
+
+  [Viktor Fonic](https://github.com/spree/spree/pull/7912)
+
+* Added missing permission checks in Admin Panel
+
+  [Vinsol](https://github.com/spree/spree/pull/8076)
+
+* Loosen project dependency on `FriendlyId` in Admin Panel and API endpoints
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8072)
+
+* Admin has to confirm clear cache in Admin Panel
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8162)
+
+* Added uniqueness validation added on promotion's code
+
+  [Vinsol](https://github.com/spree/spree/pull/8067)
+
+* Restrict deletion of payment method if associated with payments or credit cards
+
+  [Vinsol](https://github.com/spree/spree/pull/8055)
+
+* Uniqueness validation added on Taxonomy's name and Taxon's permalink
+
+  [Vinsol](https://github.com/spree/spree/pull/8050)
+
+* Admin Panel `field_container` now supports options like content_tag does
+
+  [Fabrizio Monti](https://github.com/spree/spree/pull/8163)
+
+* Simplify `EmailValidator` regexp to align with `Devise.email_regexp`
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8171)
+
+* Schema.org fixes for products microformat data
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8039)
+
+* Allow valid image types to be overridden without deleting validations for `Spree::Image`
+
+  [Tom Chipchase](https://github.com/spree/spree/pull/8176)
+
+* Updated `paperclip` to `~> 5.1.0`
+
+  [Josh Powell](https://github.com/spree/spree/pull/7858)
+
+* Updated `acts-as-taggable-on` to `5.0`
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8015)
+
+* Updated `FriendlyId` to `5.2`
+
+  [Zeke Gabrielse](https://github.com/spree/spree/pull/8005)
+
+* Loosen ActiveMerchant dependency (`~> 1.67`)
+
+  [Justin Grubbs](https://github.com/spree/spree/pull/8081)
+
+* Updated `cancancan` to `2.0`
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8009)
+
+* Updated `jquery-ui-rails` to `6.0.1` & removed unused assets
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8000)
+
+* Removing mutant dependency
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8013)
+
+* Updated `state_machines-activerecord` to `~> 0.5`
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8083)
+
+* Removed previously deprecated `LineItem#invalid_quantity_check`
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8040)
+
+* Removed deprecated automatic `UserMethods` injection
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8031)
+
+* Deprecated `Spree::Calculator::PercentPerItem` & removed `Spree::Calculator::FreeShipping`
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8030)
+
+* Removed minimum length validation on product slug
+
+  [Viktor Fonic](https://github.com/spree/spree/pull/8028)
+
+* Removed `font-awesome-rails` dependency
+
+  [Spark Solutions](https://github.com/spree/spree/pull/7949)
+
+* Deprecate `Shipment#editable_by?` & `Shipment#send_shipped_email`
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8106)
+
+* Deprecate `Variant#having_orders` & `Variant#on_backorder`
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8225)
+
+* Deprecate `DelegateBelongsTo`
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8179)
+
+* Removed unused `jquery.migrate`, `normalize` & `skeleton` assets from Core
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8185)
+
+* Removed `shoulda-matchers` dependency
+
+  [Spark Solutions](https://github.com/spree/spree/pull/8158)
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/7475880/assets,https://api.github.com/repos/spree/spree/releases/7475880,3-3-stable,https://api.github.com/repos/spree/spree/tarball/v3.3.0,https://github.com/spree/spree/releases/tag/v3.3.0,https://api.github.com/repos/spree/spree/zipball/v3.3.0,v3.3.0,False,False
+7440237,2017-08-18T11:06:07Z,2017-08-18T11:53:13Z,Version 3.3.0.rc4,For changes please refer https://github.com/spree/spree/blob/master/guides/content/release_notes/3_3_0.md,https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/7440237/assets,https://api.github.com/repos/spree/spree/releases/7440237,master,https://api.github.com/repos/spree/spree/tarball/v3.3.0.rc4,https://github.com/spree/spree/releases/tag/v3.3.0.rc4,https://api.github.com/repos/spree/spree/zipball/v3.3.0.rc4,v3.3.0.rc4,False,True
+7272068,2017-08-03T14:24:15Z,2017-08-03T14:43:43Z,Version 3.3.0.rc3,For changes please refer https://github.com/spree/spree/blob/master/guides/content/release_notes/3_3_0.md,https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/7272068/assets,https://api.github.com/repos/spree/spree/releases/7272068,master,https://api.github.com/repos/spree/spree/tarball/v3.3.0.rc3,https://github.com/spree/spree/releases/tag/v3.3.0.rc3,https://api.github.com/repos/spree/spree/zipball/v3.3.0.rc3,v3.3.0.rc3,False,True
+7270492,2017-08-03T13:02:02Z,2017-08-03T13:10:25Z,Version 3.1.7,"This patch release contains bug fixes backported from Spree 3.2 and 3.3. We'd like to thank all the contributors who made this happen 👍
+
+### Core
+- loosen `deface` dependency to `~> 1.0` which allows installing deface `1.2` which allows for newer version of nokogiri (eg. `1.7`) containing security fixes (https://github.com/spree/spree/commit/a4cdf4c52e328cc848e68cff6c5a7b1a2b509961)
+- removed redundant code from order model (https://github.com/spree/spree/pull/8139)",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/7270492/assets,https://api.github.com/repos/spree/spree/releases/7270492,3-1-stable,https://api.github.com/repos/spree/spree/tarball/v3.1.7,https://github.com/spree/spree/releases/tag/v3.1.7,https://api.github.com/repos/spree/spree/zipball/v3.1.7,v3.1.7,False,False
+7268761,2017-07-31T13:35:12Z,2017-08-03T10:37:38Z,Version 3.2.3,"This release contains numerous bug fixes backported from master. We'd like to thank all the contributors who made this happen 👍
+
+### Admin Panel
+- Admin has to confirm to clear cache in Admin Panel (https://github.com/spree/spree/commit/17d138142b54ac1ced962632f6581098cbfb263c)
+- Added missing translations keys (https://github.com/spree/spree/commit/e504ce2dc0dee27b797cfccad83d1c971b0dc95c & https://github.com/spree/spree/commit/10f008c6f0e9b60d19c50ba75fcd44906ac3ae7c)
+- user proper association to show error messages in Customer Return form in case of invalid record (https://github.com/spree/spree/commit/14a870a66ef55cd50da6bf9959e16a81bbc88907)
+- At Users index page, show alert message if no result is found (https://github.com/spree/spree/commit/f7a159728c0f997b9db430bc7603a21021bf8ce5)
+- fixed shipment tax issue when a tax category is present on shipment method (https://github.com/spree/spree/commit/ea096ee7c1aa6d7602b5b28cc2ed6f07c4bd773c)
+- show appropriate errors when a stock-movement failed (https://github.com/spree/spree/commit/f65899e6e0d418a9f86b14c08b8c9515f4cdec2b)
+- fixed exception on cancelling Return Authorization (https://github.com/spree/spree/commit/0754678b2ed2c46c31047973be52851ec6e1a24d)
+- fixed Deleting an option value while editing another nullifies the update action (https://github.com/spree/spree/commit/8a42c60ae3cd574425916b853cd5295f538af4b5)
+- show flash message and remove store-credit row from the table on deletion (https://github.com/spree/spree/commit/cb9a785d89f506f96244a8798318061f17194c52)
+- fixed `item.name` in `_create_line_items.html.erb` (https://github.com/spree/spree/commit/d0ed4d3db098b805efaba81a140f0e0f46e2199a)
+
+### Core
+- fixed `ArgumentError: invalid value for BigDecimal(): """"` for Ruby 2.4 support (https://github.com/spree/spree/commit/7b46ba3d7a4de2f010b3171a27170f0213be18af)
+- change default value of included to false in the argument list of `create_adjustment` method (https://github.com/spree/spree/commit/54cf2dd8acede8355c41d91de16d9fd19fdd518c)
+- added missing translations for cancellation email (https://github.com/spree/spree/commit/cfd1fa2ca9565fd56329aed2fddc9e397d2106ff)
+- bumped `state_machines-activerecord` to `0.5` (https://github.com/spree/spree/commit/b39d96fc4e0d99f8a9035ac58656af77ee5401dc)
+- fixed order payment_total is double of total (https://github.com/spree/spree/commit/5f5fa91b7c53d6cb6420fd69779d6ded31ac34e0)
+- fixed `balance_due` payment state after a partial refund (https://github.com/spree/spree/commit/1713bf34246377b1ebb2b2df8ccc1654604bb8af)
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/7268761/assets,https://api.github.com/repos/spree/spree/releases/7268761,3-2-stable,https://api.github.com/repos/spree/spree/tarball/v3.2.3,https://github.com/spree/spree/releases/tag/v3.2.3,https://api.github.com/repos/spree/spree/zipball/v3.2.3,v3.2.3,False,False
+7206434,2017-07-28T11:30:54Z,2017-07-28T12:02:33Z,Version 3.2.2,"This release contains numerous bug fixes backported from master. We'd like to thank all the contributors who made this happen 👍
+
+### All
+- smaller gem size by excluding specs (https://github.com/spree/spree/pull/8096)
+
+### Admin Panel
+- fixed: show promotionable form field of product even if it has variants (https://github.com/spree/spree/commit/4577e1e97f6f5179544cbc27832b1feecd96cc31)
+
+### Admin Panel & Frontend
+- Bump jquery-rails to 4.3 (https://github.com/spree/spree/commit/18bfb1fd87b2a74775be49fb11e10f7557bf241f)",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/7206434/assets,https://api.github.com/repos/spree/spree/releases/7206434,master,https://api.github.com/repos/spree/spree/tarball/v3.2.2,https://github.com/spree/spree/releases/tag/v3.2.2,https://api.github.com/repos/spree/spree/zipball/v3.2.2,v3.2.2,False,False
+7205763,2017-07-28T10:35:29Z,2017-07-28T10:48:05Z,Version 3.3.0.rc2,For changes please refer https://github.com/spree/spree/blob/master/guides/content/release_notes/3_3_0.md,https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/7205763/assets,https://api.github.com/repos/spree/spree/releases/7205763,master,https://api.github.com/repos/spree/spree/tarball/v3.3.0.rc2,https://github.com/spree/spree/releases/tag/v3.3.0.rc2,https://api.github.com/repos/spree/spree/zipball/v3.3.0.rc2,v3.3.0.rc2,False,True
+7203990,2017-07-28T08:25:11Z,2017-07-28T08:46:47Z,Version 3.1.6,"This release contains numerous bug fixes backported from Spree 3.2 and 3.3. We'd like to thank all the contributors who made this happen 👍
+
+### All
+- smaller gem size by excluding specs (https://github.com/spree/spree/pull/8095)
+
+### Admin Panel
+- fixed discontinued on toggle in admin products list (https://github.com/spree/spree/pull/8116)
+- fixed: Properly displays `or` on Taxon edit form in Admin Panel (https://github.com/spree/spree/pull/8140)
+- fixed: show promotionable form field of product even if it has variants (https://github.com/spree/spree/pull/8126)
+- fixed: Backend only Shipping Method not selectable (https://github.com/spree/spree/pull/8120)
+- fixed: hide product tabs for deleted product (https://github.com/spree/spree/pull/8119)
+
+### API
+- RABL pagination fixes (https://github.com/spree/spree/pull/8114)
+- fixed product property api endpoints (https://github.com/spree/spree/pull/8117)
+
+### Core
+- loosen `acts_as_list` dependency to `~> 0.7, >= 0.7.2` (https://github.com/spree/spree/pull/7913)
+- added validation for discontinue_on and available_on in product (https://github.com/spree/spree/pull/8118)
+-  added created_at and updated_at globally to ransack search (https://github.com/spree/spree/pull/8121)
+- fixed: don't destroy dependent associations if we cannot destroy the User (https://github.com/spree/spree/pull/8125)
+
+### Frontend
+- reduces n+1 queries for variant load associated with variant_images (https://github.com/spree/spree/pull/8122)
+- fixed: don't display empty taxonomy trees (https://github.com/spree/spree/pull/8123)",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/7203990/assets,https://api.github.com/repos/spree/spree/releases/7203990,3-1-stable,https://api.github.com/repos/spree/spree/tarball/v3.1.6,https://github.com/spree/spree/releases/tag/v3.1.6,https://api.github.com/repos/spree/spree/zipball/v3.1.6,v3.1.6,False,False
+6901096,2017-07-01T10:42:16Z,2017-07-01T10:43:34Z,Version 3.3.0.rc1,For changes please refer https://github.com/spree/spree/blob/master/guides/content/release_notes/3_3_0.md,https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/6901096/assets,https://api.github.com/repos/spree/spree/releases/6901096,master,https://api.github.com/repos/spree/spree/tarball/v3.3.0.rc1,https://github.com/spree/spree/releases/tag/v3.3.0.rc1,https://api.github.com/repos/spree/spree/zipball/v3.3.0.rc1,v3.3.0.rc1,False,True
+5971256,2017-04-04T13:58:54Z,2017-04-04T14:20:19Z,Version 3.1.5,"This release contains numerous bug fixes backported from master. We'd like to thank all the contributors who made this happen 👍
+
+### Admin Panel
+- add first and last page to pagination in admin (https://github.com/spree/spree/pull/7894)
+
+### API
+- support API -> API V1 redirects when Spree is mounted in a custom route mountpoint (https://github.com/spree/spree/pull/7909) 
+
+### Core
+- fix update order `item_count` on `updater.update` (https://github.com/spree/spree/pull/7907)",https://api.github.com/users/symarys,10439953,symarys,https://api.github.com/repos/spree/spree/releases/5971256/assets,https://api.github.com/repos/spree/spree/releases/5971256,3-1-stable,https://api.github.com/repos/spree/spree/tarball/v3.1.5,https://github.com/spree/spree/releases/tag/v3.1.5,https://api.github.com/repos/spree/spree/zipball/v3.1.5,v3.1.5,False,False
+5971211,2017-04-04T13:59:05Z,2017-04-04T14:17:51Z,Version 3.2.1,"This release contains numerous bug fixes backported from master. We'd like to thank all the contributors who made this happen 👍
+
+### Admin Panel
+- add first and last page to pagination in admin (https://github.com/spree/spree/pull/7893)
+
+### API
+- support API -> API V1 redirects when Spree is mounted in a custom route mountpoint (https://github.com/spree/spree/pull/7896) 
+
+### Core
+- fix update order `item_count` on `updater.update` (https://github.com/spree/spree/pull/7908)",https://api.github.com/users/symarys,10439953,symarys,https://api.github.com/repos/spree/spree/releases/5971211/assets,https://api.github.com/repos/spree/spree/releases/5971211,3-2-stable,https://api.github.com/repos/spree/spree/tarball/v3.2.1,https://github.com/spree/spree/releases/tag/v3.2.1,https://api.github.com/repos/spree/spree/zipball/v3.2.1,v3.2.1,False,False
+5785294,2017-03-17T12:30:55Z,2017-03-17T18:19:37Z,Version 3.2.0,"## Major/New Features
+
+### Rails 5 support
+
+`Spree 3.2` is now compatible with `Rails 5` compared to `3.1` which used to run on `Rails 4.2`.
+Thanks to that you can start using all of the [new great features available in Rails 5](http://edgeguides.rubyonrails.org/5_0_release_notes.html)
+
+Cintributed by [Spark Solutions](http://sparksolutions.co) & [Vinsol](http://vinsol.com) & [John Hawthorn](https://github.com/jhawthorn)
+
+### Products Tagging
+
+You can now tag Products additionally to just using Taxons. Tagging module uses `acts-as-taggable-on` gem. You can easily fetch a list of Products associated to any given tag(s) which should be very helpful for creating new dynamic products listings.
+
+Contributed by [Vishal Zambre](https://github.com/spree/spree/pull/7347)
+
+### Promo code applier on Cart
+
+Discount code applier was brought back to the Cart view in customer frontend. Now enhanced, more user friendly and using API V1.
+
+Contributed by [Vinsol](https://github.com/spree/spree/pull/7684)
+
+### Extended Google Analytics Enhanced Ecommerce integration
+
+Spree now passes more meaningful information into Google Analytics when adding Products to Cart like:
+
+* product category name
+* product brand name
+* variant description
+
+Contributed by [Spark Solutions](https://github.com/spree/spree/pull/7727)
+
+### New Spree open source branding
+
+We've changed logo for default customer frontend and Admin Panel to differentiate
+Spree Open Source project from Spree Commerce (company).
+
+Contributed by [Spark Solutions](https://github.com/spree/spree/pull/7707)
+
+### Lighter and more user-friendly Admin Panel
+
+We've removed a lot of unused, deprecated, outdated code and assets from the Admin Panel,
+overall reducing the codebase by a lot. We've also fixed a huge amount of UX issues
+like missing validation, bad navigation or lack of thereof and so on.
+
+Contributed by [Spark Solutions](https://github.com/spree/spree/pulls?q=is%3Apr+is%3Aclosed+label%3A%22Admin+Panel%22)
+
+### Semantic versioning for future Extensions
+
+We're changing how extensions dependencies work. Previously you had to match
+extension branch to Spree branch. Starting from now `master` branch of all
+generated extensions will work with Spree >= `3.1` and < `4.0`. Thanks to
+that we're dropping versioning of extensions same as Spree and using
+standard [Semantic versioning](http://semver.org/).
+
+Contributed by [Spark Solutions](https://github.com/spree/spree/pull/7747)
+
+### More developer-friendly Extension generator
+
+Extension template used by the generator includes now Travis CI config with
+settings to test extension against Spree 3.1, 3.2 & 3.3 (edge), PostgreSQL,
+MySQL, Ruby 2.2 & 2.3 thanks to [Appraisals gem](https://github.com/thoughtbot/appraisal)
+by thoughtbot.
+
+Contributed by [Spark Solutions](https://github.com/spree/spree/pull/7761)
+
+## Upgrade
+
+### Update your Rails version to 5.0
+
+Please follow the
+[official Rails guide](http://edgeguides.rubyonrails.org/upgrading_ruby_on_rails.html#upgrading-from-rails-4-2-to-rails-5-0)
+to upgrade your store.
+
+### Update Gemfile
+
+```ruby
+gem 'spree', '~> 3.2.0'
+gem 'spree_auth_devise', '~> 3.2.0.beta'
+gem 'spree_gateway', '~> 3.2.0.beta'
+```
+
+### Update your extensions
+
+We're changing how extensions dependencies work. Previously you had to match
+extension branch to Spree branch. Starting from now `master` branch of all
+`spree-contrib` extensions should work with Spree >= `3.1` and < `4.0`. Please change
+your extensions in Gemfile eg.:
+
+from:
+
+```ruby
+gem 'spree_braintree_vzero', github: 'spree-contrib/spree_braintree_vzero', branch: '3-1-stable'
+```
+
+to:
+
+```ruby
+gem 'spree_braintree_vzero', github: 'spree-contrib/spree_braintree_vzero'
+```
+
+### Run `bundle update`
+
+### Install missing migrations
+
+```bash
+rails spree:install:migrations
+rails spree_auth:install:migrations
+rails spree_gateway:install:migrations
+```
+
+### Run migrations
+
+```bash
+rails db:migrate
+```
+
+
+### Other Gotchas
+
+#### Ruby >= 2.2.2 required
+
+As Rails 5 is now a dependency it requires at least Ruby 2.2.2 to run. Ruby 2.3
+is also supported.
+
+#### Noteworthy Changes
+
+Also please review each of the noteworthy changes, and ensure your customizations
+or extensions are not effected. If you are affected by a change, and have any
+of your own tips please submit a PR to help the next person!
+
+## Full Changelog
+
+You can view the full changes using [Github Compare](https://github.com/spree/spree/compare/3-1-stable...master).
+
+## Noteworthy Changes
+
+* Removed previously deprecated Spree CMD installer
+
+    [Spark Solutions](https://github.com/spree/spree/pull/7278)
+
+* Removed unused `Spree::StoreController#apply_coupon_code` action
+
+    [Spark Solutions](https://github.com/spree/spree/pull/7284)
+
+* Removed `Admin::SearchController` and pointed Admin Panel search actions to API endpoints
+
+    [Spark Solutions](https://github.com/spree/spree/pull/7444)
+
+* Removed previously deprecated `Spree::ProductsHelper::line_item_description`
+
+    [Spark Solutions](https://github.com/spree/spree/pull/7283)
+
+* Removed unused method  `Spree::Admin::BaseHelper#attribute_name_for`
+
+    [Spark Solutions](https://github.com/spree/spree/pull/7282)
+
+* Removed unused `Spree::Admin::InventorySettingsHelper`
+
+    [Spark Solutions](https://github.com/spree/spree/pull/7282)
+
+* Removed unused `Spree::Admin::TablesHelper`
+
+    [Spark Solutions](https://github.com/spree/spree/pull/7282)
+
+* Removed unused `Spree::Admin::ProductsHelper`
+
+    [Spark Solutions](https://github.com/spree/spree/pull/7282)
+
+* Removed unused method  `Spree::Admin::NavigationHelper#collapse_sidebar_link`
+
+    [Spark Solutions](https://github.com/spree/spree/pull/7282)
+
+* Removed unused method  `Spree::Admin::NavigationHelper#configurations_menu_item`
+
+    [Spark Solutions](https://github.com/spree/spree/pull/7282)
+
+* Moved `Spree::PromotionRulesHelper` to `Spree::Admin::PromotionRulesHelper`
+
+    [Spark Solutions](https://github.com/spree/spree/pull/7282)
+
+* Fixed permissions for Product associations management in Admin Panel
+
+    [Spark Solutions](https://github.com/spree/spree/pull/7663)
+
+* ActiveMerchant updated to `~> 1.59`
+
+    [Spark Solutions](https://github.com/spree/spree/pull/7616)
+
+* Added `created_at` to Variant model
+
+    [Spark Solutions](https://github.com/spree/spree/pull/7627)
+
+* Additional Admin Panel usability fixes
+
+    [Nimish Gupta](https://github.com/spree/spree/pull/7551, https://github.com/spree/spree/pull/7552. https://github.com/spree/spree/pull/7553)
+
+* Allow order to transit from resumed state to returned state
+
+    [Nimish Gupta](https://github.com/spree/spree/pull/7554)
+
+* Changed `state` translation key in Admin Panel to `status`
+
+    [orbit-dna](https://github.com/spree/spree/pull/7557)
+
+* Fixed API pagination `per_page` and `current_page` values (now always returned as integer)
+
+    [Spark Solutions](https://github.com/spree/spree/pull/7550)
+
+* Display Spree version in Admin Panel
+
+    [Spark Solutions](https://github.com/spree/spree/pull/7685)
+
+    By default, it's displayed only for Admin users who can manage the current Store, but can be disabled altogether by changing preferences:
+
+    ```
+    Spree::Config[:admin_show_version] = false
+    ```
+    in `config/initializers/spree.rb`
+
+* New preferences for Admin Panel `per_page` settings, default value for all of them is now
+  `Kaminari.config.default_per_page` (by default `25`)
+
+  [Spark Solutions](https://github.com/spree/spree/pull/7730)
+
+  * `orders_per_page` renamed to `admin_orders_per_page`
+  * `properties_per_page` renamed to `properties_per_page`
+  * `promotions_per_page` renamed to `admin_promotions_per_page`
+  * `customer_returns_per_page` renamed to `admin_customer_returns_per_page`
+  * added `admin_users_per_page`
+
+* Removed unused `Spree::Admin::UsersController#json_data` method
+
+  [Spark Solutions](https://github.com/spree/spree/pull/7731)
+
+* Added validation errors and other UX fixes for return process in Admin Panel
+
+  [Spark Solutions](https://github.com/spree/spree/pull/7728)
+
+* Added GitGub issue template
+
+  [Josh Powell](https://github.com/spree/spree/pull/7721)
+
+* Added revert and deactivate methods to allow actions to take place when a
+Promotion is removed from the Cart
+
+  [Joe Connor](https://github.com/spree/spree/pull/7705)
+
+* Use `Spree::Money` to display values in Sales Total report
+
+  [Spark Solutions](https://github.com/spree/spree/pull/7702)
+
+* Fixed filtering out Products by `discontinue_on` in Admin Panel products index
+
+  [Joe Swann](https://github.com/spree/spree/pull/7686)
+
+* Allow title separator to be customized
+
+  [Ryan Siddle](https://github.com/spree/spree/pull/7672)
+
+* Additional fixes for Spree mounted in other then default `/` mountpoint
+
+  [Spark Solutions](https://github.com/spree/spree/pull/7725)
+
+* Search for current Order in Frontend using guest token only
+
+  [Björn Andersson](https://github.com/spree/spree/pull/7626)
+
+* Deprecated `Spree::Calculator::FreeShipping`
+
+  [Spark Solutions](https://github.com/spree/spree/pull/7753)
+
+* Added promotion rule for shipping country
+
+  [Spark Solutions](https://github.com/spree/spree/pull/7542)",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/5785294/assets,https://api.github.com/repos/spree/spree/releases/5785294,3-2-stable,https://api.github.com/repos/spree/spree/tarball/v3.2.0,https://github.com/spree/spree/releases/tag/v3.2.0,https://api.github.com/repos/spree/spree/zipball/v3.2.0,v3.2.0,False,False
+5734640,2017-03-14T07:43:37Z,2017-03-14T08:15:07Z,Version 3.1.4,"This release contains numerous bug fixes backported from master. We'd like to thank all the contributors who made this happen 👍
+
+### Admin Panel
+- fixed issue `As an admin I cannot edit guest user addresses in admin/orders` (https://github.com/spree/spree/pull/7834)
+- localized fields for `products/_form.html.erb` to prevent incorrectly parsed decimal values (https://github.com/spree/spree/pull/7714)
+
+### Frontend
+- Search for current order using guest token only (https://github.com/spree/spree/pull/7622)
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/5734640/assets,https://api.github.com/repos/spree/spree/releases/5734640,3-1-stable,https://api.github.com/repos/spree/spree/tarball/v3.1.4,https://github.com/spree/spree/releases/tag/v3.1.4,https://api.github.com/repos/spree/spree/zipball/v3.1.4,v3.1.4,False,False
+5546479,2017-02-22T12:43:09Z,2017-02-23T10:09:42Z,Version 3.2.0.rc3,"For changes please refer https://github.com/spree/spree/blob/master/guides/content/release_notes/3_2_0.md
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/5546479/assets,https://api.github.com/repos/spree/spree/releases/5546479,3-2-stable,https://api.github.com/repos/spree/spree/tarball/v3.2.0.rc3,https://github.com/spree/spree/releases/tag/v3.2.0.rc3,https://api.github.com/repos/spree/spree/zipball/v3.2.0.rc3,v3.2.0.rc3,False,True
+4967395,2016-12-19T18:39:05Z,2016-12-20T11:31:18Z,Version 3.2.0.rc2,"For changes please refer https://github.com/spree/spree/blob/master/guides/content/release_notes/3_2_0.md
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/4967395/assets,https://api.github.com/repos/spree/spree/releases/4967395,3-2-stable,https://api.github.com/repos/spree/spree/tarball/v3.2.0.rc2,https://github.com/spree/spree/releases/tag/v3.2.0.rc2,https://api.github.com/repos/spree/spree/zipball/v3.2.0.rc2,v3.2.0.rc2,False,True
+4854867,2016-12-07T11:04:43Z,2016-12-07T12:27:56Z,Version 3.2.0.rc1,"For changes please refer https://github.com/spree/spree/blob/master/guides/content/release_notes/3_2_0.md
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/4854867/assets,https://api.github.com/repos/spree/spree/releases/4854867,3-2-stable,https://api.github.com/repos/spree/spree/tarball/v3.2.0.rc1,https://github.com/spree/spree/releases/tag/v3.2.0.rc1,https://api.github.com/repos/spree/spree/zipball/v3.2.0.rc1,v3.2.0.rc1,False,True
+4795346,2016-11-30T13:54:21Z,2016-11-30T14:38:48Z,Version 3.1.3,"This release contains numerous bug fixes backported from master. We'd like to thank all the contributors who made this happen 👍
+
+### Admin Panel
+- fixed filtering out Discontinued products (https://github.com/spree/spree/pull/7683)
+- proper page title translations for Promotion Categories (ca5198e8f8f311efaf3ea7fee9d18cf681e923f4)
+- use `Spree::Money` to display values in Sales Total Report (01a61b4e7a2baaf86b6970b6e459caf9a4129c7c)
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/4795346/assets,https://api.github.com/repos/spree/spree/releases/4795346,3-1-stable,https://api.github.com/repos/spree/spree/tarball/v3.1.3,https://github.com/spree/spree/releases/tag/v3.1.3,https://api.github.com/repos/spree/spree/zipball/v3.1.3,v3.1.3,False,False
+4662482,2016-11-15T11:29:00Z,2016-11-15T12:24:05Z,Version 3.1.2,"This release contains numerous **bug** fixes backported from master. We'd like to thank all the contributors who made this happen 👍 
+
+### All
+- fix for new MasterCard CC numbers (https://github.com/spree/spree/pull/7610)
+- ActiveMerchant updated to `~> 1.59` (https://github.com/spree/spree/commit/643552659b150b453fd65dc624a609a789a77cde)
+- fix for registering Abilities without restarting server in development (https://github.com/spree/spree/pull/7660)
+
+### Core
+- fix for creating extensions that target stable branch (https://github.com/spree/spree/pull/7638)
+- fix for migration name clashing (https://github.com/spree/spree/pull/7526, 0767de4d9830157138fda11b8146364f3486a2dd)
+
+### API V1
+- fix for applying promotions with identical coupon code (https://github.com/spree/spree/pull/7591)
+
+### Admin Panel
+- fixed permissions for managing Product associations (https://github.com/spree/spree/pull/7664)
+
+### Frontend
+- only include possible promotions when supported (https://github.com/spree/spree/pull/7590)
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/4662482/assets,https://api.github.com/repos/spree/spree/releases/4662482,3-1-stable,https://api.github.com/repos/spree/spree/tarball/v3.1.2,https://github.com/spree/spree/releases/tag/v3.1.2,https://api.github.com/repos/spree/spree/zipball/v3.1.2,v3.1.2,False,False
+3896053,2016-08-16T10:45:40Z,2016-08-16T10:50:53Z,Version 3.0.10,"This release contains one **bug** and **security** fix backported from `Spree 3.1`. We'd like to thank all the contributors who made this happen 👍 
+
+If you're running `Spree 3.0` it is highly recommended to upgrade.
+
+### Core
+- fix for loading spree locales before decorators (https://github.com/spree/spree/pull/7469)
+
+### Frontend
+- security fix for potential XSS bug with the default spree frontend (https://github.com/spree/spree/pull/7438)
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/3896053/assets,https://api.github.com/repos/spree/spree/releases/3896053,master,https://api.github.com/repos/spree/spree/tarball/v3.0.10,https://github.com/spree/spree/releases/tag/v3.0.10,https://api.github.com/repos/spree/spree/zipball/v3.0.10,v3.0.10,False,False
+3895794,2016-08-16T09:50:55Z,2016-08-16T10:13:23Z,Version 3.1.1,"This release contains numerous **bug** and **security** fixes backported from master. We'd like to thank all the contributors who made this happen 👍 
+
+If you're running `Spree 3.1` it is highly recommended to upgrade.
+
+### All
+- `rails` dependency bumped to `4.2.7.1` for security reasons (https://github.com/spree/spree/pull/7529)
+- improved and more reliable test suite (https://github.com/spree/spree/pull/7525) 
+
+### Core
+- fix for duplicated translation section concerning shipping method validation (https://github.com/spree/spree/pull/7476)
+
+### Frontend
+- security fix for potential XSS bug with the default spree frontend (https://github.com/spree/spree/pull/7438)
+- fix for `restart_checkout_flow` clearing any checkout errors (https://github.com/spree/spree/pull/7454)
+
+### Admin Panel
+- selected sidebar section is automatically open on page load (https://github.com/spree/spree/pull/7524)
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/3895794/assets,https://api.github.com/repos/spree/spree/releases/3895794,master,https://api.github.com/repos/spree/spree/tarball/v3.1.1,https://github.com/spree/spree/releases/tag/v3.1.1,https://api.github.com/repos/spree/spree/zipball/v3.1.1,v3.1.1,False,False
+3451307,2016-06-15T15:54:25Z,2016-06-15T16:09:56Z,Version 3.1.0,"## Major/New Features
+
+### Store Credits support out of the box
+
+Adds Store Credit payment method. Store credit can be granted in Admin Panel by store owners and is frozen after first usage. Store credit behaves like a Credit Card in that once an amount is authorized, it cannot be used elsewhere.
+
+Store Credit can be used by customers on the checkout to pay for the order completely or be combined with other payment methods. In the near future we will work on official Spree Gift Cards extension which will use Store Credit as it's framework.
+
+Contributed by [Jeff Dutil](https://github.com/JDutil), [Peter Berkenbosch](https://github.com/peterberkenbosch), [Michael Lippold](https://github.com/smartacus), [Marc Leglise](https://github.com/mleglise) & [Spark Solutions](http://sparksolutions.co)
+
+### Versioned API
+
+While we've had the ability to version our API we weren't making use of it. Now that we're beginning to write a new API we've added a v1 namespace, and default routing `/api` requests to use `/api/v1`.  The `/api/v2` will be opt-in until we feel it is complete, and have deprecated /api/v1 (likely for Spree 4).
+
+Conitrbuted by [Ben A. Morgan](https://github.com/BenMorganIO)
+
+### Dynamic prices depending on zone for VAT countries
+
+The European Union has come up with new legislation requiring digital products to be taxed using the customer's shipping address. In turn, this means that prices have to be shown depending on the current order's tax zone.
+
+Your order will always use the price for the current tax zone. After the address step in the checkout process, the order will fetch the prices from the Variant again in order to make sure they're correct.
+
+For more information, see the [taxation guide](https://guides.spreecommerce.com/developer/taxation.html).
+
+Conitrbuted by [Martin Meyerhoff](https://github.com/mamhoff)
+
+### Future Discontinue of Products & Variants
+
+Soft deleting means that the records are left in the database but behave as if they are really deleted. Because associations from other objects (like line itmes to variant) won't normally see the deleted, core code is forced (unnaturally) to use scopes like `.with_deleted`
+
+We are fixing this by adding new feilds 'Discontinue On' to products & variants (discontinue_on)
+
+This fixes a design flaw in that in most stores these objects really should not be considered ""deleted.""  The approach proposed solves the underlying flaw and all the related bugs caused by this flaw in the following ways:
+- Migrate the timestamps deleted_at to discontinue_on (when possible), and un-delete the deleted variants (when there is not matching SKU) and products (when there is no matching slug)
+- Redefine scopes Products object (see active, not_discontinued, etc)
+- Removes all references to unscope association chains from other objects to the Product & Variant objects in places where unscope is used explicitly to work-around the default scope problem. (This is a big win because it makes the associations cleaner and easier to work with.)
+- Although it is slightly counter-intuitive, we have left the deleted_at fields in place (although their data will be moved to discontinued_at field and their values will be reset to NULL in the db migration). You can (and should!) use deleting to remove human-error mistakes (real mistakes) before the items get sold in your store, or in the case when you have duplicate slugs (Products) or SKUs (Variants) in your database. In those special cases only, you should continue to use delete. In all other cases, use the new discontinue_on feature.
+- You can only delete a Product or Variant if no orders have been placed for that product/variant. Once the variant is associated with a Line item, it can never be ""deleted,"" and instead you must use the new discontinue_on feature. Model-level checks (before_destroy) enforce this.
+- Note: The DB migration should fix your database correctly unless you have created new Products & Variants with matching slugs/SKUs of deleted records. In this case, you must use the included rake db:fix_orphan_line_items task to clean up your records. Both the schema migration and the script are very pro-active in helping you fix your own database.
+
+Contributed by [Jason Fleetwood-Boldt](https://github.com/jasonfb) & [Spark Solutions](http://sparksolutions.co)
+
+### Fully responsive (RWD) notification emails
+
+Notification emails such as Order Confirmation email or Shipment Confirmation email are now displayed properly on any screen size (mobile, tablet, dektop). User experience of those emails were also improved with clickable products, store logo and so on.
+
+Contributed by [Spark Solutions](http://sparksolutions.co)
+
+### Return Authorizations & Customer Returns Admin Panel screens
+
+The returns index screens provide a listing of returns authorizations and customer returns. So you can browse them more easy instead of accessing them trough an order. You can easily search and filter both Return Authorizations and Customer Returns.
+
+Conitrbuted by [Rein Aris](https://github.com/reinaris) & [VinSol](http://vinsol.com)
+
+### Admin Panel User Experience fixes
+
+We've put a lot of work to make the Admin Panel more user-friendly, this includes among other things:
+- new `breadcrumbs` navigation [#7319](https://github.com/spree/spree/pull/7319)
+- unified and fixed `form validations` [#7306](https://github.com/spree/spree/pull/7306) [#7314](https://github.com/spree/spree/pull/7314)  [#7315](https://github.com/spree/spree/pull/7315)
+- new order's completion date format with time [#7208](https://github.com/spree/spree/pull/7208)
+- `Stock Movement` form moved to the new modern look & feel [#7209](https://github.com/spree/spree/pull/7209)
+- `per_page`, `pagination` & `filtering` fixes for records listings [#6971](https://github.com/spree/spree/pull/6971)
+
+Contributed by [Spark Solutions](http://sparksolutions.co) & [Vinsol](http://vinsol.com)
+
+## Upgrade
+
+### Update Gemfile & Run Migrations
+
+### Other Gotchas
+
+#### Make sure to v1 namespace custom rabl templates & overrides.
+
+If your rabl templates reference others with extend you'll need to add the v1 namespace.
+
+For example:
+
+``` ruby
+extends 'spree/api/zones/show'
+```
+
+Becomes:
+
+``` ruby
+extends 'spree/api/v1/zones/show'
+```
+
+#### Remove Spree::Config.check_for_spree_alerts
+
+If you were disabling the alert checks you'll now want to remove this preference as it's no longer used.
+
+#### Noteworthy Changes
+
+Also please review each of the noteworthy changes, and ensure your customizations or extensions are not effected. If you are affected by a change, and have any of your own tips please submit a PR to help the next person!
+
+## Full Changelog
+
+You can view the full changes using [Github Compare](https://github.com/spree/spree/compare/3-0-stable...3-1-stable).
+
+## Noteworthy Changes
+- API v1 namespace to begin transition to v2.
+  
+  [Ben A. Morgan](https://github.com/spree/spree/pull/6046)
+- Remove all HABTM associations in favour of HMT associations.
+  
+  This removes the `Spree::ShippingMethod::HABTM` error message;
+  Allows users to extend the joins tables since they are now models;
+  And use the [Apartment](https://github.com/influitive/apartment) gem to their hearts content.
+  
+  [Ben A. Morgan](https://github.com/spree/spree/pull/6627) & [VinSol](https://github.com/spree/spree/pull/7034)
+- Removed `Spree::Alert`
+  
+  [Jeff Dutil](https://github.com/spree/spree/pull/6516)
+- Remove automatic payment creation with default credit card
+  
+  [Darby Perez](https://github.com/spree/spree/pull/6601)
+- Allow checkout errors to be displayed when updating customer details
+  
+  [Darby Perez](https://github.com/spree/spree/pull/6604)
+- Add default Refund Reason to `seeds.rb`
+  
+  Creating a Refund will fail if there's no refund reason record in the database. That
+  reason has to have the name set to ""Return processing"" and the mutable flag set to `false`.
+  
+  See https://github.com/spree/spree/blob/master/core/app/models/spree/refund_reason.rb#L5-L10
+  
+    [Martin Meyerhoff](https://github.com/spree/spree/pull/6528)
+- Add a `current_price_options` helper to guide price calculation in the shop
+  
+  When you use dynamic prices (as detailed above), those prices will depend on something (like the tax zon of the current order, or whether your customer is a business customer). These option are set using the new `current_price_options` helper. If your prices depend on something else, overwrite this method and add more key/value pairs to the Hash it returns.
+  
+  Be careful though to also patch the following parts of Spree accordingly:
+  - `Spree::VatPriceCalculation#gross_amount`
+  - `Spree::LineItem#update_price`
+  - `Spree::Stock::Estimator#taxation_options_for`
+  - Subclass the `DefaultTax` calculator
+    
+    [Martin Meyerhoff](https://github.com/spree/spree/pull/6662)
+- Added `Spree.admin_path` option for a dynamic admin path; making automated 'script' attacks on the backend more difficult.
+  
+  You can simply configure the option by assigning the path in your Spree initializer:
+  
+  ``` ruby
+  Spree.admin_path = ""/my-secret-backend""
+  ```
+  
+  NOTE: Plugins are not converted and still use the default /admin path. But these plugins can be
+  changed easily by adding the `path: Spree.admin_path` option in the routes.
+  
+    [Rick Blommers](https://github.com/spree/spree/pull/6739) & [VinSol](https://github.com/spree/spree/pull/7065)
+- Changed to Use Time.current instead of Time.now
+  
+  Rails uses config.time_zone to set time zone for the application, but Time.now uses server time zone instead
+  of using set config.time_zone. So, in order to use application time zone we need to use Time.current/Time.zone.now.
+  
+  [Abhishek Jain](https://github.com/spree/spree/pull/6761)
+- Removed `Order#has_available_shipment`, which was unnecessary since it always returned nil
+  
+  [VinSol](https://github.com/spree/spree/pull/7007)
+- (OOS) Out of Stock Product page: better handling of cart form user experience
+  
+  [Spark Solutions](https://github.com/spree/spree/pull/6970)
+- Spree Command Installer won't lock you to a specific Spree patch version, we'll produce eg. `gem 'spree', '~> 3.1.0'` for easier updating
+  
+  [Spark Solutions](https://github.com/spree/spree/pull/7018)
+- Spree Auth Devise & Spree Gateway available from RubyGems
+  
+  [Spark Solutions](https://github.com/spree/spree/pull/7047)
+- Added `/forbidden` path
+  
+  [Faruk Aydin & Spark Solutions](https://github.com/spree/spree/pull/6991)
+- Changed `before_filter` to `before_action`
+  
+  [VinSol](https://github.com/spree/spree/pull/7114)
+- Additional database indexes for better performance
+  
+  [Spark Solutions](https://github.com/spree/spree/pull/7098)
+- Removed `Order#shipping_method_id` column
+  
+  [VinSol](https://github.com/spree/spree/pull/6966)
+- Added `OrderContents#remove_line_item` method
+  
+  [wuboy0307](https://github.com/spree/spree/pull/6934)
+- Ensure that Order#guest_token is unique
+  
+  [Spark Solutions](https://github.com/spree/spree/pull/7184)
+- Added missing views for image, option_type, option_value API controllers
+  
+  [Alex B.](https://github.com/spree/spree/pull/7159)
+- Renamed `Order#update!` to `update_with_updater!` as it conflicts with rails `update!` method, also deprecate current update! method
+  
+  [VinSol](https://github.com/spree/spree/pull/7144)
+- Removed `Calculator#register` method
+  
+  [VinSol](https://github.com/spree/spree/pull/7001)
+- Added HTML5 Product Microdata information
+  
+  [Rehan Jaffer](https://github.com/spree/spree/pull/6986)
+- Moved user class extensions to a module
+  
+  [Alessandro Lepore](https://github.com/spree/spree/pull/6740)
+- Added caching for default store and current tracker
+  
+  [wuboy0307](https://github.com/spree/spree/pull/6671) & [Spark Solutions](https://github.com/spree/spree/pull/7223)
+- Added `destroy` functionality to `refund_reason` and `return_authorization_reason`
+  
+  [VinSol](https://github.com/spree/spree/pull/7049)
+- Deprecated `Spree::Validations::DbMaximumLengthValidator`, added `DbMaximumLengthValidator` instead
+  
+  [VinSol](https://github.com/spree/spree/pull/7062)
+- Deprecated Spree CMD installer in favour of standard gem-like installation process
+  
+  [Spark Solutions](https://github.com/spree/spree/pull/7263)
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/3451307/assets,https://api.github.com/repos/spree/spree/releases/3451307,3-1-stable,https://api.github.com/repos/spree/spree/tarball/v3.1.0,https://github.com/spree/spree/releases/tag/v3.1.0,https://api.github.com/repos/spree/spree/zipball/v3.1.0,v3.1.0,False,False
+3431668,2016-06-13T13:15:55Z,2016-06-13T13:19:52Z,Version 3.1.0.rc4,,https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/3431668/assets,https://api.github.com/repos/spree/spree/releases/3431668,3-1-stable,https://api.github.com/repos/spree/spree/tarball/v3.1.0.rc4,https://github.com/spree/spree/releases/tag/v3.1.0.rc4,https://api.github.com/repos/spree/spree/zipball/v3.1.0.rc4,v3.1.0.rc4,False,True
+3209871,2016-05-12T09:18:09Z,2016-05-12T09:52:46Z,Version 3.0.9,"This release contains numerous fixes backported from master. We'd like to thank all the contributors who made this happen.
+- Upgrade paperclip dependency to fix security issue (https://github.com/spree/spree/commit/e6c0d581cd74b3fc29c4419b133193328cdf986f)
+- Locking acts_as_lists at 0.7.2, 0.7.3 is broken (https://github.com/spree/spree/commit/e2859d6749f2e0a7e711b17dd9cd69a33d1a439a)
+- fix error in creating extension using spree command, fixes #7237 (https://github.com/spree/spree/commit/d2cc6d4c1f119279cf638eb87ccfe1615ecc899a)
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/3209871/assets,https://api.github.com/repos/spree/spree/releases/3209871,3-0-stable,https://api.github.com/repos/spree/spree/tarball/v3.0.9,https://github.com/spree/spree/releases/tag/v3.0.9,https://api.github.com/repos/spree/spree/zipball/v3.0.9,v3.0.9,False,False
+3209487,2016-05-12T08:38:55Z,2016-05-12T08:58:43Z,Version 3.1.0.rc3,,https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/3209487/assets,https://api.github.com/repos/spree/spree/releases/3209487,3-1-stable,https://api.github.com/repos/spree/spree/tarball/v3.1.0.rc3,https://github.com/spree/spree/releases/tag/v3.1.0.rc3,https://api.github.com/repos/spree/spree/zipball/v3.1.0.rc3,v3.1.0.rc3,False,True
+3164684,2016-05-12T08:38:55Z,2016-05-05T13:22:48Z,Version 3.1.0.rc2,"For changes please refer https://github.com/spree/spree/blob/master/guides/content/release_notes/3_1_0.md and https://github.com/spree/spree/pull/7324
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/3164684/assets,https://api.github.com/repos/spree/spree/releases/3164684,3-1-stable,https://api.github.com/repos/spree/spree/tarball/v3.1.0.rc2,https://github.com/spree/spree/releases/tag/v3.1.0.rc2,https://api.github.com/repos/spree/spree/zipball/v3.1.0.rc2,v3.1.0.rc2,False,True
+2954583,2016-04-05T11:25:07Z,2016-04-05T12:31:09Z,Version 3.1.0.rc1,"For changes please refer https://github.com/spree/spree/blob/master/guides/content/release_notes/3_1_0.md
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/2954583/assets,https://api.github.com/repos/spree/spree/releases/2954583,3-1-stable,https://api.github.com/repos/spree/spree/tarball/v3.1.0.rc1,https://github.com/spree/spree/releases/tag/v3.1.0.rc1,https://api.github.com/repos/spree/spree/zipball/v3.1.0.rc1,v3.1.0.rc1,False,True
+2821488,2016-03-16T08:35:59Z,2016-03-16T08:54:41Z,Version 3.0.8,"This release contains numerous fixes backported from master.  We'd like to thank all the contributors who made this happen. 
+
+### All
+- support for `sprockets-rails` 3.x https://github.com/spree/spree/commit/5546b0b19043d393f04b7eb6820978ced5bba1a5
+
+### Core
+- `SPREE_VERSION` removed https://github.com/spree/spree/commit/762a2e157a30c673a54c7c9b730251833c234e0b
+- CI build fixes https://github.com/spree/spree/commit/78b35fc64fba6cb386554385b85e1a0f5482748a 
+- gemspecs cleanup https://github.com/spree/spree/commit/762a2e157a30c673a54c7c9b730251833c234e0b
+- fixes for extension generator https://github.com/spree/spree/commit/e492c7ec75e0c14d0d68474f199ef0094a193cd9 https://github.com/spree/spree/commit/c955f1bb9bb5116a84c401d5b8da8b98efe9c7e7 https://github.com/spree/spree/commit/e28a20128ead1ac6f3f8f075486320371753ab2e
+- generated files by installer use the new ruby syntax https://github.com/spree/spree/commit/8a78019ba7acddc53b58686b5b5003fc78106e2f
+- `rspec-rails` upgraded to 3.4.2 https://github.com/spree/spree/commit/f53a0046710588419879d01f6b808023a86430a0
+- `state-machines` warning removed https://github.com/spree/spree/commit/7cca4c0e50f2521e44ae17771ddcfc5fe3a204bc
+- installer fixes https://github.com/spree/spree/commit/ba3472f48af0bf7ba678b840bcb3415497614440 https://github.com/spree/spree/commit/5acaf0fefa062382436261f5a4a2c2d4943bfcd9
+
+### Frontend
+- fix for bug that could lead to duplicate guest tokens https://github.com/spree/spree/commit/bc0c3679fb137394c59cfe5651ffe561ee2e4722 (thanks @charlie-hadden for reporting!)
+
+### Backend
+- payment methods form fixes https://github.com/spree/spree/commit/b8cb2e543251d0bc56b6b150a9f43b016672ff7d
+- closable alerts https://github.com/spree/spree/commit/aace151942406ea06dd1d9e3d43464d74699e4e8
+- test suite fixes https://github.com/spree/spree/commit/bd1b8b48e0e6532ba63f0290e4d7f02ab80510a5
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/2821488/assets,https://api.github.com/repos/spree/spree/releases/2821488,3-0-stable,https://api.github.com/repos/spree/spree/tarball/v3.0.8,https://github.com/spree/spree/releases/tag/v3.0.8,https://api.github.com/repos/spree/spree/zipball/v3.0.8,v3.0.8,False,False
+2672297,2016-02-23T17:11:55Z,2016-02-23T17:14:35Z,Version 3.0.7,"Security fix release - for changes refer https://github.com/spree/spree/pull/7107 
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/2672297/assets,https://api.github.com/repos/spree/spree/releases/2672297,3-0-stable,https://api.github.com/repos/spree/spree/tarball/v3.0.7,https://github.com/spree/spree/releases/tag/v3.0.7,https://api.github.com/repos/spree/spree/zipball/v3.0.7,v3.0.7,False,False
+2639870,2016-02-18T12:52:36Z,2016-02-18T12:53:53Z,Version 3.0.6.1,"This release fixes installer problems caused by 3.0.6
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/2639870/assets,https://api.github.com/repos/spree/spree/releases/2639870,3-0-stable,https://api.github.com/repos/spree/spree/tarball/v3.0.6.1,https://github.com/spree/spree/releases/tag/v3.0.6.1,https://api.github.com/repos/spree/spree/zipball/v3.0.6.1,v3.0.6.1,False,False
+2639079,2016-02-16T16:55:35Z,2016-02-18T10:36:23Z,Version 3.0.6,"This release contains numerous fixes backported from master.  We'd like to thank all the contributors who made this happen. 
+
+### Core
+- using spree command installer won't lock you to a specific Spree version, it will always add it to gemfile such as `~> 3.0.6`
+- [spree_auth_devise](https://github.com/spree/spree_auth_devise) and [spree_gateway](https://github.com/spree/spree_gateway) are both available from RubyGems now, no need to pull them from GitHub
+- all gems are tested against Ruby 2.2 on CI
+- [shoulda matchers](https://github.com/thoughtbot/shoulda-matchers) added to project
+- rubocop fixes
+- bugfixes, performance optimizations
+- numerous documentation fixes & updates
+
+### Backend
+- per page drop-down fixes https://github.com/spree/spree/issues/6888
+- jquery-rails updated to 4.1
+- products sub-menu active state fix https://github.com/spree/spree/commit/d27a67a578e4ce077e3543aa7947e4820bc1ca1f
+
+### Frontend
+- jquery-rails updated to 4.1
+- bootstrap-sass updated
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/2639079/assets,https://api.github.com/repos/spree/spree/releases/2639079,3-0-stable,https://api.github.com/repos/spree/spree/tarball/v3.0.6,https://github.com/spree/spree/releases/tag/v3.0.6,https://api.github.com/repos/spree/spree/zipball/v3.0.6,v3.0.6,False,False
+2508730,2016-01-28T13:54:13Z,2016-01-28T14:05:50Z,Version 3.0.5,"1. This is a minor release containing dependency fixes, specs fixes, some backend UI fixes
+2. Removes Spree::Alert
+
+Thanks to all contributors! Spree is back :)
+",https://api.github.com/users/damianlegawiec,55154,damianlegawiec,https://api.github.com/repos/spree/spree/releases/2508730/assets,https://api.github.com/repos/spree/spree/releases/2508730,3-0-stable,https://api.github.com/repos/spree/spree/tarball/v3.0.5,https://github.com/spree/spree/releases/tag/v3.0.5,https://api.github.com/repos/spree/spree/zipball/v3.0.5,v3.0.5,False,False
+1695220,2015-08-19T17:38:21Z,2015-08-19T18:50:36Z,Version 3.0.4,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1695220/assets,https://api.github.com/repos/spree/spree/releases/1695220,master,https://api.github.com/repos/spree/spree/tarball/v3.0.4,https://github.com/spree/spree/releases/tag/v3.0.4,https://api.github.com/repos/spree/spree/zipball/v3.0.4,v3.0.4,False,False
+1695216,2015-08-19T17:32:44Z,2015-08-19T18:50:26Z,Version 2.4.10,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1695216/assets,https://api.github.com/repos/spree/spree/releases/1695216,master,https://api.github.com/repos/spree/spree/tarball/v2.4.10,https://github.com/spree/spree/releases/tag/v2.4.10,https://api.github.com/repos/spree/spree/zipball/v2.4.10,v2.4.10,False,False
+1695215,2015-08-19T17:18:26Z,2015-08-19T18:50:16Z,Version 2.3.13,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1695215/assets,https://api.github.com/repos/spree/spree/releases/1695215,master,https://api.github.com/repos/spree/spree/tarball/v2.3.13,https://github.com/spree/spree/releases/tag/v2.3.13,https://api.github.com/repos/spree/spree/zipball/v2.3.13,v2.3.13,False,False
+1695213,2015-08-19T17:05:00Z,2015-08-19T18:50:04Z,Version 2.2.14,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1695213/assets,https://api.github.com/repos/spree/spree/releases/1695213,master,https://api.github.com/repos/spree/spree/tarball/v2.2.14,https://github.com/spree/spree/releases/tag/v2.2.14,https://api.github.com/repos/spree/spree/zipball/v2.2.14,v2.2.14,False,False
+1561675,2015-07-20T19:56:38Z,2015-07-20T20:04:28Z,Version 3.0.2,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1561675/assets,https://api.github.com/repos/spree/spree/releases/1561675,master,https://api.github.com/repos/spree/spree/tarball/v3.0.2,https://github.com/spree/spree/releases/tag/v3.0.2,https://api.github.com/repos/spree/spree/zipball/v3.0.2,v3.0.2,False,False
+1561672,2015-07-20T19:44:17Z,2015-07-20T20:04:19Z,Version 2.4.8,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1561672/assets,https://api.github.com/repos/spree/spree/releases/1561672,master,https://api.github.com/repos/spree/spree/tarball/v2.4.8,https://github.com/spree/spree/releases/tag/v2.4.8,https://api.github.com/repos/spree/spree/zipball/v2.4.8,v2.4.8,False,False
+1561671,2015-07-20T19:33:05Z,2015-07-20T20:04:07Z,Version 2.3.11,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1561671/assets,https://api.github.com/repos/spree/spree/releases/1561671,master,https://api.github.com/repos/spree/spree/tarball/v2.3.11,https://github.com/spree/spree/releases/tag/v2.3.11,https://api.github.com/repos/spree/spree/zipball/v2.3.11,v2.3.11,False,False
+1561670,2015-07-20T19:19:49Z,2015-07-20T20:03:50Z,Version 2.2.12,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1561670/assets,https://api.github.com/repos/spree/spree/releases/1561670,master,https://api.github.com/repos/spree/spree/tarball/v2.2.12,https://github.com/spree/spree/releases/tag/v2.2.12,https://api.github.com/repos/spree/spree/zipball/v2.2.12,v2.2.12,False,False
+1260067,2015-05-05T17:49:24Z,2015-05-05T17:58:04Z,Version 3.0.1,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1260067/assets,https://api.github.com/repos/spree/spree/releases/1260067,master,https://api.github.com/repos/spree/spree/tarball/v3.0.1,https://github.com/spree/spree/releases/tag/v3.0.1,https://api.github.com/repos/spree/spree/zipball/v3.0.1,v3.0.1,False,False
+1260065,2015-05-05T17:39:41Z,2015-05-05T17:57:49Z,Version 2.4.7,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1260065/assets,https://api.github.com/repos/spree/spree/releases/1260065,master,https://api.github.com/repos/spree/spree/tarball/v2.4.7,https://github.com/spree/spree/releases/tag/v2.4.7,https://api.github.com/repos/spree/spree/zipball/v2.4.7,v2.4.7,False,False
+1260064,2015-05-05T17:09:24Z,2015-05-05T17:57:30Z,Version 2.3.10,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1260064/assets,https://api.github.com/repos/spree/spree/releases/1260064,master,https://api.github.com/repos/spree/spree/tarball/v2.3.10,https://github.com/spree/spree/releases/tag/v2.3.10,https://api.github.com/repos/spree/spree/zipball/v2.3.10,v2.3.10,False,False
+1035402,2015-03-10T18:53:29Z,2015-03-10T19:35:10Z,Version 3.0.0,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1035402/assets,https://api.github.com/repos/spree/spree/releases/1035402,master,https://api.github.com/repos/spree/spree/tarball/v3.0.0,https://github.com/spree/spree/releases/tag/v3.0.0,https://api.github.com/repos/spree/spree/zipball/v3.0.0,v3.0.0,False,False
+1035154,2015-03-10T18:06:46Z,2015-03-10T18:27:23Z,Version 2.4.6,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1035154/assets,https://api.github.com/repos/spree/spree/releases/1035154,master,https://api.github.com/repos/spree/spree/tarball/v2.4.6,https://github.com/spree/spree/releases/tag/v2.4.6,https://api.github.com/repos/spree/spree/zipball/v2.4.6,v2.4.6,False,False
+1035076,2015-03-10T17:56:40Z,2015-03-10T18:06:16Z,Version 2.3.9,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1035076/assets,https://api.github.com/repos/spree/spree/releases/1035076,master,https://api.github.com/repos/spree/spree/tarball/v2.3.9,https://github.com/spree/spree/releases/tag/v2.3.9,https://api.github.com/repos/spree/spree/zipball/v2.3.9,v2.3.9,False,False
+1035030,2015-03-10T17:34:34Z,2015-03-10T17:55:50Z,Version 2.2.11,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1035030/assets,https://api.github.com/repos/spree/spree/releases/1035030,master,https://api.github.com/repos/spree/spree/tarball/v2.2.11,https://github.com/spree/spree/releases/tag/v2.2.11,https://api.github.com/repos/spree/spree/zipball/v2.2.11,v2.2.11,False,False
+1008862,2015-03-03T17:25:17Z,2015-03-03T18:14:33Z,Version 2.2.10,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1008862/assets,https://api.github.com/repos/spree/spree/releases/1008862,master,https://api.github.com/repos/spree/spree/tarball/v2.2.10,https://github.com/spree/spree/releases/tag/v2.2.10,https://api.github.com/repos/spree/spree/zipball/v2.2.10,v2.2.10,False,False
+1008861,2015-03-03T17:17:32Z,2015-03-03T18:14:08Z,Version 2.3.8,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1008861/assets,https://api.github.com/repos/spree/spree/releases/1008861,master,https://api.github.com/repos/spree/spree/tarball/v2.3.8,https://github.com/spree/spree/releases/tag/v2.3.8,https://api.github.com/repos/spree/spree/zipball/v2.3.8,v2.3.8,False,False
+1008723,2015-03-03T17:01:09Z,2015-03-03T17:39:50Z,Version 2.4.5,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1008723/assets,https://api.github.com/repos/spree/spree/releases/1008723,master,https://api.github.com/repos/spree/spree/tarball/v2.4.5,https://github.com/spree/spree/releases/tag/v2.4.5,https://api.github.com/repos/spree/spree/zipball/v2.4.5,v2.4.5,False,False
+1008721,2015-03-03T16:40:19Z,2015-03-03T17:39:21Z,Version 3.0.0.rc4,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/1008721/assets,https://api.github.com/repos/spree/spree/releases/1008721,master,https://api.github.com/repos/spree/spree/tarball/v3.0.0.rc4,https://github.com/spree/spree/releases/tag/v3.0.0.rc4,https://api.github.com/repos/spree/spree/zipball/v3.0.0.rc4,v3.0.0.rc4,False,True
+917533,2015-02-04T18:43:31Z,2015-02-04T18:48:53Z,Version 3.0.0.rc1,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/917533/assets,https://api.github.com/repos/spree/spree/releases/917533,master,https://api.github.com/repos/spree/spree/tarball/v3.0.0.rc1,https://github.com/spree/spree/releases/tag/v3.0.0.rc1,https://api.github.com/repos/spree/spree/zipball/v3.0.0.rc1,v3.0.0.rc1,False,True
+917531,2015-02-04T01:19:23Z,2015-02-04T18:48:29Z,Version 2.4.3,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/917531/assets,https://api.github.com/repos/spree/spree/releases/917531,master,https://api.github.com/repos/spree/spree/tarball/v2.4.3,https://github.com/spree/spree/releases/tag/v2.4.3,https://api.github.com/repos/spree/spree/zipball/v2.4.3,v2.4.3,False,False
+805616,2014-12-23T14:49:38Z,2014-12-23T15:31:49Z,Version 2.1.12,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/805616/assets,https://api.github.com/repos/spree/spree/releases/805616,master,https://api.github.com/repos/spree/spree/tarball/v2.1.12,https://github.com/spree/spree/releases/tag/v2.1.12,https://api.github.com/repos/spree/spree/zipball/v2.1.12,v2.1.12,False,False
+805613,2014-12-23T15:11:08Z,2014-12-23T15:31:18Z,Version 2.2.9,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/805613/assets,https://api.github.com/repos/spree/spree/releases/805613,master,https://api.github.com/repos/spree/spree/tarball/v2.2.9,https://github.com/spree/spree/releases/tag/v2.2.9,https://api.github.com/repos/spree/spree/zipball/v2.2.9,v2.2.9,False,False
+759417,2014-12-05T14:47:42Z,2014-12-05T17:23:09Z,Version 2.1.11,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/759417/assets,https://api.github.com/repos/spree/spree/releases/759417,master,https://api.github.com/repos/spree/spree/tarball/v2.1.11,https://github.com/spree/spree/releases/tag/v2.1.11,https://api.github.com/repos/spree/spree/zipball/v2.1.11,v2.1.11,False,False
+759415,2014-12-05T15:33:09Z,2014-12-05T17:22:45Z,Version 2.2.8,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/759415/assets,https://api.github.com/repos/spree/spree/releases/759415,master,https://api.github.com/repos/spree/spree/tarball/v.2.2.8,https://github.com/spree/spree/releases/tag/v.2.2.8,https://api.github.com/repos/spree/spree/zipball/v.2.2.8,v.2.2.8,False,False
+759413,2014-12-05T15:59:22Z,2014-12-05T17:22:26Z,Version 2.3.6,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/759413/assets,https://api.github.com/repos/spree/spree/releases/759413,master,https://api.github.com/repos/spree/spree/tarball/v2.3.6,https://github.com/spree/spree/releases/tag/v2.3.6,https://api.github.com/repos/spree/spree/zipball/v2.3.6,v2.3.6,False,False
+759410,2014-12-05T16:14:37Z,2014-12-05T17:21:46Z,Version 2.4.2,,https://api.github.com/users/JDutil,25104,JDutil,https://api.github.com/repos/spree/spree/releases/759410/assets,https://api.github.com/repos/spree/spree/releases/759410,master,https://api.github.com/repos/spree/spree/tarball/v2.4.2,https://github.com/spree/spree/releases/tag/v2.4.2,https://api.github.com/repos/spree/spree/zipball/v2.4.2,v2.4.2,False,False
+403836,2014-07-01T00:44:58Z,2014-07-01T04:40:14Z,Version 2.2.3 ,"For the changes included in this release please refer to the [Compare View](https://github.com/spree/spree/compare/v2.2.2...v2.2.3).
+",https://api.github.com/users/radar,2687,radar,https://api.github.com/repos/spree/spree/releases/403836/assets,https://api.github.com/repos/spree/spree/releases/403836,master,https://api.github.com/repos/spree/spree/tarball/v2.2.3,https://github.com/spree/spree/releases/tag/v2.2.3,https://api.github.com/repos/spree/spree/zipball/v2.2.3,v2.2.3,False,False
+403819,2014-06-30T23:51:45Z,2014-07-01T00:12:02Z,Version 2.3.0,"Spree 2.3.0 is the next major version of Spree. The main features of this release are:
+- Rails 4.1 support
+- Preferences are serialised on records, rather than fetched from another table
+- Better multi-store support by adding a `Spree::Store` model.
+- Users are tracked using a permanent cookie, allowing for orders made as a guest to be tracked with orders made while signed in.
+
+## Core
+-   Drop first_name and last_name fields from spree_credit_cards.  Add
+  first_name & last_name methods for now to keep ActiveMerchant happy.
+  
+  Jordan Brough
+-   Replaced cookies.signed[:order_id] with cookies.signed[:guest_token].
+  
+  Now we are using a signed cookie to store the guests unique token
+  in the browser.  This allows customers who close their browser to
+  continue their shopping when they visit again.  More importantly
+  it allows you as a store owner to uniquely identify your guests orders.
+  Since we set cookies.signed[:guest_token] whenever a vistor comes
+  you may also use this cookie token on other objects than just orders.
+  For instance if a guest user wants to favorite a product you can
+  assign the cookies.signed[:guest_token] value to a token field on your
+  favorites model.  Which will then allow you to analyze the orders and
+  favorites this user has placed before which is useful for recommendations.
+  
+  Jeff Dutil
+-   Order#token is no longer fetched from another table.
+  
+  Both Spree::Core::TokeResource and Spree::TokenizedPersmission are deprecated.
+  Order#token value is now persisted into spree_orders.guest_token. Main motivation
+  here is save a few extra queries when creating an order. The TokenResource
+  module was being of no use in spree core.
+  
+  NOTE: Watch out for the possible expensive migration that come along with this
+  
+  Washington L Braga Jr
+-   Replaced session[:order_id] usage with cookies.signed[:order_id].
+  
+  Now we are using a signed cookie to store the order id on a guests
+  browser client.  This allows customers who close their browser to
+  continue their shopping when they visit again.
+  Fixes #4319
+  
+  Jeff Dutil
+-   Order#process_payments! no longer raises. Gateways must raise on failing authorizations.
+  
+  Now it's a Gateway or PaymentMethod responsability to raise a custom
+  exception any time an authorization fails so that it can be rescued
+  during checkout and proper action taken.
+-   Assign request headers env to Payment when creating it via checkout.
+  
+  This might come in handy for some gateways, e.g. Adyen, actions that require
+  data such as user agent and accept header to create user profiles. Previously
+  we had no way to access the request headers from within a gateway class
+-   More accurate and simpler Order#payment_state options.
+  
+  Balance Due. Paid. Credit Owed. Failed. These are the only possible values
+  for order payment_state now. The previous `pending` state has been dropped
+  and order updater logic greatly improved as it now mostly consider total
+  values rather than doing last payment state checks.
+  
+  Huge thanks to dan-ding. See https://github.com/spree/spree/issues/4605
+-   Config settings related to mail have been removed. This includes
+  `enable_mail_delivery`, `mail_bcc`, `intercept_email`,
+  `override_actionmailer_config`, `mail_host`, `mail_domain`, `mail_port`,
+  `secure_connection_type`, `mail_auth_type`, `smtp_username`, and
+  `smtp_password`.
+  
+  These should instead be [configured on actionmailer directly](http://api.rubyonrails.org/classes/ActionMailer/Base.html#class-ActionMailer::Base-label-Configuration+options).
+  The existing functionality can also be used by including the [spree_mail_settings](https://github.com/spree-contrib/spree_mail_settings) gem.
+  
+  John Hawthorn
+-   refactor the api to use a general importer in `lib/spree/importer/order.rb`
+  
+  Peter Berkenbosch
+-   Ensure transition to payment processing state happens outside transaction.
+  
+  Chris Salzberg
+-   Increase the precision of the amount/price columns in order for support other currencies. See https://github.com/spree/spree/issues/4657
+  
+  Gonzalo Moreno
+-   Preferences on models are now stored in a serialized `preferences` column instead of the `Spree::Preferences` table.
+  
+  `Spree::Preferences` are still used for configuration (like `Spree::Config`).
+  For models with preferences (`Calculator`, `PromotionRule`, and
+  `PaymentMethod` in spree core) they are now serialized using
+  `ActiveRecord::Base.serialize`, storing the preferences as YAML in the
+  `preferences` column.
+  
+  ```
+  > c = Spree::Calculator.first
+  => #<Spree::Calculator::Shipping::FlatRate id: 1, type: ""Spree::Calculator::Shipping::FlatRate"",
+  calculable_id: 1, calculable_type: ""Spree::ShippingMethod"", created_at: ""2014-06-29 21:56:59"",
+  updated_at: ""2014-06-29 21:57:00"", preferences: {:amount=>5, :currency=>""USD""}>
+  > c.preferred_amount
+  => 5
+  > c.preferred_amount = 10
+  => 10
+  > c
+  => #<Spree::Calculator::Shipping::FlatRate id: 1, type: ""Spree::Calculator::Shipping::FlatRate"",
+  calculable_id: 1, calculable_type: ""Spree::ShippingMethod"", created_at: ""2014-06-29 21:56:59"",
+  updated_at: ""2014-06-29 21:57:00"", preferences: {:amount=>10, :currency=>""USD""}>
+  ```
+  
+  John Hawthorn
+-   Add Spree::Store model for basic multi-store/multi-domain support
+  
+  This provides a basic framework for multi-store/multi-domain, based on the
+  spree-multi-domain extension. Some existing configuration has been moved to
+  this model, so that they can have different values depending on the site
+  being served:
+  - `Spree::Config[:site_name]` is moved to `name`
+  - `Spree::Config[:site_url]` is moved to `url`
+  - `Spree::Config[:default_meta_description]` is moved to `meta_description`
+  - `Spree::Config[:default_meta_keywords]` is moved to `meta_keywords`
+  - `Spree::Config[:default_seo_title]` is moved to `seo_title`
+  
+  A migration will move existing configuration onto a new default store.
+  
+  A new `ControllerHelpers::Store` concern provides a `current_store` helper
+  to fetch a helper based on the request's domain.
+  
+  Jeff Dutil, Clarke Brunsdon, and John Hawthorn
+
+## API
+-   Support existing credit card feature on checkout.
+  
+  Checkouts_controller#update now uses the same Order::Checkout#update_from_params
+  from spree frontend which help us to remove a lot of duplicated logic. As a
+  result of that `payment_source` params must be sent now outsite the `order` key.
+  
+  Before you'd send a request like this:
+  
+  ``````
+  ```ruby
+  api_put :update, :id => order.to_param, :order_token => order.guest_token,
+    :order => {
+      :payments_attributes => [{ :payment_method_id => @payment_method.id.to_s }],
+      :payment_source => { @payment_method.id.to_s => { name: ""Spree"" } }
+    }
+  ```
+  ``````
+  
+  Now it should look like this:
+  
+  ``````
+  ```ruby
+  api_put :update, :id => order.to_param, :order_token => order.guest_token,
+    :order => {
+      :payments_attributes => [{ :payment_method_id => @payment_method.id.to_s }]
+    },
+    :payment_source => {
+      @payment_method.id.to_s => { name: ""Spree"" }
+    }
+  ```
+  ``````
+  
+  Josh Hepworth and Washington
+-   api/orders/show now display credit cards as source under payment
+  
+  Washington Luiz
+-   refactor the api to use a general importer in core gem.
+  
+  Peter Berkenbosch
+- Shipment manifests viewed within the context of an order no longer return variant info. The line items for the order already contains this information. #4498
+  - Ryan Bigg
+
+## Frontend
+-   The api key that was previously placed in the dom for ajax requests has been
+  removed since the api now uses the session to authenticate the user.
+-   Mostly inspired by Jeff Squires extension spree_reuse_credit card, checkout
+  now can remember user credit card info. Make sure your user model responds
+  to a `payment_sources` method and customers will be able to reuse their
+  credit card info.
+  
+  Washington Luiz
+-   Use settings from current_store instead of Spree::Config
+  
+  Jeff Dutil, John Hawthorn, and Washington Luiz
+
+## Backend
+-   The api key that was previously placed in the dom for ajax requests has been
+  removed since the api now uses the session to authenticate the user.
+",https://api.github.com/users/radar,2687,radar,https://api.github.com/repos/spree/spree/releases/403819/assets,https://api.github.com/repos/spree/spree/releases/403819,master,https://api.github.com/repos/spree/spree/tarball/v2.3.0,https://github.com/spree/spree/releases/tag/v2.3.0,https://api.github.com/repos/spree/spree/zipball/v2.3.0,v2.3.0,False,False
+191377,2014-02-18T04:29:25Z,2014-02-19T03:51:21Z,Version 2.1.5,"For the changes included in this release please refer to the [Compare View](https://github.com/spree/spree/compare/v2.1.4...v2.1.5).
+",https://api.github.com/users/radar,2687,radar,https://api.github.com/repos/spree/spree/releases/191377/assets,https://api.github.com/repos/spree/spree/releases/191377,master,https://api.github.com/repos/spree/spree/tarball/v2.1.5,https://github.com/spree/spree/releases/tag/v2.1.5,https://api.github.com/repos/spree/spree/zipball/v2.1.5,v2.1.5,False,False
+189833,2014-02-18T04:25:29Z,2014-02-18T04:26:59Z,Version 2.0.9,"For the changes included in this release please refer to the [Compare View](https://github.com/spree/spree/compare/v2.0.8...v2.0.9).
+",https://api.github.com/users/radar,2687,radar,https://api.github.com/repos/spree/spree/releases/189833/assets,https://api.github.com/repos/spree/spree/releases/189833,master,https://api.github.com/repos/spree/spree/tarball/v2.0.9,https://github.com/spree/spree/releases/tag/v2.0.9,https://api.github.com/repos/spree/spree/zipball/v2.0.9,v2.0.9,False,False
+140707,2014-01-22T23:55:45Z,2014-01-23T02:28:42Z,Version 2.0.8,"## Core
+- Bumped Rails to 3.2.16
+  
+  Ryan Bigg
+- Bumped ActiveMerchant to 1.42.3
+  
+  Ryan Bigg
+- Bumped aws-sdk to 1.31.3.
+  
+  Ryan Bigg
+- Bumped to ransack 1.1.0.
+  
+  Ryan Bigg
+- Bumped Kaminari to 0.15.0.
+  
+  Ryan Bigg
+- Add `currency_sign_before_symbol` setting, allows for either -$10.00 or $-10.00.
+  
+  Ryan Bigg
+- Switched from `* 100` to `money.cents` in a couple of places in `Payment::Processing`, for proper handling of cents in currencies where cents are not 100ths of a dollar. 
+  
+  Clarke Brunsdon
+- Spree.user_class now accepts a Symbol, as well as a String.
+  
+  hbakhtiyor
+- All adjustments are now updated during `Order#update!`.  #3960
+  
+  John Hawthorn
+- Can now control whether or not variants have inventory tracking on a per-variant basis. #3974
+  
+  Michael Tucker
+- Cancelling an order now sets the `payment_state` to `credit_owed` in all cases. #3711
+  
+  Ryan Bigg
+- Only on hand inventory units are now restocked. 
+  
+  Washington Luiz
+- Shipment numbers are now once again 12 characters long (H, followed by 11 numbers). #4063
+  
+  Ryan Bigg
+- Inferring a currency for `Spree::Money.parse` when none is given now works. #4077
+  
+  cheef
+- The User promotion rule should now no longer use the `Spree.user_class` class as its association. 6fd78ec
+  
+  Peter Berkenbosch
+- Only eligible promotions are now counted towards `Promotion#credits`. #4120
+  
+  Ryan Bigg
+- Order#available_payment_methods will now return payment methods marked as 'Both' #4199
+  
+  Francisco Trindade & Ryan Bigg
+
+## API
+- When line items are added after the delivery state, the shipments are now recreated. #3914
+  
+  Washington Luiz
+- State names are now persisted on addresses when using `ensure_state_from_api`, even if the state does not exist as a `Spree::State`. e976a3bbd603ea981499f440fa69f2e6d0d930d7
+  
+  Washington Luiz
+- Times are now returned with millisecond precision. (Note: this patch is not in the 2-1-stable or master branches because Rails 4 does this by default.)
+  
+  Washington Luiz
+
+## Backend
+- Don't serve JS to non XHR requests. Prevents sentive data leaking. Thanks to
+  Egor Homakov for pointing that out in Spree codebase.
+  See http://homakov.blogspot.com.br/2013/05/do-not-use-rjs-like-techniques.html
+  for details.
+- 'Only show completed orders' checkbox status will now persist when paging through orders.
+  
+  darbs + Ryan Bigg
+- Persist search fields acrross requests for sales total report #3906
+  
+  Ryan Bigg
+- Flash messages for destructive actions in the admin backend are now visible once again. #4032
+  
+  Ryan Bigg
+- Spaces inside shipment tracking numbers are now accounted for.
+  
+  Daniel Pritchett
+
+## Frontend
+- Country lists where the country names contain acceents are now sorted correctly. #3911
+  
+  Jim
+- Flash messages no longer persist for gateway or coupon application errors. #4034
+  
+  Scott (sc0ttman)
+",https://api.github.com/users/radar,2687,radar,https://api.github.com/repos/spree/spree/releases/140707/assets,https://api.github.com/repos/spree/spree/releases/140707,master,https://api.github.com/repos/spree/spree/tarball/v2.0.8,https://github.com/spree/spree/releases/tag/v2.0.8,https://api.github.com/repos/spree/spree/zipball/v2.0.8,v2.0.8,False,False
+122782,2014-01-23T00:19:35Z,2014-01-23T02:30:04Z,Version 2.1.4,"## Auth
+- Upgraded to Devise 3.2. Should be a fairly smooth upgrade path, just remember to run the migrations:
+  
+  bundle exec rake railties:install:migrations
+  bundle exec rake db:migrate
+
+## Core
+- Introduce Core::UserAddress module. Once included on the store user class the user address can be rememembered on checkout
+  
+  Washington Luiz / Peter Berkenbosch
+- Fixed issue where selecting a payment method that required confirmation would fail, then another payment method that did _not_ require confirmation was then chosen, but confirmation step would still appear. #3970
+  
+  Washington Luiz
+- Bumped Kaminari version to 0.15.0
+  
+  Ryan Bigg
+- Shipments are now ""touched"" when Inventory Units are updated, and Orders are now ""touched"" when Payments are updated. Variants are now ""touched"" when Stock Items are updated. This ""touching"" will update the record's timestamp.
+  
+  Ryan Bigg
+- If a name field now exists on spree_variants, Spree will use that rather than the virtual attribute defined by `delegates_belongs_to`. #4012
+  
+  Washington Luiz
+- Moved `Money.extract_cents` and `Money.parse` to `Spree::Money`, as those methods are being deprecated in the Money gem, but Spree still uses them to a great extent.
+  
+  Ryan Bigg
+- Added ability to enable/disable inventory tracking control on the variant-level.
+  
+  Michael Tucker
+- Only in_stock inventory units are now restocked once an order is canceled.
+  
+  Washington Luiz
+- Backorders for incomplete orders are now no longer fufiled. #4056
+  
+  Sean O'Hara
+- Shipment numbers should be 11-characters, not 9. #4063
+  
+  Ryan Bigg
+- Only available shipping rates are now sorted in `Spree::Stock::Estimator`. #4067
+  
+  Ryan Bigg
+- Email is now only required once past the address step of the checkout. #4079
+  
+  Ryan Bigg
+- Ensure state_changes records are no longer created if the state changes. #4072
+  
+  Ryan Bigg
+- `allow_ssl_in_*` variables are no longer accessed during initialization. #4094
+  
+  John Hawthorn
+- Promotion rules are now loaded after initialization so that the user rule is loaded correctly. 
+  
+  Peter Berkenbosch
+- Fixed issue where common shipping methods were not being returned when calculating packages. #4102
+  
+  Dan Kubb
+- Only eligible promotions now count towards `credits_count` on `Spree::Promotion` objects. #4120
+  
+  Ryan Bigg
+- Order#available_payment_methods will now return payment methods marked as 'Both' #4199
+  
+  Francisco Trindade & Ryan Bigg
+
+## API
+- Cached products/show template, which can lead to drastically (65x) faster loading times on product requests.
+  
+  Ryan Bigg
+- The parts that make up an order's response from /api/orders/:num are cached, which can lead to a 5x improvement of speed for this API endpoint. 00e92054caba9689c0f8ed913240668039b6e8de
+  
+  Ryan Bigg
+- Cached variant objects which can lead to slightly faster loading times (4x) for each variant.
+  
+  Ryan Bigg
+- Added a route to allow for /api/variants/:id requests
+  
+  Ryan Bigg
+- Taxons can now be gathered without their children with the `?without_children=1` query parameter. #4112
+  
+  Ryan Bigg
+- Orders on the `/api/orders/mine` endpoint can now be paginated and searched. #4099
+  
+  Richard Nuno
+- Order token can now be passed as a header: `X-Spree-Order-Token`. #4148
+  
+  Lucjan Suski (methyl)
+
+## Backend
+- Don't serve JS to non XHR requests. Prevents sentive data leaking. Thanks to
+  Egor Homakov for pointing that out in Spree codebase.
+  See http://homakov.blogspot.com.br/2013/05/do-not-use-rjs-like-techniques.html
+  for details.
+- 'Only show completed orders' checkbox status will now persist when paging through orders.
+  
+  darbs + Ryan Bigg
+- Implemented a basic Risk Assessment feature in Spree Backend. Viewing any Order's edit page now shows the following, with a status indicator:
+  
+  ```
+  Payments; link_to new log feature (ie. Number of multiple failed authorization requests)
+  AVS response (ie. Billing address not matching credit card)
+  CVV response (ie. code not matching)
+  ```
+  
+  Ben Radler (aka lordnibbler)
+- Log entries are now displayed in the admin backend for payments.
+  
+  Ryan Bigg
+- Orders without shipments will now display their line items properly in the admin backend.
+  
+  Ryan Bigg
+- Fix issue where a controller that inherited from Spree::ResourceController may not be able to find its class.
+  
+  Ryan Bigg, tomkrus, Michael Tucker
+- Payment amounts are now displayed as ""$50.00"" Rather than ""50.0"" on the payments show screen.
+  
+  Ryan Bigg
+- Shipment states for items on the order screen can now be translated.
+  
+  Tiago Amaro
+- JavaScript destroy action flash messages are shown once again. #4032
+  
+  Ryan Bigg
+- The page title for admin screens can now be set with a `content_for :title` block. 
+  
+  Ryan Bigg
+- Items' SKUs are now displayed on the shipment manifest list. #4045
+  
+  Peter Berkenbosch
+- Spaces inside shipment tracking numbers are now accounted for.
+  
+  Daniel Pritchett
+
+## Frontend
+- Checkout now may remember user address
+  
+  Washington Luiz / Peter Berkenbosch
+- Checkout now no longer redirects back to address state if confirmation step fails. #4117
+  
+  Ryan Bigg
+- Orders are only created now when there is a product added to the cart. #4136
+  
+  Washington Luiz
+- Added Deface Hook for Payment Method fields so that they can be defaced. #42222
+  
+  Dave Kiss
+",https://api.github.com/users/radar,2687,radar,https://api.github.com/repos/spree/spree/releases/122782/assets,https://api.github.com/repos/spree/spree/releases/122782,master,https://api.github.com/repos/spree/spree/tarball/v2.1.4,https://github.com/spree/spree/releases/tag/v2.1.4,https://api.github.com/repos/spree/spree/zipball/v2.1.4,v2.1.4,False,False
+99294,2013-11-20T00:12:32Z,2013-11-21T00:45:33Z,Version 2.1.3,"## Core
+-   A _channel_ column was added to the spree_orders table. Users can set
+  it when importing orders from other stores. e.g. amazon
+  
+  Washington Luiz
+-   Highline version has been bumped to allow anything > 1.6.18 and < 1.7.x.
+  
+  Ryan Bigg
+-   Active Merchant version has been bumped to 1.42.0. This should fix Money gem dependency problems.
+  
+  Ryan Bigg
+-   aws-sdk version has been bumped to 1.27.0. This should fix Nokogiri gem dependency problems.
+  
+  Ryan Bigg
+-   Fixed issue where Product#set_property was causing an undefined method when spree_i18n was in use.
+  
+  Ryan Bigg
+-   Taxes can now be classed as ""included"" or ""additional"". Taxes which are ""included"" are those such as VAT/GST, where the price includes the tax already. ""Additional"" taxes are like Sales Tax in the US where the tax amount is added on after the listed price of the item. This change now means that included taxes are displayed on the checkout.
+  
+  Ryan Bigg
+
+## API
+-   ApiHelpers attributes can now be extended without overriding instance
+  methods. By using the same approach in PermittedAttributes. e.g.
+  
+  ```
+  Spree::Api::ApiHelpers.order_attributes.push :locked_at
+  ```
+  
+  Washington Luiz
+-   ApiHelpers attributes can now be extended without overriding instance
+  methods. By using the same approach in PermittedAttributes. e.g.
+  
+  ```
+  Spree::Api::ApiHelpers.order_attributes.push :locked_at
+  ```
+  
+  Washington Luiz
+-   Admin users can set the order channel when importing orders. By sing the
+  channel attribute on Order model
+  
+  Washington Luiz
+-   An order's shipments are now destroyed (to be recreated) when an order is assigned a new line item through the API. #3914
+  
+  Washington Luiz
+
+## Backend
+- Fixed styling issues with select2 boxes. #3854
+  
+  Dominik Staskiewicz
+- Fixed issue where taxons could not be reordered. #3891 #3833 #3390
+  
+  Lucas Dohmen
+
+## Frontend
+- Country lists that include countries with accents in their names are now sorted correctly. #3911
+  
+  Jim
+
+## Gateway
+- Added support for Stripe.js, which will now be used automatically when a Stripe payment method is selected. If a user has JavaScript disabled, then it will fall back to the old server-to-server communication technique.
+  
+  Ryan Bigg
+",https://api.github.com/users/radar,2687,radar,https://api.github.com/repos/spree/spree/releases/99294/assets,https://api.github.com/repos/spree/spree/releases/99294,master,https://api.github.com/repos/spree/spree/tarball/v2.1.3,https://github.com/spree/spree/releases/tag/v2.1.3,https://api.github.com/repos/spree/spree/zipball/v2.1.3,v2.1.3,False,False
+98234,2013-11-19T23:43:57Z,2013-11-20T00:03:29Z,Version 2.0.7,"_For all commits, please see [the GitHub compare view](https://github.com/spree/spree/compare/v2.0.6...v2.0.7)._
+
+## Core
+-   A _channel_ column was added to the spree_orders table. Users can set
+  it when importing orders from other stores. e.g. amazon
+  
+  Washington Luiz
+-   Converting timestamps to json now give us miliseconds precision (by monkey
+  patching ActiveSupport::TimeWithZone#as_json)
+  
+  Washington Luiz
+-   Deface version has been bumped to 1.0.0.
+  
+  Ryan Bigg
+-   Highline version has been bumped to allow anything > 1.6.18 and < 1.7.x.
+  
+  Ryan Bigg
+-   Active Merchant version has been bumped to 1.42.0. This should fix Money gem dependency problems.
+  
+  Ryan Bigg
+-   aws-sdk version has been bumped to 1.27.0. This should fix Nokogiri gem dependency problems.
+-   Fixed issue where Product#set_property was causing an undefined method when spree_i18n was in use.
+  
+  Ryan Bigg
+-   Fixed styling issues of select2 boxes in Admin backend. #3854 #3863
+  
+  Dominik Staskiewicz
+-   Fixed issue where trying to process BogusSimple payments would fail. #3824
+  
+  James Strong
+-   Added an index to spree_users spree_api_key field. #3884
+  
+  Justin Kronz
+-   OrderInventory now acknowledges `track_inventory_units` setting and will not create backorders when that setting is set to `false`. b66a98a
+  
+  Washington Luiz
+-   All adjustments are now updated when an order is updated, rather than just shipping + promotion adjustments. #3960
+  
+  John Hawthorn
+
+## API
+-   Admin users can set the order channel when importing orders. By sing the
+  channel attribute on Order model
+  
+  Washington Luiz
+-   Added missing per_page node to products/index
+  
+  Ryan Bigg
+-   `ship_total` is now returned on order results.
+  
+  Washington Luiz
+
+## Backend
+-   Fixed taxon reordering issues. #3390 #3956
+  
+  Dan Pritchett
+
+## Frontend
+-   Added Kaminari call to add pagination data to the `head` tag on pages. #3903
+  
+  Richard Hart
+",https://api.github.com/users/radar,2687,radar,https://api.github.com/repos/spree/spree/releases/98234/assets,https://api.github.com/repos/spree/spree/releases/98234,master,https://api.github.com/repos/spree/spree/tarball/v2.0.7,https://github.com/spree/spree/releases/tag/v2.0.7,https://api.github.com/repos/spree/spree/zipball/v2.0.7,v2.0.7,False,False
+67962,2013-10-15T00:49:11Z,2013-10-15T22:54:56Z,Version 2.0.6,"## Core
+- Fix admin menu not icons not being centered. #3725
+  
+  _Ramon Roche_
+- Payment identifiers now do not change on each save. #3733
+  
+  _Ryan Bigg_
+- Added migrations to make the migration from Spree 1.3.x to 2.0.x a little easier. #3605 #3660
+  
+  _Stefan Wrobel_
+- Product#stock_items now returns stock items for the master variant as well. #3737
+  
+  _Ryan Bigg_
+- Add inventory_units association back to the Order model. #3744
+  
+  _Ryan Bigg_
+- Bump Activemerchant to 1.39.2.
+  
+  _Ryan Bigg_
+- Fix issue where cart.png was not being dealt with correctly during precompilation.
+  
+  _Ryan Bigg_
+- StockItem#process_backorders now processes backorders when the stock is adjusted postively. #3755
+  
+  _Ryan Bigg_
+- Fixed issue where shipping rates would lose the current selected rate when refreshing rates. #3766
+  
+  _dan-ding_
+- Fixed issue where force_non_ssl_redirect redirect location was like `/orders/populate?controller=home.`, rather than just `/`. #3799
+  
+  _John Hawthorn_
+- Fixed sample data loading issues with shipping methods. #3776
+  
+  _Washington Luiz_
+- Removed unused credit card fields, start_month, start_year and issue_number. #3802
+  
+  _John Hawthorn_
+- Fixed issue where a product could be linked to a taxon more than once. #3494
+  
+  _Ryan Bigg_
+- Included jquery.validate locale messages when the locale is not ""en"" #3794
+  
+  _Ryan Bigg_
+- Fixed issue where stock items could not be created if a deleted stock item for that variant existed already. #3834
+  
+  _Washington Luiz_
+- Removed force_ssl_redirect, as Rails 3.2.14 and Rails 4 both have this available.
+  
+  _Washington Luiz_
+- Fixed redirect loop with redirect_https_to_http. #3813
+  
+  _John Hawthorn_
+- Use sRGB colorspace in Image model. Using the RGB colorspace on more recent versions of ImageMagick cause the image to be uploaded darker. Caveat: Using sRGB on older versions of ImageMagick may also cause this bug. If you're seeing images being uploaded darker after this change, please upgrade your ImageMagick version.
+  
+  _Ryan Bigg_
+- Fixed issue where not including frontend component may have caused the `preference_rescue.rb` that a migration depends on to go missing. #3860
+
+## API
+- Normal users can no longer read stock item, stock location or stock movements API endpoints.
+  
+  _Ryan Bigg_
+
+## Backend
+- Use default datepicker format is used if none is specified in the locale file. #3602
+  
+  _Peter Goldstein_
+- Added the ability to change a payment's amount through the backend. #3765
+  
+  _Dan Kubb_
+- Fixed issue where promotion rules select box was not being reloaded correctly. #3572 #3816
+  
+  _Washington Luiz_
+- Prices are now displayed in the local format on products/new.
+  
+  _laurens_
+- Change authorize_admin to use the controller's name, rather than `Object` when `model_class` does not return anything. #3622
+  
+  _Ryan Bigg_
+- Fixed issue where cancelling a line item delete didn't actually cancel it. #3862
+  
+  _Ryan Bigg_
+- Fixed slow loading of ""Add Stock Movement"" screen if there were a lot of variants in the system.
+  
+  _Ryan Bigg_
+
+## Frontend
+
+No changes.
+",https://api.github.com/users/radar,2687,radar,https://api.github.com/repos/spree/spree/releases/67962/assets,https://api.github.com/repos/spree/spree/releases/67962,master,https://api.github.com/repos/spree/spree/tarball/v2.0.6,https://github.com/spree/spree/releases/tag/v2.0.6,https://api.github.com/repos/spree/spree/zipball/v2.0.6,v2.0.6,False,False
+67959,2013-10-15T01:18:26Z,2013-10-15T22:52:38Z,Version 2.1.2,"## Core
+- Payment identifiers are no longer recalculated when they are saved. #3733
+  
+  _Ryan Bigg_
+- Product#stock_items now returns stock items for the master variant as well. #3737
+  
+  _Ryan Bigg_
+- Added a default format for datepicker_field_value, in case one is not available in locale file. #3602
+  
+  _Peter Goldstein_
+- Bumped activemerchant to 1.39.2. #3745
+  
+  _Piotr Usewicz_
+- Sandbox now references correct branch for spree_auth_devise when it is generated. #3770
+  
+  _Wes Ketchum_
+- Better accessibility support (for more information, see #3414.)
+  
+  _Cameron Cundiff and Trevor John_
+- StockItem#process_backorders will now process stock when it is adjusted postively (i.e. -3 => -2).
+  
+  _Ryan Bigg_
+- Fixed shipping rates losing current rate when refreshing rates. #3766
+  
+  _dan-ding_
+- Allow any version of the Money gem above 5.1.1. Related to #2737.
+  
+  _Ryan Bigg_
+- Fixed issue where a stock item for a variant could not be created if one of the same variant had already been created. #3834
+  
+  _Washington Luiz_
+- Added custom routing code to work around issues described in rails/rails#12367.
+  
+  _Ryan Bigg_
+- Added Spree::Config[:send_core_emails] preference setting.
+
+This setting allows developers to use standard rails mail configuration (in config
+files) by setting :override_actionmailer_config to false without sending
+spree core emails (e.g. order confirmation). This is useful e.g. in the
+case where devs have opted to use an external mail API such as Mandrill
+for store-related emails but still want to use ActionMailer in other
+parts of their app. #3812
+
+```
+*Sean O'Hara*
+```
+- Fixed issue where preferences_rescue was living in Frontend, but was necessary in Core. If you had migrations from older versions of Spree, they may have depended on this file. If you did not include the Frontend component, then this file would be unavailable. #3860
+  
+  _ayraju_
+
+## API
+- States and countries endpoints now do not require authentication, even if it is forced with the `requires_authentication` setting. This is so the frontend's checkout address page can still work.
+  
+  _Ryan Bigg_
+- You can now assign a location to a shipment when creating it through the orders API. f3ef2e1d46bc972442acbbcaae928e6ef2dc0eb5
+  
+  _Washington Luiz_
+- Stock Items, Stock Movements and Stock Locations are now invisible to non-admin users.
+  
+  _Ryan Bigg_
+- Fixed issue where X-Spree-Token header was being ignored. #3798
+  
+  _Washington Luiz_
+
+## Backend
+-   Added ability to edit payment amount on the payments listing. #3765
+  
+  _Dan Kubb_
+-   Added ability to create and delete countries via the backend.
+  
+  _Washington Luiz_
+-   Fixed issue where rules select box was not being reloaded after a rule was selected.
+  
+  _Washington Luiz_
+-   Fixed issue where API calls to stock locations endpoint were not passing through a token. #3828
+  
+  _Alain Pilon_
+-   Fixed admin top menu spacing. #3839
+  
+  _Ramon Roche_
+-   The name of the controller is now used rather than `Object` in authorize_admin. #3622
+  
+  _Ryan Bigg_
+
+## Frontend
+- References to cart.png will now reference the precompiled asset.
+  
+  _Dan Kubb_
+- Special instructions are no longer ignored when specified in the checkout.
+  
+  _Dan Kubb_
+- Use `display_price` more consistently. #3822
+- When a payment fails, it will now include the message from the gateway as a validation error. This potentially provides additional information to the user, which may guide them to correcting the data they're inputting, allowing the payment to go through successfully. #3851
+  
+  _Ryan Bigg_
+",https://api.github.com/users/radar,2687,radar,https://api.github.com/repos/spree/spree/releases/67959/assets,https://api.github.com/repos/spree/spree/releases/67959,master,https://api.github.com/repos/spree/spree/tarball/v2.1.2,https://github.com/spree/spree/releases/tag/v2.1.2,https://api.github.com/repos/spree/spree/zipball/v2.1.2,v2.1.2,False,False
+20965,2013-08-05T04:58:23Z,2013-08-05T05:04:30Z,Version 2.0.4,"# Core
+-  Sandbox generator and installer now use the correct 2-0-stable branch of spree_auth_devise 
+  3179a7ac85d4cfcb76622509fc739a0e17668d5a & 759fa3475f5230da3794aed86503913978dde22d.
+- Product requires `shipping_category_id` on create #3188.
+  
+  _Jeff Dutil_
+-   No longer set ActiveRecord::Base.include_root_in_json = true during install.
+  Originally set to false back in 2011 according to convention. After
+  https://groups.google.com/forum/#!topic/spree-user/D9dZQayC4z, it
+  was changed. Applications should now decide their own setting for this value.
+  
+  _John Dyer and Sean Schofield_
+- Revert bump of Rubygems required version which made Spree 2.0.0 unusable on Heroku. 77103dc4f4c93c195ae20f47944f68ef31a7bbe9
+  
+  _@Actven_
+- Improve performance of `Order#payment_required?` by not updating the totals every time. #3040 #3086
+  
+  _Washington Luiz_
+- Remove after_save callback for stock items backorders processing and
+  fixes count on hand updates when there are backordered units #3066
+  
+  _Washington Luiz_
+- InventoryUnit#backordered_for_stock_item no longer returns readonly objects
+  neither return an ActiveRecored::Association. It returns only an array of
+  writable backordered units for a given stock item #3066
+  
+  _Washington Luiz_
+- Scope shipping rates as per shipping method display_on #3119
+  e.g. Shipping methods set to back_end only should not be displayed on frontend too
+  
+  _Washington Luiz_
+- Translation for admin tabs are now located under the `spree.admin.tab` key. Previously, they were on the top-level, which lead to conflicts when users wanted to override view translations, like this:
+
+``` yml
+en:
+  spree:
+    orders:
+      show:
+        thank_you: ""Thanks, buddy!""
+```
+
+See #3133 for more information.
+-   Change `order.promotion_credit_exists?` api. Now it receives an adjustment
+  originator (PromotionAction instance) instead of a promotion. Allowing
+  multiple adjustments being created for the same promotion as the current
+  PromotionAction / Promotion api suggests #3262
+  - Washington Luiz *
+- CreditCard model now validates that the card is not expired.
+  
+  _Ryan Bigg_
+- Payment model will now no longer provide a vague error message for when the source is invalid. Instead, it will provide error messages like ""Credit Card Number can't be blank""
+  
+  _Ryan Bigg_
+- Calling #destroy on any PaymentMethod, Product, TaxCategory, TaxRate or Variant object will now no longer delete that object. Instead, the `deleted_at` attribute on that object will be set to the current time. Attempting to find that object again using something such as `Spree::Product.find(1)` will fail because there is now a default scope to only find _non_-deleted records on these models. To remove this scope, use `Spree::Product.unscoped.find(1)`. #3321
+  
+  _Ryan Bigg_
+- Removed `variants_including_master_and_deleted`, in favour of using the Paranoia gem. This scope would now be achieved using `variants_including_master.with_deleted`.
+  
+  _Ryan Bigg_
+- You can now find the total amount on hand of a variant by calling `Variant#total_on_hand`. #3427
+  
+  _Ruben Ascencio_
+- Tax categories are now stored on line items. This should make tax calculations slightly faster. #3481
+  
+  _Ryan Bigg_
+
+# API
+- PUT requests to Checkouts API endpoints now require authorization to alter an order.
+  
+  _Ryan Bigg_
+- The Products API endpoint now returns an additional key called `shipping_category_id`, and also requires `shipping_category_id` on create.
+  
+  _Jeff Dutil_
+- Checkouts API's update action will now correctly process line item attributes (either `line_items` or `line_item_attributes`)
+  - Ryan Bigg*
+- Checkouts API now correctly processes incoming payment data during the payment step.
+  
+  _Ryan Bigg_
+- Fix issue where `set_current_order` before filter would be called when CheckoutsController actions were run, causing the order object to be deleted. #3306
+  
+  _Ryan Bigg_
+- An order can no longer transition past the ""cart"" state without first having a line item. #3312
+  
+  _Ryan Bigg_
+- Attributes other than ""quantity"" and ""variant_id"" will be added to a line item when creating along with an order. #3404
+  
+  _Alex Marles & Ryan Bigg_ 
+
+# Backend
+-   Symbolize attachment style keys on ImageSettingController otherwise users
+  would get _undefined method `processors' for ""48x48>"":String>_ since
+  paperclip can't handle key strings.
+  
+  _Washington Luiz_
+- Fix bug where taxonomy URL was incorrect when Spree was mounted at a non-root path 50ac165c13f6d9123db704b72e9feae86971af70.
+  
+  _Washington Luiz_
+- Fixed issue where selecting an existing user in the customer details step would not associate them with an order.
+  
+  _Ryan Bigg and dan-ding_
+
+# Frontend
+-  Fix issue where ""Use Billing Address"" checkbox was unticked when certain
+  browsers autocompleted the checkout form. #3068 #3085
+  
+  _Washington Luiz_
+",https://api.github.com/users/radar,2687,radar,https://api.github.com/repos/spree/spree/releases/20965/assets,https://api.github.com/repos/spree/spree/releases/20965,master,https://api.github.com/repos/spree/spree/tarball/v2.0.4,https://github.com/spree/spree/releases/tag/v2.0.4,https://api.github.com/repos/spree/spree/zipball/v2.0.4,v2.0.4,False,False
+1772,2013-09-16T01:20:39Z,2013-10-15T22:50:33Z,Version 2.1.0,"## API
+- The Products API endpoint now returns an additional key called `shipping_category_id`, and also requires `shipping_category_id` on create.
+  
+  _Jeff Dutil_
+- The Products API endpoint now returns an additional key called `display_price`, which is the proper rendering of the price of a product.
+  
+  _Ryan Bigg_
+- The Images API's `attachment_url` key has been removed in favour of keys that reflect the current image styles available in the application, such as `mini_url` and `product_url`. Use these now to references images.
+  
+  _Ryan Bigg_
+- Fix issue where calling OrdersController#update with line item parameters would _always_ create new line items, rather than updating existing ones.
+  
+  _Ryan Bigg_
+- The Orders API endpoint now returns an additional key called `display_item_total`, which is the proper rendering of the total line item price of an order.
+  
+  _Ryan Bigg_
+- Include a `per_page` key in Products API end response so that libraries like jQuery.simplePagination can use this to display a pagination element on the page.
+  
+  _Ryan Bigg_
+- Line item responses now contain `single_display_amount` and `display_amount` for ""pretty"" versions of the single and total amount for a line item, as well as a `total` node which is an ""ugly"" version of the total amount of a line item.
+  
+  _Ryan Bigg_
+- /api/orders endpoints now accept a `?order_token` parameter which should be the order's token. This can be used to authorize actions on an order without having to pass in an API key.
+  
+  _Ryan Bigg_
+- Requests to POST /api/line_items will now update existing line items. For example if you have a line item with a variant ID=2 and quantity=10 and you attempt to create a new line item for the same variant with a quantity of 5, the existing line item's quantity will be updated to 15. Previously, a new line item would erroneously be created.
+  
+  _Ryan Bigg_
+- /api/countries now will a 304 response if no country has been changed since the last request.
+  
+  _Ryan Bigg_
+- The Shipments API no longer returns inventory units. Instead, it will return manifest objects. This is necessary due to the split shipments changes brought in by Spree 2.
+  
+  _Ryan Bigg_
+- Checkouts API's update action will now correctly process line item attributes (either `line_items` or `line_item_attributes`)
+  
+  _Ryan Bigg_
+- The structure of shipments data in the API has changed. Shipments can now have many shipping methods, shipping rates (which in turn have many zones and shipping categories), as well as a new key called ""manifest"" which returns the list of items contained within just this shipment for the order.
+  
+  _Ryan Bigg_
+- Address responses now contain a `full_name` attribute.
+  
+  _Ryan Bigg_
+- Shipments responses now contain a `selected_shipping_rate` key, so that you don't have to sort through the list of `shipping_rates` to get the selected one.
+  
+  _Ryan Bigg_
+- Checkouts API now correctly processes incoming payment data during the payment step.
+  
+  _Ryan Bigg_
+- Fix issue where `set_current_order` before filter would be called when CheckoutsController actions were run, causing the order object to be deleted. #3306
+  
+  _Ryan Bigg_
+- An order can no longer transition past the ""cart"" state without first having a line item. #3312
+  
+  _Ryan Bigg_
+- Attributes other than ""quantity"" and ""variant_id"" will be added to a line item when creating along with an order. #3404
+  
+  _Alex Marles & Ryan Bigg_
+- Requests to POST /api/line_items will now update existing line items. For example if you have a line item with a variant ID=2 and quantity=10 and you attempt to create a new line item for the same variant with a quantity of 5, the existing line item's quantity will be updated to 15. Previously, a new line item would erroneously be created.
+  - Ryan Bigg
+- Checkouts API's update action will now correctly process line item attributes (either `line_items` or `line_item_attributes`)
+  - Ryan Bigg
+- Taxon attributes from `/api/taxons` are now returned within `taxons` subkey. Before:
+
+``` json
+[{ name: 'Ruby' ... }]
+```
+
+Now:
+
+``` json
+{ taxons: [{ name: 'Ruby' }]}
+```
+
+```
+* Ryan Bigg
+```
+
+## Backend
+-   layouts/admin.html.erb was broken into partials for each section. e.g.
+  header, menu, submenu, sidebar. Extensions should update their deface
+  overrides accordingly
+  
+  _Washington Luiz_
+-   No longer requires all jquery ui modules. Extensions should include the
+  ones they need on their own manifest file. #3237
+  
+  _Washington Luiz_
+-   Symbolize attachment style keys on ImageSettingController otherwise users
+  would get _undefined method `processors' for ""48x48>"":String>_ since
+  paperclip can't handle key strings. #3069 #3080
+  
+  _Washington Luiz_
+-   Split line items across shipments. Use this to move line items between 
+  existing shipments or to create a new shipment on an order from existing
+  line items.
+  
+  _John Dyer_
+-   Fixed display of ""Total"" price for a line item on a shipment. #3135
+  
+  _John Dyer_
+-   Fixed issue where selecting an existing user in the customer details step would not associate them with an order.
+  
+  _Ryan Bigg and dan-ding_
+-   We now use [jQuery.payment](https://stripe.com/blog/jquery-payment) (from Stripe) to provide slightly better formatting on credit card number, expiry and CVV fields.
+  
+  _Ryan Bigg_
+-   ""Infinite scrolling"" now implemented for products taxon search to prevent loading all taxons at once. Only 50 taxons are loaded at a time now.
+  
+  _Ryan Bigg_
+
+## Cmd
+
+No changes.
+
+## Core
+- Product requires `shipping_category_id` on create #3188.
+  
+  _Jeff Dutil_
+-   No longer set ActiveRecord::Base.include_root_in_json = true during install.
+  Originally set to false back in 2011 according to convention. After
+  https://groups.google.com/forum/#!topic/spree-user/D9dZQayC4z, it
+  was changed. Applications should now decide their own setting for this value.
+  
+  _Weston Platter_
+-   Change `order.promotion_credit_exists?` api. Now it receives an adjustment
+  originator (PromotionAction instance) instead of a promotion. Allowing
+  multiple adjustments being created for the same promotion as the current
+  PromotionAction / Promotion api suggests #3262
+-   Remove after_save callback for stock items backorders processing and
+  fixes count on hand updates when there are backordered units #3066
+  
+  _Washington Luiz_
+-   InventoryUnit#backordered_for_stock_item no longer returns readonly objects
+  neither return an ActiveRecored::Association. It returns only an array of
+  writable backordered units for a given stock item #3066
+  
+  _Washington Luiz_
+-   Scope shipping rates as per shipping method display_on #3119
+  e.g. Shipping methods set to back_end only should not be displayed on frontend too
+  
+  _Washington Luiz_
+-   Add `propagate_all_variants` attribute to StockLocation. It controls
+  whether a stock items should be created fot the stock location every time
+  a variant or a stock location is created
+  
+  _Washington Luiz_
+-   Add `backorderable_default` attribute to StockLocation. It sets the
+  backorderable attribute of each new stock item
+  
+  _Washington Luiz_
+-   Removed `t()` override in `Spree::BaseHelper`. #3083
+  
+  _Washington Luiz_
+-   Improve performance of `Order#payment_required?` by not updating the totals every time. #3040 #3086
+  
+  _Washington Luiz_
+-   Fixed the FlexiRate Calculator for cases when max_items is set. #3159
+  
+  _Dana Jones_
+- Translation for admin tabs are now located under the `spree.admin.tab` key. Previously, they were on the top-level, which lead to conflicts when users wanted to override view translations, like this:
+
+``` yml
+en:
+  spree:
+    orders:
+      show:
+        thank_you: ""Thanks, buddy!""
+```
+
+See #3133 for more information.
+
+```
+* Ryan Bigg*
+```
+- CreditCard model now validates that the card is not expired.
+  
+  _Ryan Bigg_
+- Payment model will now no longer provide a vague error message for when the source is invalid. Instead, it will provide error messages like ""Credit Card Number can't be blank""
+  
+  _Ryan Bigg_
+- Calling #destroy on any PaymentMethod, Product, TaxCategory, TaxRate or Variant object will now no longer delete that object. Instead, the `deleted_at` attribute on that object will be set to the current time. Attempting to find that object again using something such as `Spree::Product.find(1)` will fail because there is now a default scope to only find _non_-deleted records on these models. To remove this scope, use `Spree::Product.unscoped.find(1)`. #3321
+  
+  _Ryan Bigg_
+- Removed `variants_including_master_and_deleted`, in favour of using the Paranoia gem. This scope would now be achieved using `variants_including_master.with_deleted`.
+  
+  _Ryan Bigg_
+- You can now find the total amount on hand of a variant by calling `Variant#total_on_hand`. #3427
+  
+  _Ruben Ascencio_
+- Tax categories are now stored on line items. This should make tax calculations slightly faster. #3481
+  
+  _Ryan Bigg_
+- `update_attribute(s)_without_callbacks` have gone away, in favour of `update_column(s)`
+  
+  _Ryan Bigg_
+
+## Frontend
+-  Fix issue where ""Use Billing Address"" checkbox was unticked when certain
+  browsers autocompleted the checkout form. #3068 #3085
+  
+  _Washington Luiz_
+-  Switch to new Google Analytics analytics.js SDK from ga.js SDK for custom dimensions & metrics.
+  
+  _Jeff Dutil_
+-  We now use [jQuery.payment](https://stripe.com/blog/jquery-payment) (from Stripe) to provide slightly better formatting on credit card number, expiry and CVV fields.
+  
+  _Ryan Bigg_
+",https://api.github.com/users/radar,2687,radar,https://api.github.com/repos/spree/spree/releases/1772/assets,https://api.github.com/repos/spree/spree/releases/1772,master,https://api.github.com/repos/spree/spree/tarball/v2.1.0,https://github.com/spree/spree/releases/tag/v2.1.0,https://api.github.com/repos/spree/spree/zipball/v2.1.0,v2.1.0,False,False

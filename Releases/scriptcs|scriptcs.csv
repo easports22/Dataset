@@ -1,0 +1,445 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+5531493,2017-02-22T08:54:46Z,2017-02-22T08:55:38Z,v0.17.1,"Get it via [svm](https://github.com/scriptcs-contrib/svm), [Chocolatey](https://chocolatey.org/packages/ScriptCs/0.17.1)! or [Homebrew](http://brew.sh/).
+
+### This Release
+
+This patch release fixes a bug with NuGet that was causing .NET Standard packages to get installed for .NET 4.5 framework assemblies.
+
+### Issue Details
+
+#### Fixes
+- scriptcs now detects the current framework version and ensures only packages for that version are installed. (#1213)  - by @glennblock
+",https://api.github.com/users/glennblock,141124,glennblock,https://api.github.com/repos/scriptcs/scriptcs/releases/5531493/assets,https://api.github.com/repos/scriptcs/scriptcs/releases/5531493,master,https://api.github.com/repos/scriptcs/scriptcs/tarball/v0.17.1,https://github.com/scriptcs/scriptcs/releases/tag/v0.17.1,https://api.github.com/repos/scriptcs/scriptcs/zipball/v0.17.1,v0.17.1,False,False
+5109101,2017-02-12T19:44:17Z,2017-02-12T19:44:43Z,v0.17.0,"Get it via [svm](https://github.com/scriptcs-contrib/svm), [Chocolatey](https://chocolatey.org/packages/ScriptCs/0.17.0)! or [Homebrew](http://brew.sh/).
+
+Special thanks to: @BlackFrog1, @gregoryyoung, @aarondandy, and @rickardp for their contributions to this release.
+
+### This Release
+
+This is the first release in a while for scriptcs. It includes some great new features such as Pretty Printing, Support for NuGet credentials, enrichment to the execution environment and more!
+
+For API users (hosting or other programmatic usage), there is one major change, the removal of members exposing Common.Logging types (#1189) from the public API. These were deprecated in version 0.15.0. As a result, the ScriptCs.Core NuGet package no longer takes a dependency on the Common.Logging package.
+
+### Breaking API Changes
+
+**High impact**: Common.Logging types have been removed from the scriptcs public API.
+
+**Medium impact**: The ScriptCs.Core NuGet package no longer takes a dependency on the Common.Logging package. If you are using Common.Logging for other purposes, after upgrading your project to ScriptCs.Core 0.17.0 you should check to see if NuGet has removed Common.Logging. If so, you will have to reinstall it yourself.
+
+**Low impact**: 
+
+*Affects hosters / module authors only*
+* The `IConsole` interface has a new `Width` parameter. 
+* The  `IScriptEnvironment` interface has new members `AddCustomPrinter<T>)`, `Print<T>()`, `ScriptPath`, `LoadedScripts`, `ScriptAssembly`, and `Initialize()`. 
+* The `FileParserContext` and `FilePreProcessResult` classes have a new member: `ScriptPath`
+
+### Issue Details
+
+#### New Features
+
+* Common Logging is gone! (#1190) - by @glennblock. Kudos to @adamralph for getting everything in place to allow the surgical removal.
+* Pretty printing support has now been added to the REPL (#1156) - by @gregoryyoung 
+
+ ![screen shot 2017-02-11 at 10 46 24 pm]   (https://cloud.githubusercontent.com/assets/141124/22864844/8de41d34-f10d-11e6-9f9a-5091f5a42812.png)
+
+* You can now access the main script and any loaded script paths using the new `Env.ScriptPath` and `Env.LoadedScripts` properties (#225) - by @glennblock
+* You can access the compiled script assembly from within a script using the new `Env.ScriptAssembly` property. This alleviates having to use reflection or jump through hoops to get the script assembly (#244) - by @glennblock
+
+   ```csharp
+   #load child.csx
+   Console.WriteLine(""Main script:"" + Env.ScriptPath); 
+   Console.WriteLine(""Loaded scripts:"");
+   Console.WriteLine(""\t"" + String.Join(Environment.NewLine + ""\t"", Env.LoadedScripts.ToArray()));  
+   Console.WriteLine(""Assembly:"" + Env.ScriptAssembly);
+   ```
+ 
+   ![screen shot 2017-02-11 at 10 56 50 pm](https://cloud.githubusercontent.com/assets/141124/22864847/a0538d7e-f10d-11e6-9975-7d80a1aaf683.png)
+
+* Added a ScriptCs Nuget package which has all the binaries. This allows running scripts like on a CI server simply by installing the package from NuGet. Also makes it easy to include ScriptCs binaries in a project.  (#1061) - by @glennblock
+* Added new `-e` and `--eval` options for allowing execution of code passed at the command line. (Currently does not work with svm due to a bug) (#1085) - by @glennblock
+
+   ![screen shot 2017-02-12 at 10 22 12 am](https://cloud.githubusercontent.com/assets/141124/22864851/aeda1796-f10d-11e6-987e-f59c1c085c3c.png)
+
+
+* Global Credential provider can now be set for NuGet. (#1018) - by @aarondandy 
+
+#### Fixes
+
+* REPL command help displays formatted to the width of the terminal. (#1047)  -by @BlackFrog1 
+
+   ![replformatting](https://cloud.githubusercontent.com/assets/550820/7661016/29f0143c-fb1d-11e4-8545-62ad0c5d9f00.png)
+
+* Char literals are properly handled if they have escape chars. (#1143) - by @rickardp 
+* Compilation into cache no longer throws a ScriptCompilationException (#1153) - by @filipw 
+* Stylecop removed from test projects, LibLog and Mono LineEditor (#1191) - by @glennblock
+* Changed errors to always show in Red as opposed to Dark Red to address readability (#1198) - by @glennblock
+
+   ![errors](https://cloud.githubusercontent.com/assets/141124/22173093/7a25b322-df6d-11e6-9fee-e0e89f72b0dc.png)
+
+* Comments can now be before directives. (#1185) - by @glennblock
+* Relative paths are now handled properly (#1193) - by @glennblock
+* Updated to Nuget.core 2.14.0 fixes error with ScriptCs.OctopusClient script pack (#1208) - by @glennblock 
+
+
+",https://api.github.com/users/glennblock,141124,glennblock,https://api.github.com/repos/scriptcs/scriptcs/releases/5109101/assets,https://api.github.com/repos/scriptcs/scriptcs/releases/5109101,master,https://api.github.com/repos/scriptcs/scriptcs/tarball/v0.17.0,https://github.com/scriptcs/scriptcs/releases/tag/v0.17.0,https://api.github.com/repos/scriptcs/scriptcs/zipball/v0.17.0,v0.17.0,False,False
+2960035,2016-04-07T00:20:50Z,2016-04-07T00:22:23Z,v0.16.1,"This hotfix addresses an issue we found with the `ScriptCs.Engine.Roslyn` module that affects hosters of scriptcs who are using that package.
+
+The issue does not affect direct users of scriptcs, so it is not necessary to upgrade unless you are hosting.
+",https://api.github.com/users/glennblock,141124,glennblock,https://api.github.com/repos/scriptcs/scriptcs/releases/2960035/assets,https://api.github.com/repos/scriptcs/scriptcs/releases/2960035,master,https://api.github.com/repos/scriptcs/scriptcs/tarball/v0.16.1,https://github.com/scriptcs/scriptcs/releases/tag/v0.16.1,https://api.github.com/repos/scriptcs/scriptcs/zipball/v0.16.1,v0.16.1,False,False
+2939655,2016-04-02T02:07:15Z,2016-04-03T08:09:05Z,v0.16.0,"# 0.16.0 is here!
+
+Go get it via [svm](https://github.com/scriptcs-contrib/svm), [Chocolatey](https://chocolatey.org/packages/ScriptCs/0.16.0) or [Homebrew](http://brew.sh/)! 
+
+This release brings a _MAJOR_ upgrade to scriptcs.
+
+## New Roslyn!
+
+The most prominent feature is we've upgraded to newer Roslyn `1.0.0-rc2` bits!  This is a big deal as we've been on the same bits for 3+ years and this brings some major enhancements. The new Roslyn _finally_ brings async/await and dynamic to scripts running on .NET. Not only that, it includes awesome new language enhancements of [C# 6.0](https://msdn.microsoft.com/en-us/magazine/dn802602.aspx?f=255&MSPPError=-2147217396), like Auto-Property initializers!
+
+**Note** - We are updating to Roslyn `1.0.0-rc2` and not the latest Roslyn `1.2.1` as the newer bits require .NET 4.6+ and this allows us to keep .NET 4.5 compat.
+
+Look below and see dynamic and Auto-Property initializers in action (On Windows)!
+
+![screen shot 2016-04-02 at 9 41 49 am](https://cloud.githubusercontent.com/assets/141124/14227649/44b0c044-f8b7-11e5-9312-41a2b852892f.png)
+
+And here is an example using async/await!
+
+![screen shot 2016-04-02 at 12 30 25 pm](https://cloud.githubusercontent.com/assets/141124/14228607/d7b6460e-f8ce-11e5-8c43-59195e8f8cfe.png)
+
+## REPL enhancements from Mono
+
+This release includes enhancements in our REPL to make it behave similar to the Bash shell. This includes Emacs  keybindings, history, searching, etc. Special thanks to @migueldeicaza for this contribution.
+
+Below you can see I have pressed `ctrl+R` to use reverse-search to find the code that I had entered with `a`. As it is reverse it found the last line that I had entered.
+
+![screen shot 2016-04-02 at 9 45 18 am](https://cloud.githubusercontent.com/assets/141124/14227667/bfe76e98-f8b7-11e5-82c6-97abc2d7ea97.png)
+
+## Debugging in Visual Studio
+
+A long sought after feature for scriptcs has been to enable debugging in Visual Studio. In this release we introduce the `:openvs` command. From the repl, you can type `:openvs ""[filename]""` and it will create a solution for you including all the files and subdirectories in the same folder. It will then launch Visual Studio where you can execute the script and debug! You can add breakpoints, watches, etc. 
+
+Below you can see a screenshot:
+
+![debugging](https://cloud.githubusercontent.com/assets/141124/14227600/34e25818-f8b6-11e5-9c04-3385d981efc7.png)
+
+## Breaking API Changes
+
+**Low Impact** - The `IConsole.ReadLine` method signature has changed to `string ReadLine(string prompt)`. This was necessary to properly support the latest REPL enhancements. This change will impact custom hosters who have provided their own `IConsole` implementation and it will need to get updated to support the new signature.
+
+## Issue Details
+
+New: Upgrade to Roslyn packages 1.0.0 rc2 #1059 
+New: OpenVS #1109 
+New: Provide editing capabilities using Mono.Terminal.GetLine. #1118 / #1119 
+
+Fixed: Cannot use array initializers #1070 
+Fixed: Error on double handling in REPL #864 
+Fixed: Support the `dynamic` keyword in the Roslyn engine #1057 
+Fixed: v0.9.0 - Using Generic Method Call Results In ""ERROR: Unable to change after type...""  #580 
+Fixed: Stack overflow in Roslyn when local variable is used before declared #691 
+Fixed: Cannot call external methods with params args #1066
+Fixed: Change cache folder to being script-local #1086
+Fixed: NullReferenceException running script (x86 Win10, .NET 4.6) #1095
+Fixed: Compilation error using dynamic #1110
+Fixed: scriptcs -install gives a very verbose error for package not found #1114
+
+## Thanks to our contributors!!!
+
+Thank you to the following people outside of our core team who contributed filing issues and sending PRs to this release:
+
+@aikeru, @ClockEndGooner, @ChrSteinert, @migueldeicaza, @nesteruk, @olagjo and @sapiens
+
+## Thanks to Microsoft and the Roslyn team!
+
+This release would not have been possible without the support of the Roslyn team and their awesome move of releasing Roslyn under OSS!
+
+Look for an update in the future that will move on to the latest Roslyn bits!
+",https://api.github.com/users/glennblock,141124,glennblock,https://api.github.com/repos/scriptcs/scriptcs/releases/2939655/assets,https://api.github.com/repos/scriptcs/scriptcs/releases/2939655,master,https://api.github.com/repos/scriptcs/scriptcs/tarball/0.16.0,https://github.com/scriptcs/scriptcs/releases/tag/0.16.0,https://api.github.com/repos/scriptcs/scriptcs/zipball/0.16.0,0.16.0,False,False
+1156151,2015-04-12T17:55:15Z,2015-04-12T17:58:27Z,v0.14.1,"Get it via [svm](https://github.com/scriptcs-contrib/svm), [Chocolatey](https://chocolatey.org/packages/ScriptCs/0.14.1) or [Homebrew](http://brew.sh/)!
+
+**Fixed:** Hotfix NuGet.Core package reference #1020 
+",https://api.github.com/users/adamralph,677704,adamralph,https://api.github.com/repos/scriptcs/scriptcs/releases/1156151/assets,https://api.github.com/repos/scriptcs/scriptcs/releases/1156151,master,https://api.github.com/repos/scriptcs/scriptcs/tarball/v0.14.1,https://github.com/scriptcs/scriptcs/releases/tag/v0.14.1,https://api.github.com/repos/scriptcs/scriptcs/zipball/v0.14.1,v0.14.1,False,False
+1098544,2015-08-03T16:41:39Z,2015-08-03T16:58:40Z,v0.15.0,"Get it via [svm](https://github.com/scriptcs-contrib/svm), [Chocolatey](https://chocolatey.org/packages/ScriptCs/0.15.0) or [Homebrew](http://brew.sh/)!
+
+This release, our first for a while, introduces a new `:scriptpacks` REPL command, fixes a bug which prevented `else` from being used in Mono and many other small enhancements, bug fixes and performance improvements as well as a significant API change. See 'Issue Details' below for more details.
+
+For API users (hosting or other programmatic usage), there is one major change, the deprecation of Common.Logging (#847). This has been replaced by [LibLog](https://github.com/damianh/LibLog), but this is an internal implementation detail, since LibLog is a source code package. The end effect for scriptcs API users is that the members which use Common.Logging types have been obsoleted in the public API and replaced with new members which use types under the `ScriptCs.Contracts` namespace. Support for the Common.Logging types will be removed completely in a later release and the dependency on Common.Logging will be removed entirely, so you are encouraged to switch to the new API as soon as possible.
+
+**All script packs, script libraries, modules, hosts and other code which uses the scriptcs NuGet packages should be changed to switch from using the Common.Logging members to the new API members as soon as possible to prevent breakage when Common.Logging is removed.** For more details, see the [related blog post](http://blog.scriptcs.net/2015/08/03/deprecating-common-logging/).
+
+For users of ScriptCs.Hosting there is also a further minor change to make the API a little more friendly (#998).
+
+### Breaking API Changes
+
+**Low impact**: The `ScriptCs.Hosting.IScriptServicesBuilder` interface has a new method, `LoadScriptPacks(bool load = true)`. Given there is little utility for API users in implementing this interface, it is _extremely_ unlikely that this will cause any breakages. Indeed, this interface may even be removed in future.
+
+### Issue Details
+
+**New:** Added :scriptpacks REPL command #1005
+**New:** Print exception stack traces to console when logging at debug level #987
+**New:** Warn on scriptcs -save when packages directory does not exist #989
+**New:** Better console output when script not found #1010
+**New:** Show logger name at debug and trace level #1008
+**New:** Update to Mono.CSharp 4.0.0 and NRefactory 5.5.1 #1046
+**New:** Upgrade to NuGet 2.8.6 #1072
+
+**New (API):** Deprecate Common.Logging usage in favour of our own logging API #847
+**New (API):** Add LoadScriptPacks method to ScriptServicesBuilder #998 _(breaking - see above)_
+**New (API):** Make ScriptExecutor references methods virtual #1036
+
+**Fixed:** `else` keyword not correctly parsed in Mono #1060
+**Fixed:** Namespaces and references are not properly imported within Script Libraries #1025
+**Fixed:** scriptcs -debug without -repl does not configure REPL correctly. #990
+**Fixed:** Namespace aliasing causes an exception to be thrown #826 
+**Fixed:** Script pack usings don't appear in :usings #992
+**Fixed:** Command alias not shown in :help #985
+**Fixed:** Extra line breaks in scriptcs -help #962
+
+**Performance:** Fix profile optimization #945
+**Performance:** Speed up -help and -version #963
+",https://api.github.com/users/adamralph,677704,adamralph,https://api.github.com/repos/scriptcs/scriptcs/releases/1098544/assets,https://api.github.com/repos/scriptcs/scriptcs/releases/1098544,master,https://api.github.com/repos/scriptcs/scriptcs/tarball/v0.15.0,https://github.com/scriptcs/scriptcs/releases/tag/v0.15.0,https://api.github.com/repos/scriptcs/scriptcs/zipball/v0.15.0,v0.15.0,False,False
+1013794,2015-03-23T16:42:50Z,2015-03-23T16:43:03Z,v0.14.0,"Get it on [Chocolatey](https://chocolatey.org/packages/ScriptCs/0.14.0)!
+
+For more information see the [blog](http://blog.scriptcs.net/)!
+
+**New:** Script Libraries #909
+**New:** Remove redundant $id from JSON strings in REPL #700 
+**New:** Add an "":exit"" command to the REPL. #427
+**New:** Ignore shebang on *nix platforms #956
+**New:** Include binstub for *nix in build artifacts #675
+**New:** Better REPL greeting message #932
+
+**Fixed:** Duplicate references cause script execution to fail #953 
+
+**Performance:** Only scan for modules when -m is specified #964
+",https://api.github.com/users/adamralph,677704,adamralph,https://api.github.com/repos/scriptcs/scriptcs/releases/1013794/assets,https://api.github.com/repos/scriptcs/scriptcs/releases/1013794,master,https://api.github.com/repos/scriptcs/scriptcs/tarball/v0.14.0,https://github.com/scriptcs/scriptcs/releases/tag/v0.14.0,https://api.github.com/repos/scriptcs/scriptcs/zipball/v0.14.0,v0.14.0,False,False
+981290,2015-02-24T07:15:02Z,2015-02-24T07:21:50Z,v0.13.3,"This is a bug fix release.
+
+**Fixed:** Unable to install Script CS v0.13.2 - Get-EnvironmentVariable not recognized - #936
+",https://api.github.com/users/adamralph,677704,adamralph,https://api.github.com/repos/scriptcs/scriptcs/releases/981290/assets,https://api.github.com/repos/scriptcs/scriptcs/releases/981290,master,https://api.github.com/repos/scriptcs/scriptcs/tarball/v0.13.3,https://github.com/scriptcs/scriptcs/releases/tag/v0.13.3,https://api.github.com/repos/scriptcs/scriptcs/zipball/v0.13.3,v0.13.3,False,False
+929258,2015-02-07T17:00:45Z,2015-02-07T17:01:43Z,v0.13.2,"This is a bug fix release.
+
+**Fixed:** scriptcs 0.13.1 crashes when a package has a framework assembly reference - #922
+",https://api.github.com/users/adamralph,677704,adamralph,https://api.github.com/repos/scriptcs/scriptcs/releases/929258/assets,https://api.github.com/repos/scriptcs/scriptcs/releases/929258,master,https://api.github.com/repos/scriptcs/scriptcs/tarball/v0.13.2,https://github.com/scriptcs/scriptcs/releases/tag/v0.13.2,https://api.github.com/repos/scriptcs/scriptcs/zipball/v0.13.2,v0.13.2,False,False
+920557,2015-02-05T12:58:43Z,2015-02-05T12:59:06Z,v0.13.1,"This is a bug fix release.
+
+**Fixed:** Implicit installation fails in scriptcs 0.13 in a legacy folder - https://github.com/scriptcs/scriptcs/issues/912
+**Fixed:** scriptcs crashes when native DLL's are present - https://github.com/scriptcs/scriptcs/issues/913
+",https://api.github.com/users/adamralph,677704,adamralph,https://api.github.com/repos/scriptcs/scriptcs/releases/920557/assets,https://api.github.com/repos/scriptcs/scriptcs/releases/920557,master,https://api.github.com/repos/scriptcs/scriptcs/tarball/v0.13.1,https://github.com/scriptcs/scriptcs/releases/tag/v0.13.1,https://api.github.com/repos/scriptcs/scriptcs/zipball/v0.13.1,v0.13.1,False,False
+882775,2015-01-28T06:17:19Z,2015-01-28T06:17:41Z,v0.13,"## Breaking Changes
+
+This release changes the file system conventions used by scriptcs. See the [related blog post](http://blog.scriptcs.net/2015/01/28/a-new-file-system/) for more information. This is not necessarily a breaking change since migration is automatic when scriptcs is run, but in some situations, work may be required when upgrading from an older version of scriptcs.
+
+## Issue Details
+
+**New:** Change scriptcs filesystem names to avoid clashes - #626
+**New:** Default to REPL when other options are passed - #869
+
+**Fixed:** Cannot install ScriptCS via Chocolatey for multiple user accounts - #874
+**Fixed:** Expressions capturing local vars do not compile in Mono - #713
+",https://api.github.com/users/adamralph,677704,adamralph,https://api.github.com/repos/scriptcs/scriptcs/releases/882775/assets,https://api.github.com/repos/scriptcs/scriptcs/releases/882775,master,https://api.github.com/repos/scriptcs/scriptcs/tarball/v0.13,https://github.com/scriptcs/scriptcs/releases/tag/v0.13,https://api.github.com/repos/scriptcs/scriptcs/zipball/v0.13,v0.13,False,False
+805931,2014-12-24T19:22:32Z,2014-12-24T19:57:11Z,v0.12,"**New**: Allow REPL commands to be aliased - #730
+**New**: Added support for :references, :usings, :vars and :help in REPL - #830
+**New**: Make REPL injectable and overrideable like other services - #434
+
+**Fixed**: Cannot mix loglevel and debug command line args - #833
+",https://api.github.com/users/adamralph,677704,adamralph,https://api.github.com/repos/scriptcs/scriptcs/releases/805931/assets,https://api.github.com/repos/scriptcs/scriptcs/releases/805931,master,https://api.github.com/repos/scriptcs/scriptcs/tarball/v0.12,https://github.com/scriptcs/scriptcs/releases/tag/v0.12,https://api.github.com/repos/scriptcs/scriptcs/zipball/v0.12,v0.12,False,False
+726412,2014-12-11T01:50:12Z,2014-12-11T01:51:03Z,v0.11,"**New**: Support a global scriptcs.opts file - #768
+**New**: Display the first inner exception of an AggregateException - #834
+**New**: Add System.Net.Http.dll ref and System.Net.Http usings as defaults - #811
+**New**: Define TRACE by default - #573
+**New**: Remove InteractiveBase from MonoHost - #828
+**New**: Update to Mono.CSharp 3.6.1 - #827
+
+**Fixed**: Bad using statements break the REPL - #849 
+**Fixed**: Cannot install NuGet packages with dashes in pre-release part - #841
+**Fixed**: Setting Debug to true in opts file doesn't change LogLevel - #775
+**Fixed**: Mono REPL can't parse nested classes - #702
+",https://api.github.com/users/adamralph,677704,adamralph,https://api.github.com/repos/scriptcs/scriptcs/releases/726412/assets,https://api.github.com/repos/scriptcs/scriptcs/releases/726412,master,https://api.github.com/repos/scriptcs/scriptcs/tarball/v0.11,https://github.com/scriptcs/scriptcs/releases/tag/v0.11,https://api.github.com/repos/scriptcs/scriptcs/zipball/v0.11,v0.11,False,False
+462108,2014-07-30T22:15:14Z,2014-07-31T06:03:09Z,v0.10.1,"**Fixed:** Removal of old install paths in choco install script - #815
+",https://api.github.com/users/adamralph,677704,adamralph,https://api.github.com/repos/scriptcs/scriptcs/releases/462108/assets,https://api.github.com/repos/scriptcs/scriptcs/releases/462108,master,https://api.github.com/repos/scriptcs/scriptcs/tarball/v0.10.1,https://github.com/scriptcs/scriptcs/releases/tag/v0.10.1,https://api.github.com/repos/scriptcs/scriptcs/zipball/v0.10.1,v0.10.1,False,False
+462105,2014-08-01T02:27:43Z,2014-11-23T01:11:52Z,v0.10.2,"**Fixed:** scriptcs 0.10.1 fails to install - #815
+",https://api.github.com/users/adamralph,677704,adamralph,https://api.github.com/repos/scriptcs/scriptcs/releases/462105/assets,https://api.github.com/repos/scriptcs/scriptcs/releases/462105,master,https://api.github.com/repos/scriptcs/scriptcs/tarball/v0.10.2,https://github.com/scriptcs/scriptcs/releases/tag/v0.10.2,https://api.github.com/repos/scriptcs/scriptcs/zipball/v0.10.2,v0.10.2,False,False
+458818,2014-07-30T01:51:08Z,2015-01-25T11:42:46Z,v0.10,"## Features
+
+This release is **JAM PACKED** with new features which are listed below:
+
+### Mono Support!!!!
+
+Since we first started this project, we had a dream of one day working on [Mono](http://www.mono-project.com/Main_Page). Today that dream has come true! We've just shipped initial support for Mono. Resting on the Mono CSharp compiler, you can now run your scripts on [Mac and Linux](https://github.com/scriptcs/scriptcs/wiki/Installing-on-Mac-and-Linux) with Mono. 
+
+You can run scriptcs, use script packs / nuget and work with the REPL. We don't have full parity yet syntax wise, but this is something we will be continuing to flesh out. Module support has not yet been verified, but we believe it works :-) 
+
+_Special thanks to [Stone Gíslason](https://github.com/ztone) for his significant efforts on the Mono feature._
+
+### Async/await and dynamic
+
+The Roslyn CTP currently does not support `async/await` or the `dynamic` keyword. With the mono engine support, we are now enabling you to use async/await AND dynamic via Mono's compiler, even in Windows on the .NET runtime. 
+- If you run on Mac or Linux, it will just work.
+- On Windows, force the Mono engine by passing `-modules mono` when you run scriptcs i.e. `scriptcs.exe dynamic.csx -modules mono`
+
+#### Examples
+
+**async/await**
+
+``` csharp
+#r System.Net.Http
+using System.Net.Http;
+
+public async Task DumpRequestAsync() {
+    var client = new HttpClient();
+    var response = await client.GetAsync(""http://www.yahoo.com"");
+    Console.WriteLine(response);
+}
+
+DumpRequestAsync().Wait();
+```
+
+**dynamic**
+
+``` csharp
+using System.Dynamic;
+
+dynamic foo = new ExpandoObject();
+foo.bar = ""bar"";
+Console.WriteLine(foo.bar);
+```
+
+### Custom REPL commands
+
+One of the popular requests we've received is to be able to introduce custom commands in the REPL. We've now introduced [commands](https://github.com/scriptcs/scriptcs/tree/dev/src/ScriptCs.Core/ReplCommands) like `:clear`, `:cwd` and `:install` which you can use right from within the REPL! For example `:install` will let you install packages directly. 
+
+The best part is you can now author your own commands which can be installed as part of a [Module](https://github.com/scriptcs/scriptcs/wiki/Modules)! You just need to implement [`IReplCommand`](https://github.com/scriptcs/scriptcs/blob/dev/src/ScriptCs.Contracts/IReplCommand.cs). scriptcs will find it! See our in the box commands to get a sense of how to implement your own.
+
+_Special thanks to [Kyle Roatch](https://github.com/kroatch) for his spiking which laid the ground work for this feature._
+
+### Runtime binding redirects
+
+A major pain we've had in previous releases related to versioning conflicts. This was usually due to one of the following reasons:
+- A script relies on nuget packages which scriptcs itself also uses. The packages may be binary compatible, but as the versions differ, you get a type mismatch.
+- scriptcs is hosted in an app that has conflicting dependencies with scriptcs's dependencies.
+- A script pack is compiled against a different version of a package then what scriptcs itself uses.
+
+In the standard .NET world, this is generally handled by binding redirects in app.config. In the scriptcs world however we've had no solution as the only app.config is for scriptcs itself. In this release w're introducing dynamic runtime binding redirects. This will automatically redirect any references to an earlier version of a dependency to the latest version. This will solve a bunch of problems and generally cause less failures due to conflicts, something that was particularly common with older script packs. The one caveat is if there are true binary conflicts i.e the signatures of methods have changed, or been removed. In these cases this is not related strictly to the version number, so the redirect functionality won't help.
+
+### File watching
+
+In previous releases, if you are editing a script and want it to reload, you need to kill scriptcs and re-run. Taking a hint from tools like mocha in the node world, scriptcs now supports file watching. Using the `-watch` parameter, scriptcs will execute your script in a separate `AppDomain`. It will then monitor any changes to the entry point script, and if there is a change it will tear down the AppDomain and re-execute the script. If you want to work with dependent scripts, you can use tools like `touch` to modify the main script after you make edits to the other scripts.
+
+_Special thanks to [Lucian Bargaoanu](https://github.com/lbargaoanu) for implementing this feature_
+
+#### Example
+
+``` text
+C:\src\test> scriptcs watched.csx -watch
+scriptcs (ctrl-c to exit)
+Running script 'watched.csx' and watching for changes...
+I am watched
+Script changed. Reloading...
+I am watched again
+```
+
+### Console Mirroring
+
+Using the new `-Output` switch you can now mirror input and output in from a script OR in the REPL to a file.  This is very useful for debugging or for automation scripts.
+
+#### Screenshot
+
+![dac64bc8-ce6e-11e3-99ce-253e839ff87a](https://cloud.githubusercontent.com/assets/141124/3743799/ec306be6-177f-11e4-9bae-12ce75f43db8.png)
+
+## Known issues
+- Modules are no longer being loaded from the bin folder even if you specify `-debug`. This is a bug and should be fixed in the next release.
+- Runnng the REPL in the scriptcs source folder will throw an exception when you try to run some code. This only happens as far as we can tell in that folder.
+
+## Contributors
+
+This release has had some amazing contributions. Below is a list of the contributors and the number of PRs we merged in. 
+- adamralph has 41 merged PRs
+- filipw has 13 merged PRs
+- glennblock has 12 merged PRs
+- khellang has 8 merged PRs
+- jrusbatch has 8 merged PRs
+- ztone has 6 merged PRs
+- ryanrousseau has 3 merged PRs
+- estoy has 2 merged PRs
+- stirno has 1 merged PRs
+- lukebuehler has 1 merged PRs
+- jchannon has 1 merged PRs
+- pagebrooks has 1 merged PRs
+- vgrigoriu has 1 merged PRs
+- johnduhart has 1 merged PRs
+- ikasovitch has 1 merged PRs
+- paulbouwer has 1 merged PRs
+
+Thank you again contributors for all your efforts!
+
+## Issue details
+
+Below is a detailed list of all features and bugs that were fixed in this release.
+
+**New:** Script Command logs and returns an error when an arbitrary engine recognises an incomplete submission - #806
+**New:** Dynamic binding redirects at runtime - #793
+**New:** replace file system constants with IFileSystem - #738
+**New:** Remove console noise from Mono engine when platform is Mono - #737
+**New:** DirectiveLineProcessor.GetDirectiveArgument should trim all whitespace - #733
+**New:** Parameterless custom directive line processors - #728
+**New:** updated to Mono.CSharp 3.4.0 - #705
+**New:** Move ScriptCs.SyntaxTreeParse to Mono engine assembly - #704
+**New:** Mono engine to support loose function calling other loose functions - #694
+**New:** Removed INFO prefix and added colour to console - #693
+**New:** More tolerant multiline REPL behaviour - #692
+**New:** Change Chocolatey install location to AppData\Local - #666
+**New:** Support loose functions in mono - #662
+**New:** Allow modules to be marked to auto load.  - #660
+**New:** Allow modules in the local bin to load whether -debug is specified or not - #659
+**New:** New command line arg for mirroring the console to a file - #656
+**New:** Remove 'preseeded' from output when loading a script into REPL - #649
+**New:** Remove Autofac dependency from scriptcs.exe - #639
+**New:** Upgrade to PowerArgs 2.x - #638
+**New:** Option for mirroring all console rendering in a file - #637
+**New:** Log full exception from script execution - #636
+**New:** #444 - Mono module and engine selection - #635
+**New:** updated all packages except PowerArgs which has breaking changes - #613
+**New:** Nuget package installation from the REPL - #609
+**New:** Print loader exceptions in case AggregateCatalog would throw - #608
+**New:** Remove log4net from from Hosting - #602
+**New:** switch scriptcs.exe from SS to JSON.NET - #601
+**New:** Directory enumeration - #598
+**New:** Repl change and view directory - #597
+**New:** updated all packages with non-breaking changes in latest versions - #586
+**New:** Changed FileSystem members to be virtual - #574
+**New:** upgrade to nuget 2.8 - #568
+**New:** Convert Scriptcs.Engine.Roslyn to a module.  - #444
+**New:** Remove hard reference to Roslyn Engine in hosting - #414
+**New:** Command line option to watch and reload scripts - #330
+**New:** Add pluggable command infra for the REPL - #237
+**New:** REPL - Basic Commands - #224 
+
+**Fixed:** No exception when Roslyn script is missing closing character - #802
+**Fixed:** Reference framework assemblies specified in NuGet packages - #800
+**Fixed:** Process exit code is 0 when packages fail to install - #794
+**Fixed:** Unhandled exception when package not installed - #772
+**Fixed:** Unhandled exception when assemblies in packages folder fail to load - #765
+**Fixed:** Prevent wrapping ScriptResult in ScriptResult in REPL commands - #741
+**Fixed:** Ambiguous Call on RoslynScriptingEngine - #736
+**Fixed:** Removed swallowing of script exceptions in Mono - #735
+**Fixed:** REPL using is broken - #710
+**Fixed:** fixed reference issue in the roslyn script engine - #707
+**Fixed:** Mono assembly has incorrect version number - #703
+**Fixed:** Common.Logging 2.2 does not work on Linux - #670
+**Fixed:** REPL passes null script args to script packs - #669
+**Fixed:** Exceptions thrown from profile optimization code on Mono - #668
+**Fixed:** using statements appear to be duplicated using the mono engine - #652
+**Fixed:** Scripts with missing closing chars fail silently - #647
+**Fixed:** Exceptions thrown during app termination mask exceptions from scripts - #643
+**Fixed:** Custom line processors are considered ""code"" by FilePreProcessor. - #630
+**Fixed:** Cannot add a custom LineProcessor via IModuleConfiguration - #629
+**Fixed:** Install package fails on Mono on Mac - #621
+**Fixed:** Scriptcs.exe should not load an engine (Roslyn) until it is needed. - #617
+**Fixed:** Correct behaviour of local NuGet.config file - #589
+**Fixed:** Unhandled NullReferenceException for unknown argument - #577
+**Fixed:** NuGet Package installation issue with package.config and targetFramework - #511
+**Fixed:** String in command line can override argument in config file - #501
+**Fixed:** Script packs not loaded when automatically installing NuGet packages - #297
+**Fixed:** passing an invalid arg should give a better error message - #161
+",https://api.github.com/users/adamralph,677704,adamralph,https://api.github.com/repos/scriptcs/scriptcs/releases/458818/assets,https://api.github.com/repos/scriptcs/scriptcs/releases/458818,master,https://api.github.com/repos/scriptcs/scriptcs/tarball/v0.10,https://github.com/scriptcs/scriptcs/releases/tag/v0.10,https://api.github.com/repos/scriptcs/scriptcs/zipball/v0.10,v0.10,False,False

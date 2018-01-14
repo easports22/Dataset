@@ -1,0 +1,402 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8120019,2017-10-14T11:36:08Z,2017-10-14T11:50:50Z,SteamKit 2.0.0-Beta.1,"* SteamKit 2.0 now targets .NET Standard 2.0. This means it now requires .NET Framework 4.6.1 or higher, .NET Core 2.0 or higher, or any other .NET Standard 2.0-compatible runtime.
+* Added support for WebSocket client connections.
+	* Server List treats WebSocket, TCP and UDP independently, even for the same server.
+	* If a server is not reachable on TCP, SteamKit will still attempt UDP and vice-versa.
+* Added `SteamConfiguration`, which replaces the previous assortment of individual configuration properties and parameters.
+	* If the `SteamConfiguration` permits both TCP and UDP, both can now be used (depending on server ranking). (#417)
+	* See the Breaking Changes section below for further details.
+* Added `ArgumentNullException` to the public API surface when passing null into methods that would have previously triggered a `NullReferenceException`.
+* Updated Protobuf message classes to expose a property indicating if any wire value was specified or not, and a method to clear the value.
+* Updated game-related GC messages and protobufs. (#459, #460)
+* Updated Steam enums and protobufs. (#456, #457, #458)
+* Fixed no callback being fired when calling `SteamUserStats.GetLeaderboardEntries`. (#421)
+* Fixed a crash if we encountered a message that's too small to actually contain a message.
+* Fixed user's name being changed to `[unassigned]` if `SteamFriends.SetPersonaState()` is called too early. (#442)
+* Fixed order of handlers being non-deterministic. (#442)
+* Fixed exception when using `SteamUnifiedMessages.UnifiedService<>.SendMessage`. (#469)
+
+BREAKING CHANGES
+
+* Removed all methods and properties that were marked as `[Obsolete]`.
+* The `SteamClient` constructor now accepts a `SteamConfiguration` object, which is a container for various configuration settings.
+	* If you were using the `SteamClient` constructor to specify a specific protocol type (TCP or UDP), use `SteamConfiguration` instead.
+	* If you were using various properties to modify timeouts etc., use `SteamConfiguration` instead.
+	* If you do not provide a `SteamConfiguration` when constructing a `SteamClient`, the server list will be private to that `SteamClient` instance.
+	* If you create multiple clients from a single configuration, the server list will be shared among those clients.
+	* `SteamClient.ConnectedUniverse` is now `SteamClient.Universe`. This is now set from the configuration, and is no longer `EUniverse.Invalid` when not connected.
+	* `SteamClient.ConnectionTimeout` is now read-only. Setting this property is now performed on `SteamConfiguration`.
+* Removed `SteamClient.ConnectedCallback.EResult`, as it could only ever be `EResult.OK`.
+* Servers are now represented by `ServerRecord` objects, not IP addresses.
+	* `CMListCallback` now returns a collection of `ServerRecord` objects, not IP addresses. (#434)
+	* `CMListCallback` now also includes WebSocket servers. (#434)
+	* `SteamClient.Connect` now optionally accepts a `ServerRecord` instead of optionally accepting an `IPEndPoint`. You can create a `ServerRecord` for a particular protocol type or set of protocol types.
+	* `IServerListProvider` now deals with `ServerRecord`s instead of `IPEndPoint`s.
+* Disabling server list fetching from the directory is now done via `SteamConfiguration` instead of `SmartCMServerList`.
+* `SteamDirectory` helper methods now accept a `SteamConfiguration` rather than just a cellid.
+* `SteamFriends.GetPersonaName()`, `SteamFriends.GetFriendPersonaName` and `SteamFriends.GetClanName` can all now return null if the value is unknown. (#443)
+* `WebAPI` used to throw a `WebException` on non-success status code, or other failure. It now throws `HttpRequestException`. (#446)
+* `CDNClient` and `WebAPI` now expose `Task`-based asynchronous methods. This replaces the previous synchronous methods.",https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/8120019/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/8120019,7119eaa0ded85c8049b42cad26e63e601b0ee9c6,https://api.github.com/repos/SteamRE/SteamKit/tarball/2.0.0-Beta.1,https://github.com/SteamRE/SteamKit/releases/tag/2.0.0-Beta.1,https://api.github.com/repos/SteamRE/SteamKit/zipball/2.0.0-Beta.1,2.0.0-Beta.1,False,True
+8034242,2017-10-07T12:21:57Z,2017-10-07T12:33:00Z,SteamKit 2.0.0-Alpha10,* Fixed crash when reconnecting an existing `SteamClient` instance. (#464),https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/8034242/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/8034242,15ba4f7980f10222d657087253f502e6f10e65dd,https://api.github.com/repos/SteamRE/SteamKit/tarball/2.0.0-Alpha10,https://github.com/SteamRE/SteamKit/releases/tag/2.0.0-Alpha10,https://api.github.com/repos/SteamRE/SteamKit/zipball/2.0.0-Alpha10,2.0.0-Alpha10,False,True
+7958243,2017-10-02T00:19:18Z,2017-10-02T01:58:52Z,SteamKit 2.0.0-Alpha9,"* Fixed user's name being changed to `[unassigned]` if `SteamFriends.SetPersonaState()` is called too early. (#442)
+* Fixed order of handlers being non-deterministic. (#442)
+* Fixed `WebAPI` attempting to parse whatever data the server returned on non-success status code. (#446)
+* Fixed no callback being fired when WebSockets failed on Windows 7. (#455)
+* Updated game-related GC messages and protobufs. (#459, #460)
+* Updated Steam enums and protobufs. (#456, #457, #458)
+
+BREAKING CHANGES
+* `SteamFriends.GetPersonaName()`, `SteamFriends.GetFriendPersonaName` and `SteamFriends.GetClanName` can all now return null if the value is unknown. (#443)
+* `WebAPI` used to throw a `WebException` on non-success status code, or other failure. It now throws `HttpRequestException`. (#446)",https://api.github.com/users/yaakov-h,426009,yaakov-h,https://api.github.com/repos/SteamRE/SteamKit/releases/7958243/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/7958243,master,https://api.github.com/repos/SteamRE/SteamKit/tarball/2.0.0-Alpha9,https://github.com/SteamRE/SteamKit/releases/tag/2.0.0-Alpha9,https://api.github.com/repos/SteamRE/SteamKit/zipball/2.0.0-Alpha9,2.0.0-Alpha9,False,True
+7681166,2017-09-08T08:31:48Z,2017-09-08T08:45:18Z,SteamKit 2.0.0-Alpha8,"- SteamKit 2.0 now targets .NET Standard 2.0. This means it now requires .NET Framework 4.6.1 or higher, .NET Core 2.0 or higher, or any other .NET Standard 2.0-compatible runtime.
+- `CMListCallback` now returns a collection of `ServerRecord` objects, not IP addresses. (#434)
+- `CMListCallback` now also includes WebSocket servers. (#434)
+- Added `WebAPIKey` to `SteamConfiguration`. This will be used by WebAPI objects created from the given configuration, and by `SteamDiscovery` when loading the initial server list.
+- Added extension methods to create WebAPI interfaces with settings from a `SteamConfiguration`.
+- Added `ArgumentNullException` to the public API surface when passing null into methods that would have previously triggered a `NullReferenceException`.
+- Fixed a crash if we encountered a message that's too small to actually contain a message.
+- Fixed several crashes in the WebSocket code. (#426, #436)",https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/7681166/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/7681166,5fbf66012ffb8914475037c8859acc465c8b719a,https://api.github.com/repos/SteamRE/SteamKit/tarball/2.0.0-Alpha8,https://github.com/SteamRE/SteamKit/releases/tag/2.0.0-Alpha8,https://api.github.com/repos/SteamRE/SteamKit/zipball/2.0.0-Alpha8,2.0.0-Alpha8,False,True
+7540815,2017-08-28T08:54:38Z,2017-08-28T09:39:45Z,SteamKit 2.0.0-Alpha7,* Fixed exception when using WebSocket protocol. (#426),https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/7540815/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/7540815,15e9b30d6deb67db5f7b71a3f78db1254c635c4d,https://api.github.com/repos/SteamRE/SteamKit/tarball/2.0.0-Alpha7,https://github.com/SteamRE/SteamKit/releases/tag/2.0.0-Alpha7,https://api.github.com/repos/SteamRE/SteamKit/zipball/2.0.0-Alpha7,2.0.0-Alpha7,False,True
+7255524,2017-08-02T12:08:20Z,2017-08-02T12:26:13Z,SteamKit 2.0.0-Alpha6,"- The default `EClientPersonaStateFlags` are now defined by `SteamConfiguration`. (#324)
+- Server List now treats TCP and UDP independently, even for the same server. If a server is not reachable on TCP, SteamKit will still attempt UDP and vice-versa. Additionally, if the `SteamConfiguration` permits both TCP and UDP, both can now be used (depending server ranking). #417 
+- Fixed exceptions when using WebSocket protocol (#420, #422)
+- Fixed no callback being fired when calling `SteamUserStats.GetLeaderboardEntries` (#421)",https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/7255524/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/7255524,f9c83ff766cdbbffa1bd18a7490fb601f6cf6248,https://api.github.com/repos/SteamRE/SteamKit/tarball/2.0.0-Alpha6,https://github.com/SteamRE/SteamKit/releases/tag/2.0.0-Alpha6,https://api.github.com/repos/SteamRE/SteamKit/zipball/2.0.0-Alpha6,2.0.0-Alpha6,False,True
+7107516,2017-07-20T10:31:14Z,2017-07-20T11:37:39Z,SteamKit 2.0.0-Alpha5,"* Added support for websocket client connections
+* New overloads of `WebAPI.GetInterface` and `WebAPI.GetAsyncInterface` allow you to specify a different base URL for the Steam Web APIs (i.e. `https://api.steampowered.com/`)
+* Updated game-related GC messages and protobufs.
+* Updated Steam enums and protobufs.
+
+BREAKING CHANGES
+* Removed `SteamClient.ConnectedCallback.EResult`, as it could only ever be `EResult.OK`
+* The `SteamClient` constructor now accepts a `SteamConfiguration` object, which is a container for various configuration settings. If you were using the `SteamClient` constructor to specify a specific protocol type (TCP or UDP), use `SteamConfiguration` instead.
+* If you do not provide a `SteamConfiguration` when constructing a `SteamClient`, the server list will be private to that `SteamClient` instance. If you create multiple clients from a single configuration, the server list will be shared.
+* `SteamClient.ConnectedUniverse` is now `SteamClient.Universe`. This is now set from the configuration, **and is no longer `EUniverse.Invalid` when not connected.**
+* `SteamClient.ConnectionTimeout` is now read-only. Setting this property is now performed on `SteamConfiguration`.
+* `SteamClient.Connect` now optionally accepts a `ServerRecord` instead of optionally accepting an `IPEndPoint`. You can create a `ServerRecord` for a particular protocol type or set of protocol types.
+* `IServerListProvider` now deals with `ServerRecord`s instead of `IPEndPoint`s.
+* Disabling server list fetching from the directory is now done via `SteamConfiguration` instead of `SmartCMServerList`.
+* `SteamDirectory` helper methods now accept a `SteamConfiguration` rather than just a `cellid`.
+",https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/7107516/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/7107516,8407eb61e58964b2efbe49c08503f0cf0b2aee9b,https://api.github.com/repos/SteamRE/SteamKit/tarball/2.0.0-Alpha5,https://github.com/SteamRE/SteamKit/releases/tag/2.0.0-Alpha5,https://api.github.com/repos/SteamRE/SteamKit/zipball/2.0.0-Alpha5,2.0.0-Alpha5,False,True
+6163152,2017-04-14T01:39:46Z,2017-04-24T02:43:27Z,SteamKit 2.0.0-Alpha4,,https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/6163152/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/6163152,1c3757a0144bb2ace0e1b446f29b9bf0883a9815,https://api.github.com/repos/SteamRE/SteamKit/tarball/2.0.0-Alpha4,https://github.com/SteamRE/SteamKit/releases/tag/2.0.0-Alpha4,https://api.github.com/repos/SteamRE/SteamKit/zipball/2.0.0-Alpha4,2.0.0-Alpha4,False,True
+5920702,2017-03-30T10:07:50Z,2017-03-30T10:21:36Z,SteamKit 2.0.0-Alpha3,"* Fixed xmldoc being generated with an incorrect filename
+* Fixed licence files from being copied to consumer projects automatically
+* Fixed readme.txt not being called that
+* Fixed .NET Framework version of SteamKit2 relying upon .NET Core nuget packages at runtime",https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/5920702/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/5920702,620ce2a636cb17bfdfcde6190272fe183b82b2eb,https://api.github.com/repos/SteamRE/SteamKit/tarball/2.0.0-Alpha3,https://github.com/SteamRE/SteamKit/releases/tag/2.0.0-Alpha3,https://api.github.com/repos/SteamRE/SteamKit/zipball/2.0.0-Alpha3,2.0.0-Alpha3,False,True
+5902524,2017-03-29T00:33:03Z,2017-03-29T01:18:27Z,SteamKit 2.0.0-Alpha2,* Fixed a crash in `WebAPI`.,https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/5902524/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/5902524,f41261be563d6b999be3e46102c77e4768074e76,https://api.github.com/repos/SteamRE/SteamKit/tarball/2.0.0-Alpha2,https://github.com/SteamRE/SteamKit/releases/tag/2.0.0-Alpha2,https://api.github.com/repos/SteamRE/SteamKit/zipball/2.0.0-Alpha2,2.0.0-Alpha2,False,True
+5890354,2017-03-28T07:44:28Z,2017-03-28T07:50:46Z,SteamKit 2.0.0-Alpha,"* SteamKit2 now requires .NET Framework 4.6 or a .NET Standard 1.3-compatible runtime.
+	* SteamKit2 is now supported on .NET Core.
+	* `IsolatedStorageServerListProvider` is only available in .NET Framework 4.6 and higher.
+* Updated Protobuf message classes to expose a property indicating if any wire value was specified or not, and a method to clear the value.
+* Updated `CDNClient` and `WebAPI` to expose `Task`-based asynchronous methods.
+* Removed all methods and properties that were marked as `[Obsolete]`.",https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/5890354/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/5890354,8a76ec693ed11102d1d7379b34fa75b47a975192,https://api.github.com/repos/SteamRE/SteamKit/tarball/2.0.0-Alpha,https://github.com/SteamRE/SteamKit/releases/tag/2.0.0-Alpha,https://api.github.com/repos/SteamRE/SteamKit/zipball/2.0.0-Alpha,2.0.0-Alpha,False,True
+5889746,2017-03-28T06:12:16Z,2017-03-28T06:21:28Z,SteamKit 1.8.3,"* Obsoleted `TradeProposedCallback.OtherName`.
+
+This is the final release to support .NET Framework 4.5.",https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/5889746/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/5889746,4eb340ecbf0686003ae3fa02296ce435e295ae5e,https://api.github.com/repos/SteamRE/SteamKit/tarball/1.8.3,https://github.com/SteamRE/SteamKit/releases/tag/1.8.3,https://api.github.com/repos/SteamRE/SteamKit/zipball/1.8.3,1.8.3,False,False
+5843294,2017-03-23T10:53:17Z,2017-03-23T11:01:00Z,SteamKit 1.8.2,"* Added support for Binary KeyValues field type 10 (`Int64`) (#376)
+* Obsoleted `SteamApps.GetAppInfo`, `SteamApps.GetPackageInfo`, and `SteamApps.GetAppChanges`. Use the PICS equivalents instead.
+* Updated game-related GC messages and protobufs.
+",https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/5843294/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/5843294,498f31fd215fa7140526585572ec1201cbf96d3c,https://api.github.com/repos/SteamRE/SteamKit/tarball/1.8.2,https://github.com/SteamRE/SteamKit/releases/tag/1.8.2,https://api.github.com/repos/SteamRE/SteamKit/zipball/1.8.2,1.8.2,False,False
+5545320,2017-02-23T07:51:21Z,2017-02-23T07:58:31Z,SteamKit 1.8.1,"- Added support for using CS servers that have (CDN) `usetokenauth` specified.
+- Added support for newer branch passwords with `SteamApps.CheckAppBetaPassword` and `CryptoHelper.SymmetricDecryptECB`.
+- Added `LastSeen` to the default info flags used by `SteamFriends.RequestFriendInfo`. (pr #313)
+- Tell Steam that we support the `RateLimitExceeded` logon response. (pr #307)
+- Fixed timeouts not being set for sending/receiving when using TCP. (pr #317)
+- Fixed more possible crashes when querying WMI on Windows.
+- Fixed concurrent calls to Disconnect possibly blocking connectLock indefinitely.
+- Fixed not escaping backslashes and newlines when serializing KeyValues to text. (bug #334)
+- Fixed KeyValues float parsing in cultures where comma is used as decimal separator. (bug #355)
+- Updated `SteamApps.GetCDNAuthToken` to populate `depot_id`.
+- Updated Steam enums and protobufs. (pr #323) (pr #326) (pr #327) (pr #328) (pr #329) (pr #330) (pr #361)
+- Updated game-related GC messages and protobufs.
+",https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/5545320/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/5545320,da2d7b9b48e81072fecad1c30700502066b5f443,https://api.github.com/repos/SteamRE/SteamKit/tarball/1.8.1,https://github.com/SteamRE/SteamKit/releases/tag/1.8.1,https://api.github.com/repos/SteamRE/SteamKit/zipball/1.8.1,1.8.1,False,False
+5430937,2017-02-12T02:54:35Z,2017-02-12T03:01:26Z,SteamKit 1.8.1-citest,,https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/5430937/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/5430937,d2b9202ceb958e9559e649ca24aa2ad7218766f0,https://api.github.com/repos/SteamRE/SteamKit/tarball/1.8.1-citest,https://github.com/SteamRE/SteamKit/releases/tag/1.8.1-citest,https://api.github.com/repos/SteamRE/SteamKit/zipball/1.8.1-citest,1.8.1-citest,False,True
+5430907,2017-02-12T02:36:18Z,2017-02-12T02:42:54Z,SteamKit2 1.8.1-citest,,https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/5430907/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/5430907,96dc0b87ba05d50f370c7a2b343554db6d33428e,https://api.github.com/repos/SteamRE/SteamKit/tarball/SteamKit2-1.8.1-citest,https://github.com/SteamRE/SteamKit/releases/tag/SteamKit2-1.8.1-citest,https://api.github.com/repos/SteamRE/SteamKit/zipball/SteamKit2-1.8.1-citest,SteamKit2-1.8.1-citest,False,True
+3612734,2016-07-08T04:47:30Z,2016-07-08T04:55:22Z,SteamKit 1.8.0,"- Added `CallbackManager.RunWaitAllCallbacks` (pr #292)
+- Added `KeyValue.AsUnsignedByte`. (pr #270)
+- Added `KeyValue.AsUnsignedInteger`. (pr #255)
+- Added `KeyValue.AsUnsignedShort`. (pr #270)
+- Added `SteamUserStats.GetNumberOfCurrentPlayers(GameID)`. (pr #234)
+- Added the ability to persist the server list to Isolated Storage. (pr #293)
+- Added the ability to persist the server list to a file. (pr #293)
+- Added support for fetching server list from the Steam Directory API. (pr #293)
+- Fixed a crash on Windows if WMI is unavailable.
+- Fixed a memory leak when reconnecting to Steam with the same `SteamClient` instance (pr #292)
+- Updated `SteamUserStats.GetNumberOfCurrentPlayers` to use messages that Steam continues to respond to. (pr #234)
+- Updated Steam enums and protobufs. (pr #271, pr #274, pr #296)
+- Updated game-related GC messages and protobufs.
+- Removed the hardcoded list of Steam server addresses. (pr #293)
+
+BREAKING CHANGES
+- `SmartCMServerList` APIs have changed to accomodate new server management behaviour.
+",https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/3612734/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/3612734,master,https://api.github.com/repos/SteamRE/SteamKit/tarball/SteamKit_1.8.0,https://github.com/SteamRE/SteamKit/releases/tag/SteamKit_1.8.0,https://api.github.com/repos/SteamRE/SteamKit/zipball/SteamKit_1.8.0,SteamKit_1.8.0,False,False
+2319896,2015-12-21T07:33:39Z,2015-12-21T07:47:08Z,SteamKit 1.7.0,"- Added awaitable API for job-based messages. APIs which returned a `JobID` now return an `AsyncJob<>`, which can be used to asynchronously await for results. (pr #170)
+- Added `SteamApps.PICSGetAccessTokens` overload with singular parameters. (pr #190)
+- Added `SteamFriends.RequestMessageHistory` and `SteamFriends.RequestOfflineMessages` (pr #193)
+- Added the ability to connect to Developer instances of Steam (`EUniverse.Dev`). If anyone at Valve is using this internally, hi!
+- Added the ability to set a `LoginID` in `SteamUser.LogOnDetails` so that multiple instances can connect from the same host concurrenctly. (pr #217)
+- Added `SteamClient.DebugNetworkListener` API to intercept and log raw messages. (pr #204)
+- Added the ability to dump messages in NetHook2 format for debugging purposes. (pr #204)
+- Upgraded the encryption protocol used to communicate with the Steam servers.
+- Implemented protection against man-in-the-middle attacks. (pr #214)
+- Server List will now maintain ordering from Steam, increasing the chances of a successful and geographically local connection. (pr #218)
+- After calling `SteamUser.LogOff` or `SteamGameServer.LogOff`, `SteamClient.DisconnectedCallback.UserInitiated` will be `true`. (pr #205)
+- Fixed a crash when parsing a Steam ID of the format '[i:1:234]'.
+- Fixed a crash when logging on in an environment where the hard disk has no serial ID, such as Hyper-V.
+- Fixed a bug when parsing a KeyValue file that contains a `/` followed by a newline. (pr #187)
+- Updated Steam enums and protobufs.
+- Updated game-related GC messages and protobufs.
+
+BREAKING CHANGES
+- SteamKit2 now requires .NET 4.5 or equivalent (Mono 3.0), or higher.
+- Removed obsoleted `ICallbackMsg` extension methods `IsType<>` and `Handle<>`. (pr #221)
+- Game Coordinator base messages are now generated per-game, instead of relying on Dota 2. GC messages should use the base messages for their game, which is separated by namespace. (pr #180)
+- Cell IDs are now consistently `uint`s within `SteamDirectory`.
+",https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/2319896/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/2319896,master,https://api.github.com/repos/SteamRE/SteamKit/tarball/SteamKit_1.7.0,https://github.com/SteamRE/SteamKit/releases/tag/SteamKit_1.7.0,https://api.github.com/repos/SteamRE/SteamKit/zipball/SteamKit_1.7.0,SteamKit_1.7.0,False,False
+1977100,2015-10-17T21:08:28Z,2015-10-17T21:16:55Z,SteamKit 1.6.5,"- Added inventory service unified protobufs.
+- Added the ability to specify the client's prefered Cell ID in `LogOnDetails.CellID`. (pr #148)
+- `KeyValue` objects can now be serialized (both text and binary) to streams with `SaveToStream`.
+- Fixed an issue with `CDNClient` session initialization involving sessionid values. 
+- Added setter for `KeyValue`'s indexer operator.
+- Added `ELeaderboardDisplayType` and various leaderboard retrieval functions to `SteamUserStats`. (pr #153)
+- Implemented machine id support for logon for when the Steam servers inevitably require it. (pr #152)
+- Fixed case where logging on with a different account could lead to an anonymous logon instead. (bug #160)
+- `SteamFriends.SetPersonaName` now supports `JobID`s and has a new associated callback: `PersonaChangeCallback` **(Binary level breaking change)**
+- Updated game-related GC messages and protobufs.
+",https://api.github.com/users/VoiDeD,2432381,VoiDeD,https://api.github.com/repos/SteamRE/SteamKit/releases/1977100/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/1977100,master,https://api.github.com/repos/SteamRE/SteamKit/tarball/SteamKit_1.6.5,https://github.com/SteamRE/SteamKit/releases/tag/SteamKit_1.6.5,https://api.github.com/repos/SteamRE/SteamKit/zipball/SteamKit_1.6.5,SteamKit_1.6.5,False,False
+1619824,2015-08-03T08:00:52Z,2015-08-03T08:10:34Z,SteamKit 1.6.4,"- Added smarter server selection logic.
+- Added ability to load initial server list from Steam Directory Web API. See `SteamDirectory.Initialize`.
+- Added ability to persist internal server list. See Sample 7 for details.
+- Added `SteamFriends.InviteUserToChat`.
+- Added support in `SteamUser` for passwordless login with a login key.
+- Added `NumChatMembers`, `ChatRoomName` and `ChatMembers` to `ChatEnterCallback`.
+- Added new API for callback subscriptions, `CallbackManager.Subscribe`.
+- Added `SteamApps.RequestFreeLicense` to request Free On-Demand licences.
+- Exposed `ClientOSType` and `ClientLanguage` when logging in as a specific or as an anonymous user.
+- Fixed `KeyValue` binary deserialization returning a dummy parent node containing the actually deserialized `KeyValue`. You must change to the new `Try`-prefixed methods to adopt the fixed behavior.
+- Updated Steam enums and protobufs.
+- Updated game-related GC messages and protobufs.
+
+DEPRECATIONS
+- `ICallbackMsg.IsType<>` and `ICallbackMsg.Handle<>` are deprecated and will be removed soon in a future version of SteamKit. Please use `CallbackManager.Subscribe` instead.
+- `Callback<T>` is deprecated and will be removed in a future version of SteamKit. Please use `CallbackManager.Subscribe` instead.
+- `KeyValue.ReadAsBinary` and `KeyValue.LoadAsBinary` are deprecated and will be removed in a future version of SteamKit. Use the `Try`-prefixed methods as outlined above.
+
+BREAKING CHANGES
+- `PICSProductInfo.KeyValues` has been fixed in line with the above `KeyValue` binary deserialization notes. The `KeyValue` structure returned is now the root node of the product info, not a dummy node with the actual product info as the sole child.
+",https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/1619824/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/1619824,master,https://api.github.com/repos/SteamRE/SteamKit/tarball/SteamKit_1.6.4,https://github.com/SteamRE/SteamKit/releases/tag/SteamKit_1.6.4,https://api.github.com/repos/SteamRE/SteamKit/zipball/SteamKit_1.6.4,SteamKit_1.6.4,False,False
+1420818,2015-06-20T09:03:55Z,2015-06-20T09:11:36Z,SteamKit 1.6.3,"- Added support for parsing older representations of Steam3 Steam IDs such as those from Counter-Strike: Global Offensive, i.e. `[M:1:123(456)]`.
+- Steam IDs parsed from Steam3 string representations will now have the correct instance ID set.
+- KeyValues can now be serialized to binary, however all values will be serialized as the string type.
+- Improved reliability of TCP connections to the CM and UFS servers.
+- Added `UserInitiated` property to `SteamClient.DisconnectedCallback` and `UFSClient.DisconnectedCallback` to indicate whether a disconnect was caused by the user, or by another source (Steam servers, bad network connection).
+- Updated Steam protobufs.
+- Updated game-related GC messages and protobufs.
+",https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/1420818/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/1420818,master,https://api.github.com/repos/SteamRE/SteamKit/tarball/SteamKit_1.6.3,https://github.com/SteamRE/SteamKit/releases/tag/SteamKit_1.6.3,https://api.github.com/repos/SteamRE/SteamKit/zipball/SteamKit_1.6.3,SteamKit_1.6.3,False,False
+786664,2014-12-16T10:35:30Z,2014-12-16T10:43:15Z,SteamKit 1.6.2,"- Fixed a crash when receiving a `ServiceMethod` message.
+- Fixed `ServiceMethodCallback.RpcName` having a leading '.' character (e.g. '.MethodName' instead of 'MethodName).
+- Fixed web responses in `CDNClient` not being closed, which could lead to running out of system resources.
+- Added error handling for `ClientMsgHandler`. Any unhandled exceptions will be logged to `DebugLog` and trigger `SteamClient` to disconnect.
+- Updated `EMsg` list.
+- Updated Steam protobufs.
+- Updated game-related GC messages and protobufs.
+",https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/786664/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/786664,master,https://api.github.com/repos/SteamRE/SteamKit/tarball/SteamKit_1.6.2,https://github.com/SteamRE/SteamKit/releases/tag/SteamKit_1.6.2,https://api.github.com/repos/SteamRE/SteamKit/zipball/SteamKit_1.6.2,SteamKit_1.6.2,False,False
+743023,2014-11-29T23:33:19Z,2014-11-30T04:13:59Z,SteamKit 1.6.1,"## v1.6.1 (Nov 30, 2014)
+-   Added support for VZip when decompressing depot chunks.
+-   Improved thread safety and error handling inside `TcpConnection`.
+-   Added `DownloadDepotChunk` overload for consumers who insist on connecting to particular CDNs.
+-   Updated `EResult` with the new field `NotModified`.
+-   Updated `EMsg` list.
+-   Updated `EOSType`.
+  -   The short names for Windows versions (e.g. `Win8` instead of `Windows8`) are preferred.
+  -   Addded `MacOS1010` for OS X 10.10 'Yosemite'
+-   Removed various long-obsolete values from enums where the value was renamed.
+-   Removed `EUniverse.RC`.
+-   Updated game related GC messages and protobufs.
+",https://api.github.com/users/Netshroud,284592,Netshroud,https://api.github.com/repos/SteamRE/SteamKit/releases/743023/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/743023,master,https://api.github.com/repos/SteamRE/SteamKit/tarball/SteamKit_1.6.1,https://github.com/SteamRE/SteamKit/releases/tag/SteamKit_1.6.1,https://api.github.com/repos/SteamRE/SteamKit/zipball/SteamKit_1.6.1,SteamKit_1.6.1,False,False
+620366,2014-10-12T03:12:03Z,2014-10-12T03:24:23Z,SteamKit 1.6.0,"## v1.6.0 (Oct 11, 2014)
+-   Updated `EOSType` for newer Linux and Windows versions.
+-   A `LoggedOnCallback` with `EResult.NoConnection` is now posted when attempting to logon without being connected to the remote Steam server.
+-   Fixed anonymous gameserver logon.
+-   `CDNClient.Server`'s constructor now accepts a `DnsEndPoint`.
+-   Updated `EResult` with the following new fields: `AccountLogonDeniedNeedTwoFactorCode`, `ItemDeleted`, `AccountLoginDeniedThrottle`, `TwoFactorCodeMismatch`.
+-   Added public utility class for working with DateTime and unix epochs: `DateUtils`
+-   Added `GetSingleFileInfo`, `ShareFile` and related callbacks for dealing with Steam cloud files with the `SteamCloud` handler.
+-   Fixed a potential crash when failing to properly deserialize network messages.
+-   Updated `EMsg` list.
+-   Refactored the internals of tcp connections to Steam servers to be more resilient and threadsafe.
+-   `CallbackMsg.Handle` will now return a boolean indiciating that the passed in callback matches the generic type parameter.
+-   Added support for logging into accounts with two-factor auth enabled. See the `SteamUser.LogOnDetails.TwoFactorCode` field.
+-   Updated the bootstrap list of Steam CM servers that SteamKit will initially attempt to connect to.
+-   Added `SteamFriends.FriendMsgEchoCallback` for echoed messages sent to other logged in client
+  instances.
+-   Updated game related GC messages and protobufs.
+
+BREAKING CHANGES
+-   `JobCallback` API has been merged with `Callback`. For help with transitioning code, please see the following wiki notes: https://github.com/SteamRE/SteamKit/wiki/JobCallback-Transition.
+-   `UFSClient.UploadFileResponseCallback.JobID` has been renamed to `RemoteJobID` in order to not conflict with `CallbackMsg`'s new `JobID` member.
+-   `UFSClient.UploadDetails.JobID` has been renamed to `RemoteJobID`.
+-   `CDNClient` has been refactored to support multiple authdepot calls for a single instance of the client and to support CDN servers.
+-   The following `EResult` fields have been renamed:
+  - `PSNAccountNotLinked` :arrow_forward: `ExternalAccountUnlinked`
+  - `InvalidPSNTicket` :arrow_forward: `PSNTicketInvalid`
+  - `PSNAccountAlreadyLinked` :arrow_forward: `ExternalAccountAlreadyLinked`
+",https://api.github.com/users/VoiDeD,2432381,VoiDeD,https://api.github.com/repos/SteamRE/SteamKit/releases/620366/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/620366,master,https://api.github.com/repos/SteamRE/SteamKit/tarball/SteamKit_1.6.0,https://github.com/SteamRE/SteamKit/releases/tag/SteamKit_1.6.0,https://api.github.com/repos/SteamRE/SteamKit/zipball/SteamKit_1.6.0,SteamKit_1.6.0,False,False
+225655,2014-03-16T04:48:26Z,2014-03-16T05:04:32Z,SteamKit 1.5.1,"## v1.5.1 (Mar 15, 2014)
+-   Added a parameterless public constructor to `DepotManifest.ChunkData` to support serialization.
+-   `SteamWorkshop.RequestPublishedFileDetails` has been obsoleted and is no longer supported. This functionality will be dropped in a future SteamKit release. See the the `PublishedFile` WebAPI service for a functional replacement.
+-   Added the request and response messages for the `PublishedFile` service.
+-   Fixed an unhandled exception when requesting metadata-only PICS product info.
+-   Exposed the following additional fields in the `LoggedOnCallback`: `VanityURL`, `NumLoginFailuresToMigrate`, `NumDisconnectsToMigrate`.
+-   Exposed the HTTP url details for PICS product info, see: `PICSProductInfoCallback.PICSProductInfo.HttpUri` and `UseHttp`.
+-   Added `EEconTradeResponse.InitiatorPasswordResetProbation` and `InitiatorNewDeviceCooldown`.
+-   Fixed `SteamGameServer.LogOn` and `LogOnAnonymous` sending the wrong message.
+-   Added support for token authentication for game server logon.
+-   Added the request and response messages for the `GameServers` service.
+-   Added the ability to specify server type for game servers, see: `SteamGameServer.SendStatus`.
+-   Exposed a few more fields on `TradeResultCallback`: `NumDaysSteamGuardRequired`, `NumDaysNewDeviceCooldown`, `DefaultNumDaysPasswordResetProbation`, `NumDaysPasswordResetProbation`.
+-   Fixed being unable to download depot manifests.
+-   Added `SteamID.SetFromSteam3String`.
+-   Obsoleted `SteamApps.SendGuestPass`. This functionality will be dropped in a future SteamKit release.
+-   Updated `EResult` with the following new fields: `UnexpectedError`, `Disabled`, `InvalidCEGSubmission`, `RestrictedDevice`.
+-   Updated EMsg list.
+-   Updated game related GC messages.
+
+BREAKING CHANGES
+-   Fixed `ServiceMethodResponse.RpcName` containing a leading '.'.
+",https://api.github.com/users/VoiDeD,2432381,VoiDeD,https://api.github.com/repos/SteamRE/SteamKit/releases/225655/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/225655,master,https://api.github.com/repos/SteamRE/SteamKit/tarball/SteamKit_1.5.1,https://github.com/SteamRE/SteamKit/releases/tag/SteamKit_1.5.1,https://api.github.com/repos/SteamRE/SteamKit/zipball/SteamKit_1.5.1,SteamKit_1.5.1,False,False
+77042,2013-10-26T22:19:07Z,2013-10-26T22:27:14Z,SteamKit 1.5.0,"## v1.5.0 (Oct 26, 2013)
+-   Added `DebugLog.ClearListeners()`.
+-   Added `WebAPI.AsyncInterface`, a .NET TPL'd version of `WebAPI.Interface`.
+-   Added `SteamClient.ServerListCallback`.
+-   Added `SteamUser.WebAPIUserNonceCallback`, and a method to request it: `SteamUser.RequestWebAPIUserNonce()`.
+-   Added `SteamUser.MarketingMessageCallback`.
+-   Added a new member to `CMClient`: `CellID`. This is the Steam server's recommended CellID.
+-   Added the ability to specify `AccountID` in `SteamUser.LogOnDetails`.
+-   Added a helper API to `SteamUnifiedMessages` for service messages.
+-   Fixed issue where `CallbackManager` was not triggering for `JobCallback<T>`.
+-   Fixed unhandled protobuf-net exception when (de)serializing messages with enums that are out of date.
+-   Fixed a bug where all `WebAPI.Interface` requests would instantly timeout.
+-   Fixed `Manifest.HashFileName` and `Manifest.HashContent` being swapped.
+-   Updated `EMsg` list.
+-   Updated game related GC messages.
+-   Updated the following enums: `EResult`, `EChatEntryType`, `EAccountFlags`, `EClanPermission`, `EFriendFlags`, `EOSType`, `EServerType`, `EBillingType`, `EChatMemberStateChange`, `EDepotFileFlag`, `EEconTradeResponse`.
+-   The following members of `EChatRoomEnterResponse` have been obsoleted: `NoRankingDataLobby`, `NoRankingDataUser`, `RankOutOfRange`.
+-   `EOSType.Win7` has been obsoleted and renamed to `EOSType.Windows7`.
+-   `EEconTradeResponse.InitiatorAlreadyTrading` has been obsoleted and renamed to `EEconTradeResponse.AlreadyTrading`.
+-   `EEconTradeResponse.Error` has been obsoleted and renamed to `EEconTradeResponse.AlreadyHasTradeRequest`.
+-   `EEconTradeResponse.Timeout` has been obsoleted and renamed to `EEconTradeResponse.NoResponse`.
+-   `EChatEntryType.Emote` has been obsoleted. Emotes are no longer supported by Steam.
+-   `SteamFriends.ProfileInfoCallback.RecentPlaytime` has been obsoleted. This data is no longer sent by the Steam servers.
+-   Updated to latest protobuf-net.
+
+**BREAKING CHANGES**
+-   `SteamUser.LoggedOnCallback.Steam2Ticket` is now exposed as a byte array, rather than a `Steam2Ticket` object.
+-   The `SteamKit2.Blob` namespace and all related classes have been removed.
+-   Support for Steam2 servers and the various classes within SteamKit have been removed.
+-   `CDNClient` has been heavily refactored to be more developer friendly.
+-   All `DateTime`s in callbacks are now `DateTimeKind.Utc`.
+",https://api.github.com/users/VoiDeD,2432381,VoiDeD,https://api.github.com/repos/SteamRE/SteamKit/releases/77042/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/77042,master,https://api.github.com/repos/SteamRE/SteamKit/tarball/SteamKit_1.5.0,https://github.com/SteamRE/SteamKit/releases/tag/SteamKit_1.5.0,https://api.github.com/repos/SteamRE/SteamKit/zipball/SteamKit_1.5.0,SteamKit_1.5.0,False,False
+10420,2013-07-16T01:46:00Z,2013-07-16T01:50:05Z,SteamKit 1.4.1,"## v1.4.1 (Jul 15, 2013)
+-   Added the ability to manipulate UFS (Steam cloud) files with UFSClient.
+-   Added SteamScreenshots handler for interacting with user screenshots.
+-   Added an optional parameter to SteamID.Render() to render SteamIDs to their Steam3 representations.
+-   Added the ability to specify the timeout of WebAPI requests with Interface.Timeout.
+-   The RSACrypto and KeyDictionary utility classes are now accessible to consumers.
+-   Updated EMsg list.
+-   Updated game related GC messages.
+",https://api.github.com/users/VoiDeD,2432381,VoiDeD,https://api.github.com/repos/SteamRE/SteamKit/releases/10420/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/10420,master,https://api.github.com/repos/SteamRE/SteamKit/tarball/SteamKit_1.4.1,https://github.com/SteamRE/SteamKit/releases/tag/SteamKit_1.4.1,https://api.github.com/repos/SteamRE/SteamKit/zipball/SteamKit_1.4.1,SteamKit_1.4.1,False,False
+7799,2013-06-09T03:36:56Z,2013-07-10T20:55:31Z,SteamKit 1.4.0,"## v1.4.0 (Jun 08, 2013)
+-   KeyValues now correctly writes out strings in UTF8.
+-   Fixed an exception that could occur with an invalid string passed to SteamID's constructor.
+-   Added SteamFriends.ClanStateCallback.
+-   Added EPersonaStateFlag. This value is now exposed in SteamFriends.PersonaStateCallback.
+-   Added MsgClientCreateChat and MsgClientCreateChatResponse messages.
+-   Added GlobalID base class for globally unique values (such as JobIDs, UGCHandles) in Steam.
+-   Updated EMsg list.
+-   Updated game related GC messages.
+-   Added initial support for the Steam Cloud file system with UFSClient. This feature should be considered unstable and may
+  have breaking changes in the future.
+
+**BREAKING CHANGES**
+-   STATIC_CALLBACKS builds of SteamKit have now been completely removed.
+-   Message classes for unified messages have moved namespaces from SteamKit2.Steamworks to SteamKit2.Unified.Internal.
+",https://api.github.com/users/VoiDeD,2432381,VoiDeD,https://api.github.com/repos/SteamRE/SteamKit/releases/7799/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/7799,master,https://api.github.com/repos/SteamRE/SteamKit/tarball/SteamKit_1.4.0,https://github.com/SteamRE/SteamKit/releases/tag/SteamKit_1.4.0,https://api.github.com/repos/SteamRE/SteamKit/zipball/SteamKit_1.4.0,SteamKit_1.4.0,False,False
+7795,2013-03-10T23:21:37Z,2013-07-10T20:55:24Z,SteamKit 1.3.1,"## v1.3.1 (Mar 10, 2013)
+-   Fixed issue where the avatar hash of a clan was always null.
+-   Introduced better handling of networking related cryptographic exceptions.
+-   Updated EMsg list.
+-   Exposed SteamClient.JobCallback<T> for external consumers.
+-   STATIC_CALLBACK builds of SteamKit and related code has been obsoleted and will be removed in the next version.
+-   Implemented GameID.ToString().
+-   Implemented game pass sending and recieving with SteamApps.SendGuestPass(), SteamApps.GuestPassListCallback, and
+  SteamApps.SendGuestPassCallback.
+-   Implemented requesting Steam community profile info with SteamFriends.RequestProfileInfo(), and SteamFriends.ProfileInfoCallback
+-   CMClient now exposes a ConnectionTimeout field to control the timeout when connecting to Steam. The default timeout is 5 seconds.
+-   Updated the internal list of CM servers to help alleviate some issues with connecting to dead servers.
+-   Implemented SteamClient.CMListCallback to retrieve the current list of CM servers.
+-   Implemented initial support for unified messages through the SteamUnifiedMessages handler.
+
+**BREAKING CHANGES**
+-   CMClient.Connect has been refactored significantly. It is no longer possible to use unencrypted connections. The Connect function
+  now accepts an IPEndPoint to allow consumers to specify which Steam server they wish to connect to. Along with this,
+  CMClient.Servers is now exposed as a collection of IPEndPoints, instead of IPAddresses.
+-   SteamApps.PackageInfoCallback now exposes the immediate child KeyValue for the data, to be more consistent with
+  SteamApps.AppInfoCallback.
+",https://api.github.com/users/VoiDeD,2432381,VoiDeD,https://api.github.com/repos/SteamRE/SteamKit/releases/7795/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/7795,master,https://api.github.com/repos/SteamRE/SteamKit/tarball/SteamKit_1.3.1,https://github.com/SteamRE/SteamKit/releases/tag/SteamKit_1.3.1,https://api.github.com/repos/SteamRE/SteamKit/zipball/SteamKit_1.3.1,SteamKit_1.3.1,False,False
+7792,2013-01-17T02:47:51Z,2013-07-10T20:55:00Z,SteamKit 1.3.0,"## v1.3.0 (Jan 16, 2013)
+-   Fixed case where friend and chat messages were incorrectly trimming the last character.
+-   Steam2 ServerClient now exposes a IsConnected property.
+-   Steam2 ContentServerClient can now optionally not perform a server handshake when opening a storage session.
+-   Added various enums: EClanPermission, EMarketingMessageFlags, ENewsUpdateType, ESystemIMType, EChatFlags,
+  ERemoteStoragePlatform, EDRMBlobDownloadType, EDRMBlobDownloadErrorDetail, EClientStat, EClientStatAggregateMethod,
+  ELeaderboardDataRequest, ELeaderboardSortMethod, ELeaderboardUploadScoreMethod, and EChatPermission.
+-   Fixed case where SteamKit was throwing an unhandled exception during Steam3 tcp connection teardown.
+-   Added PICS support to the SteamApps handler: PICSGetAccessTokens, PICSGetChangesSince, and PICSGetProductInfo.
+-   Added anonymous download support to CDNClient.
+-   Updated the following enums: EMsg, EUniverse, EChatEntryType, EPersonaState, EFriendRelationship, EFriendFlags,
+  EClientPersonaStateFlag, ELicenseFlags, ELicenseType, EPaymentMethod, EIntroducerRouting, EClanRank, EClanRelationship,
+  EAppInfoSection, EContentDownloadSourceType, EOSType, EServerType, ECurrencyCode, EDepotFileFlag, EEconTradeResponse,
+  ESystemIMType, ERemoteStoragePlatform, and EResult.
+-   Exposed the following properties in SteamUser.LoggedOnCallback: CellIDPingThreshold, UsePICS, WebAPIUserNonce, and 
+  IPCountryCode.
+-   Fixed case where SteamKit was incorrectly handling certain logoff messages during Steam server unavailability.
+-   Fixed potential crash in Steam2 ContentServerClient when opening a storage session.
+-   Updated to latest protobuf-net.
+
+**BREAKING CHANGES**
+-   DepotManifest.ChunkData.CRC is now named DepotManifest.ChunkData.Checksum.
+",https://api.github.com/users/VoiDeD,2432381,VoiDeD,https://api.github.com/repos/SteamRE/SteamKit/releases/7792/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/7792,master,https://api.github.com/repos/SteamRE/SteamKit/tarball/SteamKit_1.3,https://github.com/SteamRE/SteamKit/releases/tag/SteamKit_1.3,https://api.github.com/repos/SteamRE/SteamKit/zipball/SteamKit_1.3,SteamKit_1.3,False,False
+7791,2012-11-12T04:32:26Z,2013-07-10T20:52:42Z,SteamKit 1.2.2,"## v1.2.2 (Nov 11, 2012)
+-   Fixed critical issue that occured while serializing protobuf messages.
+",https://api.github.com/users/VoiDeD,2432381,VoiDeD,https://api.github.com/repos/SteamRE/SteamKit/releases/7791/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/7791,master,https://api.github.com/repos/SteamRE/SteamKit/tarball/SteamKit_1.2.2,https://github.com/SteamRE/SteamKit/releases/tag/SteamKit_1.2.2,https://api.github.com/repos/SteamRE/SteamKit/zipball/SteamKit_1.2.2,SteamKit_1.2.2,False,False
+7790,2012-11-12T00:03:36Z,2013-07-10T20:52:31Z,SteamKit 1.2.1,"## v1.2.1 (Nov 11, 2012)
+-   Added EPersonaState.LookingToTrade and EPersonaState.LookingToPlay.
+-   Added SteamFriends.UnbanChatMember.
+-   Removed GeneralDSClient.GetAuthServerList as Steam2 auth servers no longer exist.
+-   Removed dependency on Classless.Hasher.
+-   Updated to latest protobuf-net.
+",https://api.github.com/users/VoiDeD,2432381,VoiDeD,https://api.github.com/repos/SteamRE/SteamKit/releases/7790/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/7790,master,https://api.github.com/repos/SteamRE/SteamKit/tarball/SteamKit_1.2.1,https://github.com/SteamRE/SteamKit/releases/tag/SteamKit_1.2.1,https://api.github.com/repos/SteamRE/SteamKit/zipball/SteamKit_1.2.1,SteamKit_1.2.1,False,False
+7789,2012-11-04T19:45:22Z,2013-07-10T20:52:11Z,SteamKit 1.2.0,"## v1.2.0 (Nov 04, 2012)
+-   Fixed issue where LoginKeyCallback was being passed incorrect data.
+-   Fixed ClientGCMsg PacketMessage constructor.
+-   WebAPI list and array parameters are now accepted and flattened to x[n]=y format.
+-   Fixed KeyValue issue when multiple duplicate children exist.
+-   Updated protobuf definitions for internal message classes to their latest definitions.
+-   Updated EMsgs.
+-   Fixed critical MsgMulti handling.
+-   Added EEconTradeResponse.
+-   Added SteamTrading client message handler.
+-   Modified Steam3 TCP socket shutdown to play well with Mono.
+-   Modified CMClient.Connect method to be properly async.
+-   Implemented friend blocking/unblocking with SteamFriends.IgnoreFriend and SteamFriends.IgnoreFriendCallback.
+-   Fixed gameserver logon.
+-   Local user is now given the persona name [unassigned] before SteamUser.AccountInfoCallback comes in.
+-   Updated SteamKit2's bootstrap CM list, this should reduce how often SK2 will connect to an offline/dead server.
+-   Steam2 ServerClient's now expose a ConnectionTimeout member.
+
+**BREAKING CHANGES**
+-   Dota GC EMsgs are now longer located in SteamKit2.GC.Dota.EGCMsg, they are now in SteamKit2.Gc.Dota.Internal.EDOTAGCMsg.
+-   Base GC EMsgs are now longer located in SyteamKit2.GC.EGCMsgBase, they are now in multiple enums in the SteamKit2.GC.Internal namespace:
+  EGCBaseMsg, EGCSystemMsg, EGCSharedMsg, ESOMsg, EGCItemMsg
+-   SteamApps.AppInfoCallback now exposes the immediate child KeyValue for every Section, instead of an empty root parent.
+",https://api.github.com/users/VoiDeD,2432381,VoiDeD,https://api.github.com/repos/SteamRE/SteamKit/releases/7789/assets,https://api.github.com/repos/SteamRE/SteamKit/releases/7789,master,https://api.github.com/repos/SteamRE/SteamKit/tarball/SteamKit_1.2.0,https://github.com/SteamRE/SteamKit/releases/tag/SteamKit_1.2.0,https://api.github.com/repos/SteamRE/SteamKit/zipball/SteamKit_1.2.0,SteamKit_1.2.0,False,False

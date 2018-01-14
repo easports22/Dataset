@@ -1,0 +1,962 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+6582336,2017-06-02T07:12:47Z,2017-06-02T07:59:17Z,1.6.2 release note,"# 1.6.2 release note
+
+### Enhancements
+ * Use parallel function for ClassLoader when using JDK7 or later - #2886
+<br><br>
+### Bug Fixes
+ * Workaround java level Deadlock when initializing annotation - #2862
+",https://api.github.com/users/koo-taejin,10057874,koo-taejin,https://api.github.com/repos/naver/pinpoint/releases/6582336/assets,https://api.github.com/repos/naver/pinpoint/releases/6582336,master,https://api.github.com/repos/naver/pinpoint/tarball/1.6.2,https://github.com/naver/pinpoint/releases/tag/1.6.2,https://api.github.com/repos/naver/pinpoint/zipball/1.6.2,1.6.2,False,False
+6055112,2017-04-12T06:18:56Z,2017-04-12T06:43:35Z,1.6.1 release note,"# 1.6.1 release note
+The following tables will be removed in 1.7.0.
+```
+Traces
+AgentStat
+```
+If you are still using the tables above, please configure your collector and web instances to use *TraceV2* and *AgentStatV2* tables by setting the following options.
+
+**pinpoint-collector.properties**
+```
+collector.span.format.compatibility.version=v2
+collector.stat.format.compatibility.version=v2
+```
+**pinpoint-web.properties**
+```
+web.span.format.compatibility.version=v2 (or compatibilityMode if you still have data in Traces table)
+web.stat.format.compatibility.version=v2 (or compatibilityMode if you still have data in AgentStat table)
+```
+<br>
+
+### Plugins
+ * Added MariaDB 1.5.6 support - #2403 
+ * Added Resin support - #2450 (Contributed by huayaoyue6, bai-yang)
+ * Added hikariCp support - #2463
+ * Added commons-dbcp2 support #2396 
+ * Changed JBoss Plugin's JDK Logger policy. From 1.6.1, you must  set `-Djava.util.logging.manager` - #2612 
+ * Added vert.x support (experimental feature) - #1417 
+   - We do not yet recommend using this in production
+<br><br>
+
+### Enhancements
+ * Thread dumps for active threads may be obtained directly from the Web UI - #2286 
+ * Datasource metrics are collected and shown in Inspector view - #2496 
+ * Added dependency injection to agent using google-guice - #2524 
+<br><br>
+ * Added `CollectionUtils` class to commons module - #2310 
+ * Deprecated `StringUtils.drop()` API - #2312 
+ * Combined various `ArrayUtils` classes and moved it to commons module - #2317 
+<br><br>
+ * Available cluster APIs for each agent are managed agent-side - #2262  
+ * `AsyncTraceId` async sequence is incremented without holding a lock on the whole object - #2481 
+<br><br>
+ * You may omit the password parameter when calling admin APIs - #2249 
+ * GC metrics are calculated more accurately - #2282 
+ * Charts in Inspector view are requested separately - #2331 
+ * CPU metrics are collected when running on OpenJDK - #2332 
+ * Load charts shown when clicking on edges to terminal nodes in the server map are paged for easier navigation - #2434
+ * Inspector charts show the most recently started agent's data if there are multiple agents using the same agent id in a given tim eslot - #2345 
+ * Transaction data is continuously loaded in Filter Transaction view - #2382 
+ * Guard against cross-site scripting attacks - #2400 
+ * Hashcodes for select VOs are cached for performance - #2432 
+ * Real-time chart layer can be resized by dragging on the boundary - #2452 
+ * Change format for saving application favorite list - #2474 
+ * Inspector charts can be queried over a week - #2484 
+<br><br>
+
+### Bug Fixes
+ * Fixed `LinkKey` hashcode always returning 0, improving server map query performance - #2394
+ * Fixed an issue where resources were not read properly when using ASM engine - #2350 
+<br><br>
+ * Fixed dbcp `profiler.jdbc.*` configurations - #2391 
+ * Fixed an issue where networktest script would throw ""icmp port unreachable error"" - #2334 
+ * Fixed an issue where the agent's IP would always be recorded as the loopback IP - #2505 
+<br><br>
+ * Fixed an issue with the call tree focusing on the wrong element when there are duplicate timestamps - #2365 
+ * Fixed rendering issues when using FireFox - #2516 
+ * Fixed an issue where application favorite list was displayed incorrectly - #2580 
+<br><br>
+
+### UI & UX
+ * Change chart library for the main page (amchart -> chartjs) - #2500 
+<br><br>
+
+### Tasks
+ * Recompiled `TSpan` using java:beans options - #2323 
+ * Separated profiler-test module from the profiler module - #2354 
+ * Unified variable names in shell scripts - #2369 (Contributed by marcoblos)
+ * Changed commons-server module's minimum supported jdk version (1.7 -> 1.6) - #2415 
+ * Added various annotations to signify stability & visibility - #2477 
+ * Added configuration for specifying Hbase root ZNode - #2609 (Contributed by jacarrichan)
+<br><br>
+ * Added VSCode paths to *.gitignore* - #2369 (Contributed by marcoblos)
+ * Fixed typos in *CONTRIBUTING.md* - #2369 (Contributed by marcoblos)
+ * Fixed help tooltip that were in Korean - #2563 (Contributed by verdantyang)
+ * Fixed typos in *pinpoint.config* - #2543 (Contributed by gitzalm)
+<br><br>
+ 
+### Library Updates
+ * Upgraded libraries used internally - #2321 
+ * Upgraded amchart version to 3.20.20) - #2600 
+<br><br>
+",https://api.github.com/users/koo-taejin,10057874,koo-taejin,https://api.github.com/repos/naver/pinpoint/releases/6055112/assets,https://api.github.com/repos/naver/pinpoint/releases/6055112,master,https://api.github.com/repos/naver/pinpoint/tarball/1.6.1,https://github.com/naver/pinpoint/releases/tag/1.6.1,https://api.github.com/repos/naver/pinpoint/zipball/1.6.1,1.6.1,False,False
+5965903,2017-04-04T02:37:54Z,2017-04-04T06:24:11Z,1.6.1-RC2 release note,"# 1.6.1-RC2 release note
+
+For more information for 1.6.1 changes, please refer to the  [1.6.1-RC1](https://github.com/naver/pinpoint/releases/tag/1.6.1-RC1) release note.
+
+## Bug Fixes
+- Fixed missing singleton scope - #2524
+",https://api.github.com/users/koo-taejin,10057874,koo-taejin,https://api.github.com/repos/naver/pinpoint/releases/5965903/assets,https://api.github.com/repos/naver/pinpoint/releases/5965903,master,https://api.github.com/repos/naver/pinpoint/tarball/1.6.1-RC2,https://github.com/naver/pinpoint/releases/tag/1.6.1-RC2,https://api.github.com/repos/naver/pinpoint/zipball/1.6.1-RC2,1.6.1-RC2,False,False
+5763546,2017-03-16T06:29:13Z,2017-03-16T07:32:32Z,1.6.1-RC1 release note,"# 1.6.1-RC1 release note
+
+### Plugins
+ * Added MariaDB 1.5.6 support - #2403 
+ * Added Resin support - #2450 (Contributed by huayaoyue6, bai-yang)
+ * Added hikariCp support - #2463
+ * Added commons-dbcp2 support #2396 
+ * Changed JBoss Plugin's JDK Logger policy. From 1.6.1, you must  set `-Djava.util.logging.manager` - #2612 
+ * Added vert.x support (experimental feature) - #1417 
+   - We do not yet recommend using this in production
+<br><br>
+
+### Enhancements
+ * Thread dumps for active threads may be obtained directly from the Web UI - #2286 
+ * Datasource metrics are collected and shown in Inspector view - #2496 
+ * Added dependency injection to agent using google-guice - #2524 
+<br><br>
+ * Added `CollectionUtils` class to commons module - #2310 
+ * Deprecated `StringUtils.drop()` API - #2312 
+ * Combined various `ArrayUtils` classes and moved it to commons module - #2317 
+<br><br>
+ * Available cluster APIs for each agent are managed agent-side - #2262  
+ * `AsyncTraceId` async sequence is incremented without holding a lock on the whole object - #2481 
+<br><br>
+ * You may omit the password parameter when calling admin APIs - #2249 
+ * GC metrics are calculated more accurately - #2282 
+ * Charts in Inspector view are requested separately - #2331 
+ * CPU metrics are collected when running on OpenJDK - #2332 
+ * Load charts shown when clicking on edges to terminal nodes in the server map are paged for easier navigation - #2434
+ * Inspector charts show the most recently started agent's data if there are multiple agents using the same agent id in a given tim eslot - #2345 
+ * Transaction data is continuously loaded in Filter Transaction view - #2382 
+ * Guard against cross-site scripting attacks - #2400 
+ * Hashcodes for select VOs are cached for performance - #2432 
+ * Real-time chart layer can be resized by dragging on the boundary - #2452 
+ * Change format for saving application favorite list - #2474 
+ * Inspector charts can be queried over a week - #2484 
+<br><br>
+
+### Bug Fixes
+ * Fixed `LinkKey` hashcode always returning 0, improving server map query performance - #2394
+ * Fixed an issue where resources were not read properly when using ASM engine - #2350 
+<br><br>
+ * Fixed dbcp `profiler.jdbc.*` configurations - #2391 
+ * Fixed an issue where networktest script would throw ""icmp port unreachable error"" - #2334 
+ * Fixed an issue where the agent's IP would always be recorded as the loopback IP - #2505 
+<br><br>
+ * Fixed an issue with the call tree focusing on the wrong element when there are duplicate timestamps - #2365 
+ * Fixed rendering issues when using FireFox - #2516 
+ * Fixed an issue where application favorite list was displayed incorrectly - #2580 
+<br><br>
+
+### UI & UX
+ * Change chart library for the main page (amchart -> chartjs) - #2500 
+<br><br>
+
+### Tasks
+ * Recompiled `TSpan` using java:beans options - #2323 
+ * Separated profiler-test module from the profiler module - #2354 
+ * Unified variable names in shell scripts - #2369 (Contributed by marcoblos)
+ * Changed commons-server module's minimum supported jdk version (1.7 -> 1.6) - #2415 
+ * Added various annotations to signify stability & visibility - #2477 
+ * Added configuration for specifying Hbase root ZNode - #2609 (Contributed by jacarrichan)
+<br><br>
+ * Added VSCode paths to *.gitignore* - #2369 (Contributed by marcoblos)
+ * Fixed typos in *CONTRIBUTING.md* - #2369 (Contributed by marcoblos)
+ * Fixed help tooltip that were in Korean - #2563 (Contributed by verdantyang)
+ * Fixed typos in *pinpoint.config* - #2543 (Contributed by gitzalm)
+<br><br>
+ 
+### Library Updates
+ * Upgraded libraries used internally - #2321 
+ * Upgraded amchart version to 3.20.20) - #2600 
+<br><br>",https://api.github.com/users/koo-taejin,10057874,koo-taejin,https://api.github.com/repos/naver/pinpoint/releases/5763546/assets,https://api.github.com/repos/naver/pinpoint/releases/5763546,master,https://api.github.com/repos/naver/pinpoint/tarball/1.6.1-RC1,https://github.com/naver/pinpoint/releases/tag/1.6.1-RC1,https://api.github.com/repos/naver/pinpoint/zipball/1.6.1-RC1,1.6.1-RC1,False,False
+4864234,2016-12-08T07:05:13Z,2016-12-08T07:51:00Z,1.6.0 release note,"# 1.6.0 release note
+
+**You must create 2 new HBase tables if you are upgrading from a previous release.**
+
+```
+AgentStatV2
+TraceV2
+```
+
+For more information on what these tables do, please refer to the _Trace/AgentStat improvements_ section below.
+
+### ASM
+
+We have changed our default bytecode instrumentation engine from Javassist to ASM and you will now experience faster application startup time especially in an environment with a lot of Spring beans.
+This change also allows us to add powerful new APIs for you to utilize when developing plugins in the future.
+
+We have added the following option to _pinpoint.config_ to configure bytecode instrumentation engine used by the agent.
+
+**pinpoint.config**
+
+```
+profiler.instrument.engine=ASM
+```
+
+Possible values are:
+- ASM (**default**) - uses ASM for bytecode instrumentation
+- JAVASSIST - uses Javassist for bytecode instrumentation
+
+Please note that JAVASSIST instrumentation is deprecated and will be removed in future release.
+
+### Trace/AgentStat improvements
+
+Huge improvements have been made to storing trace and agent stat data. We've experienced upwards of **60-70% improvement in I/O performance and storage capacity** internally.
+**We highly recommend you create the following tables when upgrading from 1.5.x.**
+
+```
+AgentStatV2
+TraceV2
+```
+
+We have added the following options to _pinpoint-collector.properties_ and _pinpoint-web.properties_ to configure which tables to use.
+Default values have been set to ensure backwards compatibility so you most likely will not need to change anything after creating the tables above.
+
+**pinpoint-collector.properties**
+
+```
+collector.span.format.compatibility.version=v2
+collector.stat.format.compatibility.version=v2
+```
+
+Possible values are:
+- v1 - writes data to `AgentStat/Trace` table.
+- v2 (**default**) - writes data to `AgentStatV2/TraceV2` table.
+- dualWrite - writes data to `AgentStat/Trace` and `AgentStatV2/TraceV2` tables.
+
+**pinpoint-web.properties**
+
+```
+web.span.format.compatibility.version=compatibilityMode 
+web.stat.format.compatibility.version=compatibilityMode 
+```
+
+Possible values are:
+- v1 - reads data from `AgentStat/Trace` table.
+- v2 - reads data from `AgentStatV2/TraceV2` table.
+- compatibilityMode (**default**) - reads data from `AgentStatV2/TraceV2` and if nothing is found, reads data from `AgentStat/Trace` tables.
+
+<br><br><br>
+
+## Known Issues
+- When profiling Jboss, you must set `profiler.instrument.engine=JAVASSIST` in _pinpoint.config_
+  <br><br>
+
+## Plugins
+- Added Hystrix support - #1594, #2101 (Contributed by jiaqifeng)
+- Added ActiveMQ support - #1709
+- Added Apache cxf client support - #1994 (Contributed by barneykim)
+- Added JBOSS support - #2001, #2026, #2117, #2170 (Contributed by suraj-raturi)
+  <br><br>
+- Modified a number of log levels in JDBC plugins - #1729
+- Added options to allow for additional configuration in tracing JDBC drivers - #2083
+- `TProtocolDecorators` are now supported for Thrift plugin - #2106
+- Spring plugin now supports tracing component-scanned beans - #2143
+- Improved Tomcat plugin stability - #2155, #2159, #2166, #2168
+  <br><br>
+- Fixed a bug where Tomcat wasn't being traced if excludeUrl was not set - #2077
+- Fixed a bug where traces from JDK-HTTP plugin would not render destination nodes in the server map - #2010 
+  <br><br>
+- Added tests for _mybatis-spring_ v1.3+ #1703
+- _maria-db-java-client_ libraries are now pulled from maven central when running MariaDB integration test - #2072
+  <br><br>
+
+## Enhancements
+- Added support for tracing message queue clients - #1708 
+- Added support for using NIO for `UDPDataSender` - #1711 
+- CPU statistics can now be collected when using IBM JVMs - #1756 
+- Upgraded Javaassist library (3.20.0-GA -> 3.21.0-GA) - #1807 
+- Added support/configs for dumping bytecodes - #1811, #1814 
+- You may now choose to use ASM (default) to do bytecode instrumentation - #2017 
+- API information can now be stored as `SpanEvent` annotation field - #2018 
+- Removed JDK logger dependency from _bootstrap_ module - #2026 
+- Agent now uses JDK's `ThreadLocalRandom` when running on Java 7+ - #2027
+- You can now trace Pinpoint Web using Pinpoint! - #2044
+- Main classes used to detect application type are now configurable - #2156
+- You may now use ant-style patterns when configuring custom classes to trace - #2173 
+- Agent's child directories are now resolved using their canonical path - #2202 
+  <br><br>
+- Collector statistics report is now a lot more detailed - #1990 
+  <br><br>
+- Web now displays detailed error message for uncaught server exceptions - #535 
+- API for user data is now ordered - #1723 
+- API for user data now uses a parameter object - #1723 
+- Added support for storing total number of registered agents into a relational database- #1883 
+- Added additional query parameters for alarm rule API - #1887 
+- Configuration API now returns additional result - #1900 
+- Real time scatter chart now retries request on 5xx errors - #1928 
+- Improved real time scatter chart performance - #1986 
+- Removed a number of `$timeout` that led to performance issues in _Inspector_ - #2176, #2177, #2194 
+- Added parameter verification to certain APIs - #2217 
+  <br><br>
+- Improved agent stat data storage - #1533 
+- Changed hbase client - #1613 
+- Improved trace data storage - #1819, #1913, #2187 
+- Improved buffer related APIs - #1838, #1847, #1853, #1866 
+- Added support for relative path execution of networktest.sh #2261 (Contributed by fanyeren)
+  <br><br>
+
+## Bug Fixes
+- Fixed an issue where array typed fields and their getter/setter could not be injected - #1879 
+- Fixed an issue where _profiler.include_ was not working as intended - #1947
+- Added additional checks to prevent agent from registering multiple transformers for the same class - #2178 
+- Fixed send retry policy for `TCPDataSender` - #2198 
+- Fixed potential thread safety issue with `InterceptorScope` - #2259
+- Fixed an issue where `ASMClass.addDelegatorMethod()` would produce incorrect bytecode - #2264
+  <br><br>
+- Fixed concurrency issue for real time active thread chart - #1482 
+- Pinpoint web now scans for mapper files in all class paths - #1746 
+- Fixed an issue where a wrong agent was selected when dragging on the scatter chart - #1797 
+- Fixed an issue where a different focus time was being selected in the call tree - #1828 
+- Fixed an issue where a wrong application name was being displayed in the _Transaction List_ - #1872 
+- Removed pop up warnings for _jquery-layout_ components - #1873 
+- Fixed an issue where the _Transaction List_ would not load when the page is loaded through url - #1877 
+  <br><br>
+- Fixed an issue where toggling _success/failed_ check boxes in the scatter chart would show a different agent's data - #2004 
+- Fixed an issue where agent information was not being reset when selecting a different application in _Inspector_ - #2082 
+- Fixed an issue where changing applications with real time chart pinned would result in incorrect summation of active threads - #2085 
+- Fixed an issue where the _Server-List_ layer's scatter chart would not update itself under real time mode - #2137 
+- Scatter chart's total request count is now calculated correctly - #2163 
+- Fixed incorrect date calculation when time slider's previous/next button is selected in _Inspector_ - #2197 
+- Events are now properly cleared from the time slider when selecting different agents in _Inspector_ - #2206 
+- Fixed an issue where the response time chart's layout would break when the link node is clicked more than once - #2224 
+- Fixed incorrect binding of ${buildtime} variable - #2266 
+- Fixed an issue where scatter chart stuck when the y-axis max value is modified #2299
+  <br><br>
+
+## UI & UX
+- Modified UI for configuration modal - #1706 
+- Improved UI for alarm configuration - #1715, #1725, #1706, #1889, #1902 
+- Removed _beta_ tag from Pinpoint logo - #1731 
+- Changed label for switching to real time mode (from an icon to text) - #1764 
+- Added scatter charts under _Server List_ - #1787 
+- Improved _Inspector_ UI and added a time slider - #1799, #1800, #1803, #1815, #1831 
+- Changed date formats for charts in _Inspector_ - #1835 
+- Added active thread chart to _Inspector_ - #2054, #2056, #2057, #2058, #2208 
+- Application select box now shows more applications - #2137 
+- _Transaction List_ now forbids events from firing until it has finished loading - #2130 
+- Iframe inside _Transaction List_ is no longer cached - #2145 
+- Modified UI for the _Server List_ layer
+  <br><br>
+- The position of _Transaction List_'s handle bar is now remembered - #1797 
+- Adding applications to ""favorites"" is now instantly applied to application select box - #1832 
+- Added an option to set user's time zone - #1997 
+- It is now impossible to drag outside the scatter chart - #2105 
+- Added paging for displaying response summary charts for unknown nodes - #2150 
+  <br><br>
+
+## Tasks
+- Added comments on cluster configuration - #1695 
+- Refactored `xxxBo` classes into the server module (package changed from `com.navercorp.pinpoint.common` to `com.navercorp.pinpoint.common.server`) - #1720 
+- Cleaned up spring-related configurations - #1727 
+- Improved `SpanBo` code - #1734, #1742 
+- Updated QuickStart `README.md` - #1736, #1980 (Contributed by yous and abhijith0505)
+- Added configurations for checking JDK 1.6 compatibility - #1761 
+- Separated tools module - #1774 
+- Added configuration options for various plugins - #1788, #2090, #2151 (Contributed by guindous)
+- Separated optional modules by JDK versions - #1821 
+- Modified default _log4j_ setting - #1822, #2086 
+- Added maven profile to separate _pinpoint.config_ into local(development) and release configurations - #1822 
+- Updated `README.md` - #2005 #2186 
+- Repackaged Guava to remove JDK logger dependency - #2038 
+- Fixed compatibility issue with Java 7 when the agent is built using JDK 8 - #2095 
+- Changed default bytecode instrumentation to use ASM (JAVAASSIST -> ASM) - #2215 
+- Updated `doc/installation.md`
+  <br><br>
+- _jshint_ is no longer defaulted to run when building web - #1751 
+- Docker image bumped to HBase 1.2.x and fixed port for web - #1767 (Contributed by dawidmalina)
+- Added MySql docker image and made it configurable through start-web.sh - #1768 (Contributed by dawidmalina)
+- Changed artifactId of the root module (pom -> pinpoint) - #1794, 1795 
+- Added _maven-animal-sniffer_ plugin - #1833 (Contributed by 999fg)
+- Added _grunt-maven-plugin_ to enable grunt build - #1843 
+- Remove original source from being deployed after a grunt build - #1890 
+- Provide fallback when the main hbase repository is not available when building HBase docker image - #2225 
+  <br><br>
+- Added _CodeCov_ - #2060 
+  <br><br>
+
+## Library Updates
+- Upgraded HBase library (_1.0.0-cdh5.4.0_ -> _1.2.0-cdh5.7.3_) - #1684 
+- Upgraded go js library (_1.5.19_ -> _1.6.5_) - #1731 
+- Upgraded select2.js component - #1737 
+- Upgraded various dependency libraries - #1749 
+- Upgraded Javaassist library (_3.20.0-GA_ -> _3.21.0-GA_) - #1807 (Contributed by dawidmalina)
+- Upgraded netty library (_3.6.6.Final_ -> _3.10.6.Final_) - #2026 
+  <br><br>
+- Upgraded maven clover plugin - #1757 
+- Upgraded HBase version for docker HBase image (_1.0.3_ -> _1.2.3_) - #2127 (Contributed by mvlbarcelos)
+",https://api.github.com/users/koo-taejin,10057874,koo-taejin,https://api.github.com/repos/naver/pinpoint/releases/4864234/assets,https://api.github.com/repos/naver/pinpoint/releases/4864234,master,https://api.github.com/repos/naver/pinpoint/tarball/1.6.0,https://github.com/naver/pinpoint/releases/tag/1.6.0,https://api.github.com/repos/naver/pinpoint/zipball/1.6.0,1.6.0,False,False
+4714301,2016-11-21T07:35:09Z,2016-11-21T08:04:25Z,1.6.0-RC2 release note,"# 1.6.0-RC2 release note
+
+**You must create 2 new HBase tables if you are upgrading from a previous release.**
+
+```
+AgentStatV2
+TraceV2
+```
+
+For more information on what these tables do, please refer to the _Trace/AgentStat improvements_ section in the [1.6.0-RC1](https://github.com/naver/pinpoint/releases/tag/1.6.0-RC1) release note.
+
+## Known Issues
+- When profiling Jboss, you must set `profiler.instrument.engine=JAVASSIST` in _pinpoint.config_
+
+## Bug Fixes
+- Fixed potential thread safety issue with `InterceptorScope` - #2259
+- Fixed an issue where `ASMClass.addDelegatorMethod()` would produce incorrect bytecode - #2264
+  <br><br>
+- Fixed incorrect binding of ${buildtime} variable - #2266 
+
+If you want to know more about the changes 1.6.0. please refer to the [1.6.0-RC1 release notes](https://github.com/naver/pinpoint/releases/tag/1.6.0-RC1).
+",https://api.github.com/users/koo-taejin,10057874,koo-taejin,https://api.github.com/repos/naver/pinpoint/releases/4714301/assets,https://api.github.com/repos/naver/pinpoint/releases/4714301,master,https://api.github.com/repos/naver/pinpoint/tarball/1.6.0-RC2,https://github.com/naver/pinpoint/releases/tag/1.6.0-RC2,https://api.github.com/repos/naver/pinpoint/zipball/1.6.0-RC2,1.6.0-RC2,False,True
+4649379,2016-11-14T07:20:14Z,2016-11-14T08:58:33Z,1.6.0-RC1 release note,"# 1.6.0-RC1 release note
+
+**You must create 2 new HBase tables if you are upgrading from a previous release.**
+
+```
+AgentStatV2
+TraceV2
+```
+
+For more information on what these tables do, please refer to the _Trace/AgentStat improvements_ section below.
+
+### ASM
+
+We have changed our default bytecode instrumentation engine from Javassist to ASM and you will now experience faster application startup time especially in an environment with a lot of Spring beans.
+This change also allows us to add powerful new APIs for you to utilize when developing plugins in the future.
+
+We have added the following option to _pinpoint.config_ to configure bytecode instrumentation engine used by the agent.
+
+**pinpoint.config**
+
+```
+profiler.instrument.engine=ASM
+```
+
+Possible values are:
+- ASM (**default**) - uses ASM for bytecode instrumentation
+- JAVASSIST - uses Javassist for bytecode instrumentation
+
+Please note that JAVASSIST instrumentation is deprecated and will be removed in future release.
+
+### Trace/AgentStat improvements
+
+Huge improvements have been made to storing trace and agent stat data. We've experienced upwards of **60-70% improvement in I/O performance and storage capacity** internally.
+**We highly recommend you create the following tables when upgrading from 1.5.x.**
+
+```
+AgentStatV2
+TraceV2
+```
+
+We have added the following options to _pinpoint-collector.properties_ and _pinpoint-web.properties_ to configure which tables to use.
+Default values have been set to ensure backwards compatibility so you most likely will not need to change anything after creating the tables above.
+
+**pinpoint-collector.properties**
+
+```
+collector.span.format.compatibility.version=v2
+collector.stat.format.compatibility.version=v2
+```
+
+Possible values are:
+- v1 - writes data to `AgentStat/Trace` table.
+- v2 (**default**) - writes data to `AgentStatV2/TraceV2` table.
+- dualWrite - writes data to `AgentStat/Trace` and `AgentStatV2/TraceV2` tables.
+
+**pinpoint-web.properties**
+
+```
+web.span.format.compatibility.version=compatibilityMode 
+web.stat.format.compatibility.version=compatibilityMode 
+```
+
+Possible values are:
+- v1 - reads data from `AgentStat/Trace` table.
+- v2 - reads data from `AgentStatV2/TraceV2` table.
+- compatibilityMode (**default**) - reads data from `AgentStatV2/TraceV2` and if nothing is found, reads data from `AgentStat/Trace` tables.
+
+<br><br><br>
+
+## Plugins
+- Added Hystrix support - #1594, #2101 (Contributed by jiaqifeng)
+- Added ActiveMQ support - #1709
+- Added Apache cxf client support - #1994 (Contributed by barneykim)
+- Added JBOSS support - #2001, #2026, #2117, #2170 (Contributed by suraj-raturi)
+  <br><br>
+- Modified a number of log levels in JDBC plugins - #1729
+- Added options to allow for additional configuration in tracing JDBC drivers - #2083
+- `TProtocolDecorators` are now supported for Thrift plugin - #2106
+- Spring plugin now supports tracing component-scanned beans - #2143
+- Improved Tomcat plugin stability - #2155, #2159, #2166, #2168
+  <br><br>
+- Fixed a bug where Tomcat wasn't being traced if excludeUrl was not set - #2077
+- Fixed a bug where traces from JDK-HTTP plugin would not render destination nodes in the server map - #2010 
+  <br><br>
+- Added tests for _mybatis-spring_ v1.3+ #1703
+- _maria-db-java-client_ libraries are now pulled from maven central when running MariaDB integration test - #2072
+  <br><br>
+
+## Enhancements
+- Added support for tracing message queue clients - #1708 
+- Added support for using NIO for `UDPDataSender` - #1711 
+- CPU statistics can now be collected when using IBM JVMs - #1756 
+- Upgraded Javaassist library (3.20.0-GA -> 3.21.0-GA) - #1807 
+- Added support/configs for dumping bytecodes - #1811, #1814 
+- You may now choose to use ASM (default) to do bytecode instrumentation - #2017 
+- API information can now be stored as `SpanEvent` annotation field - #2018 
+- Removed JDK logger dependency from _bootstrap_ module - #2026 
+- Agent now uses JDK's `ThreadLocalRandom` when running on Java 7+ - #2027
+- You can now trace Pinpoint Web using Pinpoint! - #2044
+- Main classes used to detect application type are now configurable - #2156
+- You may now use ant-style patterns when configuring custom classes to trace - #2173 
+- Agent's child directories are now resolved using their canonical path - #2202 
+  <br><br>
+- Collector statistics report is now a lot more detailed - #1990 
+  <br><br>
+- Web now displays detailed error message for uncaught server exceptions - #535 
+- API for user data is now ordered - #1723 
+- API for user data now uses a parameter object - #1723 
+- Added support for storing total number of registered agents into a relational database- #1883 
+- Added additional query parameters for alarm rule API - #1887 
+- Configuration API now returns additional result - #1900 
+- Real time scatter chart now retries request on 5xx errors - #1928 
+- Improved real time scatter chart performance - #1986 
+- Removed a number of `$timeout` that led to performance issues in _Inspector_ - #2176, #2177, #2194 
+- Added parameter verification to certain APIs - #2217 
+  <br><br>
+- Improved agent stat data storage - #1533 
+- Changed hbase client - #1613 
+- Improved trace data storage - #1819, #1913, #2187 
+- Improved buffer related APIs - #1838, #1847, #1853, #1866 
+  <br><br>
+
+## Bug Fixes
+- Fixed an issue where array typed fields and their getter/setter could not be injected - #1879 
+- Fixed an issue where _profiler.include_ was not working as intended - #1947
+- Added additional checks to prevent agent from registering multiple transformers for the same class - #2178 
+- Fixed send retry policy for `TCPDataSender` - #2198 
+  <br><br>
+- Fixed concurrency issue for real time active thread chart - #1482 
+- Pinpoint web now scans for mapper files in all class paths - #1746 
+- Fixed an issue where a wrong agent was selected when dragging on the scatter chart - #1797 
+- Fixed an issue where a different focus time was being selected in the call tree - #1828 
+- Fixed an issue where a wrong application name was being displayed in the _Transaction List_ - #1872 
+- Removed pop up warnings for _jquery-layout_ components - #1873 
+- Fixed an issue where the _Transaction List_ would not load when the page is loaded through url - #1877 
+  <br><br>
+- Fixed an issue where toggling _success/failed_ check boxes in the scatter chart would show a different agent's data - #2004 
+- Fixed an issue where agent information was not being reset when selecting a different application in _Inspector_ - #2082 
+- Fixed an issue where changing applications with real time chart pinned would result in incorrect summation of active threads - #2085 
+- Fixed an issue where the _Server-List_ layer's scatter chart would not update itself under real time mode - #2137 
+- Scatter chart's total request count is now calculated correctly - #2163 
+- Fixed incorrect date calculation when time slider's previous/next button is selected in _Inspector_ - #2197 
+- Events are now properly cleared from the time slider when selecting different agents in _Inspector_ - #2206 
+- Fixed an issue where the response time chart's layout would break when the link node is clicked more than once - #2224 
+  <br><br>
+
+## UI & UX
+- Modified UI for configuration modal - #1706 
+- Improved UI for alarm configuration - #1715, #1725, #1706, #1889, #1902 
+- Removed _beta_ tag from Pinpoint logo - #1731 
+- Changed label for switching to real time mode (from an icon to text) - #1764 
+- Added scatter charts under _Server List_ - #1787 
+- Improved _Inspector_ UI and added a time slider - #1799, #1800, #1803, #1815, #1831 
+- Changed date formats for charts in _Inspector_ - #1835 
+- Added active thread chart to _Inspector_ - #2054, #2056, #2057, #2058, #2208 
+- Application select box now shows more applications - #2137 
+- _Transaction List_ now forbids events from firing until it has finished loading - #2130 
+- Iframe inside _Transaction List_ is no longer cached - #2145 
+- Modified UI for the _Server List_ layer
+  <br><br>
+- The position of _Transaction List_'s handle bar is now remembered - #1797 
+- Adding applications to ""favorites"" is now instantly applied to application select box - #1832 
+- Added an option to set user's time zone - #1997 
+- It is now impossible to drag outside the scatter chart - #2105 
+- Added paging for displaying response summary charts for unknown nodes - #2150 
+  <br><br>
+
+## Tasks
+- Added comments on cluster configuration - #1695 
+- Refactored `xxxBo` classes into the server module (package changed from `com.navercorp.pinpoint.common` to `com.navercorp.pinpoint.common.server`) - #1720 
+- Cleaned up spring-related configurations - #1727 
+- Improved `SpanBo` code - #1734, #1742 
+- Updated QuickStart `README.md` - #1736, #1980 (Contributed by yous and abhijith0505)
+- Added configurations for checking JDK 1.6 compatibility - #1761 
+- Separated tools module - #1774 
+- Added configuration options for various plugins - #1788, #2090, #2151 (Contributed by guindous)
+- Separated optional modules by JDK versions - #1821 
+- Modified default _log4j_ setting - #1822, #2086 
+- Added maven profile to separate _pinpoint.config_ into local(development) and release configurations - #1822 
+- Updated `README.md` - #2005 #2186 
+- Repackaged Guava to remove JDK logger dependency - #2038 
+- Fixed compatibility issue with Java 7 when the agent is built using JDK 8 - #2095 
+- Changed default bytecode instrumentation to use ASM (JAVAASSIST -> ASM) - #2215 
+- Updated `doc/installation.md`
+  <br><br>
+- _jshint_ is no longer defaulted to run when building web - #1751 
+- Docker image bumped to HBase 1.2.x and fixed port for web - #1767 (Contributed by dawidmalina)
+- Added MySql docker image and made it configurable through start-web.sh - #1768 (Contributed by dawidmalina)
+- Changed artifactId of the root module (pom -> pinpoint) - #1794, 1795 
+- Added _maven-animal-sniffer_ plugin - #1833 (Contributed by 999fg)
+- Added _grunt-maven-plugin_ to enable grunt build - #1843 
+- Remove original source from being deployed after a grunt build - #1890 
+- Provide fallback when the main hbase repository is not available when building HBase docker image - #2225 
+  <br><br>
+- Added _CodeCov_ - #2060 
+  <br><br>
+
+## Library Updates
+- Upgraded HBase library (_1.0.0-cdh5.4.0_ -> _1.2.0-cdh5.7.3_) - #1684 
+- Upgraded go js library (_1.5.19_ -> _1.6.5_) - #1731 
+- Upgraded select2.js component - #1737 
+- Upgraded various dependency libraries - #1749 
+- Upgraded Javaassist library (_3.20.0-GA_ -> _3.21.0-GA_) - #1807 (Contributed by dawidmalina)
+- Upgraded netty library (_3.6.6.Final_ -> _3.10.6.Final_) - #2026 
+  <br><br>
+- Upgraded maven clover plugin - #1757 
+- Upgraded HBase version for docker HBase image (_1.0.3_ -> _1.2.3_) - #2127 (Contributed by mvlbarcelos)
+",https://api.github.com/users/koo-taejin,10057874,koo-taejin,https://api.github.com/repos/naver/pinpoint/releases/4649379/assets,https://api.github.com/repos/naver/pinpoint/releases/4649379,master,https://api.github.com/repos/naver/pinpoint/tarball/1.6.0-RC1,https://github.com/naver/pinpoint/releases/tag/1.6.0-RC1,https://api.github.com/repos/naver/pinpoint/zipball/1.6.0-RC1,1.6.0-RC1,False,True
+2977305,2016-04-08T02:46:31Z,2016-04-08T05:16:32Z,1.5.2 release note,"# 1.5.2 release note
+
+## Plugins
+- Added Cassandra Datastax Java Driver support - #789 (Contributed by dawidmalina)
+- Added MARIA JDBC support - #1388 (Contributed by dawidmalina)
+- Added DUBBO support - #1416 (Contributed by majinkai)<br><br>
+- Added checks to see if Log4J, Logback plugins should transform their target classes - #1303
+- Reduced scope when tracing Thrift Asynchronous Client - #1319
+- You may now configure multiple methods when using User plugin - #1390
+- Added filter options for Spring plugin - #1466
+- Added option for disabling JSON(JSONLib, Jackson, Gson) plugins - #1527
+- Stored procedures may now be traced for JDBC plugins - #1541
+
+## Enhancements
+- Improved class loading to support OSGI (Jira) - #1583
+- Added support for Spring AspectJ weaving - #1443
+- Added detailed JVM memory statistics collection - #628 (Contributed by dawidmalina)
+- Response time scatter chart can now be shown per agent - #930
+- Pinpoint agent may now be used with other java agents that transform classes - #1322
+- Added duration for agent start/shutdown events - #1358
+- Added addSetter API for InstrumentClass - #1479
+- Active thread information is collected alongside other agent statistics - #1504
+- JVM GC type is now collected once at agent startup - #1532
+- Added recordApiId API to SpanRecorder - #1610
+- Spring Boot application service information is now collected - #1621 <br><br>
+- collector.l4.ip(pinpoint-collector.properites) option now allows whitespaces - #1553 <br><br>
+- Added time filtering when querying agents for real time data - #1318
+- Applied parallel result scanning when reading from HBase - #1362, #1432
+- Added SpanEvent filter to safeguard against spans with too many events - #1396
+- Added a limit to prevent OOME when fetching for transactions with too many spans - #1397
+- Made real time active thread chart smoother - #1430
+- Added RESTful API for getting application's host information - #1444
+- Removed unnecessary agent status lookups to improve server map query time - #1469
+- Modified response data RESTful API for getting scatter data - #1518
+- Added direction option for RESTful API for getting scatter data - #1573
+- Added RESTful API for getting application's response time data - #1589
+
+## Bug Fixes
+- Fixed an issue where destinationId would be set as UnknownHttpClient for HttpClient3 - #1349
+- Slf4j now works when using jul-to-slf4j - #1478
+- Fixed an issue where Log4j Logback enable option would not work properly - #1508
+- Fixed an issue where HttpClient plugin would throw an exception when request entity was multipart(content type) - #1530 <br><br>
+- Errors thrown when constructing the call tree are now more detailed - #1367
+- Fixed a bug where call statistics would show as 0 when multiple applications were bound to a single domain - #1487
+- Fixed call tree's gap calculation - #1539 <br><br>
+- Fixed an issue where a plugin's integration tests would not run under certain situations - #1595
+
+## UI & UX
+- Scatter, response summary, load summary charts can now be updated in real time - #1577, #1596
+- Charts may now be filtered by agents - #1490
+- Splitted depth into inbound, and outbound
+- Websockets now reconnects upon unexpected close - #1343
+- Added time slider to Inspector view - #1428
+- Added page for deleting agents - #1473
+- Server map is refreshed when changing inbound, outbound options - #1634
+- Added guide message when an agent has a different application name in Inspector view - #1650
+
+## Tasks
+- Docker images may now be built through maven (via docker-maven-plugin) - #1378 (Contributed by dawidmalina)
+- Jsons are now generated from Java objects instead of through JSP - #1371
+- Separated server modules for collector, and web - #1511
+- Removed deprecated HBase API calls - #1587
+- Added prefix data block encoding to HBase tables - #1606
+- Removed region pre-splitting for AgentEvent and AgentLifeCycle - #1560
+- Added jshint, merge, minify for javascript and css files
+
+## Library Updates
+- Upgraded Apache Commons Collections to v3.2.2 - #1576 (Contributed by jart)
+- Upgraded go.js 1.4.x => 1.5.x #1524
+",https://api.github.com/users/koo-taejin,10057874,koo-taejin,https://api.github.com/repos/naver/pinpoint/releases/2977305/assets,https://api.github.com/repos/naver/pinpoint/releases/2977305,master,https://api.github.com/repos/naver/pinpoint/tarball/1.5.2,https://github.com/naver/pinpoint/releases/tag/1.5.2,https://api.github.com/repos/naver/pinpoint/zipball/1.5.2,1.5.2,False,False
+2270859,2015-12-11T06:25:26Z,2015-12-11T08:49:58Z,1.5.1 release note,"# 1.5.1 release note
+
+## Plugins
+- Added POSTGRESQL support - #1200
+- Added JETTY 8 support - #1257
+- Improved stability by adding null/type checks to various plugins - #1276
+- LOG4J interceptor method checks are now more strict - #1303
+- Improved stability by changing how Accessor was obtained when injecting them in plugins - #1332
+
+## Enhancements
+-   Collector now ignores UDP health check packets by checking their IP - #1195
+-   Exceptions thrown inside Spring beans can now be configured to not show up as a failed transaction - #1262
+
+```
+profiler.spring.beans.mark.error=false  (default = false, does not mark them as failed transaction)
+```
+-   Changed Spring version (4.1.7.RELEASE -> 4.1.8.RELEASE) - #1264
+-   Maven build requirement is checked more strictly (maven 3.2+, jdk 1.7+) - #1267
+-   Changed configuration for tracing user specified methods from `profiler.user.include` to `profiler.entrypoint` - #1288
+
+```
+# Needs to be a comma separated list of fully qualified method names. Wild card not supported.
+profiler.entrypoint=
+# Ex: foo.bar.MyClass.myMethod, foo.bar.MyClass.anotherMethod
+```
+-   Interceptor registry size can now be configured (default : 4096 -> 8192) - #1306
+-   Log4j now uses `RollingFileAppender` as default - #1326
+-   Modified various log messages and log levels
+
+## Fixes
+-   Fixed potential concurrency problem when counting active threads - #1244
+-   Fixed an issue where unsampled continued transactions were left out when calculating TPS - #1271
+-   Fixed an issue where unsampled transactions would throw an error when using UserInclude plugin - #1288
+-   Fixed an issue where the agent became unstable when killed via _SIGINT_ - #1298
+
+## UI & UX
+-   Clarified ""no active thread"" state for Realtime Active ThreadChart - #1269
+-   Calendars are no longer annoying to use (changed the way they were auto-correcting) - #1309
+-   Agents that have been dead for over a week no longer shows up in Realtime Active ThreadChart - #1318
+-   Every transactions inside the transaction list now has their unique URL - #1330
+
+:smile:
+",https://api.github.com/users/koo-taejin,10057874,koo-taejin,https://api.github.com/repos/naver/pinpoint/releases/2270859/assets,https://api.github.com/repos/naver/pinpoint/releases/2270859,master,https://api.github.com/repos/naver/pinpoint/tarball/1.5.1,https://github.com/naver/pinpoint/releases/tag/1.5.1,https://api.github.com/repos/naver/pinpoint/zipball/1.5.1,1.5.1,False,False
+2175946,2015-11-24T08:24:31Z,2015-11-24T09:10:58Z,1.1.2 release note,"# 1.1.2 release note
+
+**You must create the following tables when upgrading from 1.1.x**
+
+```
+ApplicationMapStatisticsCaller_Ver2
+ApplicationMapStatisticsCallee_Ver2
+ApplicationMapStatisticsSelf_Ver2
+```
+
+Please refer to hbase-create.hbase or hbase-create-snappy.hbase for the relevant commands.
+
+## New Features
+- HTTP request parameters and SQL bind values tracing may now be enabled/disabled - #977, #1224, #1230
+
+## Enhancements
+- Improved memory usage for server map queries
+- Callee/Caller/Self statistics tables now use distributed row keys - #1037
+- UDP health check packets may now configured to be ignored through IP - #1215
+
+## Fixes
+- Fixed Arcus plugin stopping the client from reconnecting on Arcus/Memcached server fault - #1171
+- Fixed an issue where `profiler.applicationservertype` setting was not applied correctly - #1090
+- Fixed an issue where the server map failed to link nodes on HTTP calls made to non-80 ports - #1015
+",https://api.github.com/users/koo-taejin,10057874,koo-taejin,https://api.github.com/repos/naver/pinpoint/releases/2175946/assets,https://api.github.com/repos/naver/pinpoint/releases/2175946,master,https://api.github.com/repos/naver/pinpoint/tarball/1.1.2,https://github.com/naver/pinpoint/releases/tag/1.1.2,https://api.github.com/repos/naver/pinpoint/zipball/1.1.2,1.1.2,False,False
+2168780,2015-11-26T04:39:47Z,2015-11-26T04:42:40Z,1.5.0 release note,"# 1.5.0 release note
+
+**You must create the following tables when upgrading from 1.1.x**
+
+```
+ApplicationMapStatisticsCaller_Ver2
+ApplicationMapStatisticsCallee_Ver2
+ApplicationMapStatisticsSelf_Ver2
+HostApplicationMap_Ver2
+AgentLifeCycle
+AgentEvent
+```
+
+Please refer to hbase-create.hbase or hbase-create-snappy.hbase for the relevant commands.
+
+## Known Issues
+- There may be intermittant lockups when viewing Realtime Active Thread Chart. This will be fixed in the next release.
+
+## New Features
+- Implemented plugins - profilers are now pluggable - #117
+- Added active thread count monitoring for agents - #560, #751
+- You may now configure alerts and alarms #762, #862
+- SQL statements can now be combined with bind values for display - #1064
+- HTTP request parameters and SQL bind values tracing may now be enabled/disabled - #1204, #1211, #1217
+- Added transaction per second monitoring for agents - #1069
+- Added support for tracing asynchronous calls - #261, #301
+- Added support for tracking agent life cycle - #84
+- Collector's resources can now be managed with JMX - #582
+- Added support for Spring Boot applications - #951
+- Added API for querying logged in user - #943
+- Added configuration for enabling/disabling batch execution - #762
+- Added support for generating delegation code to profile method overrides - #674
+- Added statistics page for Pinpoint agent versions - #1241
+
+## New Plugins
+- Added Thrift support - #329
+- Added Jetty support - #771
+- Added OK HttpClient support - #960
+- Added Google HttpClient support - #781, #782
+- Added Jackson support - #466
+- Added Gson support - #462
+- Added Json-lib support - #460
+
+## Enhancements
+- Improved logic for SQL Cache - #208
+- Web now shows detailed error messages on exceptions - #535
+- Separated commons-hbase module - #558
+- Improved SqlMetaData table performance by using distributed row keys - #572
+- Call stacks are now depth limited - #743
+- Added JVM version to Agent information - #906
+- Main class can now be extracted from a jar/war/zip files - #956
+- Improved ByteArray encoding/decoding performance - #985
+- Cluster client/web code is now used in both Collector and Web - #1017
+- AgentInfo is no longer lost for agents staying active past TTL value - #1117
+- Improved memory usage for server map queries
+- Separated application type and Span service type = #228
+- Improved application type detection - #195
+- Pinpoint Web now uses dbcp2 - #1072
+- Improved matcher logic for generating external links for agents = #1053
+- SqlMetaData table now uses fixed length byte array for qualifier name - #592
+- Improved row key distribution for SqlMetaData table - #562
+- Pinpoint version is now added to system properties when agent is started - #173
+
+## Fixes
+- Fixed Arcus plugin stopping the client from reconnecting on Arcus/Memcached server fault - #1174
+- Fixed an issue where Zookeeper would not reconnect on session expiration when Pinpoint cluster management is enabled - #191
+- Data is now properly traced when profiling older Oracle jdbc drivers - #193
+- Fixed an issue where applications were not differentiated if they had the same name/different types - #214
+- Fixed server map error when a USER node pointed to applications with the same name/different types - #254
+- Fixed Filter Wizard displaying incorrect data when filtered by agents - #732
+- Fixed an issue where the server map failed to link nodes on HTTP calls made to non-80 ports - #968
+- Fixed an error when transactions were filtered by RPC calls with types for internal methods - #488
+
+## UI & UX
+- Clicking on the Response Summary chart's error bar now takes you straight to the transaction view - #396
+- Added help tooltips - #497
+- Dates are now correctly displayed in Internet Explorer - #507
+- You are now redirected to the main page when the transaction view is not reachable - #522
+- Improved timeline UI performance - #672
+- Added configuration page for setting :
+- Default depth, period - #1092
+- Favorites for applications - #1221
+- Application menu is now inactive on intial page load
+- Changed time slider to calendar format
+
+:smile:
+",https://api.github.com/users/koo-taejin,10057874,koo-taejin,https://api.github.com/repos/naver/pinpoint/releases/2168780/assets,https://api.github.com/repos/naver/pinpoint/releases/2168780,master,https://api.github.com/repos/naver/pinpoint/tarball/1.5.0,https://github.com/naver/pinpoint/releases/tag/1.5.0,https://api.github.com/repos/naver/pinpoint/zipball/1.5.0,1.5.0,False,False
+1780933,2015-09-08T06:51:08Z,2015-09-09T01:35:49Z,1.1.1 release note,"# 1.1.1 release note
+
+## Improvements
+- Added support for resolving ""X-Forwarded-For"" header (Tomcat) - #137
+- Upgraded Thrift library version (0.9.1 -> 0.9.2) - #645
+- Added JDK 8 support - #709
+- Upgraded Spring framework version (3.2.3.RELEASE -> 4.1.7.RELEASE) - #765
+- Improved Trace performance (Arcus, Memcached) - #776
+- Improved Trace performance (SQL caching for JDBC API) - #807
+- Redesigned algorithm for filtering Spans - #818
+
+## Fixes
+- Fixed incorrect array index handling of SqlBindValue when tracing PreparedStatement - #740
+- Fixed an issue where Filter Wizard was showing incorrect data for from/to agents - #745
+- Fixed time-to-live issue in certain HBase tables - #748
+- Fixed an issue where certain RPC transactions were ordered incorrectly in the Call Stack view - #841
+- Lost packets are now displayed as corrupted instead of throwing an exception - #842
+- Fixed an issue where the Filter Wizard would reset itself upon opening
+
+## UI
+- Changed default application search depth (7 -> 2)
+
+※ All issues ordered by category and issue no. 
+
+:smile:
+",https://api.github.com/users/koo-taejin,10057874,koo-taejin,https://api.github.com/repos/naver/pinpoint/releases/1780933/assets,https://api.github.com/repos/naver/pinpoint/releases/1780933,master,https://api.github.com/repos/naver/pinpoint/tarball/1.1.1,https://github.com/naver/pinpoint/releases/tag/1.1.1,https://api.github.com/repos/naver/pinpoint/zipball/1.1.1,1.1.1,False,False
+1508970,2015-07-08T06:54:36Z,2015-07-08T07:24:51Z,1.1.0 release note,"# 1.1.0 release note
+
+**You must create `SqlMetaData_Ver2` table if you're upgrading from 1.0.x**
+
+## Improvements
+- Upgraded Hbase version to 1.0 (dropped support for Hbase 0.94.x) - #320, #382, #432, #472
+- Added search depth option when querying for ServerMap - #523
+- Improved data storage/row key distribution logic for MetaData table stability - #572, #591, #637
+  - Added new Hbase table : `SqlMetaData_Ver2`
+- Changed Hbase table schema(split, ttl) - #621
+- Agent callstack operations no longer require synchronization - #651
+
+## Fixes
+- Fixed an issue when multiple applications had the same name but different service types - #611
+- Fixed bug when modifying HttpUrlConnection when running on Java 8 - #667
+
+## UI
+- Improved RPC timeline
+
+※ All issues ordered by category and issue no. 
+
+:smile:
+",https://api.github.com/users/koo-taejin,10057874,koo-taejin,https://api.github.com/repos/naver/pinpoint/releases/1508970/assets,https://api.github.com/repos/naver/pinpoint/releases/1508970,master,https://api.github.com/repos/naver/pinpoint/tarball/1.1.0,https://github.com/naver/pinpoint/releases/tag/1.1.0,https://api.github.com/repos/naver/pinpoint/zipball/1.1.0,1.1.0,False,False
+1299738,2015-05-15T05:24:34Z,2015-05-18T05:32:24Z,1.0.5 release,"# 1.0.5 release note
+
+## Improvements
+- Added support for multiple class loaders (ex. Tomcat multi-context) - #88
+- Added ant-style pattern matching when configuring exclude URLs - #138
+- Improved logic for sql cache - #208  
+- Added the ability to view application log using Pinpoint Agent - #234
+- Improved logic for checking if HTTP client class can be modified - #281
+- Improved transaction view performance by caching api metadata (ehcache) 
+
+## Fixes
+- Fixed a bug where tracing older (10.x and older) Oracle jdbc drivers would result in unknown database - #193
+- Fixed an issue where tracing HttpUrlConnection would throw an exception in certain situations - #235
+- Fixed a bug in `stop-hbase.sh` quickstart script 
+
+## UI
+- Added support for grouping similar nodes
+- Improved user perception on a selected node
+- Improved TransactionFilter help messages
+- Nodes can now be searched and selected
+- Selecting a call in RPC timeline will now direct the user to the corresponding row in the Distributed Call view
+
+※ All issues ordered by category and issue no. 
+
+:smile:
+",https://api.github.com/users/koo-taejin,10057874,koo-taejin,https://api.github.com/repos/naver/pinpoint/releases/1299738/assets,https://api.github.com/repos/naver/pinpoint/releases/1299738,master,https://api.github.com/repos/naver/pinpoint/tarball/1.0.5,https://github.com/naver/pinpoint/releases/tag/1.0.5,https://api.github.com/repos/naver/pinpoint/zipball/1.0.5,1.0.5,False,False
+1006140,2015-03-02T05:18:02Z,2015-03-03T02:59:16Z,1.0.4 release,"# 1.0.4 release note
+
+## Improvements
+- Added Apache HttpClient 3.x support
+- Added Apache HttpClient 3.x, 4.x http.status.code tracing - #76
+- Added Apache HttpClient 3.x, 4.x retryConnect status tracing
+- Improved performance of JDK HttpConnector tracing
+- Added Windows support for QuickStart
+
+## Changes
+- BytecodeInstrumentation API changes
+  1. When instrumenting, finded bytecode directly from classLoader
+  2. Added API for searching InstrumentClass's super class and interfaces
+  3. Improved thread-safety of InterceptorRegistry - #85
+- Separated agent's collecotor ip, port configuration
+- Added API for deleting agent ID through Pinpoint Web
+- Added API for adding trace data into Scope object
+
+## Fixes
+- Fixed occasional ClassCastException when tracing Arcus front cache
+- Fixed issue where calls were being traced even with the disabled flag set in Http header
+- Fixed inefficient Exception creation when invoking HttpServletRequest's `getHeaderNames()`, and `getParameterNames()` - #69
+- Fixed an issue where missing data were not being shown in Inspector view's charts
+- Fixed agentId, applicationName verification regex check
+- Fixed NPE when a Spring bean is loaded by the bootstrap classloader - #131
+- Fixed timer thread leak when agent reconnects to the collector - #140
+
+## UI
+- Filter Transaction Wizard now works as intended
+- Fixed an issue with amCharts throwing error messages
+
+## Configuration Changes
+- Spring trace option is now **true** by default
+",https://api.github.com/users/koo-taejin,10057874,koo-taejin,https://api.github.com/repos/naver/pinpoint/releases/1006140/assets,https://api.github.com/repos/naver/pinpoint/releases/1006140,master,https://api.github.com/repos/naver/pinpoint/tarball/1.0.4,https://github.com/naver/pinpoint/releases/tag/1.0.4,https://api.github.com/repos/naver/pinpoint/zipball/1.0.4,1.0.4,False,False

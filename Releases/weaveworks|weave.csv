@@ -1,0 +1,2128 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8065756,2017-10-10T15:17:54Z,2017-10-10T16:31:34Z,Weave latest (2.0.5),[Release Notes](https://github.com/weaveworks/weave/releases/v2.0.5),https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/8065756/assets,https://api.github.com/repos/weaveworks/weave/releases/8065756,master,https://api.github.com/repos/weaveworks/weave/tarball/latest_release,https://github.com/weaveworks/weave/releases/tag/latest_release,https://api.github.com/repos/weaveworks/weave/zipball/latest_release,latest_release,False,False
+8008531,2017-10-05T11:57:36Z,2017-10-10T16:31:32Z,Weave Net 2.0.5,"# Bug fixes
+
+* Fix /etc/hosts inside containers so the container's name resolves to its Weave Net address #3136,#3138
+* New weave-kube config for Kubernetes 1.7 and 1.8 which resolves an intermittent conflict with kube-proxy that could break Weave Net until reboot #2998,#3134
+* `weave reset`  will now remove the persistence file created by the 'v2' Docker plugin #3103,#3114
+
+[Full list of changes](https://github.com/weaveworks/weave/milestone/63?closed=1).
+
+## Upgrading the Weave Net Kubernetes addon (`weave-kube`)
+
+There is an updated DaemonSet manifest for Kubernetes 1.7 and 1.8 that adds a volume-mount for the `iptables` lock file, which avoids collisions between Weave Net components and kube-proxy that can sometimes result in a half-configured network.:
+
+```
+kubectl apply -f https://cloud.weave.works/k8s/v1.7/net
+```
+
+## External Contributors
+
+Thanks to the following who contributed changes in this release:
+@dtshepherd
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/8008531/assets,https://api.github.com/repos/weaveworks/weave/releases/8008531,master,https://api.github.com/repos/weaveworks/weave/tarball/v2.0.5,https://github.com/weaveworks/weave/releases/tag/v2.0.5,https://api.github.com/repos/weaveworks/weave/zipball/v2.0.5,v2.0.5,False,False
+7524836,2017-08-25T14:57:09Z,2017-08-25T15:25:03Z,Weave Net 2.0.4,"## Release 2.0.4
+
+Bug fixes
+
+* weave-npc failed on Centos 7, due to older 'ipset' version in kernel #3098,#3100
+
+[Full list of changes](https://github.com/weaveworks/weave/milestone/62?closed=1).
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/7524836/assets,https://api.github.com/repos/weaveworks/weave/releases/7524836,master,https://api.github.com/repos/weaveworks/weave/tarball/v2.0.4,https://github.com/weaveworks/weave/releases/tag/v2.0.4,https://api.github.com/repos/weaveworks/weave/zipball/v2.0.4,v2.0.4,False,False
+7492105,2017-08-23T11:08:35Z,2017-08-23T11:27:07Z,Weave Net 2.0.3,"**NOTE: Weave Net 2.0.2 and 2.0.3 do not work on Centos 7, due to an [incompatibility with the ipset support in the kernel](https://github.com/weaveworks/weave/issues/3098)**
+
+This release is to fix a bug which snuck into 2.0.2
+
+* Weave-npc would crash on a policy with no 'from' part - regression introduced in 2.0.2 #3095,#3096,#3097
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/7492105/assets,https://api.github.com/repos/weaveworks/weave/releases/7492105,master,https://api.github.com/repos/weaveworks/weave/tarball/v2.0.3,https://github.com/weaveworks/weave/releases/tag/v2.0.3,https://api.github.com/repos/weaveworks/weave/zipball/v2.0.3,v2.0.3,False,False
+7476356,2017-08-22T11:28:25Z,2017-08-22T14:18:06Z,Weave Net 2.0.2,"# Bug fixes and minor improvements
+
+* Fix race condition in weave-npc which would intermittently block all traffic for a namespace  #3057,#3059
+* When using Docker Plugin V2, ensure Fast Datapath works on machines that need to mount the kernel module dynamically #3080
+* Regression: weave-npc would block everything if `kubelet --hostname-override` was used #3049,#3051
+* Fix netfilter rules to block containers from accessing the Weave Net control endpoint #3093
+* If DNS server is off then disable proxy DNS registration, to avoid spurious errors #3054,#3088
+* Add comments to each iptables rule and ipset, to help when troubleshooting #3064
+* Remove code that checked for an outdated fallback address for Kubernetes api-server #3071
+* Add a label to the weavedb image so it can be filtered out by tools #3066
+* Fix various build and continuous-integration failures #3061
+* Print 'help' text faster in the weave script #3056
+* Add an option to create continuous integration hosts in different ways  #3060
+* Remove remnants of the pre-2.0 proxy and plugin from build and test #3035,#3036
+
+[Full list of changes](https://github.com/weaveworks/weave/milestone/60?closed=1).
+
+If you have edited the Weave Net DaemonSet from a previous release, you will need to re-make your changes against the new version.
+
+## Upgrading the Weave Net Kubernetes addon (`weave-kube`)
+
+Kubernetes 1.6 and above supports rolling upgrades of DaemonSets. To upgrade, simply run:
+```
+kubectl apply -f https://cloud.weave.works/k8s/v1.6/net
+```
+Kubernetes will then delete the existing Weave Net pods one by one, and create new ones with the latest Weave Net version.
+
+The `1.6` link will work for Kubernetes 1.6 and 1.7
+
+## External Contributors
+
+Thanks to the following who contributed changes in this release:
+@dlespiau
+@mikebryant
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/7476356/assets,https://api.github.com/repos/weaveworks/weave/releases/7476356,master,https://api.github.com/repos/weaveworks/weave/tarball/v2.0.2,https://github.com/weaveworks/weave/releases/tag/v2.0.2,https://api.github.com/repos/weaveworks/weave/zipball/v2.0.2,v2.0.2,False,False
+6876218,2017-06-29T09:58:50Z,2017-06-29T10:45:52Z,Weave Net 2.0.1,"## Bug fixes and minor improvements
+
+* Fall back to slower data path (`sleeve`), rather than crashing, when the machine lacks VXLAN support (required for “fast data path”, `fastdp`)  #3043
+* Fix bug in processing of arguments when Docker has TLS enabled, rather than crashing with invalid peers list, e.g. `lookup --tlsverify: no such host` #3039
+* Add `kube-system` namespace back to `weave-kube`'s YAMLs, preventing omissions leading to errors like `error contacting APIServer: the server does not allow access to the requested resource` #3033,#3042
+* Fix release script to prevent ARM64 binaries to end up in AMD64 `net-plugin`, leading to `Error response from daemon: dial unix /run/docker/plugins/<id>/weave.sock: connect: no such file or directory` when installing `net-plugin` #3045
+* `weave reset` and `weave rmpeer` now only contact Weave Cloud when Weave Net is configured with a Weave Cloud token, preventing unnecessary requests and potentially confusing `401 Unauthorized` errors in Weave Net’s logs #3044
+
+## Installation and Upgrading of Weave Net
+
+Follow the [installation instructions](http://weave.works/docs/net/latest/installing-weave/) to install this latest release of weave.
+
+When upgrading from a version earlier than 1.9.0, if your host's network interface has a limit on packet size (the ""MTU"") smaller than 1496 bytes, you should reboot after upgrading to ensure encrypted fast datapath can work. For instance this applies to Google Cloud Platform, but is not necessary on AWS.
+
+Weave Net 2.0.1 is compatible with previous versions back to 1.1.0, so it is possible to upgrade clusters incrementally and run mixed versions.
+
+## Upgrading Kubernetes from an earlier version to version 1.6
+
+In version 1.6, Kubernetes has increased security, so we need to create a special service account to run Weave Net. This is done in the file `weave-daemonset-k8s-1.6.yaml` attached to the release.
+
+Also, the [toleration](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/taint-toleration-dedicated.md) required to let Weave Net run on master nodes has moved from an annotation to a field on the DaemonSet spec object.
+
+The command to apply this new configuration via short URL is:
+```
+kubectl apply -f https://cloud.weave.works/k8s/v1.6/net
+```
+
+If you have edited the Weave Net DaemonSet from a previous release, you will need to re-make your changes against the new version.
+
+## Upgrading the Weave Net Kubernetes addon (`weave-kube`)
+
+Kubernetes 1.6 now supports rolling upgrades of DaemonSets, and we have added this setting to the YAML. To upgrade, simply run:
+```
+kubectl apply -f https://cloud.weave.works/k8s/v1.6/net
+```
+Kubernetes will then delete the existing Weave Net pods one by one, and create new ones with the latest Weave Net version.
+
+In case of issues during the rolling upgrade, please refer to [Kubernetes’ troubleshooting page](https://kubernetes.io/docs/tasks/manage-daemon/update-daemon-set/#troubleshooting)
+
+For more details about the Weave Net Kubernetes addon, see: [https://weave.works/docs/net/latest/kube-addon/](https://weave.works/docs/net/latest/kube-addon/)
+",https://api.github.com/users/marccarre,836014,marccarre,https://api.github.com/repos/weaveworks/weave/releases/6876218/assets,https://api.github.com/repos/weaveworks/weave/releases/6876218,master,https://api.github.com/repos/weaveworks/weave/tarball/v2.0.1,https://github.com/weaveworks/weave/releases/tag/v2.0.1,https://api.github.com/repos/weaveworks/weave/zipball/v2.0.1,v2.0.1,False,False
+6813561,2017-06-23T10:20:40Z,2017-06-23T13:31:31Z,Weave 2.0.0,"# Release 2.0.0
+
+## New Features
+
+## Peer Discovery via Weave Cloud
+
+You can now get all your Weave Net peers to find each other via the Weave Cloud service, instead of maintaining a list of peers at startup. #2799,#2827
+
+See the [docs page](https://github.com/weaveworks/weave/blob/master/site/using-weave/weave-cloud.md) for more details
+
+## New Docker Plugin
+
+Docker has a [new plugin system](https://docs.docker.com/engine/extend/) which improves the installation UX and solves some issues around startup.  This means Weave Net 2.0 can now run with Docker in ""swarm mode"" and supports the `docker service` command. #2396,#2397,#2651,#2727,#2805,#2816,#2905, #2906,#2929,#2932,#2945,#2950,#2956,#2963,#2964,#2966
+
+The previous Docker Plugin is still available and can be installed as before.
+
+## All of Weave Net now runs in one container
+
+Previously we had three separate containers for routing, Docker API
+proxy and Docker plugin. Running everything in one simplifies start-up and removes the need to detect various error conditions. #1642,#2897,#2936,#2945,#2946,#2951,#2960
+
+The individual commands ‘weave launch-router’, ‘weave launch-plugin’, etc., have been removed. You can turn off the plugin and proxy with new command-line options. In keeping with Semantic Versioning, we have changed the major version number for this release.
+
+### Other new features
+
+* Kubernetes configuration now comes from our “Launch Generator” that allows different options to be selected via URL. #2754,#2903,#3000,#3001
+* `weave-kube` now stores data about IP allocation in `/var/lib/weave` on the host instead of in a Kubernetes volume.  This means that the data will persist across pod deletion and re-creation, e.g. during an upgrade of Weave Net, which makes restarts more reliable. #2610,#2967
+* `weave-kube` turned on rolling updates, so careful manual handling of updates is no longer required. #3024
+
+### Bug fixes
+
+* Kubernetes Network Policies which allowed a specific set of pods to connect would block all pods on other hosts. Revert the change in v1.9.6 which ignored pods on other hosts #3025,#3028
+
+### Features removed
+
+* `weave run` has been removed.  This was the original method provided to start containers with Weave Net, but it always required care over timing of start-up, and we now provide three alternative, better, ways. You can replicate the effect by calling `docker run` then `weave attach`.  Similarly `weave start` and `weave restart` were removed. #2353,#2885
+* Everything deprecated more than one release ago has been removed, so if you use it now you get an error rather than a warning. This includes the ‘create-bridge’ command and older command-line arguments, e.g. `--iprange` was replaced by `--ipalloc-range` #2901,#2909,#2913,#2942,#2989,#2991
+
+### Functions moved from shell-script to Go code.
+
+This enables more precise error-checking and runs a bit faster. It has also enabled us to shrink the size of images downloaded: `weave-kube` is 101MB compared to 163MB previously #2953,#2954,#2974
+
+Specific items that moved from shell-script to Go:
+* Setting up the `weave` bridge #1958,#2975,#2977,#2978
+* Container attachment #2947
+* Creation of the ’weave’ default plugin network #2920
+
+### Minor improvements
+
+* You can now restart the Weave Net router without requiring the proxy to be enabled #2112
+* Plugin (legacy version) now respects `--ipalloc-default-subnet` option #2919
+* The `weave` script now detects and issues an error message if
+  `weave-kube` is running and you attempt to launch again from the script. #2709/#2966
+* It is now possible to choose the the MAC address of the `weave` bridge using `--name`, in case your hosts have identical unique IDs. #2900
+* Relaxed Kubernetes tolerations for Weave Net's daemonset in order to match any node (previously, only taints directed at master). #3018
+* Kubernetes' `seLinuxOptions` configuration is now empty by default, to reduce spurious failures on hosts not using seLinux. #3001
+* Improved reliability of namespace changes via `nsenter`. #2992
+* `weave ps` now fetches the list container IDs internally, rather than calling out to `docker ps` #2814,#2898
+* at startup, actively remove dead containers’ Weave Net IP addresses from IPAM #3013
+* at startup, only check live containers to see if they have an existing Weave Net IP address #2815,#2829
+* Weave Net CNI plugin now logs but does not raise an error if anything goes wrong during network interface delete, to be more compatible with Kubernetes 1.6. #2928
+* Stop running a shell in “privileged” mode when it’s only writing a file #2838
+* New internal REST endpoint to return all IP address mappings. #1350
+* Changed the wording where we do not log the password #2833
+* Fixed typo in plugin error messages #2894
+
+### Build and test
+
+* Weave Net is now built with Go version 1.8, which has better code generation and garbage collection #2914
+* During smoke-tests, use a webserver instead of just `ping` so we get a more realistic test that the Weave network is working #2918
+* When installing dependencies for the build container, use a keyserver port that's better for firewalls #2812
+* Kubernetes test script now scales up to more hosts, and works with Kubernetes 1.6 #2837,#2853,#2923
+* Other minor build improvements and refactoring #2760,#2910
+
+## Installation and Upgrading of Weave Net
+
+Follow the [installation instructions](http://weave.works/docs/net/latest/installing-weave/) to install this latest release of weave.
+
+When upgrading from a version earlier than 1.9.0, if your host's network interface has a limit on packet size (the ""MTU"") smaller than 1496 bytes, you should reboot after upgrading to ensure encrypted fast datapath can work. For instance this applies to Google Cloud Platform, but is not necessary on AWS.
+
+Weave Net 2.0.0's CLI, persistence, and architecture has changed a lot, but the core of Weave Net is compatible with previous versions back to 1.1.0, so it is possible to upgrade clusters incrementally and run mixed versions.
+
+## Upgrading Kubernetes from an earlier version to version 1.6
+
+In version 1.6, Kubernetes has increased security, so we need to create a special service account to run Weave Net. This is done in the file `weave-daemonset-k8s-1.6.yaml` attached to the release.
+
+Also, the [toleration](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/taint-toleration-dedicated.md) required to let Weave Net run on master nodes has moved from an annotation to a field on the DaemonSet spec object.
+
+The command to apply this new configuration via short URL is:
+```
+kubectl apply -f https://cloud.weave.works/k8s/v1.6/net
+```
+
+If you have edited the Weave Net DaemonSet from a previous release, you will need to re-make your changes against the new version.
+
+## Upgrading the Weave Net Kubernetes addon (`weave-kube`)
+
+Kubernetes 1.6 now supports rolling upgrades of DaemonSets, and we have added this setting to the YAML. To upgrade, simply run:
+```
+kubectl apply -f https://cloud.weave.works/k8s/v1.6/net
+```
+Kubernetes will then delete the existing Weave Net pods one by one, and create new ones with the latest Weave Net version.
+
+In case of issues during the rolling upgrade, please refer to [Kubernetes’ troubleshooting page](https://kubernetes.io/docs/tasks/manage-daemon/update-daemon-set/#troubleshooting)
+
+For more details about the Weave Net Kubernetes addon, see: [https://weave.works/docs/net/latest/kube-addon/](https://weave.works/docs/net/latest/kube-addon/)
+
+## External Contributors
+
+Thanks to the following who contributed changes during this release:
+@bjhaid
+@dlmiddlecote
+@mattjtodd
+@mgalgs
+@mikebryant
+@Shimi
+@stuart-warren
+@unitymind 
+
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/6813561/assets,https://api.github.com/repos/weaveworks/weave/releases/6813561,master,https://api.github.com/repos/weaveworks/weave/tarball/v2.0.0,https://github.com/weaveworks/weave/releases/tag/v2.0.0,https://api.github.com/repos/weaveworks/weave/zipball/v2.0.0,v2.0.0,False,False
+6728092,2017-06-15T17:05:18Z,2017-06-15T17:24:51Z,Weave 1.9.8,"## Release 1.9.8
+
+Bug fixes and minor improvements
+
+* Fix weave-npc blocking NodePort and any other non-local access #3011,#3014
+* Fix bug where IPAM would duplicate a fixed IP address assigned via Docker plugin #3003,#3010
+
+[Full list of changes](https://github.com/weaveworks/weave/milestone/56?closed=1).
+
+## Installation and Upgrading of Weave Net
+
+Follow the [installation instructions](http://weave.works/docs/net/latest/installing-weave/) to install this latest release of weave.
+
+When upgrading from a version earlier than 1.9.0, if your host's network interface has a limit on packet size (the ""MTU"") smaller than 1496 bytes, you should reboot after upgrading to ensure encrypted fast datapath can work. For instance this applies to Google Cloud Platform, but is not necessary on AWS.
+
+Weave Net 1.9.8 is fully compatible with all previous versions back to 1.1.0, so it is possible to upgrade clusters incrementally and run mixed versions.
+
+## Upgrading Kubernetes from an earlier version to version 1.6
+
+In version 1.6, Kubernetes has increased security, so we need to create a special service account to run Weave Net.  This is done in the file `weave-daemonset-k8s-1.6.yaml` attached to the release.  
+
+Also, the [toleration](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/taint-toleration-dedicated.md) required to let Weave Net run on master nodes has moved from an annotation to a field on the DaemonSet spec object.
+
+The command to apply this new configuration via short URL is:
+```
+kubectl apply -f https://git.io/weave-kube-1.6
+```
+
+If you have edited the Weave Net DaemonSet from a previous release, you will need to re-make your changes against the new version.
+
+## Upgrading the Weave Net Kubernetes addon (`weave-kube`)
+
+Although Kubernetes 1.6 now supports rolling upgrades of daemonsets, we have not tested this or changed the configuration for it, so we still recommend you perform the procedure manually - see https://weave.works/docs/net/latest/kube-addon/ for details.
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/6728092/assets,https://api.github.com/repos/weaveworks/weave/releases/6728092,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.9.8,https://github.com/weaveworks/weave/releases/tag/v1.9.8,https://api.github.com/repos/weaveworks/weave/zipball/v1.9.8,v1.9.8,False,False
+6572853,2017-06-01T13:51:12Z,2017-06-01T14:10:39Z,Weave 1.9.7,"This is identical to [1.9.6](https://github.com/weaveworks/weave/releases/v1.9.6) with one additional bug-fix:
+
+* weave-npc would block everything if `kubelet --hostname-override` was used #2995,#2996
+
+Thanks to @bregor for the fix!",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/6572853/assets,https://api.github.com/repos/weaveworks/weave/releases/6572853,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.9.7,https://github.com/weaveworks/weave/releases/tag/v1.9.7,https://api.github.com/repos/weaveworks/weave/zipball/v1.9.7,v1.9.7,False,False
+6547160,2017-05-30T16:28:18Z,2017-05-30T16:50:33Z,Weave 1.9.6,"## Bug fixes and minor improvements
+
+* Ensure that Kubernetes pods can contact a service implemented within the same pod, by turning on ""hairpin mode"". This is required because of a quiet change between Kubernetes 1.5 and 1.6. #2993
+* Network Policy Controller (`weave-npc`) now checks local addresses only, so it doesn't interfere with cross-cluster traffic. It should be more efficient too #2622,#2973,#2979
+* Stop reporting back to Kubernetes any issues encountered when deleting a pod's network interface. This is required because of a quiet change between Kubernetes 1.5 and 1.6. #2921,#2928
+* Fixed an issue whereby `weave-npc` couldn't start because one `ipset` was referring to another one and could not be destroyed #2915,#2949
+* Improved the code which checks whether the kernel supports `ipset` #2934,#2935
+* `weave-npc` now creates ipsets with only valid xml characters in the name #2958,#2959
+
+## Build and Testing
+
+* In build container use cross-compilers from debian package repository, so they match other components #2940
+* Pin the version of the linting tool `shfmt` so the set of things it checks is stable #2987
+* Fix lint error in script that runs smoke-tests #2962
+* Moved website publishing from Wordpress to Netlify #2986
+
+[Full list of changes](https://github.com/weaveworks/weave/milestone/55?closed=1).
+
+## Installation and Upgrading of Weave Net
+
+Follow the [installation instructions](http://weave.works/docs/net/latest/installing-weave/) to install this latest release of weave.
+
+When upgrading from a version earlier than 1.9.0, if your host's network interface has a limit on packet size (the ""MTU"") smaller than 1496 bytes, you should reboot after upgrading to ensure encrypted fast datapath can work. For instance this applies to Google Cloud Platform, but is not necessary on AWS.
+
+Weave Net 1.9.6 is fully compatible with all previous versions back to 1.1.0, so it is possible to upgrade clusters incrementally and run mixed versions.
+
+## Upgrading Kubernetes to version 1.6
+
+In version 1.6, Kubernetes has increased security, so we need to create a special service account to run Weave Net.  This is done in the file `weave-daemonset-k8s-1.6.yaml` attached to the release.  
+
+Also, the [toleration](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/taint-toleration-dedicated.md) required to let Weave Net run on master nodes has moved from an annotation to a field on the DaemonSet spec object.
+
+The command to apply this new configuration via short URL is:
+```
+kubectl apply -f https://git.io/weave-kube-1.6
+```
+
+If you have edited the Weave Net DaemonSet from a previous release, you will need to re-make your changes against the new version.
+
+## Upgrading the Weave Net Kubernetes addon (`weave-kube`)
+
+Kubernetes does not currently support rolling upgrades of daemon sets, so you will need to perform the procedure manually - see https://weave.works/docs/net/latest/kube-addon/ for details.
+
+# External Contributors
+ 
+Thanks to the following who contributed changes during this release:
+@deitch 
+@mikebryant
+@stuart-warren
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/6547160/assets,https://api.github.com/repos/weaveworks/weave/releases/6547160,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.9.6,https://github.com/weaveworks/weave/releases/tag/v1.9.6,https://api.github.com/repos/weaveworks/weave/zipball/v1.9.6,v1.9.6,False,False
+6275969,2017-05-04T08:49:26Z,2017-05-04T11:01:01Z,Weave 1.9.5,"## Bug fixes and minor improvements
+
+* Improve log messages generated if ""hairpin"" conditions are detected, to make clear which kind is likely to cause problems #2808/#2926
+* Filter out IPv6 peer addresses from Kubernetes; Weave Net currently only supports IPv4 #2904/#2912
+* Fix rare crash during initialization of weave-kube #2893/#2892
+* Include overlay and encryption modes in checkpoint reports, in case this is relevant to a version upgrade #2771/#2907
+
+## Build and Testing
+
+* Ensure CI build can run gcloud tools  #2887
+* Prevent kubeadm from upgrading Kubernetes if we are trying to test an older version #2886
+* Upgrade build scripts to support Kubernetes 1.6 #2880
+
+[Full list of changes](https://github.com/weaveworks/weave/milestone/54?closed=1).
+
+## Installation and Upgrading of Weave Net
+
+Follow the [installation instructions](http://weave.works/docs/net/latest/installing-weave/) to install this latest release of weave.
+
+When upgrading from a version earlier than 1.9.0, if your host's network interface has a limit on packet size (the ""MTU"") smaller than 1496 bytes, you should reboot after upgrading to ensure encrypted fast datapath can work. For instance this applies to Google Cloud Platform, but is not necessary on AWS.
+
+Weave Net 1.9.5 is fully compatible with all previous versions back to 1.1.0, so it is possible to upgrade clusters incrementally and run mixed versions.
+
+## Upgrading Kubernetes to version 1.6
+
+**Note** a bug in Kubernetes 1.6.0 and 1.6.1 [(#44041)](https://github.com/kubernetes/kubernetes/issues/44041) means that Weave Net will not pick up existing pod IP addresses on a restart.  We recommend you upgrade to Kubernetes 1.6.2, but if you are unable to do so then please reboot instead of individually deleting the Weave Net pods.
+
+In version 1.6, Kubernetes has increased security, so we need to create a special service account to run Weave Net.  This is done in the file `weave-daemonset-k8s-1.6.yaml` attached to the release.  
+
+Also, the [toleration](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/taint-toleration-dedicated.md) required to let Weave Net run on master nodes has moved from an annotation to a field on the DaemonSet spec object.
+
+The command to apply this new configuration via short URL is:
+```
+kubectl apply -f https://git.io/weave-kube-1.6
+```
+
+If you have edited the Weave Net DaemonSet from a previous release, you will need to re-make your changes against the new version.
+
+## Upgrading the Weave Net Kubernetes addon (`weave-kube`)
+
+Kubernetes does not currently support rolling upgrades of daemon sets, so you will need to perform the procedure manually - see https://weave.works/docs/net/latest/kube-addon/ for details.
+
+# External Contributors
+ 
+Thanks to the following who contributed changes during this release:
+keontang
+mikebryant
+nhlfr
+roberth
+tobowers
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/6275969/assets,https://api.github.com/repos/weaveworks/weave/releases/6275969,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.9.5,https://github.com/weaveworks/weave/releases/tag/v1.9.5,https://api.github.com/repos/weaveworks/weave/zipball/v1.9.5,v1.9.5,False,False
+5818791,2017-03-21T14:53:30Z,2017-03-21T15:37:19Z,Weave Net 1.9.4,"## Bug fixes and minor improvements
+
+* Support Kubernetes 1.6 - a new DaemonSet is required (see below for upgrading) #2777,#2801
+* Support Kubernetes 1.6 by allowing CNI callers to send a  network-delete request for a container that is not running or has never been attached to the network #2850
+* Leave non-weave ipsets alone in Network Policy Controller (e.g. when running Weave Net alonside keepalived-vip) #2751,#2846
+* Fix various small issues revealed by 'staticcheck' tool #2843,#2857
+* Avoid leaving 'defunct' processes when weave-kube container restarts #2836,#2845
+* When using the CNI plugin with a non-standard network configuration file, the weave bridge could get the same IP as a container, if 'weave expose' hadn't run at that point #2839,#2856
+
+## Build and Testing
+
+* Check that no defunct processes remain after each test #2852
+* Update build and test scripts to work with Kubernetes 1.6 beta #2851
+
+## Installation and Upgrading of Weave Net
+
+Follow the [installation instructions](http://weave.works/docs/net/latest/installing-weave/) to install this latest release of weave.
+
+When upgrading from a version earlier than 1.9.0, if your host's network interface has a limit on packet size (the ""MTU"") smaller than 1496 bytes, you should reboot after upgrading to ensure encrypted fast datapath can work. For instance this applies to Google Cloud Platform, but is not necessary on AWS.
+
+Weave Net 1.9.4 is fully compatible with all previous versions back to 1.1.0, so it is possible to upgrade clusters incrementally and run mixed versions.
+
+## Upgrading Kubernetes to version 1.6
+
+**Note** a bug in Kubernetes 1.6 [(#44041)](https://github.com/kubernetes/kubernetes/issues/44041) means that Weave Net will not pick up existing pod IP addresses on a restart.  Until this is fixed we recommend you reboot instead of individually deleting the Weave Net pod.
+
+In version 1.6, Kubernetes has increased security, so we need to create a special service account to run Weave Net.  This is done in the file `weave-daemonset-k8s-1.6.yaml` attached to the release.  
+
+Also, the [toleration](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/taint-toleration-dedicated.md) required to let Weave Net run on master nodes has moved from an annotation to a field on the DaemonSet spec object.
+
+The command to apply this new configuration via short URL is:
+```
+kubectl apply -f https://git.io/weave-kube-1.6
+```
+
+If you have edited the Weave Net DaemonSet from a previous release, you will need to re-make your changes against the new version.
+
+## Upgrading the Weave Net Kubernetes addon (`weave-kube`)
+
+Kubernetes does not currently support rolling upgrades of daemon sets, so you will need to perform the procedure manually - see https://weave.works/docs/net/latest/kube-addon/ for details.
+
+# External Contributors
+ 
+Thanks to the following who contributed changes during this release:
+stephan2012
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/5818791/assets,https://api.github.com/repos/weaveworks/weave/releases/5818791,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.9.4,https://github.com/weaveworks/weave/releases/tag/v1.9.4,https://api.github.com/repos/weaveworks/weave/zipball/v1.9.4,v1.9.4,False,False
+5664743,2017-03-07T14:39:11Z,2017-03-07T15:43:22Z,Weave Net 1.9.3,"## Bug fixes and minor improvements
+- Fixed a race condition in Fast Datapath encrypted connections which could lead Weave Net to crash #2824, #2825
+
+## Installation and Upgrading
+
+Follow the [installation instructions](http://weave.works/docs/net/latest/installing-weave/) to install this latest release of weave.
+
+When upgrading from a version earlier than 1.9.0, if your host's network interface has a limit on packet size (the ""MTU"") smaller than 1496 bytes, you should reboot after upgrading to ensure encrypted fast datapath can work. For instance this applies to Google Cloud Platform, but is not necessary on AWS.
+
+Weave Net 1.9.3 is fully compatible with all previous versions back to 1.1.0, so it is possible to upgrade clusters incrementally and run mixed versions.
+
+## Upgrading the Weave Net Kubernetes addon (`weave-kube`)
+
+Kubernetes does not currently support rolling upgrades of daemon sets, so you will need to perform the procedure manually - see https://weave.works/docs/net/latest/kube-addon/ for details.",https://api.github.com/users/marccarre,836014,marccarre,https://api.github.com/repos/weaveworks/weave/releases/5664743/assets,https://api.github.com/repos/weaveworks/weave/releases/5664743,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.9.3,https://github.com/weaveworks/weave/releases/tag/v1.9.3,https://api.github.com/repos/weaveworks/weave/zipball/v1.9.3,v1.9.3,False,False
+5606647,2017-03-01T14:11:58Z,2017-03-01T15:05:06Z,Weave 1.9.2,"## Bug fixes and minor improvements
+- Fix a weave-kube bug when `br_netfilter` or `xt_set` module is compiled into kernel #2820/#2821
+- Detect the absence of the required `xt_set` kernel module #2821
+
+## Installation and Upgrading
+
+Follow the [installation instructions](http://weave.works/docs/net/latest/installing-weave/) to install this latest release of weave.
+
+When upgrading from a version earlier than 1.9.0, if your host's network interface has a limit on packet size (the ""MTU"") smaller than 1496 bytes, you should reboot after upgrading to ensure encrypted fast datapath can work. For instance this applies to Google Cloud Platform, but is not necessary on AWS.
+
+Weave Net 1.9.2 is fully compatible with all previous versions back to 1.1.0, so it is possible to upgrade clusters incrementally and run mixed versions.
+
+## Upgrading the Weave Net Kubernetes addon (`weave-kube`)
+
+Kubernetes does not currently support rolling upgrades of daemon sets, so you will need to perform the procedure manually - see https://weave.works/docs/net/latest/kube-addon/ for details.
+",https://api.github.com/users/brb,122571,brb,https://api.github.com/repos/weaveworks/weave/releases/5606647/assets,https://api.github.com/repos/weaveworks/weave/releases/5606647,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.9.2,https://github.com/weaveworks/weave/releases/tag/v1.9.2,https://api.github.com/repos/weaveworks/weave/zipball/v1.9.2,v1.9.2,False,False
+5583930,2017-02-27T16:20:23Z,2017-02-27T16:59:36Z,Weave 1.9.1,"## Bug fixes and minor improvements
+- Fix a race condition when the Weave Net container is restarted
+  which could allow a new container to be allocated the same IP
+  address as an existing one #2784,#2787
+- Handle the message type received when a pod has been deleted during
+  Kubernetes api-server fail-over #2772,#2773
+- Make weave-kube work with `dockerd --iptables=false` #2726
+- Ensure we have the right kernel modules loaded for Network Policy in weave-kube #2819
+- Reference-count addresses in Network Policy Controller, to avoid
+  errors when updates come in an unexpected order #2792,#2795
+- Allow the soft connection limit to be raised in weave-kube, so
+  larger clusters can be created #2781
+- WeaveDNS was incorrectly case-sensitive for reverse DNS lookups #2817,#2818
+
+## Build and Testing
+- Scripts to create VMs to run automated tests were rewritten to use
+  Terraform and Ansible, to make it much easier to test with different
+  versions of components such as Docker and Kubernetes #2647,#2694,#2775,#2796
+- Upgrade to latest Weaveworks common build-tools #2780
+- Improve encryption tests #2793
+- Update vishvananda/netlink library to bring in changes we had previously forked #2790
+- Slight change to the build container to avoid permission errors and slow builds #2761,#2802
+
+## Installation and Upgrading
+
+Follow the [installation instructions](http://weave.works/docs/net/latest/installing-weave/) to install this latest release of weave.
+
+If your host's network interface has a limit on packet size (the ""MTU"") smaller than 1496 bytes, you should reboot after upgrading to ensure encrypted fast datapath can work. For instance this applies to Google Cloud Platform, but is not necessary on AWS.
+
+Weave Net 1.9.1 is fully compatible with all previous versions back to 1.1.0, so it is possible to upgrade clusters incrementally and run mixed versions.
+
+## Upgrading the Weave Net Kubernetes addon (`weave-kube`)
+
+Kubernetes does not currently support rolling upgrades of daemon sets, so you will need to perform the procedure manually - see https://weave.works/docs/net/latest/kube-addon/ for details.
+
+**NOTE:** The mount points for host directories moved in version 1.9.0, and were extended in 1.9.1. If you are running a modified version of the DaemonSet specification, please update it to match the new release.
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/5583930/assets,https://api.github.com/repos/weaveworks/weave/releases/5583930,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.9.1,https://github.com/weaveworks/weave/releases/tag/v1.9.1,https://api.github.com/repos/weaveworks/weave/zipball/v1.9.1,v1.9.1,False,False
+5263666,2017-02-02T11:01:41Z,2017-02-02T11:41:59Z,Weave Net Release 1.9.0,"# New Features
+
+## Fast Datapath Encryption
+- Encryption is now available for Fast Datapath connections, which
+  greatly improves the performance. Previously turning on encryption
+  would make the connection use the slower 'Sleeve' transport. #1644,#2687
+
+## Multi-architecture
+- We now build images for Intel/AMD 64-bit, ARM and ARM 64-bit.  #2713
+
+**NOTE:** The move to multi-architecture required that we update the embedded Docker client, and this has the effect that this release of Weave Net will not work with Docker installations older than 1.10. We apologise for any inconvenience.
+
+## Other new features
+- Weave Net Docker images are now labelled with description, vendor,
+  etc., according to the [Label Schema Convention](http://label-schema.org/rc1/);
+  we have removed the deprecated MAINTAINER field in Dockerfiles #2712
+- `weave status connections` now shows the MTU, the largest packet
+  size allowed on the network, which can be useful when
+  troubleshooting #2389,#2663
+- CNI plugin is now a stand-alone binary that does not depend on Docker #2594,#2662
+- Embedded docker client updated to version 1.10.3 #2395
+
+## Installation and Upgrading
+
+Follow the [installation instructions](http://weave.works/docs/net/latest/installing-weave/) to install this latest release of weave.
+
+If your host's network interface has a limit on packet size (the ""MTU"") smaller than 1496 bytes, you should reboot after upgrading to ensure encrypted fast datapath can work. For instance this applies to Google Cloud Platform, but is not necessary on AWS.
+
+Weave Net 1.9.0 is fully compatible with all previous versions back to 1.1.0, so it is possible to upgrade clusters incrementally and run mixed versions.
+
+## Upgrading the Weave Net Kubernetes addon (`weave-kube`)
+
+Kubernetes does not currently support rolling upgrades of daemon sets, so you will need to perform the procedure manually - see https://weave.works/docs/net/latest/kube-addon/ for details.
+
+**NOTE:** The mount points for host directories have moved. If you are running a modified version of the DaemonSet specification, please update it to match the new release.
+
+## Bug fixes
+- Ensure peer-name is unique on some cloud providers such as Online.net, Scaleway #2427,#2711,#2743
+- Allow network traffic from the weave network to other networks, when enabled via `weave expose` or `weave-kube`.  Docker versions prior to 1.13 will set a policy that allows this, but as of 1.13 we have to. #2758,#2762
+- Allow multicast traffic when the Network Policy Controller `weave-npc` is in use #2689,#2747
+- Stop a gossip loop forming when dns and no-dns peers are connected together #2738,#2740
+- Improve log messages from the Network Policy Controller `weave-npc` #2633,#2666,#2692,#2695
+- Weave daemon would get unexpected peerName if run outside of the 'weave' script #2480,#2685
+- Fix a rare race condition where the daemon could crash if two instances tried to create the 'datapath' device at the same time #2638,#2706
+- Fix typo in weave-npc updating network policy (currently it is impossible to hit this bug, because Kubernetes prohibits such updates) #2716
+
+## Minor improvements
+- Weave Net is now built with Go version 1.7.4, which improves performance #2529,2522
+- Fix weave-npc failing to start if a previous instance was in zombie state #2653,#2728
+- Don't fail if bridge netfilter setting is already on but read-only #2581,#2659
+- Don't fail if docker bridge happens to have more than one IP address #2580,#2686
+- Mount /etc under a different path for weave-kube, to avoid accidents #2708
+- Exec weave daemon from weave-kube launch, to remove an idle waiting shell process #2684,#2688
+- Cleaned up duplicated CNI plugin code #2593,#2678
+
+## Documentation changes
+- Warn not to delete all Weave Net pods in Kubernetes #2722
+- Fix instructions to view NetworkPolicy logs in Kubernetes #2697
+- Minor fixes to links, wording, etc #2703
+
+## Build and test
+- Pin alpine container version to 3.4, because newer version breaks weave-npc #2732,#2735,#2759
+- Parallelise CI tasks, to speed up builds. #2704, #2699
+- Many other build and test improvements #2696,#2698,#2707,#2720,#2724,#2725,#2742,#2749,#2752,#2753,#2757
+
+| Weave Cloud provides monitoring and visualisation of Weave Net application and containers. |
+| --- |
+| Sign-up for a free trial at https://cloud.weave.works |
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/5263666/assets,https://api.github.com/repos/weaveworks/weave/releases/5263666,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.9.0,https://github.com/weaveworks/weave/releases/tag/v1.9.0,https://api.github.com/repos/weaveworks/weave/zipball/v1.9.0,v1.9.0,False,False
+4868461,2016-12-08T15:11:47Z,2016-12-08T15:41:46Z,Weave 1.8.2,"# Bug fixes and minor improvements
+- Fixed a bug where looping flows were installed which caused high CPU usage #2650, #2674
+- Fixed a bug where Kubernetes master could not contact pods #2673, #2683
+- Fixed a bug where weave-kube was crashing in a loop due to invalid Weave bridge state #2657
+- Fixed a bug where iptables NAT rules were not appended due to ""temporary unavailable"" iptables error #2679
+- Added a detection of enabling the hairpin mode on the Weave bridge port which caused installation of looping flows #2674
+- Added a detection of overlaps between Weave and the host IP address ranges when launching weave-kube #2669, #2672
+- Added logging of connections blocked by weave-npc #2546, #2573
+
+# Testing
+- Limited network access to CI VMs #2667, #2670
+- Fixed the race in one of the test cases #2661
+
+# Documentation
+- Improved weave-kube documentation, documented its environment variables #2668, #2671, #2675
+- Documented logging of connections blocked by weave-npc #2546, #2573
+
+# Upgrading weave-kube
+
+Kubernetes does not currently support rolling upgrades of daemon sets, so you will need to perform the procedure manually - see https://weave.works/docs/net/latest/kube-addon/ for details.
+",https://api.github.com/users/brb,122571,brb,https://api.github.com/repos/weaveworks/weave/releases/4868461/assets,https://api.github.com/repos/weaveworks/weave/releases/4868461,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.8.2,https://github.com/weaveworks/weave/releases/tag/v1.8.2,https://api.github.com/repos/weaveworks/weave/zipball/v1.8.2,v1.8.2,False,False
+4740558,2016-11-23T12:25:13Z,2016-11-23T12:36:19Z,Weave 1.8.1,"# Bug fixes and minor improvements
+- Fixed weave-npc crash from Succeeded/Failed pods #2632,#2658
+- Fixed occasional failure to create Weave bridge on node reboot #2617,#2637
+- Fixed a bug where weave-kube would fail to install when run with unreleased snapshot builds #2642
+- Improved conformance to CNI spec by not releasing IP addresses when a container dies #2643
+- Improved troubleshooting of install failure by creating CNI config after Weave Net is up #2570
+- ""up to date"" shown even when the version check was blocked by firewall #2537,#2565,#2645
+- ""Unable to claim"" message on re-launching Weave after using CNI #2548,#2577
+- Eliminated spurious IP reclaim operations when IPAM was disabled #2567,#2644
+- Include `jq` tool in our build VM configuration #2656 
+
+# Upgrading weave-kube
+
+Kubernetes does not currently support rolling upgrades of daemon sets, so you will need to perform the procedure manually - see https://weave.works/docs/net/latest/kube-addon/ for details.
+",https://api.github.com/users/awh,1504438,awh,https://api.github.com/repos/weaveworks/weave/releases/4740558/assets,https://api.github.com/repos/weaveworks/weave/releases/4740558,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.8.1,https://github.com/weaveworks/weave/releases/tag/v1.8.1,https://api.github.com/repos/weaveworks/weave/zipball/v1.8.1,v1.8.1,False,False
+4572399,2016-11-04T15:49:44Z,2016-11-04T16:10:28Z,Weave 1.8.0,"# Features
+- Exposed network policy controller Prometheus metrics weaveworks/weave-npc#23, #2595, #2549
+- Exposed router Prometheus metrics #2535, #2547, #2523, #2579, #2578, #2568, #2560, #2561
+
+# Documentation
+- Documented Kubernetes, Prometheus & Weave Cloud integration weaveworks/weave-npc#17, weaveworks/weave-kube#30, weaveworks/weave-kube#43, #2588
+
+# Bug fixes
+- Fixed a bug where CNI plugin binaries were not upgraded #2586, #2590, #2598
+- Fixed a bug where `weave reset` did not clean up policy controller DROP rule #2591
+- Fixed a bug where failed connections remained in status output #2472, #2555
+
+# Internal
+- Merged weave-npc into weave repo weaveworks/weave-npc#16, weaveworks/weave-npc#24, weaveworks/weave-npc#28, #2585
+- Merged weave-kube into weave repo weaveworks/weave-kube#28, weaveworks/weave-kube#46, #2551
+- Added basic weave-kube integration tests weaveworks/weave-kube#29, #2569 
+- Improved safety of netns manipulation #2419, #2475, #2587, #2589
+- Updated CI VMs to Ubuntu 16.04 and Docker 1.11 #2563 
+- Fixed a build bug where `DOCKERHUB_USER` was not honoured #2552, #2564
+- Vendored tools dependencies & improved Vagrantfiles #2562
+",https://api.github.com/users/awh,1504438,awh,https://api.github.com/repos/weaveworks/weave/releases/4572399/assets,https://api.github.com/repos/weaveworks/weave/releases/4572399,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.8.0,https://github.com/weaveworks/weave/releases/tag/v1.8.0,https://api.github.com/repos/weaveworks/weave/zipball/v1.8.0,v1.8.0,False,False
+4356981,2016-10-11T10:07:24Z,2016-10-11T15:44:46Z,Weave 1.7.2,"# Bug fixes and minor improvements
+- Fixed an error where the Docker plugin could fail to attach a container with a `bridge ""weave"" not present` error #2540/#2541
+- Fixed panic on multi-homed IP address #2527/#2543
+- Fixed inferred initial peer count when target peers includes self #2481/#2543
+- Fixed compilation on Raspberry Pi #2506/#2538
+
+# Upgrading weave-kube
+
+Kubernetes does not currently support rolling upgrades of daemon sets, so you will need to perform the procedure manually:
+- Apply the updated daemonset manifest: `kubectl apply -f https://git.io/weave-kube`.
+- Kill each weave net pod in turn with `kubectl delete`; wait for the replacement to begin running before moving on to the next.
+",https://api.github.com/users/awh,1504438,awh,https://api.github.com/repos/weaveworks/weave/releases/4356981/assets,https://api.github.com/repos/weaveworks/weave/releases/4356981,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.7.2,https://github.com/weaveworks/weave/releases/tag/v1.7.2,https://api.github.com/repos/weaveworks/weave/zipball/v1.7.2,v1.7.2,False,False
+4310816,2016-10-05T14:23:42Z,2016-10-05T15:36:26Z,Weave 1.7.1,"# Bug fixes and minor improvements
+- Fixed a bug in weave-kube where IP addresses could be reused if the weave-kube daemonset was deleted and then re-applied weaveworks/weave-kube#10, weaveworks/weave-kube#17, #2531
+- Fixed a bug in weave-kube where Kubernetes services were inaccessible on CentOS 7 weaveworks/weave-kube#21, weaveworks/weave-kube#22
+- Improved CI #2274
+
+# Upgrading weave-kube
+
+Kubernetes does not currently support rolling upgrades of daemon sets, so you will need to perform the procedure manually:
+- Apply the updated daemonset manifest: `kubectl apply -f https://git.io/weave-kube`.
+- Kill each weave net pod in turn with `kubectl delete`; wait for the replacement to begin running before moving on to the next.
+",https://api.github.com/users/awh,1504438,awh,https://api.github.com/repos/weaveworks/weave/releases/4310816/assets,https://api.github.com/repos/weaveworks/weave/releases/4310816,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.7.1,https://github.com/weaveworks/weave/releases/tag/v1.7.1,https://api.github.com/repos/weaveworks/weave/zipball/v1.7.1,v1.7.1,False,False
+4240792,2016-09-27T13:46:53Z,2016-09-27T14:01:25Z,Weave 1.7.0,"# Features
+- [weave-kube](https://github.com/weaveworks/weave-kube) - Deploy Weave Net to Kubernetes with a single command
+- [weave-npc](https://github.com/weaveworks/weave-npc) - Kubernetes network policy enforcement in Weave Net
+
+The recommended method of installation is to use the new `kubeadm` tool to stand up your cluster - see [this guide](http://kubernetes.io/docs/getting-started-guides/kubeadm/) for details.
+
+# Minor Improvements
+- Show MAC addresses in `docker network inspect weave` #1803/#2412
+- Log errors arising from reading resolv.conf #2422
+
+# Documentation
+- Document use of `docker run --net` with plugin #2462
+
+# Bug fixes
+- Fix a bug where multicast packets could circumvent subnet isolation (#354/#2386)
+
+# Internal
+- Use temporary fork of Docker's (now removed) mflags package  #2489
+- Add private flag for weave-kube to install weave-npc steering rules #2524
+",https://api.github.com/users/awh,1504438,awh,https://api.github.com/repos/weaveworks/weave/releases/4240792/assets,https://api.github.com/repos/weaveworks/weave/releases/4240792,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.7.0,https://github.com/weaveworks/weave/releases/tag/v1.7.0,https://api.github.com/repos/weaveworks/weave/zipball/v1.7.0,v1.7.0,False,False
+4194392,2016-09-21T15:18:13Z,2016-09-21T16:12:56Z,Weave 1.6.2,"# Bug Fixes
+- Fixed a file descriptor leak in the proxy when running with `--rewrite-inspect` #2533
+- Fixed hang after stopping and restarting on Docker 1.12 #2469/#2502
+- Avoid an error on Google container images by checking for tx offload support #2504
+- Fixed an issue where the supplied peer list could be ignored when restarting after failure #2503/#2509
+- Check for empty peer name on launch #2495/#2501
+
+# Testing
+- Fixed flaky tests #2340/#2511/#2329/#2510
+- Update CircleCI build VM to 14.04 #2491
+
+# Docs
+- Fixed broken link #2487/#2498
+",https://api.github.com/users/awh,1504438,awh,https://api.github.com/repos/weaveworks/weave/releases/4194392/assets,https://api.github.com/repos/weaveworks/weave/releases/4194392,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.6.2,https://github.com/weaveworks/weave/releases/tag/v1.6.2,https://api.github.com/repos/weaveworks/weave/zipball/v1.6.2,v1.6.2,False,False
+3918926,2016-08-18T16:40:56Z,2016-08-19T09:03:37Z,Weave 1.6.1,"# Bug fixes
+- `weave ps` was occasionally failing to list allocated addresses of containers #2388/#2418/#2445
+- `weave launch[-router]` on 4.2 kernel would appear to succeed even if the fast datapath VXLAN UDP port was in use by a different process #2375/#2474
+- Launching the proxy would fail when the Docker daemon could not be detected #2457/#2424
+- The CNI plugin did not work with Apache Mesos #2394/#2442
+- Router stopped working after a restart in the AWSVPC mode #2381/#2409
+- Router crashed when the Docker API endpoint parameter was explicitly set to empty #2421/#2467
+- The CNI plugin did not work on recent versions of Docker for Mac #2434/#2442
+- Include the `ipam` option in the help output of the `status` subcommand #2425/#2426
+- Remove a harmless duplication of the `--no-dns` parameter #2430
+
+# Improvements
+- The CNI plugin assigns an IP to the bridge if necessary, which avoids failures if `weave expose` has not run yet #2471
+- Distinguish peer name collisions from attempts to connect to self in logs #2460
+- Improve host clock skew detection message #2174
+- Improve the error message returned when executing `weave launch-plugin` without the router running #2293/#2416
+- The `create-bridge` subcommand was not enabled in the fast datapath mode #2464/#2466
+- Allow users to omit `weave setup[-cni]` by initializing the CNI plugin on the `launch[-router]` subcommand #2435/#2442
+- Reduce verbosity of fast datapath miss event logs #1852/#2417
+
+# Internal Refactoring
+- Make the `create-bridge` subcommand initialize required interfaces #2478
+- Improve grouping of internal functions in the script #2439
+
+# Testing
+- If building docker images for Weave fails, make the CI build fail instead of pulling the images from DockerHub #1100
+
+# Build
+- Remove the deprecated `-f` flag from the `docker tags` command in Makefile #2470
+
+# Docs
+- Emphasize the need to run certain commands in the same root shell #2446
+- Add instructions for using the CNI plugin with Apache Mesos #2423
+- Add corrections on the WeaveDNS load-balancing to address RFC3438 #1710/#2407
+- Document the `--host` parameter of the `launch[-router]` subcommand #2347/#2413
+- Improve documentation of the `--trusted-subnets` parameter of the `launch[-router]` subcommand #2211/#2415
+- Remove an obsolete warning about `eval $(weave env)` when using the plugin #2450
+- Add an introduction to the operation guide #2393
+- Fix a broken link #2441
+",https://api.github.com/users/brb,122571,brb,https://api.github.com/repos/weaveworks/weave/releases/3918926/assets,https://api.github.com/repos/weaveworks/weave/releases/3918926,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.6.1,https://github.com/weaveworks/weave/releases/tag/v1.6.1,https://api.github.com/repos/weaveworks/weave/zipball/v1.6.1,v1.6.1,False,False
+3481064,2016-06-20T12:50:31Z,2016-06-20T13:25:44Z,Weave 1.6.0,"## Highlights
+- A new [AWS VPC](https://weave.works/docs/net/latest/using-weave/awsvpc/) mode that leverages Amazon Virtual Private Cloud for near-native network performance, as an alternative to the Sleeve and Fast Datapath overlays
+- Docker 1.12 introduced some internal changes that made it incompatible with previous version of Weave Net - this version restores compatibility
+- An [operational guide](https://weave.works/docs/net/latest/operational-guide/concepts/) detailing best practices for deploying and operating Weave Net
+- Changes to the target peer list are remembered across restarts, making it much easier to deploy resilient networks
+- The version checkpoint now transmits network mode (e.g. 'awsvpc') and kernel/docker versions to us to inform and guide our development efforts. See the [installation documentation](https://weave.works/docs/net/latest/installing-weave/) for instructions on disabling the checkpoint feature.
+
+**Installation and Upgrading**
+
+Follow the [installation instructions](https://weave.works/docs/net/latest/installing-weave/) to install this latest release of weave. If you're upgrading from an earlier version, see the instructions on [upgrading your cluster](https://weave.works/docs/net/latest/operational-guide/tasks#cluster-upgrade).
+
+Weave 1.6.0 is fully compatible with Weave 1.5.x, 1.4.x, 1.3.x, 1.2.x and 1.1.x, so it is possible to upgrade clusters incrementally and run mixed versions. If upgrading from Weave 1.0.x, take into account the [Weave 1.1.0 upgrading instructions](https://github.com/weaveworks/weave/releases/tag/v1.1.0).
+
+Note that all Weave components now apply a policy of `--restart=always`, so they will come back again
+on reboot. If you have your own start-up script, you should review whether this needs to be updated or disable the policy with [`--no-restart`](https://weave.works/docs/net/latest/troubleshooting/#reboots).
+
+>  NB there is a backwards incompatible change to `weave reset` to address an [issue](https://github.com/weaveworks/weave/issues/2326) where IPAM addresses were not freed if the router was not running at the time of reset. Consequently, the command will now fail if the router is not running; the old behaviour can be obtained with `weave reset --force`.
+> 
+>  Another change in behaviour: networks created via `docker network create --driver=weave` or `weavemesh` do not now add a multicast route by default; this was preventing more than one network being used by a container.  #1960/#2327
+
+## Features
+- Enable the use of AWS VPC instead of an overlay, for near-native network performance #2017/#2287/#2341/#2338/#2370
+- Docker 1.12 compatibility #2379/#2382
+- New Operational Guide #1978/#1102/#726
+- Remember changes to target peer list after restart, for easier, more resilient dynamic cluster configuration #2186/#2305
+- Observe changes to host's `/etc/resolv.conf` in Weave DNS fallback resolution, which is especially important when weave is launched early on system (re)start, prior to the file having been populated  #2360/#2364/#2378
+- Improve guidance from `weave stop-plugin` when containers attached via the plugin still exist #2320/#2331
+- Improve debug logging #2034/#2162
+- All commands accept `--help` #2318/#2352
+- Improve IPAM performance #2181/#2184
+- Make `weave dns-args` output consistent #2197/#2203
+- Consistent `weave rmpeer` error messages on isolated peers #2057/#2205
+- Improve proxy performance #2383
+- Gather docker and kernel version during checkpoint #2310/#2372
+
+## Bug Fixes
+- `weave reset` did not relinquish IPAM addresses if router was down #2326/#2332
+- A failure during container start would result in an unexpected error message if `--rm` was specified #2296/#2284
+- The proxy would attach containers even if they were already attached via a network plugin #1988/#2330
+- It was not previously possible to connect a container to two weave plugin networks #1960/#2327
+- Choice of peer from which to request free space was possibly sub-optimal #2344/#2346/#2345
+- Launching proxy with `-H /var/run/weave/weave.sock` would break #2302/#2333
+- Fix hang protection #2385
+
+## Tooling & Other Internal Improvements
+- Complete move of documentation to Wordpress #2114/#2212/#2254
+- Internal refactoring #2299
+- Upgrade vendored libraries #2218
+- Makefile improvement #2005
+- Release script publishes weavedb image to Dockerhub #2189/#2366
+- Include tests accidentally excluded from CI #2323
+- Minor documentation improvements #2362/#2368/#2355/#2335/#2369
+- Use our own Ubuntu image in examples, for simplicity #2367
+- Share more implementation between script and plugins #1726/#2374/#2354/#2307
+",https://api.github.com/users/awh,1504438,awh,https://api.github.com/repos/weaveworks/weave/releases/3481064/assets,https://api.github.com/repos/weaveworks/weave/releases/3481064,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.6.0,https://github.com/weaveworks/weave/releases/tag/v1.6.0,https://api.github.com/repos/weaveworks/weave/zipball/v1.6.0,v1.6.0,False,False
+3314092,2016-05-26T16:10:51Z,2016-05-26T16:18:08Z,Weave 1.5.2,"## Bug fixes
+- Weave Proxy did not flush the initial http header in the Docker event stream, which could cause Docker Swarm to show all nodes as ""pending"". #2306/#2311
+- When using the CNI plugin, if a container was removed and quickly replaced by another using the same IP address, other containers might be unable to contact it. Send an address resolution protocol message to update them. #2313
+- Avoid Docker hanging for 1 minute in `weave launch` if the plugin had not shut down cleanly #2286/#2292
+- Print an error message when Weave bridge mode is changed without `weave reset` #2304
+- Eliminate spurious warning message from IP allocator on plugin shutdown #2300/#2319
+- Display error message when address requested in a subnet that is too small (/31 or /32) #2282/#2321
+- Add short wait after `weave reset` to allow updates to reach peers #2280
+- Weave was occasionally unable to claim existing IP address immediately after launch #2275/#2281
+
+## Testing
+- Refactor some integration tests to run faster and more reliably #2291
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/3314092/assets,https://api.github.com/repos/weaveworks/weave/releases/3314092,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.5.2,https://github.com/weaveworks/weave/releases/tag/v1.5.2,https://api.github.com/repos/weaveworks/weave/zipball/v1.5.2,v1.5.2,False,False
+3185499,2016-05-09T14:16:38Z,2016-05-09T14:35:38Z,Weave 1.5.1,"Documentation for this release is available [here](https://www.weave.works/docs/net/1.5.1/introducing-weave/).
+
+## Bug fixes
+- Persisted data that was rendered invalid by changing peer name or allocation range is detected and removed automatically, preventing crashes and hangs #2246/#2209/#2249
+- `weave rmpeer` persists the range takeover in case the peer on which it was executed dies subsequently #2238
+- Launching a container with an explicit `WEAVE_CIDR` in the allocation range now waits instead of erroring if the allocator hasn't finished initialising #2232/#2265
+- Weave DNS now responds to AAAA queries with an empty answer section, instead of NXDOMAIN which could be cached and block subsequent resolution of A records #2244/#2252
+- `weave restart` no longer leaks DNS entries when supplied a container name instead of an ID #2193/#2204
+- Docker restart policies are no longer overridden if a container is killed by the Weave Proxy due to an attachment error #2123/#2264
+- `weave launch` no longer generates misleading ""Unable to claim"" warnings for addresses allocated via the Docker network plugin #2194/#2262/#2196
+
+## Docs
+- Streamlined and updated README #2217/#2261
+- Documented `weave status ipam` #1876/#2263
+- Documented Peer Name and shorthand notation #2233/#2266
+- Documented `--log-level` in weave usage #2245/#2250
+- Documented the use of `WEAVE_MTU` with fast datapath #2198/#2253
+- Documented adding a route on non-Weave hosts #2219
+- Removed duplicated service export documentation  #2207/#2227
+- Minor documentation improvements #2230/#2228
+- Corrected launch arguments in Docker plugin documentation
+  #2243/#2257
+- Corrected links in CNI plugin README #2214/#2259
+- Corrected links in troubleshooting documentation #2216/#2221
+
+## Build and test
+- Improve documentation preview and publishing process
+  #1078/#1700/#2245/#2255/#2258
+- Quicker smoke test runs #2220
+- Re-enable an intermittently failing test #2202
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/3185499/assets,https://api.github.com/repos/weaveworks/weave/releases/3185499,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.5.1,https://github.com/weaveworks/weave/releases/tag/v1.5.1,https://api.github.com/repos/weaveworks/weave/zipball/v1.5.1,v1.5.1,False,False
+3050803,2016-04-19T14:54:29Z,2016-04-19T15:14:33Z,Weave 1.5.0,"## Release 1.5.0
+
+## Highlights
+- A new [plugin](http://weave.works/docs/net/latest/cni-plugin/)
+  for the [Container Network Interface](https://github.com/appc/cni#cni---the-container-network-interface).
+- This release is much more robust against unscheduled restarts,
+  because it [persists key data to disk](http://www.weave.works/docs/net/latest/ipam/#persistence).
+- [New configuration options](http://weave.works/docs/net/latest/ipam/#initialization)
+  that are useful when you create or auto-scale larger networks.
+- Weave now periodically [checks for updates](http://weave.works/docs/net/latest/troubleshooting/#weave-status)
+  (can be disabled)
+
+**Installation and Upgrading**
+
+Follow the [installation instructions](http://weave.works/docs/net/latest/installing-weave/) to install this latest release of weave.
+
+Weave 1.5.0 is fully compatible with Weave 1.4.x, 1.3.x, 1.2.x and 1.1.x, so it is possible to upgrade clusters incrementally and run mixed versions. If upgrading from Weave 1.0.x, take into account the [Weave 1.1.0 upgrading instructions](https://github.com/weaveworks/weave/releases/tag/v1.1.0).
+
+Note that all Weave components now apply a policy of `--restart=always`, so they will come back again
+on reboot. If you have your own start-up script, you should review whether this needs to be updated or disable the policy with [`--no-restart`](http://weave.works/docs/net/latest/troubleshooting/#reboots).
+
+## Changes
+
+### Command-line
+- All components now restart automatically if there is a problem or the host reboots, via `--restart=always` #2029
+- `weave launch` is now idempotent, making the command easier to use in automated/scripted deployments #1859/#1967
+- `weave stop` no longer removes component containers, so now their logs can be read subsequently, and they can be restarted #1937/#1939
+- `weave rmpeer` now accepts a list of peers #2044/#2075
+- `weave rmpeer` now report on size of transferred range, or reports that nothing was done, rather than returning an error #2058/#2066/#2067
+- `weave version` now reports the version that will run next after an upgrade, not the version of an older, stopped, Weave #1827/#1938
+- Some errors detected by the weave script did not return an error status #2052/#2053/#2054/#2096
+- Improve error message when `weave launch` command has malformed peer address #1892/#1924
+- New undocumented `weave attach-bridge` feature to replace undocumented `create-bridge` #1955/#1964
+- Remove trailing dot added by Docker 1.11 at the end of hostname+domainname, when generating container's /etc/hosts #2140/#2151
+
+### Router
+- Exclude multicast packets from from having their source IP address rewritten by `weave expose`, so a receiver can see the real source address #2147/#2158
+- Weave now periodically checks if a newer version is available #1954/#2089/#2131
+- Fix an occasional failure to restart on reboot #2113/#2117
+- Fix a delay in getting the latest data to a restarted peer #2085/#2122
+- Simplify router by always running in host network namespace #1746/#1930/#2055
+
+### IP Address Management
+- Return Weave network to same state after a reboot, avoiding potential leaks of addresses or hanging, by persisting IPAM state to disk #678/#894/#901/#1971/#1973/#2012/#2031/#2046/#2051/#2077/#2135/#2164/#2165
+- Avoid leaking addresses by retaining identity of peers across reboots and `weave reset` #901/#1866/#1888/#2021/#2037
+- Restarted application containers now get given the same IP address #1047/#1191/#1922
+- The parameter `--init-peer-count n` has been rephrased as `--ipalloc-init consensus=n`; the old parameter is retained for backward compatibility #2155
+- Setting up fixed networks is now easier thanks to the new `--ipalloc-init seed` option #1998/#2000/#2155
+- Adding peers to existing networks is now easier thanks to the `--ipalloc-init observer` option #1743/#1990/#2063/#2134/#2155/#2060
+- The new `weave prime` command ensures that the network has reached a consistent state where IP address allocation has been fully initialised #1994/#1997
+- Include all current peer targets, including those added by `weave connect`, for the default `ipalloc-init consensus` count, which helps to avoid split-brain scenarios during dynamic network formation #1721/#2070/#2139/#2150
+- Don't lock up thinking there is an extra peer to agree with, when it is actually ourselves #1881
+- Improve behaviour when donating space to another peer, avoiding creating ranges of size 1 #2009/#2012/#2047/#2069
+- Make error messages clearer in certain irrecoverable IPAM conditions #1957/#2078
+- Removed an unnecessary check in the IPAM start-up code #1948
+
+### WeaveDNS
+- When stale DNS records are detected, remove them immediately #2133
+- Avoid re-broadcasting the DNS notification of a dead container #2124
+- WeaveDNS may now be disabled with the `--no-dns` option #1687/#2099/#2101
+
+### Proxy
+- The proxy now retries attaching containers after restarting, in case the router was not ready yet #1561/#1556/#1588/#1880
+- Wait for just-started or restarted containers to get going before trying to attach them #2090/#2126
+- Ensure directory /var/run/weave exists, so we don't depend on deprecated Docker behaviour allowing the router to listen on a Unix socket #1653/#1719
+- Be more defensive against Docker sending empty JSON #2109/#2128
+
+### Plugin
+- CNI plugin (see above) #1991/#1992/#2030/#2146/#2148
+- Allow requesting a specific IP address for a container when using the plugin #1734/#1916
+- Allow the subnet and IP range to be specified on `docker network create` #1806/#1915
+- Check if plugin has exited immediately, to improve visibility of startup problems #1873/#1941
+- Support custom docker args, for advanced users of the plugin #2095
+- If attaching to the network bridge fails, report the error to the user #2097/#2098
+- Move creation and removal of default `weave` network into a separate utility #1897/#1901
+- Made log messages more consistent #2074
+- Removed unused 'nameserver' option from plugin #1777
+
+### Efficiency
+- Do some network configuration by calling the kernel directly rather than via external commands #1944/#1951/#2059/#2062
+- Defer route calculation to when needed, to reduce CPU load #1761/#1773
+- Improve peer-to-peer gossip: don't stall other connections when one is blocked #1826/#1855/#1856
+- Refactor virtual-ethernet device creation #1968
+- Simplify Weave internals by using new(ish) Docker feature `docker run --pid=host` #578/#1982/#1965/#1966
+
+### Docs
+- General clean-up and reorganization of docs, now targeting WordPress publishing process #1756/#2015/#2019/#2038/#2064/#2103/#2105/#2106/#2111/#2114/#2115
+- Update the documentation on what happens when a machine reboots #2108/#2130
+- Document fast datapath (FDP) in ""How it Works"" #1908
+- Document vendored dependency management commands #1902
+- Update statement about the size of the Weave container #1114
+- Made capitalisation of 'Weave' and 'DNS' consistent #2102/#2118
+
+### Build and test
+- Repeatable builds, via containerized build and vendored dependencies #1653/#1656/#1850/#1861
+- Upgrade version of Go to 1.5.2 #1657/#1861
+- Upgrade version of Docker used in CI to 1.10.3 and fix up smoke-tests #2050/#1913
+- Upgrade version of Ubuntu in Vagrant test VMs to Wily 15.10 #1912
+- Include plugin in test coverage reports #2116
+- Fix occasional failure to collect coverage data #2072
+- Fix failure in teardown of test suites when not collecting coverage stats #2129
+- Fix occasional failure in IPAM unit tests caused by race condition #1651/#1862
+- Fix router leak in IPAM unit tests #2149/#2154
+- Fix a bug in the simulation of periodic gossip in one test #2180/#2182
+- Fix `multiweave` test harness to work with fast datapath #1589
+- Fix hang in a test by specifying /dev/null as input for netcat #2141
+- Add test for `rmpeer` command #2073
+- Better spelling check in CI #2093
+- Abstract out logging interface from weave api package #2024
+- Move smoke-test dependencies from 'all' to 'testrunner' target #1893/#1920
+- Improve robustness of CI creating and destroying VMs #864/#1857
+- Reduce footprint by combining several script utilities into a single binary #1613/#1847
+- Improve build times on CircleCI #1896
+- Shrink Travis usage #1864
+- Extract `mesh` library out to its own repository #1889/#1890
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/3050803/assets,https://api.github.com/repos/weaveworks/weave/releases/3050803,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.5.0,https://github.com/weaveworks/weave/releases/tag/v1.5.0,https://api.github.com/repos/weaveworks/weave/zipball/v1.5.0,v1.5.0,False,False
+2874651,2016-03-23T17:37:39Z,2016-03-23T17:53:54Z,Weave 1.4.6,"Fixes some issues encountered by our users.
+- Restarting a peer could leave stale entries in WeaveDNS #1867/#2023/#2081
+- Weave proxy occasionally failing to attach any new containers #2016/#2049
+
+Other fixes:
+- Resolved a crash when a restarting peer re-connected to a peer that had not received the latest IPAM data #2083/#2092
+- Make IP address space available immediately after a dead peer is removed #2068
+",https://api.github.com/users/awh,1504438,awh,https://api.github.com/repos/weaveworks/weave/releases/2874651/assets,https://api.github.com/repos/weaveworks/weave/releases/2874651,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.4.6,https://github.com/weaveworks/weave/releases/tag/v1.4.6,https://api.github.com/repos/weaveworks/weave/zipball/v1.4.6,v1.4.6,False,False
+2714350,2016-02-29T22:29:05Z,2016-02-29T23:03:22Z,Weave 1.4.5,"Higher performance for multicast and broadcast traffic when using Weave's Fast Datapath
+- The flow rule to deliver broadcast and multicast packets in-kernel
+  was not created correctly, hence every such packet caused a
+  context-switch to the software router #2003/#2008
+
+Other fixes:
+- Remove DNS entries for containers that are being restarted by Docker
+  but are not live yet #1977/#1989
+- Don't let one failing allocation attempt prevent others from
+  succeeding; they could be in different subnets which are more
+  available #1996/#2001
+- Don't complain on second router launch on kernels that lack support
+  for Fast Datapath #1929/#1983
+- Fix build broken by change in `docker/libnetwork` IPAM API #1984/#1985
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/2714350/assets,https://api.github.com/repos/weaveworks/weave/releases/2714350,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.4.5,https://github.com/weaveworks/weave/releases/tag/v1.4.5,https://api.github.com/repos/weaveworks/weave/zipball/v1.4.5,v1.4.5,False,False
+2578487,2016-02-09T11:20:58Z,2016-02-09T11:38:29Z,Weave 1.4.4,"Fixing a rather serious issue that slipped through our preparations for Docker 1.10:
+- Restarting Docker or rebooting your machine while the Weave Net plugin is running causes Docker 1.10.0 to fail to start #1959/#1963
+
+Also one other small fix:
+- Avoid a hang when trying to use plugin and proxy at the same time #1956/#1961
+",https://api.github.com/users/awh,1504438,awh,https://api.github.com/repos/weaveworks/weave/releases/2578487/assets,https://api.github.com/repos/weaveworks/weave/releases/2578487,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.4.4,https://github.com/weaveworks/weave/releases/tag/v1.4.4,https://api.github.com/repos/weaveworks/weave/zipball/v1.4.4,v1.4.4,False,False
+2538446,2016-02-02T16:35:47Z,2016-02-02T16:51:17Z,Weave 1.4.3,"Preparing for Docker 1.10, plus some bug-fixes.
+- Avoid hang in Docker v1.10 on `docker volume ls` after `weave stop`, `weave stop-plugin` or `weave reset` #1934/#1936
+- Fix ""unexpected EOF"" from Docker 1.10 on `docker exec` with Weave proxy `--rewrite-inspect` enabled #1911/#1917
+- Avoid losing DNS entries and potentially double-allocating IP addresses allocated via plugin, on router restart; also extend `weave ps` to show IP addresses allocated via plugin #1745/#1921
+- Stop creating lots of copies of `weavewait` program in Docker volumes #1757/#1935
+- Prevent container starting prematurely when proxy in `--no-multicast-route` mode #1942/#1943
+- Log error message from plugin rather than crashing when weave not running #1906/#1918
+- Warn, don't error, if unable to remove plugin network in 'weave stop', to avoid breaking the usual upgrade or config change process #1900/#1919
+- Don't crash if network conditions suggest only very small packets will get through #1905/#1926
+- Cope with unexpected errors during route traversal when starting container via proxy #1909/#1910/#1932
+",https://api.github.com/users/awh,1504438,awh,https://api.github.com/repos/weaveworks/weave/releases/2538446/assets,https://api.github.com/repos/weaveworks/weave/releases/2538446,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.4.3,https://github.com/weaveworks/weave/releases/tag/v1.4.3,https://api.github.com/repos/weaveworks/weave/zipball/v1.4.3,v1.4.3,False,False
+2426541,2016-01-14T11:40:24Z,2016-01-14T12:02:54Z,Weave 1.4.2,"Bug-fixes and minor improvements.
+- Fixed a race condition in weavewait that would occasionally hang containers at startup #1882/#1884
+- `weave launch` returns success when the plugin is running, to avoid failure on reboot #1869
+- Work round weave router failure on CoreOS 4.3 caused by kernel bug  #1854
+- `weave launch` would exit with error code on docker <1.9 #1851
+- Running `eval $(weave env)` multiple times would break `eval $(weave env --restore)` #1824/#1825
+- Don't complain in `weave stop` about ""Plugin is not running"" when plugin is not enabled #1840/#1841
+- `weave --local launch` would fail if utility program `docker_tls_args` could not be found #1844
+- Improved error reporting when TLS arg detection fails #1843
+- Improve error reporting when docker isn't running #1845
+- Add `--trusted-subnets` usage to `weave` script #1842
+- `weave run` can hang under rare combinations of options #1858
+",https://api.github.com/users/awh,1504438,awh,https://api.github.com/repos/weaveworks/weave/releases/2426541/assets,https://api.github.com/repos/weaveworks/weave/releases/2426541,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.4.2,https://github.com/weaveworks/weave/releases/tag/v1.4.2,https://api.github.com/repos/weaveworks/weave/zipball/v1.4.2,v1.4.2,False,False
+2328571,2015-12-22T17:25:57Z,2015-12-22T17:32:28Z,Weave 1.4.1,"This is a bug-fix release to cover a few issues that came up since the
+release of 1.4.0.
+- Weave would fail to launch when `$DOCKER_HOST` was set to a TCP socket secured with TLS #1820/#1822
+- Weave would fail to stop when run against Docker pre-1.9 #1815/#1817
+- Issue a warning instead of failing on `--with-dns` option to proxy, which was removed #1810/#1812
+- Make `weave version` show the plugin version #1797/#1813
+- Make `weave launch` show when the a container is restarting #1778/#1814
+- Make `weave launch` fail if the plugin is running, for consistency with router and proxy. #1818/#1819
+
+More details in the [change log](https://github.com/weaveworks/weave/issues?q=milestone%3A1.4.1).
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/2328571/assets,https://api.github.com/repos/weaveworks/weave/releases/2328571,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.4.1,https://github.com/weaveworks/weave/releases/tag/v1.4.1,https://api.github.com/repos/weaveworks/weave/zipball/v1.4.1,v1.4.1,False,False
+2299209,2015-12-17T10:30:14Z,2015-12-17T10:40:29Z,Weave Net 1.4.0,"## Highlights
+- The Docker Network plugin can now operate without a cluster store, so it is now run by default.
+- You can now use the fast datapath over trusted links and Weave encryption over untrusted links, in the same network.
+
+More details below and in the [change log](https://github.com/weaveworks/weave/issues?q=milestone%3A1.4.0).
+
+**Installation and Upgrading**
+
+Follow the [installation instructions](https://github.com/weaveworks/weave#installation) to install this latest release of weave.
+
+Weave 1.4.0 is fully compatible with Weave 1.3.x, 1.2.x and 1.1.x, so it is possible to upgrade clusters incrementally and run mixed versions. If upgrading from Weave 1.0.x, take into account the [Weave 1.1.0 upgrading instructions](https://github.com/weaveworks/weave/releases/tag/v1.1.0).
+
+If you used the plugin from version 1.3.x you may need to modify your startup scripts, since `weave launch` now creates a default network called `weave`. Note that the plugin container (`weaveplugin`) is now run with `--restart=always`, so that it is there after a restart or reboot. If you remove this container before removing all endpoints created using `--net=weave`, Docker can [hang](https://github.com/docker/libnetwork/issues/813).
+
+## Changes
+
+**Router**
+- Option to bypass encryption on trusted links, to improve performance #82/#1758
+- Added DNS upstream servers and FDP miss counter to status reporting #1571/#1662/#1592/#1663
+- Fixed possible low throughput when using encryption #1788
+- Retry vxlan vport creation, to avoid failure on start immediately after a stop #1772/#1795
+- Interpose a bridge device, so tools like conntrack and Weave Scope can see Weave Net connections #1577/#1712/#1783/#1790
+- Add option to stop weave adding an IP route for multicast addresses, to give user control over multicast routing #1741/#1755
+- Block container access to Weave control and data ports, for improved security #1634/#1670
+- Ensure `weave connect` attempts connection immediately #1714/#1716
+- More efficient processing of network topology changes #1732/#1736
+- Diagnostics for IP Address Management with `weave status` and `weave status ipam`  #1639/#1702
+- Better support for pre-1.2/post-1.2 mixed networks #1731
+- Add a 'json' function for 'weave report -f', for more flexibility when scripting #1709/#1782
+- Reduce memory usage in connection shutdown #1718
+- Improve script robustness #1749/#1750
+- Add fast datapath high level overview document #1722
+- Remove `--with-dns` option; DNS is on by default #1754/#1781
+- Remove unused vars in `weave` script #1748/#1751/#1753
+
+**Proxy**
+- More flexibility over filesystem paths for `$DOCKER_HOST` and Weave proxy socket #1579/#1586/#1689/#1694/#1740
+- Proxy now always tries to detect TLS settings, unless disabled with `--no-detect-tls` #1539/#1679
+- Ensure socket directory exists before asking Docker to use it, since Docker deprecated the feature of auto-creating it #1653/#1719
+
+**Plugin**
+- Ability to run as a Docker network plugin without a cluster store, for simpler set-up and more flexible operation #1727/#1728/#1738
+- Docker IPAM plugin using Weave's peer-to-peer IP address management #1676
+- Service discovery via WeaveDNS now works with the plugin #1725/#1730
+- Support multicast #1752/#1776
+
+**Build and Test**
+- Removed unneeded test helper #1769
+- Fixed accidental peer duplication in unit tests #1766
+- Build test/tls program using build container #1760
+- Connect to gce boxes as vagrant so we can access docker unix socket #1708
+- Fix gossip tests #1796/#1765/#1767
+- Merge plugin code into weave repository #1674/#1724
+- Move some netlink code to upstream library #1440/#1673
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/2299209/assets,https://api.github.com/repos/weaveworks/weave/releases/2299209,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.4.0,https://github.com/weaveworks/weave/releases/tag/v1.4.0,https://api.github.com/repos/weaveworks/weave/zipball/v1.4.0,v1.4.0,False,False
+2170219,2015-11-23T12:06:19Z,2015-11-23T12:17:07Z,Weave 1.3.1,"**Highlights**
+- The minimum Docker version has been increased to 1.6 due to the [upcoming deprecation of Dockerhub access](https://blog.docker.com/2015/10/docker-hub-deprecation-1-5/) for old clients. From December 7th onwards previous versions of the `weave` script will fail to pull down images from the hub; if you are unable to upgrade to 1.3.1 immediately you can work around this by running `weave --local setup` in conjunction with a compatible Docker client installation
+- Docker networking plugin now works with older kernels and allows you to configure the MTU
+
+**Installation and Upgrading**
+
+Follow the [installation instructions](https://github.com/weaveworks/weave#installation) to install this latest release of weave.
+
+Weave 1.3.1 is fully compatible with Weave 1.3.0, 1.2.x and 1.1.x, so it is possible to upgrade clusters incrementally and run mixed versions. If upgrading from Weave 1.0.x, take into account the [Weave 1.1.0 upgrading instructions](https://github.com/weaveworks/weave/releases/tag/v1.1.0).
+
+**Changes**
+- Update minimum Docker version to 1.6 #1683/#1684/#1706
+- Docker networking plugin now applies `WEAVE_MTU` to container interfaces, allowing you to configure larger frames for improved performance on networks which support it #1703 / weaveworks/docker-plugin#50 / weaveworks/docker-plugin#51
+- Docker networking plugin now works with 3.13 kernel #1682 / weaveworks/docker-plugin#48 / weaveworks/docker-plugin#49
+- Fix a memory corruption bug that could cause crashes under load #1697/#1698/#1450/#1452
+- Improve gossip efficiency #1704
+- Minor documentation fix #1699 
+",https://api.github.com/users/awh,1504438,awh,https://api.github.com/repos/weaveworks/weave/releases/2170219/assets,https://api.github.com/repos/weaveworks/weave/releases/2170219,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.3.1,https://github.com/weaveworks/weave/releases/tag/v1.3.1,https://api.github.com/repos/weaveworks/weave/zipball/v1.3.1,v1.3.1,False,False
+2116577,2015-11-12T16:49:38Z,2015-11-12T16:55:33Z,Weave 1.3.0,"**Highlights**
+
+This release includes a [Docker Plugin](http://docs.weave.works/weave/v1.3.0/features.html#plugin), so you have the option to use Weave Net that way.
+
+More details below and in the [change log](https://github.com/weaveworks/weave/issues?q=milestone%3A1.3.0).
+
+**Installation and Upgrading**
+
+Follow the [installation instructions](https://github.com/weaveworks/weave#installation) to install this latest release of weave.
+
+Weave 1.3.0 is fully compatible with Weave 1.2.x and 1.1.x, so it is possible to upgrade clusters incrementally and run mixed versions. If upgrading from Weave 1.0.x, take into account the [Weave 1.1.0 upgrading instructions](https://github.com/weaveworks/weave/releases/tag/v1.1.0).
+
+**Other changes**
+
+**_Router**_
+- fix a crash when operating in mixed 1.1/1.2 configurations. #1661/#1669
+- smoother propagation of updates when peers restart. #1554/#1641
+
+**_Docker API proxy**_
+- fix an incompatibility with older Linux kernels. #1647/#1671
+
+**_IP Address Allocator**_
+- print out address ranges more simply. #1635/#1636
+",https://api.github.com/users/awh,1504438,awh,https://api.github.com/repos/weaveworks/weave/releases/2116577/assets,https://api.github.com/repos/weaveworks/weave/releases/2116577,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.3.0,https://github.com/weaveworks/weave/releases/tag/v1.3.0,https://api.github.com/repos/weaveworks/weave/zipball/v1.3.0,v1.3.0,False,False
+2077549,2015-11-05T14:34:34Z,2015-11-05T14:50:10Z,Weave 1.2.1,"Bug-fix and minor improvements.
+- Fix crash on mixed-case DNS names #1603/#1610/#1615/#1614
+- Fix a condition where rolling restarts could hang on IP address allocation #1593/#1624
+- Gracefully deal with kernels that do not support OVS VXLAN ports, e.g. Oracle EL7; previously this would cause `weave launch` to fail with a `address family not supported by protocol` netlink error in the logs #1599/#1619
+- Fix `unknown flow key type 22` error using fast datapath on 4.3 kernel #1594
+- Prevent containers from accessing the weave router REST API when fast datapath is enabled #1632/#1637
+- Fix an edge case in `weave expose` that could prevent registration of the given hostname in weaveDNS #1626/#1629
+- Fix hang when a starting a container via the proxy and providing a network mode of `host` or `container:...` at _start_ rather than _create_ (which is the usual way) #1600/#1608
+- Prevent unnecessary reattachment attempts by the weaveproxy #1584/#1598
+- Fix weaveDNS not working with Ubuntu/UFW #1578/#1606
+- Disallow registration of foreign domains in weaveDNS #1516/#1597
+- Fix weaveproxy `--rewrite-inspect` race on container start #1549/#1616
+- Accommodate changes in API of upstream DNS library #1622
+- Integration test reliability improvements #1588/#1630
+",https://api.github.com/users/awh,1504438,awh,https://api.github.com/repos/weaveworks/weave/releases/2077549/assets,https://api.github.com/repos/weaveworks/weave/releases/2077549,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.2.1,https://github.com/weaveworks/weave/releases/tag/v1.2.1,https://api.github.com/repos/weaveworks/weave/zipball/v1.2.1,v1.2.1,False,False
+2001842,2015-10-22T12:26:38Z,2015-10-22T12:09:18Z,Weave 1.2.0,"**Highlights**
+
+This release introduces the [Fast Data Path](http://docs.weave.works/weave/v1.2.0/features.html#fast-data-path), which allows Weave networks to operate at near wire-level speeds. This new feature is enabled by default.
+
+Other highlights:
+- auto-configuration of TLS for the Weave Docker API proxy, making it
+  easier to run Weave on Macs and in conjunction with tools like
+  Docker Swarm
+- support for Docker restart policies on application containers and weave
+  infrastructure containers
+- better compatibility with recent and future Docker versions
+
+More details below and in the [change log](https://github.com/weaveworks/weave/issues?q=milestone%3A1.2.0).
+
+**Installation and Upgrading**
+
+Follow the [installation instructions](https://github.com/weaveworks/weave#installation) to install this latest release of weave.
+
+Weave 1.2.0 is fully compatible with Weave 1.1.x, so it is possible to upgrade clusters incrementally and run mixed versions. If upgrading from Weave 1.0.x, take into account the [Weave 1.1.0 upgrading instructions](https://github.com/weaveworks/weave/releases/tag/v1.1.0).
+
+(Once upgraded, if you then decide to re-install weave 1.1 take care to run `weave reset` before downgrading. Failing that, reboot the machine)
+
+# Changes
+
+## Router
+- introduce [Fast Data Path](http://docs.weave.works/weave/v1.2.0/features.html#fast-data-path),
+  which significantly improves network
+  performance. #36/#205/#991/#1438, #1396/#1451, #1448/#1522, #1505/#1513/#1525, #1510/#1526, #1533/#1538, #1544, #1548/#1550, #1558, #1552/#1562, #1567, #1570
+- apply back-off on late connection failures. Previously, errors
+  detected shortly after connection establishment would cause
+  immediate retries, causing high connection churn and log
+  noise. #953/#1447/#1496
+- handle a race conditions that could cause multiple concurrent
+  connection attempts to the same IP/port of a prospective
+  peer. #1478/#1479/#1483
+- remove spurious Docker dependency, allowing the router executable to
+  be run w/o accessing Docker. #1443/#1500
+
+## Docker API proxy
+- [auto-configure
+  TLS](http://docs.weave.works/weave/v1.2.0/proxy.html#tls). This
+  simplifies setting up weave on Mac OSX and other platforms where
+  Docker is only accessible via TLS. #1285/#1414/#1441/#1442, #1407
+- when containers started via the proxy are restarted by Docker, the
+  proxy automatically re-attaches them to the weave
+  network. #401/#1210/#1456, #1547/#1551, #1542/#1560
+- when the weave router is restarted by Docker, the proxy
+  automatically re-attaches it to the weave network. #401/#1358/#1518
+- cope with `HostConfig` on `start`, which is a backward compatibility
+  feature of the Docker API used by some
+  applications. Previously, containers started that way would end up
+  with a broken configuration, such as lack of DNS
+  settings. #1368/#1449, #1481/#1488, #1531/#1532/#1534
+- work with non-default logging driver. Previously this would cause
+  the proxy launch to report a failure even when it
+  succeeded. #1453/#1472/#1474,#1519/#1520, #1527/#1528
+- improve Docker version compatibility. New (present and future)
+  Docker features and associated changes to the Docker Remote API are
+  now handled correctly in the vast majority of cases. #1371/#1395
+- log requests/responses when running with
+  `--log-level=debug`. #1515/#1536
+- remove `/var/run/weave.sock` symlink, which was there for backward
+  compatibility with weave 1.0. Newer versions use
+  `/var/run/weave/weave.sock`. #1492/#1495
+
+## IP Address Allocator
+- gracefully handle situations where IP address allocation has been
+  seeded by different peers, e.g. because incorrect
+  `--init-peer-count` values were specified. Previously this could
+  cause the router to crash or log obscure errors. Now it causes the
+  connection between the incompatibly-initialised peers to be dropped,
+  with an intelligible error in the logs and `weave status
+  connections` output. #1178/#1463/#1499
+- do not allocate IP addresses in `weave detach/hide`. This was
+  causing these commands to hang when IP address allocation was
+  deferred (e.g. due to the lack of initial consensus or free
+  addresses). #860/#1503
+- prevent stall of `docker run/start` and `weave run/attach` when a
+  container dies just before IP address allocation, and IP address
+  allocation is deferred (e.g. due to the lack of initial consensus or
+  free addresses). #1459/#1512
+
+## Naming and Discovery (weaveDNS)
+- [prevent Docker from updating a container's
+  `/etc/hosts`](http://docs.weave.works/weave/v1.2.0/proxy.html#etchosts),
+  which, from Docker 1.8 onward, was breaking resolution of
+  unqualified names via weaveDNS. #1374/#1477, #1574
+- add an entry to `/etc/hosts` for the container's fully-qualified
+  hostname and weave IP addresses, which is expected by some
+  applications. #1497/#1557
+- enable [`weave
+  dns-add/remove`](http://docs.weave.works/weave/v1.2.0/weavedns.html#add-remove)
+  to add/remove DNS records not associated with containers. #1385/#1517
+- make name resolution case insensitive, per
+  [RFC1035](https://www.ietf.org/rfc/rfc1035.txt). #1461/#1462
+
+## CLI
+- correctly report the version of snapshot releases. #1341/#1415
+- rename `VERSION` env var to `WEAVE_VERSION`, to prevent accidental
+  conflicts. #1389
+- start temporary containers without networking, where possible, which speeds up some weave commands. #1572
+
+## Build & Test
+- make weave build & work with Go 1.5. #1386/#1393/#1412/#1436
+- switch from 'gliderlabs/alpine' to 'alpine' images, since the latter
+  is now the official name for this image. #1388
+- restrict coverage reporting to sub-packages of 'weave', thus
+  producing more accurate coverage statistics. #1524
+- add test for using sub-domains with weaveDNS. #1446
+- fix a race condition in an integration test that lead to sporadic
+  failures. #1502/#1537
+- work around a bug in Docker 1.9rc1 that breaks an integration test. #1565/#1569
+- use test scripts from [build-tools
+  repo](https://github.com/weaveworks/build-tools), for sharing with
+  other projects. #1470
+- run unit tests in a separate container (instead of the build
+  container) in CircleCI. #1204/#1469
+- build GCE test image on demand, streamlining the workflow for
+  updating the images. #1468/#1494
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/2001842/assets,https://api.github.com/repos/weaveworks/weave/releases/2001842,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.2.0,https://github.com/weaveworks/weave/releases/tag/v1.2.0,https://api.github.com/repos/weaveworks/weave/zipball/v1.2.0,v1.2.0,False,False
+1990010,2015-10-20T16:06:41Z,2015-10-20T16:18:01Z,Weave 1.1.2,"This release contains a small number of bug fixes. More details in the
+[change log](https://github.com/weaveworks/weave/issues?q=milestone%3A1.1.2).
+
+The release is fully compatible with 1.1.0 versions, so existing
+clusters can be upgraded incrementally. When upgrading from 1.0.x,
+note the compatibility information in the
+[Installation & Upgrading instructions for Weave 1.1.0](https://github.com/weaveworks/weave/releases/tag/v1.1.0).
+
+**bug fixes**
+- large multicast packets get dropped - we now lock the MTU on the multicast route to prevent Linux setting the DF flag #1507
+- weave proxy unexpectedly closes the connection after /start request - this was a regression introduced in 1.1.1 #1514 
+- weaveproxy would give a strange response if you tried to inspect an unknown container #1523
+- log message ""dropping too big DF broadcast frame"" has source and destination IP swapped #1507
+
+**testing**
+- smoke-test setup script needed updating for Go 1.5 (note this release is built with Go 1.4.2) #1543 
+- one smoke-test hardcoded the docker bridge IP, which changes in Docker 1.9 #1540 
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/1990010/assets,https://api.github.com/repos/weaveworks/weave/releases/1990010,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.1.2,https://github.com/weaveworks/weave/releases/tag/v1.1.2,https://api.github.com/repos/weaveworks/weave/zipball/v1.1.2,v1.1.2,False,False
+1910803,2015-10-05T10:28:09Z,2015-10-05T10:40:44Z,Weave 1.1.1,"This release contains a number of bug fixes and minor enhancements. More details below and in the [change log](https://github.com/weaveworks/weave/issues?q=milestone%3A1.1.1).
+
+Follow the [installation instructions](https://github.com/weaveworks/weave#installation) to install this latest release of Weave. The release is fully compatible with 1.1.0 versions, so existing clusters can be upgraded
+incrementally. When upgrading from 1.0.x, note the compatibility information in the [Installation & Upgrading instructions for Weave 1.1.0](https://github.com/weaveworks/weave/releases/tag/v1.1.0).
+
+**bug fixes**
+- on kernel versions < 3.18, starting the proxy would prevent the
+  weave network interfaces of existing containers from being
+  fully removed when they terminated. This could cause traffic for
+  subsequently started containers with the same IP to be
+  mis-routed to these stale interfaces. #1455/#1476
+- on kernel versions >= 4.2, `weave reset` could leave containers with dangling weave
+  network interfaces. #1364/#1504
+- cancellation of simultaneous IP allocation requests could crash
+  weave. #1424/#1429
+- cancelling a `docker run` against the proxy could result in a
+  spurious ""invalid CIDR address: Allocate"" error
+  message. #1418/#1425/#1426
+- when dynamically attaching a container to additional subnets,
+  visibility of the container in those subnets could be
+  delayed. #1405/#1409/#1411
+- the weave version had a stray `v` prefix in a few
+  places. #1397/#1431
+- `weave launch-proxy` would mis-report an already running
+  proxy. #1413
+- the error message about disabled IP address allocation had a
+  typo. #1427
+- the `weave stop` advice regarding `weave env --restore` had a
+  typo. #1408
+- a recent docker-machine change broke the weave build. #1466/1467
+- one of the DNS tests had a data race. #1480/#1487
+
+**minor enhancements**
+- sanity check the size of gossip messages in order to help track down
+  memory allocation errors seen in the wild. #1484/#1485
+- link to release notes from ""Weave latest"" release. #1399
+- update build & test VMs to Docker 1.8. #1428/#1435, #1433/#1454
+- disable a spuriously failing test until we fix it. #1486
+- simplify IP address allocation code in weave script. #1460
+",https://api.github.com/users/rade,109109,rade,https://api.github.com/repos/weaveworks/weave/releases/1910803/assets,https://api.github.com/repos/weaveworks/weave/releases/1910803,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.1.1,https://github.com/weaveworks/weave/releases/tag/v1.1.1,https://api.github.com/repos/weaveworks/weave/zipball/v1.1.1,v1.1.1,False,False
+1780807,2015-09-07T15:45:12Z,2015-09-08T08:53:51Z,Weave v1.1.0,"**Highlights**
+- `weave launch` now launches all weave components, simplifying
+  startup.
+- `weave status` has been completely revamped, with a much improved
+  presentation of the information, and the option to select and output
+  data in JSON.
+- weaveDNS has been rewritten and embedded in the router. The new
+  implementation simplifies configuration, improves performance, and
+  provides fault resilience for services.
+- the weave Docker API proxy now provides an even more seamless user
+  experience, and enables easier integration of weave with other
+  systems such as kubernetes.
+- many usability improvements
+- a few minor bug fixes, including a couple of security
+  vulnerabilities
+
+More details below and in the [change log](https://github.com/weaveworks/weave/issues?q=milestone%3A1.1.0).
+
+**Installation & Upgrading**
+
+Follow the [installation instructions](https://github.com/weaveworks/weave#installation) to install this latest release of weave.
+
+If upgrading from weave 1.0.x, note that a cluster can be upgraded _incrementally_, with some caveats:
+- Any installation using weaveDNS will experience a rolling partition
+  of name resolution functionality, i.e. containers only see names
+  belonging to containers on weave peers with the same version.
+- `weave launch` now launches all weave components, including
+  weaveDNS and the proxy.
+  For weaveDNS, if the existing installation was
+  - launching weaveDNS without any options, then no action is
+    required, since the `weave launch-dns` and `weave stop-dns`
+    commands still exist but are no-ops,
+  - launching weaveDNS with options, then these need to be moved to
+    the `weave launch` invocation,
+  - not launching weaveDNS, then you _may_ want to disable it with the
+    `--no-dns` option to `weave launch`, though generally this should
+    not be necessary.
+  
+  For the proxy, if the existing installation was
+  - launching the proxy without any options, then remove the `weave launch-proxy` invocation and instead just invoke `weave launch`
+  - launching the proxy with options, then you need to launch the router and proxy separately, supplying the proxy options to the latter, i.e. `weave launch-router && weave launch-proxy <options>`,
+  - not launching the proxy, then you _may_ want to only launch the router (and embedded weaveDNS) with `weave launch-router`, though typically running `weave launch` instead is fine, since launching the proxy is harmless.
+- The default IP address allocation range has changed from
+  `10.128.0.0/10` to `10.32.0.0/12`. If you are using weave's IP
+  address allocator, and are not explicitly specifying a range (with
+  `-iprange`), then you need to force weave
+  to use the old range by specifying `--ipalloc-range=10.128.0.0/10`.
+- `weave proxy-env|proxy-config` are deprecated in favour of `weave
+  env|config`. The former still work but will display a deprecation
+  warning when invoked, so you should update any scripts to use the
+  new commands.
+- The proxy now listens on a unix domain socket instead of TCP/IP _if_ that is how the launching environment connects to the Docker daemon. This is reflected in `weave env|config`, so any local code/scripts using those to configure their connection to the proxy should be unaffected. However, if you have code/scripts that have the proxy's TCP/IP endpoint hard-coded, then you may need to force the proxy to listen on the TCP/IP, as it did previously, by launching it with `weave launch-proxy -H tcp://0.0.0.0:12375`. Note that this potentially opens a security vulnerability, which is why it is no longer the default behaviour. Consider a) switching to unix domain sockets, if you are connecting to the proxy locally, b) restricting the network interfaces/IP addresses by supplying something other than `0.0.0.0`, or c) switching to [TLS](http://docs.weave.works/weave/latest_release/proxy.html#tls).
+- weaveDNS has far fewer options than previously. The removed options do not make sense in the new implementation and are unlikely to have been used in many installations, but if they were, simply removing them should be safe in most setups.
+- A number of options have been renamed. The old names still work but
+  you should update any scripts to use the new ones.
+
+# Changes
+
+## Command Line Interface
+- make `weave launch` launch the router, weaveDNS and the proxy. As a
+  result weave startup is [simpler than
+  ever](https://github.com/weaveworks/weave/tree/weave_1.1_readme_updates#example). In
+  situations where special configuration of the proxy is required, the
+  router and proxy can be [launched separately with `weave
+  launch-router` and `weave
+  launch-proxy`](http://docs.weave.works/weave/latest_release/proxy.html#setup). #382/#962/#1009/#1011/#1012, #1043/#1072
+- completely revamp [`weave
+  status`](http://docs.weave.works/weave/latest_release/troubleshooting.html#weave-status).
+  The main command now shows a much more concise and readable summary,
+  which, for example, makes it easier to spot connectivity
+  issues. Sub-commands provide additional information, which is better
+  presented and more informative than was previously the case. And
+  [`weave report`](http://docs.weave.works/weave/latest_release/troubleshooting.html#weave-report) produces a status report in JSON format, with the
+  ability to select specific pieces of information with a
+  template. #1025/#1141/#1027/#908/#1248, #1315, #1328/#1335, #1185/#1283
+- improve consistency in command line option naming. Long options
+  start with two hyphens, the `--<option>=` notation is supported, and
+  multi-word options are hyphenated. Also, all DNS options now start
+  with `--dns-`. All old option names have been retained for backward
+  compatibility; their usage results in a deprecation warning in the
+  logs. #602/#1084, #1087/#1096
+- log a more helpful error when an invalid flag is specified in `weave
+  launch`. #1321/#1324
+- output weave usage message on stderr instead stdout, thus preventing
+  odd behaviour for the likes of `eval $(weave env)` when the command
+  is mistyped. #1082/#1092
+- add `--init-peer-count` to usage output, from which it was
+  missing. #1041/#1045.
+- make `weave --help|help` work even when we cannot communicate with
+  Docker. #1322/#1325
+- reduce start-up time of `weave launch`. #992/#993
+- introduce `--log-level` option for better control over log
+  levels. #329/#1057
+- improve Docker version compatibility checking, preventing misleading
+  error messages. #576/#1297/#1298/#1326
+- improve download times by re-arranging the layers of the weavexec
+  image. #1170
+
+## Docker API proxy
+- enable [listening on a unix domain socket](http://docs.weave.works/weave/latest_release/proxy.html#setup), and do so automatically if
+  the launching environment connects to the Docker daemon that way. This
+  simplifies configuration and also prevents weakening of Docker access security. #1003/#1026, #1055/#1099
+- rename `--no-default-ipam` option to `--no-default-ipalloc`. The
+  former still works but will log a deprecation warning. #1040/#1048
+- remove `-D` option since it wasn't doing anything useful. #972/#978
+- replace `weave proxy-env|proxy-config` with `weave
+  env|config`. The former still work but will display a deprecation
+  warning when invoked. #1014/#1080/#1081
+- introduce [`weave env
+  --restore`](http://docs.weave.works/weave/latest_release/proxy.html#setup),
+  which restores the environment modified with `weave env`. This would
+  typically be invoked just prior to `weave stop|reset`. #1288/#1327
+- introduce rewriting of `/etc/hosts` so that `hostname -i` returns the weave IP
+  instead of Docker IP. `hostname -i`, and its equivalent system call,
+  is invoked by some clustered applications like cassandra and consul;
+  this change gets them to operate over the weave
+  network by default. The feature can be disabled with the
+  [`--no-rewrite-hosts` proxy
+  option](http://docs.weave.works/weave/latest_release/proxy.html#ipam). #68/#1079, #1252/#1265, #1373/#1375
+- add [`--rewrite-inspect`
+  flag](http://docs.weave.works/weave/latest_release/proxy.html#setup) to
+  make `docker inspect` return the weave network settings (such as the
+  container's weave IP address) instead of the Docker settings. This
+  is useful for integration of weave with systems such as kubernetes
+  that depend on the `docker inspect` output. #117/#212/#1199/#1222/#1376, #1390/#1391
+- attach containers to the weave network by default unless they were started with
+  `--net=host` or `--net=container:...`. In particular, containers
+  started with `--net=none` now get attached. #1302/#1303
+- permit (the equivalent of) `--net=container:(another container with
+  weave networking)` to be specified at container start
+  time. Previously this would hang.  Note that specifying a network
+  mode that way is a backward compatibility feature of the Docker
+  Remote API; normally the mode is set during container creation. So
+  this did not affect the Docker CLI and most other systems, but did
+  cause problems when integrating weave with Kubernetes. #1258/#1314
+- handle chunked responses correctly. Failure to do so was causing
+  errors when some Docker API clients, though not the Docker CLI, were
+  pointed at the proxy. #1103/#1110/#1112, #1257/#1259
+- do not disable restart policies, or stomp on the `--volume-driver`
+  option, of containers started via the proxy. #1209/#1314, #1378
+- eliminate a very rare race condition that could cause container
+  start to hang. #1300/#1314
+- improve logging of errors and warnings. #1056/#1067, #1310
+
+## Router
+- prevent repeated connection attempts from peers to themselves, which
+  could result in a lot of log noise and some performance
+  degradation. #1305/#1318
+- [`weave
+  attach|detach`](http://docs.weave.works/weave/latest_release/features.html#dynamic-network-attachment)
+  and [`weave
+  expose|hide`](http://docs.weave.works/weave/latest_release/features.html#host-network-integration)
+  now output the IP addresses involved. #954/#968
+- eliminate a DoS vector which could allow an attacker to trigger an
+  out-of-memory crash by injecting certain mal-formed weave protocol
+  packets. This is now no longer possible on encrypted weave networks
+  without knowledge of the password. #912/#1098
+- prevent exposure of potentially sensitive information to an attacker
+  during the connection establishment on an encrypted weave
+  network. Note that no sensitive information is exposed by existing
+  versions of the weave protocol, so this is merely guarding against
+  potential future vulnerability. #1029/#1098
+- seed the random number generator properly. Lack of that could in
+  some rare circumstances cause IP address allocation to take a long
+  time. #1004/#1068
+- replace gob with length-prefix encoding in the outermost protocol
+  framing. This improves performance of the codec slightly. #1189
+
+## Naming and Discovery (weaveDNS)
+- replace mDNS with gossip and embed weaveDNS in the router. This
+  simplifies configuration since weaveDNS now has far fewer options and no longer needs to be
+  launched separately and require an IP address/subnet. It also makes
+  name resolution much more efficient and accurate (the
+  addition/removal of entries is now visible near
+  instantaneously). #826/#833/#840/#841/#842/#843/#741/#944/#1065, #1151/#1155, #1168/#1173, #1156/#1176, #1180, #1193, #1177/#1195, #1181/#1183, #1158/#1190/#1197, #1215/#1225, #1218, #1203/#1224, #1275/#1277, #1281/#1282, #1306/#1307, #1332/#1334/#1344/#1345/#1348, #1347/#1354, #1362/#1363, #1357/#1358
+- name resolution now [returns _all_ matching
+  records](http://docs.weave.works/weave/latest_release/weavedns.html#how-it-works),
+  in random order, instead of just a single randomly selected
+  record. This provides basic fault resilience, allowing applications
+  to iterate over the returned answers until they find an operational
+  server. #338, #583, #733, #1245/#1256
+- `weave status dns` now lists _all_ DNS records, system-wide, not
+  just the ones for local containers. #645
+- resolve unqualified names in the weaveDNS domain, so on systems with
+  broken DNS resolvers, such as those based on musl/busybox/alpine,
+  `ping foo` now works (previously only `ping foo.weave.local`
+  did). #987/#1050/#1133/#1065
+- introduce [fine-grained control over the automatic derivation of
+  container hostnames from container
+  names](http://docs.weave.works/weave/latest_release/proxy.html#dns). This
+  is especially useful in scenarios where the container name in turn
+  is the result of some derivation, as for example happens in Amazon
+  ECS and Kubernetes. #1018/#1126, #1381/#1384
+- introduce [`weave
+  dns-lookup`](http://docs.weave.works/weave/latest_release/weavedns.html#resolve-weavedns-entries-from-host)
+  for resolving names in weaveDNS from the host. This is useful for
+  scripting application deployments and, in conjunction with `weave
+  expose`, for accessing containers from the host. #1028/#1135
+- permit invocation of [`weave
+  dns-add|dns-remove`](http://docs.weave.works/weave/latest_release/weavedns.html#add-remove)
+  without any IP address(es), which is useful for adding/removing
+  extra names for a container. #1369/#1377/#1379
+- permit weaveDNS to appear in the host's `/etc/resolv.conf`;
+  previously this could result in query cycles and
+  crashes. #1343/#1355
+- warn when firewall rules - in particular those inserted by
+  firewalld - will interfere with name resolution. #1266/#1349
+- prevent potential message ID clashes when performing concurrent
+  recursive queries, which could result in the answers to clients
+  getting mixed up. #1113/#1142
+
+## IP Address Allocator
+- The default IP address allocation range has been changed from
+  `10.128.0.0/10` to `10.32.0.0/12` to avoid clashes with subnets used
+  by some cloud platforms like Digital Ocean and GCE. #1036/#1070
+- The `-iprange` and `-ipsubnet` options have been renamed to
+  `--ipalloc-range` and `--ipalloc-default-subnet`, to make their
+  purpose clearer. The old names have been retained for backward
+  compatibility; their usage results in a deprecation warning in the
+  logs. #1035
+- prevent `weave launch` from failing when `weave expose` had
+  previously been run with automatic IP address
+  allocation. #1076/#1249/#1090, #1320
+- prevent delays of up to 30 seconds when first allocating an IP
+  address in a partially connected weave network with intermediate
+  peers that have IP allocation disabled. #1118/#1149
+- cope with more situations of restarting weave when there are running
+  containers with automatically allocated IP addresses. In particular
+  stopping all peers and then restarting them in a different order now
+  works. #1150/#1159, #1243/#1268
+- permit [manual allocation in the IP allocation
+  range](http://docs.weave.works/weave/latest_release/ipam.html#manual). This
+  results in a warning if the chosen address has already been
+  allocated. #687/#598/#1200, #1030/#1228/#1380, #1380
+- improve a number of warning and error
+  messages. #437/#480/#1053, #1034, #1128/#1174, #1317
+
+## Build & Test
+- replace homegrown go testing library with
+  [testify](https://github.com/stretchr/testify). #358/#955
+- produce coverage reports from integration tests, combine them with
+  unit test coverage, and do all this automatically, in
+  CircleCI. #673/#1105, #1115, #1220/#1221, #1154/#1230, #1146/#1198
+- significantly reduce test execution time and resource
+  usage. #1120, #1169/#1236, #1239/#1242/#1263, #1234/#1235, #1125/#1138/#1144, #1214, #1123, #1227, #1370
+- add a number of integration tests, expanding test
+  coverage. #1117, #1121, #1247, #1166
+- add race detector to unit tests. #998
+- pre-fetch Docker images required for testing, for earlier and more
+  obvious reporting of fetch failures, and more consistent test
+  execution times. #989
+- fetch go test dependencies, preventing spurious test compilation
+  failures. #1015
+- fix some breakages in integration tests when run on OSX. #1069
+- fetch go packages from github instead of google code, since the
+  latter is going away. #1059/#1060
+- increase flexibility of release script, supporting non-mainline
+  releases. #880/#909/#1372, #1383/#1387
+- miscellaneous improvements: #994, #999, #1240, #1250, #1246, #1075, #1331
+
+## Improvements ""under the hood""
+- replace homegrown go logging library with
+  [logrus](https://github.com/Sirupsen/logrus), and direct all log
+  messages to stderr. #664/#1039/#1044
+- make container aliveness check part of the IPAM/DNS APIs rather than
+  applying a heuristic. #971/#1073
+- output json status based on 'Accept' header instead of requiring
+  separate endpoint. #1063/#1077
+- label weave infrastructure containers with
+  `works.weave.role=system`. #1290
+- apply some refactoring for simplification, extraction of common code
+  and better readability. #997, #1016, #1095,#1289, #1101, #1219, #1254
+",https://api.github.com/users/awh,1504438,awh,https://api.github.com/repos/weaveworks/weave/releases/1780807/assets,https://api.github.com/repos/weaveworks/weave/releases/1780807,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.1.0,https://github.com/weaveworks/weave/releases/tag/v1.1.0,https://api.github.com/repos/weaveworks/weave/zipball/v1.1.0,v1.1.0,False,False
+1763304,2015-09-03T14:03:19Z,2015-09-03T14:18:21Z,Weave 1.0.3,"This release contains minor fixes for improved stability and robustness in addition to a bug fix to weaveDNS.
+
+More details below and in the [change log](https://github.com/weaveworks/weave/issues?q=milestone%3A1.0.3).
+
+Follow the [installation instructions](https://github.com/weaveworks/weave#installation) to install this latest release of Weave. The release is fully compatible with other 1.0.x versions, so existing clusters can be upgraded
+incrementally.
+- weaveDNS now exposes a TCP listener as well as UDP to support large answers. #1333/#1319
+- Compatibility with upstream changes to docker-py. #1366/#1367
+- Improved router/IPAM stability. #1329/#1330
+- Improved `weave reset` handling of error conditions. #1356/#1365
+- Don't allocated oversized buffers. #1340
+- Improved IPAM fuzz test robustness. #1336/#1342
+",https://api.github.com/users/awh,1504438,awh,https://api.github.com/repos/weaveworks/weave/releases/1763304/assets,https://api.github.com/repos/weaveworks/weave/releases/1763304,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.0.3,https://github.com/weaveworks/weave/releases/tag/v1.0.3,https://api.github.com/repos/weaveworks/weave/zipball/v1.0.3,v1.0.3,False,False
+1686082,2015-08-18T07:32:51Z,2015-08-18T07:40:45Z,Weave 1.0.2,"This release fixes a number of bugs, including some security vulnerabilities in the Weave Docker API proxy, hangs and failures in address allocation, and sporadic failures in name resolution.
+
+More details below and in the [change log](https://github.com/weaveworks/weave/issues?q=milestone%3A1.0.2).
+
+Follow the [installation instructions](https://github.com/weaveworks/weave#installation) to install this latest release of Weave. The release is fully compatible with other 1.0.x versions, so existing clusters can be upgraded incrementally.
+
+## Docker API proxy
+- Application containers had access to portions of the host's
+  filesystem, and had part of their own filesystem shadowed. The
+  former allowed apps to access to and modify potentially privileged
+  information and compromise the host. The latter could could cause
+  application breakages. #1232/#1237/#1238, #1287/#1291
+- Application containers could inject arbitrary code into containers
+  subsequently started via the proxy, causing such code to be executed
+  with the (potentially elevated) privileges of that
+  container. #1201/#1206
+- `docker exec` would fail for containers not attached to the weave
+  network. #1143/#1271/#1152/#1153
+- Starting a container in the host network namespace (`--net=host`)
+  would still attempt to attach that container to the weave network,
+  and pollute the host network namespace. #1157/#1165/#1167
+- Containers started with `weave run` via the proxy could get an
+  additional IP address. #1279/#1284
+- When connecting to the proxy with TLS, and using streaming, as
+  happens when running a container in the foreground or attaching to
+  it, the stream would not terminate. #1182/#1187
+- The absence of a command when running a container would not produce
+  the expected ""No command specified"" error. #1241/#1253
+- A chain of `/w/w` entrypoints, instead of a single one, could be
+  created when containers were started based on images created by
+  `docker commit`ting containers on the weave network. This does not
+  materially affect behaviour but obscures the real application
+  entrypoint in the likes of `docker ps`. #979/#980
+- The proxy did not detect the presence of a custom docker bridge,
+  specified with `DOCKER_BRIDGE`. #1109/#1136/#1137
+- The proxy was mounting any specified TLS certificate files in
+  read/write mode, which is unnecessary. #1293
+
+## Address allocation
+- `weave launch` could hang when restarting a weave peer in a
+  multi-node network when there were automatically allocated weave IP
+  addresses associated with surviving local application container,
+  weavedns, or `weave expose`. #700/#1083/#1104
+- Container startup would fail if IP address allocation took more than
+  20s. This timeout has now been removed. #1023/#1064
+- IP address allocation could take a long time when the local peer had
+  run out of space, and some other peers had recently left the weave
+  network. This in turn could cause container startup to be delayed
+  excessively, and fail with timeouts. #896/#1005/#1010
+- When an IP address range specified with `-iprange` overlaps with a
+  host route, no warning was issued. #1276/#1278
+
+## Naming and discovery
+- Concurrent resolution of a name could fail temporarily. #1270/#1273
+- Due to a bug in Docker 1.7.0 (only; not earlier or later versions),
+  name resolution would sometimes fail, especially when there was a
+  high churn of containers. #1171/#1192/#1229/#1231
+- Resolution of names outside the weavedns domain could fail if the
+  upstream DNS server returned a compressed response. #1306/#1313
+- Container startup could fail with an obscure error for container
+  with a long name, since, unless specified otherwise, weave derives
+  hostnames from container names, and the former have a spec-based
+  limit of 63 characters. Weave now suppresses the hostname derivation
+  when this condition arises and reports a warning. #1006/#1062/#1038
+- When `weave run` was invoked with `--dns-search=<arg>`, instead of
+  `--dns-search <arg>`, the weavedns domain (typically `weave.local`)
+  could be searched during name resolution even though it
+  shouldn't. #1086/#1088/#1089
+
+## Other
+- `weave attach` on a container that was started in the host network
+  namespace (`--net=host`) would succeed - even though it shouldn't -
+  and pollute the host network namespace. #1162/#1164
+- Weave could deplete the OS random number generator's entropy pool
+  when connections to a weave peer configured to use encryption were
+  made at a high rate. This does not affect weave security but can
+  cause other applications to block. We have mitigated this by
+  introducing a more sophisticated connection rate limiting
+  algorithm - instead of permitting a sustained connection rate of
+  1kHz we now only permit 10Hz but allow short bursts of up to 100
+  connections. For details, see the
+  [weave crypto docs](http://docs.weave.works/weave/latest_release/how-it-works.html#csprng). #1037/#1111/#1124
+- An application container with multiple weave IP addresses could be
+  inaccessible on all but the first for a while. #1261
+- When weave detected that the UDP IP/port of a peer had changed, the
+  resulting log message did not contain the original IP/port. #1106
+- The gopacket package moved from Google Code to GitHub, which broke
+  the build. #1071
+- The details of failures in the docker-py integration test suite
+  weren't being shown. #981
+- Several race conditions in the unit and integration tests, and their
+  infrastructure, could cause them to fail spuriously. #982/#1017/#1024, #1042/#1052/#1054, #1294/#1296
+",https://api.github.com/users/rade,109109,rade,https://api.github.com/repos/weaveworks/weave/releases/1686082/assets,https://api.github.com/repos/weaveworks/weave/releases/1686082,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.0.2,https://github.com/weaveworks/weave/releases/tag/v1.0.2,https://api.github.com/repos/weaveworks/weave/zipball/v1.0.2,v1.0.2,False,False
+1442329,2015-06-21T09:07:27Z,2015-06-21T09:22:44Z,Weave 1.0.1,"This is a bug fix release, addressing the following issue:
+- executing `docker run` from a Docker 1.7 client against the weave
+  proxy would report a `no such image` error when the requested image
+  wasn't present on the Docker host, instead of downloading it. #967/#969
+",https://api.github.com/users/rade,109109,rade,https://api.github.com/repos/weaveworks/weave/releases/1442329/assets,https://api.github.com/repos/weaveworks/weave/releases/1442329,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.0.1,https://github.com/weaveworks/weave/releases/tag/v1.0.1,https://api.github.com/repos/weaveworks/weave/zipball/v1.0.1,v1.0.1,False,False
+1432032,2015-06-18T10:24:16Z,2015-06-18T10:44:45Z,Weave 1.0.0,"**Highlights**:
+- It is now easier than ever to start containers and for them to communicate, across multiple hosts. Automatic IP address allocation, and name resolution via weaveDNS are now enabled by default, and the proxy has become more fully-featured. In short, once weave has been launched the following is possible:
+  
+  ```
+    host1$ docker run --name=pingme -dti ubuntu
+    host2$ docker run -ti ubuntu
+    root@d11e9287f65b:/# ping pingme
+  ```
+- Containers can now be
+  [load-balanced](http://docs.weave.works/weave/latest_release/weavedns.html#load-balancing)
+  easily.
+- IP address allocation is now available across [multiple
+  subnets](http://docs.weave.works/weave/latest_release/ipam.html#range),
+  and hence can be employed when running multiple, isolated
+  applications.
+- The proxy now supports [TLS
+  connections](http://docs.weave.works/weave/latest_release/proxy.html#tls),
+  enabling its deployment when the communication between docker
+  clients and the server must be secured.
+
+There are many other new features, plus the usual assortment of bug fixes and improvements under the hood. More detail below and in the [change log](https://github.com/weaveworks/weave/issues?q=milestone%3A1.0.0).
+
+_NB: This release changes the weave protocol version. Therefore, when upgrading an existing installation, all hosts need to be upgraded in order to for them to be able to communicate and form a network._
+
+## new IP address allocation features
+- enabled [automatic IP address allocation by
+  default](http://docs.weave.works/weave/latest_release/ipam.html#range),
+  allocating in the range 10.128.0.0/10. #743/#870/#893/#905
+- add ability to automatically [allocate/free IP addresses in specific
+  subnets](http://docs.weave.works/weave/latest_release/ipam.html#subnets)
+  by supplying `net:<cidr>` as the address. #675/#827
+- let `weave launch-dns` get an automatically allocated IP address if
+  none (or a subnet) is specified. #762/#900
+- `weave detach` with no addresses now detaches the container from the
+  default IP allocation subnet. #862/#827
+
+## new weaveDNS features
+- add DNS-based [load
+  balancing](http://docs.weave.works/weave/latest_release/weavedns.html#load-balancing)
+  for
+  services. #226/#615/#739/#761, #737, #736/#775, #923/#924/#926/#929, #930/#933
+- enable weaveDNS-based [name resolution by
+  default](http://docs.weave.works/weave/latest_release/weavedns.html#usage),
+  without requiring any extra parameters
+  - application containers are configured to use weaveDNS as their
+    name resolver by default. #383/#898
+  - resolvers are configured to search the weaveDNS domain
+    (i.e. typically weave.local) by default, so names in that domain
+    can be resolved without fully qualifying them. #749/#931
+  - the container hostname is derived from the container name, for
+    easy, automatic registration in weaveDNS. #750/#890, #922/#925
+- make it possible to [remove individual DNS
+  records](http://docs.weave.works/weave/latest_release/weavedns.html#add-remove)
+  by providing an FQDN to `weave dns-remove`. #631/#706
+- make [weaveDNS
+  TTL](http://docs.weave.works/weave/latest_release/weavedns.html#ttl)
+  configurable. #711/#795, #941/#943
+
+## new proxy features
+- support connecting to proxy with
+  [TLS](http://docs.weave.works/weave/latest_release/proxy.html#tls). #506/#813/#814/#815
+- enable automatic IP address allocation by default, unless [`--no-default-ipam`](http://docs.weave.works/weave/latest_release/proxy.html#ipam) is specified. #940/#947, #950/#952
+- add [`weave proxy-env` and `weave
+  proxy-config`](http://docs.weave.works/weave/latest_release/proxy.html#setup)
+  for easily obtaining the settings required to use the
+  proxy. #753/#848, #939/#949
+- add `weave stop-proxy` command. #754/#790
+- add ability to specify the proxy [listening
+  address](http://docs.weave.works/weave/latest_release/proxy.html#setup). #805/#810/#875
+- add proxy to [`weave
+  status`](http://docs.weave.works/weave/latest_release/proxy.html#troubleshooting)
+  output. #756/#800,#854,#876/#877/#878
+- shorten proxy entrypoint, so that it doesn't obscure the application
+  command in the likes of `docker ps`. #768/#769
+
+## new administrative features
+- finer-grained [control over peer
+  topology](http://docs.weave.works/weave/latest_release/features.html#dynamic-topologies)
+  - introduce `weave connect --replace` to replace command line peer
+    addresses. #658/#794
+  - permit invocation of `weave connect/forget` with multiple
+    peers. #759/#697
+  - add `-nodisco` option to `weave launch` to disable peer discovery
+    and thus give complete control over peer topology. #847/#853
+  - add command line peers to status output. #659/#764, #660/#764
+- document recommendations on [using a strong
+  password](http://docs.weave.works/weave/latest_release/features.html#security). #641/#844
+- more detailed documentation on [`-initpeercount`](http://docs.weave.works/weave/latest_release/ipam.html#initialisation). #758/#946
+- improvements to weave and container startup
+  - don't time out in `weave launch/launch-dns/launch-proxy`, since that
+    can lead to spurios failures on busy machines. #666/#828
+  - don't leave weave containers running when their network
+    configuration failed on startup. #192/#831
+  - reduce container startup time. #710/#785, #654/#706
+  - more helpful error message when weave, weavedns or the proxy fail on startup. #958
+- make `weave status` fail when weave isn't running, which is useful
+  for scripted monitoring. #784/#789
+- facilitate installation of weave from private docker registries, by
+  supplying a custom `DOCKERHUB_USER`. #887
+
+## bug fixes
+- various edge cases could cause leaked IP addresses or stale DNS records:
+  - restarting weave when there are containers with automatically
+    allocated IP addresses that subsequently die. #818/#823
+  - death of container just as we are registering it in
+    DNS. #821/#865/#904
+  - death of container just after we requested automatic IP allocation
+    for it. #819/#907
+  - death of container that was started with `weave start` using a
+    container name or short id. #881/#884
+  - `weave detach`ing an automatically allocated IP address. #861/#827
+- some errors were being misreported:
+  - network configuration errors during `weave ...` command execution
+    were swallowed and misreported as container deaths. #829/#830
+  - when starting application containers, a failure to obtain an
+    automatically allocated IP address would be misreported, and leave
+    the container running. #921/#889/#932
+  - when a container started via the proxy terminates quickly that
+    could be misreported as an unexpected container
+    death. #812/#820/#824
+  - `weave run` was terminating silently when weave got stopped during
+    IP allocation. #916/#918
+  - `weave --local run`, without further arguments, would show the
+    weave usage instead of letting docker complain about the lack of
+    arguments. #910
+  - running `weave --local ...` on a system w/o `nsenter` would
+    produce a hard to decipher error. #895
+- miscellaneous fixes:
+  - weave crypto could use the same nonce twice, which provided
+    potential attack vectors. #927/#928
+  - prevent access to the weaveDNS HTTP API from containers, which had
+    made running weaveDNS in the same subnet as application containers
+    more insecure than it should be. #899/#906
+  - specifying any `weave launch` argument before -password, -port, or
+    -iprange would result in the latter being ignored or not processed
+    correctly. #816/#852
+  - failed connection attempts between peers could be re-tried too
+    quickly. #412/#832
+  - fix a race condition in peer topology encoder, resulting from a
+    missing lock. #883
+
+## build & tests bug fixes and improvements
+- transient Alpine Linux repository issues during build could result
+  in silently broken weaveexec image. #663
+- fixed a number of race conditions that caused spurious failures in
+  the unit tests for IPAM (#779/#793, #802/#822, #915/#919), DNS
+  (#798/#836/#892/#917, #934/#937, #935), and topology gossip
+  (#885/#886/#902)
+- prevent port clashes. #720/#792
+- fix occasional timeout for non-weave name resolution in
+  tests. #347/#761
+- shrink top level dir by moving exe/image sub-dirs. #420/#817
+- run linter on travis. #765
+- various fixes and improvements to CircleCI
+  integration. #791/#796/#797
+- introduce a mechanism to run individual smoke tests. #728
+
+## improvements ""under the hood""
+- switch to a new protocol header and version negotiation, which is
+  flexible enough to permit radical changes with the possibility of
+  retaining compatibility. #871/#920
+- make it easier to change some aspects of the weave protocol w/o
+  breaking compatibility. #911/#914
+- limit acceptance rate on peer connections in order to guard against
+  online dictionary attacks on the weave password. #837/#839.
+- simplify UDP fragmentation check. #746/#888
+- simplify proxy interceptor code. #879
+- don't hash gossip channel names. #745/#748
+- improve IPAM HTTP API to allow lookup of addresses allocated to a
+  particular container. #825
+- remove pointless DOCKER_HOST parsing for proxy. #807/#808
+- restore the ""--fallback"" argument in WeaveDNS. #773
+- introduce helper function to make status output more
+  consistent. #863
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/1432032/assets,https://api.github.com/repos/weaveworks/weave/releases/1432032,master,https://api.github.com/repos/weaveworks/weave/tarball/v1.0.0,https://github.com/weaveworks/weave/releases/tag/v1.0.0,https://api.github.com/repos/weaveworks/weave/zipball/v1.0.0,v1.0.0,False,False
+1411010,2015-06-12T20:33:33Z,2015-06-12T21:52:43Z,Weave fast-datapath-preview-20150612,"Weaving Containers into Applications
+",https://api.github.com/users/dpw,15074,dpw,https://api.github.com/repos/weaveworks/weave/releases/1411010/assets,https://api.github.com/repos/weaveworks/weave/releases/1411010,master,https://api.github.com/repos/weaveworks/weave/tarball/fast-datapath-preview-20150612,https://github.com/weaveworks/weave/releases/tag/fast-datapath-preview-20150612,https://api.github.com/repos/weaveworks/weave/zipball/fast-datapath-preview-20150612,fast-datapath-preview-20150612,False,False
+1389642,2015-06-08T15:36:53Z,2015-06-08T16:17:08Z,Weave 0.11.2,"This is a bug fix release, addressing the following issues:
+- `weave run` did not respect DOCKER_CLIENT_ARGS. #855/#856/#857/#858
+- WeaveDNS negative result cache did not expire if requeried within TTL. #845/#849
+
+More details in the [change log](https://github.com/weaveworks/weave/issues?q=milestone%3A0.11.2).
+
+_NB: This release does not change the weave protocol version.
+Therefore, when upgrading an existing 0.11 installation incrementally,
+connectivity between peers will be retained._
+",https://api.github.com/users/awh,1504438,awh,https://api.github.com/repos/weaveworks/weave/releases/1389642/assets,https://api.github.com/repos/weaveworks/weave/releases/1389642,master,https://api.github.com/repos/weaveworks/weave/tarball/v0.11.2,https://github.com/weaveworks/weave/releases/tag/v0.11.2,https://api.github.com/repos/weaveworks/weave/zipball/v0.11.2,v0.11.2,False,False
+1361718,2015-06-01T13:27:39Z,2015-06-01T15:18:18Z,Weave 0.11.1,"This is a bug fix release, addressing the following issues:
+- The IP Allocator could crash in some relatively rare
+  circumstances. #782/#783.
+- When the proxy failed to attach a container to the weave network,
+  there was no failure indication and descriptive error anywhere, and
+  the application process would still start. Now an error is reported
+  to the client (i.e. typically the Docker CLI), recorded in the proxy
+  logs, and the container is terminated. #788/#799.
+- `weave launch-proxy --with-ipam` failed to configure the entrypoint
+  and DNS unless a (possibly blank) `WEAVE_CIDR` was
+  specified. Affected containers could start the application process
+  w/o the weave network interface being available, and without
+  functioning name resolution for the weaveDNS domain. #744/#747/#751/#752
+- The `weave status` output for the IP Allocator was misleadingly
+  conveying a sense of brokenness when no IP allocation requests had
+  been made yet. #787/#801
+- When invoking `weave launch-proxy` twice, the second invocation
+  would output a blank line and terminate with a success exit
+  status. Now it reports that the proxy is already running and exits
+  with a non-zero status. #767/#780
+- `weave launch-proxy` was not respecting WEAVEPROXY_DOCKER_ARGS, so
+  any user-supplied custom configuration for the weaveproxy container
+  was ignored. #755/#780
+- The proxy was not intercepting API calls to the unversioned (1.0)
+  Docker Remote API. Hence none of the weave functionality was available
+  when Docker clients were using that version of the
+  API. #770/#774/#777,#809
+- The proxy would crash when certain elements of the
+  `/containers/create` JSON were missing. We are not aware of any
+  Docker clients doing this, but it's been fixed regardless. #778/#777
+
+More details in the [change log](https://github.com/weaveworks/weave/issues?q=milestone%3A0.11.1).
+
+_NB: This release does not change the weave protocol version. Therefore, when upgrading an existing 0.11 installation incrementally, connectivity between peers will be retained._
+",https://api.github.com/users/paulbellamy,250199,paulbellamy,https://api.github.com/repos/weaveworks/weave/releases/1361718/assets,https://api.github.com/repos/weaveworks/weave/releases/1361718,master,https://api.github.com/repos/weaveworks/weave/tarball/v0.11.1,https://github.com/weaveworks/weave/releases/tag/v0.11.1,https://api.github.com/repos/weaveworks/weave/zipball/v0.11.1,v0.11.1,False,False
+1338053,2015-05-26T12:52:14Z,2015-05-26T14:50:20Z,Weave 0.11.0,"**Highlights**:
+- **[automatic IP Address Management
+  (IPAM)](http://docs.weave.works/weave/latest_release/ipam.html)**,
+  which allows application containers to be started and attached to
+  the weave network without needing to supply an IP address.
+- **[proxy](http://docs.weave.works/weave/latest_release/proxy.html)** for
+  automatically attaching containers started with ordinary `docker
+  run`, or the Docker remote API, to the weave network.
+- ability to **[add/remove extra DNS
+  records](http://docs.weave.works/weave/latest_release/weavedns.html#add-remove)**.
+- performance and scalability improvements
+- fixes for a small number of bugs discovered during testing
+
+More detail below and in the [change log](https://github.com/weaveworks/weave/issues?q=milestone%3A0.11.0).
+
+_NB: This release changes the weave protocol version. Therefore, when upgrading an existing installation, all hosts need to be upgraded in order to for them to be able to communicate and form a network._
+
+## bug fixes
+- eliminate a deadlock in route calculation, which could be
+  encountered when large numbers of peers join or leave the weave
+  network near-simultaneously. #643/#644
+- prevent certain stray UDP packets from stalling the entire UDP
+  receiver loop when crypto is in use. #564/#617
+- prevent `weave expose` from breaking container connectivity in other
+  subnets. #605/#628
+- prevent `weave expose` from breaking subnet isolation. #620/#704
+- fix breakage when running `weave` inside a container that has
+  `$PROCFS` set. #621/#622
+- fix bug in `weave launch-dns` that could result in some existing
+  containers not being recorded in weaveDNS if one of them got stopped
+  and removed during the weaveDNS launch. #690
+- fix a dormant bug in the peer connection shutdown logic. #731
+
+## new features
+- introduce automatic [IP Address Management
+  (IPAM)](http://docs.weave.works/weave/latest_release/ipam.html),
+  which allows application containers to be started and attached to
+  the weave network without needing to supply an IP address. IPAM can
+  also automatically allocate IP addresses for `weave
+  expose`. #22/#563,#485,#567,#670,#679/#685,#672/#686,#671/#689,#669/#691,#681,#677/#693,#695.#692/#696,#684/#701,#705/#719,#723/#724
+- introduce a
+  [proxy](http://docs.weave.works/weave/latest_release/proxy.html) for
+  automatically attaching containers started with ordinary `docker
+  run`, or the Docker remote API, to the weave network. The proxy
+  ensures that the weave network interface is available to application
+  processes immediately on startup. It also allows application
+  containers to be started in the foreground, and automatically
+  removed on termination (with
+  `--rm`).  #47,#230,#251,#400,#652,#655,#698,#702,#703,#708/#713,#709/#714,#707/#718,#657/#721,#738
+- add ability to [add/remove extra DNS
+  records](http://docs.weave.works/weave/latest_release/weavedns.html#add-remove). #364/#627
+- publish docs for all releases; the [main
+  documentation](http://docs.weave.works) now contain the docs for the
+  latest release instead of the current development snapshot. #604,#612,#642,#648,#650,#729,#668/#722
+- allow user to supply args to Docker in `DOCKER_CLIENT_ARGS` env var,
+  for weave remote execution, eg. in order to enable TLS. #626
+- enable weave script debugging with `WEAVE_DEBUG` env var. #618
+
+## other improvements
+- significantly simplify
+  [crypto](http://docs.weave.works/weave/latest_release/how-it-works.html#crypto)
+  implementation. #608
+- simplify and significantly improve performance of topology gossip,
+  as a result of which weave can cope much better with situations
+  where are large number of peers join or leave near- simultaneously,
+  e.g. on startup of large clusters, or in the event of a network
+  partition. #519/#619
+- better error handling in a `weave launch` failure edge case. #600/#603
+- prevent misleading error when attempting to `weave detach` from an
+  unattached container. #596/#613
+- make `weave version` cope with missing Docker images. #597/#614
+- report errors encountered when populating DNS in `weave
+  launch-dns`. #393
+- report more descriptive error when weave was compiled against too
+  old a version of libpcap. #623/#625
+- return NXDOMAIN instead of NOTIMP for query types not handled by
+  WeaveDNS, which is the expected response. #588/#589
+- bump minimum Docker version requirement for use of `--with-dns` from
+  1.2.0 to 1.3.1, due to the former not setting container hostnames
+  correctly. #587
+- bump minimum Linux kernel version requirement for running Weave from
+  3.5.0 to 3.8.0, due to some bugs in namespace support in the
+  former that break Weave. #585/#616
+- remove a layer from the weaveexec image, thus reducing download
+  times. #665
+- various documentation cleanups and improvements. #601,#640,#651,#653,#667,#648,#740
+
+## improvements to tests, and refactoring
+- add more smoke tests, improve existing tests, and make them more
+  robust. #590,#591/#594,#595,#592/#606,#683,#712
+- automatically run smoke tests on
+  [CircleCI](https://circleci.com/gh/weaveworks/weave). #624,#634,#637,#638
+- make top-level `vagrant provision` idempotent. #586
+- use `nsenter` instead of `ip netns exec`. #458/#580
+- internal changes for future support of multiple DNS responses. #559
+- some code cleanup in DNS. #609,#610
+- refactor signal handling in Weave and WeaveDNS. #633
+",https://api.github.com/users/bboreham,8125524,bboreham,https://api.github.com/repos/weaveworks/weave/releases/1338053/assets,https://api.github.com/repos/weaveworks/weave/releases/1338053,master,https://api.github.com/repos/weaveworks/weave/tarball/v0.11.0,https://github.com/weaveworks/weave/releases/tag/v0.11.0,https://api.github.com/repos/weaveworks/weave/zipball/v0.11.0,v0.11.0,False,False
+1195906,2015-04-21T15:03:43Z,2015-04-21T15:20:58Z,Weave 0.10.0,"**Highlights**:
+- **bug fixes**, in particular eradicating several deadlocks that could
+  cause peer connection failures and hangs.
+- **performance and scalability improvements** to the weave control plane,
+  as a result of which it is now possible to construct much larger
+  weave networks than previously.
+- **improved installation and administration**, particularly the
+  introduction of remote execution of the weave script in a container,
+  permitting fully containerised deployment of weave.
+- **improved diagnostics**, such as the reporting of connection failures
+  in `weave status`.
+- **new weaveDNS features**, most notably the caching of
+  DNS records for application containers, which makes finding container IP addresses via
+  weaveDNS much faster.
+
+More detail below and in the [change log](https://github.com/weaveworks/weave/issues?q=milestone%3A0.10.0).
+
+_NB: This release changes the Weave Docker image names. To upgrade from an older version, 1) stop all application containers, 2) run `weave reset` from the old version to remove all traces of weave, and only then 3) install the new version._
+
+## bug fixes
+- eliminate several deadlocks during connection establishment,
+  shutdown and topology gossip. These could lead to weave routers
+  failing to connect to each other, existing connections timing out,
+  `weave status` hanging, and general
+  mayhem.  #341,#411/#414,#418/#421,#415/#428,#445/#476,#464,#529/#530,#515/#565
+- avoid excessive ARP caching. This prevented connectivity to
+  containers which were restarted with the same IP or otherwise given
+  an IP that was recently in use. Connectivity to `weave expose`ed
+  addresses was similarly affected. #439/#441/#457
+- prevent accidental injection of ICMP ""fragmentation needed"" packets
+  with a broadcast/multicast source address. This contravened
+  [RFC1122](https://tools.ietf.org/html/rfc1122) and also broke
+  subsequent routing of broadcast/multicast packets from that
+  address. #419/#433
+- cope with linux kernels <3.8.0. #470/#504.
+- exclude non-established connections from broadcast routing. This
+  could lead to excessive loss of broadcast packets during connection
+  establishment, as well as a lot of noise in the logs. #452/#453
+- don't rely on docker for container aliveness check. This could cause
+  a misreporting of a container death during `weave launch`, `weave
+  run` and others as network configuration error. #522
+
+## performance and scalability improvements
+- massively reduce the cost and complexity of topology gossip. This
+  allows construction of substantially larger weave networks than
+  hitherto possible, and copes much better with the sudden connection
+  or disconnection of large numbers of peers. The default per-peer
+  connection limit has been increased from 10
+  to 30. #514/#516,#517/#521,#445/#476,#454/#461,#425
+- tighten the conditions under which we attempt to connect to the
+  remote addresses of inbound connections we learn about from other
+  peers. Being rather lax here was resulting in excessive failed
+  attempts, with the associated log noise, load, and spuriously
+  exceeding the configured connection limit. #448/#451/#477,#478/#555
+- [dns] cache container DNS records. This significantly reduces lookup time
+  for IPs in the weaveDNS domain used by application
+  containers. #225/#429,#473,#494/#501,#532
+
+## new administrative features
+- containerised execution of the weave script, which enables remote
+  execution (e.g. by setting `DOCKER_HOST`), and makes it possible to run weave purely through docker and without any shell access to the host. #312/#388,#379,#540/#542/#545,#507/#523/#546,#574/#575
+- add [`weave forget
+  <peer>`](http://weaveworks.github.io/weave/features.html#dynamic-topologies)
+  command, for removal of decommissioned weave
+  peers. #486/#488,#549/#550
+- allow multiple CIDRs to be specified in weave commands. #467/#498,#568/#570
+- accept a list of container names/ids in `weave ps`. #526
+- make `weave launch` synchronous, which is useful for automation. #500/#509/#538
+- make `weave connect` act immediately, instead of waiting for the
+  expiry of any timeout from a previous connection attempt to the same
+  destination. #499
+
+## new diagnostics features
+- reporting of connection failure reasons in [`weave
+  status`](http://weaveworks.github.io/weave/troubleshooting.html#status-report). #552
+- add [weaveDNS status
+  information](https://github.com/weaveworks/weave/tree/master/weavedns#troubleshooting),
+  such as current container/IP/name mappings, to `weave
+  status`. #237/#266/#465
+- give peers a
+  [nickname](http://weaveworks.github.io/weave/troubleshooting.html#status-report)
+  for easier identification, defaulting to the
+  hostname. #369/#407/#472
+- improved logging of connection lifecycle events. #449,#560
+- include `weave expose`d addresses in [`weave
+  ps`](http://weaveworks.github.io/weave/troubleshooting.html#list-attached-containers)
+  output. #385/#558
+
+## new weaveDNS features
+- handle large responses over UDP and also support TCP fallback. This
+  is especially needed when containers query external
+  domains. #362/#392,#360/#361
+- allow [setting of domain name](https://github.com/weaveworks/weave/tree/master/weavedns#using-a-different-local-domain) to something other than
+  `weave.local` #366/#394,#573/#581
+- add ability to name [`weave
+  expose`](http://weaveworks.github.io/weave/features.html#host-network-integration)d
+  addresses. #375/#566
+
+## build system improvements
+- enable [containerised
+  build](http://weaveworks.github.io/weave/building.html), making
+  easier to get a weave development environment set up and contribute
+  to weave. #370,#387
+- [Travis CI](https://travis-ci.org/weaveworks/weave)
+  integration, including linting. #397,#503,#571,#491
+- coverage reports and enable [coveralls.io](https://coveralls.io/r/weaveworks/weave)
+  integration. #396,#505/#508,#557
+- make smoke tests work with Docker 1.6. #579
+- bump go version to 1.4.2. #490,#535/#536
+- speed up tests. #547
+
+## miscellaneous improvements
+- make weave commands interruptable with Ctrl-C. #391/#395
+- stop weave more gracefully in `weave stop/stop-dns/reset`, by
+  invoking `docker stop` instead of `docker kill`. #512
+- add
+  [`WEAVE_PORT`](http://weaveworks.github.io/weave/features.html#multi-cloud-networking)
+  env var for overriding default weave port. #531/#534,#551
+- make weaveDNS container configurable by supplying docker parameters
+  to in `WEAVEDNS_DOCKER_ARGS`. #484,#487
+- detect UDP connectivity breakage, and recover from it if
+  possible. #373/#413
+- reduce likelihood of IP address clashes in tests and examples. #402
+- add installation instructions for CoreOS. #434/#435
+",https://api.github.com/users/rade,109109,rade,https://api.github.com/repos/weaveworks/weave/releases/1195906/assets,https://api.github.com/repos/weaveworks/weave/releases/1195906,master,https://api.github.com/repos/weaveworks/weave/tarball/v0.10.0,https://github.com/weaveworks/weave/releases/tag/v0.10.0,https://api.github.com/repos/weaveworks/weave/zipball/v0.10.0,v0.10.0,False,False
+912341,2015-02-03T13:20:45Z,2015-02-03T14:01:22Z,Weave 0.9.0,"- Improve WeaveDNS to the point where it can act as the name server for containers in nearly all situations.
+- Diagnose and report peer connectivity more comprehensively.
+- Adapt to changes in topology - adding & removing of weave peers, disruption of connectivity - more rapidly.
+- Cope with delays in downloading/running docker images/containers required for weave operation.
+
+[change log](https://github.com/zettio/weave/issues?q=milestone%3A0.9.0)
+",https://api.github.com/users/rade,109109,rade,https://api.github.com/repos/weaveworks/weave/releases/912341/assets,https://api.github.com/repos/weaveworks/weave/releases/912341,master,https://api.github.com/repos/weaveworks/weave/tarball/v0.9.0,https://github.com/weaveworks/weave/releases/tag/v0.9.0,https://api.github.com/repos/weaveworks/weave/zipball/v0.9.0,v0.9.0,False,False
+822498,2015-01-04T09:33:12Z,2015-01-04T09:54:30Z,Weave 0.8.0,"- Align script and image version. When the `weave` script has a version number, i.e. it is part of an official release, it runs docker images matching that version. Thus the script and image versions are automatically aligned. Unversioned/unreleased `weave` scripts run the 'latest'-tagged image versions.
+- Eliminate dependency on ethtool and conntrack. Instead of requiring these to be installed on the host, weave invokes them via a `weavetools` docker image that contains minimally packaged versions of these utilities.
+- New `weave setup` command. This downloads all docker images used by weave. Invoking this is strictly optional; its main purpose is to facilitate automated installation of weave and preventing delays in subsequent weave command execution due to image downloading.
+",https://api.github.com/users/rade,109109,rade,https://api.github.com/repos/weaveworks/weave/releases/822498/assets,https://api.github.com/repos/weaveworks/weave/releases/822498,master,https://api.github.com/repos/weaveworks/weave/tarball/v0.8.0,https://github.com/weaveworks/weave/releases/tag/v0.8.0,https://api.github.com/repos/weaveworks/weave/zipball/v0.8.0,v0.8.0,False,False
+815589,2014-12-30T14:36:34Z,2014-12-30T15:31:44Z,Weave 0.7.0,"This is the first release assigned a version number.
+
+When downloading weave you now have the following choices...
+1. a specific version, e.g. https://github.com/zettio/weave/releases/download/v0.7.0/weave
+2. latest released version: https://github.com/zettio/weave/releases/download/latest_release/weave
+3. most recent 'master' commit: https://raw.githubusercontent.com/zettio/weave/master/weave
+
+Previously the only documented download location was (3). We recommend
+that any automated scripts using that be changed to either (1) or (2).
+",https://api.github.com/users/squaremo,62033,squaremo,https://api.github.com/repos/weaveworks/weave/releases/815589/assets,https://api.github.com/repos/weaveworks/weave/releases/815589,master,https://api.github.com/repos/weaveworks/weave/tarball/v0.7.0,https://github.com/weaveworks/weave/releases/tag/v0.7.0,https://api.github.com/repos/weaveworks/weave/zipball/v0.7.0,v0.7.0,False,False

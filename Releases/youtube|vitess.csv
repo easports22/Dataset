@@ -1,0 +1,447 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+6463452,2017-05-22T13:59:22Z,2017-05-22T14:01:20Z,Vitess 2.1.1,"Bugfix release for Vitess 2.1.
+
+Changes since 2.1:
+
+* Fixed issue that auto inc columns for unsharded keyspaces were not working (https://github.com/youtube/vitess/issues/2804).
+
+If you are upgrading from a version < 2.1.0, please read the ""Upgrading"" section from the 2.1 release notes: https://github.com/youtube/vitess/releases/tag/v2.1.0",https://api.github.com/users/michael-berlin,3919251,michael-berlin,https://api.github.com/repos/youtube/vitess/releases/6463452/assets,https://api.github.com/repos/youtube/vitess/releases/6463452,master,https://api.github.com/repos/youtube/vitess/tarball/v2.1.1,https://github.com/youtube/vitess/releases/tag/v2.1.1,https://api.github.com/repos/youtube/vitess/zipball/v2.1.1,v2.1.1,False,False
+6177224,2017-04-25T06:05:57Z,2017-04-25T06:41:26Z,Vitess 2.1,"Vitess 2.1 brings many new features since the last major release 2.0.
+
+Highlights are Two-Phase Commit (2PC) support and early support for the native MySQL protocol.
+
+See below for full details.
+
+## Download
+
+* Server binaries are available in the Docker image ""vitess/lite:v2.1.0"".
+* Java client packages are published on [Maven Central](https://search.maven.org/#search|ga|1|g:""io.vitess"").
+* Source code is available via the tag ""[v2.1.0](https://github.com/youtube/vitess/tree/v2.1.0)"".
+
+## Upgrading
+
+All Vitess 2.1 changes are backward compatible with the 2.0 release. Please make sure that you follow our [recommended upgrade order](http://vitess.io/user-guide/upgrading.html#upgrade-order).
+
+If you use custom start scripts, you will have to change the command line flags which specify the topology (zookeeper or etcd) addresses. New flags are:
+
+```
+-topo_implementation zookeeper|etcd|zk2|etcd2|consul
+-topo_global_server_address global_server1,global_server2
+-topo_global_root /vitess/global
+```
+
+Additionally, for the zk2/etcd2/consul implementations, you'll have to register cell local topology servers with the `vtctl AddCellInfo` command. See [our documentation](http://vitess.io/user-guide/topology-service.html#running-in-only-one-cell) for details.
+
+This version also adds new topology plugins (""zk2"", ""etcd2"") with a different storage format. The legacy plugins ""zookeeper"" and ""etcd"" will continue to work in 2.1 but will be deprecated in the next major version. Therefore, we recommend to [migrate to one of the new plugins](http://vitess.io/user-guide/topology-service.html#migration-between-implementations) once you updated to 2.1.
+
+## Changes since the 2.0 Release
+
+* Our website vitess.io has a new logo! :)
+* **Kubernetes:**
+  * Added Helm chart and support for StatefulSet.
+* **all:**
+  * Topology:
+    * Rewrote plugins for etcd and Zookeeper (etcd2, zk2). Please see [the doc](http://vitess.io/user-guide/topology-service.html#migration-between-implementations) how to migrate to the new storage format.
+Command line flags have changed as well (shipped examples are updated).
+    * New plugin: Consul.
+  * Internal: We have changed the internal error representation in the RPC messages in a backward compatible way.
+* **clients:**
+  * Java:
+    * TLS support in client and JDBC driver.
+    * Unified package structure under new root `io.vitess`.
+    * 2.1.0 packages are published on Maven Central e.g. our JDBC driver as artifact [vitess-jdbc](https://search.maven.org/#search|ga|1|a:""vitess-jdbc"").
+  * Map Reduce:
+    * Faster execution on tables with a non-uniform distribution by sampling rows and splitting the table into equal-sized row ranges.
+* **vtctld:**
+  * New Angular 2 based UI.
+  * Online Schema Swap: Apply complex schema changes without any downtime.
+  * Resharding workflow. Automatically runs the resharding steps and shows them in the Workflow UI Tab. [New tutorials](http://vitess.io/user-guide/sharding-kubernetes-workflow.html) added which use the workflow.
+* **vtgate:**
+  * 2PC: Support for distributed transactions.
+  * Native MySQL server protocol (alpha).
+  * Direct access to shards via ""keyspace:shard"" database name.
+  * Buffer master traffic during failovers and retry to avoid client errors (disabled by default).
+  * Support for SHOW statements to expose Vitess metadata.
+  * Increase large installation scalability with (optional) two-layer vtgate pools (l2vtgate, applicable to 100+ shard installations).
+* **vttablet:**
+  * Native MySQL client protocol (instead of using libmysqlclient) (disabled by default).
+  * Support for MySQL Row-based-Replication e.g. needed when resharding (alpha).
+  * Update Stream: Applications can subscribe to a change stream (e.g. to invalidate an app level cache).
+  * Messages: Native support for a queue processing framework (alpha).
+  * Hot Row Protection: Serializes write transaction for the same row (range) to prevent that all transaction pool slots can be exhausted (disabled by default).
+  * Transaction Throttler: Rejects new transactions with retryable error if replication lag on replicas is too high (disabled by default).
+
+## Other Noteworthy Changes
+
+* Minimum required Go version changed to 1.8 (from 1.5).
+* Updated to gRPC 1.0.4 (from 1.0.0).
+",https://api.github.com/users/michael-berlin,3919251,michael-berlin,https://api.github.com/repos/youtube/vitess/releases/6177224/assets,https://api.github.com/repos/youtube/vitess/releases/6177224,master,https://api.github.com/repos/youtube/vitess/tarball/v2.1.0,https://github.com/youtube/vitess/releases/tag/v2.1.0,https://api.github.com/repos/youtube/vitess/zipball/v2.1.0,v2.1.0,False,False
+6065172,2017-04-06T18:41:00Z,2017-04-12T20:42:23Z,Vitess v2.1.0-rc.1,"This is the first release candidate of the 2.1 release.
+
+We expect minimal changes between this and the final 2.1 release.
+
+## Download
+
+* Server binaries are available in the Docker image ""vitess/lite:v2.1.0-rc.1"".
+* Java client packages are published on [Maven Central](https://search.maven.org/#search|ga|1|g:""io.vitess"").
+* Source code is available via the tag ""[v2.1.0-rc.1](https://github.com/youtube/vitess/tree/v2.1.0-rc.1)"".
+
+## Upgrading
+
+All Vitess 2.1 changes are backward compatible with the 2.0 release. Please make sure that you follow our [recommended upgrade order](http://vitess.io/user-guide/upgrading.html#upgrade-order).
+
+## Changes since the 2.0 Release
+
+* Our website vitess.io has a new logo! :)
+* **Kubernetes:**
+  * Added Helm chart and support for StatefulSet.
+* **all:**
+  * Topology:
+    * Rewrote plugins for etcd and Zookeeper (etcd2, zk2). Please see [the doc](http://vitess.io/user-guide/topology-service.html#migration-between-implementations) how to migrate to the new storage format.
+Command line flags have changed as well (shipped examples are updated).
+    * New plugin: Consul.
+  * Internal: We have changed the internal error representation in the RPC messages in a backward compatible way.
+* **clients:**
+  * Java:
+    * TLS support in client and JDBC driver.
+    * Unified package structure under new root `io.vitess`.
+    * 2.1.0-rc.1 packages are published on Maven Central e.g. our JDBC driver as artifact [vitess-jdbc](https://search.maven.org/#search|ga|1|a:""vitess-jdbc"").
+  * Map Reduce:
+    * Faster execution on tables with a non-uniform distribution by sampling rows and splitting the table into equal-sized row ranges.
+* **vtctld:**
+  * New Angular 2 based UI.
+  * Online Schema Swap: Apply complex schema changes without any downtime.
+  * Resharding workflow. Automatically runs the resharding steps and shows them in the Workflow UI Tab. [New tutorials](http://vitess.io/user-guide/sharding-kubernetes-workflow.html) added which use the workflow.
+* **vtgate:**
+  * 2PC: Support for distributed transactions.
+  * Native MySQL server protocol (alpha).
+  * Direct access to shards via ""keyspace:shard"" database name.
+  * Buffer master traffic during failovers and retry to avoid client errors (disabled by default).
+  * Support for SHOW statements to expose Vitess metadata.
+  * Increase large installation scalability with (optional) two-layer vtgate pools (l2vtgate, applicable to 100+ shard installations).
+* **vttablet:**
+  * Native MySQL client protocol (instead of using libmysqlclient) (disabled by default).
+  * Support for MySQL Row-based-Replication e.g. needed when resharding (alpha).
+  * Update Stream: Applications can subscribe to a change stream (e.g. to invalidate an app level cache).
+  * Messages: Native support for a queue processing framework (alpha).
+  * Hot Row Protection: Serializes write transaction for the same row (range) to prevent that all transaction pool slots can be exhausted (disabled by default).
+  * Transaction Throttler: Rejects new transactions with retryable error if replication lag on replicas is too high (disabled by default).
+
+## Other Noteworthy Changes
+
+* Minimum required Go version changed to 1.8 (from 1.5).
+* Updated to gRPC 1.0.4 (from 1.0.0).
+",https://api.github.com/users/michael-berlin,3919251,michael-berlin,https://api.github.com/repos/youtube/vitess/releases/6065172/assets,https://api.github.com/repos/youtube/vitess/releases/6065172,master,https://api.github.com/repos/youtube/vitess/tarball/v2.1.0-rc.1,https://github.com/youtube/vitess/releases/tag/v2.1.0-rc.1,https://api.github.com/repos/youtube/vitess/zipball/v2.1.0-rc.1,v2.1.0-rc.1,False,True
+4599098,2016-11-08T03:41:46Z,2016-11-08T06:54:27Z,Vitess v2.1.0-alpha.1,"**This is the first alpha release of the upcoming 2.1 version.**
+
+2.1 will be a feature release which will bring the following new features:
+- Support for distributed transactions, using 2 phase commit.
+- Resharding workflow improvements, to increase manageability of the process.
+- Online schema swap, to apply complex schema changes without any downtime.
+- New dynamic UI (vtctld), rewritten from scratch in angular2.
+- Update Stream functionality, for applications to subscribe to a change stream (for cache invalidation, for instance).
+- Improved Map-Reduce support, for tables with non-uniform distributions.
+- Increase large installation scalability with two-layer vtgate pools (l2vtgate, applicable to 100+ shard installations).
+- Better Kubernetes support (Helm support, better scripts, ...).
+
+Note that some of these features are still in development and not fully documented. This will change before we release the final 2.1 version.
+
+**Other noteworthy changes:**
+- Minimum required Go version changed to 1.7 (from 1.5).
+- Updated to gRPC 1.0.0 (from 0.13.0).
+- Added Percona Docker Images (changes contributed by Stitch Labs).
+",https://api.github.com/users/michael-berlin,3919251,michael-berlin,https://api.github.com/repos/youtube/vitess/releases/4599098/assets,https://api.github.com/repos/youtube/vitess/releases/4599098,master,https://api.github.com/repos/youtube/vitess/tarball/v2.1.0-alpha.1,https://github.com/youtube/vitess/releases/tag/v2.1.0-alpha.1,https://api.github.com/repos/youtube/vitess/zipball/v2.1.0-alpha.1,v2.1.0-alpha.1,False,True
+3641259,2016-07-12T01:55:00Z,2016-07-12T18:34:18Z,Vitess v2.0.0,"## Release to Manufacturing
+
+This is the code cut for what will become the first GA release of Vitess 2.0.
+We're now focused on updating documentation in preparation for General Availability.
+
+## Changes since v2.0.0-rc.2
+
+### Code Cleanup
+- [vtctld: Remove experimental VSchema editor UI](https://github.com/youtube/vitess/pull/1839)
+",https://api.github.com/users/enisoc,6733629,enisoc,https://api.github.com/repos/youtube/vitess/releases/3641259/assets,https://api.github.com/repos/youtube/vitess/releases/3641259,master,https://api.github.com/repos/youtube/vitess/tarball/v2.0.0,https://github.com/youtube/vitess/releases/tag/v2.0.0,https://api.github.com/repos/youtube/vitess/zipball/v2.0.0,v2.0.0,False,False
+3504468,2016-06-23T01:27:44Z,2016-06-23T02:12:45Z,Vitess v2.0.0-rc.2,"## Changes since v2.0.0-rc.1
+
+### Bug Fixes
+- [Automatically create /zk root if it doesn't exist](https://github.com/youtube/vitess/pull/1784)
+- [Fix edge cases in MariaDB backup/restore + reparent scenarios](https://github.com/youtube/vitess/pull/1778)
+- [Randomize MySQL server-id when initializing tablet from scratch](https://github.com/youtube/vitess/pull/1783)
+  - Fixes edge case of `replicate-same-server-id=0` together with backup/restore of former master.
+- Fix for [panic during resharding with unicode_loose_md5 vindex](https://github.com/youtube/vitess/issues/1787)
+- Fix for [ApplySchema fails on DDLS which don't result in a schema change](https://github.com/youtube/vitess/issues/1731)
+- [Fix for using SplitQuery with VTGate High-Level API](https://github.com/youtube/vitess/pull/1789)
+- [VSchema for vtcombo is per-keyspace](https://github.com/youtube/vitess/pull/1798)
+  - This better matches the per-keyspace nature of VSchema in topology.
+- [Verify that autocommit is ON](https://github.com/youtube/vitess/pull/1802)
+  - This is required for proper operation of connection pooling.
+- [ApplySchema now reloads schema on slaves](https://github.com/youtube/vitess/pull/1806)
+  - Previously, only the master would immediately reload schema.
+- [Enable admin commands on vtcombo](https://github.com/youtube/vitess/pull/1816)
+
+### Plugins
+- [Add backup storage plugin for Amazon S3](https://github.com/youtube/vitess/pull/1799)
+",https://api.github.com/users/enisoc,6733629,enisoc,https://api.github.com/repos/youtube/vitess/releases/3504468/assets,https://api.github.com/repos/youtube/vitess/releases/3504468,master,https://api.github.com/repos/youtube/vitess/tarball/v2.0.0-rc.2,https://github.com/youtube/vitess/releases/tag/v2.0.0-rc.2,https://api.github.com/repos/youtube/vitess/zipball/v2.0.0-rc.2,v2.0.0-rc.2,False,True
+3394652,2016-06-07T20:28:35Z,2016-06-07T22:06:42Z,Vitess v2.0.0-rc.1,"## Changes since v2.0.0-beta.2
+
+This is the first release candidate for v2.0.0. We are now freezing the [release-2.0](https://github.com/youtube/vitess/tree/release-2.0) branch for anything except bug fixes.
+
+### Client API
+- Allow specifying a connection-wide default keyspace for VTGateV3 queries.
+  (https://github.com/youtube/vitess/pull/1725,
+  https://github.com/youtube/vitess/pull/1727,
+  https://github.com/youtube/vitess/pull/1738)
+  - Similar to the concept of a default database for a MySQL client connection.
+
+### SQL Support
+- [Preserve case of column names](https://github.com/youtube/vitess/pull/1688) in query result field info.
+- [Preserve trailing comments](https://github.com/youtube/vitess/pull/1692) in queries rewritten by VTGateV3.
+- Support [string-based hash vindexes](https://github.com/youtube/vitess/blob/master/go/vt/vtgate/vindexes/unicodeloosemd5.go)
+  - Previously, the value to hash had to be numeric or binary.
+
+### Management
+- Hide `VtTablet*` and `VtGate*` commands behind a flag in vtctl/vtctld
+  (https://github.com/youtube/vitess/pull/1700).
+  - These commands are mostly meant for development, and should usually not be
+    allowed in production.
+  - Launch `vtctld` with the `-enable_queries` flag to allow these commands.
+- [Restart replication automatically](https://github.com/youtube/vitess/pull/1695)
+  if a tablet is restarted (e.g. as part of a Vitess upgrade).
+- Optionally allow the use of [insecure caller ID](https://github.com/youtube/vitess/pull/1737).
+- It's no longer required to set a ""sharding column name"" when using VTGateV3.
+  - i.e. no more `vtctl SetKeyspaceShardingInfo` when using VTGateV3.
+
+### Schema and VSchema
+- [VSchema config format changed](https://github.com/youtube/vitess/pull/1708)
+  - Some fields have been renamed for consistency.
+- VSchema updates are now denormalized into per-cell records.
+  (https://github.com/youtube/vitess/pull/1750)
+  - No longer need to restart VTGate to pick up VSchema for new/removed
+    keyspaces.
+  - VSchema is still available if global topology goes down.
+  - It's now possible to atomically move tables between keyspaces, for example
+    when doing a vertical split.
+  - **NOTE:** Even if you don't use VSchema, it's now required to run
+    [RebuildVSchemaGraph](http://vitess.io/reference/vtctl.html#rebuildvschemagraph)
+    to initialize these records for a new keyspace.
+- Schema changes are tested as a group, rather than individually.
+  (https://github.com/youtube/vitess/pull/1749)
+  - This allows batches of schema changes that depend on one another (#1731).
+
+### Interoperability
+- [Support MySQL 5.7](https://github.com/youtube/vitess/pull/1712)
+- [Orchestrator Integration](https://github.com/youtube/vitess/pull/1626)
+  - Along with some patches contributed to Orchestrator, these new Vitess
+    features allow the two systems to work together automatically.
+    We'll be updating the documentation soon to show how to use it.
+
+### Code Cleanup
+- Remove deprecated ""serving graph"" system, which had already been replaced by
+  streaming health checks.
+  - https://github.com/youtube/vitess/pull/1679,
+    https://github.com/youtube/vitess/pull/1683,
+    https://github.com/youtube/vitess/pull/1685,
+    https://github.com/youtube/vitess/pull/1698,
+    https://github.com/youtube/vitess/pull/1699,
+    https://github.com/youtube/vitess/pull/1706
+- [Remove deprecated rowcache](https://github.com/youtube/vitess/pull/1742)
+  - This will be replaced by a caching scheme that makes sense for both VTGateV2
+    and VTGateV3.
+- [Remove deprecated -target_tablet_type flag](https://github.com/youtube/vitess/pull/1752)
+  - Use `-init_tablet_type` instead.
+",https://api.github.com/users/enisoc,6733629,enisoc,https://api.github.com/repos/youtube/vitess/releases/3394652/assets,https://api.github.com/repos/youtube/vitess/releases/3394652,master,https://api.github.com/repos/youtube/vitess/tarball/v2.0.0-rc.1,https://github.com/youtube/vitess/releases/tag/v2.0.0-rc.1,https://api.github.com/repos/youtube/vitess/zipball/v2.0.0-rc.1,v2.0.0-rc.1,False,True
+3031627,2016-04-15T20:54:26Z,2016-04-15T21:18:39Z,Vitess v2.0.0-beta.2,"## Changes since v2.0.0-beta.1
+
+### Client Libraries
+- [JDBC-compatible wrapper](https://github.com/youtube/vitess/pull/1558)
+  - Contributed by [Flipkart](http://www.flipkart.com/)
+  - See [JDBC Example](https://github.com/youtube/vitess/blob/master/java/example/src/main/java/com/youtube/vitess/example/VitessJDBCExample.java)
+- Update Java client to better match semantics of JDBC ResultSet
+  - [columnIndex now starts at 1](https://github.com/youtube/vitess/pull/1565)
+  - [columnLabel is now case-insensitive](https://github.com/youtube/vitess/pull/1572)
+- [Java: Synchronous client wrapper](https://github.com/youtube/vitess/pull/1566)
+  - To simplify and enforce proper usage of Java client in blocking mode.
+- [Java: Support more bind variable types](https://github.com/youtube/vitess/pull/1495)
+- [Python: Always use colon style for bind variables](https://github.com/youtube/vitess/pull/1548/commits/d43aa489a6a742edd9958f7be251294aba28ec1e)
+  - Removes extra translation layer for `%` formatting from Python client.
+  - This makes the bind variable style consistent across all Vitess clients.
+  - See [local example client](https://github.com/youtube/vitess/pull/1548/commits/f37b45347ee69058320f5fcb59f25a89ef06b3e0) changes
+
+### SQL Support
+- [Phase 2 of VTGate V3 API](https://github.com/youtube/vitess/pull/1492)
+  - Can now route more complex queries.
+  - Can perform cross-shard joins.
+  - See [phase 2 of V3 design](https://github.com/youtube/vitess/blob/7c99fbe83f002ef9fce1ac143112945447eaa05a/doc/V3HighLevelDesign.md#next-phase-support-more-queries) for what is now supported.
+- [Cross-shard sequences](https://github.com/youtube/vitess/pull/1579)
+  - Note that [NEXT is now a reserved word](https://github.com/youtube/vitess/pull/1591/commits/0bef83fb4767705b44c7871c9514689005b0b790), and must be back-quoted if used as a column name.
+- [Support INTERVAL construct](https://github.com/youtube/vitess/pull/1591)
+- [Support keyspace-qualified names](https://github.com/youtube/vitess/pull/1603)
+  - i.e. `SELECT * FROM keyspace.table`, analogous to `db.table` outside Vitess.
+- [Support STRAIGHT_JOIN and UNION DISTINCT SELECT](https://github.com/youtube/vitess/pull/1630)
+
+### Resharding
+- [Support merging shards](https://github.com/youtube/vitess/pull/1635)
+- [Support resharding tables with no keyspace_id column](https://github.com/youtube/vitess/pull/1634)
+  - As long as there is a VSchema that allows Vitess to compute the keyspace_id.
+- [SplitDiff: support custom sharding column name](https://github.com/youtube/vitess/pull/1588)
+
+### Deployment and Management
+- [Configure SSL and authentication for gRPC](https://github.com/youtube/vitess/pull/1616)
+  - See [Transport Security Model](http://vitess.io/user-guide/transport-security-model.html) docs.
+- [VTGate watches for VSchema updates and refreshes automatically](https://github.com/youtube/vitess/pull/1624)
+- [V3: Allow duplicate table names in vschema](https://github.com/youtube/vitess/pull/1606)
+  - As long as they're in different keyspaces.
+- V3: Simplify VSchema
+  - [Remove the Class concept](https://github.com/youtube/vitess/pull/1614)
+  - [VSchema is now per-keyspace](https://github.com/youtube/vitess/pull/1615)
+- [Removed deprecated gorpc-based protocols](https://github.com/youtube/vitess/pull/1574)
+  - All protocols are now based on [gRPC](http://grpc.io).
+- [Ceph Backup Storage Plugin](https://github.com/youtube/vitess/pull/1629)
+  - Contributed by [Flipkart](http://www.flipkart.com/)
+
+### Build Dependencies
+- [Pre-built Docker images for Percona Server](https://github.com/youtube/vitess/pull/1547)
+- [We now depend on Go 1.5+ for native vendoring](https://github.com/youtube/vitess/pull/1625)
+
+### Analysis
+- [Pre-scan algorithm for MapReduce/Hadoop query splitting](https://github.com/youtube/vitess/pull/1545)
+",https://api.github.com/users/enisoc,6733629,enisoc,https://api.github.com/repos/youtube/vitess/releases/3031627/assets,https://api.github.com/repos/youtube/vitess/releases/3031627,master,https://api.github.com/repos/youtube/vitess/tarball/v2.0.0-beta.2,https://github.com/youtube/vitess/releases/tag/v2.0.0-beta.2,https://api.github.com/repos/youtube/vitess/zipball/v2.0.0-beta.2,v2.0.0-beta.2,False,True
+2739705,2016-03-03T20:57:58Z,2016-03-03T21:21:44Z,Vitess v2.0.0-beta.1,"## Changes since v2.0.0-alpha5
+
+### Client Libraries
+- [VTGateV3 Go driver](https://godoc.org/github.com/youtube/vitess/go/vt/vitessdriver)
+  can now also [support certain types of VTGateV2 queries](https://github.com/youtube/vitess/pull/1376)
+- [Publish PHP client to Packagist](https://github.com/youtube/vitess/issues/1438)
+- [Refactor PHP client for better standards compliance](https://github.com/youtube/vitess/pull/1457)
+- [PHP client returns associative array rows](https://github.com/youtube/vitess/pull/1464)
+- [Java client is asynchronous by default](https://github.com/youtube/vitess/pull/1511)
+- [Java client now returns 0 when converting SQL NULL to primitive types](https://github.com/youtube/vitess/pull/1461)
+- [Python client now defaults to gRPC](https://github.com/youtube/vitess/pull/1484)
+- More sample clients for [examples/local](https://github.com/youtube/vitess/tree/master/examples/local)
+  - In addition to [Python](https://github.com/youtube/vitess/blob/master/examples/local/client.py),
+    there are now sample clients for [Go](https://github.com/youtube/vitess/blob/master/examples/local/client.go),
+    [PHP](https://github.com/youtube/vitess/blob/master/examples/local/client.php),
+    and [Java](https://github.com/youtube/vitess/blob/master/java/example/src/main/java/com/youtube/vitess/example/VitessClientExample.java).
+
+### Query Service
+- [query.proto revamp](https://github.com/youtube/vitess/pull/1251)
+  - Fix NULL handling in new proto3-based query result format.
+  - Unify type system for bind variables and query results.
+- [query_rules improvements](https://github.com/youtube/vitess/pull/1265)
+  - Improved JSON syntax for bindvar constraints.
+  - Debug URL for viewing rule sets.
+- [Support REGEXP and RLIKE](https://github.com/youtube/vitess/pull/1355) in
+  SQL parser
+
+### Build Dependencies
+- Default [ZooKeeper version upgraded](https://github.com/youtube/vitess/pull/1274)
+  from 3.3.5 to 3.4.6.
+- [Update to gRPC 0.13](https://github.com/youtube/vitess/pull/1528)
+- [Support building on OS X](https://github.com/youtube/vitess/pull/1428)
+
+### Deployment and Management
+- [Add vtctld server to vtcombo](https://github.com/youtube/vitess/pull/1381)
+- [Kubernetes config updates](https://github.com/youtube/vitess/pull/1268)
+  - Use [Kubernetes DNS](http://kubernetes.io/v1.1/docs/admin/dns.html) for service discovery
+    and etcd bootstrap.
+  - Kubernetes example for MySQL 5.6.
+  - Use Kubernetes proxy to link from vtctld to vttablet status pages.
+- [Make MySQL users and privileges configurable](https://github.com/youtube/vitess/pull/1302)
+  when bootstrapping MySQL data directory.
+  - Uses `mysql_install_db` and [init_db.sql](https://github.com/youtube/vitess/blob/master/config/init_db.sql)
+    instead of extracting the old `mysql-db-dir.tbz` archive.
+- [Support semi-sync without async fallback](https://github.com/youtube/vitess/pull/1521)
+- [Remove old vtctld UI files](https://github.com/youtube/vitess/pull/1314)
+  - Deployments no longer need to include `go/cmd/vtctld/templates` folder or
+    set `-templates` flag on vtctld.
+- Add option to [bypass sanity check in ApplySchema](https://github.com/youtube/vitess/pull/1414)
+- [Print human-readable tables for CLI queries](https://github.com/youtube/vitess/pull/1523)
+  - e.g. for `ExecuteFetchAsDba`
+",https://api.github.com/users/enisoc,6733629,enisoc,https://api.github.com/repos/youtube/vitess/releases/2739705/assets,https://api.github.com/repos/youtube/vitess/releases/2739705,master,https://api.github.com/repos/youtube/vitess/tarball/v2.0.0-beta.1,https://github.com/youtube/vitess/releases/tag/v2.0.0-beta.1,https://api.github.com/repos/youtube/vitess/zipball/v2.0.0-beta.1,v2.0.0-beta.1,False,True
+2012490,2015-10-23T21:27:03Z,2015-10-24T05:19:30Z,Vitess v2.0.0-alpha5,"## Changes since v2.0.0-alpha4
+- New [built-in backup](http://vitess.io/user-guide/backup-and-restore.html)
+  plugin to store backups in [Google Cloud Storage](https://cloud.google.com/storage/).
+  - See the [Vitess on Kubernetes](http://vitess.io/getting-started/) guide for an
+    example of usage.
+- The Vitess [PHP client](https://github.com/youtube/vitess/tree/master/php) now
+  uses [gRPC](http://grpc.io).
+- Vitess [Hadoop connector](https://github.com/youtube/vitess/tree/master/java/hadoop/src/main/java/com/youtube/vitess/hadoop)
+  now uses the new gRPC-based [Java client](https://github.com/youtube/vitess/blob/master/java/client/src/main/java/com/youtube/vitess/client/VTGateConn.java).
+- Self-contained [demo](https://github.com/youtube/vitess/blob/master/examples/demo/run.py)
+  for [VTGate V3](http://vitess.io/doc/VTGateV3/), which is a preview feature as
+  of Vitess 2.0.
+- The vtctlclient-to-vtctld protocol now defaults to gRPC.
+",https://api.github.com/users/enisoc,6733629,enisoc,https://api.github.com/repos/youtube/vitess/releases/2012490/assets,https://api.github.com/repos/youtube/vitess/releases/2012490,master,https://api.github.com/repos/youtube/vitess/tarball/v2.0.0-alpha5,https://github.com/youtube/vitess/releases/tag/v2.0.0-alpha5,https://api.github.com/repos/youtube/vitess/zipball/v2.0.0-alpha5,v2.0.0-alpha5,False,True
+1921635,2015-10-07T01:45:39Z,2015-10-07T02:07:24Z,Vitess v2.0.0-alpha4,"## Changes since v2.0.0-alpha3
+- Fixes for ""bad node version"" error when using etcd. (#1176, #1184)
+- [Java client](https://github.com/youtube/vitess/blob/master/java/client/src/main/java/com/youtube/vitess/client/VTGateConn.java) is now feature-complete.
+  - The last piece was our new canonical error code translation.
+",https://api.github.com/users/enisoc,6733629,enisoc,https://api.github.com/repos/youtube/vitess/releases/1921635/assets,https://api.github.com/repos/youtube/vitess/releases/1921635,master,https://api.github.com/repos/youtube/vitess/tarball/v2.0.0-alpha4,https://github.com/youtube/vitess/releases/tag/v2.0.0-alpha4,https://api.github.com/repos/youtube/vitess/zipball/v2.0.0-alpha4,v2.0.0-alpha4,False,True
+1907015,2015-10-03T20:53:15Z,2015-10-03T21:02:26Z,Vitess v2.0.0-alpha3,"## Changes since v2.0.0-alpha2
+- Better PEP 0249 compliance in Python client.
+- Type-checking result cursor for Java client.
+- VTGate automatically adds annotations for filtered replication.
+- All RPC protocols are now off by default, and must be explicitly enabled with the -service_map flag.
+  - Previously the BSON protocols were enabled by default, and had to be explicitly disabled in -service_map if unwanted.
+- SQL is now consistently represented as a UTF-8 string.
+  - Previously it was represented in some places as a byte array.
+- Update to gRPC beta.
+",https://api.github.com/users/enisoc,6733629,enisoc,https://api.github.com/repos/youtube/vitess/releases/1907015/assets,https://api.github.com/repos/youtube/vitess/releases/1907015,master,https://api.github.com/repos/youtube/vitess/tarball/v2.0.0-alpha3,https://github.com/youtube/vitess/releases/tag/v2.0.0-alpha3,https://api.github.com/repos/youtube/vitess/zipball/v2.0.0-alpha3,v2.0.0-alpha3,False,True
+1738594,2015-08-28T18:44:40Z,2015-08-28T20:07:03Z,Vitess v2.0.0-alpha2,"## Changes since v2.0.0-alpha1
+- Fix for breaking API change in grpc-go (https://github.com/youtube/vitess/pull/1052).
+",https://api.github.com/users/enisoc,6733629,enisoc,https://api.github.com/repos/youtube/vitess/releases/1738594/assets,https://api.github.com/repos/youtube/vitess/releases/1738594,master,https://api.github.com/repos/youtube/vitess/tarball/v2.0.0-alpha2,https://github.com/youtube/vitess/releases/tag/v2.0.0-alpha2,https://api.github.com/repos/youtube/vitess/zipball/v2.0.0-alpha2,v2.0.0-alpha2,False,True
+1721781,2015-08-25T17:34:49Z,2015-08-25T20:17:31Z,Vitess v2.0.0-alpha1,"This is the first alpha cut for the 2.0.0 release.
+
+## Changes since 1.0
+- In addition to the [manual deployment](http://vitess.io/getting-started/local-instance.html)
+  option, Vitess can now be scaled dynamically in any cloud platform supported
+  by [Kubernetes](http://kubernetes.io/), including
+  [Google Container Engine](https://cloud.google.com/container-engine/) and
+  [AWS](http://kubernetes.io/v1.0/docs/getting-started-guides/aws.html).
+  - [Getting Started on Kubernetes](http://vitess.io/getting-started/)
+  - [Dynamic Resharding in Kubernetes](http://vitess.io/user-guide/sharding-kubernetes.html)
+- Docker images available for both manual and cloud deployments:
+  - [Automated Builds](https://hub.docker.com/r/vitess/base/tags/)
+  - [Lightweight Builds](https://hub.docker.com/r/vitess/lite/tags/)
+- Official client libraries for:
+  - [Java](https://github.com/youtube/vitess/blob/v2.0.0-alpha1/java/client/src/main/java/com/youtube/vitess/client/VTGateConn.java)
+  - [Python](https://github.com/youtube/vitess/blob/v2.0.0-alpha1/py/vtdb/vtgatev2.py)
+  - [PHP](https://github.com/youtube/vitess/tree/v2.0.0-alpha1/php)
+  - [Go](http://godoc.org/github.com/youtube/vitess/go/vt/vtgate/vtgateconn)
+  - _NOTE: Error handling is still being refactored as of alpha1._
+- Using new [gRPC](http://www.grpc.io/) framework built on HTTP/2.
+  - For Vitess server-to-server communication.
+  - For Java and Go client communication.
+- Underlying DB nodes can run either:
+  - MariaDB 10.0, or
+  - MySQL 5.6
+- Consistent datastore used for cluster management can be:
+  - etcd 2.0
+  - ZooKeeper
+  - _Pluggable interface available for adding more._
+- New responsive admin dashboard (on [vtctld](http://vitess.io/overview/#vtctld)).
+  - Client-side AngularJS app with Material Design.
+- Built-in [Backup/Restore](http://vitess.io/user-guide/backup-and-restore.html)
+  for disaster recovery and provisioning.
+  - New replica instances automatically restore from latest backup, and then
+    catch up to master.
+  - Queries from the app are automatically routed only to healthy, caught-up
+    replicas.
+  - Restore mechanism is routinely exercised as part of normal provisioning,
+    so you know it'll work when you really need it.
+  - _NOTE: Currently this requires a network mount. We plan to add plugins for
+    direct access to blob stores like Google Cloud Storage and Amazon S3._
+- Streaming, filtered data copy for [transparent dynamic resharding](http://vitess.io/user-guide/sharding.html#resharding).
+  - Resharding now requires no additional disk space on the source machine,
+    so it works even when existing data fills up more than half of the largest
+    available node size.
+- GTID-based MySQL failovers (also known as [reparenting](http://vitess.io/user-guide/reparenting.html))
+  allow old masters to be seamlessly reparented back into the replication stream
+  as replicas.
+  - This makes failover a routine, automated operation, allowing downtime-free
+    workflows such as:
+    - Reparent to another replica.
+    - Upgrade the old master by restarting it.
+    - Reparent to upgraded master.
+    - Upgrade remaining replicas one at a time.
+",https://api.github.com/users/enisoc,6733629,enisoc,https://api.github.com/repos/youtube/vitess/releases/1721781/assets,https://api.github.com/repos/youtube/vitess/releases/1721781,master,https://api.github.com/repos/youtube/vitess/tarball/v2.0.0-alpha1,https://github.com/youtube/vitess/releases/tag/v2.0.0-alpha1,https://api.github.com/repos/youtube/vitess/zipball/v2.0.0-alpha1,v2.0.0-alpha1,False,True

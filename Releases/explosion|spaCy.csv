@@ -1,0 +1,636 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7132246,2017-07-22T14:20:19Z,2017-07-22T16:28:50Z,"v1.9.0: Spanish model, alpha support for Norwegian & Japanese, and bug fixes","**Thanks to all of you for 5,000 stars on GitHub, the valuable feedback in the user survey and testing [spaCy v2.0 alpha](https://alpha.spacy.io/docs/usage/v2).** We're working hard on getting the new version ready and can't wait to release it. In the meantime, here's a new release for the 1.x branch that fixes a variety of outstanding bugs and adds capabilities for new languages.
+
+💌 **P.S.:** If you haven't gotten your hands on a [set of spaCy stickers yet](https://twitter.com/i/moments/888736232112574464), you can still do so – send us a DM with your address on Twitter or Gitter, and we'll mail you some!
+
+
+---
+
+## ✨ Major features and improvements
+
+* **NEW:** The first [official Spanish model](https://github.com/explosion/spacy-models/releases/tag/es_core_web_md-1.0.0) (377 MB) including vocab, syntax, entities and word vectors. Thanks to the amazing folks at [recogn.ai](http://recogn.ai) for the collaboration!
+
+```bash
+python -m spacy download es
+```
+
+```python
+nlp = spacy.load('es')
+doc = nlp(u'Esto es una frase.')
+```
+
+* **NEW:** Alpha tokenization for [Norwegian Bokmål](spacy/nb) and [Japanese](spacy/jp) (via [Janome](https://github.com/mocobeta/janome)).
+* **NEW:** Allow dropout training for `Parser` and `EntityRecognizer`, using the `drop` keyword argument to the `update()` method.
+* **NEW:** Glossary for POS, dependency and NER annotation scheme via `spacy.explain()`. For example, `spacy.explain('NORP')` will return ""Nationalities or religious or political groups"".
+* Improve language data for [Dutch](spacy/nl), [French](spacy/fr) and [Spanish](spacy/es).
+* Add `Language.parse_tree` method to generate POS tree for all sentences in a `Doc`.
+
+
+## 🔴 Bug fixes
+
+* Fix issue #1031: Close gaps in `Lexeme` API.
+* Fix issue #1034: Add annotation scheme glossary and `spacy.explain()`.
+* Fix issue #1051: Improved error messaging when trying to load non-existing model.
+* Fix issue #1052: Add missing `SP` symbol to tag map.
+* Fix issue #1061: Add `flush_cache` method to tokenizer.
+* Fix issue #1069: Fix `Doc.sents` iterator when customised with generator.
+* Fix issue ##1099, #1143: Improve documentation on models in `requirements.txt`.
+* Fix issue #1137: Use lower min version for `requests` dependency.
+* Fix issue #1207: Fix `Span.noun_chunks`.
+* Fix issue with `six` and its dependencies that occasionally caused spaCy to fail.
+* Fix typo in `package` command that caused error when printing error messages.
+
+## 📖 Documentation and examples
+
+* Fix various typos and inconsistencies.
+* **NEW:** [spaCy 101 guide](https://alpha.spacy.io/docs/usage/spacy-101) for v2.0: all important concepts, explained with examples and illustrations. Note that some of the behaviour and examples are specific to v2.0+ – but the NLP basics are relevant independent of the spaCy version you're using.
+
+## 👥 Contributors
+
+Thanks to @kengz, @luvogels, @Ferdous-Al-Imran, @uetchy, @akYoung, @pasupulaphani, @dvsrepo, @raphael0202, @yuvalpinter, @frascuchon, @kootenpv, @oroszgy, @bartbroere, @ianmobbs, @garfieldnate, @polm, @callumkift, @swierh, @val314159, @lgenerknol and @jsparedes for the contributions!",https://api.github.com/users/ines,13643239,ines,https://api.github.com/repos/explosion/spaCy/releases/7132246/assets,https://api.github.com/repos/explosion/spaCy/releases/7132246,master,https://api.github.com/repos/explosion/spaCy/tarball/v1.9.0,https://github.com/explosion/spaCy/releases/tag/v1.9.0,https://api.github.com/repos/explosion/spaCy/zipball/v1.9.0,v1.9.0,False,False
+6526881,2017-06-05T18:41:30Z,2017-06-05T19:05:12Z,"v2.0.0 alpha: Neural network model (42 MB), GPU, Pickle, better training & lots of API improvements","### [![PyPi](https://img.shields.io/pypi/v/spacy-nightly.svg?style=flat-square)](https://pypi.python.org/pypi/spacy-nightly) **Last update:** `2.0.0a17`, 2017-10-13
+
+**This is an alpha pre-release of spaCy v2.0.0 and available on pip as `spacy-nightly`. It's not intended for production use. The alpha documentation is available at [alpha.spacy.io](https://alpha.spacy.io/docs). Please note that the docs reflect the library's intended state on release, not the current state of the implementation. For bug reports, feedback and questions, see the [spaCy v2.0.0 alpha thread](https://github.com/explosion/spacy/issues/1105).**
+
+Before installing v2.0.0 alpha, we recommend setting up a clean environment.
+
+```bash
+pip install spacy-nightly
+```
+
+[The models](https://github.com/explosion/spacy-models/releases) are still under development and will keep improving. For more details, see the benchmarks below. There will also be additional models for German, French and Spanish.
+
+| Name | Lang | Capabilities | Size | spaCy | Info |
+| --- | --- | --- | ---: | --- | :---: |
+| `en_core_web_sm-2.0.0a4` | en | Parser, Tagger, NER | 42MB | `>=2.0.0a14` | [ℹ️](https://github.com/explosion/spacy-models/releases/en_core_web_sm-2.0.0-alpha4) |
+| `en_vectors_web_lg-2.0.0a0` | en | Vectors ([GloVe](https://nlp.stanford.edu/projects/glove/)) | 627MB |  `>=2.0.0a10` | [ℹ️](https://github.com/explosion/spacy-models/releases/en_vectors_web_lg-2.0.0-alpha) |
+| `xx_ent_wiki_sm-2.0.0a0` | multi | NER | 12MB | `<=2.0.0a9` | [ℹ️](https://github.com/explosion/spacy-models/releases/xx_ent_wiki_sm-2.0.0-alpha) |
+
+You can download a model by using its name or shortcut. To load a model, use spaCy's loader, e.g. `nlp = spacy.load('en_core_web_sm') `, or import it as a module (`import en_core_web_sm`) and call its `load()` method, e.g `nlp = en_core_web_sm.load()`.
+
+```bash
+python -m spacy download en_core_web_sm
+```
+
+## 📈 Benchmarks
+
+The evaluation was conducted on raw text with no gold standard information. Speed and accuracy are currently comparable to the v1.x models: speed on CPU is slightly lower, while accuracy is slightly higher. We expect performance to improve quickly between now and the release date, as we run more experiments and optimise the implementation.
+
+| Model | spaCy | Type | UAS | LAS | NER F | POS | Words/s |
+| --- | ---: | :---: | ---: | ---: | ---: | ---: | ---: |
+| `en_core_web_sm-2.0.0a4` | v2.x | neural | **91.9** | **90.0** | 85.0 | **97.1** | 10,000 |
+| `en_core_web_sm-2.0.0a3` | v2.x | neural | 91.2 | 89.2 | **85.3** | 96.9 | 10,000 |
+| `en_core_web_sm-2.0.0a2` | v2.x | neural | 91.5 | 89.5 | 84.7 | 96.9 | 10,000 |
+| `en_core_web_sm-1.1.0` | v1.x | linear | 86.6 | 83.8	| 78.5 | 96.6 | **25,700** |
+| `en_core_web_md-1.2.1` | v1.x | linear | 90.6 | 88.5 | 81.4 | 96.7 | 18,800 |
+
+## ✨ Major features and improvements
+
+* **NEW:** Neural network model for English (comparable performance to the >1GB v1.x models) and multi-language NER (still experimental).
+* **NEW:** GPU support via [Chainer](http://chainer.org)'s CuPy module.
+* **NEW:** Strings are now resolved to hash values, instead of mapped to integer IDs. This means that the string-to-int mapping no longer depends on the vocabulary state.
+* **NEW:** Trainable document vectors and contextual similarity via convolutional neural networks.
+* **NEW:** Built-in text classification component.
+* **NEW:** Built-in displaCy visualizers with Jupyter notebook support.
+* **NEW:** Alpha tokenization for [Danish](spacy/lang/da), [Polish](spacy/lang/pl) and [Indonesian](spacy/lang/id).
+* Improved language data, support for lazy loading and simple, lookup-based lemmatization for English, German, French, Spanish, Italian, Hungarian, Portuguese and Swedish.
+* Improved language processing pipelines and support for custom, model-specific components.
+* Improved and consistent saving, loading and serialization across objects, plus Pickle support.
+* Revised matcher API to make it easier to add and manage patterns and callbacks in one step.
+* Support for multi-language models and new `MultiLanguage` class (`xx`).
+* Entry point for `spacy` command to use instead of `python -m spacy`.
+
+> ### 🚧 Work in progress (not yet implemented)
+> * **NEW:** Neural network models for German, French and Spanish.
+> * **NEW:** `Binder`, a container class for serializing collections of `Doc` objects.
+
+## 🔴 Bug fixes
+
+* Fix issue #125, #228, #299, #377, #460, #606, #930: Add full Pickle support.
+* Fix issue #152, #264, #322, #343, #437, #514, #636, #785, #927, #985, #992, #1011: Fix and improve serialization and deserialization of `Doc` objects. 
+* Fix issue #512: Improve parser to prevent it from returning two `ROOT` objects.
+* Fix issue #524: Improve parser and handling of noun chunks.
+* Fix issue #621: Prevent double spaces from changing the parser result.
+* Fix issue #664, #999, #1026: Fix bugs that would prevent loading trained NER models.
+* Fix issue #671, #809, #856: Fix importing and loading of word vectors. 
+* Fix issue #753: Resolve bug that would tag OOV items as personal pronouns.
+* Fix issue #905, #1021, #1042: Improve parsing model and allow faster accuracy updates.
+* Fix issue #995: Improve punctuation rules for Hebrew and other non-latin languages.
+* Fix issue #1008: `train` command finally works correctly if used without `dev_data`.
+* Fix issue #1012: Improve documentation on model saving and loading.
+* Fix issue #1043: Improve NER models and allow faster accuracy updates.
+* Fix issue #1051: Improve error messages if functionality needs a model to be installed.
+* Fix issue #1071: Correct typo of ""whereve"" in English tokenizer exceptions.
+* Fix issue #1088: Emoji are now split into separate tokens wherever possible.
+
+> ### 🚧 Work in progress (not yet implemented)
+> * Fix issue #519, #611, #725: Retrain German model with better tokenized input.
+> * Fix issue #933, #954, #977, #1040: Improve accuracy and update [online demos](https://demos.explosion.ai).
+> * Fix issue #1044: Fix bugs in French model and improve performance.
+
+
+## 📖 Documentation and examples
+
+* **NEW:** [spacy 101 guide](https://alpha.spacy.io/docs/usage/spacy-101) with simple explanations and illustrations of the most important concepts and an overview of spaCy's features and capabilities.
+* **NEW:** [Visualizing spaCy](https://alpha.spacy.io/docs/usage/visualizers) guide on how to use the built-in [`displacy`](https://alpha.spacy.io/docs/api/displacy) module.
+* **NEW:** API docs for [top-level functions](https://alpha.spacy.io/docs/api/spacy), [`spacy.displacy`](https://alpha.spacy.io/docs/api/displacy), [`spacy.util`](https://alpha.spacy.io/docs/api/util), [`spacy.gold.GoldCorpus`](https://alpha.spacy.io/docs/api/goldcorpus).
+* **NEW:** Full code example for [text classification](examples/training/train_textcat.py) (sentiment analysis).
+* Improved [rule-based matching](https://alpha.spacy.io/docs/usage/rule-based-matching) guide with examples for matching entities and phone numbers, and social media analysis.
+* Improved [processing pipelines](https://alpha.spacy.io/docs/usage/language-processing-pipeline) guide with examples for custom sentence segmentation logic and hooking in a sentiment analysis model.
+* Re-wrote all API and usage docs and added more examples.
+
+> ### 🚧 Work in progress (not yet implemented)
+> * **NEW:** Usage guide on [scaling spaCy for production](https://alpha.spacy.io/docs/usage/production-use).
+> * **NEW:** Usage guide on [text classification](https://alpha.spacy.io/docs/usage/text-classification).
+> * **NEW:** API docs for [`spacy.pipeline.TextCategorizer`](https://alpha.spacy.io/docs/api/textcategorizer), [`spacy.pipeline.Tensorizer`](https://alpha.spacy.io/docs/api/tensorizer), [`spacy.tokens.binder.Binder`](https://alpha.spacy.io/docs/api/binder) and [`spacy.vectors.Vectors`](https://alpha.spacy.io/docs/api/vectors).
+> * Improved  [training](https://alpha.spacy.io/docs/usage/training), [NER training](https://alpha.spacy.io/docs/usage/training-ner) and [deep learning](https://alpha.spacy.io/docs/usage/deep-learning) usage guides with examples.
+
+## ⚠️ Backwards incompatibilities
+
+**Note that the old v1.x models are not compatible with spaCy v2.0.0.** If you've trained your own models, you'll have to **re-train them** to be able to use them with the new version. For a full overview of changes in v2.0, see the [alpha documentation](https://alpha.spacy.io/docs/usage/v2) and guide on [migrating from spaCy 1.x](https://alpha.spacy.io/docs/usage/v2#migrating).
+
+### Loading models
+
+[`spacy.load()`](https://alpha.spacy.io/docs/api/spacy) is now **only intended for loading models** – if you need an empty language class, import it directly instead, e.g. `from spacy.lang.en import English`. If the model you're loading is a shortcut link or package name, spaCy will expect it to be a **model package**, import it and call its `load()` method. If you supply a path, spaCy will expect it to be a **model data directory** and use the meta.json to initialise a language class and call `nlp.from_disk()` with the data path.
+
+```python
+nlp = spacy.load('en')
+nlp = spacy.load('en_core_web_sm')
+nlp = spacy.load('/model-data')
+nlp = English().from.disk('/model-data')
+# OLD: nlp = spacy.load('en', path='/model-data')
+```
+
+### Hash values instead of integer IDs
+
+The `StringStore` now resolves all strings to hash values instead of integer IDs. This means that the string-to-int mapping **no longer depends on the vocabulary state**, making a lot of workflows much simpler, especially during training. However, you still need to make sure all objects have access to the same `Vocab`. Otherwise, spaCy won't be able to resolve hashes back to their string values.
+
+```python
+nlp.vocab.strings[u'coffee']       # 3197928453018144401
+other_nlp.vocab.strings[u'coffee'] # 3197928453018144401
+```
+
+### Serialization
+
+spaCy's [serialization API](https://alpha.spacy.io/docs/usage/saving-loading) is now consistent across objects. All containers and pipeline components have `.to_disk()`, `.from_disk()`, `.to_bytes()` and `.from_bytes()` methods.
+ 
+```python
+nlp.to_disk('/model')
+nlp.vocab.to_disk('/vocab')
+# OLD: nlp.save_to_directory('/model')
+```
+
+### Processing pipelines
+
+Models can now define their own [processing pipelines](https://alpha.spacy.io/docs/usage/language-processing-pipeline) as a list of strings, mapping to component names. Components receive a `Doc`, modify it and return it to be processed by the next component in the pipeline. You can add custom components to `nlp.pipeline`, and disable components by adding their name to the `disable` keyword argument. The tokenizer can simply be overwritten with a custom function.
+
+```python
+nlp = spacy.load('en', disable=['tagger', 'ner'])
+nlp.tokenizer = my_custom_tokenizer
+nlp.pipeline.append(my_custom_component)
+doc = nlp(u""I don't want parsed"", disable=['parser'])
+```
+
+### Comparison table
+
+For the complete table and more details, see the alpha guide on [what's new in v2.0](https://alpha.spacy.io/docs/usage/v2).
+
+| Old | New | Notes |
+| --- | --- | -- |
+| `spacy.en`, `spacy.de`, ... | `spacy.lang.en`, ... | Language data moved to `lang`. |
+| `.save_to_directory`, `.dump`, `.dump_vectors` | `.to_disk `, `to_bytes` | Consistent serialization. |
+| `.load`, `.load_lexemes`, `.load_vectors`, `.load_vectors_from_bin_loc` | `.from_disk`, `.from_bytes` |  Consistent serialization. |
+| `Language.create_make_doc` | `Language.tokenizer` | Tokenizer can now be replaced via `nlp.tokenizer`. |
+| `Matcher.add_pattern`, `Matcher.add_entity` | `Matcher.add` | Simplified API. |
+| `Matcher.get_entity`, `Matcher.has_entity` | `Matcher.get`, `Matcher.__contains__` | Simplified API. |
+| `Doc.read_bytes` | `Binder` | Consistent API. |
+| `Token.is_ancestor_of` | `Token.is_ancestor ` | Duplicate method. |
+
+## 👥 Contributors
+
+This release is brought to you by @honnibal and @ines. Thanks to @Gregory-Howard, @luvogels, @Ferdous-Al-Imran, @uetchy, @akYoung, @kengz, @raphael0202, @ardeego, @yuvalpinter, @dvsrepo, @frascuchon, @oroszgy, @v3t3a, @Tpt, @thinline72, @jarle, @jimregan, @nkruglikov, @delirious-lettuce and @geovedi for the pull requests and contributions. Also thanks to everyone who submitted bug reports and took the [spaCy user survey](https://survey.spacy.io) – your feedback made a big difference!",https://api.github.com/users/honnibal,8059750,honnibal,https://api.github.com/repos/explosion/spaCy/releases/6526881/assets,https://api.github.com/repos/explosion/spaCy/releases/6526881,develop,https://api.github.com/repos/explosion/spaCy/tarball/v2.0.0-alpha,https://github.com/explosion/spaCy/releases/tag/v2.0.0-alpha,https://api.github.com/repos/explosion/spaCy/zipball/v2.0.0-alpha,v2.0.0-alpha,False,True
+6198187,2017-04-26T18:50:27Z,2017-04-26T18:51:24Z,v1.8.2: French model and small improvements,"We've been delighted to see spaCy growing so much over the last few months. Before the v1.0 release, we asked for your feedback, which has been incredibly helpful in improving the library. As we're getting closer to v2.0 we hope you'll take a few minutes to fill out the survey, to help us understand how you're using the library, and how it can be better.
+
+### [📊 Take the survey!](https://survey.spacy.io/)
+
+---
+
+## ✨ Major features and improvements
+
+* Move model shortcuts to [`shortcuts.json`](https://github.com/explosion/spacy-models/blob/master/shortcuts.json) to allow adding new ones without updating spaCy.
+* **NEW:** The first official [French model](https://github.com/explosion/spacy-models/releases/tag/fr_depvec_web_lg-1.0.0) (~1.3 GB) including vocab, syntax and word vectors.
+
+```bash
+python -m spacy download fr_depvec_web_lg
+```
+
+```python
+import fr_depvec_web_lg
+
+nlp = fr_depvec_web_lg.load()
+doc = nlp(u'Parlez-vous Français?')
+```
+
+## 🔴 Bug fixes
+
+* Fix reporting if `train` command is used without `dev_data`.
+* Fix issue #1019: Make `Span` hashable.
+
+## 📖 Documentation and examples
+
+* Update [list of available models](https://spacy.io/docs/usage/models#available) with more information (capabilities, license).
+* Update [adding languages workflow](https://spacy.io/docs/usage/adding-languages) with data examples and details on training.
+* Fix various typos and inconsistencies.
+
+## 👥 Contributors
+
+Thanks to @raphael0202 and @julien-c for the contributions!",https://api.github.com/users/ines,13643239,ines,https://api.github.com/repos/explosion/spaCy/releases/6198187/assets,https://api.github.com/repos/explosion/spaCy/releases/6198187,master,https://api.github.com/repos/explosion/spaCy/tarball/v1.8.2,https://github.com/explosion/spaCy/releases/tag/v1.8.2,https://api.github.com/repos/explosion/spaCy/zipball/v1.8.2,v1.8.2,False,False
+6161468,2017-04-23T19:25:07Z,2017-04-23T20:00:09Z,"v1.8.1: Saving, loading and training bug fixes","We've been delighted to see spaCy growing so much over the last few months. Before the v1.0 release, we asked for your feedback, which has been incredibly helpful in improving the library. As we're getting closer to v2.0 we hope you'll take a few minutes to fill out the survey, to help us understand how you're using the library, and how it can be better.
+
+### [📊 Take the survey!](https://survey.spacy.io/)
+
+---
+
+## 🔴 Bug fixes
+
+* Fix issue #988: Ensure noun chunks can't be nested.
+* Fix issue #991: `convert` command now uses Python 2/3 compatible `json.dumps`.
+* Fix issue #995: Use `regex` library for non-latin characters to simplify [punctuation rules](https://github.com/explosion/spaCy/blob/master/spacy/language_data/punctuation.py).
+* Fix issue #999: Fix parser and NER model saving and loading.
+* Fix issue #1001: Add `SPACE` to Spanish tag map.
+* Fix issue #1008: `train` command now works correctly if used without `dev_data`.
+* Fix issue #1009: `Language.save_to_directory()` now converts strings to pathlib paths.
+
+## 📖 Documentation and examples
+
+* Fix issue #889, #967: Correct typos in lightning tour and [`pos_tag.py`](https://github.com/explosion/spaCy/blob/master/examples/pos_tag.py) examples.
+* Add [`Language.save_to_directory()` method](https://spacy.io/docs/api/language#save_to_directory) to API docs.
+* Fix various typos and inconsistencies.
+
+## 👥 Contributors
+
+Thanks to @dvsrepo, @beneyal and @oroszgy for the pull requests!",https://api.github.com/users/ines,13643239,ines,https://api.github.com/repos/explosion/spaCy/releases/6161468/assets,https://api.github.com/repos/explosion/spaCy/releases/6161468,master,https://api.github.com/repos/explosion/spaCy/tarball/v1.8.1,https://github.com/explosion/spaCy/releases/tag/v1.8.1,https://api.github.com/repos/explosion/spaCy/zipball/v1.8.1,v1.8.1,False,False
+6092014,2017-04-16T21:23:59Z,2017-04-16T21:33:59Z,"v1.8.0: Better NER training, saving and loading","We've been delighted to see spaCy growing so much over the last few months. Before the v1.0 release, we asked for your feedback, which has been incredibly helpful in improving the library. As we're getting closer to v2.0 we hope you'll take a few minutes to fill out the survey, to help us understand how you're using the library, and how it can be better.
+
+### [📊 Take the survey!](https://survey.spacy.io/)
+
+---
+
+## ✨ Major features and improvements
+
+* **NEW:** Add experimental `Language.save_to_directory()` method to make it easier to save user-trained models.
+* Add `spacy.compat` module to handle platform and Python version compatibility.
+* Update `package` command to read from existing `meta.json` and supply custom location to meta file.
+* Fix various compatibility issues and improve error messages in `spacy.cli`.
+
+## 🔴 Bug fixes
+
+* Fix issue #701, #822, #937, #959: Updated docs for [NER training](https://spacy.io/docs/usage/training-ner) and [saving/loading](https://spacy.io/docs/usage/saving-loading).
+* Fix issue #968: `spacy.load()` now prints warning if no model is found.
+* Fix issue #970, #978: Use correct unicode paths for symlinks on Python 2 / Windows.
+* Fix issue #973: Make `token.lemma` and `token.lemma_` attributes writeable.
+* Fix issue #983: Add `spacy.compat` to handle compatibility.
+
+## 📖 Documentation and examples
+
+* **NEW:** Example for [training a new entity type](https://github.com/explosion/spaCy/blob/master/examples/training/train_new_entity_type.py).
+* **NEW:** Workflow for [training the Named Entity Recognizer](https://spacy.io/docs/usage/training-ner).
+* **NEW:** Workflow for [saving and loading models](https://spacy.io/docs/usage/saving-loading).
+* Update [Contributing Guidelines](https://github.com/explosion/spaCy/blob/master/CONTRIBUTING.md) with [code conventions](https://github.com/explosion/spaCy/blob/master/CONTRIBUTING.md#code-conventions) for Python and Cython.
+* Fix various typos and inconsistencies.
+
+## 👥 Contributors
+
+Thanks to @tsohil and @oroszgy for the pull requests!",https://api.github.com/users/ines,13643239,ines,https://api.github.com/repos/explosion/spaCy/releases/6092014/assets,https://api.github.com/repos/explosion/spaCy/releases/6092014,master,https://api.github.com/repos/explosion/spaCy/tarball/v1.8.0,https://github.com/explosion/spaCy/releases/tag/v1.8.0,https://api.github.com/repos/explosion/spaCy/zipball/v1.8.0,v1.8.0,False,False
+6012807,2017-04-07T16:51:48Z,2017-04-07T17:02:06Z,v1.7.5: Bug fixes and new CLI commands,"We've been delighted to see spaCy growing so much over the last few months. Before the v1.0 release, we asked for your feedback, which has been incredibly helpful in improving the library. As we're getting closer to v2.0 we hope you'll take a few minutes to fill out the survey, to help us understand how you're using the library, and how it can be better.
+
+### [📊 Take the survey!](https://survey.spacy.io/)
+
+---
+
+## ✨ Major features and improvements
+
+* **NEW**: Experimental `convert` and `model` [commands](https://spacy.io/docs/usage/cli) to convert files to spaCy's JSON format for training, and initialise a new model and its data directory.
+* Updated language data for [Spanish](spacy/es) and [Portuguese](spacy/pt).
+
+## 🔴 Bug fixes
+
+* Error messages now show the new download commands if no model is loaded.
+* The `package` command now works correctly and doesn't fail when creating files.
+* Fix issue #693: Improve rules for detecting noun chunks.
+* Fix issue #758: Adding labels now doesn't cause `EntityRecognizer` transition bug.
+* Fix issue #862: `label` keyword argument is now handled correctly in `doc.merge()`.
+* Fix issue #891: Tokens containing `/` infixes are now split by the tokenizer.
+* Fix issue #898: Dependencies are now deprojectivized correctly.
+* Fix issue #910: NER models with new labels now saved correctly, preventing memory errors.
+* Fix issue #934, #946: Symlink paths are now handled correctly on Windows, preventing `invalid switch` error.
+* Fix issue #947: Hebrew module is now added to `setup.py` and `__init__.py`.
+* Fix issue #948: Contractions are now lemmatized correctly.
+* Fix issue #957: Use `regex` module to avoid back-tracking on URL regex.
+
+## 📖 Documentation and examples
+
+* Documentation for new [`convert` and `model` commands](https://spacy.io/docs/usage/cli).
+* Update [troubleshooting guide](https://spacy.io/docs/usage/troubleshooting) with `--no-cache-dir` error resulting from outdated pip version and file name shadowing model problem.
+* Fix various typos and inconsistencies.
+
+## 👥 Contributors
+
+Thanks to @ericzhao28, @Gregory-Howard, @kinow, @jreeter, @mamoit, @kumaranvpl and @dvsrepo for the pull requests!",https://api.github.com/users/ines,13643239,ines,https://api.github.com/repos/explosion/spaCy/releases/6012807/assets,https://api.github.com/repos/explosion/spaCy/releases/6012807,master,https://api.github.com/repos/explosion/spaCy/tarball/v1.7.5,https://github.com/explosion/spaCy/releases/tag/v1.7.5,https://api.github.com/repos/explosion/spaCy/zipball/v1.7.5,v1.7.5,False,False
+5871328,2017-03-26T14:46:00Z,2017-03-26T15:08:13Z,"v1.7.3: Alpha support for Hebrew, new CLI commands and bug fixes","## ✨ Major features and improvements
+
+* **NEW:** Alpha tokenization for [Hebrew](spacy/he).
+* **NEW:** Experimental `train` and `package` [commands](https://spacy.io/docs/usage/cli) to train a model and convert it to a Python package.
+* Enable experimental support for L1-regularized regression loss in dependency parser and named entity recognizer. Should improve fine-tuning of existing models.
+* Fix high memory usage in `download` command.
+
+## 🔴 Bug fixes
+
+* Fix issue #903, #912: Base forms are now correctly protected from lemmatization.
+* Fix issue #909, #925: Use `mlink` to create symlinks in Python 2 on Windows.
+* Fix issue #910: Update config when adding label to pre-trained model.
+* Fix issue #911: Delete old training scripts.
+* Fix issue #918: Use `--no-cache-dir` when downloading models via pip.
+* Fixed infinite recursion in `spacy.info`.
+* Fix initialisation of languages when no model is available.
+
+
+## 📖 Documentation and examples
+
+* [Troubleshooting guide](https://spacy.io/docs/usage/troubleshooting) for most common issues and usage problems.
+* Documentation for new [`package` and `train` commands](https://spacy.io/docs/usage/cli).
+* Documentation for spaCy's [JSON format for training data](https://spacy.io/docs/api/annotation#json-input).
+* Fix various typos and inconsistencies.
+
+## 👥 Contributors
+
+Thanks to @raphael0202, @pavlin99th, @iddoberger and @solresol for the pull requests!",https://api.github.com/users/ines,13643239,ines,https://api.github.com/repos/explosion/spaCy/releases/5871328/assets,https://api.github.com/repos/explosion/spaCy/releases/5871328,master,https://api.github.com/repos/explosion/spaCy/tarball/v1.7.3,https://github.com/explosion/spaCy/releases/tag/v1.7.3,https://api.github.com/repos/explosion/spaCy/zipball/v1.7.3,v1.7.3,False,False
+5801372,2017-03-20T12:20:26Z,2017-03-20T12:37:49Z,v1.7.2: Small fixes to beam parser and model linking,"## 🔴 Bug fixes
+
+* Success message in `link` is now displayed correctly when using local paths.
+* Decrease beam density and fix Python 3 problem in `beam_parser`.
+* Fix issue #894: Model packages now install and compile paths correctly on Windows.
+
+## 📖 Documentation and examples
+
+* [Standalone NER training](examples/train_ner_standalone.py) example.
+* Fix various typos and inconsistencies.",https://api.github.com/users/ines,13643239,ines,https://api.github.com/repos/explosion/spaCy/releases/5801372/assets,https://api.github.com/repos/explosion/spaCy/releases/5801372,master,https://api.github.com/repos/explosion/spaCy/tarball/v1.7.2,https://github.com/explosion/spaCy/releases/tag/v1.7.2,https://api.github.com/repos/explosion/spaCy/zipball/v1.7.2,v1.7.2,False,False
+5793756,2017-03-19T00:44:43Z,2017-03-19T10:42:22Z,v1.7.1: Fix data download for system installation,"## 🔴 Bug fixes
+
+* Fix issue #892: Data now downloads and installs correctly on system Python.",https://api.github.com/users/ines,13643239,ines,https://api.github.com/repos/explosion/spaCy/releases/5793756/assets,https://api.github.com/repos/explosion/spaCy/releases/5793756,master,https://api.github.com/repos/explosion/spaCy/tarball/v1.7.1,https://github.com/explosion/spaCy/releases/tag/v1.7.1,https://api.github.com/repos/explosion/spaCy/zipball/v1.7.1,v1.7.1,False,False
+5791286,2017-03-18T19:04:22Z,2017-03-18T19:24:19Z,"v1.7.0: New 50 MB model, CLI, better downloads and lots of bug fixes","## ✨ Major features and improvements
+
+* **NEW:** Improved English model.
+* **NEW:** Additional smaller English model (50 MB, only 2% less accurate than larger model).
+* **NEW:** Command line interface to download and link models, view debugging info and print Markdown info for easy copy-pasting to GitHub.
+* **NEW:** Alpha support for [Finnish](spacy/fi) and [Bengali](spacy/bn).
+* Updated language data for [Swedish](spacy/sv) and [French](spacy/fr).
+* Simplified import of lemmatizer data to make it easier to add lemmatization for other languages.
+
+### Improved model download and installation
+
+To increase transparency and make it easier to use spaCy with your own models, all data is now available as direct downloads, organised in [individual releases](https://github.com/explosion/spacy-models/releases). spaCy v1.7 also supports installing and loading models as **Python packages**. You can now choose how and where you want to keep the data files, and set up ""shortcut links"" to load models by name from within spaCy. For more info on this, see the new [models documentation](https://spacy.io/docs/usage/models). 
+
+```bash
+# out-of-the-box: download best-matching default model
+python -m spacy download en
+
+# download best-matching version of specific model for your spaCy installation
+python -m spacy download en_core_web_md
+
+# pip install .tar.gz archive from path or URL
+pip install /Users/you/en_core_web_md-1.2.0.tar.gz
+pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_md-1.2.0/en_core_web_md-1.2.0.tar.gz
+
+# set up shortcut link to load installed package as ""en_default""
+python -m spacy link en_core_web_md en_default
+
+# set up shortcut link to load local model as ""my_amazing_model""
+python -m spacy link /Users/you/data my_amazing_model
+```
+
+```python
+nlp1 = spacy.load('en')
+nlp2 = spacy.load('en_core_web_md')
+nlp3 = spacy.load('my_amazing_model')
+```
+
+## ⚠️ Backwards incompatibilities
+
+* **IMPORTANT:** Due to fixes to the lemmatizer, the previous English model (v1.1.0) is not compatible with spaCy v1.7.0. When upgrading to this version, you need to download the new model (`en_core_web_md` v1.2.0). The German model is still valid and will be linked to the `de` shortcut automatically.
+* spaCy's package manger `sputnik` is now deprecated. For now, we will keep maintaining our download server to support the `python -m spacy.{en|de}.download all` command in older versions, but it will soon re-route to download the models from GitHub instead.
+* English lemmatizer data is now stored in Python files in [`spacy/en`](spacy/en) and the WordNet data previously stored in `corpora/en` has been removed. This should not affect your code, unless you have added functionality that relies on these data files.
+
+This will be the last major release before v2.0, which will introduce a few breaking changes to allow native deep learning integration. If you're using spaCy in production, don't forget to **pin your dependencies**:
+
+```python
+# requirements.txt
+spacy>=1.7.0,<2.0.0
+
+# setup.py
+install_requires=['spacy>=1.7.0,<2.0.0']
+```
+
+## 🔴 Bug fixes
+
+* Fix issue #401: Contractions with `'s` are now lemmatized correctly.
+* Fix issue #507, #711, #798: Models are now available as direct downloads.
+* Fix issue #669: `Span` class now has `lower_` and `upper_` properties.
+* Fix issue #686: Pronouns now lemmatize to `-PRON-`.
+* Fix issue #704: Sentence boundary detection improved with new English model.
+* Fix issue #717: Contracted verbs now have the correct lemma.
+* Fix issue #730, #763, #880, #890: A smaller English model (`en_core_web_sm`) is now available.
+* Fix issue #755: Add missing import to prevent exception using `--force`.
+* Fix issue #759: All available `NUM_WORDS` are now recognised correctly as `like_number`.
+* Fix issue #766: Add operator to `matcher` and make sure open patterns are closed at doc end.
+* Fix issue #768: Allow zero-width infix tokens in tokenizer exceptions.
+* Fix issue #771: Version numbers for `ujson` and `plac` are now specified correctly.
+* Fix issue #775: ""Shell"" and ""shell"" are now excluded from English tokenizer exceptions.
+* Fix issue #778: spaCy is now [available on conda](https://anaconda.org/conda-forge/spacy) via `conda-forge`.
+* Fix issue #781: Lemmatizer is now correctly applied to OOV words.
+* Fix issue #791: Environment variables are now passed to subprocess calls in `cythonize`.
+* Fix issue #792: Trailing whitespace is now handled correctly by the tokenizer.
+* Fix issue #801: Update global infix rules to prevent attached punctuation in complex cases.
+* Fix issue #805: Swedish tokenizer exceptions are now imported correctly.
+* Fix issue #834: `load_vectors()` now accepts arbitrary space characters as word tokens.
+* Fix issue #840: Use better regex for matching URL patterns in tokenizer exceptions.
+* Fix issue #847: ""Shed"" and ""shed"" are now excluded from English tokenizer exceptions.
+* Fix issue #856: Vocab now adds missing words when importing vectors.
+* Fix issue #859: Prevent extra spaces from being added after applying `token_match` regex.
+* Fix issue #868: Model data can now be downloaded to any directory.
+* Fix issue #886: `token.idx` now matches original index when text contains newlines.
+
+## 📖 Documentation and examples
+
+* **NEW:**  [Models usage](https://spacy.io/docs/usage/models) documentation.
+* **NEW:** [Command line interface](https://spacy.io/docs/usage/cli) documentation.
+* **NEW:** [`spacy-models`](https://github.com/explosion/spacy-models), including the latest model releases.
+* **NEW:** [Linear model feature scheme](https://spacy.io/docs/api/features) API docs.
+* Add [`help wanted (easy)`](https://github.com/explosion/spaCy/labels/help%20wanted%20%28easy%29) issue label for contribution requests suitable for beginners.
+* Update [installation docs](https://spacy.io/docs/usage/) with more details on model download and building spaCy from source.
+* Fix various typos and inconsistencies.
+
+## 👥 Contributors
+
+This release is brought to you by @honnibal and @ines. Thanks to @magnusburton, @jktong, @JasonKessler, @sudowork, @oiwah, @raphael0202, @latkins, @ematvey, @Tpt, @wallinm1, @knub, @wehlutyk, @vaulttech, @nycmonkey, @jondoughty, @aniruddha-adhikary, @badbye, @shuvanon, @rappdw, @ericzhao28, @juanmirocks and @rominf for the pull requests!",https://api.github.com/users/honnibal,8059750,honnibal,https://api.github.com/repos/explosion/spaCy/releases/5791286/assets,https://api.github.com/repos/explosion/spaCy/releases/5791286,master,https://api.github.com/repos/explosion/spaCy/tarball/v1.7.0,https://github.com/explosion/spaCy/releases/tag/v1.7.0,https://api.github.com/repos/explosion/spaCy/zipball/v1.7.0,v1.7.0,False,False
+5169688,2017-01-16T13:02:12Z,2017-01-16T13:14:30Z,v1.6.0: Improvements to tokenizer and tests,"## ✨ Major features and improvements
+- Updated token exception handling mechanism to allow the usage of arbitrary functions as token exception matchers.
+- Improve how tokenizer exceptions for English contractions and punctuations are generated.
+- Update language data for [Hungarian](spacy/hu) and [Swedish](spacy/sv) tokenization.
+- Update to use [Thinc v6](https://github.com/explosion/thinc/) to prepare for [spaCy v2.0](https://github.com/explosion/spaCy/projects/3).
+
+## 🔴 Bug fixes
+- Fix issue #326: Tokenizer is now more consistent and handles abbreviations correctly.
+- Fix issue #344: Tokenizer now handles URLs correctly.
+- Fix issue #483: Period after two or more uppercase letters is split off in tokenizer exceptions.
+- Fix issue #631: Add `richcmp` method to `Token`.
+- Fix issue #718: Contractions with `She` are now handled correctly.
+- Fix issue #736: Times are now tokenized with correct string values.
+- Fix issue #743: `Token` is now hashable.
+- Fix issue #744: `were` and `Were` are now excluded correctly  from contractions.
+
+## 📋 Tests
+- Modernise and reorganise all tests and remove model dependencies where possible.
+- Improve test speed to ~20s for basic tests (from previously >80s) and ~100s including models (from previously >200s).
+- Add fixtures for spaCy components and test utilities, e.g. to create `Doc` object manually.
+- Add [documentation for tests](spacy/tests) to explain conventions and organisation.
+
+## 👥 Contributors
+
+Thanks to @oroszgy, @magnusburton, @guyrosin and @danielhers  and  for the pull requests!
+",https://api.github.com/users/honnibal,8059750,honnibal,https://api.github.com/repos/explosion/spaCy/releases/5169688/assets,https://api.github.com/repos/explosion/spaCy/releases/5169688,master,https://api.github.com/repos/explosion/spaCy/tarball/v1.6.0,https://github.com/explosion/spaCy/releases/tag/v1.6.0,https://api.github.com/repos/explosion/spaCy/zipball/v1.6.0,v1.6.0,False,False
+5021289,2016-12-27T21:19:19Z,2016-12-27T21:20:03Z,v1.5.0: Alpha support for Swedish and Hungarian,"## ✨ Major features and improvements
+- **NEW:** Alpha support for [Swedish](spacy/sv) tokenization.
+- **NEW:** Alpha support for [Hungarian](spacy/hu) tokenization.
+- Update language data for [Spanish](spacy/es) tokenization.
+- Speed up tokenization when no data is preloaded by caching the first 10,000 vocabulary items seen.
+
+## 🔴 Bug fixes
+- List the `language_data` package in the [`setup.py`](setup.py).
+- Fix missing `vec_path` declaration that was failing if `add_vectors` was set.
+- Allow `Vocab` to load without `serializer_freqs`.
+
+## 📖 Documentation and examples
+- **NEW:** [spaCy Jupyter notebooks](https://github.com/explosion/spacy-notebooks) repo: ongoing collection of easy-to-run spaCy examples and tutorials.
+- Fix issue #657: Generalise dependency parsing [annotation specs](https://spacy.io/docs/api/annotation) beyond English.
+- Fix various typos and inconsistencies.
+
+## 👥 Contributors
+
+Thanks to @oroszgy, @magnusburton, @jmizgajski, @aikramer2, @fnorf and @bhargavvader for the pull requests!
+",https://api.github.com/users/ines,13643239,ines,https://api.github.com/repos/explosion/spaCy/releases/5021289/assets,https://api.github.com/repos/explosion/spaCy/releases/5021289,master,https://api.github.com/repos/explosion/spaCy/tarball/v1.5.0,https://github.com/explosion/spaCy/releases/tag/v1.5.0,https://api.github.com/repos/explosion/spaCy/zipball/v1.5.0,v1.5.0,False,False
+4952593,2016-12-18T22:54:39Z,2016-12-18T23:02:40Z,v1.4.0: Improved language data and alpha Dutch support,"## ✨ Major features and improvements
+- **NEW:** Alpha support for [Dutch](spacy/nl) tokenization.
+- Reorganise and improve format of language data.
+- Add [shared](spacy/language_data) tag map, entity rules, emoticons and punctuation to language data.
+- Convert entity rules, morphological rules and lemmatization rules from JSON to Python.
+- Update language data for [English](spacy/en), [German](spacy/de), [Spanish](spacy/es), [French](spacy/fr), [Italian](spacy/it) and [Portuguese](spacy/pt).
+
+## 🔴 Bug fixes
+- Fix issue #649: Update and reorganise stop lists.
+- Fix issue #672: Make `token.ent_iob_` return unicode.
+- Fix issue #674: Add missing lemmas for contracted forms of ""be"" to `TOKENIZER_EXCEPTIONS`.
+- Fix issue #683: `Morphology` class now supplies tag map value for the special space tag if it's missing. 
+- Fix issue #684: Ensure `spacy.en.English()` loads the Glove vector data if available. Previously was inconsistent with behaviour of `spacy.load('en')`.
+- Fix issue #685: Expand `TOKENIZER_EXCEPTIONS` with unicode apostrophe (`’`).
+- Fix issue #689: Correct typo in `STOP_WORDS`.
+- Fix issue #691: Add tokenizer exceptions for ""gonna"" and ""Gonna"".
+
+## ⚠️  Backwards incompatibilities
+
+No changes to the public, documented API, but the previously undocumented language data and model initialisation processes have been refactored and reorganised. If you were relying on the `bin/init_model.py` script, see the new [spaCy Developer Resources](https://github.com/explosion/spacy-dev-resources) repo. Code that references internals of the `spacy.en` or `spacy.de` packages should also be reviewed before updating to this version.
+
+## 📖  Documentation and examples
+- **NEW:** [""Adding languages""](https://spacy.io/docs/usage/adding-languages) workflow.
+- **NEW:** [""Part-of-speech tagging""](https://spacy.io/docs/usage/pos-tagging) workflow.
+- **NEW:** [spaCy Developer Resources](https://github.com/explosion/spacy-dev-resources) repo – scripts, tools and resources for developing spaCy.
+- Fix various typos and inconsistencies.
+
+## 👥 Contributors
+
+Thanks to @dafnevk, @jvdzwaan, @RvanNieuwpoort, @wrvhage, @jaspb, @savvopoulos and @davedwards for the pull requests!
+",https://api.github.com/users/honnibal,8059750,honnibal,https://api.github.com/repos/explosion/spaCy/releases/4952593/assets,https://api.github.com/repos/explosion/spaCy/releases/4952593,master,https://api.github.com/repos/explosion/spaCy/tarball/v1.4.0,https://github.com/explosion/spaCy/releases/tag/v1.4.0,https://api.github.com/repos/explosion/spaCy/zipball/v1.4.0,v1.4.0,False,False
+4823578,2016-12-03T10:55:22Z,2016-12-03T10:56:08Z,v1.3.0: Improve API consistency,"## ✨ Major features and improvements
+
+- Add `Span.sentiment` attribute.
+- #658: Add `Span.noun_chunks` iterator (thanks @pokey).
+- #642: Let `--data-path` be specified when running download.py scripts (thanks @ExplodingCabbage).
+- #638: Add German stopwords (thanks @souravsingh).
+- #614: Fix `PhraseMatcher` to work with new `Matcher` (thanks @sadovnychyi).
+
+## 🔴  Bug fixes
+- Fix issue #605: `accept` argument to `Matcher` now rejects matches as expected.
+- Fix issue #617: `Vocab.load()` now works with string paths, as well as `Path` objects.
+- Fix issue #639: Stop words in `Language` class now used as expected.
+- Fix issues #656, #624: `Tokenizer` special-case rules now support arbitrary token attributes.
+
+## 📖 Documentation and examples
+- Add [""Customizing the tokenizer""](https://spacy.io/docs/usage/customizing-tokenizer) workflow.
+- Add [""Training the tagger, parser and entity recognizer""](https://spacy.io/docs/usage/training) workflow.
+- Add [""Entity recognition""](https://spacy.io/docs/usage/entity-recognition) workflow.
+- Fix various typos and inconsistencies.
+
+## 👥  Contributors
+
+Thanks to @pokey, @ExplodingCabbage, @souravsingh, @sadovnychyi, @manojsakhwar, @TiagoMRodrigues, @savkov, @pspiegelhalter, @chenb67, @kylepjohnson, @YanhaoYang, @tjrileywisc, @dechov, @wjt, @jsmootiv and @blarghmatey for the pull requests!
+",https://api.github.com/users/honnibal,8059750,honnibal,https://api.github.com/repos/explosion/spaCy/releases/4823578/assets,https://api.github.com/repos/explosion/spaCy/releases/4823578,master,https://api.github.com/repos/explosion/spaCy/tarball/v1.3.0,https://github.com/explosion/spaCy/releases/tag/v1.3.0,https://api.github.com/repos/explosion/spaCy/zipball/v1.3.0,v1.3.0,False,False
+4576913,2016-11-05T01:35:37Z,2016-11-05T01:35:55Z,"v1.2.0: Alpha tokenizers for Chinese, French, Spanish, Italian and Portuguese","## ✨ Major features and improvements
+- **NEW:** Support Chinese tokenization, via [Jieba](https://github.com/fxsjy/jieba).
+- **NEW:** Alpha support for French, Spanish, Italian and Portuguese tokenization.
+
+## 🔴  Bug fixes
+- Fix issue #376: POS tags for ""and/or"" are now correct.
+- Fix issue #578: `--force` argument on download command now operates correctly.
+- Fix issue #595: Lemmatization corrected for some base forms.
+- Fix issue #588: `Matcher` now rejects empty patterns.
+- Fix issue #592: Added exception rule for tokenization of ""Ph.D.""
+- Fix issue #599: Empty documents now considered tagged and parsed.
+- Fix issue #600: Add missing `token.tag` and `token.tag_` setters.
+- Fix issue #596: Added missing unicode import when compiling regexes that led to incorrect tokenization.
+- Fix issue #587: Resolved bug that caused `Matcher` to sometimes segfault.
+- Fix issue #429: Ensure missing entity types are added to the entity recognizer.
+",https://api.github.com/users/honnibal,8059750,honnibal,https://api.github.com/repos/explosion/spaCy/releases/4576913/assets,https://api.github.com/repos/explosion/spaCy/releases/4576913,master,https://api.github.com/repos/explosion/spaCy/tarball/v1.2.0,https://github.com/explosion/spaCy/releases/tag/v1.2.0,https://api.github.com/repos/explosion/spaCy/zipball/v1.2.0,v1.2.0,False,False
+4460780,2016-10-23T16:53:34Z,2016-10-23T16:54:12Z,v1.1.0: Bug fixes and adjustments,"## ✨ Major features and improvements
+- Rename new `pipeline` keyword argument of `spacy.load()` to `create_pipeline`.
+- Rename new `vectors` keyword argument of `spacy.load()` to `add_vectors`.
+
+## 🔴 Bug fixes
+- Fix issue #544: Add `vocab.resize_vectors()` method, to support changing to vectors of different dimensionality.
+- Fix issue #536: Default probability was incorrect for OOV words.
+- Fix issue #539: Unspecified encoding when opening some JSON files.
+- Fix issue #541: GloVe vectors were being loaded incorrectly.
+- Fix issue #522: Similarities and vector norms were calculated incorrectly.
+- Fix issue #461: `ent_iob` attribute was incorrect after setting entities via `doc.ents`
+- Fix issue #459: Deserialiser failed on empty doc
+- Fix issue #514: Serialization failed after adding a new entity label.
+",https://api.github.com/users/honnibal,8059750,honnibal,https://api.github.com/repos/explosion/spaCy/releases/4460780/assets,https://api.github.com/repos/explosion/spaCy/releases/4460780,master,https://api.github.com/repos/explosion/spaCy/tarball/v1.1.0,https://github.com/explosion/spaCy/releases/tag/v1.1.0,https://api.github.com/repos/explosion/spaCy/zipball/v1.1.0,v1.1.0,False,False
+4424558,2016-10-18T23:24:22Z,2016-10-19T00:29:19Z,v1.0.0: Support for deep learning workflows and entity-aware rule matcher,"## ✨ Major features and improvements
+- **NEW:** [custom processing pipelines](https://spacy.io/docs/usage/customizing-pipeline), to support deep learning workflows
+- **NEW:** [Rule matcher](https://spacy.io/docs/usage/rule-based-matching) now supports entity IDs and attributes
+- **NEW:** Official/documented [training APIs](https://github.com/explosion/spaCy/tree/master/examples/training) and `GoldParse` class
+- Download and use GloVe vectors by default
+- Make it easier to load and unload word vectors
+- Improved rule matching functionality
+- Move basic data into the code, rather than the json files. This makes it simpler to use the tokenizer without the models installed, and makes adding new languages much easier.
+- Replace file-system strings with `Path` objects. You can now load resources over your network, or do similar trickery, by passing any object that supports the `Path` protocol.
+
+## ⚠️  Backwards incompatibilities
+- The data_dir keyword argument of `Language.__init__` (and its subclasses `English.__init__` and `German.__init__`) has been renamed to `path`.
+- Details of how the Language base-class and its sub-classes are loaded, and how defaults are accessed, have been heavily changed. If you have your own subclasses, you should review the changes.
+- The deprecated `token.repvec` name has been removed.
+- The `.train()` method of Tagger and Parser has been renamed to `.update()`
+- The previously undocumented `GoldParse` class has a new `__init__()` method. The old method has been preserved in `GoldParse.from_annot_tuples()`.
+- Previously undocumented details of the `Parser` class have changed.
+- The previously undocumented `get_package` and `get_package_by_name` helper functions have been moved into a new module, `spacy.deprecated`, in case you still need them while you update.
+
+## 🔴  Bug fixes
+- Fix `get_lang_class` bug when GloVe vectors are used.
+- Fix Issue #411: `doc.sents` raised IndexError on empty string.
+- Fix Issue #455: Correct lemmatization logic
+- Fix Issue #371: Make `Lexeme` objects hashable
+- Fix Issue #469: Make `noun_chunks` detect root NPs
+
+## 👥  Contributors
+
+Thanks to @daylen, @RahulKulhari, @stared, @adamhadani, @izeye and @crawfordcomeaux for the pull requests!
+",https://api.github.com/users/honnibal,8059750,honnibal,https://api.github.com/repos/explosion/spaCy/releases/4424558/assets,https://api.github.com/repos/explosion/spaCy/releases/4424558,master,https://api.github.com/repos/explosion/spaCy/tarball/v1.0.0,https://github.com/explosion/spaCy/releases/tag/v1.0.0,https://api.github.com/repos/explosion/spaCy/zipball/v1.0.0,v1.0.0,False,False

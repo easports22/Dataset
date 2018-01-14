@@ -1,0 +1,1768 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7295746,2017-08-28T14:41:55Z,2017-08-28T14:43:31Z,"Higher order gradients, Distributed PyTorch, Broadcasting, Advanced Indexing, New Layers and more","Here comes the next major release of PyTorch, just in time for ICML.  Install it today from our website http://pytorch.org
+Package documentation for this release is available at [http://pytorch.org/docs/0.2.0/](http://pytorch.org/docs/0.2.0/)
+
+We're introducing long-awaited features such as Broadcasting, Advanced Indexing, Higher-order gradients and finally: Distributed PyTorch.
+
+**Due to introducing Broadcasting, the code behavior for certain broadcastable situations is different from behavior in 0.1.12. This might lead to silent bugs in your existing code. We've provided easy ways of identifying this ambiguous code in the *Important Breakages and Workarounds* section.**
+
+Table of contents:
+- Tensor Broadcasting (numpy-style)
+- Advanced Indexing for Tensors and Variables
+- Higher-order gradients
+- Distributed PyTorch (multi-node training, etc.)
+- Neural Network layers and features: SpatialTransformers, WeightNorm, EmbeddingBag, etc.
+- New in torch and autograd: matmul, inverse, etc.
+- Easier debugging, better error messages
+- Bug Fixes
+- **Important Breakages and Workarounds**
+
+## Tensor Broadcasting (numpy-style)
+
+In short, if a PyTorch operation supports broadcasting, then its Tensor arguments can be automatically expanded to be of equal sizes (without making copies of the data).
+
+PyTorch Broadcasting semantics [closely follow numpy-style broadcasting](https://docs.scipy.org/doc/numpy/user/basics.broadcasting.html#module-numpy.doc.broadcasting); if you are familiar with numpy broadcasting, things should just work as expected.
+
+### General Semantics
+
+Two tensors are “broadcastable” if the following rules hold:
+- Each tensor has at least one dimension.
+- When iterating over the dimension sizes, starting at the trailing dimension, the dimension sizes must either be equal, one of them is 1, or one of them does not exist.
+
+For Example:
+
+```python
+>>> x=torch.FloatTensor(5,7,3)
+>>> y=torch.FloatTensor(5,7,3)
+# same shapes are always broadcastable (i.e. the above rules always hold)
+
+# can line up trailing dimensions
+>>> x=torch.FloatTensor(5,3,4,1)
+>>> y=torch.FloatTensor(  3,1,1)
+
+# x and y are broadcastable.
+# 1st trailing dimension: both have size 1
+# 2nd trailing dimension: y has size 1
+# 3rd trailing dimension: x size == y size
+# 4th trailing dimension: y dimension doesn't exist
+
+# but:
+>>> x=torch.FloatTensor(5,2,4,1)
+>>> y=torch.FloatTensor(  3,1,1)
+# x and y are not broadcastable, because in the 3rd trailing dimension 2 != 3
+```
+
+If two tensors x, y are ""broadcastable"", the resulting tensor size is calculated as follows:
+- If the number of dimensions of x and y are not equal, prepend 1 to the dimensions of the tensor with fewer dimensions to make them equal length.
+- Then, for each dimension size, the resulting dimension size is the max of the sizes of x and y along that dimension.
+
+For Example:
+
+```python
+# can line up trailing dimensions to make reading easier
+>>> x=torch.FloatTensor(5,1,4,1)
+>>> y=torch.FloatTensor(  3,1,1)
+>>> (x+y).size()
+torch.Size([5, 3, 4, 1])
+
+# error case
+>>> x=torch.FloatTensor(5,2,4,1)
+>>> y=torch.FloatTensor(  3,1,1)
+>>> (x+y).size()
+RuntimeError: The size of tensor a (2) must match the size of tensor b (3) at non-singleton dimension 1
+```
+
+More details [can be found on the PyTorch documentation site](http://pytorch.org/docs/0.2.0/notes/broadcasting.html).  Also, each torch function lists its broadcasting semantics in the documentation.
+
+## Advanced Indexing for Tensors and Variables
+
+PyTorch now supports a subset of NumPy style [advanced indexing](https://docs.scipy.org/doc/numpy/reference/arrays.indexing.html#advanced-indexing). This allows users to select arbitrary indices at each dimension of the Tensor, including non-adjacent indices and duplicate indices, using the same `[]`-style operation. This allows for a more flexible indexing strategy without needing calls to PyTorch's `Index[Select, Add, ...]`  functions.
+
+Let's look at some examples:
+
+```python
+x = torch.Tensor(5, 5, 5)
+```
+
+**Pure Integer Array Indexing - specify arbitrary indices at each dimension**
+
+```python
+x[[1, 2], [3, 2], [1, 0]]
+--> yields a 2-element Tensor (x[1][3][1], x[2][2][0])
+```
+
+**also supports broadcasting, duplicates**
+
+```python
+x[[2, 3, 2], [0], [1]]
+--> yields a 3-element Tensor (x[2][0][1], x[3][0][1], x[2][0][1])
+```
+
+**arbitrary indexer shapes allowed**
+
+```python
+x[[[1, 0], [0, 1]], [0], [1]].shape
+--> yields a 2x2 Tensor [[x[1][0][1], x[0][0][1]],
+                         [x[0][0][1], x[1][0][1]]]
+```
+
+**can use colon, ellipse**
+
+```python
+x[[0, 3], :, :]
+x[[0, 3], ...]
+--> both yield a 2x5x5 Tensor [x[0], x[3]]
+```
+
+**also use Tensors to index!**
+
+```python
+y = torch.LongTensor([0, 2, 4])
+x[y, :, :]
+--> yields a 3x5x5 Tensor [x[0], x[2], x[4]]
+```
+
+**selection with less than ndim, note the use of comma**
+
+```python
+x[[1, 3], ]
+--> yields a 2x5x5 Tensor [x[1], x[3]]
+```
+
+## Higher order gradients
+
+Now you can evaluate higher order differentials in PyTorch. For example, you can compute Hessian-Vector products, penalize the norm of the gradients of your model, implement Unrolled GANs and Improved WGANs, etc.
+
+In the `0.2` release, we've enabled the ability to compute higher order gradients for all of `torch.XXX` functions and the most popular `nn`layers. The rest will be covered in the next release.
+
+Here's a short example that penalizes the norm of the weight gradients of a Resnet-18 model, so that the volume of weights is slow-changing.
+
+```python
+import torch
+from torchvision.models import resnet18
+from torch.autograd import Variable
+
+model = resnet18().cuda()
+
+# dummy inputs for the example
+input = Variable(torch.randn(2,3,224,224).cuda(), requires_grad=True)
+target = Variable(torch.zeros(2).long().cuda())
+
+# as usual
+output = model(input)
+loss = torch.nn.functional.nll_loss(output, target)
+
+grad_params = torch.autograd.grad(loss, model.parameters(), create_graph=True)
+# torch.autograd.grad does not accumuate the gradients into the .grad attributes
+# It instead returns the gradients as Variable tuples.
+
+# now compute the 2-norm of the grad_params
+grad_norm = 0
+for grad in grad_params:
+    grad_norm += grad.pow(2).sum()
+grad_norm = grad_norm.sqrt()
+
+# take the gradients wrt grad_norm. backward() will accumulate
+# the gradients into the .grad attributes
+grad_norm.backward()
+
+# do an optimization step
+optimizer.step()
+```
+
+We see two new concepts here:
+
+1. [torch.autograd.grad](http://pytorch.org/docs/master/autograd.html#torch.autograd.grad) is a function that takes in [outputs, list of inputs (for which you want gradients)], and returns the gradients wrt. these inputs as a tuple, rather than accumulating the gradients into the `.grad` attributes. This is useful if you want to further operate on the gradients.
+2. You can operate on the gradients, and call `backward()` on them.
+
+The list of `nn` layers that support higher order gradients are:
+- `AvgPool*d`, `BatchNorm*d`, `Conv*d`, `MaxPool1d,2d`, `Linear`, `Bilinear`
+- `pad`, `ConstantPad2d`, `ZeroPad2d`, `LPPool2d`,  `PixelShuffle`
+- `ReLU6`, `LeakyReLU`, `PReLU`, `Tanh`, `Tanhshrink`, `Threshold`, `Sigmoid`, `HardTanh`, `ELU`, `Softsign`, `SeLU`
+- `L1Loss`, `NLLLoss`, `PoissonNLLLoss`, `LogSoftmax`, `Softmax2d`
+The rest will be enabled in the next release.
+
+To enable higher order gradients, we've introduced a new style of writing `autograd.Function` (the current/old style of writing functions is fully backward compatible). [You can read more about the new style of functions here](http://pytorch.org/docs/0.2.0/notes/extending.html).
+
+Most of you dont write your own `autograd.Function`s, they are low-level primitives that introduce
+new operations to the autograd engine, where you specify the forward and backward calls.
+
+## Distributed PyTorch
+
+We introduce the [torch.distributed](http://pytorch.org/docs/0.2.0/distributed.html) package that allows you to exchange Tensors among multiple machines. Using this package, you can scale your network training over multiple machines and larger mini-batches. For example, you are given the primitives to implement [Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour](https://arxiv.org/abs/1706.02677).
+
+The `distributed` package follows an MPI-style programming model. This means that there are functions provided to you such as `send`, `recv`, `all_reduce` that will exchange Tensors among nodes (machines).
+
+For each of the machines to first identify each other and assign unique numbers to each other (ranks), we provide simple initialization methods:
+- shared file system (requires that all processes can access a single file system)
+- IP multicast (requires that all processes are in the same network)
+- environment variable (requires you to manually assign ranks and know an address of a node reachable from all processes)
+
+Our package documentation contains more details on initialization and available backends, but here's an example of initializing using a multicast address:
+
+```python
+import torch.distributed as dist
+
+dist.init_process_group(backend='tcp',
+                        init_method='tcp://[ff15:1e18:5d4c:4cf0:d02d:b659:53ba:b0a7]:23456',
+                        world_size=4)
+
+print('Hello from process {} (out of {})!'.format(
+        dist.get_rank(), dist.get_world_size()))
+```
+
+This would print `Hello from process 2 (out of 4)`on the 3rd machine.
+
+World size is the number of processes that will participate in the job. Each will be assigned a rank, which is a number between 0 and world_size - 1, unique within this job. It will serve as a process identifier and will be used instead of an address to, for example, specify to which process should a tensor be sent.
+
+Here's a snippet that shows how simple point-to-point communication can be performed:
+
+```python
+# All processes (receiving ones too!) need to have tensors of appropriate
+# size preallocated.
+x = torch.Tensor(10)
+if dist.get_rank() == 0:
+    x.normal_()
+    # Send x to process with rank 1
+    dist.send(x, dst=1)
+else:  # rank == 1
+    # Receive data from process with rank 0 and save result in x
+    dist.recv(x, src=0)
+```
+
+Asynchronous p2p functions (`isend`, `irecv`) are available too.
+
+However, some communication patterns appear so often that more efficient collective calls have been developed. They typically engage the whole process group and are much faster than naive algorithms using `send`/`recv`. One example is `all_reduce`:
+
+```python
+x = torch.Tensor([dist.get_rank()])
+# Add tensors from all processes such that they all receive the result.
+# x is an input and output to this operation.
+dist.all_reduce(x)
+```
+
+The distributed package is fairly low-level, so that it allows to implement more advanced algorithms and tailor the code to very specific purposes, but data-parallel training is such a common one that we have created high-level helpers for it.
+
+Hence, we've introduced `DistributedDataParallel`, which is meant to be a nearly drop-in replacement for nn.DataParallel.
+Here's a code snippet demonstrating changes necessary to add it to existing training code:
+
+```python
+# Wrap model in DistributedDataParallel (CUDA only for the moment)
+model = torch.nn.parallel.DistributedDataParallel(model.cuda())
+
+# Use a DistributedSampler to restrict each process to a distinct subset
+# of the dataset.
+train_dataset = ...
+train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
+train_loader = torch.utils.data.DataLoader(
+    train_dataset, batch_size=args.batch_size, num_workers=args.workers,
+    pin_memory=True, sampler=train_sampler)
+
+for epoch in range(args.num_epochs):
+    # Use .set_epoch() method to reshuffle the dataset partition at every iteration
+    train_sampler.set_epoch(epoch)
+    # training loop
+    ...
+```
+
+You can see a fuller [Imagenet training example here](https://github.com/pytorch/examples/tree/master/imagenet)
+
+## New nn layers: SpatialTransformers, WeightNorm, EmbeddingBag, etc.
+
+#### New features
+- [forward_pre_hook](http://pytorch.org/docs/master/nn.html#torch.nn.Module.register_forward_pre_hook) is introduced to execute user-specified closures right before a forward function is called.
+- Convenient access to non-leaf gradients:
+Currently, to access and inspect gradients of intermediate values, we have to use `hooks`. This is not convenient for doing simple inspections. Hence, we introduce `retain_grad`. It is best explained via an example:
+
+```python
+input = Variable(torch.rand(1, 3), requires_grad=True)
+h1 = input * 3
+out = (h1 * h1).sum()
+
+h1.retain_grad()
+out.backward()
+
+print(h1.grad)
+# without calling retain_grad(), h1.grad is None
+```
+- DataParallel now supports dicts as inputs
+
+#### New Layers
+
+- Spatial Transformer Networks via `F.grid_sample` and `F.affine_grid`
+- `nn.SeLU` and `nn.AlphaDropout` are introduced, from the paper: [Self-Normalizing Neural Networks](https://arxiv.org/abs/1706.02515)
+- `nn.GLU` (Gated Linear Unit) is introduced from the paper [Convolutional Sequence to Sequence Learning](https://arxiv.org/abs/1705.03122)
+- [Weight Normalization](https://arxiv.org/abs/1602.07868) is now implemented via [torch.utils.weight_norm](http://pytorch.org/docs/master/nn.html#torch.nn.utils.weight_norm).
+- You can now ignore specific target indices while computing `cross_entropy_loss` and `nll_loss` using the `ignore_index` argument. This is a cheap and useful way of implementing masking, where you can have a `mask` index that is ignored in computing the loss.
+- `F.normalize` implements dimension-wise renormalization
+- `F.upsample` and `nn.Upsample` consolidate multiple Upsampling layers into one function. It implements 2d and 3d bilinear/trilinear/nearest upsampling.
+- `nn.EmbeddingBag`: When build bag-of-words models, doing an `Embedding` followed by `Sum` or `Mean` is common. For variable length sequences, computing bags of embeddings involves masking. We provide a singe `nn.EmbeddingBag` which is much more efficent and faster to compute bags of embeddings, especially for variable length sequences.
+- Numerically stable Binary Cross-Entropy loss via `bce_with_logits`
+- A negative log-likelihood loss with Poisson distribution of the target via `PoissonNLLLoss`
+- `cosine_similarity`: Returns cosine similarity between x1 and x2, computed along dim.
+
+#### training utilities
+
+*Learning Rate Schedulers:* [torch.optim.lr_scheduler](http://pytorch.org/docs/master/optim.html#how-to-adjust-learning-rate) provides several dumb and smart methods to adjust the current learning rate. They are quite convenient while experimenting, giving a proxy for what you as the user would likely want to do.
+
+There are various strategies provided, which can be used depending on the appropriate situation, more can be read in the [package docs](http://pytorch.org/docs/master/optim.html#how-to-adjust-learning-rate):
+ - ReduceLROnPlateau, LambdaLR, StepLR, MultiStepLR, ExponentialLR
+
+
+*`ConcatDataset`* that is a convenient dataset meta-class that can merge and concatenate two individual datasets.
+
+## New in torch and autograd
+
+- All reduce functions such as `sum` and `mean`now default to squeezing the reduced dimension. For example `torch.sum(torch.randn(10, 20))` returns a 1D Tensor.
+- `x.shape`, similar to numpy. A convenience `property` that is equivalent to `x.size()`
+- `torch.matmul`, similar to np.matmul
+- bitwise and, or, xor, lshift, rshift
+- autograd support for `inverse`, `gesv`, `cumprod`, `atan2`
+- unbiased `var` and `std` now available via keyword argument option
+- `torch.scatter_add` - torch.scatter, except when duplicate indices are encountered, the values are summed.
+- torch.median behaves similar to torch.sum when no arguments are given, i.e. it reduces all the dimensions and returns a single median value of the flattened Tensor.
+- masked_copy_ has been renamed to masked_scatter_ (with deprecation on masked_copy_)
+- torch.manual_seed now seeds all CUDA devices as well
+- You can now specify the random number generator object via keyword arguments `torch.rand(1000, generator=gen)`
+
+## Bug-fixes and small improvements
+
+- Now we emit an error when a Variable is converted to a bool. For example:
+
+```
+b = Variable(torch.zeros(1))
+if b[0]: # errors now
+```
+
+- Fix correctness bugs in qr decomposition on CUDA.
+- Support for IBM PowerPC64 platform
+- Check that the CuDNN version at compile-time is the same version at run-time.
+- Improve error message in CUDA forked subprocess
+- Faster transposed-copy on CPU
+- Improve error messages in InstanceNorm
+- Add more argument checking for various routines, especially BatchNorm and Convolution routines.
+- Better error messages around shape reporting across the CPU backend.
+- Support more than 8 GPUs per machine (work-around a CUDA p2p restriction)
+- Improve error message when accessing attributes that don't exist
+- t() of Variable consistent with Tensor
+- prevent divide-by-zero when dropout p=1
+- fix sharing of CUDA tensors on non-current devices
+- when BN epsilon < allowed CuDNN value, fallback to THNN
+- Fix thread-trashing when using different number of threads for MKL and OMP
+- improve memory usage when using CuDNN RNN
+- Fix ZeroPad2d backwards with negative padding
+- add dummy tensor.data property, to provide interpretable error message to users
+- Fix in-place division for Python3
+- Raise error when call from_numpy on 0-dim array
+- Empty Tensors dont error out when shared across multiprocessing
+- fix baddbmm for expanded tensors
+- Let parallel_apply accept arbitrary inputs
+- keyword arguments in Tensor and Variable are now consistent
+- fix torch.inverse when Magma is not available
+- Add logical not operator for ByteTensor
+- add device asserts in scatter/gather kernels
+
+## Important Breakages and Workarounds
+
+As you've read, we've introduced two important changes that are not
+backward compatible:
+- Numpy-style Broadcasting
+- Reduction functions such as `sum(1)` now default to `keepdim=False`
+
+We provide different levels of Python warnings that you can enable to alert you if you are using deprecated behavior or if the behavior of your code has changed.
+
+#### tl;dr
+Here is a code snippet that you can add to the top of your scripts.
+Adding this code will generate warnings highlighting incompatible code.
+
+Fix your code to no longer generate warnings.
+
+```python
+# insert this to the top of your scripts (usually main.py)
+import sys, warnings, traceback, torch
+def warn_with_traceback(message, category, filename, lineno, file=None, line=None):
+    sys.stderr.write(warnings.formatwarning(message, category, filename, lineno, line))
+    traceback.print_stack(sys._getframe(2))
+warnings.showwarning = warn_with_traceback; warnings.simplefilter('always', UserWarning);
+torch.utils.backcompat.broadcast_warning.enabled = True
+torch.utils.backcompat.keepdim_warning.enabled = True
+```
+Once all warnings disappear, you can remove the code snippet.
+
+#### More elaborately
+
+Now, let us see the three incompatible changes with examples.
+
+##### Using the (now deprecated) 1-dimensional view pointwise function
+
+Prior versions of PyTorch allowed certain pointwise functions to execute on tensors with different shapes, as long as the number of elements in each tensor was equal.  The pointwise operation would then be carried out by viewing each tensor as 1-dimensional. PyTorch now supports broadcasting. The “1-dimensional” pointwise behavior is considered deprecated and will generate a Python warning in cases where tensors are not broadcastable, but have the same number of elements.
+
+For example:
+
+```python
+>>> torch.add(torch.ones(4), torch.ones(2,2))
+__main__:1: UserWarning: self and other not broadcastable, but have the same
+number of elements.  Falling back to deprecated pointwise behavior.
+2
+2
+2
+2
+[torch.FloatTensor of size 4]
+```
+
+##### Broadcasting in code where it didn't happen before
+The introduction of broadcasting can cause backwards incompatible changes in the case where two tensors do not have the same shape,
+but are broadcastable and have the same number of elements.
+
+For example:
+
+```python
+>>> torch.add(torch.ones(4,1), torch.randn(4))
+```
+
+would previously produce a Tensor with size: `torch.Size([4,1])`,
+but now produces a Tensor with size: `torch.Size([4,4])`.
+
+In order to help identify cases in your code where backwards incompatibilities introduced by broadcasting may exist, you may set `torch.utils.backcompat.broadcast_warning.enabled` to `True`, which will generate a python warning in such cases.
+
+For Example:
+
+```python
+>>> torch.utils.backcompat.broadcast_warning.enabled=True
+>>> torch.add(torch.ones(4,1), torch.ones(4))
+__main__:1: UserWarning: self and other do not have the same shape, but are broadcastable, and have the same number of elements.
+```
+Note that this setting can trigger warnings for valid uses of broadcasting (including in library code), so you probably want to turn this warning off after migrating your code.
+
+##### KeepDim=False for Reduction Functions
+
+To get a warning when using a dimensional reduction function with the default keepdim argument, set `torch.utils.backcompat.keepdim_warning.enabled` to `True`.  For example:
+
+```python
+>>> torch.sum(torch.ones(2,3), 1)
+__main__:1: UserWarning: backwards compatibility: call to ""sum"" uses default value for keepdim which has changed default to False.  Consider passing as kwarg.
+3
+3
+[torch.FloatTensor of size 2]
+```
+
+As with `torch.utils.backcompat.broadcast_warning.enabled`, this warning can trigger from valid code, so you most likely want to disable this warning after migrating your code.
+
+Note also that using `keepdim=False` can cause your existing code to ""just work"" with broadcasting.  For example:
+
+```python
+# behavior with (old) keepdim=True, causes accidental broadcast
+>>> torch.add(torch.ones(4), torch.ones(4,4).sum(dim=1, keepdim=True))
+5  5  5  5
+5  5  5  5
+5  5  5  5
+5  5  5  5
+[torch.FloatTensor of size 4x4]
+
+# new behavior with keepdim=False is equivalent to non-broadcasted result
+>>> torch.add(torch.ones(4), torch.ones(4,4).sum(dim=1, keepdim=False))
+5
+5
+5
+5
+[torch.FloatTensor of size 4]
+```
+",https://api.github.com/users/soumith,1310570,soumith,https://api.github.com/repos/pytorch/pytorch/releases/7295746/assets,https://api.github.com/repos/pytorch/pytorch/releases/7295746,v0.2.0,https://api.github.com/repos/pytorch/pytorch/tarball/v0.2.0,https://github.com/pytorch/pytorch/releases/tag/v0.2.0,https://api.github.com/repos/pytorch/pytorch/zipball/v0.2.0,v0.2.0,False,False
+6258732,2017-05-01T19:55:29Z,2017-05-02T22:26:49Z,"Sparse support for CUDA, bug fixes, performance improvements","API Changes
+-----------
+- `torch.range` is deprecated in favor of `torch.arange` which is consistent with numpy and python range.
+- On sparse Tensors, `contiguous` is renamed to `coalesce` and `coalesce` is now made out-of-place.
+  (a reminder that Sparse API is still experimental and evolving, so we dont provide backward-compability).
+
+New Features
+------------
+
+### New layers and functions
+- `torch.topk` is now supported for all CUDA types, not just `torch.cuda.FloatTensor`.
+- Added a three-way ranking loss: [nn.TripletMarginLoss](http://pytorch.org/docs/nn.html#tripletmarginloss)
+- Added per-instance normalization layers: [nn.InstanceNorm1d](http://pytorch.org/docs/nn.html#instancenorm1d), [nn.InstanceNorm2d](http://pytorch.org/docs/nn.html#instancenorm2d), [nn.InstanceNorm3d](http://pytorch.org/docs/nn.html#instancenorm3d)
+  Each channel is treated as an instance to normalize, and mean-subtraction and std-division is done. This is useful when dealing with larger images and smaller mini-batches where BatchNorm like effects are desired.
+- `nn.ZeroPad2d` and `nn.ConstantPad2d` are added.
+- `nn.Bilinear` is added, which computes `Y = X1 * W * X2 + b`
+
+### Negative dimension support for all functions
+Every single function that took a dimension argument will also allow taking negative dimensions.
+
+A negative dimension will index the tensor from the last dimension.
+
+For example:
+
+```
+x = torch.randn(10, 20, 30)
+y = torch.mean(x, dim = -1)
+```
+
+Here, since `x` has 3 dimensions, and `dim = -1`, the last dimension, i.e. `dim=3` is picked for taking a mean.
+
+The functions with dimension arguments are:
+```
+narrow, transpose, size, cat, chunk, gather, index_select, split, squeeze,
+stack, unbind, unsqueeze, cumprod, cumsum, mean, median, mode, norm, prod, std,
+sum, var, kthvalue, max, min, sort, topk, renorm,
+index_add, index_copy, index_fill, scatter, select, unfold
+```
+
+### CUDA support for Sparse Tensors, faster CPU sparse
+
+Now a part of the `torch.sparse` API is also supported for `torch.cuda.sparse.*Tensor`.
+
+Functions that are supported on CUDA are:
+```
+sparse_mask, to_dense, coalesce, transpose, spaddmm
+spcadd, mul, div, cadd, csub, cmul
+```
+
+`nn.Embedding` now supports sparse even on CUDA (with the `sparse=True` flag) leveraging these sparse functions.
+
+A new hybrid matrix-multiply `hspmm` operation that multiplies a sparse matrix with a dense matrix and returns a matrix in the form of a hybrid tensor (i.e. 1 sparse dimension, 1 dense dimension).
+
+Several of the CPU sparse functions have more efficient implementations.
+
+In a quickly hacked up Embedding classifier training script by @martinraison we see CUDA sparse performing as well as CUDA dense:
+https://gist.github.com/martinraison/1e7c18c6f6eda87f1cb4995b0e6a22a5
+
+Table times of seconds / batch
+
+_      | CPU  | CUDA
+-------|------|------
+Dense  | 10   | 0.86
+Sparse | 0.15 | 0.13
+
+### named_parameters to filter out specific parameter types
+
+Let's say that you want to add weight decay to all parameters of your model except for the biases. How do you get only the biases of your model?
+We introduce [nn.Module.named_parameters](http://pytorch.org/docs/nn.html#torch.nn.Module.named_parameters) for this.
+It joins `named_children` and `named_modules` in helping you filter specific attributes of models.
+
+Example of filtering out biases of a model and give them weight_decay of 0:
+
+```python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+m = nn.Sequential(
+      nn.Linear(10, 20),
+      nn.ReLU(),
+      nn.Linear(20, 20),
+      nn.ReLU(),
+    )
+weights, biases = [], []
+for name, p in m.named_parameters():
+   if 'bias' in name:
+       biases += [p]
+   else:
+       weights += [p]
+
+optim.SGD([
+  {'params': weights},
+  {'params': biases, weight_decay=0}
+], lr=1e-2, momentum=0.9, weight_decay=1e-5)
+```
+
+Performance Improvements
+------------------------
+- `cumsum` and `cumprod` have been significantly made faster on the GPU via using some thrust primitives where appropriate.
+- `LSTMCell` and `GRUCell` are now significantly faster on the GPU via a fused kernel
+- The default Algorithm for CuDNN has been changed to `PRECOMP_GEMM` which is a
+  much faster algorithm that takes a tiny bit of workspace. Previously, it used to
+  be `IMPLICIT_GEMM` which took zero workspace, but was significantly slower.
+- 5% to 10% improvement in data loader by collating batches directly into shared memory.
+- SVD is now computed on the GPU via divide-and-conquer (sgesdd) which gives a 2x to 5x speedup.
+- The commonly used function `expand` has been moved to C, to have better performance in smaller models.
+
+Bug Fixes
+---------
+- Added contiguous checks on weight and bias for a large range of THNN functions
+- make the range of `random_` correct when both lower and upper bound are specified
+- `parallel_apply` now can take arguments that are unhashable
+- Reshape `grad` correctly in the Dot function (inputs don't have to be 1D vectors...)
+- Added `Variable.type_as`
+- Unify argument names of `norm` and `renorm` to have `p=norm_type, dim=dim`
+- `btrisolve` works on CPU doubles
+- ipython autocomplete for torch.nn.Module fixed via implementing `__dir__`
+- `device_ids` can now be `None` again in `F.data_parallel` and will use all available GPUs
+- workaround cudnn bugs in BatchNorm (<5.1.10) and Dilation (6.0.20)
+- Padding bugfix in Conv1d CPU
+- `remainder` and `cremainder` are fixed for integer types
+- fix memory leak in `btrisolve` and `getri`
+- If nn.Module's source cant be retrieved because of any exception,
+  handle serialization to be non-fatal
+- `collate_fn` now retains the type of the numpy array
+- `is_tensor` and `is_storage` are now fixed for old-style Python classes
+- `torch.cat` now supports keyword arguments
+- CUDA collectives supported coalescing, but the inputs were all assumed
+  to be of the same Tensor type. This is fixed.
+- Fix a deadlock bug in autograd because of an underlying glibc bug in specific
+  linux distros (ArchLinux in particular)
+- `abs` is now fixed for `char` and `short` cuda types
+- fix `torch.diag` autograd when giving a dimension argument
+- fix grouped convolution on CPU when `bias=False`
+- expose `dilated` convolutions for `ConvTranspose*d`
+- Fix a bug in `HingeEmbeddingLoss` where `margin` can now be specified via kwargs
+
+Improved error messages
+-----------------------
+- Fix errors and messages when no CUDA devices are available.
+",https://api.github.com/users/soumith,1310570,soumith,https://api.github.com/repos/pytorch/pytorch/releases/6258732/assets,https://api.github.com/repos/pytorch/pytorch/releases/6258732,v0.1.12,https://api.github.com/repos/pytorch/pytorch/tarball/v0.1.12,https://github.com/pytorch/pytorch/releases/tag/v0.1.12,https://api.github.com/repos/pytorch/pytorch/zipball/v0.1.12,v0.1.12,False,False
+5938760,2017-03-31T16:19:59Z,2017-03-31T16:27:41Z,"CuDNN v6, new layers, lots of bugfixes","## Minor API Changes
+
+- in `optim.Adamax`, the default learning rate and epsilon have been made
+  consistent with Lasagne, Keras and TF.
+  - Previous: `(lr=1e-2, eps=1e-38)`
+  - Current : `(lr=2e-3, eps=1e-8)`
+- **Make `random_` range exclusive** (it used to be exclusive when only the upper bound was specified, and inclusive when both were given).
+- `torch.cat` now **disallows catting along inexistent dimensions**
+  (to make it consistent with numpy and Variable cat)
+- `torch.utils.clip_grad_norm` now returns the total norm (say, for logging purposes).
+
+## Performance Improvements
+- Reduce DataParallel overhead on >4 GPUs
+  - Improve broadcast/reduce performance by coalescing tensors
+- `nn.Embedding`'s backward performance increased for batch sizes > 1024
+
+## New Features
+**torch**
+- Batch triangular factorization and solves have been interfaced (CPU and GPU) and
+  are available under `torch.btrifact` and `torch.btrisolve`. [See documentation
+  for usage](http://pytorch.org/docs/torch.html#torch.btrifact)
+- All RNG functions now have `generator` specifiable via a keyword argument
+- `torch.mode` is now supported on the GPU via a high-performance kernel.
+
+**autograd, nn and optim**  
+- CuDNN v6 integrated:
+  - Faster Dilated Convolutions (and less memory hungry)
+  - 1D FFT-based Convolutions
+  - Significant performance improvement for Softmax layers
+  - Speedups across many functions
+  - Improved CuDNN error messages
+  - We will integrate persistent RNNs in the next release
+- `torch.trace`, `torch.cumsum`, `torch.cross` are now implemented in autograd  
+- `nll_loss` now supports Spatial inputs (i.e. 4d inputs BCHW) and computes
+    channel-wise cross-entropy.
+- `nn.PReLU` now supports all dimensional Tensors, not just 1d and 2d.
+- add `nn.PairwiseDistance` and `F.pairwise_distance` that compute batchwise
+    pairwise distance between two vectors.
+- Adaptive Max and Average Pooling added for 1d, 2d inputs via
+    `nn.AdaptiveMaxPooling1d`, `nn.AdaptiveAvgPooling2d`, etc.
+- RMSProp now has `momentum` and a `centered` option. If `centered` is True,
+  the gradient is normalized by an estimation of it's variance. (Graves 2013)
+
+**utils**  
+- `WeightedRandomSampler` has been added as a custom sampler for the DataLoader.
+  It samples elements from `[0,..,len(weights)-1]` with the given probabilities
+  and is useful to sample from unbalanced datasets where some classes have
+  many more samples than others. [See the docs](http://pytorch.org/docs/data.html)
+  for more details
+- DataLoader now allows returning of numpy arrays
+
+
+## Bug Fixes
+*torch*
+- When loading GPU checkpoints from disk with storage location remapping,
+  `torch.cuda` was still attempted to be imported. This is now fixed, and
+  you can load GPU checkpoints on machines with no GPUs or CUDA.
+- Work around an OSX `fread` bug where loading checkpoints of each Tensor > 1GB
+  would give an error.
+- Fixed a in `torch.cat` where it now does not
+  accept `reverse` (it's not a `PySequence`)
+  For example:
+  ```
+  l = [Variable(torch.ones(1,3)*i) for i in range(3)]
+  torch.cat(reversed(l), 0) # errors now
+  ```
+- Fix a memory leak in `torch.from_numpy`
+- GPU svd returned a larger matrix than expected in the `some` mode.
+  This is now fixed to match CPU behavior.
+- Fix a bug in CPU max that was introduced in the previous release.
+
+**autograd, nn and optim**  
+- Reassigning attributes in modules correctly works now.
+  This example used to not work correctly, `l.a` always remained `None`.
+  Now it works as one would expect:
+  ```python
+  l = nn.Linear(10, 20)
+  l.a = None
+  l.a = nn.Parameter(torch.randn(2))
+  # l.a is correctly updated
+  ```
+- Fix bug where adding a hook could replace an existing hook
+- Fix `nn.Embedding` and `nn.CosineEmbeddingLoss` to work without
+  error on non-float CUDA (half, double)
+- Fix a bug in `nn.Embedding` when the `max_norm` option was used. Some of the
+  indices were not respecting `max_norm` and this is fixed.
+- Fix corner-case in `Variable`'s SetItem where gradient was of incorrect shape.
+  `x.grad` used to be of shape 20, because `y[1]`` was of shape 20.
+  ```
+  x = Variable(torch.randn(1, 20), requires_grad=True)
+  y = Variable(torch.zeros(10, 20))
+  y[1] = x
+  ```
+- Fix a segfault in Conv1d when input doesn't require grad.
+- Assertions in `pack_padded_sequence` to check that sequence is of length > 0
+- `torch.prod`'s autograd forumlae were incorrect if the Tensor had 0. This
+  formula has been fixed.
+- Variable `expand` and `expand_as` had incorrect dimension inference when using
+  broadcasting semantics. The formula has been fixed in these cases.
+- Fix a size mismatch in `CosineEmbeddingLoss`. [See this issue](https://github.com/pytorch/pytorch/issues/1058) for more details.
+- Fixed a bug in LBFGS that caused it to use uninitialized locals. [See issue](https://github.com/pytorch/pytorch/issues/1039)
+- Add assertions for negative padding in `nn.Conv*` functions.
+- Fix the sttdev gradient formula for the stochastic function `normal`.
+
+**other**
+- Fix issue when returning strings from the DataLoader when `pin_memory=True`
+- Binaries no longer dependent on needing a `libcudart.so` at runtime.
+",https://api.github.com/users/soumith,1310570,soumith,https://api.github.com/repos/pytorch/pytorch/releases/5938760/assets,https://api.github.com/repos/pytorch/pytorch/releases/5938760,v0.1.11,https://api.github.com/repos/pytorch/pytorch/tarball/v0.1.11,https://github.com/pytorch/pytorch/releases/tag/v0.1.11,https://api.github.com/repos/pytorch/pytorch/zipball/v0.1.11,v0.1.11,False,False
+5748328,2017-03-05T19:30:13Z,2017-03-15T05:58:21Z,"Variable-length RNNs, Better Indexing, Sparse Tensors, Faster CPU, Many Bug Fixes","New Features
+------------
+
+### Indexing and Broadcasting Improvements
+
+- Add broadcasting semantics to `expand` / `expand_as`.
+  - Previously, `expand` had no ability to add new dimensions, and `unsqueeze`
+    had to be used to first create singleton dimensions before expansion.
+  - Now, singleton dimensions are automatically prepended to the shape of
+    the tensor if a matching dimension is found.
+    Here's an example:
+    ```python
+    x = torch.rand(5)
+    y = torch.rand(4, 8, 5)
+    z = x.expand_as(y) # z is of shape (4, 8, 5)
+
+    x = torch.rand(1, 8, 1)
+    z.expand_as(y) # z is of shape (4, 8, 5)
+    ```
+- Unsqueeze dimensions using None indexing
+  ```python
+  a = torch.randn(10)
+  b = a.unsqueeze(0)
+  b = a[None, :]     # Equivalent operations
+  ```
+- Indexing with steps is supported (only positive steps)
+  ```python
+  In [1]: a = torch.randn(10)
+  In [2]: a
+  Out[2]:
+
+     0.1338
+     1.0789
+     1.2302
+    -1.3343
+    -0.4676
+     1.3511
+    -0.4374
+    -1.0611
+    -0.1528
+    -1.3994
+    [torch.FloatTensor of size 10]
+
+  In [3]: a[0:10:3]
+  Out[3]:
+
+     0.1338
+    -1.3343
+    -0.4374
+    -1.3994
+    [torch.FloatTensor of size 4]
+  ```
+
+### Variable-length mini-batches in Recurrent Networks
+`nn.RNN`, `nn.LSTM`, `nn.GRU` now support mini-batches where sequences are of variable
+lengths.
+You can pass an input of type [`PackedSequence`](http://pytorch.org/docs/nn.html#packedsequence)
+into these layers.
+A `PackedSequence` holds data and a list of sequence sizes of a packed sequence batch.
+For example, a `PackedSequence` will hold an input mini-batch of such sequences:
+```
+a b c d e
+a b c d e f g h
+a b
+a b c d
+```
+Here, each input row is of variable length.
+
+You can construct a `PackedSequence` using the provided function
+[`pack_padded_sequence`](http://pytorch.org/docs/nn.html#torch.nn.utils.rnn.pack_padded_sequence)
+
+`pack_padded_sequence` takes a `Variable` containing padded sequences, i.e. a `Tensor`
+of `T x B x *`, where `B` is the size of the mini-batch, and each input is either of
+length `T` or is padded to length `T`. It also takes a list of lengths of each input.
+From these, it constructs a `PackedSequence`
+
+For example, it will take [8, 5, 4, 2] and and an input `8 x 4 x 128`
+that corresponds to:
+```
+a b c d e f g h
+a b c d e 0 0 0
+a b c d 0 0 0 0
+a b 0 0 0 0 0 0
+```
+
+The output of the RNN layers will also be a `PackedSequence`, which can then be inverted
+back to a padded Tensor using the inverse function:
+[`pad_packed_sequence`](http://pytorch.org/docs/nn.html#torch.nn.utils.rnn.pad_packed_sequence)
+
+
+### Sparse Tensors (CPU)
+Original goals:
+- ability to propagate sparse updates in a network (e.g. for updating an embedding matrix)
+- ability to efficiently compute ""bag-of-words"" sentence embeddings (e.g. weighted average of word embeddings)
+
+Implemented features:
+- enable backpropagation of sparse gradients without conversion to dense tensors. In most cases a runtime exception is thrown when mixing different gradient types for the same variable
+- add some methods for `THSTensor`: `zero`, elementwise `add` and `mul`, scalar `mul` and `div`
+- make `addcmul` method of `THTensor` compatible with sparse operands
+- make `spmm` method accessible from Python as `dsmm`
+- `sparse_mask` method on `THTensor`. This produces a sparse tensor from a dense tensor,
+   by using a sparse tensor as a mask. A value is only present in the output sparse
+   tensor if it also exists in the mask.
+- update `optim.Adagrad` to use sparse updates when possible.
+- **leave `Variable`'s gradient to `None` by default.**
+  This is because there is no canonical zero gradient anymore (it could be dense or
+  sparse, and if it is sparse we don't know how many dimensions are sparse)
+- N-dimensional values for sparse tensors:
+  - Basically for things like applying sparse updates to embedding matrices, only the
+    first dimension (the one that corresponds to the word index) is sparse. The other
+    dimension is always dense (only whole embedding vectors are updated). An elegant
+    solution is to make the `values` tensor N-dimensional instead of 1-dimensional.
+    For an embedding matrix, the sparse gradient will have a `values` tensor of
+    size `nnz * embedding_size` instead of just `nnz`.
+
+### Common weight initialization methods for neural networks
+By default, all `Linear` and `Conv` layers in PyTorch are initialized according to
+a scheme proposed by [LeCun'98](http://yann.lecun.com/exdb/publis/pdf/lecun-98b.pdf).
+
+However, there are several other commonly used initialization methods.
+We now support many other methods via `torch.nn.init`.
+Supported methods include:
+[`uniform`, `normal`, `constant`, `xavier_uniform`, `xavier_normal`, `kaiming_uniform`,
+`kaiming_normal`, `orthogonal`, `sparse`](http://pytorch.org/docs/nn.html#torch-nn-init)
+
+Here's an example of using these initialization methods:
+```python
+import math
+from torch import nn
+
+class Net(nn.Module):
+  def __init__(self):
+     super(Net, self).__init__()
+     self.conv1 = nn.Conv2d(5, 10, (3, 3))
+     nn.init.xavier_uniform(self.conv1.weight, gain=math.sqrt(2.0))
+     nn.init.constant(self.conv1.bias, 0.1)
+
+network = Net()
+```
+
+### Other features
+- Added a gradient checker utility `torch.autograd.gradcheck` that can
+  be used to check your implementations. Here's a small example:
+  ```python
+  from torch.autograd import Variable, gradcheck
+  inputs = Variable(torch.randn(4, 4), requires_grad=True)
+  gradcheck(lambda x: 2*x.diag(), (inputs,), eps=1e-3)
+  ```
+- Add a [clip_grad_norm](http://pytorch.org/docs/nn.html#torch.nn.utils.clip_grad_norm) utility to easily clip gradients via constraints on their norms.
+- Document `nn.ModuleList` and `nn.ParameterList` that are immensely useful when
+  storing a list of modules in a `Container`
+- Optimizers have backward-compatiblity for old checkpoints.
+  `__set_state__` and `__get_state__` introduced into optimizers.
+- Add Nesterov momentum to `optim.SGD` via [`nesterov=True` kwarg](http://pytorch.org/docs/optim.html#torch.optim.SGD)
+- DataParallel supports multiple inputs and keyword args (which are also scattered)
+  ```
+  m = nn.DataParallel(model)
+  # Now valid
+  m(x, y, option=z)
+  ```
+  See the [documentation](http://pytorch.org/docs/nn.html?highlight=dataparallel#torch.nn.DataParallel) for exact behavior.
+- DataLoader's `default_collate` now also supports numpy arrays
+- Added `F.pad` that supports Constant, Reflection and Replication padding in a single
+  interface: [http://pytorch.org/docs/nn.html#pad](http://pytorch.org/docs/nn.html#pad)
+- `train()` now optionally supports a boolean argument. For example `model.train(False)`
+  will set it to `eval` mode and `model.train(True)` sets it to `train` mode.
+- Added a `DataLoader` sampler: `SubsetRandomSampler`that takes a list of indices
+  in it's constructor and randomly samples from these indices. Useful when you
+  want to sample only a particular subset of your dataset.
+- Transpose supports negative dimensions. For example:
+  ```python
+  a = torch.randn(2, 3)
+  b = a.transpose(0, 1)   # both are equivalent
+  b = a.transpose(-2, -1) # both are equivalent
+  ```
+
+Performance Improvements
+------------------------
+- CPU Tensor backend gets faster
+  - Explicit AVX, AVX2 and improved SSE intrinsics to speedup copy, fill, add, mul, div
+  - Much improved speed for all apply and reduce operations to have better cache hits
+  - Added OpenMP in TH_TENSOR_APPLY* operations
+  - Overall, 2x to 10x+ faster on a lot of operations, closer to Numpy speeds
+  - Runtime dispatch of intrinsics based on CPU features (easy to ship binaries)
+- Serialization Improvements
+    - Fixed bugs on serialization for Tensors > 2GB
+    - 5x to 10x faster serialization (no longer Tarring Tensors)
+
+Bug Fixes
+---------
+- Multi-GPU CuDNN RNN now has separate dropout descriptors per GPU
+- NLLLoss2d has proper shape checks on GPU and stable sizeAverage formulation
+- LogSoftmax2d has a more stable formula
+- Fix prodall (prod without dim arguments) to not average
+- Return correct number of gradients from cuDNN RNN
+- NLLLoss2d has support for weights
+- Fix Unpooling bug for MaxPool1d
+- Fix Indexing when using only an ellipsis
+```python
+x = torch.randn(2,2,2,2)
+x[...] # used to fail, fixed now.
+```
+- expose stateless methods (`torch.*`` methods) for `torch.cuda.HalfTensor`
+- Prevent creation of reference cycles (and hence improve memory usage) when
+  leaf variables were using in-place operations.
+- Fix gradient computation for the indexing operation in the case of sending in
+  `LongTensor`.
+- Fix a reshaping bug in the grad_input of basic operations such as `+, -, *, /` etc.
+  This used to fail, but is fixed now:
+  ```python
+  x = Variable(torch.randn(4, 6), requires_grad=True)
+  b = Variable(torch.rand(12, 1) + 1e-2, requires_grad=True)
+  (x + b.mm(Variable(torch.rand(1, 2) + 1e-2))).sum().backward()
+  ```
+- Revert partial indexing with `LongTensor` to return to numpy-compatibility
+- References to some Tensors in `BatchNorm` and `Conv` are now freed to improve
+  memory usage in certain situations. ResNet-152 finetuning with batch_size 16
+  used to consume the same amount of memory as batch 256 after this fix.
+- Fix a bug where `requires_grad` was being propagated forward differently in
+  CPU mode and CUDA mode.
+- Fix bugs in `torch.multinomial` on CUDA, where in rare cases, the sampling
+  lead to nonsensical values
+- Allow backprop through CuDNN RNN in `eval()` mode.
+- Support `np.int16` in conversion to `ShortTensor`
+- Enable multithreading in MKL (was disabled previously due to a cmake bug).
+
+Improved error messages
+-----------------------
+- Print a readable error message when arguments are on different GPUs
+- Add better error message for conversion of CUDA tensors to numpy
+- Add checks for reward type and size in StochasticFunction
+",https://api.github.com/users/soumith,1310570,soumith,https://api.github.com/repos/pytorch/pytorch/releases/5748328/assets,https://api.github.com/repos/pytorch/pytorch/releases/5748328,v0.1.10,https://api.github.com/repos/pytorch/pytorch/tarball/v0.1.10,https://github.com/pytorch/pytorch/releases/tag/v0.1.10,https://api.github.com/repos/pytorch/pytorch/zipball/v0.1.10,v0.1.10,False,False
+5562225,2017-02-17T12:58:51Z,2017-02-24T13:02:03Z,Bug fix release,"## Bug fixes:
+- Major bugfix in CuDNN bindings for cases of non-contiguous grad-outputs
+  - also added better error checking and asserts to cudnn RNN and Conv
+- Fixed serialization bugs when serializing Tensors > 2GB
+- Enable and half and double THNN backends
+- RNNBase and Embedding fixed to be compatible with DataParallel
+- Fix bug in torch.cat for multi-GPU settings
+- Support bias=False in Conv3d
+- Change behavior of `detach()` to actually remove the creator (previously was just detaching compute)
+
+## Features and performance
+- Refactored autograd internals into python-agnostic C++ (#662)
+- view, unsqeeze and squeeze moved to C for superior performance
+- Allow DataParallel to have tuple inputs
+- Add a `torch.__version__` string.
+",https://api.github.com/users/soumith,1310570,soumith,https://api.github.com/repos/pytorch/pytorch/releases/5562225/assets,https://api.github.com/repos/pytorch/pytorch/releases/5562225,v0.1.9,https://api.github.com/repos/pytorch/pytorch/tarball/v0.1.9,https://github.com/pytorch/pytorch/releases/tag/v0.1.9,https://api.github.com/repos/pytorch/pytorch/zipball/v0.1.9,v0.1.9,False,False
+5362062,2017-02-03T20:31:03Z,2017-02-05T02:01:26Z,"Bug Fixes, initial Distributed support","A bugfix release with some small features:
+
+## New Features
+- THPP now has CUDA Tensors
+- autograd functions: repeat, var, std, renorm, comparison ops added.
+- Merged an initial version of THD (distributed pytorch)
+- Indexing support with LongTensor indices
+- Add torch.unbind
+- Add `ModuleList` and `ParameterList` to store lists of modules / params in an `nn.Module`
+
+## Bug and usability fixes
+- Fix a bug in FFI utils
+- Fix lua-reader for SpatialConvolution
+- Fix backward contiguous check in BatchNorm
+- Fix travis builds
+- Pep8 enforced for the entire codebase
+- CuDNN RNN non-contiguous fixes
+- Remove circular references in some Autograd functions
+- Add CUDA asserts to various kernels for out-of-bounds checks
+- Fix non-contiguous bug in torch.cat
+- Fix memory leak in Unpooling
+
+## API Changes
+- nn.Billinear\* -> nn.Bilinear*
+- Return indices as well in autograd for `torch.sort` and `torch.topk`
+- `.set_index` -> `._set_index` (made private)
+- `normal` and `log_norma`l kwarg changed from `var` to `std`
+- `Optimizer.state_dict` now has semantics matching `Module state_dict`
+",https://api.github.com/users/soumith,1310570,soumith,https://api.github.com/repos/pytorch/pytorch/releases/5362062/assets,https://api.github.com/repos/pytorch/pytorch/releases/5362062,master,https://api.github.com/repos/pytorch/pytorch/tarball/v0.1.8,https://github.com/pytorch/pytorch/releases/tag/v0.1.8,https://api.github.com/repos/pytorch/pytorch/zipball/v0.1.8,v0.1.8,False,False
+5339179,2017-01-26T03:47:23Z,2017-02-02T12:40:39Z,bug fixes and small features,"A bugfix release with some small features:
+
+## New Features
+- LBFGS Optimizer added
+- Add `state_dict` for optimizers for easy checkpointing
+- Add differential upsampling modules for 2d (bilinear, nearest)
+
+## Bug and usability fixes
+- Fix multi-GPU bugs in indexing
+- Improve error messages for optimizer
+- Fix bug in Conv1d
+- Fix bug in Conv*d groups
+- Add improved error messages for unsupported CuDNN codepaths
+- fix bugs in CuDNN bindings
+- Workaround bugs in CuDNN itself (batchnorm-backward, non-contiguous weights)
+- Fix lua-reader's BatchNorm and Linear layers
+- Fix some memory leaks
+- Give fatal errors on Variable comparison
+- Fix bug in ELU backward
+- Fix index_select backward
+- Fix BatchNorm backward in evaluate mode (workaround CuDNN bug)
+
+## API Changes
+- Adadelta's `step_rate` is renamed to `lr`
+- Adam's default learning rate the same as LuaTorch
+",https://api.github.com/users/soumith,1310570,soumith,https://api.github.com/repos/pytorch/pytorch/releases/5339179/assets,https://api.github.com/repos/pytorch/pytorch/releases/5339179,master,https://api.github.com/repos/pytorch/pytorch/tarball/v0.1.7,https://github.com/pytorch/pytorch/releases/tag/v0.1.7,https://api.github.com/repos/pytorch/pytorch/zipball/v0.1.7,v0.1.7,False,False
+5339083,2017-01-21T15:41:52Z,2017-02-02T12:29:07Z,Beta is here.,"Our last release (v0.1.5) was on November 14th, 2016
+
+We finished, froze and released (v0.1.6) on Jan 21st, 2016.
+
+A lot has happened since 0.1.5. 
+
+## Summary
+- PyTorch public release on 18th Jan, 2016.
+- An initial Model Zoo, several common Vision models can be initialized with pretrained weights downloaded from the zoo.
+- All the 100+ torch.\* functions bar 3 (topk, mode and kthvalue) are GPU-ready, and performance improvements across board for several existing ones.
+- All relevant neural network modules are now CuDNN bound.
+- Stochastic functions added to Autograd, for use in reinforcement learning
+- A functional interface of the nn library is added
+- GPU device initialization has been made lazy (improvement in CUDA initialization time on multi-GPU machines)
+- Pinned memory support, and leveraging it in DataLoader 
+- Made error messages across board more informative, especially around shape checks
+- A rich set of examples and tutorials added to pytorch/examples and pytorch/tutorials
+- API Reference at pytorch.org/docs
+- Multiprocessing support for CUDA (Python3 only)
+- An initial version of CPU Sparse Tensors is added and used in nn.Embedding(sparse=True). More to come on this side.
+- Added a lua reader to load existing .t7 files with Torch models
+- Various bug-fixes.
+- Allow returning of changed gradients in hooks
+
+## API Changes
+- `Conv*d` and `*Pool*d` layers now take a tuple of kernel sizes/strides/padding instead of `kh`/`kw`.
+- `Unpooling*` layers have a changed API
+- `Variable.grad` is now a `Variable` (was a `Tensor`)
+- `nn.Container` is deprecated and merged into `nn.Module`. Replace all instances of `nn.Container` in your code with `nn.Module`
+- `torch.cat` changed API to take an iterable of tensors, along with a dimension (previously varargs of Tensors). Also `torch.cat`'s default dimension is changed. It's been made an inverse transform for `torch.split` and `torch.chunk`.
+- `Variable.no_grad` has been renamed to `Variable.detach`
+- RMSProp's initialization of gradients changed from ones to zeros (#485)
+- Removed `cmin`, `cmax` and `cinv` (functionality of `cmin`, `cmax` split between `max`/`min` and `clamp`; `cinv` renamed to `reciprocal`)
+- `register_hook` API changed, names are removed. See: https://github.com/pytorch/pytorch/pull/446
+- `torch.*(..., out=Tensor)` is adopted for output arguments
+
+## Model Zoo
+
+A model zoo has been started with several pre-trained vision models available such as AlexNet, ResNet50, etc. The download and usage of the models is seamless with a keyword argument.
+
+``` python
+import torchvision.models as models
+models.alexnet(pretrained=True)
+```
+
+The models are hosted on Amazon S3, and we look forward to more models from the community.
+Basic documentation is found here:
+
+http://pytorch.org/docs/model_zoo.html
+
+You can find specific models listed in the README of torchvision and torchtext
+
+## Stochastic Functions in Autograd
+
+We introduced Stochastic functions that needed to be provided with a `reward` for their backward.
+This feature was inspired by [Gradient Estimation Using Stochastic Computation Graphs by Schulman et. al.](https://arxiv.org/abs/1506.05254) and is helpful to implement reinforcement learning techniques.
+Documentation is here: http://pytorch.org/docs/autograd.html#torch.autograd.Variable.reinforce
+A showcase of using these nodes is in the REINFORCE example: https://github.com/pytorch/examples/blob/master/reinforcement_learning/reinforce.py#L70
+
+## Functional interface to nn
+
+PyTorch neural networks have so far been modeled around `nn.Module`. However, for most simple functions such as ReLU, using this is a bit cumbersome.
+To simplify this, we've introduced a functional interface to nn, and modified the tutorials to use this API where appropriate.
+
+For example:
+
+``` python
+import torch.nn as nn
+import torch.nn.functional as F
+
+# module style
+relu = nn.ReLU()
+y = relu(x)
+
+# functional style
+y = F.relu(x)
+```
+
+The functional style is convenient when using non-parametric and non-learnable functions.
+
+Documentation for these functions is here: http://pytorch.org/docs/nn.html#torch-nn-functional
+
+## Faster GPU code
+
+The initialization of the GPU backend has been made lazy. This means that it will automatically be 
+imported and initialized when needed (and not before-hand). Doing this has improved startup times (especially for multi-GPU systems) and reduced boilerplate code.
+
+We've also integrated support for pinned memory, which accelerates CPU to GPU transfers for specially marked buffers. Using this, we accelerated the multiprocessing data loaders.
+
+## A rich set of examples
+
+With the help of some of you, we've added a rich set of examples from Image Super-resolution to Neural Machine Translation.
+You can explore more here: https://github.com/pytorch/examples
+
+## API Reference and Notes
+
+We've fleshed out a full API reference that is mostly complete at docs.pytorch.org
+Contributions are welcome :)
+
+We've also added notes such has CUDA Semantics, Extending PyTorch, etc.
+
+## Multiprocessing support for CUDA
+
+Uptil now, Tensor sharing using multiprocessing only worked for CPU Tensors.
+We've now enabled Tensor sharing for CUDA tensors when using python-3.
+You can read more notes here: http://pytorch.org/docs/notes/multiprocessing.html
+
+## Lua Reader
+
+A ""lua reader"" has been integrated, that can load most LuaTorch .t7 files, including `nn` models.
+nngraph models are not supported.
+
+Example usage can be found here: https://discuss.pytorch.org/t/convert-import-torch-model-to-pytorch/37/2
+",https://api.github.com/users/soumith,1310570,soumith,https://api.github.com/repos/pytorch/pytorch/releases/5339083/assets,https://api.github.com/repos/pytorch/pytorch/releases/5339083,v0.1.6,https://api.github.com/repos/pytorch/pytorch/tarball/v0.1.6,https://github.com/pytorch/pytorch/releases/tag/v0.1.6,https://api.github.com/repos/pytorch/pytorch/zipball/v0.1.6,v0.1.6,False,False
+4696571,2016-11-18T09:00:27Z,2016-11-18T10:15:32Z,Alpha-5,"# What's new in Alpha-5?
+
+## Usability
+- keyword arguments, improved indexing for all torch and autograd functions!
+- Deterministic data loader even under multiple workers
+- LAPACK bindings with full CUDA support via MAGMA
+- Easier numpy2torch conversion with torch.from_numpy(x)
+- Lot more documentation
+  - fully covered neural networks
+  - fully covered optim package
+  - partly covered torch documentation
+- Tutorials:
+  - Increased depth, length and clarity of the tutorials
+
+## New Features and modules
+- PyTorch Vision: a package to hold common dataloaders, transforms and utilities for images and videos
+  - Data loaders for: COCO (captioning and detection), Imagenet, CIFAR10/100, LSUN etc.
+  - Image Transforms: commonly used data augmentation transforms such as random-cropping, normalization
+    - Unit-tested
+  - Utilities: saving Tensors as images, creating grids of images from a mini-batch of tensors.
+- Recurrent Neural Networks
+  - A complete and robust implementation of efficient Stacked LSTMs, RNNs, GRUs (bidirectional and otherwise)
+  - Seamlessly integrated CuDNN is used whenever possible for maximum performance
+  - A complete word-level language modeling example on the PennTreeBank dataset
+    - verification that the perplexity matches the reference Torch implementation
+- an example of Generative Adversarial Networks:
+  - DCGAN example in < 250 lines (includes everything)
+  - Verified the results to match reference implementations
+  - Multi-GPU ready!
+- A redesigned Optim package with the following optimization methods:
+  - SGD, AdaDelta, Adagrad, Adam, AdaMax, Averaged SGD, RProp, RMSProp
+  - Fully unit tested against their reference implementations
+  - Fully documented
+- Improved Multi-GPU performance (and more is coming)
+  - Integrated NVIDIA NCCL for maximizing multi-GPU communication performance
+
+## Plans for Alpha-6
+- docstrings support and finishing torch and autograd documentation
+- Fully verifying the convergence of ResNet / Imagenet training
+- More examples around:
+  - Reinforcement Learning / OpenAI Gym
+  - Object Detection 
+  - Sequence to Sequence methods
+  - WaveNet / ByteNet
+  - More adversarial networks (text2image, etc.)
+- More gains in performance, and fully flesh out CuDNN integration
+- Half-precision training for GPUs
+- A Lua-Torch model loader, and improved legacy.nn support
+- Lua bridge, to call your existing lua code
+
+# Usability
+
+## Keyword arguments
+
+All torch and autograd functions used to only support arguments in the correct order.
+For example:
+
+``` python
+torch.clamp(x, -0.1, 0.1)
+```
+
+This is often unreadable, especially for LAPACK usage where one declares booleans such as upper=True
+
+Now, one can simply do:
+
+``` python
+torch.clamp(x, min=-0.1, max=0.1)
+```
+
+We've also implemented ellipsis indexing similar to NumPy
+
+## Deterministic Data Loader
+
+The data loader now generates indices on the main process and regardless of how many workers you use,
+the order of data loading will remain consistent if you use the same random seed.
+
+## Fully tested LAPACK bindings
+
+Unit tests on both the CPU and CUDA side.
+On the CPU, we ship with MKL-integration, and on the GPU, LAPACK is powered by MAGMA
+
+## Documentation
+
+We are at a stage where we have converged to stable APIs.
+Hence, documentation is going at a rapid pace, and we have covered:
+- nn
+- optim
+- part of torch / Tensors
+
+As always, you can check out the documentation here: [pytorch.org/api/latest/en/](http://pytorch.org/api/latest/en/)
+
+## Tutorials
+
+We added one new tutorial: **[Creating extensions using numpy and scipy](https://github.com/pytorch/tutorials/blob/master/Creating%20extensions%20using%20numpy%20and%20scipy.ipynb)**
+- This covers the case where you would want to quickly write some modules of your neural network using familiar scipy tools like scipy.sparse for example.
+
+We improved the existing tutorials to cover more of the basics, and improved them.
+
+# New Features and modules
+
+## PyTorch Vision
+
+A one-stop repository for all of your image (and soon) video needs, whether that be data loaders, common neural network definitions (such as alexnet, inception, resnet etc.) or data augmentation routines.
+Our plan is to put some serious engineering firepower into this module, with GPU loaders and augmentation routines, especially for video processing. Contributions welcome :)
+
+So far, we have:
+
+### Data loaders
+- COCO (Captioning and Detection) (https://github.com/pytorch/vision#coco)
+- LSUN Classification (https://github.com/pytorch/vision#lsun)
+- ImageFolder (https://github.com/pytorch/vision#imagefolder)
+- Imagenet-12 (https://github.com/pytorch/vision#imagenet-12)
+- CIFAR10 and CIFAR100 (https://github.com/pytorch/vision#cifar)
+
+All the data loaders are fully documented, and share a basic interface.
+They are fully compatible with torch.utils.DataLoader to be parallelized in fetching.
+
+### Common Image Transforms
+- Convertors from PIL Image to Torch Tensors
+- Random Cropping, Scaling, Normalization transforms
+  - Unit tested
+
+**The Imagenet example has been updated to use this package**
+
+## Recurrent Neural Networks
+
+One of the biggest strengths of PyTorch's new design is to be able to seamlessly share weights and do recurrent nets.
+We've emphasized this, and also deeply integrated CuDNN in a way that as a user you do not notice a thing, while having the full power and speed.
+
+nn.RNN, nn.LSTM and nn.GRU are the stacked RecurrentNet modules that you would want to use, and for generally crazy research, we've also given implementations of individual cells: nn.LSTMCell and nn.GRUCell
+
+A fully tested and verified example is provided in https://github.com/pytorch/examples/tree/master/word_language_model
+This example does word-level language modeling on the PennTreeBank dataset.
+
+## Adversarial Networks
+
+A concise example of Generative Adversarial Networks for Image Generation is provided, integrating multiple datasets (showcasing the power of the vision package).
+The example is < 250 lines of code, and gives a lot more clarity towards the usage of PyTorch.
+Multiple data loader threads, checkpointing, saving generated images to disk and much more is showcased.
+
+## A stable and fleshed out Optim package
+
+It took us some time to design a good and stable Optim API, but now we have converged to a clean design.
+The Optim package is fully Multi-GPU and Multi-device ready out of the box.
+Now we've implemented and unit tested the following algorithms:
+- SGD, AdaDelta, Adagrad, Adam, AdaMax, Averaged SGD, RProp, RMSProp
+
+Setting per-layer learning rates, or optimizing only part of your neural network is now very trivial.
+
+It is fully documented here: http://pytorch.org/api/latest/en/#torch-optim
+It's usage can be seen both in the DCGAN and Imagenet examples.
+
+## Improved Multi-GPU performance (and more is coming)
+
+We've improved the Multi-GPU performance since alpha-4, and we are close to squeezing out full performance.
+We are working closely with NVIDIA to squeeze out the last drops of performance and make PyTorch future-proof for the P100 and new cards.
+",https://api.github.com/users/soumith,1310570,soumith,https://api.github.com/repos/pytorch/pytorch/releases/4696571/assets,https://api.github.com/repos/pytorch/pytorch/releases/4696571,v0.1.5,https://api.github.com/repos/pytorch/pytorch/tarball/v0.1.5,https://github.com/pytorch/pytorch/releases/tag/v0.1.5,https://api.github.com/repos/pytorch/pytorch/zipball/v0.1.5,v0.1.5,False,True
+4294033,2016-10-03T07:14:06Z,2016-10-03T22:21:00Z,Alpha-4 Release,"## Some interesting stats
+
+#### On Resnets
+
+Because of our aggressive freeing and allocating resources, ResNets in PyTorch take lesser memory than torch-nn
+- 4.4GB in PyTorch
+- 6.5GB in Torch-nn
+- 4.6GB in Torch-nn with a hacky sharing of gradinput buffers
+- On 1-GPU, PyTorch speed is 10s of milliseconds faster than Torch-nn
+- On 2-GPUs, PyTorch is the same speed as Torch-nn
+- On 4-GPUs, PyTorch is about 10 to 20% slower, but it's because we have just finished implementing Multi-GPU and we will be plugging this perf difference in the next week.
+
+#### FFI-based C extension
+
+On a small benchmark of adding a constant to a 5x5 tensor at 1000 calls:
+- LuaJIT FFI: 0.001 seconds
+- Lua 5.2 FFI: 0.003 seconds
+- PyTorch CFFI: 0.003 seconds
+- Raw Python CFFI / CTypes: 0.001 seconds
+
+## What's new in Alpha-4?
+
+### Usability
+- Two Tutorials, now located at: [https://github.com/pytorch/tutorials](https://github.com/pytorch/tutorials)
+  - Tutorial 1: [Introduction to PyTorch for former Torchies](https://github.com/pytorch/tutorials/blob/master/Introduction%20to%20PyTorch%20for%20former%20Torchies.ipynb)
+  - Tutorial 2: [Write your own C code that interfaces into PyTorch via FFI](https://github.com/pytorch/tutorials/blob/master/Creating%20Extensions%20using%20FFI.md)
+- Examples:
+  - A full Imagenet / ResNet example is now located at: https://github.com/pytorch/examples/tree/master/imagenet
+    - it works! :)
+    - Has performant Multi-GPU support
+- More improved error messages and shape checks across the board in pytorch, TH, THNN
+- `torch.*` functions now dont use `CamelCase`, but use `underscore_case`. Example: `torch.index_add_`
+
+### New Features and modules
+- Multi-GPU primitives
+- A custom CUDA allocator to maximize autograd performance (backported to Torch too)
+- More autograd functions. Now it's almost API complete for all differentiable `torch.*` functions.
+- CuDNN Integration
+- Multiprocess DataLoader in `torch.utils` (used in the imagenet example)
+- Extensions API to interface to your C code simply via FFI
+  - [An example extension is provided here](https://github.com/pytorch/extension-ffi)
+
+## Plans for Alpha-5
+- Revamping and rethinking the Checkpointing API
+- Revamping the Optim API to support things like per-layer learning rates and optimizing non-weights (like in NeuralStyle)
+- RNN Examples, initially for PennTreeBank language modeling
+- Better RNN support in general, improved error messages, multi-GPU etc.
+- NCCL Integration for improved multi-GPU performance (already implemented at https://github.com/pytorch/pytorch/pull/78 )
+- Documentation / Reference manual for `torch.*` and `autograd`
+
+## Usability
+
+### Tutorials
+
+We've added two tutorials to get you all started.
+- Tutorial 1: [Introduction to PyTorch for former Torchies](https://github.com/pytorch/tutorials/blob/master/Introduction%20to%20PyTorch%20for%20former%20Torchies.ipynb)
+  - In this tutorial we cover the torch, autograd and nn packages from a perspective of former Torch users. 
+  - Going through this tutorial should get you started. Let us know how we can improve it.
+- Tutorial 2: [Write your own C code that interfaces into PyTorch via FFI](https://github.com/pytorch/tutorials/blob/master/Creating%20Extensions%20using%20FFI.md)
+  - In this tutorial, we showcase how you can call your own C code that takes torch tensors as inputs / outputs in a seamless way via FFI
+  - The tutorial showcases how you can write your own neural network Module that calls in C implementations
+
+### Examples
+
+We've added a full imagenet example with ResNets that should be really suited towards “learning by example”.
+It is located here: [https://github.com/pytorch/examples/tree/master/imagenet](https://github.com/pytorch/examples/tree/master/imagenet)
+The data for the example has to be preprocessed for now in the same way as is specified in [fb.resnet.torch](https://github.com/facebook/fb.resnet.torch/blob/master/INSTALL.md#download-the-imagenet-dataset)
+
+The example has Multi-GPU support in a DataParallel fashion.
+
+### More improved error messages
+
+We've gone through the TH and THNN C libraries and added much more intuitive error messages that report the mismatched shapes. We will continue to make improvements on this front.
+If you have any unintuitive error messages that you encounter, please open an issue at https://github.com/pytorch/pytorch/issues
+
+For example:
+
+Old error message:
+
+```
+bad argument #2 to 'v' (3D or 4D (batch mode) tensor expected for input
+```
+
+New error message:
+
+```
+bad argument #2 to 'v' (3D or 4D (batch mode) tensor expected for input, but got: [100 x 100]
+```
+
+No more CamelCase for functions
+
+All torch functions have been renamed from CamelCase to underscore_case.
+indexAdd → index_add_
+getRNGState → get_rng_state
+etc.
+
+## New Features and modules
+
+### Multi-GPU primitives
+- We've added efficient multi-GPU support in general for neural networks. Instead of building magic blocks that do opaque parallelization for you, we've broken them down into easy to use collectives.
+- A pattern like DataParallel is implemented in terms of:
+  - replicate, scatter, gather, parallel_apply
+  - These are reusable collectives for implementing other multi-gpu patterns as well
+  - https://github.com/pytorch/pytorch/blob/master/torch/nn/parallel/__init__.py#L24-L38
+
+### Performance
+
+With Multi-GPU, we naturally overlap data transfers with compute across the whole graph. This makes multi-GPU much more efficient, and is done in a way that does not interfere with the imperativeness / error reporting.
+
+Another important note is that we now dispatch parallel modules via python threads, which makes the CUDA kernel launches in a breadth-first fashion, getting rid of obvious kernel launch latency bottlenecks.
+
+### Custom CUDA allocator to maximize autograd performance
+
+In Torch, we had to write nn modules in a careful way to avoid cuda synchronization points which were a multi-GPU bottleneck and general performance bottleneck. This affected neural networks and autograd sometimes up to 2x in performance penalty.
+
+In PyTorch (and Torch), Sam Gross has written a new Caching CUDA allocator that avoids cuda synchronization points while being really suited towards Tensor use-cases where we typically do short-term and long-term allocations of memory of the same tensor sizes.
+
+This unblocks us from a lot of performance issues.
+
+### More autograd functions
+
+Now the torch.\* API should be pretty much be ready for full autograd support (short of 3 functions).
+Autograd has been enabled for all the functions with the exception of non-differentiable functions like torch.eq.
+
+### CuDNN Integration
+
+We now fully integrate and support CuDNN version 5.1.3, and it is shipped in the binaries (just like CUDA), so you never have to worry about manually downloading and installing it from the NVIDIA website.
+
+### Generic Multiprocess DataLoader
+
+We've added a flexible Data Loader that supports multiple data loading workers. This enables a lot of use-cases, and is first used in our Imagenet example.
+
+### C Extensions API
+
+We added an easy to use extensions API and an example extension here: 
+https://github.com/pytorch/extension-ffi
+
+You can call your C functions (that have TH*Tensor inputs / outputs and other fundamental types in the function signature) without writing any manual Python bindings.
+
+One question you might have is, what kind of call overhead these auto-generated FFI bindings have. The answer is “None”, as seen in the numbers in the beginning of the note.
+
+The example extension also covers how you can define your autograd-ready nn module that calls your C function.
+",https://api.github.com/users/soumith,1310570,soumith,https://api.github.com/repos/pytorch/pytorch/releases/4294033/assets,https://api.github.com/repos/pytorch/pytorch/releases/4294033,v0.1.4,https://api.github.com/repos/pytorch/pytorch/tarball/v0.1.4,https://github.com/pytorch/pytorch/releases/tag/v0.1.4,https://api.github.com/repos/pytorch/pytorch/zipball/v0.1.4,v0.1.4,False,True
+4151222,2016-09-16T09:31:36Z,2016-09-16T11:01:19Z,Alpha-3 Release,"# What's new?
+
+## Usability
+- conda binaries for all Linux (as old as RHEL 6 and  Ubuntu 12.04) (we are working on OSX and pip binaries). 
+  - Now installing pytorch is as simple as:
+    - `conda install pytorch -c https://conda.anaconda.org/t/6N-MsQ4WZ7jo/soumith`
+    - it links against MKL, ships CUDA and MAGMA runtime with it, and #justworks
+- Human-ready error messages
+- Started working on documentation and an API Reference
+  - pytorch.org/api/0.1.3/en/ (http://pytorch.org/api/0.1.3/en/) 
+- Continuous integration with GPU support. Never have a broken master again
+  - https://build.pytorch.org (https://build.pytorch.org/) 
+
+## New Features and modules
+- The (new) neural network module now has 75% of the modules implemented (71 out of 93), and we are powering through the rest
+  - most of the modules in old-nn have been removed because we do not need Containers and many modules such as CAddTable are covered by Autograd
+- autograd now supports all torch functions present in twitter-autograd and a lot more....
+- Added Trainer and Dataset abstractions (like in TorchNet)
+
+## Plans for Alpha-4
+- cudnn integration (and CUDA allocator). 
+  - We have this implemented but are iterating over design https://github.com/pytorch/pytorch/pull/36
+- Multi-GPU support in nn
+- examples, examples, examples
+  - we will work on having examples across all domains (vision, NLP, RL, etc.)
+
+## Usability
+
+### Conda binaries for Linux
+
+PyTorch will be shipped on Linux and OSX (and likely Windows) from the day-1, and we want it to be as simple and intuitive install process.
+We have versioned binaries, that do not require the user to install anything (except an NVIDIA Driver if you intend to use the GPU. Not even CUDA is a dependency).
+
+For now, to get started on Linux:
+
+``` bash
+conda install pytorch -c https://conda.anaconda.org/t/6N-MsQ4WZ7jo/soumith
+```
+
+We have built OSX binaries, but have some small bugs on OSX, and we'll fix the issues there over the week.
+We are working on “pip install” for non Anaconda python installs.
+
+### Human-ready error messages
+
+We've gone through how we report type errors and dispatch errors and make it easy for the user to understand what they did wrong. See this small example:
+
+``` python
+In [1]: import torch
+In [2]: x = torch.FloatTensor(10)
+In [3]: x.addmm(torch.ones(1), 1, 'str')
+ValueError                                Traceback (most recent call last)
+<ipython-input-3-90eb50ea2e35> in <module>()
+----> 1 x.addmm(torch.ones(1), 1, 'str')
+
+ValueError: addmm recieved an invalid combination of argument types - got (torch.DoubleTensor, int, str), but expected one of:
+ * (torch.FloatTensor mat1, torch.FloatTensor mat2)
+ * (float beta, torch.FloatTensor mat1, torch.FloatTensor mat2)
+ * (float beta, float alpha, torch.FloatTensor mat1, torch.FloatTensor mat2)
+```
+
+### Continuous Builds with GPU support
+- All pushes to the _master_ branch are fully built and unit tested
+- All Pull Requests are fully built and unit tested
+- On Titan-X GPUs in the NIMBIX cloud
+- One can go checkout the builds details at: https://build.pytorch.org (https://build.pytorch.org/)
+
+## New Features and modules
+
+### Neural Network Modules
+- Added fully functional and fully unit-tested nn modules and criterions for pretty much everything one would need for their current workflows. 
+- We have about 25% of the modules missing (mostly exotic and lightly used ones) but will get to those in the coming few days.
+- nn modules have been renamed to be simplified in their naming. For example:
+  - SpatialConvolution → conv2d
+  - The new naming can be referenced at pytorch.org/api/0.1.3/en/ (http://pytorch.org/api/0.1.3/en/) or via autocomplete.
+- Full unit-test coverage for all implemented functions
+
+### Autograd
+- We've added autograd support for almost all the torch functions (and operators like +, - etc.)
+  - We have all the functions implemented that are presented in twitter-autograd, and we have many more.
+  - At this point we have about 75 to 80% of them covered (ball park).
+  - Full unit-test coverage for all implemented functions
+
+### Trainer & Dataset classes
+
+#### Trainer
+
+We've added a TorchNet style _Trainer_ class that provides a convenient abstraction
+
+``` python
+trainer = Trainer(model, criterion, optimizer, dataset)
+trainer.register_plugin(ProgressMonitor())
+trainer.register_plugin(LossMonitor())
+trainer.register_plugin(AccuracyMonitor())
+trainer.register_plugin(Logger(['progress', 'accuracy', 'loss'], interval=(5, 'iterations')))
+trainer.run(epochs=5)
+
+################################################################################
+# progress: 180/60000 (0.30%)     accuracy: 0.00% (3.24%)         loss: 2.3051 (2.2116)
+# progress: 280/60000 (0.47%)     accuracy: 5.00% (4.84%)         loss: 2.3045 (2.2891)
+# progress: 380/60000 (0.63%)     accuracy: 25.00% (13.04%)       loss: 2.2974 (2.2992)
+```
+
+#### Dataset
+
+The data loading is implemented using three abstractions: 
+- _DataSource_ - a simple object that defines indexing and checking length. Indexing returns a tuple of (sample, label)
+- _Sampler_ - an object that defines the data ordering. it has to be iterable, and it’s iterator should return a string of indices in [0; len(data_source)-1] interval. The end of the iterator indicates completing the epoch. 
+- _Dataset_ - an object which wraps a DataSource and a Sampler. Defines all the data loading logic (e.g. all the multiprocessing code).
+
+The Datsets will accept a list of transforms (like image augmentation) that are given to it, which will run on the data before given out.
+",https://api.github.com/users/soumith,1310570,soumith,https://api.github.com/repos/pytorch/pytorch/releases/4151222/assets,https://api.github.com/repos/pytorch/pytorch/releases/4151222,v0.1.3,https://api.github.com/repos/pytorch/pytorch/tarball/v0.1.3,https://github.com/pytorch/pytorch/releases/tag/v0.1.3,https://api.github.com/repos/pytorch/pytorch/zipball/v0.1.3,v0.1.3,False,True
+4025327,2016-09-01T04:58:22Z,2016-09-01T05:03:16Z,alpha-2 Release,"## What's new?
+
+We've 
+- built seamless support for multiprocessing with Tensor sharing
+- changed the API of the optim engine
+- added a complete Hook system for nn and autograd
+- added in-place ops to autograd and more neural network modules to nn
+
+## Multiprocessing with Tensor sharing
+
+In Torch, or in general, one uses ""threads"" to build parallel data loaders, as well as to do Hogwild training.  
+Threads are powerful, as one can share Tensors between threads.  
+This allows you to:
+- transfer data between threads with efficiently with zero memory copy and serialization overhead.
+- share tensors among threads for parameter sharing models
+
+Sharing Tensors among threads is very useful when you do Hogwild training, i.e. if you want to train several models in parallel, but want to share their underlying parameters.  
+This is often used in non ConvNets, like training word embeddings, RL-for-games, etc.
+
+With Python, one cannot use threads because of a few technical issues.  
+Python has what is called [Global Interpreter Lock](https://wiki.python.org/moin/GlobalInterpreterLock), which does not allow threads to concurrently execute python code.
+
+Hence, the most pythonic way to use multiple CPU cores is [multiprocessing](http://docs.python.org/2/library/multiprocessing.html)
+
+We made PyTorch to seamlessly integrate with python multiprocessing.  
+This involved solving some complex technical problems to make this an air-tight solution, and more can be read [in this in-depth technical discussion](http://github.com/pytorch/pytorch/wiki/Multiprocessing-Technical-Notes).
+
+What this means for you as the end-user is that you can simply use multiprocessing in this way:
+
+``` python
+# loaders.py
+# Functions from this file run in the workers
+
+def fill(queue):
+  while True:
+    tensor = queue.get()
+    tensor.fill_(10)
+    queue.put(tensor)
+
+def fill_pool(tensor):
+  tensor.fill_(10)
+```
+
+``` python
+# Example 1: Using multiple persistent processes and a Queue
+# process.py
+
+import torch
+import torch.multiprocessing as multiprocessing
+from loaders import fill
+
+# torch.multiprocessing.Queue automatically moves Tensor data to shared memory
+# So the main process and worker share the data
+queue = multiprocessing.Queue()
+buffers = [torch.Tensor(2, 2) for i in range(4)]
+for b in buffers:
+  queue.put(b)
+processes = [multiprocessing.Process(target=fill, args=(queue,)).start() for i in range(10)]
+```
+
+``` python
+# Example 2: Using a process pool
+# pool.py
+
+import torch
+from torch.multiprocessing import Pool
+from loaders import fill_pool
+
+tensors = [torch.Tensor(2, 2) for i in range(100)]
+pool = Pool(10)
+pool.map(fill_pool, tensors)
+```
+
+## Optim's API changes
+
+Optimizer's step function now accepts a closure that should return a loss variable (similar to `legacy.optim`).
+
+We've realized that to keep Optim flexible for multiple methods, like SGD with nesterov, Conjugate Gradient, LBFGS etc., we need to have the input to optim be a function that evaluates the model. 
+This is necessary because several optimization methods re-evaluate the function multiple times at different parameters.
+To come to this necessary API change, we took into account complicated scenarios like Dynamic RNNs and complex ConvNet models with dynamic branching.  
+
+So the API now looks like this:
+
+``` python
+optimizer = optim.SGD(model, lr=1e-3, momentum)
+input, target = ...
+optimizer.step(lambda: criterion(model(input), target)) #sufficient for simple models
+```
+
+To simplify things at the user end for simple or specific common models, we will introduce a Trainer class, that will take a (dataset, model, optim) triple and train the model. This trainer class is planned for alpha-3.
+
+## A complete Hook system for nn and autograd
+
+Accessing intermediate values during the forward pass is straightforward, but during backward the buffers can rapidly change their content (for example: when doing in-place optimizations). 
+
+If you want to get access to the gradients at a particular Op or Layer inside your model, one uses a hook system. 
+Hooks can be attached to variables or to modules and are called as soon as the gradient is available:
+
+``` python
+# Example in autograd
+a, b, c = [Variable(torch.Tensor(5, 5)) for i in range(3)]
+
+def print_norm(grad):
+    print(grad.norm(2))
+
+y = b * c + a
+y.register_hook(print_norm)
+
+z = y * y - b
+z.backward(torch.ones(5, 5))
+
+# Example in nn
+model = ...
+
+def inspect_forward(module, input, output):
+    ...
+
+model.conv2.register_forward_hook(inspect_forward)
+
+def inspect_backward(module, grad_input, grad_output):
+    ...
+
+model.conv2.register_backward_hook(inspect_backward)
+```
+
+We would definitely look forward to comments about the Hook system. Let us know what you think.
+
+### Added in-place ops to autograd and more neural network modules to nn
+- As part of porting fb.resnet.torch, we've added AveragePool2d and fixed BatchNorm2d
+- Now, autograd fully supports in-place operations, with in-place variables immediately marked as dirty.
+  To illustrate this, let's look at a small example
+
+``` python
+x = Variable(torch.ones(5, 5))
+y = Variable(torch.ones(5, 5) * 4)
+
+z = x * y
+q = z * y
+r = z + y
+z.add_(y)
+# z is a the last expression, so this should succeed
+z.backward(torch.ones(5, 5))
+
+# r doesn't use the z in it's backward, so it should succeed
+r.backward(torch.ones(5, 5))
+
+# however, q needs z in it's backward, but z has now been 
+# marked as dirty (because it was used in an in-place operation)
+# this line will hence raise an error
+q.backward(torch.ones(5, 5))
+```
+
+## Plans for alpha-3
+- Unit tests for multiprocessing
+- Add more nn modules and autograd functions ( we're porting fb.resnet.torch )
+- New CUDA memory allocator (non-synchronizing CUDA tensors allocations)
+  - We've made progress on this, but it is not complete yet
+- Trainer and Dataset classes
+- Continuous builds for CUDA (using Nimbix)
+- Binary packages (nightly and versioned)
+",https://api.github.com/users/soumith,1310570,soumith,https://api.github.com/repos/pytorch/pytorch/releases/4025327/assets,https://api.github.com/repos/pytorch/pytorch/releases/4025327,alpha-2,https://api.github.com/repos/pytorch/pytorch/tarball/v0.1.2,https://github.com/pytorch/pytorch/releases/tag/v0.1.2,https://api.github.com/repos/pytorch/pytorch/zipball/v0.1.2,v0.1.2,False,True
+4025320,2016-08-24T14:52:32Z,2016-09-01T05:01:36Z,alpha-1 release,"It's been a week since pytorch alpha-0.
+We're excited to now present alpha-1 :)
+
+## What's new?
+
+We've built a working and unit-tested version of the new nn and autograd packages (torch.nn, torch.autograd) along with a basic draft optim package (torch.optim). The old packages will continue to be available at torch.legacy.*
+
+We've also built fully working serialization (torch.save / torch.load) with features that one expects out of the box like sharing staying intact.
+
+At this point, you can play around with things and get a feel of the new design.
+
+There's an MNIST example at https://github.com/pytorch/examples
+
+A concern raised about pytorch was that Python is a slow language.
+
+It turns out that the MNIST example runs in exactly the same amount of time / epoch in both pytorch and (lua)Torch, and we haven't yet done any optimizations in the code in pytorch yet.
+
+Another notable thing is that pytorch uses 1500MB of system memory vs (lua)Torch's 2300MB. This is before we've added any in-place optimizations into pytorch. The design of the new nn allows us to add seamless memory optimizations without needing the user to mark things as in-place or out-of-place which will bring us more seamless memory savings in pytorch. 
+
+More verbosely:
+
+### torch.nn
+
+We've published an early version of the new nn package.
+There are only a few modules right now, but we'll be adding more soon.
+
+There are a couple of advantages over to old package:
+- Modules no longer hold temporary buffers and short-lived state. This allows to use the same module a number of times in forward pass, and the gradients will be summed automatically. For example, see how we use the same nn.ReLU object multiple times over here: https://github.com/pytorch/examples/blob/master/mnist/main.py#L43
+- There's no longer any need for using rigid container modules. Your model is defined by your code. You can select a completely different path across your model just by adding a number of `if`s. Any crazy branching schemes inside your model are allowed by design.
+- It's fully compatible with autograd. Instead of using `nn.Add` or `nn.Index` you can just write this in your model definition: `y = module1(x_1)[0] + module2(x_2)`.
+- You can register both forward and backward hooks at each module, which allow you to inspect the intermediate outputs and gradients flowing through the network and the graph.
+- [Not Yet Implemented] Safe in-place operations. Tensors used in in-place operations are marked as dirty, and trying to use them in any way raises an error.
+
+### torch.autograd
+
+Autograd at the core of pytorch. Enabling it is just a matter of wrapping your tensors in `Variable` objects before starting the computation (`x = Variable(x)`). Then, when you have your output you can either call `y.backward()` if it's a scalar, or provide gradient w.r.t. the variable as an argument (`y.backward(grad_output)`). Gradients w.r.t. variables are then available in their `.grad` attributes. Please note that only gradients of leaf variables (i.e. created by the user) are computed. If you want to access any gradients of intermediate values, you'll have to use a hook system.
+
+If you don't want to compute gradient for some variables, you can even mark them in a constructor with `requires_grad=False`, and they will be optimized out from the backward pass.
+
+### torch.optim
+
+_Please note that this api is still a bit experimental, and is likely to undergo changes soon._
+
+optim has a different, more object oriented API. First, you have to create an optimizer object `optimizer = optim.sgd(model, lr=1e-3, momentum=0.9)`. If you don't want to merge the model and criterion in a single object, it's also possible to pass a tuple of `(model, criterion)` as the first argument to a constructor. Then, in your training loop you just call `loss = optimizer.step(input)` (in case of separate model and criterion input should be a tuple of `(input, target)`). This accumulates all the gradients and performs a single optimization step on the parameters.
+
+### Serialization
+
+Tensors supported `pickle` protocol since the beginning of alpha, but pickle can't handle storage/data sharing properly and requires all the data to be copied before serialization. 
+We've created `torch.load` and `torch.save`, that have the same interface and solve both of these problems.
+
+### Tensor operators
+
+Thanks to @bart we've added support for `@` operator for matrix multiplication, and changes the `*` to elementwise multiplication.
+
+## Plans for alpha-2:
+- Hook system for nn and autograd (for accessing intermediate values)
+- More nn modules, autograd options, and optim algorithms
+- Inter-process sharing of tensors (for multiprocess data loading or hogwild training)
+- New CUDA memory allocator (non-synchronizing CUDA tensors allocations)
+",https://api.github.com/users/soumith,1310570,soumith,https://api.github.com/repos/pytorch/pytorch/releases/4025320/assets,https://api.github.com/repos/pytorch/pytorch/releases/4025320,alpha-1,https://api.github.com/repos/pytorch/pytorch/tarball/v0.1.1,https://github.com/pytorch/pytorch/releases/tag/v0.1.1,https://api.github.com/repos/pytorch/pytorch/zipball/v0.1.1,v0.1.1,False,True

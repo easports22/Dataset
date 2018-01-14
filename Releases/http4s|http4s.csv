@@ -1,0 +1,819 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8000736,2017-10-03T18:14:05Z,2017-10-04T20:55:50Z,," Use http4s-dsl with any effect type by either:
+    * extend `Http4sDsl[F]`
+    * create an object that extends `Http4sDsl[F]`, and extend that.
+    * `import org.http4s.dsl.io._` is still available for those who
+      wish to specialize on `cats.effect.IO`
+* Remove `Semigroup[F[MaybeResponse[F]]]` constraint from
+  `BlazeBuilder`.
+* Fix `AutoSlash` middleware when a service is mounted with a prefix.
+* Publish internal http4s-parboiled2 as a separate module.  This does
+  not add any new third-party dependencies, but unbreaks `sbt
+  publishLocal`.
+* Add `Request.from`, which respects `X-Fowarded-For` header.
+* Make `F` in `EffectMessageSyntax` invariant
+* Add `message.decodeJson[A]` syntax to replace awkward `message.as(implicitly,
+  jsonOf[A])`. Brought into scope by importing one of the following, based on
+  your JSON library of choice.
+  * `import org.http4s.argonaut._`
+  * `import org.http4s.circe._`
+  * `import org.http4s.json4s.jackson._`
+  * `import org.http4s.json4s.native._`
+* `AsyncHttpClient.apply` no longer takes a `bufferSize`.  It is made
+  irrelevant by fs2-reactive-streams.
+* `MultipartParser.parse` no longer takes a `headerLimit`, which was unused.
+* Add `maxWaitQueueLimit` (default 256) and `maxConnectionsPerRequestKey`
+  (default 10) to `PooledHttp1Client`.
+* Remove private implicit `ExecutionContext` from `StreamApp`. This had been
+  known to cause diverging implicit resolution that was hard to debug.
+* Shift execution of the routing of the `HttpService` to the `ExecutionContext`
+  provided by the `JettyBuilder` or `TomcatBuilder`. Previously, it only shifted
+  the response task and stream. This was a regression from v0.16.
+* Add two utility execution contexts. These may be used to increase throughput
+  as the server builder's `ExecutionContext`. Blocking calls on routing may
+  decrease fairness or even deadlock your service, so use at your own risk:
+  * `org.http4s.util.execution.direct`
+  * `org.http4s.util.execution.trampoline`
+* Deprecate `EffectRequestSyntax` and `EffectResponseSyntax`. These were
+  previously used to provide methods such as `.putHeaders` and `.withBody`
+  on types `F[Request]` and `F[Response]`.  As an alternative:
+  * Call `.map` or `.flatMap` on `F[Request]` and `F[Response]` to get access
+    to all the same methods.
+  * Variadic headers have been added to all the status code generators in
+    `Http4sDsl[F]` and method generators in `import org.http4s.client._`.
+    For example:
+    * `POST(uri, urlForm, Header(""Authorization"", ""Bearer s3cr3t""))`
+    * ``Ok(""This will have an html content type!"", `Content-Type`(`text/html`))``
+* Restate `HttpService[F]` as a `Kleisli[OptionT[F, ?], Request[F], Response[F]]`.
+* Similarly, `AuthedService[F]` as a `Kleisli[OptionT[F, ?], AuthedRequest[F], Response[F]]`.
+* `MaybeResponse` is removed, because the optionality is now expressed through
+  the `OptionT` in `HttpService`. Instead of composing `HttpService` via a
+  `Semigroup`, compose via a `SemigroupK`. Import `org.http4s.implicits._` to
+  get a `SemigroupK[HttpService]`, and chain services as `s1 <+> s2`. We hope to
+  remove the need for `org.http4s.implicits._` in a future version of cats with
+  [issue 1428](https://github.com/typelevel/cats/issues/1428).
+* The `Service` type alias is deprecated in favor of `Kleisli`.  It used to represent
+  a partial application of the first type parameter, but since version 0.18, it is
+  identical to `Kleisli.
+* `HttpService.lift`, `AuthedService.lift` are deprecated in favor of `Kleisli.apply`.
+* Remove `java.xml.bind` dependency from `GZip` middleware to avoid an
+  extra module dependency in Java 9.
+* Upgraded dependencies:
+    * jawn-fs2-0.12.0-M2
+    * log4s-1.4.0
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000736/assets,https://api.github.com/repos/http4s/http4s/releases/8000736,master,https://api.github.com/repos/http4s/http4s/tarball/v0.18.0-M2,https://github.com/http4s/http4s/releases/tag/v0.18.0-M2,https://api.github.com/repos/http4s/http4s/zipball/v0.18.0-M2,v0.18.0-M2,False,False
+8000691,2017-10-04T17:10:20Z,2017-10-04T20:52:49Z,,"* Backport removal `java.xml.bind` dependency from `GZip` middleware,
+  to play more nicely with Java 9.
+* Dependency upgrades:
+  * metrics-core-3.2.5
+  * tomcat-8.0.23
+  * twirl-1.3.12
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000691/assets,https://api.github.com/repos/http4s/http4s/releases/8000691,master,https://api.github.com/repos/http4s/http4s/tarball/v0.16.4,https://github.com/http4s/http4s/releases/tag/v0.16.4,https://api.github.com/repos/http4s/http4s/zipball/v0.16.4,v0.16.4,False,False
+8000687,2017-10-02T17:05:26Z,2017-10-04T20:52:25Z,v0.17.3,"* Shift execution of HttpService to the `ExecutionContext` provided by the
+  `BlazeBuilder` when using HTTP/2. Previously, it only shifted the response
+  task and body stream.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000687/assets,https://api.github.com/repos/http4s/http4s/releases/8000687,master,https://api.github.com/repos/http4s/http4s/tarball/v0.17.3,https://github.com/http4s/http4s/releases/tag/v0.17.3,https://api.github.com/repos/http4s/http4s/zipball/v0.17.3,v0.17.3,False,False
+8000683,2017-09-30T03:54:21Z,2017-10-04T20:52:10Z,,"* Fix `java.io.IOException: An invalid argument was supplied` on blaze-client
+  for Windows when writing an empty sequence of `ByteBuffer`s.
+* Set encoding of `captureWriter` to UTF-8 instead of the platform default.
+* Dependency upgrades:
+  * blaze-0.12.9
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000683/assets,https://api.github.com/repos/http4s/http4s/releases/8000683,master,https://api.github.com/repos/http4s/http4s/tarball/v0.16.3,https://github.com/http4s/http4s/releases/tag/v0.16.3,https://api.github.com/repos/http4s/http4s/zipball/v0.16.3,v0.16.3,False,False
+8000679,2017-09-26T01:13:53Z,2017-10-04T20:52:00Z,,"* Remove private implicit strategy from `StreamApp`. This had been known to
+  cause diverging implicit resolution that was hard to debug.
+* Shift execution of HttpService to the `ExecutionContext` provided by the
+  `BlazeBuilder` as advertised. Previously, it only shifted the response stream.
+* Split off http4s-parboiled2 module as `""org.http4s"" %% ""parboiled""`. There are
+  no externally visible changes, but this simplifies and speeds the http4s
+  build.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000679/assets,https://api.github.com/repos/http4s/http4s/releases/8000679,master,https://api.github.com/repos/http4s/http4s/tarball/v0.17.2,https://github.com/http4s/http4s/releases/tag/v0.17.2,https://api.github.com/repos/http4s/http4s/zipball/v0.17.2,v0.17.2,False,False
+8000675,2017-09-25T22:19:45Z,2017-10-04T20:51:46Z,,"* Dependency patch upgrades:
+  * async-http-client-2.0.37
+  * blaze-0.12.8: changes default number of selector threads to
+    from `2 * cores + 1` to `max(4, cores + 1)`.
+  * jetty-9.4.7.v20170914
+  * tomcat-8.5.21
+  * twirl-1.3.7
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000675/assets,https://api.github.com/repos/http4s/http4s/releases/8000675,master,https://api.github.com/repos/http4s/http4s/tarball/v0.16.2,https://github.com/http4s/http4s/releases/tag/v0.16.2,https://api.github.com/repos/http4s/http4s/zipball/v0.16.2,v0.16.2,False,False
+8000672,2017-09-17T23:21:46Z,2017-10-04T20:51:32Z,,"* Fix bug where metrics were not captured in `Metrics` middleware.
+* Pass `redactHeadersWhen` argument from `Logger` to `RequestLogger`
+  and `ResponseLogger`.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000672/assets,https://api.github.com/repos/http4s/http4s/releases/8000672,master,https://api.github.com/repos/http4s/http4s/tarball/v0.17.1,https://github.com/http4s/http4s/releases/tag/v0.17.1,https://api.github.com/repos/http4s/http4s/zipball/v0.17.1,v0.17.1,False,False
+8000669,2017-09-17T21:13:41Z,2017-10-04T20:51:21Z,,"* Publish our fork of parboiled2 as http4s-parboiled2 module.  It's
+  the exact same internal code as was in http4s-core, with no external
+  dependencies. By publishing an extra module, we enable a
+  `publishLocal` workflow.
+* Charset fixes: 
+  * Deprecate `CharsetRange.isSatisfiedBy` in favor of
+    and ```Accept-Charset`.isSatisfiedBy`` in favor of
+    ```Accept-Charset`.satisfiedBy``.
+  * Fix definition of `satisfiedBy` to respect priority of
+    ```Charset`.*``.
+  * Add `CharsetRange.matches`.
+* ContentCoding fixes: 
+  * Deprecate `ContentCoding.satisfiedBy` and
+    `ContentCoding.satisfies` in favor of ```Accept-Encoding`.satisfiedBy``.
+  * Deprecate ```Accept-Encoding`.preferred``, which has no reasonable
+    interpretation in the presence of splats.
+  * Add ```Accept-Language`.qValue``.
+  * Fix definition of `satisfiedBy` to respect priority of
+    `ContentCoding.*`.
+  * Add `ContentCoding.matches` and `ContentCoding.registered`.
+  * Add `Arbitrary[ContentCoding]` and ```Arbitrary[`Accept-Encoding`]`` 
+    instances.
+* LanguageTag fixes: 
+  * Deprecate `LanguageTag.satisfiedBy` and
+    `LanguageTag.satisfies` in favor of ```Accept-Language`.satisfiedBy``.
+  * Fix definition of `satisfiedBy` to respect priority of
+    `LanguageTag.*` and matches of a partial set of subtags.
+  * Add `LanguageTag.matches`.
+  * Deprecate `LanguageTag.withQuality` in favor of new
+    `LanguageTag.withQValue`.
+  * Deprecate ```Accept-Language`.preferred``, which has no reasonable
+    interpretation in the presence of splats.
+  * Add ```Accept-Language`.qValue``.
+  * Add `Arbitrary[LanguageTag]` and ```Arbitrary[`Accept-Language`]``
+    instances.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000669/assets,https://api.github.com/repos/http4s/http4s/releases/8000669,master,https://api.github.com/repos/http4s/http4s/tarball/v0.16.1,https://github.com/http4s/http4s/releases/tag/v0.16.1,https://api.github.com/repos/http4s/http4s/zipball/v0.16.1,v0.16.1,False,False
+8000667,2017-09-01T12:18:23Z,2017-10-04T20:51:07Z,,"* Honor `Retry-After` header in `Retry` middleware.  The response will
+  not be retried until the maximum of the backoff strategy and any
+  time specified by the `Retry-After` header of the response.
+* The `RetryPolicy.defaultRetriable` only works for methods guaranteed
+  to not have a body.  In fs2, we can't introspect the stream to
+  guarantee that it can be rerun.  To retry requests for idempotent
+  request methods, use `RetryPolicy.unsafeRetriable`.  To retry
+  requests regardless of method, use
+  `RetryPolicy.recklesslyRetriable`.
+* Fix `Logger` middleware to render JSON bodies as text, not as a hex
+  dump.
+* `MultipartParser.parse` returns a stream of `ByteVector` instead of
+  a stream of `Byte`. This perserves chunking when parsing into the
+  high-level `EntityDecoder[Multipart]`, and substantially improves
+  performance on large files.  The high-level API is not affected.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000667/assets,https://api.github.com/repos/http4s/http4s/releases/8000667,master,https://api.github.com/repos/http4s/http4s/tarball/v0.17.0,https://github.com/http4s/http4s/releases/tag/v0.17.0,https://api.github.com/repos/http4s/http4s/zipball/v0.17.0,v0.17.0,False,False
+8000663,2017-09-01T11:16:34Z,2017-10-04T20:50:54Z,,"* `Retry` middleware takes a `RetryPolicy` instead of a backoff
+  strategy.  A `RetryPolicy` is a function of the request, the
+  response, and the number of attempts.  Wrap the previous `backoff`
+  in `RetryPolicy {}` for compatible behavior.
+* Expose a `Part.fileData` constructor that accepts an `EntityBody`.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000663/assets,https://api.github.com/repos/http4s/http4s/releases/8000663,master,https://api.github.com/repos/http4s/http4s/tarball/v0.16.0,https://github.com/http4s/http4s/releases/tag/v0.16.0,https://api.github.com/repos/http4s/http4s/zipball/v0.16.0,v0.16.0,False,False
+8000662,2017-08-29T19:57:01Z,2017-10-04T20:50:41Z,,"* In blaze-server, when doing chunked transfer encoding, flush the
+  header as soon as it is available.  It previously buffered until the
+  first chunk was available.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000662/assets,https://api.github.com/repos/http4s/http4s/releases/8000662,master,https://api.github.com/repos/http4s/http4s/tarball/v0.17.0-RC3,https://github.com/http4s/http4s/releases/tag/v0.17.0-RC3,https://api.github.com/repos/http4s/http4s/zipball/v0.17.0-RC3,v0.17.0-RC3,False,False
+8000659,2017-08-29T17:55:16Z,2017-10-04T20:50:32Z,,"* Add a `responseHeaderTimeout` property to `BlazeClientConfig`.  This
+  measures the time between the completion of writing the request body
+  to the reception of a complete response header.
+* Upgraded dependencies:
+    * async-http-client-2.0.35
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000659/assets,https://api.github.com/repos/http4s/http4s/releases/8000659,master,https://api.github.com/repos/http4s/http4s/tarball/v0.16.0-RC3,https://github.com/http4s/http4s/releases/tag/v0.16.0-RC3,https://api.github.com/repos/http4s/http4s/zipball/v0.16.0-RC3,v0.16.0-RC3,False,False
+8000655,2017-08-24T13:15:00Z,2017-10-04T20:50:16Z,,"* Remove `ServiceSyntax.orNotFound(a: A): Task[Response]` in favor of
+  `ServiceSyntax.orNotFound: Service[Request, Response]`
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000655/assets,https://api.github.com/repos/http4s/http4s/releases/8000655,master,https://api.github.com/repos/http4s/http4s/tarball/v0.17.0-RC2,https://github.com/http4s/http4s/releases/tag/v0.17.0-RC2,https://api.github.com/repos/http4s/http4s/zipball/v0.17.0-RC2,v0.17.0-RC2,False,False
+8000647,2017-08-24T12:02:50Z,2017-10-04T20:49:39Z,,"* Move http4s-blaze-core from `org.http4s.blaze` to
+  `org.http4s.blazecore` to avoid a conflict with the non-http4s
+  blaze-core module.
+* Change `ServiceOps` to operate on a `Service[?, MaybeResponse]`.
+  Give it an `orNotFound` that returns a `Service`.  The
+  `orNotFound(a: A)` overload is left for compatibility with Scala
+  2.10.
+* Build with Lightbend compiler instead of Typelevel compiler so we
+  don't expose `org.typelevel` dependencies that are incompatible with
+  ntheir counterparts in `org.scala-lang`.
+* Upgraded dependencies:
+    * blaze-0.12.7 (fixes eviction notice in http4s-websocket)
+    * twirl-1.3.4
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000647/assets,https://api.github.com/repos/http4s/http4s/releases/8000647,master,https://api.github.com/repos/http4s/http4s/tarball/v0.16.0-RC2,https://github.com/http4s/http4s/releases/tag/v0.16.0-RC2,https://api.github.com/repos/http4s/http4s/zipball/v0.16.0-RC2,v0.16.0-RC2,False,False
+8000642,2017-08-17T03:24:15Z,2017-10-04T20:49:26Z,,"* Port `ChunkAggregator` to fs2
+* Add logging middleware
+* Standardize on `ExecutionContext` over `Strategy` and `ExecutorService`
+* Implement `Age` header
+* Fix `Client#toHttpService` to not dispose until the body is consumed
+* Add a buffered implementation of `EntityDecoder[Multipart]`
+* In async-http-client, don't use `ReactiveStreamsBodyGenerator` unless there is
+  a body to transmit. This fixes an `IllegalStateException: unexpected message
+  type`
+* Add `HSTS` middleware
+* Add option to serve pre-gzipped resources
+* Add RequestLogging and ResponseLogging middlewares
+* `StaticFile` options return `OptionT[Task, ?]`
+* Set `Content-Length` or `Transfer-Encoding: chunked` header when serving
+  from a URL
+* Explicitly close `URLConnection``s if we are not reading the contents
+* Upgrade to:
+    * async-http-client-2.0.34
+    * fs2-0.9.7
+    * metrics-core-3.2.4
+    * scodec-bits-1.1.5
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000642/assets,https://api.github.com/repos/http4s/http4s/releases/8000642,master,https://api.github.com/repos/http4s/http4s/tarball/v0.17.0-RC1,https://github.com/http4s/http4s/releases/tag/v0.17.0-RC1,https://api.github.com/repos/http4s/http4s/zipball/v0.17.0-RC1,v0.17.0-RC1,False,False
+8000639,2017-08-16T21:33:59Z,2017-10-04T20:49:12Z,,"* Remove laziness from `ArbitraryInstances`
+* Support an arbitrary predicate for CORS allowed origins
+* Support `Access-Control-Expose-Headers` header for CORS
+* Fix thread safety issue in `EntityDecoder[XML]`
+* Support IPV6 headers in `X-Forwarded-For`
+* Add `status` and `successful` methods to client
+* Overload `client.fetchAs` and `client.streaming` to accept a `Task[Request]`
+* Replace `Instant` with `HttpDate` to avoid silent truncation and constrain
+  to dates that are legally renderable in HTTP.
+* Fix bug in hash code of `CaseInsensitiveString`
+* Update `request.pathInfo` when changing `request.withUri`. To keep these
+  values in sync, `request.copy` has been deprecated, but copy constructors
+  based on `with` have been added.
+* Remove `name` from `AttributeKey`.
+* Add `withFragment` and `withoutFragment` to `Uri`
+* Construct `Content-Length` with `fromLong` to ensure validity, and
+  `unsafeFromLong` when you can assert that it's positive.
+* Add missing instances to `QueryParamDecoder` and `QueryParamEncoder`.
+* Add `response.cookies` method to get a list of cookies from `Set-Cookie`
+  header.  `Set-Cookie` is no longer a `Header.Extractable`, as it does
+  not adhere to the HTTP spec of being concatenable by commas without
+  changing semantics.
+* Make servlet `HttpSession` available as a request attribute in servlet
+  backends
+* Fix `Part.name` to return the name from the `Content-Disposition` header
+  instead of the name _of_ the `Content-Disposition` header. Accordingly, it is
+  no longer a `CaseInsensitiveString`
+* `Request.toString` and `Response.toString` now redact sensitive headers. A
+  method to redact arbitrary headers is added to `Headers`.
+* `Retry-After` is now modeled as a `Either[HttpDate, Long]` to reflect either
+  an http-date or delta-seconds value.
+* Look for index.html in `StaticFile` when rendering a directory instead of
+  returning `401 Unauthorized`.
+* Limit dates to a minimum of January 1, 1900, per RFC.
+* Add `serviceErrorHandler` to `ServerBuilder` to allow pluggable error handlers
+  when a server backend receives a failed task or a thrown Exception when
+  invoking a service. The default calls `toHttpResponse` on `MessageFailure` and
+  closes the connection with a `500 InternalServerError` on other non-fatal
+  errors.  Fatal errors are left to the server.
+* `FollowRedirect` does not propagate sensitive headers when redirecting to a
+  different authority.
+* Add Content-Length header to empty response generators
+* Upgraded dependencies:
+    * async-http-client-2.0.34
+    * http4s-websocket-0.2.0
+    * jetty-9.4.6.v20170531
+    * json4s-3.5.3
+    * log4s-1.3.6
+    * metrics-core-3.2.3
+    * scala-2.12.3-bin-typelevel-4
+    * scalaz-7.2.15
+    * tomcat-8.5.20
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000639/assets,https://api.github.com/repos/http4s/http4s/releases/8000639,master,https://api.github.com/repos/http4s/http4s/tarball/v0.16.0-RC1,https://github.com/http4s/http4s/releases/tag/v0.16.0-RC1,https://api.github.com/repos/http4s/http4s/zipball/v0.16.0-RC1,v0.16.0-RC1,False,False
+8000637,2017-07-21T02:28:34Z,2017-10-04T20:48:51Z,,"* Backport rendering of details in `ParseFailure.getMessage`
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000637/assets,https://api.github.com/repos/http4s/http4s/releases/8000637,master,https://api.github.com/repos/http4s/http4s/tarball/v0.15.16,https://github.com/http4s/http4s/releases/tag/v0.15.16,https://api.github.com/repos/http4s/http4s/zipball/v0.15.16,v0.15.16,False,False
+8000635,2017-07-11T04:05:20Z,2017-10-04T20:48:41Z,,"* Close parens in `Request.toString`
+* Use ""message"" instead of ""request"" in message body failure messages
+* Add `problem+json` media type
+* Tolerate `[` and `]` in queries parsing URIs. These characters are parsed, but
+  percent-encoded.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000635/assets,https://api.github.com/repos/http4s/http4s/releases/8000635,master,https://api.github.com/repos/http4s/http4s/tarball/v0.15.14,https://github.com/http4s/http4s/releases/tag/v0.15.14,https://api.github.com/repos/http4s/http4s/zipball/v0.15.14,v0.15.14,False,False
+8000630,2017-05-28T01:05:20Z,2017-10-04T20:48:29Z,,"* Fix file corruption issue when serving static files from the classpath
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000630/assets,https://api.github.com/repos/http4s/http4s/releases/8000630,master,https://api.github.com/repos/http4s/http4s/tarball/v0.17.0-M3,https://github.com/http4s/http4s/releases/tag/v0.17.0-M3,https://api.github.com/repos/http4s/http4s/zipball/v0.17.0-M3,v0.17.0-M3,False,False
+8000625,2017-05-27T01:31:12Z,2017-10-04T20:48:18Z,,"* Fix `WebjarService` so it matches assets.
+* `ServerApp` overrides `process` to leave a single abstract method
+* Add gzip trailer in `GZip` middleware
+* Upgraded dependencies:
+    * circe-0.8.0
+    * jetty-9.4.5.v20170502
+    * scalaz-7.2.13
+    * tomcat-8.5.15
+* `ProcessApp` uses a `Process[Task, Nothing]` rather than a
+  `Process[Task, Unit]`
+* `Credentials` is split into `Credentials.AuthParams` for key-value pairs and
+  `Credentials.Token` for legacy token-based schemes.  `OAuthBearerToken` is
+  subsumed by `Credentials.Token`.  `BasicCredentials` no longer extends
+  `Credentials`, but is extractable from one.  This model permits the
+  definition of other arbitrary credential schemes.
+* Add `fromSeq` constructor to `UrlForm`
+* Allow `WebjarService` to pass on methods other than `GET`.  It previously
+  threw a `MatchError`.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000625/assets,https://api.github.com/repos/http4s/http4s/releases/8000625,master,https://api.github.com/repos/http4s/http4s/tarball/v0.16.0-M3,https://github.com/http4s/http4s/releases/tag/v0.16.0-M3,https://api.github.com/repos/http4s/http4s/zipball/v0.16.0-M3,v0.16.0-M3,False,False
+8000620,2017-05-25T03:51:04Z,2017-10-04T20:48:02Z,,"* Patch-level upgrades to dependencies:
+    * async-http-client-2.0.32
+    * blaze-0.12.6 (fixes infinite loop in some SSL handshakes)
+    * jetty-9.3.19.v20170502
+    * json4s-3.5.2
+    * tomcat-8.0.44
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000620/assets,https://api.github.com/repos/http4s/http4s/releases/8000620,master,https://api.github.com/repos/http4s/http4s/tarball/v0.15.13,https://github.com/http4s/http4s/releases/tag/v0.15.13,https://api.github.com/repos/http4s/http4s/zipball/v0.15.13,v0.15.13,False,False
+8000616,2017-05-11T16:05:51Z,2017-10-04T20:47:48Z,,"* Fix GZip middleware to render a correct stream
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000616/assets,https://api.github.com/repos/http4s/http4s/releases/8000616,master,https://api.github.com/repos/http4s/http4s/tarball/v0.15.12,https://github.com/http4s/http4s/releases/tag/v0.15.12,https://api.github.com/repos/http4s/http4s/zipball/v0.15.12,v0.15.12,False,False
+8000614,2017-04-30T05:37:48Z,2017-10-04T20:47:37Z,,"* `Timeout` middleware takes an implicit `Scheduler` and
+  `ExecutionContext`
+* Bring back `http4s-async-client`, based on `fs2-reactive-stream`
+* Restore support for WebSockets
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000614/assets,https://api.github.com/repos/http4s/http4s/releases/8000614,master,https://api.github.com/repos/http4s/http4s/tarball/v0.17.0-M2,https://github.com/http4s/http4s/releases/tag/v0.17.0-M2,https://api.github.com/repos/http4s/http4s/zipball/v0.17.0-M2,v0.17.0-M2,False,False
+8000610,2017-04-30T04:22:38Z,2017-10-04T20:47:25Z,,"* Upgraded dependencies:
+    * argonaut-6.2
+    * jetty-9.4.4.v20170414
+    * tomcat-8.5.14
+* Fix `ProcessApp` to terminate on process errors
+* Set `secure` request attribute correctly in blaze server
+* Exit with code `-1` when `ProcessApp` fails
+* Make `ResourceService` respect `If-Modified-Since`
+* Rename `ProcessApp.main` to `ProcessApp.process` to avoid overload confusio
+* Avoid intermediate String allocation in Circe's `jsonEncoder`
+* Adaptive EntityDecoder[Json] for circe: works directly from a ByteBuffer for
+  small bodies, and incrementally through jawn for larger.
+* Capture more context in detail message of parse errors
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000610/assets,https://api.github.com/repos/http4s/http4s/releases/8000610,master,https://api.github.com/repos/http4s/http4s/tarball/v0.16.0-M2,https://github.com/http4s/http4s/releases/tag/v0.16.0-M2,https://api.github.com/repos/http4s/http4s/zipball/v0.16.0-M2,v0.16.0-M2,False,False
+8000608,2017-04-30T03:46:21Z,2017-10-04T20:47:11Z,,"* Upgrade to blaze-0.12.5 to pick up fix for `StackOverflowError` in
+  SSL handshake
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000608/assets,https://api.github.com/repos/http4s/http4s/releases/8000608,master,https://api.github.com/repos/http4s/http4s/tarball/v0.15.11,https://github.com/http4s/http4s/releases/tag/v0.15.11,https://api.github.com/repos/http4s/http4s/zipball/v0.15.11,v0.15.11,False,False
+8000605,2017-04-29T00:25:49Z,2017-10-04T20:46:54Z,v0.15.10,"* Patch-level upgrades to dependencies
+* argonaut-6.2
+* scalaz-7.2.12
+* Allow preambles and epilogues in multipart bodies
+* Limit multipart headers to 40 kilobytes to avoid unbounded buffering
+  of long lines in a header
+* Remove `' '` and `'?'` from alphabet for generated multipart
+  boundaries, as these are not token characters and are known to cause
+  trouble for some multipart implementations
+* Fix multipart parsing for unlucky input chunk sizes
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000605/assets,https://api.github.com/repos/http4s/http4s/releases/8000605,master,https://api.github.com/repos/http4s/http4s/tarball/v0.15.10,https://github.com/http4s/http4s/releases/tag/v0.15.10,https://api.github.com/repos/http4s/http4s/zipball/v0.15.10,v0.15.10,False,False
+8000599,2017-04-19T14:49:21Z,2017-10-04T20:46:34Z,,"* Terminate `ServerApp` even if the server fails to start
+* Make `ResourceService` respect `If-Modified-Since`
+* Patch-level upgrades to dependencies:
+* async-http-client-2.0.31
+* jetty-9.3.18.v20170406
+* json4s-3.5.1
+* log4s-1.3.4
+* metrics-core-3.1.4
+* scalacheck-1.13.5
+* scalaz-7.1.13 or scalaz-7.2.11
+* tomcat-8.0.43
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000599/assets,https://api.github.com/repos/http4s/http4s/releases/8000599,master,https://api.github.com/repos/http4s/http4s/tarball/v0.15.9,https://github.com/http4s/http4s/releases/tag/v0.15.9,https://api.github.com/repos/http4s/http4s/zipball/v0.15.9,v0.15.9,False,False
+8000594,2017-04-09T02:02:17Z,2017-10-04T20:46:19Z,,"* First release on cats and fs2
+    * All scalaz types and typeclasses replaced by cats equivalengts
+	* `scalaz.concurrent.Task` replaced by `fs2.Task`	
+	* `scalaz.stream.Process` replaced by `fs2.Stream`
+* Roughly at feature parity with v0.16.0-M1. Notable exceptions:
+	* Multipart not yet supported
+	* Web sockets not yet supported
+	* Client retry middleware can't check idempotence of requests
+	* Utilties in `org.http4s.util.io` not yet ported
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000594/assets,https://api.github.com/repos/http4s/http4s/releases/8000594,master,https://api.github.com/repos/http4s/http4s/tarball/v0.17.0-M1,https://github.com/http4s/http4s/releases/tag/v0.17.0-M1,https://api.github.com/repos/http4s/http4s/zipball/v0.17.0-M1,v0.17.0-M1,False,False
+8000591,2017-04-08T19:58:07Z,2017-10-04T20:46:07Z,,"* Fix type of `AuthedService.empty`
+* Eliminate `Fallthrough` typeclass.  An `HttpService` now returns
+  `MaybeResponse`, which can be a `Response` or `Pass`.  There is a
+  `Semigroup[MaybeResponse]` instance that allows `HttpService`s to be
+  chained as a semigroup.  `service orElse anotherService` is
+  deprecated in favor of `service |+| anotherService`.
+* Support configuring blaze and Jetty servers with a custom
+  `SSLContext`.
+* Upgraded dependencies for various modules:
+    * async-http-client-2.0.31
+    * circe-0.7.1
+    * jetty-9.4.3.v20170317
+    * json4s-3.5.1
+    * logback-1.2.1
+    * log4s-1.3.4
+    * metrics-3.2.0
+    * scalacheck-1.13.5
+    * tomcat-8.0.43
+* Deprecate `EntityEncoder[ByteBuffer]` and
+  `EntityEncoder[CharBuffer]`.
+* Add `EntityDecoder[Unit]`.
+* Move `ResponseClass`es into `Status`.
+* Use `SSLContext.getDefault` by default in blaze-client.  Use
+  `BlazeServerConfig.insecure` to ignore certificate validity.  But
+  please don't.
+* Move `CaseInsensitiveString` syntax to `org.http4s.syntax`.
+* Bundle an internal version of parboiled2.  This decouples core from
+  shapeless, allowing applications to use their preferred version of
+  shapeless.
+* Rename `endpointAuthentication` to `checkEndpointAuthentication`.
+* Add a `WebjarService` for serving files out of web jars.
+* Implement `Retry-After` header.
+* Stop building with `delambdafy` on Scala 2.11.
+* Eliminate finalizer on `BlazeConnection`.
+* Respond OK to CORS pre-flight requests even if the wrapped service
+  does not return a successful response.  This is to allow `CORS`
+  pre-flight checks of authenticated services.
+* Deprecate `ServerApp` in favor of `org.http4s.util.ProcessApp`.  A
+  `ProcessApp` is easier to compose all the resources a server needs via
+  `Process.bracket`.
+* Implement a `Referer` header.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000591/assets,https://api.github.com/repos/http4s/http4s/releases/8000591,master,https://api.github.com/repos/http4s/http4s/tarball/v0.16.0-M1,https://github.com/http4s/http4s/releases/tag/v0.16.0-M1,https://api.github.com/repos/http4s/http4s/zipball/v0.16.0-M1,v0.16.0-M1,False,False
+8000586,2017-04-06T15:18:26Z,2017-10-04T20:45:49Z,,"* Cache charset lookups to avoid synchronization.  Resolution of
+  charsets is synchronized, with a cache size of two.  This avoids
+  the synchronized call on the HTTP pool.
+* Strip fragment from request target in blaze-client.  An HTTP request
+  target should not include the fragment, and certain servers respond
+  with a `400 Bad Request` in their presence.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000586/assets,https://api.github.com/repos/http4s/http4s/releases/8000586,master,https://api.github.com/repos/http4s/http4s/tarball/v0.15.8,https://github.com/http4s/http4s/releases/tag/v0.15.8,https://api.github.com/repos/http4s/http4s/zipball/v0.15.8,v0.15.8,False,False
+8000582,2017-03-10T03:13:00Z,2017-10-04T20:45:34Z,,"* Change default server and client executors to a minimum of four
+  threads.
+* Bring scofflaw async-http-client to justice for its brazen
+  violations of Reactive Streams Rule 3.16, requesting of a null
+  subscription.
+* Destroy Tomcat instances after stopping, so they don't hold the port
+* Deprecate `ArbitraryInstances.genCharsetRangeNoQuality`, which can
+  cause deadlocks
+* Patch-level upgrades to dependencies:
+    * async-http-client-2.0.30
+    * jetty-9.3.16.v20170120
+    * logback-1.1.11
+    * metrics-3.1.3
+    * scala-xml-1.0.6
+    * scalaz-7.2.9
+    * tomcat-8.0.41
+    * twirl-1.2.1
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000582/assets,https://api.github.com/repos/http4s/http4s/releases/8000582,master,https://api.github.com/repos/http4s/http4s/tarball/v0.15.7,https://github.com/http4s/http4s/releases/tag/v0.15.7,https://api.github.com/repos/http4s/http4s/zipball/v0.15.7,v0.15.7,False,False
+8000577,2017-03-04T01:02:52Z,2017-10-04T20:45:19Z,,"* Log unhandled MessageFailures to `org.http4s.server.message-failures`
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000577/assets,https://api.github.com/repos/http4s/http4s/releases/8000577,master,https://api.github.com/repos/http4s/http4s/tarball/v0.15.6,https://github.com/http4s/http4s/releases/tag/v0.15.6,https://api.github.com/repos/http4s/http4s/zipball/v0.15.6,v0.15.6,False,False
+8000574,2017-02-20T14:39:38Z,2017-10-04T20:45:08Z,,"* Allow services wrapped in CORS middleware to fall through
+* Don't log message about invalid CORS headers when no `Origin` header present
+* Soften log about invalid CORS headers from info to debug
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000574/assets,https://api.github.com/repos/http4s/http4s/releases/8000574,master,https://api.github.com/repos/http4s/http4s/tarball/v0.15.5,https://github.com/http4s/http4s/releases/tag/v0.15.5,https://api.github.com/repos/http4s/http4s/zipball/v0.15.5,v0.15.5,False,False
+8000572,2017-02-12T17:10:10Z,2017-10-04T20:44:58Z,,"* Call `toHttpResponse` on tasks failed with `MessageFailure`s from
+  `HttpService`, to get proper 4xx handling instead of an internal
+  server error.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000572/assets,https://api.github.com/repos/http4s/http4s/releases/8000572,master,https://api.github.com/repos/http4s/http4s/tarball/v0.15.4,https://github.com/http4s/http4s/releases/tag/v0.15.4,https://api.github.com/repos/http4s/http4s/zipball/v0.15.4,v0.15.4,False,False
+8000569,2017-01-17T05:29:58Z,2017-10-04T20:44:47Z,,"* Dispose of redirect responses in `FollowRedirect`. Fixes client deadlock under heavy load
+* Refrain from logging headers with potentially sensitive info in blaze-client
+* Add `hashCode` and `equals` to `Headers`
+* Make `challenge` in auth middlewares public to facilitate composing multiple auth mechanisms
+* Fix blaze-client detection of stale connections
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000569/assets,https://api.github.com/repos/http4s/http4s/releases/8000569,master,https://api.github.com/repos/http4s/http4s/tarball/v0.15.3,https://github.com/http4s/http4s/releases/tag/v0.15.3,https://api.github.com/repos/http4s/http4s/zipball/v0.15.3,v0.15.3,False,False
+8000567,2016-12-30T01:19:06Z,2017-10-04T20:44:39Z,,"* Add helpers to add cookies to requests
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000567/assets,https://api.github.com/repos/http4s/http4s/releases/8000567,master,https://api.github.com/repos/http4s/http4s/tarball/v0.15.2,https://github.com/http4s/http4s/releases/tag/v0.15.2,https://api.github.com/repos/http4s/http4s/zipball/v0.15.2,v0.15.2,False,False
+8000565,2016-12-30T01:01:16Z,2017-10-04T20:44:29Z,,"* Backport rendering of details in `ParseFailure.getMessage`
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000565/assets,https://api.github.com/repos/http4s/http4s/releases/8000565,master,https://api.github.com/repos/http4s/http4s/tarball/v0.12.6,https://github.com/http4s/http4s/releases/tag/v0.12.6,https://api.github.com/repos/http4s/http4s/zipball/v0.12.6,v0.12.6,False,False
+8000563,2016-12-21T14:16:54Z,2017-10-04T20:44:12Z,,"* Fix GZip middleware to fallthrough non-matching responses
+* Fix UnsupportedOperationException in Arbitrary[Uri]
+* Upgrade to Scala 2.12.1 and Scalaz 7.2.8
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000563/assets,https://api.github.com/repos/http4s/http4s/releases/8000563,master,https://api.github.com/repos/http4s/http4s/tarball/v0.15.1,https://github.com/http4s/http4s/releases/tag/v0.15.1,https://api.github.com/repos/http4s/http4s/zipball/v0.15.1,v0.15.1,False,False
+8000559,2016-12-01T03:30:17Z,2017-10-04T20:44:00Z,,"* Add support for Scala 2.12
+* Added `Client.fromHttpService` to assist with testing.
+* Make all case classes final where possible, sealed where not.
+* Codec for Server Sent Events (SSE)
+* Added JSONP middleware
+* Improve Expires header to more easily build the header and support parsing of the header
+* Replce lazy `Raw.parsed` field with a simple null check
+* Added support for Zipkin headers
+* Eliminate response attribute for detecting fallthrough response.
+  The fallthrough response must be `Response.fallthrough`.
+* Encode URI path segments created with `/`
+* Introduce `AuthedRequest` and `AuthedService` types.
+* Replace `CharSequenceEncoder` with `CharBufferEncoder`, assuming
+  that `CharBuffer` and `String` are the only `CharSequence`s one
+  would want to encode.
+* Remove `EnittyEncoder[Char]` and `EntityEncoder[Byte]`.  Send an
+  array, buffer, or String if you want this.
+* Add `DefaultHead` middleware for `HEAD` implementation.
+* Decouple `http4s-server` from Dropwizard Metrics.  Metrics code is
+  in the new `http4s-metrics` module.
+* Allow custom scheduler for timeout middleware.
+* Add parametric empty `EntityEncoder` and `EntityEncoder[Unit]`.
+* Replace unlawful `Order[CharsetRange]` with `Equal[CharsetRange]`.
+* Auth middlewares renamed `BasicAuth` and `DigestAuth`.
+* `BasicAuth` passes client password to store instead of requesting
+  password from store.
+* Remove realm as an argument to the basic and digest auth stores.
+* Basic and digest auth stores return a parameterized type instead of
+  just a String username.
+* Upgrade to argonaut-6.2-RC2, circe-0.6.1, json4s-3.5.0
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000559/assets,https://api.github.com/repos/http4s/http4s/releases/8000559,master,https://api.github.com/repos/http4s/http4s/tarball/v0.15.0,https://github.com/http4s/http4s/releases/tag/v0.15.0,https://api.github.com/repos/http4s/http4s/zipball/v0.15.0,v0.15.0,False,False
+8000553,2016-10-26T03:28:46Z,2017-10-04T20:43:44Z,,"* Fix expansion of `uri` and `q` macros by qualifying with `_root_`
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000553/assets,https://api.github.com/repos/http4s/http4s/releases/8000553,master,https://api.github.com/repos/http4s/http4s/tarball/v0.14.11,https://github.com/http4s/http4s/releases/tag/v0.14.11,https://api.github.com/repos/http4s/http4s/zipball/v0.14.11,v0.14.11,False,False
+8000549,2016-10-12T19:38:55Z,2017-10-04T20:43:33Z,,"* Include timeout type and duration in blaze client timeouts
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000549/assets,https://api.github.com/repos/http4s/http4s/releases/8000549,master,https://api.github.com/repos/http4s/http4s/tarball/v0.14.10,https://github.com/http4s/http4s/releases/tag/v0.14.10,https://api.github.com/repos/http4s/http4s/zipball/v0.14.10,v0.14.10,False,False
+8000543,2016-10-10T04:01:57Z,2017-10-04T20:43:25Z,,"* Don't use `""null""` as query string in servlet backends for requests without a query string
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000543/assets,https://api.github.com/repos/http4s/http4s/releases/8000543,master,https://api.github.com/repos/http4s/http4s/tarball/v0.14.9,https://github.com/http4s/http4s/releases/tag/v0.14.9,https://api.github.com/repos/http4s/http4s/zipball/v0.14.9,v0.14.9,False,False
+8000540,2016-10-03T20:49:53Z,2017-10-04T20:43:15Z,,"* Allow param names in UriTemplate to have encoded, reserved parameters
+* Upgrade to blaze-0.12.1, to fix OutOfMemoryError with direct buffers
+* Upgrade to Scalaz 7.1.10/7.2.6
+* Upgrade to Jetty 9.3.12
+* Upgrade to Tomcat 8.0.37
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000540/assets,https://api.github.com/repos/http4s/http4s/releases/8000540,master,https://api.github.com/repos/http4s/http4s/tarball/v0.14.8,https://github.com/http4s/http4s/releases/tag/v0.14.8,https://api.github.com/repos/http4s/http4s/zipball/v0.14.8,v0.14.8,False,False
+8000535,2016-09-25T20:41:42Z,2017-10-04T20:42:58Z,,"* Retry middleware now only retries requests with idempotent methods
+  and pure bodies and appropriate status codes
+* Fix bug where redirects followed when an effectful chunk (i.e., `Await`) follows pure ones.
+* Don't uppercase two hex digits after ""%25"" when percent encoding.
+* Tolerate invalid percent-encodings when decoding.
+* Omit scoverage dependencies from POM
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000535/assets,https://api.github.com/repos/http4s/http4s/releases/8000535,master,https://api.github.com/repos/http4s/http4s/tarball/v0.14.7,https://github.com/http4s/http4s/releases/tag/v0.14.7,https://api.github.com/repos/http4s/http4s/zipball/v0.14.7,v0.14.7,False,False
+8000533,2016-09-12T02:42:28Z,2017-10-04T20:42:45Z,,"* Don't treat `Kill`ed responses (i.e., HEAD requests) as abnormal
+  termination in metrics
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000533/assets,https://api.github.com/repos/http4s/http4s/releases/8000533,master,https://api.github.com/repos/http4s/http4s/tarball/v0.14.6,https://github.com/http4s/http4s/releases/tag/v0.14.6,https://api.github.com/repos/http4s/http4s/zipball/v0.14.6,v0.14.6,False,False
+8000528,2016-09-03T03:04:36Z,2017-10-04T20:42:30Z,,"* Fix blaze-client handling of HEAD requests
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000528/assets,https://api.github.com/repos/http4s/http4s/releases/8000528,master,https://api.github.com/repos/http4s/http4s/tarball/v0.14.5,https://github.com/http4s/http4s/releases/tag/v0.14.5,https://api.github.com/repos/http4s/http4s/zipball/v0.14.5,v0.14.5,False,False
+8000525,2016-08-29T14:58:20Z,2017-10-04T20:42:17Z,,"* Don't render trailing ""/"" for URIs with empty paths
+* Avoid calling tail of empty list in `/:` extractor
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000525/assets,https://api.github.com/repos/http4s/http4s/releases/8000525,master,https://api.github.com/repos/http4s/http4s/tarball/v0.14.4,https://github.com/http4s/http4s/releases/tag/v0.14.4,https://api.github.com/repos/http4s/http4s/zipball/v0.14.4,v0.14.4,False,False
+8000524,2016-08-24T14:43:38Z,2017-10-04T20:42:07Z,,"* Follow 301 and 302 responses to POST with a GET request.
+* Follow all redirect responses to HEAD with a HEAD request.
+* Fix bug where redirect response is disposed prematurely even if not followed.
+* Fix bug where payload headers are sent from original request when
+  following a redirect with a GET or HEAD.
+* Return a failed task instead of throwing when a client callback
+  throws an exception. Fixes a resource leak.
+* Always render `Date` header in GMT.
+* Fully support the three date formats specified by RFC 7231.
+* Always specify peer information in blaze-client SSL engines
+* Patch upgrades to latest async-http-client, jetty, scalaz, and scalaz-stream
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000524/assets,https://api.github.com/repos/http4s/http4s/releases/8000524,master,https://api.github.com/repos/http4s/http4s/tarball/v0.14.3,https://github.com/http4s/http4s/releases/tag/v0.14.3,https://api.github.com/repos/http4s/http4s/zipball/v0.14.3,v0.14.3,False,False
+8000521,2016-08-10T13:35:08Z,2017-10-04T20:41:53Z,,"* Override `getMessage` in `UnexpectedStatus`
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000521/assets,https://api.github.com/repos/http4s/http4s/releases/8000521,master,https://api.github.com/repos/http4s/http4s/tarball/v0.14.2,https://github.com/http4s/http4s/releases/tag/v0.14.2,https://api.github.com/repos/http4s/http4s/zipball/v0.14.2,v0.14.2,False,False
+8000517,2016-06-15T20:47:17Z,2017-10-04T20:41:41Z,,"* Added the possibility to specify custom responses to MessageFailures
+* Address issue with Retry middleware leaking connections
+* Fixed the status code for a semantically invalid request to `422 UnprocessableEntity`
+* Rename `json` to `jsonDecoder` to reduce possibility of implicit shadowing
+* Introduce the `ServerApp` trait
+* Deprectate `onShutdown` and `awaitShutdown` in `Server`
+* Support for multipart messages
+* The Path extractor for Long now supports negative numbers
+* Upgrade to scalaz-stream-0.8.2(a) for compatibility with scodec-bits-1.1
+* Downgrade to argonaut-6.1 (latest stable release) now that it cross builds for scalaz-7.2
+* Upgrade parboiled2 for compatibility with shapeless-2.3.x
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000517/assets,https://api.github.com/repos/http4s/http4s/releases/8000517,master,https://api.github.com/repos/http4s/http4s/tarball/v0.14.1,https://github.com/http4s/http4s/releases/tag/v0.14.1,https://api.github.com/repos/http4s/http4s/zipball/v0.14.1,v0.14.1,False,False
+8000513,2016-06-15T16:43:10Z,2017-10-04T20:41:23Z,,"* Address issue with Retry middleware leaking connections.
+* Pass the reason string when setting the `Status` for a successful `ParseResult`.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000513/assets,https://api.github.com/repos/http4s/http4s/releases/8000513,master,https://api.github.com/repos/http4s/http4s/tarball/v0.13.3,https://github.com/http4s/http4s/releases/tag/v0.13.3,https://api.github.com/repos/http4s/http4s/zipball/v0.13.3,v0.13.3,False,False
+8000511,2016-04-13T17:42:05Z,2017-10-04T20:41:12Z,,"* Fixes the CanBuildFrom for RequestCookieJar to avoid duplicates.
+* Update version of jawn-parser which contains a fix for Json decoding.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000511/assets,https://api.github.com/repos/http4s/http4s/releases/8000511,master,https://api.github.com/repos/http4s/http4s/tarball/v0.13.2,https://github.com/http4s/http4s/releases/tag/v0.13.2,https://api.github.com/repos/http4s/http4s/zipball/v0.13.2,v0.13.2,False,False
+8000508,2016-04-07T16:45:48Z,2017-10-04T20:41:01Z,,"* Remove implicit resolution of `DefaultExecutor` in blaze-client.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000508/assets,https://api.github.com/repos/http4s/http4s/releases/8000508,master,https://api.github.com/repos/http4s/http4s/tarball/v0.13.1,https://github.com/http4s/http4s/releases/tag/v0.13.1,https://api.github.com/repos/http4s/http4s/zipball/v0.13.1,v0.13.1,False,False
+8000507,2016-03-29T14:17:43Z,2017-10-04T20:40:51Z,,"* Add support for scalaz-7.2.x (use version 0.13.0a).
+* Add a client backed based on async-http-client.
+* Encode keys when rendering a query string.
+* New entity decoder based on json4s' extract.
+* Content-Length now accepts a Long.
+* Upgrade to circe-0.3, json4s-3.3, and other patch releases.
+* Fix deadlocks in blaze resulting from default executor on single-CPU machines.
+* Refactor `DecodeFailure` into a new `RequestFailure` hierarchy.
+* New methods for manipulating `UrlForm`.
+* All parsed headers get a `parse` method to construct them from their value.
+* Improve error message for unsupported media type decoding error.
+* Introduce `BlazeClientConfig` class to simplify client construction.
+* Unify client executor service semantics between blaze-client and async-http-client.
+* Update default response message for UnsupportedMediaType failures.
+* Add a `lenient` flag to blazee configuration to accept illegal characters in headers.
+* Remove q-value from `MediaRange` and `MediaType`, replaced by `MediaRangeAndQValue`.
+* Add `address` to `Server` trait.
+* Lazily construct request body in Servlet NIO to support HTTP 100.
+* Common operations pushed down to `MessageOps`.
+* Fix loop in blaze-client when no connection can be established.
+* Privatize most of the blaze internal types.
+* Enable configuration of blaze server parser lengths.
+* Add trailer support in blaze client.
+* Provide an optional external executor to blaze clients.
+* Fix Argonaut string interpolation
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000507/assets,https://api.github.com/repos/http4s/http4s/releases/8000507,master,https://api.github.com/repos/http4s/http4s/tarball/v0.13.0,https://github.com/http4s/http4s/releases/tag/v0.13.0,https://api.github.com/repos/http4s/http4s/zipball/v0.13.0,v0.13.0,False,False
+8000500,2016-03-11T00:46:22Z,2017-10-04T20:40:31Z,,"* Fix bug on rejection of invalid URIs.
+* Do not send `Transfer-Encoding` or `Content-Length` headers for 304 and others.
+* Don't quote cookie values.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000500/assets,https://api.github.com/repos/http4s/http4s/releases/8000500,master,https://api.github.com/repos/http4s/http4s/tarball/v0.12.4,https://github.com/http4s/http4s/releases/tag/v0.12.4,https://api.github.com/repos/http4s/http4s/zipball/v0.12.4,v0.12.4,False,False
+8000498,2016-02-24T15:47:55Z,2017-10-04T20:40:19Z,,"* Upgrade to jawn-0.8.4 to fix decoding escaped characters in JSON.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000498/assets,https://api.github.com/repos/http4s/http4s/releases/8000498,master,https://api.github.com/repos/http4s/http4s/tarball/v0.12.3,https://github.com/http4s/http4s/releases/tag/v0.12.3,https://api.github.com/repos/http4s/http4s/zipball/v0.12.3,v0.12.3,False,False
+8000493,2016-01-30T16:23:48Z,2017-10-04T20:40:02Z,,"* Encode keys as well as values when rendering a query.
+* Don't encode '?' or '/' when encoding a query.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000493/assets,https://api.github.com/repos/http4s/http4s/releases/8000493,master,https://api.github.com/repos/http4s/http4s/tarball/v0.12.1,https://github.com/http4s/http4s/releases/tag/v0.12.1,https://api.github.com/repos/http4s/http4s/zipball/v0.12.1,v0.12.1,False,False
+8000489,2016-01-16T01:58:05Z,2017-10-04T20:39:44Z,,"* Refactor the client API for resource safety when not reading the entire body.
+* Rewrite client connection pool to support maximum concurrent
+  connections instead of maximum idle connections.
+* Optimize body collection for better connection keep-alive rate.
+* Move `Service` and `HttpService`, because a `Client` can be viewed as a `Service`.
+* Remove custom `DateTime` in favor of `java.time.Instant`.
+* Support status 451 Unavailable For Legal Reasons.
+* Various blaze-client optimizations.
+* Don't let Blaze `IdentityWriter` write more than Content-Length bytes.
+* Remove `identity` `Transfer-Encoding`, which was removed in HTTP RFC errata.
+* In blaze, `requireClose` is now the return value of `writeEnd`.
+* Remove body from `Request.toString` and `Response.toString`.
+* Move blaze parser into its own class.
+* Trigger a disconnect if an ignored body is too long.
+* Configurable thread factories for happier profiling.
+* Fix possible deadlock in default client execution context.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000489/assets,https://api.github.com/repos/http4s/http4s/releases/8000489,master,https://api.github.com/repos/http4s/http4s/tarball/v0.12.0,https://github.com/http4s/http4s/releases/tag/v0.12.0,https://api.github.com/repos/http4s/http4s/zipball/v0.12.0,v0.12.0,False,False
+8000484,2015-12-29T01:26:38Z,2017-10-04T20:39:28Z,,"* Blaze upgrade to fix parsing HTTP responses without a reason phrase.
+* Don't write more than Content-Length bytes in blaze.
+* Fix infinite loop in non-blocking Servlet I/O.
+* Never write a response body on HEAD requests to blaze.
+* Add missing `'&'` between multivalued k/v pairs in `UrlFormCodec.encode`
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000484/assets,https://api.github.com/repos/http4s/http4s/releases/8000484,master,https://api.github.com/repos/http4s/http4s/tarball/v0.11.3,https://github.com/http4s/http4s/releases/tag/v0.11.3,https://api.github.com/repos/http4s/http4s/zipball/v0.11.3,v0.11.3,False,False
+8000480,2015-12-05T01:13:37Z,2017-10-04T20:39:15Z,,"* Fix stack safety issue in async servlet I/O.
+* Reduce noise from timeout exceptions in `ClientTimeoutStage`.
+* Address file descriptor leaks in blaze-client.
+* Fix `FollowRedirect` middleware for 303 responses.
+* Support keep-alives for client requests with bodies.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000480/assets,https://api.github.com/repos/http4s/http4s/releases/8000480,master,https://api.github.com/repos/http4s/http4s/tarball/v0.11.2,https://github.com/http4s/http4s/releases/tag/v0.11.2,https://api.github.com/repos/http4s/http4s/zipball/v0.11.2,v0.11.2,False,False
+8000476,2015-11-29T13:44:53Z,2017-10-04T20:38:52Z,,"* Honor `connectorPoolSize` and `bufferSize` parameters in `BlazeBuilder`.
+* Add convenient `ETag` header constructor.
+* Wait for final chunk to be written before closing the async context in non-blocking servlet I/O.
+* Upgrade to jawn-streamz-0.7.0 to use scalaz-stream-0.8 across the board.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000476/assets,https://api.github.com/repos/http4s/http4s/releases/8000476,master,https://api.github.com/repos/http4s/http4s/tarball/v0.11.1,https://github.com/http4s/http4s/releases/tag/v0.11.1,https://api.github.com/repos/http4s/http4s/zipball/v0.11.1,v0.11.1,False,False
+8000454,2015-11-20T23:45:16Z,2017-10-04T20:37:42Z,,"* Upgrade to scalaz-stream 0.8
+* Add Circe JSON support module.
+* Add ability to require content-type matching with EntityDecoders.
+* Cleanup blaze-client internals.
+* Handle empty static files.
+* Add ability to disable endpoint authentication for the blaze client.
+* Add charset encoding for Argonaut JSON EntityEncoder.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000454/assets,https://api.github.com/repos/http4s/http4s/releases/8000454,master,https://api.github.com/repos/http4s/http4s/tarball/v0.11.0,https://github.com/http4s/http4s/releases/tag/v0.11.0,https://api.github.com/repos/http4s/http4s/zipball/v0.11.0,v0.11.0,False,False
+8000447,2015-10-07T18:30:28Z,2017-10-04T20:37:28Z,,"* Processes render data in chunked encoding by default.
+* Incorporate type name into error message of QueryParam.
+* Comma separate Access-Control-Allow-Methods header values.
+* Default FallThrough behavior inspects for the FallThrough.fallthroughKey.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000447/assets,https://api.github.com/repos/http4s/http4s/releases/8000447,master,https://api.github.com/repos/http4s/http4s/tarball/v0.10.1,https://github.com/http4s/http4s/releases/tag/v0.10.1,https://api.github.com/repos/http4s/http4s/zipball/v0.10.1,v0.10.1,False,False
+8000445,2015-09-03T15:17:01Z,2017-10-04T20:37:16Z,,"* Replace `PartialService` with the `Fallthrough` typeclass and `orElse` syntax.
+* Rename `withHeaders` to `replaceAllHeaders`
+* Set https endpoint identification algorithm when possible.
+* Stack-safe `ProcessWriter` in blaze.
+* Configureable number of connector threads and buffer size in blaze-server.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000445/assets,https://api.github.com/repos/http4s/http4s/releases/8000445,master,https://api.github.com/repos/http4s/http4s/tarball/v0.10.0,https://github.com/http4s/http4s/releases/tag/v0.10.0,https://api.github.com/repos/http4s/http4s/zipball/v0.10.0,v0.10.0,False,False
+8000440,2015-08-27T21:26:32Z,2017-10-04T20:37:03Z,,"* Trampoline recursive calls in blaze ProcessWriter.
+* Handle server hangup and body termination correctly in blaze client.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000440/assets,https://api.github.com/repos/http4s/http4s/releases/8000440,master,https://api.github.com/repos/http4s/http4s/tarball/v0.9.3,https://github.com/http4s/http4s/releases/tag/v0.9.3,https://api.github.com/repos/http4s/http4s/zipball/v0.9.3,v0.9.3,False,False
+8000436,2015-08-27T00:41:00Z,2017-10-04T20:36:52Z,,"* Bump http4s-websockets to 1.0.3 to properly decode continuation opcode.
+* Fix metrics incompatibility when using Jetty 9.3 backend.
+* Preserve original headers when appending as opposed to quoting.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000436/assets,https://api.github.com/repos/http4s/http4s/releases/8000436,master,https://api.github.com/repos/http4s/http4s/tarball/v0.9.2,https://github.com/http4s/http4s/releases/tag/v0.9.2,https://api.github.com/repos/http4s/http4s/zipball/v0.9.2,v0.9.2,False,False
+8000432,2015-08-27T00:39:29Z,2017-10-04T20:36:37Z,,"* Preserve original headers when appending as opposed to quoting.
+* Upgrade to jawn-0.8.3 to avoid transitive dependency on GPL2 jmh
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000432/assets,https://api.github.com/repos/http4s/http4s/releases/8000432,master,https://api.github.com/repos/http4s/http4s/tarball/v0.8.5,https://github.com/http4s/http4s/releases/tag/v0.8.5,https://api.github.com/repos/http4s/http4s/zipball/v0.8.5,v0.8.5,False,False
+8000429,2015-08-19T18:30:33Z,2017-10-04T20:36:20Z,,"* Fix bug in servlet nio handler.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000429/assets,https://api.github.com/repos/http4s/http4s/releases/8000429,master,https://api.github.com/repos/http4s/http4s/tarball/v0.9.1,https://github.com/http4s/http4s/releases/tag/v0.9.1,https://api.github.com/repos/http4s/http4s/zipball/v0.9.1,v0.9.1,False,False
+8000423,2015-08-16T13:01:12Z,2017-10-04T20:36:06Z,,"* Require Java8.
+* `StaticFile` uses the filename extension exclusively to determine media-type.
+* Add `/` method to `Uri`.
+* Add `UrlFormLifter` middleware to aggregate url-form parameters with the query parameters.
+* Add local address information to the `Request` type.
+* Add a Http method 'or' (`|`) extractor.
+* Add `VirtualHost` middleware for serving multiple sites from one server.
+* Add websocket configuration to the blaze server builder.
+* Redefine default timeout status code to 500.
+* Redefine the `Service` arrow result from `Task[Option[_]]` to `Task[_]`.
+* Don't extend `AllInstances` with `Http4s` omnibus import object.
+* Use UTF-8 as the default encoding for text bodies.
+* Numerous bug fixes by numerous contributors!
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000423/assets,https://api.github.com/repos/http4s/http4s/releases/8000423,master,https://api.github.com/repos/http4s/http4s/tarball/v0.9.0,https://github.com/http4s/http4s/releases/tag/v0.9.0,https://api.github.com/repos/http4s/http4s/zipball/v0.9.0,v0.9.0,False,False
+8000416,2015-07-13T19:59:06Z,2017-10-04T20:35:49Z,,"* Honor the buffer size parameter in gzip middleware.
+* Handle service exceptions in servlet backends.
+* Respect asyncTimeout in servlet backends.
+* Fix prefix mounting bug in blaze-server.
+* Do not apply CORS headers to unsuccessful OPTIONS requests.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000416/assets,https://api.github.com/repos/http4s/http4s/releases/8000416,master,https://api.github.com/repos/http4s/http4s/tarball/v0.8.4,https://github.com/http4s/http4s/releases/tag/v0.8.4,https://api.github.com/repos/http4s/http4s/zipball/v0.8.4,v0.8.4,False,False
+8000412,2015-07-02T14:44:58Z,2017-10-04T20:35:29Z,,"* Fix bug parsing IPv4 addresses found in URI construction.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000412/assets,https://api.github.com/repos/http4s/http4s/releases/8000412,master,https://api.github.com/repos/http4s/http4s/tarball/v0.8.3,https://github.com/http4s/http4s/releases/tag/v0.8.3,https://api.github.com/repos/http4s/http4s/zipball/v0.8.3,v0.8.3,False,False
+8000404,2015-06-22T18:29:41Z,2017-10-04T20:35:10Z,,"* Patch instrumented handler for Jetty to time async contexts correctly.
+* Fix race condition with timeout registration and route execution in blaze client
+* Replace `ConcurrentHashMap` with synchronized `HashMap` in `staticcontent` package.
+* Fix static content from jars by avoiding `""//""` in path uris when serving static content.
+* Quote MediaRange extensions.
+* Upgrade to jawn-streamz-0.5.0 and blaze-0.8.2.
+* Improve error handling in blaze-client.
+* Respect the explicit default encoding passed to `decodeString`.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000404/assets,https://api.github.com/repos/http4s/http4s/releases/8000404,master,https://api.github.com/repos/http4s/http4s/tarball/v0.8.2,https://github.com/http4s/http4s/releases/tag/v0.8.2,https://api.github.com/repos/http4s/http4s/zipball/v0.8.2,v0.8.2,False,False
+8000401,2015-06-16T17:24:00Z,2017-10-04T20:34:57Z,,"* Authentication middleware integrated into the server package.
+* Static content tools integrated into the server package.
+* Rename HttpParser to HttpHeaderParser and allow registration and removal of header parsers.
+* Make UrlForm EntityDecoder implicitly resolvable.
+* Relax UrlForm parser strictness.
+* Add 'follow redirect' support as a client middleware.
+* Add server middleware for auto retrying uris of form '/foo/' as '/foo'.
+* Numerous bug fixes.
+* Numerous version bumps.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000401/assets,https://api.github.com/repos/http4s/http4s/releases/8000401,master,https://api.github.com/repos/http4s/http4s/tarball/v0.8.1,https://github.com/http4s/http4s/releases/tag/v0.8.1,https://api.github.com/repos/http4s/http4s/zipball/v0.8.1,v0.8.1,False,False
+8000394,2015-05-05T12:15:16Z,2017-10-04T20:34:40Z,,"* Add QueryParamMatcher to the dsl which returns a ValidationNel.
+* Dsl can differentiate between '/foo/' and '/foo'.
+* Added http2 support for blaze backend.
+* Added a metrics middleware usable on all server backends.
+* Websockets are now modeled by an scalaz.stream.Exchange.
+* Add `User-Agent` and `Allow` header types and parsers.
+* Allow providing a Host header to the blaze client.
+* Upgrade to scalaz-stream-7.0a.
+* Added a CORS middleware.
+* Numerous bug fixes.
+* Numerous version bumps.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000394/assets,https://api.github.com/repos/http4s/http4s/releases/8000394,master,https://api.github.com/repos/http4s/http4s/tarball/v0.7.0,https://github.com/http4s/http4s/releases/tag/v0.7.0,https://api.github.com/repos/http4s/http4s/zipball/v0.7.0,v0.7.0,False,False
+8000387,2015-03-30T03:13:06Z,2017-10-04T20:34:23Z,,"* Fix bug in Request URI on servlet backend with non-empty context or servlet paths.
+* Allow provided Host header for Blaze requests.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000387/assets,https://api.github.com/repos/http4s/http4s/releases/8000387,master,https://api.github.com/repos/http4s/http4s/tarball/v0.6.5,https://github.com/http4s/http4s/releases/tag/v0.6.5,https://api.github.com/repos/http4s/http4s/zipball/v0.6.5,v0.6.5,False,False
+8000385,2015-03-16T01:00:30Z,2017-10-04T20:34:13Z,,"* Avoid loading javax.servlet.WriteListener when deploying to a servlet 3.0 container.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000385/assets,https://api.github.com/repos/http4s/http4s/releases/8000385,master,https://api.github.com/repos/http4s/http4s/tarball/v0.6.4,https://github.com/http4s/http4s/releases/tag/v0.6.4,https://api.github.com/repos/http4s/http4s/zipball/v0.6.4,v0.6.4,False,False
+8000375,2015-02-27T23:21:58Z,2017-10-04T20:33:32Z,,"* Use the thread pool provided to the Jetty servlet builder.
+* Avoid throwing exceptions when parsing headers.
+* Make trailing slash insignificant in service prefixes on servlet containers.
+* Fix mapping of servlet query and mount prefix.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000375/assets,https://api.github.com/repos/http4s/http4s/releases/8000375,master,https://api.github.com/repos/http4s/http4s/tarball/v0.6.2,https://github.com/http4s/http4s/releases/tag/v0.6.2,https://api.github.com/repos/http4s/http4s/zipball/v0.6.2,v0.6.2,False,False
+8000374,2015-02-04T18:38:16Z,2017-10-04T20:33:21Z,,"* Update to blaze-0.5.1
+* Remove unneeded error message (90b2f76097215)
+* GZip middleware will not throw an exception if the AcceptEncoding header is not gzip (ed1b2a0d68a8)
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000374/assets,https://api.github.com/repos/http4s/http4s/releases/8000374,master,https://api.github.com/repos/http4s/http4s/tarball/v0.6.1,https://github.com/http4s/http4s/releases/tag/v0.6.1,https://api.github.com/repos/http4s/http4s/zipball/v0.6.1,v0.6.1,False,False
+8000367,2015-01-27T18:15:36Z,2017-10-04T20:33:05Z,,"## http4s-core
+* Remove ResponseBuilder in favor of Response companion.
+* Allow '';'' separators for query pairs.
+* Make charset on Message an Option.
+* Add a `flatMapR` method to EntityDecoder.
+* Various enhancements to QueryParamEncoder and QueryParamDecoder.
+* Make Query an IndexedSeq.
+* Add parsers for Location and Proxy-Authenticate headers.
+* Move EntityDecoder.apply to `Request.decode` and `Request.decodeWith`
+* Move headers into `org.http4s.headers` package.
+* Make UriTranslation respect scriptName/pathInfo split.
+* New method to resolve relative Uris.
+* Encode query and fragment of Uri.
+* Codec and wrapper type for URL-form-encoded bodies.
+
+## http4s-server
+* Add SSL support to all server builders.
+
+## http4s-blaze-server
+* Add Date header to blaze-server responses.
+* Close connection when error happens during body write in blaze-server.
+
+## http4s-servlet
+* Use asynchronous servlet I/O on Servlet 3.1 containers.
+* ServletContext syntax for easy mounting in a WAR deployment.
+* Support Dropwizard Metrics collection for servlet containers.
+
+## http4s-jawn
+* Empty strings are a JSON decoding error.
+
+## http4s-argonaut
+* Add codec instances for Argonaut's CodecJson.
+
+## http4s-json4s
+* Add codec instances for Json4s' Reader/Writer.
+
+## http4s-twirl
+* New module to support Twirl templates
+
+## http4s-scala-xml
+* Split scala-xml support into http4s-scala-xml module.
+* Change inferred type of `scala.xml.Elem` to `application/xml`.
+
+## http4s-client
+* Support for signing oauth-1 requests in client.
+
+## http4s-blaze-client
+* Fix blaze-client when receiving HTTP1 response without Content-Length header.
+* Change default blaze-client executor to variable size.
+* Fix problem with blaze-client timeouts.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000367/assets,https://api.github.com/repos/http4s/http4s/releases/8000367,master,https://api.github.com/repos/http4s/http4s/tarball/v0.6.0,https://github.com/http4s/http4s/releases/tag/v0.6.0,https://api.github.com/repos/http4s/http4s/zipball/v0.6.0,v0.6.0,False,False
+8000361,2015-01-08T22:02:33Z,2017-10-04T20:32:41Z,,"* Upgrade to blaze 0.4.1 to fix header parsing issue in blaze http/1.x client and server.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000361/assets,https://api.github.com/repos/http4s/http4s/releases/8000361,master,https://api.github.com/repos/http4s/http4s/tarball/v0.5.4,https://github.com/http4s/http4s/releases/tag/v0.5.4,https://api.github.com/repos/http4s/http4s/zipball/v0.5.4,v0.5.4,False,False
+8000359,2015-01-05T16:53:08Z,2017-10-04T20:32:29Z,,"* Upgrade to argonaut-6.1-M5 to match jawn. [#157](https://github.com/http4s/http4s/issues/157)
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000359/assets,https://api.github.com/repos/http4s/http4s/releases/8000359,master,https://api.github.com/repos/http4s/http4s/tarball/v0.5.3,https://github.com/http4s/http4s/releases/tag/v0.5.3,https://api.github.com/repos/http4s/http4s/zipball/v0.5.3,v0.5.3,False,False
+8000350,2015-01-02T22:17:01Z,2017-10-04T20:32:16Z,,"* Upgrade to jawn-0.7.2.  Old version of jawn was incompatible with argonaut. [#157]](https://github.com/http4s/http4s/issues/157)
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000350/assets,https://api.github.com/repos/http4s/http4s/releases/8000350,master,https://api.github.com/repos/http4s/http4s/tarball/v0.5.2,https://github.com/http4s/http4s/releases/tag/v0.5.2,https://api.github.com/repos/http4s/http4s/zipball/v0.5.2,v0.5.2,False,False
+8000347,2014-12-23T15:52:54Z,2017-10-04T20:32:05Z,,"* Include context path in calculation of scriptName/pathInfo. [#140](https://github.com/http4s/http4s/issues/140)
+* Fix bug in UriTemplate for query params with multiple keys.
+* Fix StackOverflowError in query parser. [#147](https://github.com/http4s/http4s/issues/147)
+* Allow ';' separators for query pairs.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000347/assets,https://api.github.com/repos/http4s/http4s/releases/8000347,master,https://api.github.com/repos/http4s/http4s/tarball/v0.5.1,https://github.com/http4s/http4s/releases/tag/v0.5.1,https://api.github.com/repos/http4s/http4s/zipball/v0.5.1,v0.5.1,False,False
+8000344,2014-12-11T20:32:04Z,2017-10-04T20:31:47Z,,"* Client syntax has evloved and now will include Accept headers when used with EntityDecoder
+* Parse JSON with jawn-streamz.
+* EntityDecoder now returns an EitherT to make decoding failure explicit.
+* Renamed Writable to EntityEncoder
+* New query param typeclasses for encoding and decoding query strings.
+* Status equality now discards the reason phrase.
+* Match AttributeKeys as singletons.
+* Added async timeout listener to servlet backends.
+* Start blaze server asynchronously.
+* Support specifying timeout and executor in blaze-client.
+* Use NIO for encoding files.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000344/assets,https://api.github.com/repos/http4s/http4s/releases/8000344,master,https://api.github.com/repos/http4s/http4s/tarball/v0.5.0,https://github.com/http4s/http4s/releases/tag/v0.5.0,https://api.github.com/repos/http4s/http4s/zipball/v0.5.0,v0.5.0,False,False
+8000338,2014-12-02T01:45:14Z,2017-10-04T20:31:26Z,,"* Fix whitespace parsing in Authorization header [#87](https://github.com/http4s/http4s/issues/87)
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000338/assets,https://api.github.com/repos/http4s/http4s/releases/8000338,master,https://api.github.com/repos/http4s/http4s/tarball/v0.4.2,https://github.com/http4s/http4s/releases/tag/v0.4.2,https://api.github.com/repos/http4s/http4s/zipball/v0.4.2,v0.4.2,False,False
+8000334,2014-11-21T15:55:24Z,2017-10-04T20:31:11Z,,"* `Uri.query` and `Uri.fragment` are no longer decoded. [#75](https://github.com/http4s/http4s/issues/75)
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000334/assets,https://api.github.com/repos/http4s/http4s/releases/8000334,master,https://api.github.com/repos/http4s/http4s/tarball/v0.4.1,https://github.com/http4s/http4s/releases/tag/v0.4.1,https://api.github.com/repos/http4s/http4s/zipball/v0.4.1,v0.4.1,False,False
+8000327,2014-11-18T18:02:46Z,2017-10-04T20:30:51Z,,"* Change HttpService form a `PartialFunction[Request,Task[Response]]`
+  to `Service[Request, Response]`, a type that encapsulates a `Request => Task[Option[Response]]`
+* Upgrade to scalaz-stream-0.6a
+* Upgrade to blaze-0.3.0
+* Drop scala-logging for log4s
+* Refactor ServerBuilders into an immutable builder pattern.
+* Add a way to control the thread pool used for execution of a Service
+* Modernize the Renderable/Renderer framework
+* Change Renderable append operator from ~ to <<
+* Split out the websocket codec and types into a seperate package
+* Added ReplyException, an experimental way to allow an Exception to encode
+  a default Response on for EntityDecoder etc.
+* Many bug fixes and slight enhancements
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000327/assets,https://api.github.com/repos/http4s/http4s/releases/8000327,master,https://api.github.com/repos/http4s/http4s/tarball/v0.4.0,https://github.com/http4s/http4s/releases/tag/v0.4.0,https://api.github.com/repos/http4s/http4s/zipball/v0.4.0,v0.4.0,False,False
+8000321,2014-08-29T00:42:31Z,2017-10-04T20:30:26Z,,"
+* New client API with Blaze implementation
+* Upgrade to scalaz-7.1.0 and scalaz-stream-0.5a
+* JSON Writable support through Argonaut and json4s.
+* Add EntityDecoders for parsing bodies.
+* Moved request and response generators to http4s-dsl to be more flexible to
+  other frameworks'' syntax needs.
+* Phased out exception-throwing methods for the construction of various
+  model objects in favor of disjunctions and macro-enforced literals.
+* Refactored imports to match the structure followed by [scalaz](https://github.com/scalaz/scalaz).
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000321/assets,https://api.github.com/repos/http4s/http4s/releases/8000321,master,https://api.github.com/repos/http4s/http4s/tarball/v0.3.0,https://github.com/http4s/http4s/releases/tag/v0.3.0,https://api.github.com/repos/http4s/http4s/zipball/v0.3.0,v0.3.0,False,False
+8000311,2014-07-16T03:01:19Z,2017-10-04T20:29:40Z,,"* Scala 2.11 support
+* Spun off http4s-server module. http4s-core is neutral between server and
+the future client.
+* New builder for running Blaze, Jetty, and Tomcat servers.
+* Configurable timeouts in each server backend.
+* Replace Chunk with scodec.bits.ByteVector.
+* Many enhancements and bugfixes to URI type.
+* Drop joda-time dependency for slimmer date-time class.
+* Capitalized method names in http4s-dsl.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000311/assets,https://api.github.com/repos/http4s/http4s/releases/8000311,master,https://api.github.com/repos/http4s/http4s/tarball/v0.2.0,https://github.com/http4s/http4s/releases/tag/v0.2.0,https://api.github.com/repos/http4s/http4s/zipball/v0.2.0,v0.2.0,False,False
+8000297,2014-04-16T03:44:17Z,2017-10-04T20:28:19Z,,"* Initial public release.
+",https://api.github.com/users/rossabaker,142698,rossabaker,https://api.github.com/repos/http4s/http4s/releases/8000297/assets,https://api.github.com/repos/http4s/http4s/releases/8000297,master,https://api.github.com/repos/http4s/http4s/tarball/v0.1.0,https://github.com/http4s/http4s/releases/tag/v0.1.0,https://api.github.com/repos/http4s/http4s/zipball/v0.1.0,v0.1.0,False,False

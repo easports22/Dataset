@@ -1,0 +1,333 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+6824290,2017-06-24T14:43:07Z,2017-06-24T14:47:06Z,Medoo 1.4.5,"- Bug fixes for `like` and guid problem
+- Return false if prepare statement failed",https://api.github.com/users/catfan,1467904,catfan,https://api.github.com/repos/catfan/Medoo/releases/6824290/assets,https://api.github.com/repos/catfan/Medoo/releases/6824290,master,https://api.github.com/repos/catfan/Medoo/tarball/v1.4.5,https://github.com/catfan/Medoo/releases/tag/v1.4.5,https://api.github.com/repos/catfan/Medoo/zipball/v1.4.5,v1.4.5,False,False
+6587390,2017-06-02T15:25:04Z,2017-06-02T15:28:16Z,Medoo 1.4.4,"- Bug fix for `error()` when statement is empty
+- Bug fix for using SQL function on `select()`",https://api.github.com/users/catfan,1467904,catfan,https://api.github.com/repos/catfan/Medoo/releases/6587390/assets,https://api.github.com/repos/catfan/Medoo/releases/6587390,master,https://api.github.com/repos/catfan/Medoo/tarball/v1.4.4,https://github.com/catfan/Medoo/releases/tag/v1.4.4,https://api.github.com/repos/catfan/Medoo/zipball/v1.4.4,v1.4.4,False,False
+6458126,2017-05-22T04:39:48Z,2017-05-22T04:43:08Z,Medoo 1.4.3,Fixed `error()` bug and SQL function syntax for update and insert statement.,https://api.github.com/users/catfan,1467904,catfan,https://api.github.com/repos/catfan/Medoo/releases/6458126/assets,https://api.github.com/repos/catfan/Medoo/releases/6458126,master,https://api.github.com/repos/catfan/Medoo/tarball/v1.4.3,https://github.com/catfan/Medoo/releases/tag/v1.4.3,https://api.github.com/repos/catfan/Medoo/zipball/v1.4.3,v1.4.3,False,False
+6402778,2017-05-16T14:30:44Z,2017-05-16T14:37:20Z,Medoo 1.4.2,Fixes bug for incorrect uniqid return on XAMMP Windows environment,https://api.github.com/users/catfan,1467904,catfan,https://api.github.com/repos/catfan/Medoo/releases/6402778/assets,https://api.github.com/repos/catfan/Medoo/releases/6402778,master,https://api.github.com/repos/catfan/Medoo/tarball/v1.4.2,https://github.com/catfan/Medoo/releases/tag/v1.4.2,https://api.github.com/repos/catfan/Medoo/zipball/v1.4.2,v1.4.2,False,False
+6360610,2017-05-11T23:53:15Z,2017-05-11T23:57:31Z,Medoo 1.4.1,"Emergency bug fixes.
+
+- Fix `*` for selecting all columns
+- `exec()` allow empty map",https://api.github.com/users/catfan,1467904,catfan,https://api.github.com/repos/catfan/Medoo/releases/6360610/assets,https://api.github.com/repos/catfan/Medoo/releases/6360610,master,https://api.github.com/repos/catfan/Medoo/tarball/v1.4.1,https://github.com/catfan/Medoo/releases/tag/v1.4.1,https://api.github.com/repos/catfan/Medoo/zipball/v1.4.1,v1.4.1,False,False
+6333543,2017-05-10T02:46:45Z,2017-05-10T03:44:31Z,Medoo 1.4,"# Make Medoo Great Again
+
+> The most greatest update on Medoo history. This version included a lot of significant improvements that obviously increasing the performance and flexibility. We also redesign our official website, providing better useful content for documentation.
+
+### Prepared statement ready
+Medoo is now using prepared statement for inside query execution. This will increase the query performance and also prevent SQL injection.
+
+### Add supported for data type declaration
+```php
+$data = $database->select(""post"", [
+	""[>]account"" => [""user_id""]
+], [
+	""post.post_id"",
+ 
+	""profile"" => [
+		""account.age [Int]"",
+		""account.is_locked [Bool]"",
+		""account.userData [JSON]""
+	]
+], [
+	""LIMIT"" => [0, 2]
+]);
+ 
+echo json_encode($data);
+
+// Output data
+[
+	{
+		post_id: ""1"",
+		profile: {
+			age: 20,
+			is_locked: true,
+			userData: [""foo"", ""bar"", ""tim""]
+		}
+	},
+	{
+		post_id: ""2"",
+		profile: {
+			age: 25,
+			is_locked: false,
+			userData: [""mydata1"", ""mydata2""]
+		}
+	}
+]
+```
+
+### Add supported for LOBs and resources data type for insert() and update()
+```php
+class Foo {
+	var $bar = ""cat"";
+ 
+	public function __wakeup()
+	{
+		$this->bar = ""dog"";
+	}
+}
+ 
+$object_data = new Foo();
+ 
+$fp = fopen($_FILES[ ""file"" ][ ""tmp_name"" ], ""rb"");
+ 
+$database->insert(""account"", [
+	// String value
+	""user_name"" => ""foo"",
+ 
+	// Integer value
+	""age"" => 25,
+ 
+	// Boolean value
+	""is_locked"" => true,
+	
+	// Array value
+	""lang"" => [""en"", ""fr"", ""jp"", ""cn""],
+ 
+	// Array value encoded as JSON
+	""lang [JSON]"" => [""en"", ""fr"", ""jp"", ""cn""],
+ 
+	// Object value
+	""object_data"" => $object_data,
+ 
+	// Large Objects (LOBs)
+	""image"" => $fp
+]);
+```
+
+### Logging option
+We added a logging option for initialization. Logging feature will be disabled for better performance and less memory consumption.
+
+```php
+$database = new Medoo([
+	""database_type"" => ""mysql"",
+	""database_name"" => ""name"",
+	""server"" => ""localhost"",
+	""username"" => ""your_username"",
+	""password"" => ""your_password"",
+ 
+	// Enable logging
+	""logging"" => true,
+]);
+```
+
+### New query() API, supports prepared statement
+```php
+$data = $database->query(
+	""SELECT * FROM account WHERE user_name = :user_name AND age = :age"", [
+		"":user_name"" => ""John Smite"",
+		"":age"" => 20
+	]
+)->fetchAll();
+```
+
+### Additional changes
+- Supports JSON decode
+- Supports multiple GROUP by
+- Improve MATCH full-text search
+- Improve data mapping performance
+- Improve all regex matching
+- Improve MSSQL and Oracle database support
+
+### Upgrading Medoo 1.2 to Medoo 1.4
+There is only one change required
+```php
+// From
+$database->insert(""account"", [
+	""user_name"" => ""foo"",
+	""email"" => ""foo@bar.com"",
+	""age"" => 25,
+	""(JSON) lang"" => [""en"", ""fr"", ""jp"", ""cn""]
+]);
+
+// To
+$database->insert(""account"", [
+	""user_name"" => ""foo"",
+	""email"" => ""foo@bar.com"",
+	""age"" => 25,
+	""lang [JSON]"" => [""en"", ""fr"", ""jp"", ""cn""]
+]);
+```
+Code changes for upgrading older version to Medoo 1.4, read more
+https://medoo.in/api/upgrade
+
+New designed official website is now HTTPS also
+https://medoo.in",https://api.github.com/users/catfan,1467904,catfan,https://api.github.com/repos/catfan/Medoo/releases/6333543/assets,https://api.github.com/repos/catfan/Medoo/releases/6333543,master,https://api.github.com/repos/catfan/Medoo/tarball/v1.4,https://github.com/catfan/Medoo/releases/tag/v1.4,https://api.github.com/repos/catfan/Medoo/zipball/v1.4,v1.4,False,False
+5492113,2017-02-17T16:05:35Z,2017-02-17T16:09:11Z,Medoo 1.2.1,"Fix initialization bug
+",https://api.github.com/users/catfan,1467904,catfan,https://api.github.com/repos/catfan/Medoo/releases/5492113/assets,https://api.github.com/repos/catfan/Medoo/releases/5492113,master,https://api.github.com/repos/catfan/Medoo/tarball/v1.2.1,https://github.com/catfan/Medoo/releases/tag/v1.2.1,https://api.github.com/repos/catfan/Medoo/zipball/v1.2.1,v1.2.1,False,False
+5394038,2017-02-08T10:15:12Z,2017-02-08T11:01:44Z,Medoo 1.2,"The new milestone version Medoo 1.2 is now released. We make Medoo more modern, powerful and compatible.
+
+### Changes
+- PSR compatible
+- Use namespace
+- Dropped support for PHP 5.1, the minimal requirement is PHP 5.4
+- New initialization
+- Change all `array()` to `[]`
+- Updated and simplified all method name with camel case
+- Improve multiple insert performance
+- Improve database compatible
+
+### New features
+- Customizable DSN for initialization
+- New API `id()` for fetching the last insert row ID
+- Execute customized command for initialization
+- Support condition relationship between two column
+- Compound like condition
+- Connect condition with AND by default
+
+### [Important!!!] You will need some code change before upgrading to 1.2
+
+See the changes and how to upgrade to Medoo 1.2
+http://medoo.in/api/upgrade
+
+We also updated the official website for better documentation. Hope you enjoy it :)
+",https://api.github.com/users/catfan,1467904,catfan,https://api.github.com/repos/catfan/Medoo/releases/5394038/assets,https://api.github.com/repos/catfan/Medoo/releases/5394038,master,https://api.github.com/repos/catfan/Medoo/tarball/v1.2,https://github.com/catfan/Medoo/releases/tag/v1.2,https://api.github.com/repos/catfan/Medoo/zipball/v1.2,v1.2,False,False
+3620809,2016-07-07T17:58:29Z,2016-07-09T07:05:29Z,Medoo 1.1.2,"- Emergency bug fix
+",https://api.github.com/users/catfan,1467904,catfan,https://api.github.com/repos/catfan/Medoo/releases/3620809/assets,https://api.github.com/repos/catfan/Medoo/releases/3620809,master,https://api.github.com/repos/catfan/Medoo/tarball/v1.1.2,https://github.com/catfan/Medoo/releases/tag/v1.1.2,https://api.github.com/repos/catfan/Medoo/zipball/v1.1.2,v1.1.2,False,False
+3536008,2016-06-28T04:59:23Z,2016-06-28T05:23:09Z,Medoo 1.1.1,"- Emergency bug fixes
+",https://api.github.com/users/catfan,1467904,catfan,https://api.github.com/repos/catfan/Medoo/releases/3536008/assets,https://api.github.com/repos/catfan/Medoo/releases/3536008,master,https://api.github.com/repos/catfan/Medoo/tarball/v1.1.1,https://github.com/catfan/Medoo/releases/tag/v1.1.1,https://api.github.com/repos/catfan/Medoo/zipball/v1.1.1,v1.1.1,False,False
+3524550,2016-06-26T10:26:40Z,2016-06-26T10:51:52Z,Medoo 1.1,"We are happy to announced that Medoo v1.1 is now released.
+
+This version is included some awesome changes and useful features.
+- New feature - data mapping
+- New feature - table alias
+- New `ORDER` syntax (Incompatible for old version)
+- Improve performance & bug fixes
+
+### Data Mapping
+
+``` php
+$data = $database->select(""post"", [
+    ""[>]account"" => [""user_id""]
+], [
+    ""post.post_id"",
+    ""post.content"",
+
+    ""userData"" => [
+        ""account.user_id"",
+        ""account.email"",
+
+        ""meta"" => [
+            ""account.location"",
+            ""account.gender""
+        ]
+    ]
+], [
+    ""LIMIT"" => [0, 2]
+]);
+
+echo json_encode($data);
+```
+
+``` json
+// Outputed data
+[
+    {
+        post_id: ""1"",
+        content: ""Hello world!"",
+        userData: {
+            user_id: ""1"",
+            email: ""foo@example.com"",
+            meta: {
+                location: ""New York"",
+                gender: ""male""
+            }
+        }
+    },
+    {
+        post_id: ""2"",
+        content: ""Hey everyone"",
+        userData: {
+            user_id: ""2"",
+            email: ""bar@example.com"",
+            meta: {
+                location: ""London"",
+                gender: ""female""
+            }
+        }
+    }
+]
+```
+
+### New ORDER syntax (Incompatible for old version)
+
+``` php
+$database->select(""account"", ""user_id"", [
+
+    // Single condition
+    ""ORDER"" => ""user_id"",
+
+    // Multiple condition
+    ""ORDER"" => [
+        // Order by column with sorting by customized order.
+        ""user_id"" => [43, 12, 57, 98, 144, 1],
+
+        // Order by column
+        ""register_date"",
+
+        // Order by column with descending sorting
+        ""profile_id"" => ""DESC"",
+
+        // Order by column with ascending sorting
+        ""date"" => ""ASC""
+    ]
+]);
+```
+",https://api.github.com/users/catfan,1467904,catfan,https://api.github.com/repos/catfan/Medoo/releases/3524550/assets,https://api.github.com/repos/catfan/Medoo/releases/3524550,master,https://api.github.com/repos/catfan/Medoo/tarball/v1.1,https://github.com/catfan/Medoo/releases/tag/v1.1,https://api.github.com/repos/catfan/Medoo/zipball/v1.1,v1.1,False,False
+2614989,2016-02-14T16:03:42Z,2016-02-15T09:33:44Z,Medoo 1.0.2,"Fixed some bug from Medoo 1.0.
+",https://api.github.com/users/catfan,1467904,catfan,https://api.github.com/repos/catfan/Medoo/releases/2614989/assets,https://api.github.com/repos/catfan/Medoo/releases/2614989,master,https://api.github.com/repos/catfan/Medoo/tarball/v1.0.2,https://github.com/catfan/Medoo/releases/tag/v1.0.2,https://api.github.com/repos/catfan/Medoo/zipball/v1.0.2,v1.0.2,False,False
+1910079,2015-10-05T07:26:17Z,2015-10-05T07:44:45Z,Medoo 1.0,"The Medoo 1.0 is now on the earth.
+
+This is the milestone for Medoo history. We got a lot of support from developer around the world, since we started the project. Thank you very much!
+
+This version improved the code and documentation for more better quality.
+
+And we have add this useful new features for this version.
+- Table prefix
+- Database transactions
+
+Enjoy And Keep Walking :)
+",https://api.github.com/users/catfan,1467904,catfan,https://api.github.com/repos/catfan/Medoo/releases/1910079/assets,https://api.github.com/repos/catfan/Medoo/releases/1910079,master,https://api.github.com/repos/catfan/Medoo/tarball/v1.0,https://github.com/catfan/Medoo/releases/tag/v1.0,https://api.github.com/repos/catfan/Medoo/zipball/v1.0,v1.0,False,False
+940244,2015-02-11T03:54:23Z,2015-02-11T04:28:08Z,Medoo 0.9.8,"We are happy to release the Medoo 0.9.8 today with a lot of improvement and fixes.
+- Remove old LIKE feature
+- Like condition supports multiple value
+- Add debug mode
+- Drop support for datetime covert
+- Code improvement and bug fixes
+- Improve documentation on official website. Add more sample and usage.
+",https://api.github.com/users/catfan,1467904,catfan,https://api.github.com/repos/catfan/Medoo/releases/940244/assets,https://api.github.com/repos/catfan/Medoo/releases/940244,master,https://api.github.com/repos/catfan/Medoo/tarball/v0.9.8,https://github.com/catfan/Medoo/releases/tag/v0.9.8,https://api.github.com/repos/catfan/Medoo/zipball/v0.9.8,v0.9.8,False,False
+754766,2014-12-04T07:52:42Z,2014-12-04T09:00:59Z,Medoo 0.9.7,"We are happy to release the newest version of Medoo 0.9.7. This version have a lot of improvement, bug fixes and some usage change will be affected for the next version.
+- New LIKE condition usage with advanced syntax supported
+- New log() API
+- Add alias support for table joining
+- Table joining support get()
+- Improve and optimize database connection
+- Fix and improve Oracle support
+- Support MySQL socket connection
+- Fix and improve HAVING clause
+- Code optimization
+
+[Notice]
+- The previous `LIKE` condition usage will be deprecated on next version. If you are using `LIKE` condition in your project, please read more about the new `LIKE` condition API http://medoo.in/api/where.
+- The default charset value `utf8` is removed. If you have charset issue while using this version, just add charset value for initialization.
+",https://api.github.com/users/catfan,1467904,catfan,https://api.github.com/repos/catfan/Medoo/releases/754766/assets,https://api.github.com/repos/catfan/Medoo/releases/754766,master,https://api.github.com/repos/catfan/Medoo/tarball/v0.9.7,https://github.com/catfan/Medoo/releases/tag/v0.9.7,https://api.github.com/repos/catfan/Medoo/zipball/v0.9.7,v0.9.7,False,False
+493649,2014-08-15T12:29:42Z,2014-08-15T12:32:54Z,Medoo 0.9.6.2,"- Fix bug for has API
+- Fix Allow using SQL functions bug #112, reported by @Heirir
+- Optimize code
+",https://api.github.com/users/catfan,1467904,catfan,https://api.github.com/repos/catfan/Medoo/releases/493649/assets,https://api.github.com/repos/catfan/Medoo/releases/493649,master,https://api.github.com/repos/catfan/Medoo/tarball/v0.9.6.2,https://github.com/catfan/Medoo/releases/tag/v0.9.6.2,https://api.github.com/repos/catfan/Medoo/zipball/v0.9.6.2,v0.9.6.2,False,False
+363165,2014-06-08T16:39:46Z,2014-06-08T16:47:07Z,Medoo v0.9.6,"- Add support for multi-order
+- Add support for advanced LIKE matching
+- Add support for negative LIKE
+- Add support for using SQL functions
+- Bugs fix and some improvement
+",https://api.github.com/users/catfan,1467904,catfan,https://api.github.com/repos/catfan/Medoo/releases/363165/assets,https://api.github.com/repos/catfan/Medoo/releases/363165,master,https://api.github.com/repos/catfan/Medoo/tarball/v0.9.6,https://github.com/catfan/Medoo/releases/tag/v0.9.6,https://api.github.com/repos/catfan/Medoo/zipball/v0.9.6,v0.9.6,False,False
+307102,2014-04-28T02:15:14Z,2014-05-07T04:20:40Z,Medoo v0.9.5.3,"- Add support for complex relativity condition
+- Add support for comment relativity condition
+- Add support for ORDER by field
+- Add support for JSON encode for `insert()` and `update()`
+- Add support for table joining for Select based APIs
+- Add support for NOT Between
+- Add support for Oracle and Sybase
+- Add support datetime for `max()` and `min()`
+- New initialization
+- Code optimization and bug fixes
+",https://api.github.com/users/catfan,1467904,catfan,https://api.github.com/repos/catfan/Medoo/releases/307102/assets,https://api.github.com/repos/catfan/Medoo/releases/307102,master,https://api.github.com/repos/catfan/Medoo/tarball/v0.9.5.3,https://github.com/catfan/Medoo/releases/tag/v0.9.5.3,https://api.github.com/repos/catfan/Medoo/zipball/v0.9.5.3,v0.9.5.3,False,False

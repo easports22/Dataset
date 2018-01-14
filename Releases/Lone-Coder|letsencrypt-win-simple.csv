@@ -1,0 +1,281 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8029880,2017-10-28T15:45:12Z,2017-10-07T09:44:11Z,v1.9.7.x,"This release marks a major update of the validation stage, which is now decoupled from the target acquisition and installation stages of the program. This has made it possible to add support for DNS and TLS validation. 
+
+## Validation plugins
+After choosing a target you will now be presented with a second menu to choose your validation options. There are plenty to choose from, though not all of them will be available of every target. In unattended mode you can pick a validation plugin using the `--validation` switch. If not specified we stick to the default one (FileSystem).
+ ### HTTP
+| Name        	| Description                                                                                                                                                                                          	|
+|-------------	|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
+| FileSystem  	| The classic way to go, with some small improvements such as the option to copy the web.config file when using a manual target.                                                                       	|
+| IIS                 | Configure a temporary application in IIS to handle validation requests, see below for more details.                                                                       	|
+| Ftp         	| The legacy plugin re-invented as a way to publish files, but now capable of all the goodness that should be expected, such as running unattended, renewing and installing the resulting certificate. 	|
+| WebDav      	| See above.                                                                                                                                                                                           	|
+| SelfHosting 	| Not running any web server? Why not let us run one for you. Contributed by @dazerdude.                                                                                                                	|
+### DNS
+| Name     	| Description                                                                                                                                                                                     	|
+|----------	|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
+| Azure    	| Automatically create and delete records in the Azure DNS service. The essence of this code was contributed by @olivermue.                                                                        	|
+| Scripted 	| Do-it-yourself support for any DNS provider which offers an API. You provide the path to a script/program that creates a record and one that deletes a record. LEWS takes care of the rest for you. 	|
+### TLS-SNI
+| Name     	| Description                                                                                                                                                                                     	|
+|----------	|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
+| IIS | Creates a temporary binding in IIS, preferable in the site that's being validated, but in case of manual input it will create a temporary website specifically for the purpose of answering the TLS-SNI challenges. 	|
+
+## IIS validation mode
+A big pain for FileSystem validation is getting the IIS configuration right. Not all servers have the same modules installed and in most cases local web.config files are not allowed to change crucial settings which are required for the ACME server to access the validation file. This put us between a rock and a hard place: too much configuration in the default web.config and crash due to locked sections and missing modules, or too little configuration and force each new user to struggle with the known issues by themselves.
+
+v1.9.7 offers a different solution. The new IIS validation mode goes directly to the IIS server manager and tells it to make exceptions for the website that you're using for validation. This means that we don't have to unlock sections that Microsoft locked by default (for good reason) and that we can use feature detection to prevent errors. Specifically, it changes the following settings for the `.well-known` folder.
+
+- Remove all non-global modules
+- Configure the httpHandlers in the right way (StaticFile)
+- Enable anonymous authentication
+- Disable the ""Require SSL"" setting
+- Allow unlisted clients in the IP security section
+- Disable UrlRewrite (if installed)
+
+Other settings, such as `mimeType` and `authorization` are still done locally with the web.config, so you can also still customize or override settings if needed.
+
+## Renewals
+Users will no longer have to dig through the event viewer to figure out what's happening with your renewals. You can now get a summary of that information from the main menu, where the successes and failures can be summarized per certificate. 
+
+LEWS uses this data itself to determine with a high degree of confidence which certificates it has previously created. This does not only prevent accidental removal of other certificates with similar friendly names, but allows us to search IIS for bindings which use the certificate outside of the original target. This allows you to link the certificate to a places such as the empty binding on the Default Web Site, yet still have it automatically renew when the time is there.
+
+## Bug fixes and other small improvements
+- #280 - Install the intermediate certificates, so that a full chain can be built up
+- #290 - Consider all bindings which use the certificate, not just the first one
+- #293 - Add check to test if .NET Framework 4.5 is installed
+- #380 - Re-creating the scheduled task for a specific user requires them to re-enter the password...
+- ...also do not crash when the password is incorrect, but simply prompt for a retry
+- #420 - Convert private key to Microsoft RSA SChannel Cryptographic Provider for compatibility
+- #429 - Option to choose on which port to create new HTTPS bindings by @jlafitte 
+- #450 - Fix bug in determination of the .well-known path for the FTP plugin
+- Use the latest version of ACMESharp, allowing us to...
+- #488 - Switch to BouncyCastle from OpenSSL as the library to generate certificates
+- Main menu option to run a specific renewal
+- Don't (re)validate when the host has already validated 
+- Don't ask ""Would you like to start again"" every time
+- ...many more
+
+### v1.9.7.0-beta2
+
+- Fix #592 (crash on decodechallenge)
+
+### v1.9.7.0-beta3 / -beta4
+
+- Fix #599 (not waiting on scripts to finish)
+- Fix #597 (error while opening certificate store)
+- Fine-tuning of log output in response to #595
+- Beta4 fixes a debug value in the .config which should not have been committed
+
+### v1.9.7.0-beta5
+
+- Fix #601 (file has changed on disk error when committing changes to IIS)
+
+### v1.9.7.0-beta6
+
+- Additional change for #597 (auto-translate ""Personal"" store name to ""My"" to prevent confusion)
+- Fix #603 (central ssl store error when pfx password has been set)
+- Fix #395 (null reference when choosing Azure DNS)
+
+### v1.9.7.0-beta7
+
+- Fix #604 (crash on IIS 7.5)
+- Additional changes for IIS 7.5 (use My store by default instead of WebHosting)
+- Additional change for #395 (use Public Suffix List to distinguish domain from subdomain)
+- Improvements to code that runs external programs, contributed by @lggt in #606 
+
+### v1.9.7.0-beta8
+
+- Separate IIS validation from FileSystem validation, addressing backwards compatibility issue #607
+- Make IIS configuration even more comprehensive. It now creates a new sub-application with only global modules, discarding those installed by other applications (e.g. CMS'es) which might live at the site level.
+
+### v1.9.7.0-beta9
+
+- Some fixes for the newly separated IIS validation mode
+- Additional bugfix for Azure validation
+- Allow unattended use of the IISBinding TargetPlugin
+- Validate WebRootPath for FileSystem ValidationPlugin (in response to #608)
+
+### v1.9.7.0-beta10
+
+- Enable TLS-SNI validation (#203)
+- Update build script, making the program more light-weight and, add version.txt file (#423)",https://api.github.com/users/WouterTinus,11052380,WouterTinus,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/8029880/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/8029880,develop,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/v1.9.7.0-beta10,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/v1.9.7.0-beta10,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/v1.9.7.0-beta10,v1.9.7.0-beta10,False,True
+7743226,2017-09-27T20:11:24Z,2017-09-13T18:54:55Z,v1.9.6.x,"# Plugin changes
+This release doesn't contain many new features, but is an important first step towards a more modular and flexible client. Lots of code has been simplified and de-duplicated to separate the ""target-aquisition"" part of the plugin system from the other functions commonly performed by plugins (i.e. validation and installation). 
+
+# New UX
+
+The main functional change is the start of a new UX. The program will now present the user with brand-new menu that allows you to create a certificate, list scheduled renewals, run scheduled renewals (forced), or cancel (all) renewals. For many common use cases it won't be necessary to dive into the registry or figure out command line switches, making LEWS more simple, as it's name states it wants to be.
+
+# Features and improvements
+- Option to create a certificate for a specific IIS site(s) in unattended mode (#445) 
+Example: `--plugin iissite --siteid 1` 
+Example `--plugin iissites --siteid 1,2,3`
+- Option to exclude specific hosts from a SAN certificate (#419)
+Example: `--plugin iissite --siteid 1 --excludebindings exclude.me,exclude.me.too`
+
+# Removed
+- The `--san` switch has been removed because it's no longer needed in the new UX.
+
+## v1.9.6.1
+
+Fix #578 (unattended manual mode)
+Fix #572 (exclude binding with uppercase characters)
+Fix #573 (`--hidehttps` didn't play nice with target updates)  
+
+## v1.9.6.2
+
+Fix #584 (central ssl support broken)
+Fix #581 (allow task to run in battery mode)
+Fix #583 (respect system wide proxy settings)",https://api.github.com/users/WouterTinus,11052380,WouterTinus,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7743226/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7743226,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/v1.9.6.2,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/v1.9.6.2,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/v1.9.6.2,v1.9.6.2,False,False
+7514635,2017-09-13T04:10:18Z,2017-08-24T19:51:33Z,v1.9.5.x,"The following major changes have been made since the previous release.
+
+- Support for reading international domain names from IIS (#425).
+- For new installs, we will use system-wide instead of user-specific folders and registry locations, giving you more freedom to run the program from different (service) accounts, both interactively and as scheduled task. By default the scheduled task will be created to run under the SYSTEM account. However, if user-specific configuration data is detected during startup, it will be used, to maintain compatibility with pre-1.9.5 installs (#483). Read the [Migration Guide](https://github.com/Lone-Coder/letsencrypt-win-simple/wiki/Migration-to-v1.9.5) if you are upgrading and want to run as SYSTEM.
+- During renewal of IIS bindings the hosts for the sites are re-scanned. New domain names are added to the list, missing ones get removed and if the site cannot be found at all, the whole renewal is cancelled (#433, #436).
+- Allow some log messages with ""Information"" priority to get logged to the Event Viewer, to allow administrators to better monitor what is happening when the program runs unattended or as a scheduled task.
+- Various bugfixes and small improvements and refactoring, see the [list](https://github.com/Lone-Coder/letsencrypt-win-simple/milestone/8).
+
+## 1.9.5.1
+
+- Change build options to prevent issue #557 when manually migrating",https://api.github.com/users/WouterTinus,11052380,WouterTinus,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7514635/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7514635,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/v1.9.5.1,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/v1.9.5.1,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/v1.9.5.1,v1.9.5.1,False,False
+7455821,2017-08-20T12:51:23Z,2017-08-20T13:22:04Z,v1.9.4.x,"This is a long overdue bug fix release, which fixes some major and minor issues.
+
+- If renewal fails for any reason, LEWS will now keep retrying until it succeeds, instead of pretending that it worked. This was a very serious and annoying issue reported many times by different users (#510, #475, #474, #460, #458, #448, #446 etc.)
+- New `--verbose` mode for debugging, allowing the default mode to become a lot less chatty. In general the user I/O has been optimized and made more consistent across different parts of the program.
+- Default web.config changed to prevent common handler and mime type issues (#490)
+- The intermittent ""specified logon session does not exist"" error should be fixed now (#371)
+- If the webroot of an IIS website changes it is now updated during the renewal process (#499)
+- It's now possible to renew manually created certificates using a script (#299).
+- Update Json.Net to fix intermittent ""request payload did not parse as JSON"" error (#508)
+- Better support for unattended use
+- [Many more issues](https://github.com/Lone-Coder/letsencrypt-win-simple/milestone/7?closed=1)
+
+Check out the updated documentation about [command line arguments](https://github.com/Lone-Coder/letsencrypt-win-simple/wiki/Command-Line-Arguments) and [application settings](https://github.com/Lone-Coder/letsencrypt-win-simple/wiki/Application-Settings).
+
+## v1.9.4.1 
+Fixes #527
+
+## v1.9.4.2
+Fixes #317 
+
+## v1.9.4.3
+Fixes #544",https://api.github.com/users/WouterTinus,11052380,WouterTinus,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7455821/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7455821,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/v1.9.4,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/v1.9.4,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/v1.9.4,v1.9.4,False,False
+7353158,2017-08-10T19:27:52Z,2017-08-10T19:59:42Z,1.9.4-beta13,This will hopefully be the last beta for 1.9.4 -- I'm off for a week and plan to release the final version when I get back. Thanks everyone for testing!,https://api.github.com/users/WouterTinus,11052380,WouterTinus,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7353158/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7353158,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/1.9.4-beta13,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/1.9.4-beta13,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/1.9.4-beta13,1.9.4-beta13,False,True
+7339550,2017-08-09T21:09:54Z,2017-08-09T21:16:17Z,,,https://api.github.com/users/WouterTinus,11052380,WouterTinus,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7339550/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7339550,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/1.9.4-beta12,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/1.9.4-beta12,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/1.9.4-beta12,1.9.4-beta12,False,True
+7337001,2017-08-09T17:51:25Z,2017-08-09T17:54:47Z,1.9.4-beta11,This release contains minor changes to console I/O and hides some more log messages behind the --verbose switch. It also contains a new version of JSON.NET to try and tackle #508.,https://api.github.com/users/WouterTinus,11052380,WouterTinus,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7337001/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7337001,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/1.9.4-beta11,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/1.9.4-beta11,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/1.9.4-beta11,1.9.4-beta11,False,True
+7313410,2017-08-08T03:24:07Z,2017-08-08T05:08:04Z,1.9.4-beta10,It keeps raining new builds. This one adds a --verbose switch to show all extra logging messages which were previously only available in debug builds. That should help with troubleshooting. Also one nasty bug got fixed that prevented 1.9.4 from processing scheduled renewals created by earlier versions (#502).,https://api.github.com/users/WouterTinus,11052380,WouterTinus,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7313410/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7313410,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/1.9.4-beta10,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/1.9.4-beta10,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/1.9.4-beta10,1.9.4-beta10,False,True
+7310652,2017-08-07T21:21:49Z,2017-08-07T21:26:25Z,1.9.4-beta9,"Mainly this updated beta contains improvements to error handling.
+
+Breaking changes: two command line parameters have been removed, specifically --configpath and --proxy, because those were not being persisted in the renewal process, and it actually doesn't make much sense to do that either. 
+
+The new alternative is to configure those settings through letsencrypt.exe.config.",https://api.github.com/users/WouterTinus,11052380,WouterTinus,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7310652/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7310652,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/1.9.4-beta9,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/1.9.4-beta9,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/1.9.4-beta9,1.9.4-beta9,False,True
+7298350,2017-08-06T19:33:34Z,2017-08-06T19:45:42Z,1.9.4-beta8,"I've documented and cleanup up the program options.
+
+Two important changes since beta7
+
+- There was a --signeremail and an --emailadress option which both promised to do the same, but only the former actually worked. Now the former has been removed and only the latter works. So for unattended registration with ACME from now one use --emailadress.
+
+- I removed the option --certoutpath. It serves the same function as the much older --centralsslstore, while the latter is implemented in a more flexible way (i.e. on a per-certificate basis instead of globally). There already was a way to set --certoutpath globally, which is through the program settings (letsencrypt.exe.config).
+
+The Wiki has been updated to reflect the latest set of command line arguments:
+
+https://github.com/Lone-Coder/letsencrypt-win-simple/wiki/Command-Line-Arguments",https://api.github.com/users/WouterTinus,11052380,WouterTinus,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7298350/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7298350,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/1.9.4-beta8,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/1.9.4-beta8,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/1.9.4-beta8,1.9.4-beta8,False,True
+7292734,2017-08-05T06:51:53Z,2017-08-05T06:55:45Z,,See #493 ,https://api.github.com/users/WouterTinus,11052380,WouterTinus,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7292734/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7292734,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/1.9.4-beta7,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/1.9.4-beta7,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/1.9.4-beta7,1.9.4-beta7,False,True
+7280151,2017-08-04T04:44:50Z,2017-08-04T04:49:27Z,,"Fixes for #499, #498 and #496",https://api.github.com/users/WouterTinus,11052380,WouterTinus,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7280151/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7280151,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/1.9.4-beta6,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/1.9.4-beta6,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/1.9.4-beta6,1.9.4-beta6,False,True
+7265590,2017-08-03T05:10:22Z,2017-08-03T05:21:23Z,,"No new features, just bugfixes and refactoring. Where possible I'm trying to simplify the code to make it work more consistently and easier for new developers to understand. There are still a lot of anti-patterns in the code base which make my fingers itch, but I do want to get this 1.9.4 release stable enough for production use, so I'm holding off some of the bigger changes for 1.9.5 and beyond.",https://api.github.com/users/WouterTinus,11052380,WouterTinus,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7265590/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7265590,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/1.9.4-beta5,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/1.9.4-beta5,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/1.9.4-beta5,1.9.4-beta5,False,True
+7247274,2017-08-01T19:43:44Z,2017-08-01T19:46:43Z,Many improvements to the manual plugin,,https://api.github.com/users/WouterTinus,11052380,WouterTinus,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7247274/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7247274,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/1.9.4-beta4,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/1.9.4-beta4,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/1.9.4-beta4,1.9.4-beta4,False,True
+7219098,2017-07-30T07:23:25Z,2017-07-30T07:27:50Z,Task Scheduler fix,Pretty serious bug fix #491,https://api.github.com/users/WouterTinus,11052380,WouterTinus,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7219098/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7219098,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/v.1.9.4-beta3,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/v.1.9.4-beta3,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/v.1.9.4-beta3,v.1.9.4-beta3,False,True
+7215919,2017-07-29T10:04:34Z,2017-07-29T10:09:27Z,Manual renewals and lots of small fixes,,https://api.github.com/users/WouterTinus,11052380,WouterTinus,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7215919/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7215919,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/v1.9.4-beta2,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/v1.9.4-beta2,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/v1.9.4-beta2,v1.9.4-beta2,False,True
+7177965,2017-07-26T17:12:18Z,2017-07-26T17:16:27Z,DNS challenge and handling authorization failures,"This release should fix the long standing issue #408 and adds support for DNS challenges by @olivermue
+
+This is my first attempt at creating a release, so mind the -beta. If people don't encounter any problems with this code, I will release this as final and start to merge more PRs for v1.9.5.",https://api.github.com/users/WouterTinus,11052380,WouterTinus,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7177965/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/7177965,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/v1.9.4-beta,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/v1.9.4-beta,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/v1.9.4-beta,v1.9.4-beta,False,True
+5793759,2017-03-19T10:39:25Z,2017-03-19T10:43:19Z,letsencrypt-win-simple v1.9.3,"This release is the same as 1.9.2 which was erroneously built in `debug` mode.
+
+- v1.9.2 was built in debug mode, should be release mode #392",https://api.github.com/users/nul800sebastiaan,304656,nul800sebastiaan,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/5793759/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/5793759,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/v1.9.3,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/v1.9.3,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/v1.9.3,v1.9.3,False,False
+5790966,2017-03-18T14:15:23Z,2017-03-18T14:19:31Z,letsencrypt-win-simple v1.9.2,"- Re-enable TLS 1.0 #268
+- IP binding for all IP addresses is *, not empty string #313
+- Command line parameters for Email address and use default user for renew task #325
+- Added proxy configuration option. #287
+- Add option to make the private key non-exportable #296
+- Use a SeriLog console sink instead of Console.Write #373
+- Unattended runs for custom Plugins #275
+- Environment.ExitCode is set in case of error #348
+- Added prompt and re-factored function. Added certificate out path option. #372
+- Update NuGet dependencies #374
+- README updates #383 / #384 
+",https://api.github.com/users/nul800sebastiaan,304656,nul800sebastiaan,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/5790966/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/5790966,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/v1.9.2,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/v1.9.2,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/v1.9.2,v1.9.2,False,False
+3455246,2016-05-20T16:55:55Z,2016-06-16T02:21:58Z,letsencrypt-win-simple v1.9.1,"Fix subjectName index and CN prefix in UninstallCertificate #224 
+Remove TLS 1.0 as it is deprecated #219 
+Integrated pipeline issues when running under a site installed at Default Web Site #208 
+Chacter Limit when enter in Alternative Names for SAN cert #191 
+Fixing manual run when not using SAN #174 
+""Standard"" pem names #27
+",https://api.github.com/users/rkerber,9090595,rkerber,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/3455246/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/3455246,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/v1.9.1,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/v1.9.1,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/v1.9.1,v1.9.1,False,False
+2811262,2016-03-08T19:24:57Z,2016-03-15T00:00:08Z,letsencrypt-win-simple v1.9.0,"SAN Support #3 
+Default Friendly Date Format Updated #81 
+Multiple Site/ Entire Server SAN Support #84 
+Added CertificatePath config option #85 
+Use '.' for MIME type extension #86 
+Multiple authorizations removed #90
+Enable TLS 1.0, 1.1 and 1.2 #92 
+Added CertificateStore config option #98 
+Changed Manual Plugin sanInput to be able to have a longer input #102 
+Added RenewalDays config option
+Fixed some variable names, locations, and protection
+Added ObjectExtentions.cs to be able to copy objects so they don't all get updated.
+Fixed Multiple Site SAN Issue where it was trying to update bindings that were not there.
+Add in FTP uploading #25 
+Add in WebDav uploading #67 
+Allow user to specify credentials for scheduled task #129 
+Enhanced plugin architecture to allow the plugins to handle renewals and auto.
+Suppress output when running unattended (manual host) #135 
+Delete folder structure for IIS, FTP and WebDav plugins after successful authorization #93 
+Delete old certificates automatically #83 
+Added Costura.Fody to remove extra dll files in binaries.
+Added in ability to run script after install for select plugins
+Removed SAN sites showing with no HTTP Hosts
+Removed extra printouts #135
+Fixed cert uninstall #124 
+Fixed IIS cert install #94
+Fixed SAN index #147 #154
+",https://api.github.com/users/rkerber,9090595,rkerber,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/2811262/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/2811262,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/v1.9,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/v1.9,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/v1.9,v1.9,False,False
+2530775,2016-02-01T16:44:01Z,2016-02-01T16:55:29Z,letsencrypt-win-simple v1.8,"Moved web.config file to separate file
+Changed the default web.config so it works with Stock IIS 7.5+ and allows all users to access it
+Added logging
+Added pagination to host list
+Added ability to hide hosts with existing HTTPS bindings from host list
+Removed IDN domains from host list
+Added Centralized SSL Support
+Added PFX password support
+Added using HTTP IP for HTTPS binding
+Added support for specifying RSA Key bit size
+Increased authorization sleep
+Changed certificate friendly name format
+Scheduled Task is no longer hidden
+Added ability to not overwrite scheduled task
+",https://api.github.com/users/rkerber,9090595,rkerber,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/2530775/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/2530775,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/v1.8,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/v1.8,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/v1.8,v1.8,False,False
+2235633,2015-12-04T18:34:29Z,2015-12-04T18:37:35Z,letsencrypt-win-simple v1.7,"Fixed Server 2008 cert store. Fall back to Personal store if Web Hosting is not available.
+Add email to registration (used for renewal fail notices).
+",https://api.github.com/users/Lone-Coder,920120,Lone-Coder,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/2235633/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/2235633,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/v1.7,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/v1.7,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/v1.7,v1.7,False,False
+2216425,2015-12-01T21:38:20Z,2015-12-01T21:48:08Z,letsencrypt-win-simple v1.6,"Check for IIS installed. Shouldn't crash if IIS not installed now.
+Enable SNI for IIS 8. This will cause problems with IE on XP, but can be turned off and won't be set if there's an existing https binding.
+Always prompt at end of program unless renew. No more disappearing errors when not running from console.
+Store certs in ""WebHosting"" instead of personal.
+
+Switch from letsencrypt-win lib submodule to ACMESharp nuget and latest API.
+- Removed the letsencrypt-win git submodule
+- Added references to latest ACMESharp (and related) nuget packages
+- Updated code to use latest ACMESharp namespaces and new CertProvider
+  interface instead of deprecated CsrHelper
+- Includes support for auto-swiitching between 32/64-bit cert provider
+",https://api.github.com/users/Lone-Coder,920120,Lone-Coder,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/2216425/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/2216425,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/v1.6,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/v1.6,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/v1.6,v1.6,False,False
+2150174,2015-11-19T00:40:53Z,2015-11-19T00:43:26Z,letsencrypt-win-simple v1.4,"Added plugin system.
+Added manual option.
+Better error reporting.
+",https://api.github.com/users/Lone-Coder,920120,Lone-Coder,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/2150174/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/2150174,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/v1.4,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/v1.4,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/v1.4,v1.4,False,False
+2127919,2015-11-15T05:19:29Z,2015-11-15T05:49:56Z,letsencrypt-win-simple v1.1,,https://api.github.com/users/Lone-Coder,920120,Lone-Coder,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/2127919/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/2127919,master,"https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/v1,1",https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/v1%2C1,"https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/v1,1","v1,1",False,False
+2124710,2015-11-13T21:49:12Z,2015-11-13T21:52:52Z,letsencrypt-win-simple,"Automatic renewals should be fully working. It will create a task in Windows Task Schedule that will run each night and update the certs automatically every 60 days. For renewals your web site must still be setup to pass authorization via the answer file.
+",https://api.github.com/users/Lone-Coder,920120,Lone-Coder,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/2124710/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/2124710,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/v1.0,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/v1.0,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/v1.0,v1.0,False,False
+2119350,2015-11-13T01:27:37Z,2015-11-13T01:35:22Z,letsencrypt-win-simple,"Initial release on GitHub release system.
+",https://api.github.com/users/Lone-Coder,920120,Lone-Coder,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/2119350/assets,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/releases/2119350,master,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/tarball/v0.6,https://github.com/Lone-Coder/letsencrypt-win-simple/releases/tag/v0.6,https://api.github.com/repos/Lone-Coder/letsencrypt-win-simple/zipball/v0.6,v0.6,False,False

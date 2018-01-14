@@ -1,0 +1,831 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7462885,2017-08-21T10:53:38Z,2017-08-21T10:58:59Z,bettercap v1.6.2,"Changelog
+===
+
+**New Features**
+
+* New `MAC` spoofer.
+* New `HSRP` spoofer.
+* New `HSRP` sniffer.
+* New `RADIUS` sniffer.
+* New `BFD` sniffer.
+* New `WOL` sniffer.
+* New `Asterisk` sniffer.
+* New `TeamTalk` sniffer.
+* New `WSD`, `UPnP`, `mDNS` and `SSDP` discovery agents. 
+* Improved logger performances.
+
+**Fixes**
+
+* Fixes #356: iptables rule mess up `BeEF`
+* Fix re-arp issue on tp-link and other routers.
+* Fix: A `DNS` request is no more needed in order to determine if the `HTTP` request going to the proxy is targeting the local machine or not.
+* Throttling logger queue processing to avoid 100% `CPU` usage while polling the queue.
+
+**Code Style**
+
+* Turned most of `SSLSTRIP` logs into debug logs
+* Removed a few debug logs
+* Various `README` updates.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/7462885/assets,https://api.github.com/repos/evilsocket/bettercap/releases/7462885,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.6.2,https://github.com/evilsocket/bettercap/releases/tag/v1.6.2,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.6.2,v1.6.2,False,False
+6882391,2017-06-29T17:39:58Z,2017-06-29T17:41:35Z,bettercap v1.6.1,"Changelog
+===
+
+**New Features**
+
+* Huge improvement on `HTTPS` parser, now it parses `TLS` Client Hello messages with `SNI` extension in order to extract the real hostname.
+* Removed `IPv6` specific options, use of `IPv6` is automatically detected now.
+* Updated `*BSD` firewall manager to support `IPv6` forwarding.
+* IPv6 port redirection option.
+* `UDP` proxy implemented.
+
+**Fixes**
+
+* Fixed #444: Broken when system language is not `EN`
+* Fixed #450: `SSL` certificate expired.
+* Fixed #451: Custom proxy module `on_pre_request` access: `undefined method 'textual?'`.
+* Fixed #382: High `CPU` Usage on Single Targeting.
+* Fixed #380: Error while running a `UDP` proxy.
+* Fixed #302: SSLStrip module adds trailing slash to domains.
+* Fixed context ipv6 detection.
+* Fixed issues with newer packetfu.
+* Fixed s ifconfig returning ipv6.
+* Misc fixes to handle correctly both `IPv4` and `IPv6`
+* Minor fix on `HTTP` response generation.
+* Added `PacketFu` monkey patch for NDP.
+
+**Code Style**
+
+* Minor refactoring of `HTTPS` `SNI` parser.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/6882391/assets,https://api.github.com/repos/evilsocket/bettercap/releases/6882391,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.6.1,https://github.com/evilsocket/bettercap/releases/tag/v1.6.1,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.6.1,v1.6.1,False,False
+5027023,2016-12-28T18:19:18Z,2016-12-28T18:19:38Z,bettercap v1.6.0,"# Changelog
+
+**New Features**
+- Generated a new CA pem file with less descriptive fields, trying to clone `GoDaddy` CA as much as possible.
+- New `-R` rainbow option! :D
+- Improved (a lot) target hostname resolution and coloring.
+- Updated mac vendors lookup file with latest version.
+- Improved sniffer performances using a threadpool to dispatch and process raw packets.
+
+**Fixes**
+- Fix: More robust OS compatibility check.
+- Fixed `COOKIE` parser in order to avoid printing duplicated cookies.
+- Fixed target hostname resolution.
+- Fixes #343: BSD `Firewall#del_port_redirection` method should selectively remove a rule.
+- Fixes #329: Unable to set `--http-ports` with `--custom-proxy`
+- Fixes #316: Unable to fetch certs for hosts not running on 443.
+- Improved `StreamLogger` hexdump method to use the whole console width.
+- Improved `HTTPS` connections sniffer and `DNS` resolution.
+- Added thread-safety to sniffer thread pool.
+
+**Code Style**
+- Replaced all http links with https ones when possible.
+- Removed unused classes.
+- Making lolize gem used for -R/--rainbows argument optional.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/5027023/assets,https://api.github.com/repos/evilsocket/bettercap/releases/5027023,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.6.0,https://github.com/evilsocket/bettercap/releases/tag/v1.6.0,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.6.0,v1.6.0,False,False
+4916190,2016-12-14T10:26:06Z,2016-12-14T10:29:31Z,bettercap v1.5.9,"# Changelog
+
+**New Features**
+- New `--no-http-logs` proxy option.
+- New `Response#redirect!` helper method.
+- New `REDIRECT` http proxy module ( location hijacking ).
+- New `--html-position` option.
+- Fixes #257: New `--disable-parsers` option.
+- Prioritize root privilege check
+- TCP proxy modules can now register options too.
+- `--silent` option now suppress Logger.raw messages too.
+
+**Fixes**
+- Fixes #318: Error while serving client: Couldn't extract host from the request.
+- Fixes #307: Error getting mac address from `PPP` interface.
+- Fixes #302: SSLStrip module adds trailing slash to domains
+- Fixed a bug which caused the Redirect http module to be loaded even if not selected.
+- Fixes #291: Precomputing list of targets in order to stress less the cpu.
+- Fixed bug in ftp and mail creds parsers which caused a mislabeling of capture credentials.
+- Fixes #292: undefined method `arp_opcode` for `nil:NilClass`
+
+**Code Style**
+- Printing shell commands if debug mode is enabled.
+- Remove redundant requires, minor update to syntax using rubocop
+- Removed credit card parser, it's causing a lot of false positives and there's no way to distinguish them
+- Removed warning if using beta releases, no one gives a fuck about it anyway.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/4916190/assets,https://api.github.com/repos/evilsocket/bettercap/releases/4916190,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.5.9,https://github.com/evilsocket/bettercap/releases/tag/v1.5.9,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.5.9,v1.5.9,False,False
+3988135,2016-08-26T23:48:38Z,2016-08-26T23:51:49Z,bettercap v1.5.8,"# Changelog
+
+**New Features**
+- New `--log-http-response` option.
+- New `--html-file PATH` option.
+- New `--full-duplex` option ( **half duplex mode is now the default** ).
+- HTTP(S) logs from the proxy do not truncate urls to 50 characters anymore.
+
+**Fixes**
+- Fixed `InjectJS` module bug which caused the HTML of the page to be broken in some circumstances.
+- Fixed a bug which caused the HTTPS proxy not to work properly with wildcard domains.
+- Fixed `TeamViewer` packets version parsing.
+- Fixes #282: Inject modules fail on uppercase tags.
+- Fixed a bug while changing/randomizing `MAC` address on Linux.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/3988135/assets,https://api.github.com/repos/evilsocket/bettercap/releases/3988135,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.5.8,https://github.com/evilsocket/bettercap/releases/tag/v1.5.8,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.5.8,v1.5.8,False,False
+3861702,2016-08-11T01:53:08Z,2016-08-11T01:54:11Z,bettercap v1.5.7,"# Changelog
+
+**Fixes**
+- Fixes #254: Exception on `CTRL+C`
+- Fixed a bug which caused '*.domain.tld' certificates not to be correctly handled
+- Fixes #270: sslstrip fails to rewrite links
+
+**Code Style**
+- Using debug messages instead of warnings when targeting the whole network and a target mac or ip address can't be found.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/3861702/assets,https://api.github.com/repos/evilsocket/bettercap/releases/3861702,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.5.7,https://github.com/evilsocket/bettercap/releases/tag/v1.5.7,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.5.7,v1.5.7,False,False
+3665141,2016-07-15T09:27:00Z,2016-07-15T09:29:22Z,bettercap v1.5.6,"# Changelog
+
+**New Features**
+- Fixes #252: new `TeamViewer` sniffer module.
+
+**Fixes**
+- Fixes #256: Bumped colorize version to 0.8
+- Fixes #241: Exception due to  invalid byte sequence in utf-8 when bettercap logger is trying to write to log file.
+- Fixed Formatting
+- Fixes #235 : `HTTPS` proxy unable to ignore invalid server certificate.
+- Make sure Kali is updated before installing Bettercap
+- Included correct install instructions for Bettercap on Kali.
+- Use sub! with block to avoid strange sub! behaviour when data contains  the sequence backslash-backtick
+- Adding proper timeouts while fetching `HTTPS` certificates.
+
+**Code Style**
+- Rescue syntax for `udp_socket`.rb
+- Refactor equals? at target.rb
+- Rescue syntax for `packet_queue`.rb
+- Line fold and rescue syntax in httpd.rb
+- Simplify if statements for teamviewer.rb
+- Simplify if statements for dhcp.rb
+- Rescue syntax on firewalls/bsd.rb
+- Formatting
+- Doc update
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/3665141/assets,https://api.github.com/repos/evilsocket/bettercap/releases/3665141,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.5.6,https://github.com/evilsocket/bettercap/releases/tag/v1.5.6,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.5.6,v1.5.6,False,False
+3303559,2016-05-25T14:12:06Z,2016-05-25T14:14:12Z,bettercap v1.5.5,"# Changelog
+
+**New Features**
+- New `--use-mac` and `--random-mac` options to hide the interface MAC address during an attack.
+- HTTP proxy modules can now return a crafted response from their `on_pre_request` method.
+
+**Fixes**
+- Fixes #232 : High cpu utilization with `--no-discovery` option
+- Fixes #233 : Crash due to IPv6 DNS resolution.
+- Fixes #224 : Fixed FreeBSD Support.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/3303559/assets,https://api.github.com/repos/evilsocket/bettercap/releases/3303559,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.5.5,https://github.com/evilsocket/bettercap/releases/tag/v1.5.5,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.5.5,v1.5.5,False,False
+3084138,2016-04-23T18:28:00Z,2016-04-23T18:30:01Z,bettercap v1.5.4,"# Changelog
+
+**New Features**
+- Implemented new `--proxy-upstream-address` option.
+- Allow connections to local `HTTP` server with new `--allow-local-connections` option.
+
+**Fixes**
+- Fixed misuse of `BSD` licensing in `ThreadPool` class.
+- Fixed a bug which caused ifconfig data not to be correctly collected if the interface name includes non alpha-numeric characters ( VLANs etc )
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/3084138/assets,https://api.github.com/repos/evilsocket/bettercap/releases/3084138,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.5.4,https://github.com/evilsocket/bettercap/releases/tag/v1.5.4,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.5.4,v1.5.4,False,False
+2899792,2016-03-28T15:33:08Z,2016-03-28T15:35:08Z,bettercap v1.5.3,"Hotfix release for v1.5.2
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2899792/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2899792,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.5.3,https://github.com/evilsocket/bettercap/releases/tag/v1.5.3,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.5.3,v1.5.3,False,False
+2899281,2016-03-28T14:14:44Z,2016-03-28T14:18:04Z,bettercap v1.5.2,"# Changelog
+
+**New Features**
+- Added support for `PUT` requests to the http proxy.
+- Each module now can define some metadata such as author name, license, description etc.
+
+**Fixes**
+- Fixed a bug which caused the proxy not to be enabled if only --proxy-module argument was specified.
+- Fixes #200: 'Too many open files' error makes bettercap `PacketQueue` crash.
+- Fixes #199 : Issue while parsing port numbers from command line.
+- Fixed a bug which prevented the log-to-file feature to work correctly.
+- Fixes #193: Check every port for ""Address already in use"" before it is actually used.
+- Fixed a bug which prevented to use DNS server.
+- Fix: --proxy-\* options will enable HTTP proxy.
+- Improved debug logging of network informations.
+
+**Code Style**
+- Refactored Context.ifconfig to a more elegant Context.iface Target class instance.
+- Minor refactoring of discovery wait interval logic.
+- Renamed ""arpcache"" option to ""discovery"" and inverted logic.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2899281/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2899281,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.5.2,https://github.com/evilsocket/bettercap/releases/tag/v1.5.2,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.5.2,v1.5.2,False,False
+2842743,2016-03-18T17:40:40Z,2016-03-18T17:42:10Z,bettercap v1.5.1,"# Changelog
+
+**New Features**
+- New `--tcp-proxy-upstream` shortcut argument.
+- New docs folder with Sphinx based documentation files.
+- The  parameter `--tcp-proxy-upstream-address` now accepts both IPs and hostnames.
+
+**Fixes**
+- Fixes #184 : Discovery should not start if one or more targets are specified.
+- More explicit error messages while loading proxy modules.
+- Each *-port argument is now validated.
+
+**Code Style**
+- Improved debug logs.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2842743/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2842743,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.5.1,https://github.com/evilsocket/bettercap/releases/tag/v1.5.1,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.5.1,v1.5.1,False,False
+2826210,2016-03-16T18:40:28Z,2016-03-16T18:44:49Z,bettercap v1.5.0,"# Changelog
+
+**New Features**
+- New TCP modular and transparent proxy.
+- Connections within internal nodes on the network are now spoofed.
+- Memory usage optimization.
+
+**Fixes**
+- Fixed a bug which caused bettercap to crash if the gateway mac address could not be detected.
+- Fixes #180: `NoMethodError` on `OS` X
+- Fixed `--httpd-path` option position.
+- Fixed `SignalException` handling.
+- Fixed little endian `PCAP` files support.
+- Fixed big endian `PCAP` files support.
+- Fixed exception handling while loading external PCAP file as sniffer source.
+- Fixes #176 : `ArgumentError` on `GC.start( :full_mark => false )` with Ruby 1.9.3
+- Fixes #175 : `ARP` Spoofer doesn't spoof internal connections.
+- Fixed handling of text/plain content-types in `StreamLogger` class.
+- Better hex dumping of binary data.
+
+**Code Style**
+- Renamed `--sniffer-pcap` option to `--sniffer-output`.
+- `:check` validator can now be used for every type of `Network::Proto:Base` derived classes.
+- Minor refactoring of `if not` to `unless`.
+- Minor refactoring/semplification of spoofing logic.
+- Unified `OSX` and `OpenBSD` firewalls under the same `BSD` class.
+- Refactored `DHCP` protocol class and constants.
+- Refactored and centralized gateway mac resolution and usage logic.
+- Whole refactoring of options parsing and handling logic into different, dedicated, classes.
+- Added a few comments here and there.
+- Refactored `::Proxy` -> `::HTTP::Proxy`
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2826210/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2826210,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.5.0,https://github.com/evilsocket/bettercap/releases/tag/v1.5.0,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.5.0,v1.5.0,False,False
+2775656,2016-03-09T12:47:05Z,2016-03-09T12:49:12Z,bettercap v1.4.6,"# Changelog
+
+**New Features**
+- Periodically calling Ruby garbage collector in order to keep memory usage reasonable.
+- Full support for `OpenBSD` thanks to Angelos D. Keromytis ( angelos@cs.columbia.edu ).
+
+**Fixes**
+- Fixed 'overly strict dependency' warning in gemspec file.
+- Typos and indentation fixes.
+- Giving priority to `ifconfig` over `iproute2`.
+- Only throw exception if can't resolve gateway mac address and it's really needed.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2775656/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2775656,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.4.6,https://github.com/evilsocket/bettercap/releases/tag/v1.4.6,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.4.6,v1.4.6,False,False
+2712195,2016-02-29T17:53:56Z,2016-02-29T17:56:00Z,bettercap v1.4.5,"# Changelog
+
+**New Features**
+- New `CREDITCARD` sniffer with Luhn algorithm verification.
+- Handling `DELETE` requests.
+
+**Fixes**
+- Fixes #165 : Fixed a bug which caused the `--custom-proxy` argument to not work properly.
+- Fixes #134 : Bettercap killing connections.
+- Fix: Resetting packet forwarding only **after** restore packets are sent.
+- Fixed wrong boolean condition in `ARP` spoofer.
+
+**Code Style**
+- Refactored if/then constructs to ternary operators.
+- Refactored `DNS` server code.
+- Moved Authority loading code into `SSLServer` class.
+- Refactored proxy processor code.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2712195/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2712195,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.4.5,https://github.com/evilsocket/bettercap/releases/tag/v1.4.5,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.4.5,v1.4.5,False,False
+2679909,2016-02-24T14:54:03Z,2016-02-24T14:56:50Z,bettercap v1.4.4,"# Changelog
+
+**New Features**
+- New `Proxy::SSL::Store` class to cache upstream certificates on disk.
+- Using `socket.accept_nonblock` and `IO.select` loop to improve `HTTP` and `HTTPS` proxies performances.
+- Using real number of CPU cores to size Proxy's thread pool.
+- Stripping out a few security headers from responses ( tnx to **Mazin Ahmed @mazen160** )
+
+**Fixes**
+- Fixed a bug which caused `DNS` server to be created twice if both `HTTP` and `HTTPS` proxy were enabled.
+- Fixes #152 : Generating `HTTPS` certificates on the fly leveraging on `SNI` mechanism.
+- Gracefully handling exceptions in `Proxy::SSL::Authority`
+- `--proxy-module` option does not allow any proxy by default anymore.
+- `--proxy-https` option won't enable `HTTP` proxy as well by default anymore.
+
+**Code Style**
+- Moved `SSL` server logic into dedicated `Proxy::SSL::Server` class.
+- Centralized requires into main bettercap.rb file.
+- Printing options default values in yellow.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2679909/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2679909,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.4.4,https://github.com/evilsocket/bettercap/releases/tag/v1.4.4,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.4.4,v1.4.4,False,False
+2663966,2016-02-22T17:08:14Z,2016-02-22T17:09:59Z,bettercap v1.4.3,"# Changelog
+
+**New Features**
+- New `--custom-redirection` option.
+
+**Fixes**
+- Fixed a concurrency related bug in `Target` class.
+- Fixed a bug in `StreamLogger` class which caused service name not to be printed for the first incoming packet.
+- Fixed a few typos.
+- Fix: Using proper port and address for ssl strip DNS server.
+- Some fixes and refactoring of SSL Stripping.
+- Fixed a bug in SSL Strip which might have caused unstable navigation if detected HTTPS link was not valid.
+- Fixes #155 : Fixed a bug in ssl strip starting flag.
+- Fixes #154 : `RubyDNS` server not handling `Errno::EMFILE` exceptions.
+- Fixed a boolean condition which enabled DNS redirection even if sslstrip-ping was disabled.
+
+**Code Style**
+- Precomputing upstream server port in `Proxy` class.
+- Big refactoring to HTTP responses parsing logic with big overall proxying optimization.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2663966/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2663966,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.4.3,https://github.com/evilsocket/bettercap/releases/tag/v1.4.3,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.4.3,v1.4.3,False,False
+2632745,2016-02-17T15:11:56Z,2016-02-17T15:13:06Z,bettercap v1.4.2,"# Changelog
+
+**Fixes**
+- Fixed a bug which prevented the HSTS bypass' DNS resolver to work properly.
+- Fixed starting message flags.
+
+**Code Style**
+- Some minor refactoring and comments around `Context#gateway_mac_resolved` flag.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2632745/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2632745,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.4.2,https://github.com/evilsocket/bettercap/releases/tag/v1.4.2,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.4.2,v1.4.2,False,False
+2626246,2016-02-16T19:21:25Z,2016-02-16T19:23:24Z,bettercap v1.4.1,"# Changelog ( hotfix release )
+
+**Fixes**
+- Fixed a bug which caused the gateway `MAC` address not to be resolved in some cases.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2626246/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2626246,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.4.1,https://github.com/evilsocket/bettercap/releases/tag/v1.4.1,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.4.1,v1.4.1,False,False
+2626204,2016-02-16T19:15:38Z,2016-02-16T19:16:37Z,bettercap v1.4.0,"# Hotfix Release
+- Fixed a critical bug in discovery agents.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2626204/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2626204,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.4.0,https://github.com/evilsocket/bettercap/releases/tag/v1.4.0,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.4.0,v1.4.0,False,False
+2625505,2016-02-16T17:32:23Z,2016-02-16T17:35:02Z,bettercap v1.3.9,"# Changelog
+
+**New Features**
+- Now using a custom DNS resolver in order to handle ssl-stripped and hsts-bypassed requests.
+- Closes #142 : Now the `-T` option accepts IPs, MACs, IP ranges and subnet masks.
+
+**Fixes**
+- Lot of fixes to SSL Stripping and HSTS bypass.
+- Fixed a few ip/mac validation bugs, refactored Network objects validation into `Network::Validator` class.
+- Fix: Parsing real HTTP protocol version from requests.
+- Fixed `Network::get_gateway` bug.
+- Fixes #144 : Undefined method getpeername with HTTPS proxy.
+- Fixed a bug in `StreamLogger` which prevented correct POST fields dumping in some circumstances.
+- Fixed a bug in spoofers base class.
+
+**Code Style**
+- SSL Exceptions are now logged as debug messages.
+- Turned debug log into info message.
+- Increased maximum number of threads for proxy thread pool.
+- Do not log as warnings `EOFErrors` while serving proxy clients.
+- Removed useless log in `StreamLogger`
+- Refactored `Network::get_gateway` method.
+- Refactoring and big optimization of the `Network::get_hw_address` method.
+- Major refactoring of `Proxy::Request` class.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2625505/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2625505,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.3.9,https://github.com/evilsocket/bettercap/releases/tag/v1.3.9,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.3.9,v1.3.9,False,False
+2610182,2016-02-13T22:37:04Z,2016-02-13T22:39:55Z,bettercap v1.3.8,"# Changelog
+
+**New Features**
+- New `HSTS` bypass capabilities implemented.
+- New Logger.exception method used to log debug infos for exceptions.
+- New `SNMP` protocol parser.
+- Printing a few stats after parsing `PCAP` input stream.
+
+**Fixes**
+- `StreamLogger` class will dump `POST` contents accordingly to the content-type
+- Fixes #134 : Bettercap killing connections
+- Minor fix on stream logger.
+- Fixes #132: crash on startup (autoload func)
+- Fix: Don't trim request url if it's a `POST` request.
+- Some fixes to the `Proxy::Request` object.
+- Fixed a bug which made the sniffer slow and prevented some packet to be parsed.
+- Do not log `SocketError` exceptions in Proxy class.
+
+**Code Style**
+- Some refactoring to option parsing.
+- Logging proxy modules exceptions on beta builds.
+- Better socket exception handling for Proxy class.
+- Added a few comments to `StreamLogger::addr2s` method
+- Using `StreamLogger::`log_post`` both for proxy and sniffer.
+- Refactored ssl-stripped url handling.
+- `Service/Port` name is not printed in light blue.
+- Minor refactoring of `BetterCap::Sniffer` class.
+- Better info logging for builtin proxy modules.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2610182/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2610182,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.3.8,https://github.com/evilsocket/bettercap/releases/tag/v1.3.8,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.3.8,v1.3.8,False,False
+2573160,2016-02-08T16:04:23Z,2016-02-08T16:07:08Z,bettercap v1.3.7,"# Changelog
+
+**New Features**
+- New `PGSQL` authentication parser.
+- New `MYSQL` authentication parser.
+- New `NTLM` protocol parser and `NTLMSSP` Authentication sniffer.
+- `HTTP` Auth parser can now parse every kind of Authentication header ( `NTLM` authentication too ).
+- Printing `*` when an address is `255.255.255.255`.
+- Resolving port to network service name when possible.
+
+**Fixes**
+- Fix: Do not send probes to already discovered devices.
+- Fixed bug in sslstripping which caused the client connection to hang when sending expired cookies.
+- Fix: Using either `tcp_dst` or `udp_dst` in `StreamLogger`.
+- Fixed metaprogramming bug in `BetterCap::Network::Protos::Base`.
+
+**Code Style**
+- Using Response static methods to generate constant `HTTP` responses.
+- Autoload every Ruby file in bettercap installation.
+- Removed `DHCP#transaction_id`
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2573160/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2573160,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.3.7,https://github.com/evilsocket/bettercap/releases/tag/v1.3.7,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.3.7,v1.3.7,False,False
+2566366,2016-02-06T17:49:36Z,2016-02-06T17:53:40Z,bettercap v1.3.6,"# Changelog
+
+**New Features**
+- Added new `COOKIE` sniffer.
+- Added new `WHATSAPP` sniffer.
+- New `DHCP` dissector and authentication sniffer.
+
+**Fixes**
+- Fixed #105: Refactor `BetterCap::Parsers` loading mechanism to use Ruby metaprogramming.
+- Fixed #95: Requires ifconfig on Linux.
+- Fixed #126: sniffer doesn't print local POST request
+- If logged address is 0.0.0.0, use the MAC instead.
+
+**Code Style**
+- Refactored Spoofers loading mechanism using Ruby metaprogramming.
+- Moved `Factories::Firewall` logic to `Firewalls::Base` class.
+- Better sniffer log messages.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2566366/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2566366,master,https://api.github.com/repos/evilsocket/bettercap/tarball/1.3.6,https://github.com/evilsocket/bettercap/releases/tag/1.3.6,https://api.github.com/repos/evilsocket/bettercap/zipball/1.3.6,1.3.6,False,False
+2525644,2016-01-31T20:26:51Z,2016-01-31T20:27:28Z,bettercap v1.3.5,"Hotfix release for v1.3.4
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2525644/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2525644,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.3.5,https://github.com/evilsocket/bettercap/releases/tag/v1.3.5,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.3.5,v1.3.5,False,False
+2525560,2016-01-31T19:51:47Z,2016-01-31T19:55:53Z,bettercap v1.3.4,"# Changelog
+
+**New Features**
+- New DNS spoofing feature ( `--dns FILE` and `--dns-port PORT` options ).
+
+**Fixes**
+- Fixed issue #117 : Cannot add headers to response.headers in modules.
+- Fix: Do not show acquired/lost targets if discovery is disabled.
+
+**Code Style**
+- Moved `HTTPD` to `BetterCap::Network::Servers::HTTPD`.
+- Moved servers creation logic into new `Context#create_servers!` method.
+- Refactored `Options#to_redirections` method.
+- Moved main logic into `Context#start!` method.
+- Minor restyling of HTTPS and HTTP proxies starting message.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2525560/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2525560,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.3.4,https://github.com/evilsocket/bettercap/releases/tag/v1.3.4,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.3.4,v1.3.4,False,False
+2522797,2016-01-30T17:31:16Z,2016-01-30T17:34:23Z,bettercap v1.3.3,"# Changelog
+
+**New Features**
+- New `DICT` protocol credentials parser.
+- New `Redis` protocol credentials parser.
+- New `MPD` protocol credentials parser.
+- New `RLogin` protocol credentials parser.
+- New `SNPP` protocol credentials parser.
+- New `--log-timestamp` option to enable timestamps while logging.
+
+**Fixes**
+- Fixed issue #114 : Error while parsing IPv6 address.
+
+**Code Style**
+- Better SocketError handling in Proxy class.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2522797/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2522797,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.3.3,https://github.com/evilsocket/bettercap/releases/tag/v1.3.3,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.3.3,v1.3.3,False,False
+2496327,2016-01-26T19:55:09Z,2016-01-26T19:56:04Z,bettercap v1.3.2,"Hotfix release for issue #107 
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2496327/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2496327,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.3.2,https://github.com/evilsocket/bettercap/releases/tag/v1.3.2,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.3.2,v1.3.2,False,False
+2495763,2016-01-26T18:27:53Z,2016-01-26T18:31:55Z,bettercap v1.3.1,"# Changelog
+
+**New Features**
+- Improved POST data parser/sniffer.
+- Implemented sslstrip favicon spoofing.
+- Proxy modules can now declare a on_pre_request method to handle requests before they are performed.
+
+**Fixes**
+- Fixed issue #106 : Invalid multibyte char (US-ASCII).
+- Updated `bettercap.gemspec` file to solve a few warnings while building the GEM.
+- Do not print POST informations if the HTTP body of the request is not available.
+- Handling  `OptionParser::MissingArgument` exception ( closing #103 )
+- Using proper IO classes in Linux Firewall class.
+- Cleaning appropriate headers during sslstrip attack.
+
+**Code Style**
+- Documented a few methods.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2495763/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2495763,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.3.1,https://github.com/evilsocket/bettercap/releases/tag/v1.3.1,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.3.1,v1.3.1,False,False
+2482220,2016-01-24T14:34:30Z,2016-01-24T14:38:11Z,bettercap v1.3.0,"# Changelog
+
+**New Features**
+- **sslstrip** feature and new `--no-sslstrip` option to disable it.
+
+**Fixes**
+- Fixed a bug which caused Proxy response headers to be lowercase only.
+- Fixed a deprecation warning message from Ruby > 2.0.
+- Fixed issue #102: re-arp targets.
+
+**Code Style**
+- Minor refactoring.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2482220/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2482220,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.3.0,https://github.com/evilsocket/bettercap/releases/tag/v1.3.0,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.3.0,v1.3.0,False,False
+2469356,2016-01-21T17:59:07Z,2016-01-21T18:03:21Z,bettercap v1.2.4,"# Changelog
+
+**New Features**
+- New `InjectHTML` proxy module.
+- New `NNTP` auth parser. ( tnx to @bcoles )
+- New starting status message with enabled and disabled modules reporting.
+
+**Fixes**
+- Fixed a bug which caused new and/or lost targets not to be printed in some specific circumstances.
+- Turned firewall redirection logs into debug messages.
+- Fixed a bug which prevented clients to be ""rickrolled"" if they're connecting to us directly.
+
+**Code Style**
+- Moved acquired and lost targets printing logic to discovery thread.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2469356/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2469356,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.2.4,https://github.com/evilsocket/bettercap/releases/tag/v1.2.4,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.2.4,v1.2.4,False,False
+2459194,2016-01-20T11:34:35Z,2016-01-20T11:39:01Z,bettercap v1.2.3,"# Changelog
+
+**New Features**
+- Using WebRick HTTP client instead of raw socket, now the transparent proxy is much more stable and fast!
+- Implemented `--http-ports` and `--https-ports` options.
+
+**Fixes**
+- Fixed a bug which prevented new and lost targets to be printed if spoofing was disabled.
+- Fixed issue #94: Show more information about targets that have been acquired or lost.
+- Correct singular or plural form of 'target'.
+- Fixed a bug in InjectCSS proxy module. 
+- Checking proxy module command line arguments only in initialize method.
+
+**Code Style**
+- Minor refactoring of `BetterCap::Spoofers::Arp` class.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2459194/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2459194,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.2.3,https://github.com/evilsocket/bettercap/releases/tag/v1.2.3,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.2.3,v1.2.3,False,False
+2439993,2016-01-16T17:30:31Z,2016-01-16T17:35:00Z,bettercap v1.2.2,"# Changelog
+
+**New Features**
+- Implemented `--packet-throttle` option.
+- You ca now load both custom or builtin proxy modules. 
+- Added `injectcss` and `injectjs` builtin proxy modules.
+
+**Fixes**
+- Fixed bug in http auth sniffer.
+- Using one global `Pcap.open_live` in `PacketQueue` class ( no more `Too many open files` error, yay! )
+
+**Code Style**
+- Reorganized some of the classes into `BetterCap::Network` module.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2439993/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2439993,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.2.2,https://github.com/evilsocket/bettercap/releases/tag/v1.2.2,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.2.2,v1.2.2,False,False
+2420125,2016-01-13T14:27:04Z,2016-01-13T14:33:23Z,bettercap v1.2.1,"# Changelog
+
+**New Features**
+- Proxy modules can now register custom options defining a `self.register_options` class method.
+- Better unhandled exceptions crash report.
+- Implemented `--kill` feature.
+
+**Fixes**
+- Using a global `UDPSocket` object in `PacketQueue` class in order to send UDP packets.
+- Better gateway and targets reporting.
+- Fixed issue #88 : NameError exception in 1.2.0: ""wrong constant name `BetterCap::Spoofers::Arp`""
+
+**Code Style**
+- Moved ARP table parsing logic to new `ArpReader` class.
+- Converted some of the INFO messages to DEBUG messages.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2420125/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2420125,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.2.1,https://github.com/evilsocket/bettercap/releases/tag/v1.2.1,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.2.1,v1.2.1,False,False
+2406651,2016-01-11T16:57:46Z,2016-01-11T17:02:46Z,bettercap v1.2.0,"# Changelog
+
+**New Features**
+- New fully automatized **ICMP ""DoubleDirect"" spoofer** module.
+- Using PacketFu to create ICMP packets instead of ping utility in broadcast mode.
+- Using the new PacketQueue class as a centralized IP packet sender ( **huge performance improvement** ).
+
+**Fixes**
+- Fixed a bug in `Logger` class which made the program hang in some circumstances.
+- Do not show warning about sniffer being disabled if the spoofer was disabled as well.
+- Do not join threads while stopping proxy.
+
+**Code Style**
+- General refactoring of namespaces/modules with better folder structure.
+- RDOCumented every public class and public methods.
+- Removed discovery agents per-ip debug message.
+- Better network informations debug logging.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2406651/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2406651,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.2.0,https://github.com/evilsocket/bettercap/releases/tag/v1.2.0,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.2.0,v1.2.0,False,False
+2365117,2016-01-03T14:36:03Z,2016-01-03T14:42:15Z,bettercap v1.1.10,"# Changelog
+
+**New Features**
+- Implemented `--silent` option to suppress `Logger` messages.
+- Implemented `--no-target-nbns` option to disable targets NBNS hostname resolution.
+- Implemented `--custom-parser REGEX` option to use a custom regular expression for the sniffer.
+- Option `-T|--target` now supports both ip and mac addresses.
+- Using `StreamLogger` for both `Proxy` and `Sniffer` traffic. Better sniffer logging.
+
+**Fixes**
+- Fixed a bug which caused the logger to raise an exception when `-h|--help` option is passed.
+- Give some time to the discovery thread to spawn its workers, this prevents `Too many open files` errors to delay host discovery.
+- Fixed a bug which caused exceptions not to be printed.
+- Suppress log messages as soon as CTRL+C is pressed.
+
+**Code Style**
+- Removed deprecated tests folder.
+- Wrapped every class with `module BetterCap` and refactored old code structure.
+- Various refactoring with if/unless boolean conditions.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2365117/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2365117,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.1.10,https://github.com/evilsocket/bettercap/releases/tag/v1.1.10,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.1.10,v1.1.10,False,False
+2361820,2016-01-01T20:30:47Z,2016-01-01T20:36:23Z,bettercap v1.1.9,"# Changelog
+
+**New Features**
+- Better targets printing and sorting.
+- Better version checking for beta versions.
+- Lighter single-threaded logging system with work queue.
+
+**Fixes**
+- Fixed a bug in `Options.has_spoofer?` method.
+- Better and safer shutdown procedure handling.
+- Better sniffer threading handling.
+- Fixed gateway info printing.
+- Fixed a bug which caused a `Target` object to be created for already discovered and stored targets.
+
+**Code Style**
+- Moved command line arguments parsing and checking into `Options.parse!` method.
+- Some refactoring on error reporting.
+- Moved discovery thread logic in dedicated `Discovery` class.
+- Moved update check logic into `UpdateChecker` dedicated class.
+- Cleaner port redirection handling.
+- Removed useless `Context.network` member.
+- Minor refactoring on options logic inside main script.
+- Not using `git ls-files` anymore in gemspec but Dir.glob
+- Minor changes to `Discovery` messages.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2361820/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2361820,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.1.9,https://github.com/evilsocket/bettercap/releases/tag/v1.1.9,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.1.9,v1.1.9,False,False
+2284871,2015-12-14T16:56:38Z,2015-12-14T17:02:52Z,bettercap v1.1.8,"# Changelog
+
+**New Features**
+- Implemented HTTP 1.1 chunked transfer encoding support.
+- Implemented NetBIOS NBNS address to hostname resolution.
+- Improved proxy performances using non-blocking I/O.
+
+**Fixes**
+- Added missing dependency `network_interface` to gemspec.
+- Gracefully handling `<Errno::EBADF: Bad file descriptor>` when stopping proxies.
+
+**Code Style**
+- Minor refactoring of `ArpAgent` class.
+- Minor refactoring of `Context#create_proxies` and `Context#finalize` methods.
+- Minor refactoring on `ArpSpoofer#start` method.
+- Moved options logic to dedicated class.
+- Removed useless code from `Proxy::ThreadPool` class.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2284871/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2284871,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.1.8,https://github.com/evilsocket/bettercap/releases/tag/v1.1.8,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.1.8,v1.1.8,False,False
+2215425,2015-12-01T18:59:08Z,2015-12-01T19:00:43Z,bettercap v1.1.7 - hotfix,"Hotfix for issue #78.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2215425/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2215425,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.1.7,https://github.com/evilsocket/bettercap/releases/tag/v1.1.7,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.1.7,v1.1.7,False,False
+2202359,2015-11-29T13:40:57Z,2015-11-29T13:48:13Z,bettercap v1.1.6,"# Changelog
+
+**New Features**
+- Updated `hw-prefixes` file with latest version from nmap repository.
+- Using Google fake subject for CertStore::get_selfsigned method ( `/C=US/ST=California/L=Mountain View/O=Google Inc/CN=www.google.com` ) .
+- Implemented custom upstream proxy options ( `--custom-proxy`, `--custom-https-proxy` ) both for HTTP and HTTPS.
+
+**Fixes**
+- Handling `Proxy-Connection` HTTP header, fixed `Connection` header regular expression.
+- Handling `Too many open files.` BPF errors in BaseAgent class.
+- Fixed bettercap.gemspec file with required_ruby_version attribute.
+- Fixed a bug which caused the HTTP response body to be truncated in some cases.
+- Improved proxy performances disabling BasicSocket reverse lookups.
+- Improved proxy performances using thread pooling.
+
+**Code Style**
+- Debug log of outgoing HTTP request in proxy module.
+- Fixed indentation.
+- Minor proxy code refactoring.
+- Moved proxy streams logging to dedicated class.
+- Better networking code with new Proxy::Streamer class.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/2202359/assets,https://api.github.com/repos/evilsocket/bettercap/releases/2202359,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.1.6,https://github.com/evilsocket/bettercap/releases/tag/v1.1.6,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.1.6,v1.1.6,False,False
+1977864,2015-10-18T08:32:31Z,2015-10-18T08:38:50Z,bettercap v1.1.5,"# Changelog
+
+**New Features**
+- New argument to manually specify the gateway address, tnx to @misterade 
+- New `--sniffer-source` argument to read a pcap file instead of sniffing from the network interface.
+
+**Fixes**
+- Fixed #66 : Minor but important fix in binary_streaming()
+- Fixed #62 : WARNING: pinging broadcast address.
+- Fixed #44 : Using correct charset/encoding for response body.
+- Stopping threads is now faster.
+- Removed flush in add_port_redirection, tnx to @julegatti 
+- Using response content-length if available during html streaming.
+- Skipping HTTPS request if the hostname is the same as the previous one.
+- Forcing both internal and external encodings to UTF-8.
+
+**Code Style**
+- Removed Syn discovery agent as it was useless.
+- Some logs restyling.
+- Added website to banner, replaced examples on help menu with a link to instructions.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/1977864/assets,https://api.github.com/repos/evilsocket/bettercap/releases/1977864,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.1.5,https://github.com/evilsocket/bettercap/releases/tag/v1.1.5,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.1.5,v1.1.5,False,False
+1645970,2015-08-08T16:22:26Z,2015-08-08T16:31:49Z,bettercap v1.1.4,"# Changelog
+
+**New Features**
+- First prototype of HTTPS transparent proxy with realtime crafted certificate and/or custom .pem file.
+- Added dynamic ARP agent/sniffer that will reply to ARP who-has requests when needed.
+- Implemented half-duplex mode for weird routers that whenever receive an ARP_OPREPLY suddenly sends an ARP_OPREQUEST to the real ip, screwing up MITM ( see #45 )
+- Now the user can target more than one address at once, tnx to @mvrilo 
+- Now the user can load more than one spoofer at once, tnx to @minotaur-0 
+
+**Fixes**
+- Added Gemfile & stuff, tnx to @felipebalbi 
+- Fixed bug that caused the program to hang for 10 seconds if user pressed CTRL-C but no discovery was running.
+- Fixed a bug in OSX firewall class which caused an exception if pf.conf file was not found.
+- Fixed multiple bugs in OSX firewall class.
+- Avoid the https proxy to exit if an exception is thrown during accept.
+- Fixed #45: ARP spoofing rarely working ( see new --half-duplex argument ).
+- Handling gracefully proxy modules exceptions.
+- Fixed a bug of the pcap file serializer that caused it to save packets from the attacker machine.
+- Handling/Fixing #47 and #48: Handled exception when gateway can not be determined.
+- Fixing capturing on ArpSpoofer, tnx to @minotaur-0 
+
+**Code Style**
+- New tests, tnx to @samsymons 
+- Added CONTRIBUTING.md guidelines file.
+- Simplified Proxy#client_thread method.
+- Printing 'sniffer module disabled' warning only if spoofer is actually running.
+- Small refactoring: Declaring proxy processor only once.
+- Improved version check, using rubygem API, tnx to @felipebalbi 
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/1645970/assets,https://api.github.com/repos/evilsocket/bettercap/releases/1645970,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.1.4,https://github.com/evilsocket/bettercap/releases/tag/v1.1.4,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.1.4,v1.1.4,False,False
+1591980,2015-07-27T17:36:30Z,2015-07-27T17:44:39Z,bettercap v1.1.3,"# Changelog
+
+**New Features**
+- Enabled -v|--version printing
+- Using -n flag for ARP binary ( arp -a -n ) in order to speed up the parsing.
+- New --check-updates option will check if a new version of bettercap is available.
+
+**Fixes**
+- Fixed #26 : Undefined method 'split' for nil:NilClass.
+- Fixed #28 : Handling PacketFu::Packet#parse exceptions gracefully.
+- Fixed #32 : Restoring original ip_forward system state.
+- Fixed #34 : Error when executing bettercap -X
+- Fixed #35 : Using ARP cache in Network.get_hw_address before sending actual ARP probe.
+- Fixed #36 : JS injection && content type comparision.
+- Added more robust network interface search.
+
+**Code Style**
+- Updated hash syntax to ruby 1.9
+- Minor Sniffer code refactoring.
+- Refactored PacketFu::Utils#ifconfig monkey patch library.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/1591980/assets,https://api.github.com/repos/evilsocket/bettercap/releases/1591980,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.1.3,https://github.com/evilsocket/bettercap/releases/tag/v1.1.3,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.1.3,v1.1.3,False,False
+1588247,2015-07-26T21:08:43Z,2015-07-26T21:14:13Z,bettercap v1.1.2,"# Changelog
+
+**New Features**
+- Every proxy-\* option will auto enable the transparent proxy if specified.
+- New feature to save all packets to a pcap file ( --sniffer-pcap option ).
+- New --sniffer-filter argument to pass custom BPF filters to the sniffer.
+- New ARP network discovery agent.
+- Added --no-spoofing argument ( alias for --spoofer NONE ).
+
+**Fixes**
+- Fixed proxy after method refactoring.
+- Added a sleep of 10 seconds between one ARP parsing and the next one if --no-discovery argument is passed.
+- Finally removed dependency on PacketFu::Utils#whoami? BUGGED method.
+- Fixed a bug which caused a wrong gateway to be considered when the system is connected to a vpn.
+- Fixed #23 - Gracefully handling no default interface scenario.
+- Fixed capture stream bug on Mac OSX using timeouts.
+
+**Code Style**
+- Some code refactoring, tnx to @RoxasShadow 
+- Centralized multi threaded discovery agent logic into a base class.
+- Moved proxy modules to [dedicated repo](https://github.com/evilsocket/bettercap-proxy-modules).
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/1588247/assets,https://api.github.com/repos/evilsocket/bettercap/releases/1588247,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.1.2,https://github.com/evilsocket/bettercap/releases/tag/v1.1.2,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.1.2,v1.1.2,False,False
+1586295,2015-07-25T18:39:55Z,2015-07-25T18:44:39Z,bettercap v1.1.1,"# Changelog
+
+**New Features**
+- Added builtin HTTP server.
+- New ASCII art logo ( i know, not a new feature, but cool anyway :D )
+- Help menu now prints some example usages.
+
+**Fixes**
+- Enabled --help command line argument.
+- Prevent an exception from being thrown if the Config const doesn't exist.
+- Help menu now available to non root users as well.
+- Make sure that exceptions thrown from credentials parsers are handled.
+- Print a warning if both proxy and URL sniffer module are enabled.
+- Improved MAIL parser regexp, fixed a few false positives.
+- Fixed small bug which caused a warning to be printed when not needed.
+
+**Code Style**
+- More compact way of printing local and gateway address and mac.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/1586295/assets,https://api.github.com/repos/evilsocket/bettercap/releases/1586295,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.1.1,https://github.com/evilsocket/bettercap/releases/tag/v1.1.1,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.1.1,v1.1.1,False,False
+1572477,2015-07-22T19:00:50Z,2015-07-22T19:10:51Z,bettercap v1.1.0,"# Changelog
+
+**New Features**
+- Added warning message if sniffer is not enabled.
+- Added --no-discovery argument to skip active host discovery.
+- Implemented HTTP transparent proxy with modules support.
+- New SYN network discovery agent.
+- Dynamic discovery, new hosts are added to the targets list while running. 
+
+**Fixes**
+- Enabling sniffer if -L argument is passed.
+- More fixes for localized linux tools.
+- Fixed Linux firewall class for port redirection.
+- Logging improved.
+- Fixed linux firewall del_port_redirection method.
+- Fixed a bug in OSX firewall class which caused an unhandled exception while enabling PF if PF was already enabled.
+- Fixes on HTTPS sniffer.
+
+**Code Style**
+- Moved some logs to debug logs.
+- Moved various discovery agents into separate classes.
+- Minor code restyling.
+- New dedicated folder to sniffer class and parsers.
+- Centralized globals into Context object.
+- Turned bettercap into a proper ruby gem.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/1572477/assets,https://api.github.com/repos/evilsocket/bettercap/releases/1572477,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.1.0,https://github.com/evilsocket/bettercap/releases/tag/v1.1.0,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.1.0,v1.1.0,False,False
+1565856,2015-07-21T09:50:25Z,2015-07-21T15:55:30Z,bettercap v1.0.6-hotfix,"Hotfix release to correct an ifconfig bug.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/1565856/assets,https://api.github.com/repos/evilsocket/bettercap/releases/1565856,master,https://api.github.com/repos/evilsocket/bettercap/tarball/v1.0.6-hotfix,https://github.com/evilsocket/bettercap/releases/tag/v1.0.6-hotfix,https://api.github.com/repos/evilsocket/bettercap/zipball/v1.0.6-hotfix,v1.0.6-hotfix,False,False
+1564012,2015-07-21T09:20:04Z,2015-07-21T09:22:23Z,bettercap v1.0.6,"**Changelog**
+- Added debug logging flag and many debug messages.
+- Fixed an issue with the host discovery thread pool.
+- Fixed weird ruby regex bug.
+- Fixed various PacketFu bug.
+- Moved enable_icmp_bcast inside icmp thread.
+- Fixed #14 : Ifconfig parsing for foreign localizations.
+- Ensuring english localization when executing ifconfig.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/1564012/assets,https://api.github.com/repos/evilsocket/bettercap/releases/1564012,master,https://api.github.com/repos/evilsocket/bettercap/tarball/1.0.6,https://github.com/evilsocket/bettercap/releases/tag/1.0.6,https://api.github.com/repos/evilsocket/bettercap/zipball/1.0.6,1.0.6,False,False
+1556388,2015-07-19T10:47:58Z,2015-07-19T10:49:38Z,bettercap v1.0.5,"**Changelog:**
+- Remove colors from log when saving logline to file.
+- New UDP host discovery along with old ICMP one.
+- Fixed #11 and #7
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/1556388/assets,https://api.github.com/repos/evilsocket/bettercap/releases/1556388,master,https://api.github.com/repos/evilsocket/bettercap/tarball/1.0.5,https://github.com/evilsocket/bettercap/releases/tag/1.0.5,https://api.github.com/repos/evilsocket/bettercap/zipball/1.0.5,1.0.5,False,False
+1556213,2015-07-19T08:35:53Z,2015-07-19T08:38:05Z,bettercap v1.0.4,"**Changelog:**
+- Fixed logging to file.
+- Check if IPv4 network of given interface was detected.
+- Enable bcast ping in the kernel.
+- Better reporting of generic exceptions.
+- Handling SystemExit gracefully.
+- Fixed #6 : Could not determin IPv4 address of 'XXXX' interface
+- Fixed #13 : Could not detect gateway address
+- Fixed #9 : undefined method 'tcp_src' for nil:NilClass.
+",https://api.github.com/users/evilsocket,86922,evilsocket,https://api.github.com/repos/evilsocket/bettercap/releases/1556213/assets,https://api.github.com/repos/evilsocket/bettercap/releases/1556213,master,https://api.github.com/repos/evilsocket/bettercap/tarball/1.0.4,https://github.com/evilsocket/bettercap/releases/tag/1.0.4,https://api.github.com/repos/evilsocket/bettercap/zipball/1.0.4,1.0.4,False,False

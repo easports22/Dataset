@@ -1,0 +1,77 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+3868317,2016-08-11T17:59:11Z,2016-08-11T18:00:16Z,v5.0.1,"- Fixes arguments passed to deprecated internal methods. (#198)
+",https://api.github.com/users/ktheory,975,ktheory,https://api.github.com/repos/kickstarter/rack-attack/releases/3868317/assets,https://api.github.com/repos/kickstarter/rack-attack/releases/3868317,master,https://api.github.com/repos/kickstarter/rack-attack/tarball/v5.0.1,https://github.com/kickstarter/rack-attack/releases/tag/v5.0.1,https://api.github.com/repos/kickstarter/rack-attack/zipball/v5.0.1,v5.0.1,False,False
+3848213,2016-08-09T17:00:23Z,2016-08-09T17:03:07Z,v5.0.0,"- Deprecate `whitelist`/`blacklist` in favor of `safelist`/`blocklist`. (#181,
+  thanks @renee-travisci).  To upgrade and fix deprecations, find and replace instances of `whitelist` and `blacklist` with `safelist` and `blocklist`. If you reference `rack.attack.match_type`, note that it will have values like `:safelist`/`:blocklist`.
+- Remove test coverage for unsupported ruby dependencies: ruby 2.0, activesupport 3.2/4.0, and dalli 1.
+- Document example for setting `X-RateLimit-*` response headers (#193)
+",https://api.github.com/users/ktheory,975,ktheory,https://api.github.com/repos/kickstarter/rack-attack/releases/3848213/assets,https://api.github.com/repos/kickstarter/rack-attack/releases/3848213,master,https://api.github.com/repos/kickstarter/rack-attack/tarball/v5.0.0,https://github.com/kickstarter/rack-attack/releases/tag/v5.0.0,https://api.github.com/repos/kickstarter/rack-attack/zipball/v5.0.0,v5.0.0,False,False
+3590199,2016-07-05T02:35:03Z,2016-07-05T15:34:53Z,,"- Deprecate `whitelist`/`blacklist` in favor of `safelist`/`blocklist`. (#181,
+  thanks @renee-travisci).  To upgrade and fix deprecations, find and replace instances of `whitelist` and `blacklist` with `safelist` and `blocklist`. If you reference `rack.attack.match_type`, note that it will have values like `:safelist`/`:blocklist`.
+- Remove test coverage for unsupported ruby dependencies: ruby 2.0, activesupport 3.2/4.0, and dalli 1.
+",https://api.github.com/users/ktheory,975,ktheory,https://api.github.com/repos/kickstarter/rack-attack/releases/3590199/assets,https://api.github.com/repos/kickstarter/rack-attack/releases/3590199,master,https://api.github.com/repos/kickstarter/rack-attack/tarball/v5.0.0.beta1,https://github.com/kickstarter/rack-attack/releases/tag/v5.0.0.beta1,https://api.github.com/repos/kickstarter/rack-attack/zipball/v5.0.0.beta1,v5.0.0.beta1,False,True
+2632658,2016-02-17T14:50:43Z,2016-02-17T15:07:00Z,v4.4.1,"- Fix a bug affecting apps using `Redis::Store` and `ActiveSupport` that could generate an error saying dalli was a required dependency. I learned all about ActiveSupport autoloading. See #165. Thx @tirdadc for repoting in #163,
+",https://api.github.com/users/ktheory,975,ktheory,https://api.github.com/repos/kickstarter/rack-attack/releases/2632658/assets,https://api.github.com/repos/kickstarter/rack-attack/releases/2632658,master,https://api.github.com/repos/kickstarter/rack-attack/tarball/v4.4.1,https://github.com/kickstarter/rack-attack/releases/tag/v4.4.1,https://api.github.com/repos/kickstarter/rack-attack/zipball/v4.4.1,v4.4.1,False,False
+2589700,2016-02-10T20:05:43Z,2016-02-10T20:35:20Z,v4.4.0,"- New: support for MemCacheStore (#153). Thanks @elhu.
+- Some documentation and test harness improvements.
+",https://api.github.com/users/ktheory,975,ktheory,https://api.github.com/repos/kickstarter/rack-attack/releases/2589700/assets,https://api.github.com/repos/kickstarter/rack-attack/releases/2589700,master,https://api.github.com/repos/kickstarter/rack-attack/tarball/v4.4.0,https://github.com/kickstarter/rack-attack/releases/tag/v4.4.0,https://api.github.com/repos/kickstarter/rack-attack/zipball/v4.4.0,v4.4.0,False,False
+2313024,2015-12-18T17:31:35Z,2015-12-18T17:37:06Z,v4.3.1: Security release,"There is a security vulnerability with how requests are normalized when using Rails' ActionDispatch.
+
+Versions Affected:  < 4.3.0
+Not affected: rack apps not using Rails
+Fixed Versions: 4.3.1
+
+## Impact 
+
+When using rack-attack with a rails app, developers expect the request
+path to be normalized. In particular, trailing slashes are stripped so
+a request path ""/login/"" becomes ""/login"" by the time you're in
+ActionController.
+
+Since Rack::Attack runs before ActionDispatch, the request path is not
+yet normalized. This can cause throttles and blacklists to not work as
+expected.
+
+E.g., a throttle:
+
+```
+throttle('logins', ...) {|req| req.path == ""/login"" }
+```
+
+would not match a request to '/login/', though Rails would route
+'/login/' to the same '/login' action. 
+
+## Releases
+
+Install rack-attack 4.3.1 from rubygems.org.
+
+```
+# In Gemfile using bundler
+gem 'rack-attack', '~> 4.3.1'
+```
+
+## Workarounds 
+
+If you prefer not to upgrade, you may work around this issue by making sure your throttles, blacklists, etc handle an optional trailing slash in `req.path`. 
+
+For example:
+
+``` ruby
+# Unsafe:
+throttle(...) { |req| req.path == '/login' }
+
+# Safe:
+throttle(...) { |req| req.path == '/login' || req.path == '/login/' }
+```
+
+## Credit
+
+This vulnerability was reported by Andres Riancho from Include Security (@includesecurity on GitHub and Twitter). Thank you, Andres & Include Security.
+
+## Other changes in v4.3.1
+- Remove support for ruby 1.9.x
+- Add Code of Conduct
+- Several documentation and testing improvements
+
+Changes: https://github.com/kickstarter/rack-attack/compare/v4.3.0...v4.3.1
+",https://api.github.com/users/ktheory,975,ktheory,https://api.github.com/repos/kickstarter/rack-attack/releases/2313024/assets,https://api.github.com/repos/kickstarter/rack-attack/releases/2313024,master,https://api.github.com/repos/kickstarter/rack-attack/tarball/v4.3.1,https://github.com/kickstarter/rack-attack/releases/tag/v4.3.1,https://api.github.com/repos/kickstarter/rack-attack/zipball/v4.3.1,v4.3.1,False,False

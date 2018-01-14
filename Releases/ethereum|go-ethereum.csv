@@ -1,0 +1,1517 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8120239,2017-10-14T12:58:53Z,2017-10-14T13:05:08Z,Urgent Update (v1.7.2),"**Geth 1.7.2 is a hotfix release to address a DOS vulnerability in the EVM starting at Byzantium. Please upgrade before block 4_370_000!**
+
+Pre-built binaries should be available shortly at https://geth.ethereum.org/downloads/.",https://api.github.com/users/karalabe,129561,karalabe,https://api.github.com/repos/ethereum/go-ethereum/releases/8120239/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/8120239,release/1.7,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.7.2,https://github.com/ethereum/go-ethereum/releases/tag/v1.7.2,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.7.2,v1.7.2,False,False
+7982109,2017-10-03T17:18:39Z,2017-10-04T06:57:28Z,Ptolemy (v1.7.1),"This is a maintenance release that fixes regressions in the 1.7.0 release.
+
+**This release enables the Byzantium hard fork transition at block number 4370000 (~17th October) on the mainnet and block number 1035301 (~9th October) on the Rinkeby test network. Please update well before these dates to ensure a smooth transition.**
+
+Noteworthy changes:
+
+* Log queries handle the null topic correctly. ([#15195](https://github.com/ethereum/go-ethereum/issues/15195))
+* Ledger Nano S and Trezor hardware wallets should once again be detected on macOS. ([#15232](https://github.com/ethereum/go-ethereum/issues/15232))
+* p2p: messages are compressed using Snappy. See [EIP706](https://github.com/ethereum/EIPs/pull/706) for more information. ([#15106](https://github.com/ethereum/go-ethereum/issues/15106))
+* ethclient: The new `TransactionSender` method can be used to derive the sender address
+  of a transaction at the time of inclusion. ([#15127](https://github.com/ethereum/go-ethereum/issues/15127)).
+
+For a full rundown of changes, please see the [v1.7.1 milestone](https://github.com/ethereum/go-ethereum/milestone/56?closed=1).
+
+**As always, binaries and mobile libraries are available on our [download page](https://geth.ethereum.org/downloads/).**
+",https://api.github.com/users/fjl,6915,fjl,https://api.github.com/repos/ethereum/go-ethereum/releases/7982109/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/7982109,release/1.7,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.7.1,https://github.com/ethereum/go-ethereum/releases/tag/v1.7.1,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.7.1,v1.7.1,False,False
+7752088,2017-09-14T10:55:42Z,2017-09-14T14:08:00Z,Megara (v1.7.0),"The Go Ethereum team is proud to announce the next release family of Geth, the first incarnation of which focuses on laying the groundwork for the upcoming Metropolis hard forks (Byzantium and Constantinople) and consists of [125+ code contributions](https://github.com/ethereum/go-ethereum/milestone/47?closed=1) to various parts of the project.
+
+## Byzantium fork
+
+The current incarnation of Geth contains all the Byzantium EIPs implemented and also features the fork block number **1,700,000** for the Ropsten testnet transition. The block numbers for Rinkeby and the main Ethereum network will be finalized when Ropsten is deemed stable.
+
+You can find details about individual protocol updates at the following locations:
+
+* **[EIP 98](https://github.com/ethereum/EIPs/issues/98)**: Removal of intermediate state roots from receipts ([#14750](https://github.com/ethereum/go-ethereum/pull/14750)).
+* Expanded by **[EIP 658](https://github.com/ethereum/EIPs/pull/658)**: Embedding transaction return data in receipts ([#15014](https://github.com/ethereum/go-ethereum/pull/15014)).
+* **[EIP 100](https://github.com/ethereum/EIPs/issues/100)**: Change difficulty adjustment to target mean block time including uncles ([#14733](https://github.com/ethereum/go-ethereum/pull/14733)).
+* **[EIP 198](https://github.com/ethereum/EIPs/issues/198)**, **[EIP 212 (197)](https://github.com/ethereum/EIPs/issues/212)** and **[EIP 213 (196)](https://github.com/ethereum/EIPs/issues/213)**: Precompiled contracts for modular exponentiation; elliptic curve addition, scalar multiplication and pairing ([#14959](https://github.com/ethereum/go-ethereum/pull/14959), [#14993](https://github.com/ethereum/go-ethereum/pull/14993)).
+* **[EIP 214 (116)](https://github.com/ethereum/EIPs/pull/214)**: Expanding the EVM with static contract calls ([#14978](https://github.com/ethereum/go-ethereum/pull/14978)).
+* **[EIP 211](https://github.com/ethereum/EIPs/pull/211)**: Expanding the EVM with dynamically sized return data ([#14981](https://github.com/ethereum/go-ethereum/pull/14981)).
+* **[EIP 206 (140)](https://github.com/ethereum/EIPs/pull/206)**: Expanding the EVM with cheap state revertals ([#14983](https://github.com/ethereum/go-ethereum/pull/14983)).
+* **[EIP 649](https://github.com/ethereum/EIPs/pull/669)**: Delaying the difficulty bomb and reducing the block reward ([#15028](https://github.com/ethereum/go-ethereum/pull/15028)).
+* **[EIP 684](https://github.com/ethereum/EIPs/issues/684)**: Preventing overwriting contracts (Byzantium prep) ([#15039](https://github.com/ethereum/go-ethereum/pull/15039)).
+
+## Performance optimizations
+
+The 1.7 release series of Geth is aimed to focus primarily on performance improvements (beside the Byzantium hard fork). The first release of the family already packs a heavy punch with two database schema modifications resulting in significant optimizations:
+
+* Transaction and receipt storage was completely reworked, cutting the data storage requirements of a fast synced node in half, from 26.3GB to 14.9GB at the time of the implementation ([#14801](https://github.com/ethereum/go-ethereum/pull/14801)).
+* EVM log storage and indexing was completely reworked, cutting the filtering time of the entire chain for contract events by 2-3 orders of magnitude, from minutes to under a second ([#14522](https://github.com/ethereum/go-ethereum/pull/14522), [#14631](https://github.com/ethereum/go-ethereum/pull/14631)).
+
+Some work-in-progress updates that will land in the next releases are:
+
+* Upgrading the base peer-to-peer protocol used by all Ethereum sub-protocols, cutting the bandwidth needed for a fast sync from 33.6GB to 13.5GB ([#15106](https://github.com/ethereum/go-ethereum/pull/15106)). This upgrade will improve the general bandwidth requirement of the network as well as light clients too.
+* Introducing a more sophisticated memory caching for state tries, reducing disk IO by a couple orders of magnitude. Exact number are pending a final implementation ([#14952](https://github.com/ethereum/go-ethereum/pull/14952)).
+
+## Trezor wallets
+
+About this time last year we've introduced support for the Ledger hardware wallet. Due to popular demand, we've now expanded on our hardware wallet offering by also rolling out support for the Trezor ([#14885](https://github.com/ethereum/go-ethereum/pull/14885)).
+
+Opposed to the Ledger however, the Trezor is a bit more complicated as it requires a PIN-unlock sent from the communicating machine instead of directly input by the user. As such, when a user plugs in a Trezor, Geth will print:
+
+`New wallet appeared, failed to open url=trezor://0003:0007:00 err=""trezor: pin needed""`
+
+The Geth console can be used to unlock the Trezor by invoking `personal.openWallet(url)`, which will request the user to enter the shuffled PIN code and send that over to the Trezor for verification:
+
+```
+> personal.openWallet(""trezor://0003:0007:00"")
+
+Look at the device for number positions
+
+7 | 8 | 9
+--+---+--
+4 | 5 | 6
+--+---+--
+1 | 2 | 3
+
+Please enter current PIN:
+
+INFO [08-10|11:58:06] New wallet appeared url=trezor://0003:0007:00 status=""Trezor v1.5.0 'Hi' online""
+```
+For details on how to interact with the Trezor from the JSON-RPC APIs, please consult the [PR description](https://github.com/ethereum/go-ethereum/pull/14885).
+
+## Transaction journal
+
+In the 1.6.x release family of Geth we've introduced a new transaction pool to avoid propagation issues due to minimum gas-price requirements. This new pool accepted all transactions irrelevant of pricing, and always kept the best paying 4K of them, discarding the cheaper ones.
+
+The new pool features a special exemption mechanism for local accounts so that a user's own transactions are always prioritized over remote ones, even if they are under-priced compared to everyone else's. This ensures that cheap transactions don't get flushed out of the network during heavy usage (e.g. ICO) as long as the originating node remains online.
+
+Geth 1.7.0 takes this protective measure a step forward by journaling all locally created transactions to disk, and loading them back up on a node restart. This ensures that even if the originating node goes offline, cheap transactions still have a chance to be included when the node comes back ([#14784](https://github.com/ethereum/go-ethereum/pull/14784)).
+
+The transaction journal can be an enormous help for node operators during software upgrades by not having to worry about local transactions going missing. Furthermore, the journal also acts as a resiliency mechanism against node crashes, ensuring that no transaction data is lost.
+
+## Rinkeby updates
+
+There have been a lot of subtle tunings made to Puppeth and Rinkeby over the course of this release, such as better ethstats logging to detect malicious reporters and IP address blacklisting to deny access for them.
+
+The Rinkeby testnet also proved vital in finding and and fixing a transaction pool event race that caused a lot of headache around lost transactions and/or duplicate nonce assignments. All such known errors have now been fixed ([#15085](https://github.com/ethereum/go-ethereum/pull/15085)).
+
+Lastly we're extremely happy to announce that [Infura became an active player](https://blog.infura.io/infuras-signer-and-bootnode-on-rinkeby-440de6f70961) in the Rinkeby test network by aiding the community both with their own bootnode as well as running an authorized signer node. This should make the Rinkeby network even more robust and resilient.
+
+## Closing remarks
+
+Geth 1.7.0 contains a lot of bug fixes and we consider it our best release until now, however we urge everyone to take care with the upgrade and monitor it closely afterwards as it does contain non-trivial database upgrades.
+
+Furthermore, we'd like to emphasize that **the upgraded database cannot be used by previous versions of Geth**. Our recommendation for production users it to sync from scratch with Geth 1.7.0, and leave the old database backed up until you confirm that the new release works correctly for all your use cases.
+
+For a full rundown of the changes please consult the [Geth 1.7.0 release milestone](https://github.com/ethereum/go-ethereum/pulls?page=1&amp;q=is%3Apr+milestone%3A1.7.0+is%3Aclosed).
+
+**As always, binaries and mobile libraries are available on our [download page](https://geth.ethereum.org/downloads/).**",https://api.github.com/users/karalabe,129561,karalabe,https://api.github.com/repos/ethereum/go-ethereum/releases/7752088/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/7752088,release/1.7,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.7.0,https://github.com/ethereum/go-ethereum/releases/tag/v1.7.0,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.7.0,v1.7.0,False,False
+7000175,2017-07-11T14:32:36Z,2017-07-12T09:37:46Z,AYTABTU (v1.6.7),"Geth v1.6.7 (All Your Transaction Are Belong To Us) is another fine maintenance release:
+
+* The transaction pool now tracks 'local' transactions based on sender address (https://github.com/ethereum/go-ethereum/pull/14737).
+   * Transactions sent by local addresses are exempt from gas pricing- and overall queue size limits.
+* Docker images are smaller because consensus tests are no longer included (https://github.com/ethereum/go-ethereum/pull/14734, https://github.com/ethereum/go-ethereum/pull/14792).
+ * Extend RPC formatting error messages with field details to better describe the failure (https://github.com/ethereum/go-ethereum/pull/14686).
+ * Add Whisper v5 CLI flags to Geth and add a Whisper Go client library (https://github.com/ethereum/go-ethereum/pull/14540).
+
+**Important notice to projects running public nodes (MyEtherWallet, Etherscan, Infura, etc): The sender address of any transaction submitted via RPC will be considered a local address, and all transactions from such addresses will be exempt of the gas price and pool size enforcement. To avoid DOS attacks due to the exemption algorithm, please run with `--txpool.nolocals` to disable special exemptions for local accounts.**
+
+For other minor changes in this release, see the [1.6.7 milestone](https://github.com/ethereum/go-ethereum/milestone/54?closed=1).
+
+**Binaries and mobile libraries are available on our [download page](https://geth.ethereum.org/downloads/).**",https://api.github.com/users/fjl,6915,fjl,https://api.github.com/repos/ethereum/go-ethereum/releases/7000175/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/7000175,release/1.6,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.6.7,https://github.com/ethereum/go-ethereum/releases/tag/v1.6.7,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.6.7,v1.6.7,False,False
+6813039,2017-06-23T09:26:54Z,2017-06-23T10:02:57Z,lgtm on mobile (v1.6.6),"This is another maintenance release:
+
+* Fast sync should be more reliable with magnetic disks (https://github.com/ethereum/go-ethereum/pull/14460)
+* A transaction pool inconsistency regarding tracking of pending transactions is resolved (https://github.com/ethereum/go-ethereum/pull/14673)
+* ethclient: TransactionByHash now actually returns pending = false for mined transactions (https://github.com/ethereum/go-ethereum/pull/14663)
+
+
+For other minor changes in this release, see the [1.6.6 milestone](https://github.com/ethereum/go-ethereum/milestone/52?closed=1).
+
+**Binaries and mobile libraries are available on our [download page](https://geth.ethereum.org/downloads/).**",https://api.github.com/users/fjl,6915,fjl,https://api.github.com/repos/ethereum/go-ethereum/releases/6813039/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/6813039,release/1.6,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.6.6,https://github.com/ethereum/go-ethereum/releases/tag/v1.6.6,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.6.6,v1.6.6,False,False
+6576854,2017-06-01T18:48:47Z,2017-06-01T18:55:15Z,Hat Trick (v1.6.5),"Geth v1.6.5 is a security release to counter on ongoing attack on mainnet!
+
+ - Use a bitmap instead of a hashmap to store the results of jumpdest analysis, and optimise analysis process ([#14570](https://github.com/ethereum/go-ethereum/pull/14570)).
+
+**Binaries and mobile libraries are available on our [download page](https://geth.ethereum.org/downloads/).**",https://api.github.com/users/karalabe,129561,karalabe,https://api.github.com/repos/ethereum/go-ethereum/releases/6576854/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/6576854,release/1.6,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.6.5,https://github.com/ethereum/go-ethereum/releases/tag/v1.6.5,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.6.5,v1.6.5,False,False
+6573609,2017-06-01T14:33:17Z,2017-06-01T14:45:35Z,Coverage (v1.6.4),"Geth v1.6.4 is a hotfix release to patch a transaction signing regression introduced by 1.6.2:
+
+ * Properly initialize account nonce mutex in the API (https://github.com/ethereum/go-ethereum/pull/14568).
+
+Previous (v1.6.3) version of Geth included the following hotfixes:
+
+ * Fix a quadratic overhead when adding new transactions to the pool (https://github.com/ethereum/go-ethereum/pull/14561).
+ * Reduce egress network traffic sent to ethstats to avoid overloads (https://github.com/ethereum/go-ethereum/pull/14563).
+ * Fix our `ethereum/client-go:alpine` image to point to the 1.6 branch (https://github.com/ethereum/go-ethereum/pull/14564).
+ * Fix an account handling regression with badly encoded legacy keyfiles (https://github.com/ethereum/go-ethereum/pull/14565).
+
+Original (v1.6.2) version of Geth being hotfixed included:
+
+- Server-side tx nonce assignment works for concurrent RPC calls to sendTransaction (#14516).
+- The transaction pool accepts transactions with any gas price (#14442).
+- **(potentially breaking change)** Key imports enforce private key length of 32 bytes (#14502). This affects the `personal_importRawKey` RPC method.
+
+Previously hidden transaction pool defaults can now be set:
+
+```
+--txpool.pricelimit value    Minimum gas price limit to enforce for acceptance into the pool (default: 1)
+--txpool.pricebump value     Price bump percentage to replace an already existing transaction (default: 10)
+--txpool.accountslots value  Minimum number of executable transaction slots guaranteed per account (default: 16)
+--txpool.globalslots value   Maximum number of executable transaction slots for all accounts (default: 4096)
+--txpool.accountqueue value  Maximum number of non-executable transaction slots permitted per account (default: 64)
+--txpool.globalqueue value   Maximum number of non-executable transaction slots for all accounts (default: 1024)
+--txpool.lifetime value      Maximum amount of time non-executable transaction are queued (default: 3h0m0s)
+```
+
+
+**Binaries and mobile libraries are available on our [download page](https://geth.ethereum.org/downloads/).**",https://api.github.com/users/karalabe,129561,karalabe,https://api.github.com/repos/ethereum/go-ethereum/releases/6573609/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/6573609,release/1.6,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.6.4,https://github.com/ethereum/go-ethereum/releases/tag/v1.6.4,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.6.4,v1.6.4,False,False
+6568913,2017-06-01T08:41:48Z,2017-06-01T09:52:52Z,Covfefe (v1.6.3),"**Nuked: Please see https://github.com/ethereum/go-ethereum/releases/tag/v1.6.4.**
+
+Geth v1.6.3 is a hotfix release to address some issues discovered during yesterday's crazy transaction volume:
+
+ * Fix a quadratic overhead when adding new transactions to the pool (https://github.com/ethereum/go-ethereum/pull/14561).
+ * Reduce egress network traffic sent to ethstats to avoid overloads (https://github.com/ethereum/go-ethereum/pull/14563).
+ * Fix our `ethereum/client-go:alpine` image to point to the 1.6 branch (https://github.com/ethereum/go-ethereum/pull/14564).
+ * Fix an account handling regression with badly encoded legacy keyfiles (https://github.com/ethereum/go-ethereum/pull/14565).
+
+**Binaries and mobile libraries are available on our [download page](https://geth.ethereum.org/downloads/).**",https://api.github.com/users/karalabe,129561,karalabe,https://api.github.com/repos/ethereum/go-ethereum/releases/6568913/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/6568913,release/1.6,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.6.3,https://github.com/ethereum/go-ethereum/releases/tag/v1.6.3,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.6.3,v1.6.3,False,False
+6553048,2017-05-31T03:45:13Z,2017-05-31T09:01:20Z,"Nonce, Inc. (v1.6.2)","**Nuked: Please see https://github.com/ethereum/go-ethereum/releases/tag/v1.6.4.**
+
+This is mostly a maintenance release with new features added around transaction handling:
+
+- Server-side tx nonce assignment works for concurrent RPC calls to sendTransaction (#14516).
+- The transaction pool accepts transactions with any gas price (#14442).
+- **(potentially breaking change)** Key imports enforce private key length of 32 bytes (#14502). This affects the `personal_importRawKey` RPC method.
+
+Previously hidden transaction pool defaults can now be set:
+
+```
+--txpool.pricelimit value    Minimum gas price limit to enforce for acceptance into the pool (default: 1)
+--txpool.pricebump value     Price bump percentage to replace an already existing transaction (default: 10)
+--txpool.accountslots value  Minimum number of executable transaction slots guaranteed per account (default: 16)
+--txpool.globalslots value   Maximum number of executable transaction slots for all accounts (default: 4096)
+--txpool.accountqueue value  Maximum number of non-executable transaction slots permitted per account (default: 64)
+--txpool.globalqueue value   Maximum number of non-executable transaction slots for all accounts (default: 1024)
+--txpool.lifetime value      Maximum amount of time non-executable transaction are queued (default: 3h0m0s)
+```
+
+For other minor changes in this release, see the [1.6.2 milestone](https://github.com/ethereum/go-ethereum/milestone/49?closed=1).
+
+**Binaries and mobile libraries are available on our [download page](https://geth.ethereum.org/downloads/).**",https://api.github.com/users/fjl,6915,fjl,https://api.github.com/repos/ethereum/go-ethereum/releases/6553048/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/6553048,release/1.6,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.6.2,https://github.com/ethereum/go-ethereum/releases/tag/v1.6.2,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.6.2,v1.6.2,False,False
+6276895,2017-05-04T11:11:45Z,2017-05-04T11:57:18Z,Deripors of Ohratuu (v1.6.1),"Geth 1.6.1 is mostly a bugfix release adding various polishes throughout the codebase.
+
+Highlights of the release are the capability to iterate over a contract's storage entries via the RPC; transitioning [Whisper to protocol v5](https://github.com/ethereum/go-ethereum/wiki/Whisper) along with bundled diagnostics tools; and shorthand connectivity to the Rinkeby test network.
+
+For a detailed rundown, please consult the [1.6.1 milestone](https://github.com/ethereum/go-ethereum/milestone/48?closed=1).
+
+### New features:
+
+ 
+ * `debug_storageRangeAt` RPC supports iterating over contract storage entries (https://github.com/ethereum/go-ethereum/pull/14350).
+ * Switch Whisper to protocol v5 (https://github.com/ethereum/go-ethereum/pull/14387), ship diagnostic tool (https://github.com/ethereum/go-ethereum/pull/14414).
+ * Add `--rinkeby` flag to quickly connect to the Rinkeby testnet (https://github.com/ethereum/go-ethereum/pull/14418).
+ * Support disabling USB hardware wallet lookups (https://github.com/ethereum/go-ethereum/pull/14357).
+ * GitHub faucet bot protection (https://github.com/ethereum/go-ethereum/pull/14339) and funding tiers (https://github.com/ethereum/go-ethereum/pull/14402).
+ * Add explicit SSH server key management for `puppeth` (https://github.com/ethereum/go-ethereum/pull/14398).
+ * `geth init` and `geth removedb` operate on both full and light chains (https://github.com/ethereum/go-ethereum/pull/14412).
+
+
+### Bugfixes and annoyances:
+
+ * Forbid leading zeroes in RPC block numbers (https://github.com/ethereum/go-ethereum/pull/13886).
+ * Friendly error if the user tries to reinit its chain with an incompatible genesis (https://github.com/ethereum/go-ethereum/pull/14358).
+ * Return `[]` instead of `null` when listing accounts but none can be found (https://github.com/ethereum/go-ethereum/pull/14374).
+ * When generating bootnode keys, print and exit, don't start up node (https://github.com/ethereum/go-ethereum/pull/14372).
+ * Make network IDs uniform uint64 everywhere (https://github.com/ethereum/go-ethereum/pull/14377).
+ * Fix data race in during native dapp node restarts (https://github.com/ethereum/go-ethereum/pull/14379).
+ * Support setting flags after sub-commands too (https://github.com/ethereum/go-ethereum/pull/14388, https://github.com/ethereum/go-ethereum/pull/14413).
+ * Fix `clique` miner ugly error log when starting a new network (https://github.com/ethereum/go-ethereum/pull/14411).
+
+**Binaries and mobile libraries are available on our [download page](https://geth.ethereum.org/downloads/).**",https://api.github.com/users/karalabe,129561,karalabe,https://api.github.com/repos/ethereum/go-ethereum/releases/6276895/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/6276895,release/1.6,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.6.1,https://github.com/ethereum/go-ethereum/releases/tag/v1.6.1,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.6.1,v1.6.1,False,False
+6081680,2017-04-14T10:07:07Z,2017-04-14T10:54:21Z,Puppeth Master (v1.6.0),"We are delighted to announce the first release in the 1.6 series! Below is a condensed version of everything we've been working on and you can also find a friendly write up [on our blog](https://blog.ethereum.org/2017/04/14/geth-1-6-puppeth-master/)!
+
+## Breaking Changes
+
+ * The `--fast` and `--light` flags are deprecated (**still usable**) in favor of `--syncmode=fast` and `--syncmode=light`.
+ * The default sync mode is `--syncmode=fast`, for full sync please use `--syncmode=full`.
+ * If `--datadir` is specified in conjunction with `--testnet`, it will no longer create a `testnet` folder within the given data directory, rather will use the one requested directly.
+
+## New Features
+
+* The 'clique' Proof of Authority consensus engine can be used for private networks (#3753).
+* The new `puppeth` command can be used to deploy private networks (#13854).
+* `geth --config` can be used to configure geth using a TOML file (#13875).
+* Swarm manifests can be mounted as a directory through FUSE (#3690, #13872).
+* Swarm manifests can be listed using the `swarm ls` command (#3742).
+* The `swarm` command accepts file uploads through stdin (#3744).
+* The `evm` command can disassemble contracts. This replaces the disasm command (#3729).
+* The `evm` command supports creation of contracts written in EVM assembly language (#3686)
+* For `geth --dev` chains, Ethereum protocol upgrades (Homestead, etc.) are enabled at block 0 (#3697).
+* The new `debug_getBadBlocks` RPC method returns recently seen 'bad blocks'.
+* The `geth bug` command can be used to open bug reports (#3684).
+* JS tracing can use `contract.caller`, `contract.address`, `contract.value`, `contract.calldata` to inspect the current call context (#14311).
+* `rlpdump` can stop decoding after the first value with the `--single` flag (#14320).
+
+## Removed Features
+
+* The `eth_compileSolidity` RPC method is removed (#3740). See ethereum/EIPs#209 for more information.
+* cmd/gethrpctest, cmd/ethtest are gone (#3705).
+* `geth upgradedb` is gone. It's no longer feasible to reimport all blocks given the length of the mainnet chain. (#3705)
+
+## Internal Improvements
+
+* Building go-ethereum now requires Go 1.7 or later (#3808). This enables use of the standard-library package ""context"", which is now used instead of ""golang.org/x/net/context"" (#3809).
+* go-ethereum has preliminary support for pluggable consensus engines. (#3817)
+* core/vm uses 64bit integers to represent the gas counter and memory size (#3674)
+* Fast sync auto-resumes after deep chain reorganisations (#3743)
+* Genesis block JSON handling is stricter and safer. Notably, most JSON fields now require the ""0x"" prefix. (#3794)
+* Log messages are enhanced with contextual, machine-readable information (#3696)
+* The `newHeads` subscription returns blocks hashes in addition to other header fields (#13868).
+* Package trie contains new union and difference iterators (#3637, #14312)
+* Package rlp supports the `rlp:""-""` struct tag to skip fields.
+* The new swarm/api/client package wraps the Swarm HTTP API (#3742).
+* `make devtools` installs commands required for `go generate`
+* Package core can be built without cgo (#3680, #3750).
+* Ethash verification caches are memory-mapped, improving startup time (#3750).
+* Contract calls made through Go bindings can use a custom sender address (#3782).
+* The gas price oracle is now less complicated (#13853).
+
+## Squashed Bugs
+
+* Hardware wallet support is improved. Ledger integration should now work on Windows and macOS. (#3681)
+* The `logsBloom` field is now set for pending blocks returned through RPC (#3717)
+* HTTP CORS check allows arbitrary other headers (#3783)
+* The light client answers RPC requests during sync (#3660).
+* Light client servers will no longer refuse to talk to other light client servers (#13889).
+* `geth --ethstats` plays nicer with some quirks of the ethstats server (#3812, #13856).
+* The current head is announced to peers when sync completes (#13883).
+* Transactions are accepted as soon as CPU mining starts. This fixes transaction inclusion issues for small private networks (#13882).
+* Discovery bootstrap nodes are used as a last-resort dial target (#13874).
+* cmd/swarm doesn't crash if `--ethapi` is empty or invalid (#3754).
+* The RPC server delivers all pending responses before closing the connection (#3814).
+
+**Binaries and mobile libraries are available on our [download page](https://geth.ethereum.org/downloads/)**.",https://api.github.com/users/karalabe,129561,karalabe,https://api.github.com/repos/ethereum/go-ethereum/releases/6081680/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/6081680,release/1.6,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.6.0,https://github.com/ethereum/go-ethereum/releases/tag/v1.6.0,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.6.0,v1.6.0,False,False
+5433399,2017-02-13T16:54:59Z,2017-02-13T17:30:50Z,Davy Jones' Locker (v1.5.9),"_""Roses are red, Violets are blue, Geth now supports Hardware wallets too!""_
+
+Geth v1.5.9 is a feature release working towards hardware and HD (hierarchical deterministic) wallets. The first step consists of support for the _Ledger Nano S_ and _Ledger Blue (USB only)_ HD hardware wallets (https://github.com/ethereum/go-ethereum/pull/3592), also laying the groundwork for supporting subsequent hardware and software HD wallets.
+
+Other notable changes:
+- Genesis JSON additions and polishes for black box testing https://github.com/ethereum/go-ethereum/pull/3635, https://github.com/ethereum/go-ethereum/pull/3656
+- Split off Android builds into Linux build jobs https://github.com/ethereum/go-ethereum/pull/3662
+- Swarm manifest manipulation commands https://github.com/ethereum/go-ethereum/pull/3645
+- Slim down versioned Alpine Docker images https://github.com/ethereum/go-ethereum/pull/3670
+
+Bugfixes:
+- Fix data race in transaction pool nonce retrieval https://github.com/ethereum/go-ethereum/pull/3625
+- Support swarm in-process restarts https://github.com/ethereum/go-ethereum/pull/3651
+- Fix `abigen` contract parsing for `solc` v1.4.8+ https://github.com/ethereum/go-ethereum/pull/3648
+- Fix shutdown issue for swarm running in a docker container https://github.com/ethereum/go-ethereum/pull/3649
+
+For a full rundown, please see the [v1.5.9 milestone](https://github.com/ethereum/go-ethereum/milestone/46?closed=1).
+
+**Binaries and mobile libraries are available on our [download page](https://geth.ethereum.org/downloads/)**.
+
+### Ledger ProTips
+- Signing EIP155 transactions requires at least v1.0.3 of the Ethereum app on the Ledger.
+  - You may sign non-EIP155 transactions using the `go-ethereum` library directly.
+- Contract interactions or deploys need to enable `Contract data` from the Ethereum app `Settings`.
+- `Browser support` needs to be turned off from the Ethereum app `Settings` (different protocol).
+- Windows support requires a USB driver (official Red Hat): https://github.com/daynix/UsbDk/releases
+  - May be bundled into our installer later, we're curious how well it holds up in the wild first.
+- Linux support might require [granting the user write access](http://support.ledgerwallet.com/knowledge_base/topics/ledger-wallet-is-not-recognized-on-linux) to the Ledger 
+- Accounts are automatically derived, searching for non zero balance or non zero nonce.
+  - First empty account is always listed (sending it funds will derive the next empty account).
+- Mist doesn't know about Ledger, if asked for a password, enter empty and confirm tx on device.
+- If in doubt, unplug and replug :P 
+
+### Go API changes
+
+_Just to emphasize, the section below is about the Go API (i.e. `go-ethereum` library) changes. The RPC did not incur any backwards incompatible changes. If you do find something, it's a bug, please report it._
+
+Until now the `go-ethereum` codebase assumed that accounts are equivalent to individual private keys stored on disk inside a keystore. To support hardware and HD wallets however, this invariant breaks, requiring a new API with different constructs and mechanisms. We've tried our best to introduce this new API in such a way that it's trivial to transition to it for anyone already using `go-ethereum` as a library from Go or Java/ObjC/Swift.
+
+The first breaking change is that while previously the `accounts.Manager` (or `AccountManager` on mobile) was a glorified keystore, now it changed its scope to handle `Wallet` objects, which may contain multiple accounts, as well as may be backed by different backends (keystore or hardware). The previous keystore is kept intact, just renamed to `Keystore` within the `keystore` package (arguably a better name and location). If you used the account manager in your own code, a simple swap to the keystore should more or less just work™.
+
+The other breaking change you need to be aware of is that while previously transaction signing in the keystore only required a hash of the transaction, the new code requires the entire transaction object. This is needed to support hardware wallets which require the transaction details for user confirmation UI elements.
+",https://api.github.com/users/karalabe,129561,karalabe,https://api.github.com/repos/ethereum/go-ethereum/releases/5433399/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/5433399,release/1.5,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.5.9,https://github.com/ethereum/go-ethereum/releases/tag/v1.5.9,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.5.9,v1.5.9,False,False
+5322493,2017-02-01T01:14:04Z,2017-02-01T11:03:58Z,Peachest (v1.5.8),"Geth v1.5.8 is a patch release to address bugs and annoyances. For a full rundown of the changes please see the [1.5.8 milestone](https://github.com/ethereum/go-ethereum/milestone/45?closed=1).
+
+Notable changes:
+- Gas estimation now does binary search to find the right amount of gas even in complex refund conditions where the required gas is higher that the final consumption. (#3587)
+- ECDSA signing uses a deterministic nonce. This change affects transaction signing. (#3561)
+- A new developer tool, `cmd/wnode`, allows testing the Whisper v5 protocol. (#3580)
+
+**Binaries and mobile libraries are available on our [download page](https://geth.ethereum.org/downloads/)**.
+",https://api.github.com/users/fjl,6915,fjl,https://api.github.com/repos/ethereum/go-ethereum/releases/5322493/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/5322493,release/1.5,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.5.8,https://github.com/ethereum/go-ethereum/releases/tag/v1.5.8,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.5.8,v1.5.8,False,False
+5168435,2017-01-16T09:57:02Z,2017-01-16T10:11:46Z,Peacher (v1.5.7),"This is a bug fix release that resolves several regressions related to hex handling in the RPC API.
+See the [1.5.7 milestone](https://github.com/ethereum/go-ethereum/milestone/44?closed=1) for more details.
+
+There are a few other changes in this release:
+- The geth console now uses web3.js v0.18.1 (#3545)
+- `--olympic` is gone (#3553)
+- A hang in the light client is resolved (#3568)
+
+As always, you can install/update via your favorite package manager, or download pre-built binaries from our downloads page at https://geth.ethereum.org/downloads/
+",https://api.github.com/users/fjl,6915,fjl,https://api.github.com/repos/ethereum/go-ethereum/releases/5168435/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/5168435,release/1.5,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.5.7,https://github.com/ethereum/go-ethereum/releases/tag/v1.5.7,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.5.7,v1.5.7,False,False
+5106993,2017-01-09T15:39:27Z,2017-01-09T18:57:28Z,Peach (v1.5.6),"Geth 1.5.6 - Peach (:peach:) is a refactor and clean up (plumping) release.
+
+This release also improves the EVMs call stack (#3378) and improves the overal EVM performance by 40% and is a pre-patch for the next 64bit gas counting PR. It will also allow for unmetered EVM calls for non-consensus critical execution (e.g. `eth_call`), however at this point this has not yet been integrated.
+
+### Feature(s)
+- Support for swarm CORS headers #3388
+
+### Bug fix(es)
+- Ropsten chain dump file import fix #3515
+- Allow zero priced txs #3454
+- RPC APIs no longer accept hex values without 0x prefix. #3475
+- Fixed hex handling for signing functions #3453
+- Enforce chain ancestry and fixed future block imports #3433 
+- `eth_compileSolidity` once again produces identical results for each compilation #3522 
+- Error reporting of the Swarm HTTP API is improved #3468 #3469 #3470
+
+### Go API Changes
+- `vm.Log` has moved to core/types to reduce dependencies of package ethclient. #3518
+- `types.SignECDSA` is now called `types.SignTx`. The `SignECDSA` method of `Transaction` has been removed. #3516
+- Go functions dealing with signatures now expect a V value of 0 or 1. `crypto.SignEthereum` and related APIs have been removed. You can convert the signature to ethereum format with a V value of 27 or 28 using  `sig[64] += 27`. #3455 
+- accounts/abi handles more Solidity types. #3403 #3464 #3533 
+
+**Binaries are available on our [download page](https://geth.ethereum.org/downloads/)**
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/5106993/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/5106993,release/1.5,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.5.6,https://github.com/ethereum/go-ethereum/releases/tag/v1.5.6,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.5.6,v1.5.6,False,False
+4917888,2016-12-14T14:06:54Z,2016-12-14T14:40:00Z,Doesn't look like anything to me (1.5.5),"Geth 1.5.5 is a patch release, mostly fixing bugs and annoyances.
+
+The brave soul/sole feature of the release is support for exporting the blockchain to- and importing it from gzipped data streams (#3427) too. This can be useful for private network development purposes to back up and restore snapshots of the chain and for debugging/testing purposes. You can do compressed export/import operation simply via specifying a chain output file name ending in `.gz`.
+
+The built in netstats client was fixed to report a few infos that were not sent to the netstats server in the previous release due to an oversight (#3370, #3373, #3390). This should help sort out the issues seen on the netstats page that certain charts had missing data in them. Further it adds support for historical data queries that are relevant mostly for private netstats servers with only Geth nodes reporting (#3425).
+
+A few data race issues were fixed in the transaction pool (#3412, #3429) that should help with some duplicate nonce allocations during heavy/parallel transaction publishes; and in the miner (#3431, #3430) that were harmless, just found and fixed. The tracking of mined but not yet conformed blocks was reworked to make it nicer and stabler (if by any chance you relied on these logs having a certain format, be advised that they have changed slightly).
+
+The release fixes a bug in the Windows installer that occasionally corrupted the `PATH` environment variable (#3419); and contains a batch of tweaks and fixes for the light client (#3413) and swarm (3421).
+
+As of 13th December, Canonical deprecated Ubuntu Wily and dropped support for building and distributing launchpad PPA packages for that version of their OS. As a result, we had to remove those PPA builds from out build service too (#3439). However, you can still download bundles binaries from our [downloads page](https://geth.ethereum.org/downloads/) which will work on any Linux distribution (based on libc).
+
+Beside the above, a handful of minor patches were also included in theis release. For a full rundown, please see the [1.5.5 milestone](https://github.com/ethereum/go-ethereum/milestone/42?closed=1)  page.
+
+Binaries are available on our [downloads page](https://geth.ethereum.org/downloads/).
+
+_PS: Honorable mention goes to Razvan, Viorel and Vlad of the Ethereum Cluj meetup for helping find 5 of the bugs fixed above and providing the motivation for 3 awesome features planned for the next release ;)_
+",https://api.github.com/users/karalabe,129561,karalabe,https://api.github.com/repos/ethereum/go-ethereum/releases/4917888/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/4917888,release/1.5,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.5.5,https://github.com/ethereum/go-ethereum/releases/tag/v1.5.5,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.5.5,v1.5.5,False,False
+4773468,2016-11-28T13:59:26Z,2016-11-28T15:06:45Z,Stat it (v1.5.4),"This release fixes minor bugs and adds exciting features.
+
+### New Features
+
+Geth now includes a built-in netstats reporter. Use `--ethstats ""<nodename>:<secret>@ethstats.net""` to get listed on ethstats.net. (#3336) **Assignment**: find secret Skype room with ethstats password :wink: 
+
+Network communication can now be restricted to a list of IP subnetworks. This feature is intended for private chains (and meetups!). For example, `geth --netrestrict 192.168.0.0/16` only allows connections in the commonly used LAN range. (#3325) 
+
+RPC filters can now filter logs in the pending block. (#3219)
+
+### Fixed Bugs
+- Two bugs in ethclient were squashed. (#3330, #3328)
+- go-ethereum should once again build with git 1.7 and later. (#3352)
+- For the full list of changes, [see the 1.5.4 milestone](https://github.com/ethereum/go-ethereum/milestone/41?closed=1).
+
+**Binaries are available on our [download page](https://geth.ethereum.org/downloads/)**
+
+### Note About Go API Freeze
+
+We originally planned to freeze the Go API of certain packages by the 1.5.4 release. We will delay the
+freeze by a couple of versions because we're still discovering edge cases as we continue to build
+libraries and apps on top of it.
+",https://api.github.com/users/fjl,6915,fjl,https://api.github.com/repos/ethereum/go-ethereum/releases/4773468/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/4773468,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.5.4,https://github.com/ethereum/go-ethereum/releases/tag/v1.5.4,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.5.4,v1.5.4,False,False
+4754961,2016-11-24T22:03:13Z,2016-11-24T23:04:41Z,Touch Revert (v1.5.3),"This release fixes the consensus failure that occurred at block 2686351.
+
+Geth was failing to revert empty account deletions when the transaction causing the
+deletions of empty accounts ended with an an out-of-gas exception. An additional issue
+was found in Parity, where the Parity client incorrectly failed to revert empty account
+deletions in a more limited set of contexts involving out-of-gas calls to precompiled
+contracts; the new Geth behaviour matches Parity's, and empty accounts will cease to be a
+source of concern in general in about one week once the state clearing process finishes.
+
+**Binaries are available on our [download page](https://geth.ethereum.org/downloads/)**
+
+## Ropsten Testnet
+
+With 1.5.3 `--testnet` now selects the Ropsten network. If you have a blockchain database
+for the Morden network, run `geth --testnet removedb` to remove it.
+",https://api.github.com/users/fjl,6915,fjl,https://api.github.com/repos/ethereum/go-ethereum/releases/4754961/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/4754961,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.5.3,https://github.com/ethereum/go-ethereum/releases/tag/v1.5.3,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.5.3,v1.5.3,False,False
+4701675,2016-11-18T11:01:54Z,2016-11-18T18:35:58Z,Cry uncle (v1.5.2),"This release fixes a regression that caused geth to fail to full sync past the previous (EIP150) hard fork at block number 2463000.
+- Fix a regression that caused the uncle on block 2463002 to be mistakenly determined to be invalid.
+
+### 1.5.1 Release notes
+
+This release fixes typo that set the EIP155 hard fork block to zero in --testnet mode.
+For other changes in this release, please see [the 1.5.1 milestone](https://github.com/ethereum/go-ethereum/pulls?q=is%3Apr+milestone%3A1.5.1+is%3Aclosed).
+
+### 1.5.0 Release notes
+
+Geth 1.5 contains about 8 months of work and includes many new features and fixes. The
+most prominent features include:
+- Ethereum hard fork No. 4 containing [EIP155](https://github.com/ethereum/EIPs/issues/155) (replay
+  protection), [EIP161](https://github.com/ethereum/EIPs/issues/161) (state clearing), and [EIP170](https://github.com/ethereum/EIPs/issues/170) (code size limit).
+- Improvements to the RPC API (see below)
+- Initial release of the stable Go API, iOS and Android support. APIs are released as a
+  preview and will receive more changes in the upcoming weeks. We expect to freeze certain
+  Go APIs in the 1.5.4 release.
+
+For a full rundown and a more detailed post about the changes please see the [Whoa ... Geth 1.5](https://blog.ethereum.org/2016/11/17/whoa-geth-1-5/).
+
+This release overhauls the build infrastructure. Release packages are now built on Travis,
+AppVeyor and CircleCI. Archives are available from [geth.ethereum.org](https://geth.ethereum.org)
+
+### Database Upgrade
+
+The 1.5.0 release changes the structure of the blockchain database. Geth will upgrade the database
+during normal operation, **but you cannot revert to the previous 1.4.x releases**. If you
+do want to revert, you'll need to keep a backup of the chaindata directory or resync.
+
+### Changes to the RPC API
+- **Breaking Change**: `eth_sign` prepends a known string to the input and hashes the
+  message on the server side. See [PR #2940](https://github.com/ethereum/go-ethereum/pull/2940) for more information.
+- We have also added `personal_sign` and `personal_recover`.
+- Block responses now include the `mixDigest`.
+- Transaction responses include `v`, `r` and `s` values.
+- In receipt responses, the `root` field is now prefixed with `0x`.
+- `personal_importRawKey` makes it possible to import an unencrypted private key via RPC.
+- `eth_getRawTransaction` returns the RLP encoding of a transaction.
+- `debug_traceTransaction` can filter the EVM through an arbitrary JavaScript map/reduce
+  function on the server side. [See documentation](https://github.com/ethereum/go-ethereum/wiki/Management-APIs#javascript-based-tracing) for more details.
+- You can subscribe to real time events when using the WebSocket and IPC
+  transports. [See Pub/Sub documentation](https://github.com/ethereum/go-ethereum/wiki/RPC-PUB-SUB) for more details.
+
+### Changes for Go Developers (and people building from git)
+- Go dependencies are now vendored using the `vendor/` directory. If you use Go 1.5 or Go 1.6, you
+  need to set `GO15VENDOREXPERIMENT=1` in your environment.
+- The `develop` branch is deprecated. All development will happen on the `master` branch.
+  This makes it easier for you to get the latest changes. We will continue to keep the
+  develop branch in sync with master for one more month to ease the transition.
+- If you want to stick to stable releases only, please use the `release/1.5` branch.
+- Releases will happen more frequently (promise).
+
+### Experimental Features
+
+Note that these features are highly experimental. Expect bugs and breakage while we
+stabilise them over the next couple of releases.
+- Geth can now run in light client mode with the `--light` flag. Light client mode syncs
+  recent block headers and fetches state values on demand. Note that very few light client
+  servers are available yet. You too can be a server using the `--lightserv` flag.
+- The Swarm daemon (`bzzd`) and associated helper tools are included and somewhat
+  functional.
+- Whisper v5 PoC code is included in the repository, but not enabled yet.
+- You can now use go-ethereum as a library in Android (Java) and iOS (ObjC/Swift)
+  projects. `abigen` has gained preliminary support for creating Java bindings to Ethereum
+  contracts.
+
+Please report any issues you encounter.
+
+You can find GPG-signed binaries for all supported platforms on https://geth.ethereum.org/downloads.
+",https://api.github.com/users/fjl,6915,fjl,https://api.github.com/repos/ethereum/go-ethereum/releases/4701675/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/4701675,release/1.5,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.5.2,https://github.com/ethereum/go-ethereum/releases/tag/v1.5.2,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.5.2,v1.5.2,False,False
+4687207,2016-11-16T12:10:03Z,2016-11-17T13:57:49Z,Let There Be Less Typos (v1.5.1),"This release fixes typo that set the EIP155 hard fork block to zero in --testnet mode.
+For other changes in this release, please see [the 1.5.1 milestone](https://github.com/ethereum/go-ethereum/pulls?q=is%3Apr+milestone%3A1.5.1+is%3Aclosed).
+
+### 1.5.0 Release notes
+
+Geth 1.5 contains about 8 months of work and includes many new features and fixes. The
+most prominent features include:
+- Ethereum hard fork No. 4 containing [EIP155](https://github.com/ethereum/EIPs/issues/155) (replay
+  protection), [EIP161](https://github.com/ethereum/EIPs/issues/161) (state clearing), and [EIP170](https://github.com/ethereum/EIPs/issues/170) (code size limit).
+- Improvements to the RPC API (see below)
+- Initial release of the stable Go API, iOS and Android support. APIs are released as a
+  preview and will receive more changes in the upcoming weeks. We expect to freeze certain
+  Go APIs in the 1.5.4 release.
+
+For a full rundown and a more detailed post about the changes please see the [Whoa ... Geth 1.5](https://blog.ethereum.org/2016/11/17/whoa-geth-1-5/).
+
+This release overhauls the build infrastructure. Release packages are now built on Travis,
+AppVeyor and CircleCI. Archives are available from [geth.ethereum.org](https://geth.ethereum.org)
+
+### Database Upgrade
+
+The 1.5.0 release changes the structure of the blockchain database. Geth will upgrade the database
+during normal operation, **but you cannot revert to the previous 1.4.x releases**. If you
+do want to revert, you'll need to keep a backup of the chaindata directory or resync.
+
+### Changes to the RPC API
+- **Breaking Change**: `eth_sign` prepends a known string to the input and hashes the
+  message on the server side. See [PR #2940](https://github.com/ethereum/go-ethereum/pull/2940) for more information.
+- We have also added `personal_sign` and `personal_recover`.
+- Block responses now include the `mixDigest`.
+- Transaction responses include `v`, `r` and `s` values.
+- In receipt responses, the `root` field is now prefixed with `0x`.
+- `personal_importRawKey` makes it possible to import an unencrypted private key via RPC.
+- `eth_getRawTransaction` returns the RLP encoding of a transaction.
+- `debug_traceTransaction` can filter the EVM through an arbitrary JavaScript map/reduce
+  function on the server side. [See documentation](https://github.com/ethereum/go-ethereum/wiki/Management-APIs#javascript-based-tracing) for more details.
+- You can subscribe to real time events when using the WebSocket and IPC
+  transports. [See Pub/Sub documentation](https://github.com/ethereum/go-ethereum/wiki/RPC-PUB-SUB) for more details.
+
+### Changes for Go Developers (and people building from git)
+- Go dependencies are now vendored using the `vendor/` directory. If you use Go 1.5 or Go 1.6, you
+  need to set `GO15VENDOREXPERIMENT=1` in your environment.
+- The `develop` branch is deprecated. All development will happen on the `master` branch.
+  This makes it easier for you to get the latest changes. We will continue to keep the
+  develop branch in sync with master for one more month to ease the transition.
+- If you want to stick to stable releases only, please use the `release/1.5` branch.
+- Releases will happen more frequently (promise).
+
+### Experimental Features
+
+Note that these features are highly experimental. Expect bugs and breakage while we
+stabilise them over the next couple of releases.
+- Geth can now run in light client mode with the `--light` flag. Light client mode syncs
+  recent block headers and fetches state values on demand. Note that very few light client
+  servers are available yet. You too can be a server using the `--lightserv` flag.
+- The Swarm daemon (`bzzd`) and associated helper tools are included and somewhat
+  functional.
+- Whisper v5 PoC code is included in the repository, but not enabled yet.
+- You can now use go-ethereum as a library in Android (Java) and iOS (ObjC/Swift)
+  projects. `abigen` has gained preliminary support for creating Java bindings to Ethereum
+  contracts.
+
+Please report any issues you encounter.
+
+You can find GPG-signed binaries for all supported platforms on https://geth.ethereum.org/downloads.
+",https://api.github.com/users/fjl,6915,fjl,https://api.github.com/repos/ethereum/go-ethereum/releases/4687207/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/4687207,release/1.5,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.5.1,https://github.com/ethereum/go-ethereum/releases/tag/v1.5.1,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.5.1,v1.5.1,False,False
+4663338,2016-11-15T13:29:33Z,2016-11-15T13:55:45Z,Let There Be Light (v1.5.0),"Geth 1.5 contains about 8 months of work and includes many new features and fixes. The
+most prominent features include:
+- Ethereum hard fork No. 4 containing [EIP155](https://github.com/ethereum/EIPs/issues/155) (replay
+  protection), [EIP161](https://github.com/ethereum/EIPs/issues/161) (state clearing), and [EIP170](https://github.com/ethereum/EIPs/issues/170) (code size limit).
+- Improvements to the RPC API (see below)
+- Initial release of the stable Go API, iOS and Android support. APIs are released as a
+  preview and will receive more changes in the upcoming weeks. We expect to freeze certain
+  Go APIs in the 1.5.4 release.
+
+For a full rundown and a more detailed post about the changes please see the [Whoa ... Geth 1.5](https://blog.ethereum.org/2016/11/17/whoa-geth-1-5/).
+
+This release overhauls the build infrastructure. Release packages are now built on Travis,
+AppVeyor and CircleCI. Archives are available from [geth.ethereum.org](https://geth.ethereum.org)
+
+### Database Upgrade
+
+The 1.5.0 release changes the structure of the blockchain database. Geth will upgrade the database
+during normal operation, **but you cannot revert to the previous 1.4.x releases**. If you
+do want to revert, you'll need to keep a backup of the chaindata directory or resync.
+
+### Changes to the RPC API
+- **Breaking Change**: `eth_sign` prepends a known string to the input and hashes the
+  message on the server side. See [PR #2940](https://github.com/ethereum/go-ethereum/pull/2940) for more information.
+- We have also added `personal_sign` and `personal_recover`.
+- Block responses now include the `mixDigest`.
+- Transaction responses include `v`, `r` and `s` values.
+- In receipt responses, the `root` field is now prefixed with `0x`.
+- `personal_importRawKey` makes it possible to import an unencrypted private key via RPC.
+- `eth_getRawTransaction` returns the RLP encoding of a transaction.
+- `debug_traceTransaction` can filter the EVM through an arbitrary JavaScript map/reduce
+  function on the server side. [See documentation](https://github.com/ethereum/go-ethereum/wiki/Management-APIs#javascript-based-tracing) for more details.
+- You can subscribe to real time events when using the WebSocket and IPC
+  transports. [See Pub/Sub documentation](https://github.com/ethereum/go-ethereum/wiki/RPC-PUB-SUB) for more details.
+
+### Changes for Go Developers (and people building from git)
+- Go dependencies are now vendored using the `vendor/` directory. If you use Go 1.5 or Go 1.6, you
+  need to set `GO15VENDOREXPERIMENT=1` in your environment.
+- The `develop` branch is deprecated. All development will happen on the `master` branch.
+  This makes it easier for you to get the latest changes. We will continue to keep the
+  develop branch in sync with master for one more month to ease the transition.
+- If you want to stick to stable releases only, please use the `release/1.5` branch.
+- Releases will happen more frequently (promise).
+
+### Experimental Features
+
+Note that these features are highly experimental. Expect bugs and breakage while we
+stabilise them over the next couple of releases.
+- Geth can now run in light client mode with the `--light` flag. Light client mode syncs
+  recent block headers and fetches state values on demand. Note that very few light client
+  servers are available yet. You too can be a server using the `--lightserv` flag.
+- The Swarm daemon (`bzzd`) and associated helper tools are included and somewhat
+  functional.
+- Whisper v5 PoC code is included in the repository, but not enabled yet.
+- You can now use go-ethereum as a library in Android (Java) and iOS (ObjC/Swift)
+  projects. `abigen` has gained preliminary support for creating Java bindings to Ethereum
+  contracts.
+
+Please report any issues you encounter.
+
+You can find GPG-signed binaries for all supported platforms on https://geth.ethereum.org/downloads.
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/4663338/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/4663338,release/1.5,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.5.0,https://github.com/ethereum/go-ethereum/releases/tag/v1.5.0,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.5.0,v1.5.0,False,False
+4662903,2016-11-15T12:46:47Z,2016-11-15T13:47:47Z,Garbage Man (v1.4.19),"Geth 1.4.19 contains only the Ethereum hard fork No. 4 which includes [EIP#155](https://github.com/ethereum/EIPs/issues/155) (replay
+  protection), [EIP#161](https://github.com/ethereum/EIPs/issues/161) (state clearing), and [EIP#170](https://github.com/ethereum/EIPs/issues/170) (code size limit).
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/4662903/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/4662903,release/1.4,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.19,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.19,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.19,v1.4.19,False,False
+4397063,2016-10-15T11:00:43Z,2016-10-15T11:17:15Z,Note 7 (v1.4.18),"This is release Note 7 :boom: and includes the [EIP150 1b/1c Hardfork](https://github.com/ethereum/EIPs/issues/150) and a few fixes:
+- Import reporter improvement https://github.com/ethereum/go-ethereum/pull/3120
+- Trie memory fix https://github.com/ethereum/go-ethereum/pull/3135
+- Expvar debug flag https://github.com/ethereum/go-ethereum/pull/3136
+- Transaction pool soft limitations https://github.com/ethereum/go-ethereum/pull/3138
+
+**Note for users running geth on the Ethereum Classic network (--oppose-dao-fork):**
+
+The EIP150 transition is programmed to occur at block 2463000 whether or not --oppose-dao-fork is used.
+If you use this option please migrate to the geth client maintained by Ethereum Classic developers.
+
+---
+
+``` text
+geth-darwin-amd64-1.4.18-ef9265d0.tar.gz
+sha256: 6325050cb382f4543863d88e2abd6609e9c2ebfe34a2c2915fb9ef5a5367d04b
+```
+
+``` text
+geth-linux-amd64-1.4.18-ef9265d0.tar.gz
+sha256: efbace0ef748974becd563803b518965f1567de55b51a444d54a619ed3dae612
+```
+
+``` text
+geth-windows-amd64-1.4.18-ef9265d0.zip
+sha256: d26dd020c7c2a3bbae9e9cdfb278a24d2e840be3910c88b87e7a04fb46fa7bf1
+```
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/4397063/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/4397063,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.18,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.18,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.18,v1.4.18,False,False
+4349406,2016-10-10T14:19:05Z,2016-10-10T15:31:10Z,Poolaid (v1.4.17),"![pool-aid](https://cloud.githubusercontent.com/assets/6915/19241407/d483dcae-8f0e-11e6-9980-607e2a33c5f9.gif)
+
+This release limits the number of transactions per-user and globally so as to limit maximum memory consumption and egress network traffic.
+
+``` text
+geth-darwin-amd64-1.4.17-5a6008e0.tar.gz
+sha256: c2c815c2d5175ede115f3740f6e37b55e8c81b93496c3d73bdfb922b6a5c5d07
+```
+
+``` text
+geth-linux-amd64-1.4.17-5a6008e0.tar.gz
+sha256: 10a3f1ff357d3d6c566b4557df242a28169d1431f19b6505ac1e06c540bfadfd
+```
+
+``` text
+geth-windows-amd64-1.4.17-5a6008e0.zip
+sha256: da230058e6d11436179576ed30a9512eda82d9715c0c1ff13a2e0ab13fee158c
+```
+",https://api.github.com/users/fjl,6915,fjl,https://api.github.com/repos/ethereum/go-ethereum/releases/4349406/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/4349406,release/1.4,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.17,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.17,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.17,v1.4.17,False,False
+4323724,2016-10-06T14:25:17Z,2016-10-06T14:57:38Z,Dear Diary (v1.4.16),"This release improves block processing performance to work around recent DoS attacks. It also disables the --jitvm A/B test which previously enabled the experimental JIT VM for 10% of geth users.
+
+The DoS issue that began affecting the network two days ago has been remediated by adding state journalling to Geth. Journalling means that we no longer need to copy a transaction's state when a call is made; this is the root cause of many of the recently identified issues. Journalling, along with other recent improvements in response to other attacks, should also make Geth significantly faster at importing transactions.
+",https://api.github.com/users/fjl,6915,fjl,https://api.github.com/repos/ethereum/go-ethereum/releases/4323724/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/4323724,release/1.4,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.16,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.16,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.16,v1.4.16,False,False
+4286586,2016-10-03T08:55:41Z,2016-10-03T09:10:20Z,Come at me Bro (1.4.15),"Geth 1.4.15 is a hotfix release to address two DoS attack vectors abused on the mainnet:
+- Wasted CPU resources by abusing the EVMs JUMPDEST cache's key generation.
+- Huge memory and CPU consumption by abusing quadratic contract state dirty tracking.
+
+Please update ASAP. Further optimizations will most probably follow as we comb the code for bottlenecks.
+",https://api.github.com/users/karalabe,129561,karalabe,https://api.github.com/repos/ethereum/go-ethereum/releases/4286586/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/4286586,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.15,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.15,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.15,v1.4.15,False,False
+4249873,2016-09-28T10:40:44Z,2016-09-28T10:45:51Z,What else should we rewrite? (1.4.14),"This is a Geth pre-release to counter the network DoS attacks from yesterday and those detected today. It is a prerelease (to help people get back on track fast) with further updates coming soon. As always, please keep an eye on your nodes while using as it features a new bleeding edge caching mechanism.
+
+Note, initial attack blocks may process slower as cold data is loaded from the disk, but the longer Geth runs the less impact such transactions should have.
+
+_Being a pre-release, we won't land this code just yet in the `master` branch, also inherently meaning we won't be providing stable binaries from the usual channels (brew, ppa, chocolatey), however cross builds are available for testing below. Mist builds containing the pre-release will also be available._
+
+---
+
+:nut_and_bolt: [[xgo](https://github.com/karalabe/xgo) build bot] Published [geth 1.4.14-prerelease (f88bca7)](https://bintray.com/karalabe/ethereum/geth/1.4.14-prerelease-f88bca7/view) - **release/1.4** branch
+
+| Package | Size | SHA1 Checksum |
+| --- | :-: | --- |
+| [geth-1.4.14-prerelease-f88bca7-android-21.aar.tar.bz2](https://bintray.com/artifact/download/karalabe/ethereum/geth-1.4.14-prerelease-f88bca7-android-21.aar.tar.bz2) | 22M | `a033fae9dd7c301d1e413de1fbef10337cb4f73e` |
+| [geth-1.4.14-prerelease-f88bca7-darwin-10.6-amd64.tar.bz2](https://bintray.com/artifact/download/karalabe/ethereum/geth-1.4.14-prerelease-f88bca7-darwin-10.6-amd64.tar.bz2) | 5.3M | `5cf7d9afe89c74f5d635c2f9d7ff6b41e2ab1b17` |
+| [geth-1.4.14-prerelease-f88bca7-ios-7.0-framework.tar.bz2](https://bintray.com/artifact/download/karalabe/ethereum/geth-1.4.14-prerelease-f88bca7-ios-7.0-framework.tar.bz2) | 20M | `bf714d97fb533a3dfb751cb2b433a07a6f805b4c` |
+| [geth-1.4.14-prerelease-f88bca7-linux-386.tar.bz2](https://bintray.com/artifact/download/karalabe/ethereum/geth-1.4.14-prerelease-f88bca7-linux-386.tar.bz2) | 6.3M | `81a97b37c7beb938015f52d00c966de1c1397239` |
+| [geth-1.4.14-prerelease-f88bca7-linux-amd64.tar.bz2](https://bintray.com/artifact/download/karalabe/ethereum/geth-1.4.14-prerelease-f88bca7-linux-amd64.tar.bz2) | 6.5M | `26022ac82c7974359c90f6108cc3ba1f1803a22d` |
+| [geth-1.4.14-prerelease-f88bca7-linux-arm-5.tar.bz2](https://bintray.com/artifact/download/karalabe/ethereum/geth-1.4.14-prerelease-f88bca7-linux-arm-5.tar.bz2) | 6.0M | `fb5e18aef2bc309fe2d8102d4c13ec62dc3975a6` |
+| [geth-1.4.14-prerelease-f88bca7-linux-arm-6.tar.bz2](https://bintray.com/artifact/download/karalabe/ethereum/geth-1.4.14-prerelease-f88bca7-linux-arm-6.tar.bz2) | 6.0M | `08b33e0608debfd865959b17c7e01b43fab05a8f` |
+| [geth-1.4.14-prerelease-f88bca7-linux-arm-7.tar.bz2](https://bintray.com/artifact/download/karalabe/ethereum/geth-1.4.14-prerelease-f88bca7-linux-arm-7.tar.bz2) | 6.0M | `8a7c801c5eefd66ee8602226cb0e54193dd37ccc` |
+| [geth-1.4.14-prerelease-f88bca7-linux-arm64.tar.bz2](https://bintray.com/artifact/download/karalabe/ethereum/geth-1.4.14-prerelease-f88bca7-linux-arm64.tar.bz2) | 6.0M | `b6bd9ae9965d5dd5b007f660145f2812b0213bde` |
+| [geth-1.4.14-prerelease-f88bca7-linux-mips64.tar.bz2](https://bintray.com/artifact/download/karalabe/ethereum/geth-1.4.14-prerelease-f88bca7-linux-mips64.tar.bz2) | 5.7M | `f44d08e7f50d11c25983d699be490161f26cf743` |
+| [geth-1.4.14-prerelease-f88bca7-linux-mips64le.tar.bz2](https://bintray.com/artifact/download/karalabe/ethereum/geth-1.4.14-prerelease-f88bca7-linux-mips64le.tar.bz2) | 5.8M | `f62bbfc22c126e99a55b28153d17e746d39f035c` |
+| [geth-1.4.14-prerelease-f88bca7-windows-4.0-386.exe.zip](https://bintray.com/artifact/download/karalabe/ethereum/geth-1.4.14-prerelease-f88bca7-windows-4.0-386.exe.zip) | 5.6M | `817435ad820663371cad23473f1cf7c9c5a6d1d7` |
+| [geth-1.4.14-prerelease-f88bca7-windows-4.0-amd64.exe.zip](https://bintray.com/artifact/download/karalabe/ethereum/geth-1.4.14-prerelease-f88bca7-windows-4.0-amd64.exe.zip) | 5.7M | `99a7354471ae8974a66184ab5ad34a96330598d2` |
+
+_Disclaimer: All of these binaries have been cross-compiled from Linux. Their primary goal is to provide access to unsupported or experimental platforms. We cannot guarantee that a cross compiler will produce the same performing code as a native build will. For any issues found, please contact [@karalabe](https://github.com/karalabe)._
+",https://api.github.com/users/karalabe,129561,karalabe,https://api.github.com/repos/ethereum/go-ethereum/releases/4249873/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/4249873,release/1.4,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.14,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.14,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.14,v1.4.14,False,True
+4228218,2016-09-26T09:40:58Z,2016-09-26T09:47:59Z,Into the Woods (1.4.13),"This patch is a hotfix release to mitigate last weeks DoS attacks, and those ongoing currently against Geth nodes in the network.
+
+This patch should still be considered bleeding-edge. We advise exchanges and other users running business-critical applications that intend to run this release to simultaneously run a different client node and trigger a circuit breaker in case there is another DoS vulnerability or consensus failure. Users should continue to be on the alert for new patches and attacks against the network. Once enough nodes run the patch and the situation sufficiently stabilizes we will advise miners to slowly raise the gas limit.
+
+There will be an additional patch created over the next several weeks to implement some more permanent fixes including cache journaling and cache-miss mitigation.
+",https://api.github.com/users/karalabe,129561,karalabe,https://api.github.com/repos/ethereum/go-ethereum/releases/4228218/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/4228218,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.13,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.13,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.13,v1.4.13,False,False
+4164451,2016-09-19T01:28:08Z,2016-09-19T01:30:55Z,"From Shanghai, with love (1.4.12)","Hotfix release for a network DOS attack! Please update ASAP.
+",https://api.github.com/users/karalabe,129561,karalabe,https://api.github.com/repos/ethereum/go-ethereum/releases/4164451/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/4164451,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.12,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.12,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.12,v1.4.12,False,False
+3916771,2016-08-18T15:31:35Z,2016-08-18T17:23:55Z,Minor Text Fixes (1.4.11),"This release fixes the following issues:
+- Preparing for a new build system #2726 #2896
+- Fixes concurrent map access in filtering #2711
+- Cancel DAO challenge on peer drop #2833 
+- Removed eth/61 protocol #2842
+- Downloader improvements #2855 #2861 #2867 #2868 #2866 
+- Removed ECRECOVER log message #2892
+- Added support for MIPS64 #2682
+- Fixed a temporal anomaly in the blockchain when inserting blocks #2873
+- Minor text fixes..[.](http://knowyourmeme.com/memes/pokemon-go-updates-controversy) 
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/3916771/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/3916771,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.11,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.11,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.11,v1.4.11,False,False
+3673270,2016-07-16T15:52:56Z,2016-07-16T16:31:59Z,Return of the ETH (1.4.10),"**Looking for the latest Ethereum Wallet/Mist? See [here](https://github.com/ethereum/mist/releases/latest)**
+
+Geth 1.4.10 ""Return of the ETH"" is the `go-ethereum` team's DAO hard-fork implementation. It enables anyone to choose whether they would like to support the DAO hard-fork or oppose it, and take them to their blockchain of choice.
+- To **support** the DAO hard-fork, start Geth with `--support-dao-fork`
+- To **oppose** the DAO hard-fork, start Geth with `--oppose-dao-fork`
+
+On startup (on the main network) Geth will print the currently configured choice, which you can freely change with the appropriate flag at any time. If neither of the above flags is specified, the previous configuration is used. **If no fork choice was ever provided, Geth will default to supporting the fork [per the majority vote](http://carbonvote.com/).**
+
+_Please note, fast sync and light clients do not verify state transitions, only perform header validations and PoW checks. As such, a fork unaware client (i.e. non-updated one) will always fast-sync to the longest chain, as it doesn't have the necessary information on what to look for in the headers. Even if you oppose the fork, please update so your client knows what chain to avoid._
+
+References:
+- Hard fork spec: https://blog.slock.it/hard-fork-specification-24b889e70703#.cumx78uqu
+- Implementation details: https://github.com/ethereum/go-ethereum/pull/2814
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/3673270/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/3673270,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.10,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.10,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.10,v1.4.10,False,False
+3548861,2016-06-29T12:42:21Z,2016-06-29T14:03:51Z,The network strikes back (1.4.9),"Geth 1.4.9 is a reversal release to undo the code changes that went into the 1.4.8 ""DAO Wars"" soft-fork release, as the soft-fork was deemed too vulnerable to DOS attacks, opening up the entire Ethereum network to resource abuse by malicious users.
+
+Most importantly, this release reverts a data race introduced by the rushed soft-fork that can lead to miners crashing if they are running transactions simultaneously with importing blocks from the network. Thank you @9600- for finding this!
+
+Additionally, the previously release's soft-fork code required a non-insignificant performance impact even when the soft-fork is not enacted, making this current release at the same time a minor performance boost compared to 1.4.8.
+",https://api.github.com/users/karalabe,129561,karalabe,https://api.github.com/repos/ethereum/go-ethereum/releases/3548861/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/3548861,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.9,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.9,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.9,v1.4.9,False,False
+3516508,2016-06-24T15:17:12Z,2016-06-29T09:22:15Z,DAO Wars (1.4.8),"**This release should be considered nuked. The soft-fork turned out to violate a system invariant leading to potential DOS attack vectors, and the rushed code contains a data race that can sometime lead to miner crashes. Please either use 1.4.7 or 1.4.9 instead (they are equivalent).**
+
+---
+
+Version 1.4.8 is a small patch release to give the community a voice to decide whether to **temporarily** freeze TheDAOs v1.0 from releasing funds or not. If the community decides to freeze the funds, only a few whitelisted accounts can retrieve the blocked funds and return them to previous owners.
+
+_Note: If the soft-fork passes, it will block all DAOs from releasing funds, not just the ones the community considers attacked. This is understandably undesired for all legitimately split DAOs. As such – if the community votes to enact the soft-fork – we propose a follow up patch to the soft-fork that will whitelist all DAOs split according to the intent upheld by the enacted soft-fork._
+
+### How to use this release?
+
+Miners supporting the DAO soft-fork can do so by starting Geth with `--dao-soft-fork`. This will cause the block gas limits to be lowered towards Pi million until the deciding block `1800000` (approx. 6 days from now) is reached. If the gas limit of this block is below or equal 4M, the soft-fork goes into effect and (all updating) miners will start blocking DAO transactions that release funds.
+
+Miners not supporting the DAO soft-fork can run Geth normally without any extra arguments needed. They will try to keep the block gas limits at the current 4.7 million. If the gas limit of the decisive block will be above 4M, the soft-fork is denied and (all updating) miners will accept DAO transactions that release funds.
+
+_Note: All updating clients will agree upon the outcome of the vote and will adhere to that decision. If the soft-fork vote passes, miners voting against it will start blocking transactions too; whereas if the soft-fork is denied, miners voting for it will also accept all transactions._
+
+### What if I don't update?
+
+Miners who do not update by definition vote against the soft-fork as they will continue the current logic of keeping the gas limit above the vote threshold. If the soft-fork is accepted by the majority, non-updating miners will still accept blocked transactions. In that case, non-updating miners will either fork off their own Ethereum network, diverging from the majority, or will forfeit any blocks they mined (since it's not accepted by the majority, overruling the minority blocks).
+
+### Should non-miners (nodes, wallets, mist, etc) update?
+
+From the perspective of non-miners, this update has little relevance. Either outcome of the vote is equally valid from a plain node's perspective, so plain nodes will accept the heavier chain miners decide on without having to know anything about the soft-fork mechanism or results.
+
+### Epilogue
+
+This release implements a **soft-fork**. A soft-fork is perfectly compatible with all protocol rules and requires only the consensus of the majority of miners to enact. It is temporary and can be removed/amended at any point in time upon miner consensus. It does not break protocol rules; it does not roll back any executed transactions/blocks; and it does not change any blockchain state outside of the original protocol capabilities.
+
+_Note: This release does not represent a consent to hard-fork the network. It is a means to give people more time to come up with the best solution._
+",https://api.github.com/users/karalabe,129561,karalabe,https://api.github.com/repos/ethereum/go-ethereum/releases/3516508/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/3516508,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.8,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.8,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.8,v1.4.8,False,False
+3447138,2016-06-15T09:33:33Z,2016-06-15T10:37:43Z,Colourise (1.4.7),"Version 1.4.7 is a tiny patch release mainly to address a Windows console colour issue and to fix a few miscellaneous annoyances.
+- Fix Windows console colour output https://github.com/ethereum/go-ethereum/pull/2669
+- Fix console to not choke on parentheses in strings https://github.com/ethereum/go-ethereum/pull/2670
+- Work around some CI and build server issues https://github.com/ethereum/go-ethereum/pull/2671 and https://github.com/ethereum/go-ethereum/pull/2687
+- Fix typo in the `geth account` subcommand help https://github.com/ethereum/go-ethereum/pull/2673
+- Update the CLI package dependencies https://github.com/ethereum/go-ethereum/pull/2677 and https://github.com/ethereum/go-ethereum/pull/2681
+- Fix ABI number encoding issues for native Dapps https://github.com/ethereum/go-ethereum/pull/2653 and https://github.com/ethereum/go-ethereum/pull/2680
+- Fix EVM debug traces for same-block contract suicides https://github.com/ethereum/go-ethereum/pull/2686
+- Extend `evm` utility tool with contract creation support https://github.com/ethereum/go-ethereum/pull/2693
+- Fix whitespace typos during chain import/export https://github.com/ethereum/go-ethereum/pull/2697
+",https://api.github.com/users/karalabe,129561,karalabe,https://api.github.com/repos/ethereum/go-ethereum/releases/3447138/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/3447138,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.7,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.7,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.7,v1.4.7,False,False
+3379270,2016-06-06T14:22:55Z,2016-06-06T15:58:12Z,EDGE (1.4.6),"As Ethereum got more popular, the peer-to-peer networking infrastructure became extremely versatile (we have 3G peers in New Zealand and Satellite peers in the US). Certain assumptions that Geth made about the network when we've launched became untrue in the last months, especially with TheDAO bringing in an unexpected number of new users and environments. In this newly expanded network, the original assumptions caused Geth to be too aggressive with which peers are useful and which are not.
+
+Geth 1.4.6 ""EDGE"" aims to solve the synchronization issues resulting from this newly found heterogeneity: it introduces a lot more download concurrency to avoid bottlenecks caused by badly connected remote machines, and also introduces adaptive quality-of-service tuning to make peer selection less aggressive for users with more restricted connectivity.
+
+The result is a newly polished sync mechanism that can churn out a 7-8MB/s download speed in the current Ethereum main network (if your connectivity allows it), but also provide a solid and stable stream for all users, verified for as low as [**EDGE**](https://en.wikipedia.org/wiki/Enhanced_Data_Rates_for_GSM_Evolution) connections (440ms latency, 200 kbps upstream, 220kbps downstream).
+
+We'd like to shout out a big thanks to @ellis2323 for the tireless benchmarking and re-benchmarking of our polishes on high end machines and connectivity (reaching 3 hours full sync times and 20 minutes fast sync times) as well as to @JasonCoombs for verifying connectivity and sync stability on extremely high latency satellite links.
+
+A breakdown of the sync changes:
+- Concurrent header retrievals to prevent sync bottlenecks #2315 
+- Disable transaction processing during initial sync cycle #2574, #2649
+- Download state trie concurrently with blockchain during fast sync #2627
+- Adaptive quality of service tuning for restricted connectivity #2630 
+- Fast-sync critical-section download failure resiliency #2647
+- Enterprise grade hand-tuned multi-level heuristic smart caching :trollface: #2585
+
+Polishes and bugfixes:
+- Refactor JavaScript console for external library reuse #2535, #2656
+- Re-enable bad block reporting to track any strange activity #2614
+- Fix a transaction pool data-race for extreme tests #2655
+- Fix eth_getTransactionCount on the testnet for non existent accounts #2626
+- Fix compiler path and listing for Solidity compilation #2613, #2612
+- Fix an extremely rare downloader hang after a successful sync  #2637
+- Fix a CI server `go vet` annoyance with mutex copying #2580
+",https://api.github.com/users/karalabe,129561,karalabe,https://api.github.com/repos/ethereum/go-ethereum/releases/3379270/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/3379270,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.6,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.6,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.6,v1.4.6,False,False
+3290506,2016-05-24T08:31:56Z,2016-05-24T09:39:20Z,drop table users (1.4.5),"This is a bug fix release and includes the following changes:
+- Fixed `eth_estimateGas` for non-contract accounts #2589
+- Fixed `eth_signTransaction` to return the signed transaction #2578 
+- Fixed `nil` pointer crash for topics #2585
+- Excluded all `personal` namespace from history #2567
+- Added new `personal_signAndSendTransaction` method to the RPC #2564
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/3290506/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/3290506,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.5,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.5,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.5,v1.4.5,False,False
+3218905,2016-05-17T12:59:51Z,2016-05-17T15:32:39Z,Gethasaurus (1.4.4),"Credit for the release name goes to @sjalq. ([See gitter discussion](https://gitter.im/ethereum/go-ethereum?at=573604f964dbdadc7debd4e4))
+
+**Security fixes**
+
+eth protocol vulnerabilities have been discovered by bounty hunters.
+We'll give out more details at a later time along with the full report that we have received.
+- Fixed: DoS attack vector in the block downloader
+- Fixed: theoretical (but impractical) method of increasing the local minimum block difficulty
+
+This release also fixes a couple of bugs:
+- Fixed: crash when assigning `--rpcaddr` #2555 (#2563)
+- Fixed: panic in the `abigen` tool #2519 (#2559 #2551)
+- Fixed: WebSocket HTTP origin (#2539)
+- Skip transaction processing during fast sync (#2574)
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/3218905/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/3218905,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.4,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.4,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.4,v1.4.4,False,False
+3192913,2016-05-10T11:46:03Z,2016-05-10T11:54:57Z,Gethy McGethface (1.4.3),"**Note: 1.4.3 fixes a regression introduced at the very last minute that affected miners**
+
+Release 1.4 is a major release in the history of Go Ethereum and brings you about roughly 6 months worth of work and less [crashes](http://www.vox.com/2016/5/8/11606554/nerc-rrs-david-attenborough-boaty-mcboatface-explained). This is the final release of the 1.4 series and marks the end of the release candidates.
+
+This document will describe some of the major features included in this release and list most of the minor features. For a full rundown of features and fixes please refer to the [1.4.0 milestone](https://github.com/ethereum/go-ethereum/issues?q=milestone%3A1.4.0+is%3Aclosed), [1.4.1 milestone](https://github.com/ethereum/go-ethereum/issues?q=milestone%3A1.4.1+is%3Aclosed) and [1.4.2 milestone](https://github.com/ethereum/go-ethereum/issues?q=milestone%3A1.4.2+is%3Aclosed).
+
+#### On chain version update notifications
+
+We've added a [Geth release oracle](http://etherscan.io/address/0xFA7B9770Ca4cb04296Cac84F37736d4041251CDF#code) contract to the network which holds the current version of `geth` with the release hash. All updated clients will check the contract and fetch the version number and check whether the version number is greater than the version you're running. It will emit a notice telling you there's a new client available. More info on #2497 .
+
+New releases need to be signed off by 2 out of 3 current signers (@obscuren, @fjl and @karalabe) to be accepted by the oracle and users be notified of it. Note, that we do not do any automatic upgrades, only display a small CLI notification to the user every once in a while.
+
+The verified contract is live at [0xFA7B9770Ca4cb04296Cac84F37736d4041251CDF](http://etherscan.io/address/0xFA7B9770Ca4cb04296Cac84F37736d4041251CDF#code). The full contract ABI is [available here](https://gist.github.com/karalabe/090246a39e01904361c98bf432e1fdac), but you can also use a [reduced ABI](https://gist.github.com/karalabe/4d45a2ba244e9c60c13e9c77d858b6ef) that just contains the list of signers and the current release version.
+
+#### Event Subscriptions
+
+Over the past months we've significantly overhauled our RPC implementation and added several new capabilities and transport layers. At present `geth` supports the following transport layers:
+- WebSockets (available with the `--ws` flag)
+- HTTP (available with the `--rpc` flag)
+- IPC (available with the `--ipc` flag and enabled by default)
+
+Previously when creating new filters you'd need to poll for them and query to see if there were any pending filter updates. With the new asynchronous implementation we've added an new additional subscription model where, instead of polling, you get notified by the client via pushed updates.
+
+Please refer to the [documentation](https://github.com/ethereum/go-ethereum/wiki/RPC-PUB-SUB) about our new subscription model.
+
+#### Native Go DApp Development
+
+With the introduction of package `accounts/abi` which allowed you to create bindings between Ethereum Contracts and Go we've taken it one step further and developed a new tool which can do all the bindings for you given a ABI json structure. Our `abigen` (which is available in `cmd/abigen`) can create fully automated Go Bindings to any Ethereum contract without the need for manual fiddling. See our [step-by-step](https://github.com/ethereum/go-ethereum/wiki/Native-DApps:-Go bindings-to-Ethereum-contracts) tutorial for more information.
+
+#### Private networks
+
+With the interest of private networking growing we've added some new configuration utilities to `geth` and deprecated some flags that will be removed as of 1.5.
+
+With the coming of Geth 1.4 we've deprecated the `--genesis <json_file>` flag and replaced with a [`geth init <json file>`](https://github.com/ethereum/go-ethereum/wiki/Command-Line-Options#init) sub command. This means that you'll no longer be able to mix the **destructive** `--genesis` flag with other flags.
+
+In addition to the above mentioned `init` subcommand we've added a new field to the genesis file: `config` which allows you to specify configuration options for the chain. At present the only available option is `""homesteadBlock"":""0x block_number""` and may be extended with more options as we progress. The configuration option is not yet standardised and may not be implemented in other implementations.
+
+#### Basic build support for iOS and Android platform
+
+Geth should be buildable for iOS and Android platforms. While it's certainly not anywhere near feasible to run Geth in a production environment on an iPhone or on an Android device with the current full node implementation, however this will serve as a foundation for future updates, which will include LES (Light Ethereum Subprotocol) capabilities.
+
+#### Debugging options
+
+We've added several new debugging features that will allow you to get transaction traces and full block traces:
+- `traceTransaction( hash )`
+- `traceBlockByHash( hash )`
+- `traceBlockByNumber( number )`
+- `traceBlockByFile( file_with_rlp_encoded_block )`
+- `traceBlock( rlp_hex_encoded_string )`
+
+The tracer functions can be found in the `debug` namespace. Please note that these functions are not available within web3 and may only be accessed through either HTTP, IPC, WebSocket RPC and the `geth console`.
+
+### Feature mentions
+- New EVM enabled for a few lucky ones
+- Node refactoring to allow using Geth as a library
+- Fully rewritten RPC layer
+- Pending transaction inspection
+- Many, many fixes [other](https://github.com/ethereum/go-ethereum/milestones/1.4) fixes
+- NTP time check
+- General optimisations
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/3192913/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/3192913,release/1.4,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.3,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.3,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.3,v1.4.3,False,False
+3187971,2016-05-09T20:06:27Z,2016-05-10T09:17:13Z,Gethy McGethface (1.4.2 final),"## Gethy has moved on to [1.4.3](https://github.com/ethereum/go-ethereum/releases/tag/v1.4.3).
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/3187971/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/3187971,release/1.4,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.2,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.2,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.2,v1.4.2,False,False
+3147501,2016-05-03T12:05:30Z,2016-05-04T07:10:16Z,Knoxjonesi (1.4.1),"**Note: all binaries have been cross compiled to the various platforms. If any of the binaries do not work for your platform please [raise an issue](https://github.com/ethereum/go-ethereum/new).**
+
+---
+
+Release 1.4 is a major release in the history of Go Ethereum and brings you about roughly 6 months worth of work. For this release we've planned several RCs (Release Candidates) so we can test the release together with our community and gather feedback for the final release.
+
+If you want to build this release from source, please use the `release/1.4` branch.
+
+``` text
+$ git checkout release/1.4
+```
+
+This document will describe some of the major features included in this release and list most of the minor features. For a full rundown of features and fixes please refer to the [1.4.0 milestone](https://github.com/ethereum/go-ethereum/issues?q=milestone%3A1.4.0+is%3Aclosed) and [1.4.1 milestone](https://github.com/ethereum/go-ethereum/issues?q=milestone%3A1.4.1+is%3Aclosed).
+
+#### On chain version update notifications
+
+We've added a [Geth release oracle](http://etherscan.io/address/0xFA7B9770Ca4cb04296Cac84F37736d4041251CDF#code) contract to the network which holds the current version of `geth` with the release hash. All updated clients will check the contract and fetch the version number and check whether the version number is greater than the version you're running. It will emit a notice telling you there's a new client available. More info on #2497 .
+
+New releases need to be signed off by 2 out of 3 current signers (@obscuren, @fjl and @karalabe) to be accepted by the oracle and users be notified of it. Note, that we do not do any automatic upgrades, only display a small CLI notification to the user every once in a while.
+
+The verified contract is live at [0xFA7B9770Ca4cb04296Cac84F37736d4041251CDF](http://etherscan.io/address/0xFA7B9770Ca4cb04296Cac84F37736d4041251CDF#code). The full contract ABI is [available here](https://gist.github.com/karalabe/090246a39e01904361c98bf432e1fdac), but you can also use a [reduced ABI](https://gist.github.com/karalabe/4d45a2ba244e9c60c13e9c77d858b6ef) that just contains the list of signers and the current release version.
+
+#### Event Subscriptions
+
+Over the past months we've significantly overhauled our RPC implementation and added several new capabilities and transport layers. At present `geth` supports the following transport layers:
+- WebSockets (available with the `--ws` flag)
+- HTTP (available with the `--rpc` flag)
+- IPC (available with the `--ipc` flag and enabled by default)
+
+Previously when creating new filters you'd need to poll for them and query to see if there were any pending filter updates. With the new asynchronous implementation we've added an new additional subscription model where, instead of polling, you get notified by the client via pushed updates.
+
+Please refer to the [documentation](https://github.com/ethereum/go-ethereum/wiki/RPC-PUB-SUB) about our new subscription model.
+
+#### Native Go DApp Development
+
+With the introduction of package `accounts/abi` which allowed you to create bindings between Ethereum Contracts and Go we've taken it one step further and developed a new tool which can do all the bindings for you given a ABI json structure. Our `abigen` (which is available in `cmd/abigen`) can create fully automated Go Bindings to any Ethereum contract without the need for manual fiddling. See our [step-by-step](https://github.com/ethereum/go-ethereum/wiki/Native-DApps:-Go bindings-to-Ethereum-contracts) tutorial for more information.
+
+#### Private networks
+
+With the interest of private networking growing we've added some new configuration utilities to `geth` and deprecated some flags that will be removed as of 1.5.
+
+With the coming of Geth 1.4 we've deprecated the `--genesis <json_file>` flag and replaced with a [`geth init <json file>`](https://github.com/ethereum/go-ethereum/wiki/Command-Line-Options#init) sub command. This means that you'll no longer be able to mix the **destructive** `--genesis` flag with other flags.
+
+In addition to the above mentioned `init` subcommand we've added a new field to the genesis file: `config` which allows you to specify configuration options for the chain. At present the only available option is `""homesteadBlock"":""0x block_number""` and may be extended with more options as we progress. The configuration option is not yet standardised and may not be implemented in other implementations.
+
+#### Basic build support for iOS and Android platform
+
+Geth should be buildable for iOS and Android platforms. While it's certainly not anywhere near feasible to run Geth in a production environment on an iPhone or on an Android device with the current full node implementation, however this will serve as a foundation for future updates, which will include LES (Light Ethereum Subprotocol) capabilities.
+
+#### Debugging options
+
+We've added several new debugging features that will allow you to get transaction traces and full block traces:
+- `traceTransaction( hash )`
+- `traceBlockByHash( hash )`
+- `traceBlockByNumber( number )`
+- `traceBlockByFile( file_with_rlp_encoded_block )`
+- `traceBlock( rlp_hex_encoded_string )`
+
+The tracer functions can be found in the `debug` namespace. Please note that these functions are not available within web3 and may only be accessed through either HTTP, IPC, WebSocket RPC and the `geth console`.
+
+### Feature mentions
+- New EVM enabled for a few lucky ones
+- Node refactoring to allow using Geth as a library
+- Fully rewritten RPC layer
+- Pending transaction inspection
+- Many, many fixes [other](https://github.com/ethereum/go-ethereum/milestones/1.4) fixes
+- NTP time check
+- General optimisations
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/3147501/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/3147501,release/1.4,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.1,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.1,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.1,v1.4.1,False,True
+3058845,2016-04-19T16:15:04Z,2016-04-20T10:31:06Z,Bursarius (1.4.0),"**Note: all binaries have been cross compiled to the various platforms. If any of the binaries do not work for your platform please [raise an issue](https://github.com/ethereum/go-ethereum/new).**
+
+---
+
+Release 1.4 is a major release in the history of Go Ethereum and brings you about roughly 6 months worth of work. For this release we've planned several RCs (Release Candidates) so we can test the release together with our community and gather feedback for the final release.
+
+If you want to build this release from source, please use the `release/1.4` branch.
+
+``` text
+$ git checkout release/1.4
+```
+
+This document will describe some of the major features included in this release and list most of the minor features. For a full rundown of features and fixes please refer to the [1.4 milestone](https://github.com/ethereum/go-ethereum/milestones/1.4.0).
+
+#### Event Subscriptions
+
+Over the past months we've significantly overhauled our RPC implementation and added several new capabilities and transport layers. At present `geth` supports the following transport layers:
+- WebSockets (available with the `--ws` flag)
+- HTTP (available with the `--rpc` flag)
+- IPC (available with the `--ipc` flag and enabled by default)
+
+Previously when creating new filters you'd need to poll for them and query to see if there were any pending filter updates. With the new asynchronous implementation we've added an new additional subscription model where, instead of polling, you get notified by the client via pushed updates.
+
+Please refer to the [documentation](https://github.com/ethereum/go-ethereum/wiki/RPC-PUB-SUB) about our new subscription model.
+
+#### Native Go DApp Development
+
+With the introduction of package `accounts/abi` which allowed you to create bindings between Ethereum Contracts and Go we've taken it one step further and developed a new tool which can do all the bindings for you given a ABI json structure. Our `abigen` (which is available in `cmd/abigen`) can create fully automated Go Bindings to any Ethereum contract without the need for manual fiddling. See our [step-by-step](https://github.com/ethereum/go-ethereum/wiki/Native-DApps:-Go bindings-to-Ethereum-contracts) tutorial for more information.
+
+#### Private networks
+
+With the interest of private networking growing we've added some new configuration utilities to `geth` and deprecated some flags that will be removed as of 1.5.
+
+With the coming of Geth 1.4 we've deprecated the `--genesis <json_file>` flag and replaced with a [`geth init <json file>`](https://github.com/ethereum/go-ethereum/wiki/Command-Line-Options#init) sub command. This means that you'll no longer be able to mix the **destructive** `--genesis` flag with other flags.
+
+In addition to the above mentioned `init` subcommand we've added a new field to the genesis file: `config` which allows you to specify configuration options for the chain. At present the only available option is `""homesteadBlock"":""0x block_number""` and may be extended with more options as we progress. The configuration option is not yet standardised and may not be implemented in other implementations.
+
+#### Basic build support for iOS and Android platform
+
+Geth should be buildable for iOS and Android platforms. While it's certainly not anywhere near feasible to run Geth in a production environment on an iPhone or on an Android device with the current full node implementation, however this will serve as a foundation for future updates, which will include LES (Light Ethereum Subprotocol) capabilities.
+
+#### Debugging options
+
+We've added several new debugging features that will allow you to get transaction traces and full block traces:
+- `traceTransaction( hash )`
+- `traceBlockByHash( hash )`
+- `traceBlockByNumber( number )`
+- `traceBlockByFile( file_with_rlp_encoded_block )`
+- `traceBlock( rlp_hex_encoded_string )`
+
+The tracer functions can be found in the `debug` namespace. Please note that these functions are not available within web3 and may only be accessed through either HTTP, IPC, WebSocket RPC and the `geth console`.
+
+### Feature mentions
+- New EVM enabled for a few lucky ones
+- Node refactoring to allow using Geth as a library
+- Fully rewritten RPC layer
+- Pending transaction inspection
+- Many, many fixes [other](https://github.com/ethereum/go-ethereum/milestones/1.4) fixes
+- NTP time check
+- General optimisations
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/3058845/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/3058845,release/1.4,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.4.0,https://github.com/ethereum/go-ethereum/releases/tag/v1.4.0,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.4.0,v1.4.0,False,True
+2932503,2016-04-01T10:12:59Z,2016-04-01T10:52:56Z,Release 1.3.6,"This release fixes an issue that fails to strip eol in some cases where a password is required. 
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/2932503/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/2932503,release/1.3.6,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.3.6,https://github.com/ethereum/go-ethereum/releases/tag/v1.3.6,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.3.6,v1.3.6,False,False
+2736209,2016-03-03T14:22:12Z,2016-03-03T14:35:54Z,Release 1.3.5,"This release contains a crucial network hotfix #2285 
+
+This release contains all changes from the [homestead release (1.3.4)](https://github.com/ethereum/go-ethereum/releases/tag/v1.3.4).
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/2736209/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/2736209,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.3.5,https://github.com/ethereum/go-ethereum/releases/tag/v1.3.5,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.3.5,v1.3.5,False,False
+2426736,2016-02-29T14:05:37Z,2016-02-29T14:07:48Z,Homestead (1.3.4),"**UPDATE: Please use the [`1.3.5` release](https://github.com/ethereum/go-ethereum/releases/tag/v1.3.5) which contains a network hotfix**
+
+This is the first minor protocol upgrade that will set in at `1.150.000`'s block (Testnet = `494.000`). This release includes the following changes to the protocol and fixes:
+
+### Protocol changes
+- [EIP-7](https://github.com/ethereum/EIPs/issues/23): New EVM opcode `DELEGATECALL`
+- [EIP-2](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2.mediawiki): Consensus rules changes:
+  1. The gas cost for creating contracts via a transaction is increased from 21000 to 53000;
+  2. All transaction signatures whose s-value is greater than `secp256k1n/2` are now considered invalid;
+  3. OOG `CREATE` calls when there's insufficient gas for storing the code (as opposed to silently ignoring the code storage);
+  4. Difficulty adjust algorithm has changed to `block_diff = parent_diff + parent_diff // 2048 * max(1 - (block_timestamp - parent_timestamp) // 10, -99) + int(2**((block.number // 100000) - 2))`
+
+### Fixes / Other
+- Increased artificial gas floor #2266
+- Decreased minimum accepted gas price #2273 
+- Fixed windows p2p discover bug #2146 
+- Fixed transaction sorting #2143
+- Implement [EIP-8](https://github.com/ethereum/EIPs/pull/49) p2p protocol upgrade #2091 
+- Fixed downloader OOM #2265 
+
+#### Miners
+
+The minimum accepted gas price for both relaying and block inclusion has changed with #2273 to 20 Shannon (from 50 Shannon), this because of the recent changes in the price of Ether. You can change this setting with the `--gasprice` flag when starting up the client and restore the old gas price if desired. 
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/2426736/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/2426736,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.3.4,https://github.com/ethereum/go-ethereum/releases/tag/v1.3.4,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.3.4,v1.3.4,False,False
+2373971,2016-01-05T12:02:07Z,2016-01-05T14:27:14Z,Breviceps (1.3.3),"This release contains only bug fixes:
+- Fast sync downloader fix #2097
+- Transaction pool fixed #2101
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/2373971/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/2373971,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.3.3,https://github.com/ethereum/go-ethereum/releases/tag/v1.3.3,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.3.3,v1.3.3,False,False
+2177319,2015-11-24T12:48:47Z,2015-11-25T10:46:47Z,Attwater (1.3.2),"This release contains bug fixes and improvements.
+
+### Features and improvements
+
+Removed legalese #1993 
+ABI fixes #1943 
+Polish protocol gathering #1934 
+Ongoing core refactor #1917 
+Added unofficial signTransaction method #1666 
+Peer download selection algorithm #1953 
+
+### Bug fixes
+
+Verify recovery ID #1984 
+Downloader delivery #1980 
+Downloader ignore list #1960 
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/2177319/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/2177319,release/1.3.2,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.3.2,https://github.com/ethereum/go-ethereum/releases/tag/v1.3.2,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.3.2,v1.3.2,False,False
+2045264,2015-10-31T19:00:58Z,2015-11-03T11:27:04Z,Arenarius (1.3.1),"This release is a preliminary release to our 2.0 release is already quite packed with new features, optimisations and fixes. For a full list of changes and fixes see the [1.3.0 milestone](https://github.com/ethereum/go-ethereum/issues?q=milestone%3A1.3.0+is%3Aclosed).
+
+This release also marks a new line of release names. We've chosen the list of rodents starting with the [Geomyidae (gophers)](https://en.wikipedia.org/wiki/Gopher).
+
+### Features and improvements
+- Light KDF #1940
+- Optimised log filtering #1899
+- GPU mining #1869
+- Ethereum fast sync, eth/63 #1889
+- Implemented testnet #1888
+- Preliminary ICAP functions #1887
+
+### Bug fixes
+- Fixed GPO goroutine leak #1932
+- Fixed OOM IPC #1946
+- Fixed several console issues #1840 
+
+More information about the next release can be found on the [milestone 1.3.2](https://github.com/ethereum/go-ethereum/milestones/1.3.2) page.
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/2045264/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/2045264,release/1.3.0,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.3.1,https://github.com/ethereum/go-ethereum/releases/tag/v1.3.1,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.3.1,v1.3.1,False,False
+1996095,2015-10-21T13:53:54Z,2015-10-21T16:06:05Z,Bugfoot (1.2.3) hotfix 2,"This release fixes a critical, yet unlikely, bug in the EVM which may cause you to go out of sync due to a state root failure.
+
+More information about the issue can be found in [this gist](https://gist.github.com/obscuren/87ca82e1193548330a39).
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1996095/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1996095,release/1.2.1,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.2.3,https://github.com/ethereum/go-ethereum/releases/tag/v1.2.3,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.2.3,v1.2.3,False,False
+1901657,2015-10-02T10:55:57Z,2015-10-02T11:09:26Z,Bugfoot (1.2.2) hotfix 1,"This release fixes a potential issue with clients getting stuck during chain re-organisation. This is a potential random DOS, triggered on possibly some clients (no full-scale DOS) #1865 
+
+This release also fixes an issue with clients syncing on eth/62 occasionally dropping older eth/61 peers, though healthy peers will never drop anyone #1866 
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1901657/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1901657,release/1.2.1,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.2.2,https://github.com/ethereum/go-ethereum/releases/tag/v1.2.2,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.2.2,v1.2.2,False,False
+1889325,2015-10-01T08:38:43Z,2015-10-01T09:34:37Z,Bugfoot  (1.2.1),"This release includes mostly bug fixes, optimisations and improvements. For a full list of changes and fixes see the [1.2.0 milestone](https://github.com/ethereum/go-ethereum/issues?q=milestone%3A1.2.0+is%3Aclosed). Here are the most notable changes:
+
+### Improvements & features
+- Improved chain re-organisation and adding of missing transactions #1669
+- Ethereum Wire Protocol version 62 #1701 ¹
+- Added `receiptRoot` to RPC `getBlock` response #1742
+
+### Bug fixes
+- Fixed `submitHashrate` RPC call #1671
+- Solidity compiler API update fixes compatibility issue with latest solc ##1770 and expose solidity errors #1598
+- Expose missing `shh_getMessage` #1718
+- Fixed crash on unknown blocks (`develop` only) #1842
+- Fixed duplication of `nonce`s during fast transaction generation #1662
+
+### Notes
+
+¹ While we've been running eth/62 for the last month or so untouched and haven't notices issues, a small local environment is very different from the live network. If you experience any sync problems, you can force geth to sync on the previous eth/61 protocol via `--eth=61`.
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1889325/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1889325,release/1.2.1,https://api.github.com/repos/ethereum/go-ethereum/tarball/1.2.1,https://github.com/ethereum/go-ethereum/releases/tag/1.2.1,https://api.github.com/repos/ethereum/go-ethereum/zipball/1.2.1,1.2.1,False,False
+1792876,2015-09-10T08:44:45Z,2015-09-10T09:23:57Z,Liquid Fairies (1.1.0) Hotfix 3,"This release fixes an important issue related to state handling in block processing.
+",https://api.github.com/users/Gustav-Simonsson,293096,Gustav-Simonsson,https://api.github.com/repos/ethereum/go-ethereum/releases/1792876/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1792876,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.1.3,https://github.com/ethereum/go-ethereum/releases/tag/v1.1.3,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.1.3,v1.1.3,False,False
+1759876,2015-09-02T22:52:42Z,2015-09-02T23:02:00Z,Liquid Fairies (1.1.0) Hotfix 2,"This release is mainly for miners; fixing an important mining strategy with block times.
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1759876/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1759876,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.1.2,https://github.com/ethereum/go-ethereum/releases/tag/v1.1.2,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.1.2,v1.1.2,False,False
+1753705,2015-09-01T22:40:27Z,2015-09-01T22:41:07Z,Liquid Fairies (1.1.0) Hotfix 1,"This update fixes an important issue related to block gas tracking.
+",https://api.github.com/users/Gustav-Simonsson,293096,Gustav-Simonsson,https://api.github.com/repos/ethereum/go-ethereum/releases/1753705/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1753705,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.1.1,https://github.com/ethereum/go-ethereum/releases/tag/v1.1.1,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.1.1,v1.1.1,False,False
+1753682,2015-09-01T22:29:44Z,2015-09-01T22:34:10Z,v1.0.3,"This update fixes an important issue related to block gas tracking.
+",https://api.github.com/users/Gustav-Simonsson,293096,Gustav-Simonsson,https://api.github.com/repos/ethereum/go-ethereum/releases/1753682/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1753682,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.0.3,https://github.com/ethereum/go-ethereum/releases/tag/v1.0.3,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.0.3,v1.0.3,False,False
+1708324,2015-08-20T19:41:39Z,2015-08-22T10:02:16Z,,,https://api.github.com/users/tgerring,731472,tgerring,https://api.github.com/repos/ethereum/go-ethereum/releases/1708324/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1708324,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.0.2,https://github.com/ethereum/go-ethereum/releases/tag/v1.0.2,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.0.2,v1.0.2,False,False
+1696259,2015-08-25T14:21:12Z,2015-08-25T14:25:40Z,Liquid Fairies (1.1.0),"![Imgur](http://i.imgur.com/Etb7jVK.jpg)
+
+This release includes several bug fixes, optimisations and improvements:
+
+### Improvements & features
+- New VM (JIT enabled) #1490, #1638
+- Merged databases to 1 #1604
+- REPL `inspect` method added #1667
+- REPL ctrl-c, ctrl-d behaviour changed #1658
+- `ethtest` tracing option #1640
+- REPL NATSPEC/password prompts (user agents) #1635
+- Trie improvements #1603, #1594
+- Hashrate reporter #1596
+
+### Bug fixes
+- `SendTransaction` recipient validation #1610, #1615
+- `--olympic` fix #1611
+- Tx rate limiter (thru locking) #1663
+- `--exec` output fix #1659
+- `EstimateGas` reports correct gas consumption #1654
+- `attach` reconnectability #1652
+- Windows REPL improvements and fixes #1642, #1600
+- Default extra data changed #1595
+- Web3 update #1641
+- Removed `fdtrack` message #1694 
+- TCP/UDP timeout fixes #1689
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1696259/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1696259,release/1.1.0,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.1.0,https://github.com/ethereum/go-ethereum/releases/tag/v1.1.0,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.1.0,v1.1.0,False,False
+1632333,2015-08-07T12:38:21Z,2015-08-05T16:50:36Z,Thawing (1.0.1) Hotfix 1,"![Thawing!](http://i.imgur.com/4Ohhwwo.jpg)
+
+This release includes several bug fixes and improvements and includes the thawing process.
+- Start of thawing process #1578
+- Difficulty adjust scheme #1588
+- Miner transaction sorting #1583
+- Default, community chosen genesis block #1569
+- Crash in chain manager #1568
+- Log number fixes #1545
+- Go 1.5 ready (crypto fix) #1536
+- Fix for eth_call and eth_estimateGas #1534
+- console `resend` method fix #1461
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1632333/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1632333,release/1.0.1,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.0.1.1,https://github.com/ethereum/go-ethereum/releases/tag/v1.0.1.1,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.0.1.1,v1.0.1.1,False,False
+1602011,2015-07-29T13:59:33Z,2015-07-29T14:44:39Z,Frontier (1.0.0),"![Frontier](https://files.gitter.im/ethereum/go-ethereum/private/Yxkm/68747470733a2f2f66696c65732e6769747465722e696d2f657468657265756d2f676f2d657468657265756d2f707269766174652f336d43722f6d617872657364656661756c742e6a70673.jpg)
+
+This is the first major and first live-net version of the go-ethereum client **geth** (1.0.0) and marks a major milestone in the history of Ethereum and the Go Ethereum codebase.
+- Protocol changes:
+  - 5 ETH reward per block
+  - Target block time upped to 15s
+  - Temp hard limit of 5000g
+- Downloader fixes and improvements
+- Mining improvements and state syncing issues resolved
+- Canary fixes
+- License update
+- Genesis loading
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1602011/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1602011,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v1.0.0,https://github.com/ethereum/go-ethereum/releases/tag/v1.0.0,https://api.github.com/repos/ethereum/go-ethereum/zipball/v1.0.0,v1.0.0,False,False
+1516494,2015-07-09T16:06:41Z,2015-07-09T16:18:27Z,Release 0.9.38 - RC2,"This is the Frontier RC2 release. This release fixes the following issues:
+- Windows fixes for account creation #1453
+- Syncing DoS protection #1451, #1450
+- web3 update to 0.8.1
+- Possible (though hardly!) chain DoS fixed #1443
+- Miner log events #1439
+
+For a list of changes included in this release please see [Frontier RC2](https://github.com/ethereum/go-ethereum/milestones/Frontier%20RC2).
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1516494/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1516494,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.9.38,https://github.com/ethereum/go-ethereum/releases/tag/v0.9.38,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.9.38,v0.9.38,False,False
+1505174,2015-07-07T13:33:57Z,2015-07-07T13:43:37Z,Release 0.9.36 - Frozen,"![Frozen](https://files.gitter.im/ethereum/go-ethereum/private/3mCr/maxresdefault.jpg)
+
+This is version 0.9.36 and is a major release in the history of Ethereum and the Go Ethereum team. This release marks a feature stop and is a pre-release for Frontier :shipit: and will go down in history as the ""Frozen"" release.
+
+This release improves and fixes the following:
+- Fixes to receipt storage and added RPC getters for the receipts #1399, #1397
+- Bad block reporting #1400
+- Lazy validation for miners #1389
+- Recover tools #1373
+- Massively reduces state size, disk throughput and transaction processing #1396
+- Account management improvements #1283
+- Improved block downloading & implemented Protocol version 61 #1333
+- Web3.js 0.8.0 #1430 
+
+For a list of changes included in this release please see [Milestone 0.9.36](https://github.com/ethereum/go-ethereum/issues?q=milestone%3A0.9.36) and [Milestone Frontier](https://github.com/ethereum/go-ethereum/issues?q=milestone%3AFrontier).
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1505174/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1505174,develop,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.9.36,https://github.com/ethereum/go-ethereum/releases/tag/v0.9.36,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.9.36,v0.9.36,False,False
+1477224,2015-06-30T09:15:01Z,2015-06-30T09:18:46Z,Hotfix release 0.9.34-1,"This release fixes a potential crash. For changes see https://github.com/ethereum/go-ethereum/releases/tag/v0.9.34
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1477224/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1477224,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.9.34-1,https://github.com/ethereum/go-ethereum/releases/tag/v0.9.34-1,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.9.34-1,v0.9.34-1,False,False
+1475942,2015-06-30T00:22:23Z,2015-06-30T00:28:00Z,Release 0.9.34,"This is release 0.9.34 and addresses the following issues and improvements: 
+- Core optimisations & immutability of consensus types (#1301)
+- Monitoring and metrics system. Please see the [Metrics and Monitoring wiki](https://github.com/ethereum/go-ethereum/wiki/Metrics-and-Monitoring) for more info  (#1321 #1346)
+- New keystore encryption scheme (+ backward compatibility) (#1085)
+
+For a list of changes included in this release please see [Milestone 0.9.34](https://github.com/ethereum/go-ethereum/issues?q=milestone%3A0.9.34). For the next release please see [Milestone 0.9.36](https://github.com/ethereum/go-ethereum/issues?q=milestone%3A0.9.36)
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1475942/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1475942,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.9.34,https://github.com/ethereum/go-ethereum/releases/tag/v0.9.34,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.9.34,v0.9.34,False,False
+1451604,2015-06-23T17:19:36Z,2015-06-23T17:27:45Z,Release 0.9.32,"This is release 0.9.32 and addresses the following issues and improvements: 
+- Downloader potential DOS attack #1314
+- Removed old version of mist #1302
+- Core optimisations #1282
+- Integration of the finalised console
+  - Attach to a running geth node with `geth attach`
+  - Start in console mode with `geth console`
+- RPC raw transaction `eth_sendRawTransaction` #1267
+
+For a list of changes included in this release please see [Milestone 0.9.32](https://github.com/ethereum/go-ethereum/issues?q=milestone%3A0.9.32). For the next release please see [Milestone 0.9.34](https://github.com/ethereum/go-ethereum/issues?q=milestone%3A0.9.34)
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1451604/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1451604,develop,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.9.32,https://github.com/ethereum/go-ethereum/releases/tag/v0.9.32,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.9.32,v0.9.32,False,False
+1418299,2015-06-15T17:28:51Z,2015-06-15T17:34:54Z,Release 0.9.30 - Consolation,"This is release ""Consolation"" and addresses the following issues and improvements: 
+- Optimisations on the VM [1228](https://github.com/ethereum/go-ethereum/pull/1228)
+  - Structured logging
+  - Program Counter change
+- A new RPC layer and added IPC [1200](https://github.com/ethereum/go-ethereum/pull/1200)
+- Downloader improvements
+- GPO (Gas Price Oracle). The GPO advices on gas price. Please refer to the [GPO article](https://github.com/ethereum/go-ethereum/wiki/Gas-Price-Oracle) for more information.
+- P2P improvements [1261](https://github.com/ethereum/go-ethereum/pull/1261)
+- Transaction pool improvement [1260](https://github.com/ethereum/go-ethereum/pull/1260). This issue fixes network load.
+- Implemented a new console (`make console`) which communicates over IPC.
+
+For a list of changes included in this release please see [Milestone 0.9.30](https://github.com/ethereum/go-ethereum/issues?q=milestone%3A0.9.30)
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1418299/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1418299,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.9.30,https://github.com/ethereum/go-ethereum/releases/tag/v0.9.30,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.9.30,v0.9.30,False,False
+1395480,2015-06-09T19:12:29Z,2015-06-09T19:23:36Z,Release 0.9.28,"This is a stability and security fix and is required for all users.
+
+### Highlights
+- Security issue EC Recover and right padding up to 128
+- Downloader security improvements
+- Chucking of max size blocks and transactions
+- Improved parallelisation of nonce checks during import
+- Improved transaction handling
+- Automated ARM builds
+
+For a full list of changes check [v0.9.26 / v0.9.28](https://github.com/ethereum/go-ethereum/compare/v0.9.26...v0.9.28)
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1395480/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1395480,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.9.28,https://github.com/ethereum/go-ethereum/releases/tag/v0.9.28,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.9.28,v0.9.28,False,False
+1348913,2015-05-28T16:21:21Z,2015-05-28T16:26:56Z,Fork slayer (0.9.26),"This is a mandatory update and helps to improve the network's stability through several upgrade mechanism and download policies.
+
+This release will go down in history as the **fork slayer** :-)
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1348913/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1348913,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.9.26,https://github.com/ethereum/go-ethereum/releases/tag/v0.9.26,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.9.26,v0.9.26,False,False
+1340453,2015-05-27T00:07:04Z,2015-05-27T00:08:09Z,Olympic Release (0.9.25),"This update fixes two things:
+1. [Hardcode](https://github.com/ethereum/go-ethereum/blob/develop/core/blocks.go#L7) a block's header hash so that when it encounters it in your blockchain revert back the **valid** parent and from there on get back on the right track. All clients which catch up from anything previous to the **invalid** block won't have any issue and might not even notice the bad chain. 
+2. Fixes an issue within the Ethereum VM's memory when doing a sub-call (op codes `CALL` & `CALLCODE`). When doing a sub-call you reserve a bit of memory for the sub-calls return data and write to that memory region when the sub-call returns. The subtle change is that previously Geth would zero out the memory and then write, now it doesn't zero and write directly. Here's an example of the before and after
+
+Before:
+
+```
+Mem before call   = [1,1,1,1,1,1,1,1,1,1]
+Sub calls returns = [6,6]
+Mem after call    = [6,6,0,0,0,0,0,0,0,0]
+```
+
+After:
+
+```
+Mem before call   = [1,1,1,1,1,1,1,1,1,1]
+Sub calls returns = [6,6]
+Mem after call    = [6,6,1,1,1,1,1,1,1,1]
+```
+
+This update also includes a re-work of the `p2p` dialing mechanism.
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1340453/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1340453,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.9.25,https://github.com/ethereum/go-ethereum/releases/tag/v0.9.25,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.9.25,v0.9.25,False,False
+1337468,2015-05-26T12:51:41Z,2015-05-26T12:57:37Z,Olympic Release (0.9.24),"This update fixes two things:
+1. [Hardcode](https://github.com/ethereum/go-ethereum/blob/develop/core/blocks.go#L7) a block's header hash so that when it encounters it in your blockchain revert back the **valid** parent and from there on get back on the right track. All clients which catch up from anything previous to the **invalid** block won't have any issue and might not even notice the bad chain. 
+2. Fixes an issue within the Ethereum VM's memory when doing a sub-call (op codes `CALL` & `CALLCODE`). When doing a sub-call you reserve a bit of memory for the sub-calls return data and write to that memory region when the sub-call returns. The subtle change is that previously Geth would zero out the memory and then write, now it doesn't zero and write directly. Here's an example of the before and after
+
+Before:
+
+```
+Mem before call   = [1,1,1,1,1,1,1,1,1,1]
+Sub calls returns = [6,6]
+Mem after call    = [6,6,0,0,0,0,0,0,0,0]
+```
+
+After:
+
+```
+Mem before call   = [1,1,1,1,1,1,1,1,1,1]
+Sub calls returns = [6,6]
+Mem after call    = [6,6,1,1,1,1,1,1,1,1]
+```
+
+This update also includes a re-work of the `p2p` dialing mechanism.
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1337468/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1337468,develop,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.9.24,https://github.com/ethereum/go-ethereum/releases/tag/v0.9.24,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.9.24,v0.9.24,False,False
+1323858,2015-05-21T17:53:35Z,2015-05-21T17:57:57Z,Olympic Release (0.9.23),"This Olympic release comes with fixes in the following areas:
+- BUG: fixes for creation transactions.
+- FEATURE: AOT DAG generation
+- BUG: uncle fix during GPU mining
+- BUG: coinbase fix
+- FEATURE: parallel nonce checking during block processing
+- BUG: downloader fixes and vuln patches
+- FEATURE: multi CORS for RPC
+- FEATURE: `removedb` implemented for killing your local chain
+- FEATURE: multiple account unlocks from CLI
+- FEATURE: solidity compiler accepts multi-contract source (API change)
+
+#### Installation instructions
+
+Build instructions for OSX, Windows and Linux can be found [here](https://github.com/ethereum/go-ethereum/wiki/Building-Ethereum). 
+
+#### Upgrade from <0.9.20
+
+If you have accounts in your wallet that you'd like to keep you need export them first first with the `gethkey` tool found [here](https://github.com/ethereum/gethkey). Download and install and run the following for each of the accounts you'd like to keep:
+
+```
+mkdir -p ~/export_keys
+gethkey <account_address> ~/export_keys/account_address
+geth account import ~/export_keys/account_address
+```
+
+When you've verified and imported all of your keys `rm -rf ~/export_keys`.
+
+#### Resources
+- [Geth console](https://github.com/ethereum/go-ethereum/wiki/JavaScript-Console)
+- [Geth CLI](https://github.com/ethereum/go-ethereum/wiki/Command-Line-Options)
+- [Geth account management](https://github.com/ethereum/go-ethereum/wiki/Managing-your-accounts)
+- [WIP Frontier GitBook](http://ethereum.gitbooks.io/frontier-guide/content/)
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1323858/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1323858,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/0.9.23,https://github.com/ethereum/go-ethereum/releases/tag/0.9.23,https://api.github.com/repos/ethereum/go-ethereum/zipball/0.9.23,0.9.23,False,False
+1303541,2015-05-16T11:04:22Z,2015-05-16T11:05:44Z,Olympic Release (0.9.21.1),"Olympic release comes with many improvements to the CLI tools and includes a fully programmable JavaScript interface and JavaScript REPL (**R**ead **E**valuate **P**rint **L**oop). We've also added support for solidity using the solidity stand-alone compiler: `solc`.
+
+The CLI has seen a massive overhaul in usability and CLI utilities. For a complete list of utils and tools please run `geth help` or `get help topic` for a detailed description.
+
+We're also in the process of writing a  [Frontier GitBook](http://ethereum.gitbooks.io/frontier-guide/content/). Please note that this book is a work in progress and will serve as the main guide for frontier once released.
+
+#### Installation instructions
+
+Build instructions for OSX, Windows and Linux can be found [here](https://github.com/ethereum/go-ethereum/wiki/Building-Ethereum). 
+
+#### Upgrade from <0.9.20
+
+If you have accounts in your wallet that you'd like to keep you need export them first first with the `gethkey` tool found [here](https://github.com/ethereum/gethkey). Download and install and run the following for each of the accounts you'd like to keep:
+
+```
+mkdir -p ~/export_keys
+gethkey <account_address> ~/export_keys/account_address
+geth account import ~/export_keys/account_address
+```
+
+When you've verified and imported all of your keys `rm -rf ~/export_keys`.
+
+If you've been encountering `INVALID block #xxxx` run a `geth upgradedb` after you've updated (ignore any errors it encounters). When it's done re-run geth as you normally do.
+
+#### Resources
+- [Geth console](https://github.com/ethereum/go-ethereum/wiki/JavaScript-Console)
+- [Geth CLI](https://github.com/ethereum/go-ethereum/wiki/Command-Line-Options)
+- [Geth account management](https://github.com/ethereum/go-ethereum/wiki/Managing-your-accounts)
+- [WIP Frontier GitBook](http://ethereum.gitbooks.io/frontier-guide/content/)
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1303541/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1303541,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.9.21.1,https://github.com/ethereum/go-ethereum/releases/tag/v0.9.21.1,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.9.21.1,v0.9.21.1,False,False
+1302791,2015-05-15T22:27:17Z,2015-05-15T22:38:03Z,Olympic Release (0.9.21),"Olympic release comes with many improvements to the CLI tools and includes a fully programmable JavaScript interface and JavaScript REPL (**R**ead **E**valuate **P**rint **L**oop). We've also added support for solidity using the solidity stand-alone compiler: `solc`.
+
+The CLI has seen a massive overhaul in usability and CLI utilities. For a complete list of utils and tools please run `geth help` or `get help topic` for a detailed description.
+
+We're also in the process of writing a  [Frontier GitBook](http://ethereum.gitbooks.io/frontier-guide/content/). Please note that this book is a work in progress and will serve as the main guide for frontier once released.
+
+#### Installation instructions
+
+Build instructions for OSX, Windows and Linux can be found [here](https://github.com/ethereum/go-ethereum/wiki/Building-Ethereum). 
+
+#### Upgrade from <0.9.20
+
+If you have accounts in your wallet that you'd like to keep you need export them first first with the `gethkey` tool found [here](https://github.com/ethereum/gethkey). Download and install and run the following for each of the accounts you'd like to keep:
+
+```
+mkdir -p ~/export_keys
+gethkey <account_address> ~/export_keys/account_address
+geth account import ~/export_keys/account_address
+```
+
+When you've verified and imported all of your keys `rm -rf ~/export_keys`.
+
+If you've been encountering `INVALID block #xxxx` run a `geth upgradedb` after you've updated (ignore any errors it encounters). When it's done re-run geth as you normally do.
+
+#### Resources
+- [Geth console](https://github.com/ethereum/go-ethereum/wiki/JavaScript-Console)
+- [Geth CLI](https://github.com/ethereum/go-ethereum/wiki/Command-Line-Options)
+- [Geth account management](https://github.com/ethereum/go-ethereum/wiki/Managing-your-accounts)
+- [WIP Frontier GitBook](http://ethereum.gitbooks.io/frontier-guide/content/)
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1302791/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1302791,develop,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.9.21,https://github.com/ethereum/go-ethereum/releases/tag/v0.9.21,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.9.21,v0.9.21,False,True
+1288182,2015-05-12T17:05:35Z,2015-05-12T17:06:47Z,Olympic Release (0.9.20),"Olympic release comes with many improvements to the CLI tools and includes a fully programmable JavaScript interface and JavaScript REPL (**R**ead **E**valuate **P**rint **L**oop). We've also added support for solidity using the solidity stand-alone compiler: `solc`.
+
+The CLI has seen a massive overhaul in usability and CLI utilities. For a complete list of utils and tools please run `geth help` or `get help topic` for a detailed description.
+
+We're also in the process of writing a  [Frontier GitBook](http://ethereum.gitbooks.io/frontier-guide/content/). Please note that this book is a work in progress and will serve as the main guide for frontier once released.
+
+#### Installation instructions
+
+Build instructions for OSX, Windows and Linux can be found [here](https://github.com/ethereum/go-ethereum/wiki/Building-Ethereum). 
+
+#### Upgrade from <0.9.20
+
+If you have accounts in your wallet that you'd like to keep you need export them first first with the `gethkey` tool found [here](https://github.com/ethereum/gethkey). Download and install and run the following for each of the accounts you'd like to keep:
+
+```
+mkdir -p ~/export_keys
+gethkey <account_address> ~/export_keys/account_address
+geth account import ~/export_keys/account_address
+```
+
+When you've verified and imported all of your keys `rm -rf ~/export_keys`.
+
+If you've been encountering `INVALID block #xxxx` run a `geth upgradedb` after you've updated (ignore any errors it encounters). When it's done re-run geth as you normally do.
+
+#### Resources
+- [Geth console](https://github.com/ethereum/go-ethereum/wiki/JavaScript-Console)
+- [Geth CLI](https://github.com/ethereum/go-ethereum/wiki/Command-Line-Options)
+- [Geth account management](https://github.com/ethereum/go-ethereum/wiki/Managing-your-accounts)
+- [WIP Frontier GitBook](http://ethereum.gitbooks.io/frontier-guide/content/)
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1288182/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1288182,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.9.20,https://github.com/ethereum/go-ethereum/releases/tag/v0.9.20,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.9.20,v0.9.20,False,True
+1277832,2015-05-09T11:13:16Z,2015-05-09T11:17:39Z,Olympic Release,"### Update on the release can be found [here](https://github.com/ethereum/go-ethereum/releases/tag/v0.9.20)
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/1277832/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/1277832,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.9.18,https://github.com/ethereum/go-ethereum/releases/tag/v0.9.18,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.9.18,v0.9.18,False,True
+975920,2015-02-22T12:26:21Z,2015-02-22T15:03:07Z,Proof of concept 8,"![Mist](https://dl.dropboxusercontent.com/u/4270001/pocs/8.png)
+
+## General changes
+- Improved UI and UX
+- Multithreaded miner
+- Finalised RPC interface
+- Improved networking & peer discovery
+- Moved from WebKit to Chromium (QtWebEngine)
+
+## Other
+- Moved away from a asynchronous javascript api to a synchronous (using RPC)
+- Qt5.4
+- DApp listing
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/975920/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/975920,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.8.5,https://github.com/ethereum/go-ethereum/releases/tag/v0.8.5,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.8.5,v0.8.5,False,True
+973556,2015-02-20T23:53:47Z,2015-02-20T23:55:05Z,Proof of concept 8,"The next in the proof of concept series, No. 8
+
+Changes in the release include:
+- Improved networking (P2P version 2)
+- Improved Mist UI
+- New Browser
+- DApp listing
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/973556/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/973556,develop,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.8.4,https://github.com/ethereum/go-ethereum/releases/tag/v0.8.4,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.8.4,v0.8.4,False,True
+802513,2014-12-21T14:13:06Z,2014-12-22T10:16:03Z,Proof of concept 7,,https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/802513/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/802513,develop,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.7.10,https://github.com/ethereum/go-ethereum/releases/tag/v0.7.10,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.7.10,v0.7.10,False,True
+608386,2014-10-07T09:20:59Z,2014-10-07T09:28:10Z,Mist 0.6.8,"This release _fixes_ & _improves_ the following:
+- Improved block downloading
+- Added black listing when kicking of bad peers
+- Removed old windows from GUI
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/608386/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/608386,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.6.8,https://github.com/ethereum/go-ethereum/releases/tag/v0.6.8,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.6.8,v0.6.8,False,True
+585052,2014-09-26T11:47:31Z,2014-09-26T11:56:14Z,Mist 0.6.7,"This release _fixes_ & _improves_ the following:
+- Messaging API. Previous version didn't follow the correct rules when filtering messages;
+- Added display for connected peer's capabilities.
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/585052/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/585052,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.6.7,https://github.com/ethereum/go-ethereum/releases/tag/v0.6.7,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.6.7,v0.6.7,False,True
+580532,2014-09-24T18:41:13Z,2014-09-24T18:45:10Z,Mist 0.6.6,"This release _fixes_ & _improves_ the following:
+- Block chain download speed
+- Block organisational stuff
+- JefCoin fixes ;-)
+- Mine without tx
+
+[Previous release notes](https://github.com/ethereum/go-ethereum/releases/tag/v0.6.5)
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/580532/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/580532,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.6.6,https://github.com/ethereum/go-ethereum/releases/tag/v0.6.6,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.6.6,v0.6.6,False,True
+575222,2014-09-22T17:33:29Z,2014-09-23T16:26:50Z,Mist 0.6.5,"# Mist (Ether Browser)
+
+**note**: Windows binaries will be uploaded **soon**™
+
+![](https://dl.dropboxusercontent.com/u/4270001/Screenshot%202014-09-22%2023.33.52.png)
+
+This is the first release of the **proof of concept** ether browser named **Mist**. Mist is **PoC6** ready and has the following _improvements_ and _features_:
+- [HTML ĐApp](https://github.com/ethereum/go-ethereum/wiki/PoC6-JS-API) development.
+
+**JavaScript** API now aligns better with the regular calling convention that C++ uses (`getMethod` vs `method`) while still remaining fully **async** using `Promise`es.
+- [QML ĐApp](https://github.com/ethereum/go-ethereum/wiki/QML-PoC6-API) development.
+
+The **QML** API is far from finished but shares common methods with the **JavaScript** API (just without the promises) and a few additional methods. A sample application is provided in Mist; **JeffCoin**. The source code can be found in the [mist repo](https://github.com/ethereum/go-ethereum/tree/master/mist/assets/qml/views/jeffcoin).
+- [Mutan 0.5](https://github.com/ethereum/go-ethereum/wiki/Mutan-0.5#basic-syntax)
+  -  `{ /* code */ }` style to define a new local scope.
+  - `else if` statement.
+  - Logical `and` and `or` (`&&` `||`)
+  - `this` changed in favour of `message`
+- Improved debugger (Mutan stack info)
+- Embedded HTML renderer.
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/575222/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/575222,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.6.5,https://github.com/ethereum/go-ethereum/releases/tag/v0.6.5,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.6.5,v0.6.5,False,True
+450441,2014-07-25T08:42:16Z,2014-07-25T08:53:20Z,0.6.0 - Adrastea,"![wqz0qsidvoykkp7ngbrqfpftbinb3i927gh6xu3jkk4](https://cloud.githubusercontent.com/assets/6264126/3699761/47fd03fe-13d8-11e4-8509-4aa713e10419.png)
+
+This release _fixes_ and _improves_ the following:
+- Improved catching up. Previous build would sometimes fail to catch up or stop for no obvious reason. This should now be fixed
+- Fixed the VM. This caused issues with processing certain contracts.
+- If a connection fails to a peer it will continue trying for a couple of times.
+- Peers can be pushed towards clients even when the clients hasn't asked for it. Previously builds would ignore the peer server's `peer message`.
+- Fixed retina issue
+- Faster startup time
+
+Additionally I've decided to give some flavour to the releases; names of satellites.
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/450441/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/450441,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/v0.6.0,https://github.com/ethereum/go-ethereum/releases/tag/v0.6.0,https://api.github.com/repos/ethereum/go-ethereum/zipball/v0.6.0,v0.6.0,False,True
+445891,2014-07-18T11:49:52Z,2014-07-23T10:38:49Z,PoC5 Release (v0.5.19),"Fixed zero division error
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/445891/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/445891,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/0.5.19,https://github.com/ethereum/go-ethereum/releases/tag/0.5.19,https://api.github.com/repos/ethereum/go-ethereum/zipball/0.5.19,0.5.19,False,True
+444519,2014-07-18T11:49:52Z,2014-07-22T17:56:04Z,PoC5 Release (v0.5.18),"PoC5 Release
+",https://api.github.com/users/obscuren,6264126,obscuren,https://api.github.com/repos/ethereum/go-ethereum/releases/444519/assets,https://api.github.com/repos/ethereum/go-ethereum/releases/444519,master,https://api.github.com/repos/ethereum/go-ethereum/tarball/0.5.18,https://github.com/ethereum/go-ethereum/releases/tag/0.5.18,https://api.github.com/repos/ethereum/go-ethereum/zipball/0.5.18,0.5.18,False,True

@@ -1,0 +1,1583 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8242807,2017-10-24T18:40:26Z,2017-10-24T18:45:28Z,2.10.0,"## New features in 2.10.0
+
+We've ported our HTTP client to Boost Beast to allow for more meaningful TLS errors and support for HTTP proxies.
+
+#3623 Use Boost Beast as the HTTP client implementation (previously we used cpp-netlib)
+
+## Bug fixes
+
+#3862 Lock access to individual SQL databases
+#3856 Fix extended_schema on Windows (previously all extended columns were HIDDEN)
+
+## Table changes (from 2.9.0 to 2.10.0)
+
+Added table `key_events` to Darwin (Apple OS X)
+Added table `authenticode` to Microsoft Windows
+Added table `logical_drives` to Microsoft Windows
+Added table `physical_disk_performance` to Microsoft Windows
+Added column `version` (`TEXT_TYPE`) to table `usb_devices`
+",https://api.github.com/users/obelisk,2386877,obelisk,https://api.github.com/repos/facebook/osquery/releases/8242807/assets,https://api.github.com/repos/facebook/osquery/releases/8242807,master,https://api.github.com/repos/facebook/osquery/tarball/2.10.0,https://github.com/facebook/osquery/releases/tag/2.10.0,https://api.github.com/repos/facebook/osquery/zipball/2.10.0,2.10.0,False,False
+8208428,2017-10-21T20:23:14Z,2017-10-21T21:54:01Z,2.9.2,,https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/8208428/assets,https://api.github.com/repos/facebook/osquery/releases/8208428,master,https://api.github.com/repos/facebook/osquery/tarball/2.9.2,https://github.com/facebook/osquery/releases/tag/2.9.2,https://api.github.com/repos/facebook/osquery/zipball/2.9.2,2.9.2,False,True
+8144105,2017-10-17T06:31:03Z,2017-10-17T06:31:31Z,2.9.1,,https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/8144105/assets,https://api.github.com/repos/facebook/osquery/releases/8144105,master,https://api.github.com/repos/facebook/osquery/tarball/2.9.1,https://github.com/facebook/osquery/releases/tag/2.9.1,https://api.github.com/repos/facebook/osquery/zipball/2.9.1,2.9.1,False,True
+8002784,2017-10-05T00:32:00Z,2017-10-05T00:37:07Z,2.9.0,"## New features in 2.9.0
+
+This is a security release, it includes fixes for weaknesses in several virtual tables.
+
+Please check out the new [`SECURITY.md`](https://github.com/facebook/osquery/blob/master/SECURITY.md) security issues tracker for more details. This release has updated several dependency formulas. The focus for those updates was also security related. While it is unclear if weaknesses in dependencies have an exact adverse effect on osquery, it is important to update them regardless. These updates mean a stronger and safer set of binary versions available on the https://osquery.io downloads page.
+
+## Bug fixes
+
+#3785 (**CVE-2017-15026**) Use sanitized SQL for `ie_extensions` on Windows
+#3783  Drop temporary privileges to the intended user within `safari_extensions`
+#3782 (**CVE-2017-15027**) Use the owner of parent path in `dropToParent` event if the parent is a symlink
+#3781 (**CVE-2017-15028**) Drop temporary privileges to the intended user within `known_hosts`
+
+The notable dependency updates include:
+#3780 `libmagic` updated to 5.32
+#3775 `libxml2` updated to 2.9.5
+#3767 `augeas` updated to 1.8.1
+#3770 `libarchive` updated to 3.3.3
+",https://api.github.com/users/muffins,1328916,muffins,https://api.github.com/repos/facebook/osquery/releases/8002784/assets,https://api.github.com/repos/facebook/osquery/releases/8002784,master,https://api.github.com/repos/facebook/osquery/tarball/2.9.0,https://github.com/facebook/osquery/releases/tag/2.9.0,https://api.github.com/repos/facebook/osquery/zipball/2.9.0,2.9.0,False,False
+7945086,2017-09-29T04:58:19Z,2017-09-29T17:24:01Z,2.8.1,"## New features in 2.8.1
+
+This is largely a break-fix release addressing an issue with Kinesis/Firehose logging format. This release also sees a few small changes to the newly designed website as well as a small overhaul to the filesystem abstraction to make use of boosts `path` objects.
+
+## Bug fixes
+
+#3746 Check Crypt API values for `nullptr` before using in `disk_encryption` table
+#3743 Add newline character between loglines for Firehose/Kinesis
+
+## Table changes (from 2.8.0 to 2.8.1)
+
+Added column `last_opened_time` (`DOUBLE_TYPE`) to table `apps`",https://api.github.com/users/muffins,1328916,muffins,https://api.github.com/repos/facebook/osquery/releases/7945086/assets,https://api.github.com/repos/facebook/osquery/releases/7945086,master,https://api.github.com/repos/facebook/osquery/tarball/2.8.1,https://github.com/facebook/osquery/releases/tag/2.8.1,https://api.github.com/repos/facebook/osquery/zipball/2.8.1,2.8.1,False,False
+7801710,2017-09-19T03:23:44Z,2017-09-19T03:47:29Z,2.8.0,"# New features in 2.8.0
+
+This release merges the osqueryi shell into the osqueryd daemon. Both binaries will still be shipped with all platforms packages and the osqueryi binary is simply a copy of osqueryd binary. The core logic of the shell meerly checks the name of the running executable, and if it's osqueryi we launch into the shell. This release also sees various changes to our third party dependencies. Firstly we have dropped snappy and LZ4 from our dependency chain in favor of ZSTD, so these packages will no longer be required for builds. Further we have upgraded all platforms to make use of Boost 1.65.0, and finally we have successfully seen Firehose/Kinesis logging brought to the Windows platform. Lastly a few hardening changes to the RocksDB interface will ensure a better and more robust interface with the local caching database and strive to recover from database corruption.
+
+#3635 RocksDB interface has been extended to include a 'backup' and recover feature
+#3641 Firehose/Kinesis logging is now supported on Windows
+
+## Bug fixes
+
+#3613 Fixed boost 1.65.0 builds for macos  
+#3599 Addressed an issue in the Kinesis/Firehose record size check
+#3628 Wrapped the Windows shutdown event logic in a Mutex 
+#3651 New query counter added to ignore initial results for differential querying
+#3661 Fixed listening_ports table to use readlink instead of readpath
+#3663 Fixed RocksDB interface to avoid calling DB::Flush so often
+#3662 Fixed debug info breakage introduced via binary merging
+#3673 Fixed builds linking against shared objects
+#3671 Fixed bug which had changed enrollment tests path
+#3685 Use PackageKit to better enumerate package receipts on macos
+#3698 Address shutdown behavior on Windows to ensure safe service stop
+
+## Table changes (from 2.7.0 to 2.8.0)
+
+Added table `python_packages` to All Platforms
+Added table `chocolatey_packages` to Microsoft Windows
+Added table `curl` to POSIX-compatible Plaforms
+Added column `friendly_name` (`TEXT_TYPE`) to table `interface_addresses`
+Added column `friendly_name` (`TEXT_TYPE`) to table `interface_details`
+Added column `host` (`TEXT_TYPE`) to table `preferences`
+Removed table `process_file_events` from Darwin (Apple OS X)
+Removed table `python_packages` from POSIX-compatible Plaforms
+",https://api.github.com/users/muffins,1328916,muffins,https://api.github.com/repos/facebook/osquery/releases/7801710/assets,https://api.github.com/repos/facebook/osquery/releases/7801710,master,https://api.github.com/repos/facebook/osquery/tarball/2.8.0,https://github.com/facebook/osquery/releases/tag/2.8.0,https://api.github.com/repos/facebook/osquery/zipball/2.8.0,2.8.0,False,False
+7483159,2017-08-22T19:01:40Z,2017-08-22T19:02:56Z,2.7.0,"## New features in 2.7.0
+
+#3506 FSEvents on macOS will monitor mount events within already-monitored directories
+#3503 OpenBSM events are monitored as `process_events` on macOS
+#3265 Add RapidJSON integration as a boost property tree replacement
+#3530 Implement excluded paths for FIM for Linux and macOS
+
+### Bug fixes
+
+#3517 Wait for each extension before respawning
+#3553 and #3552 Fixing memory leaks in virtual tables
+#3534 Improve macOS process `start_time` column
+#3539 Fix sizes for `block_devices` on macOS and Linux
+#3574 Display correct UID for proceses for Domain Users on Windows
+#3580 Fix handling of multiple LIKE and GLOB predicates*
+
+* When using `LIKE` and `GLOB` with `OR` in query predicates the SQLite optimizer may replace `TEXT` fields with incorrect values, causing unexpected behavior for tables like `file` expecting globbing input for path names.
+
+### Table changes (from 2.6.0 to 2.7.0)
+
+Added table `process_memory_map` to All Platforms (from POSIX)
+
+Added table `device_firmware` to Darwin (Apple OS X)
+Added table `gatekeeper` to Darwin (Apple OS X)
+Added table `gatekeeper_approved_apps` to Darwin (Apple OS X)
+Added table `shared_folders` to Darwin (Apple OS X)
+Added table `sharing_preferences` to Darwin (Apple OS X)
+Added table `certificates` to MacOS and Windows
+Added table `user_events` to POSIX-compatible Plaforms
+Added table `ec2_instance_metadata` to Ubuntu, CentOS
+Added table `ec2_instance_tags` to Ubuntu, CentOS
+
+Added column `block_size` (`INTEGER_TYPE`) to table `block_devices`
+Added column `cwd` (`TEXT_TYPE`) to table `process_events`
+Added column `status` (`BIGINT_TYPE`) to table `process_events`
+Added column `action` (`TEXT_TYPE`) to table `scheduled_tasks`
+Added column `class` (`TEXT_TYPE`) to table `usb_devices`
+Added column `protocol` (`TEXT_TYPE`) to table `usb_devices`
+Added column `subclass` (`TEXT_TYPE`) to table `usb_devices`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/7483159/assets,https://api.github.com/repos/facebook/osquery/releases/7483159,master,https://api.github.com/repos/facebook/osquery/tarball/2.7.0,https://github.com/facebook/osquery/releases/tag/2.7.0,https://api.github.com/repos/facebook/osquery/zipball/2.7.0,2.7.0,False,False
+7279226,2017-08-04T01:09:04Z,2017-08-04T01:40:47Z,2.6.1,,https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/7279226/assets,https://api.github.com/repos/facebook/osquery/releases/7279226,master,https://api.github.com/repos/facebook/osquery/tarball/2.6.1,https://github.com/facebook/osquery/releases/tag/2.6.1,https://api.github.com/repos/facebook/osquery/zipball/2.6.1,2.6.1,False,True
+7152329,2017-07-24T20:51:50Z,2017-07-24T23:38:41Z,2.6.0,"This is the next stable build of osquery, ready for production. This release fixes many bugs in the Windows version vastly improving stability and some tables. The SQLite version was also bumped to 3.19.3 and improvements were made to inotify eventing on linux. The preferences table on Darwin has also been changed and it's core functionality moved to a new plist table. See (#3455) for more details as this may require updates to any scheduled queries that use this table. For more complete release notes, see the highlights below.
+
+**Several bug fixes pertaining to Windows:**
+* (#3478) Fixed a crash in interface_details - If WMI data was empty, an invalid access occurred.
+* (#3481) Choco build output directory change - Building a package will now drop you in the directory you started in, not the build directory.
+* (#3475) Fixed worker respawn logic - Killed workers were not being respawned correctly due to a lack of early exit.
+* (#3470) system_info FQDN - The system_info table on Windows will now return the full FQDN, not just the host name.
+* (#3484) Additional install locations - The programs table checks more locations to find installed applications.
+* (#3431) Skip tests on Windows -  It's now possible to skip building tests via a environment variable on Windows.
+* (#3444) Autoexec - Added a new table to find auto-executing programs.
+* (#3436) IE Extensions - Added a new table to list extensions installed in IE.
+
+**A few bug fixes to POSIX/macOS**
+* (#3454) (#3473) (#3476) High Sierra related fixes - Fixed a bug where the local clang-format wasn't being used and instead of the system one was called. Also fixed a globbing bug caused by a new file ordering on APFS systems.
+* (#3480) Mount event on Darwin - FSEvents now also catches mount events and these alerts go through the same pub sub flow with the action ""MOUNTED"".
+
+**General Updates**
+* (#3488) Changes to plugin failures - All plugins will now fail if one fails. This ensures plugins are in a good state when initialization finishes.
+* (#3485) Update to SQLite - SQLite version bumped to 3.19.3
+* (#3489) TSAN fixes - Some general TSAN issues addressed.
+* (#3487) Don't ignore SIGCHLD - Stop ignoring the SIGCHLD interrupt to exit faster.
+* (#3459) Updates to inotify - Logic improved around add/removing subscribers in the inotify eventer.
+* (#3469) Fix TLS Config Update - Fixes TLS update and sets the refresh period to one hour.
+* (#3457) Moved pid file - The osquery pid file is now in /var/run/ on Linux and FreeBSD system.
+* (#3378) Added epoch time to scheduled queries - To assist in keeping backend systems in sync with system state, an epoch decorator was added.
+* (#3455) Separated preferences and plist - Preferences was split into its own table and the functionality of plist parsing was moved to a new plist table.
+* (#3448) Watchdog issues resolved - There were some instances where certain flag usage would inadvertently disable the watchdog.
+* (#3390) Symlink column in file table -  A new column containing information on if the file is a symlink.",https://api.github.com/users/obelisk,2386877,obelisk,https://api.github.com/repos/facebook/osquery/releases/7152329/assets,https://api.github.com/repos/facebook/osquery/releases/7152329,master,https://api.github.com/repos/facebook/osquery/tarball/2.6.0,https://github.com/facebook/osquery/releases/tag/2.6.0,https://api.github.com/repos/facebook/osquery/zipball/2.6.0,2.6.0,False,False
+7074305,2017-07-18T07:08:38Z,2017-07-18T07:28:40Z,2.5.3,,https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/7074305/assets,https://api.github.com/repos/facebook/osquery/releases/7074305,master,https://api.github.com/repos/facebook/osquery/tarball/2.5.3,https://github.com/facebook/osquery/releases/tag/2.5.3,https://api.github.com/repos/facebook/osquery/zipball/2.5.3,2.5.3,False,True
+6898917,2017-06-30T18:12:43Z,2017-06-30T21:46:13Z,2.5.2,,https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/6898917/assets,https://api.github.com/repos/facebook/osquery/releases/6898917,master,https://api.github.com/repos/facebook/osquery/tarball/2.5.2,https://github.com/facebook/osquery/releases/tag/2.5.2,https://api.github.com/repos/facebook/osquery/zipball/2.5.2,2.5.2,False,True
+6764325,2017-06-19T02:37:01Z,2017-06-19T21:25:36Z,2.5.1,,https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/6764325/assets,https://api.github.com/repos/facebook/osquery/releases/6764325,master,https://api.github.com/repos/facebook/osquery/tarball/2.5.1,https://github.com/facebook/osquery/releases/tag/2.5.1,https://api.github.com/repos/facebook/osquery/zipball/2.5.1,2.5.1,False,True
+6704518,2017-06-14T00:53:05Z,2017-06-14T02:16:12Z,2.5.0,"## New features in 2.5.0:
+
+There are several new features and bug fixes.
+
+#3356 Only reconfigure event publishers if configuration content changes
+#3375 Add the ""platform mask"" to enrollment requests
+#3376 Allow Linux publishers to be interrupted (previously they would stop)
+#3360 Add a watchdog delay (60s) before enforcing limits to allow for log flushing
+#3402 Increase max `rpm_package_files` to 64k on Linux
+
+### Table changes (from 2.4.6 to 2.5.0):
+
+Added table `virtual_memory_info` to Darwin (Apple OS X)
+Added table `load_average` to POSIX-compatible Plaforms
+Added column `local_hostname` (`TEXT_TYPE`) to table `system_info`
+Added and removed several columns from Window's `drivers` table
+",https://api.github.com/users/muffins,1328916,muffins,https://api.github.com/repos/facebook/osquery/releases/6704518/assets,https://api.github.com/repos/facebook/osquery/releases/6704518,master,https://api.github.com/repos/facebook/osquery/tarball/2.5.0,https://github.com/facebook/osquery/releases/tag/2.5.0,https://api.github.com/repos/facebook/osquery/zipball/2.5.0,2.5.0,False,False
+6667191,2017-06-09T17:35:40Z,2017-06-09T20:26:00Z,2.4.7,,https://api.github.com/users/muffins,1328916,muffins,https://api.github.com/repos/facebook/osquery/releases/6667191/assets,https://api.github.com/repos/facebook/osquery/releases/6667191,master,https://api.github.com/repos/facebook/osquery/tarball/2.4.7,https://github.com/facebook/osquery/releases/tag/2.4.7,https://api.github.com/repos/facebook/osquery/zipball/2.4.7,2.4.7,False,True
+6551859,2017-05-31T00:08:20Z,2017-05-31T00:21:04Z,2.4.6,"## New features in 2.4.6:
+
+This release contains a 'Rebuild the World' release of third party dependencies with bumps in most of the libraries used by osquery. As a part of this bump in third party dependencies we now make use of Clang's ThinLTO to enhance the linking experience. This release further brings in fixes to our build process to facilitate using ASAN and TSAN frameworks. Lastly this release introduces the concept of views for osquery queries, as well as SQL to_base64 and from_base64 column functions.
+
+#3297 Windows `interface_addresses` now leverages native Win32 APIs as opposed to WMI
+#3312 Add base64 encode and decoding functions
+#3306 Adding a config block to create views
+
+### Bug fixes
+
+#3307 Fix reading past the end of buffer in fileops tests
+#3308 Fix temperature sorting in darwin temperature_sensors table
+#3309 Fix crash caused by boost's unhandled exception in filesystem
+#3286 Fix sudoers path on FreeBSD, add fields to os_version
+#3291 Fix patchlevel reporting for FreeBSD
+#3322 Removing pretty printing from windows event log data
+#3335 Fix invalid control character in profile.py
+[Tidy] Fix all C99 warnings #3353
+
+### Table changes (from 2.4.4 to 2.4.6):
+
+Added table `fbsd_kmods` to FreeBSD
+Added column `device` (`TEXT_TYPE`) to table `disk_events`
+Added column `type` (`TEXT_TYPE`) to table `interface_addresses`
+Removed column `bsd_name` (`TEXT_TYPE`) from table `disk_events`
+",https://api.github.com/users/muffins,1328916,muffins,https://api.github.com/repos/facebook/osquery/releases/6551859/assets,https://api.github.com/repos/facebook/osquery/releases/6551859,master,https://api.github.com/repos/facebook/osquery/tarball/2.4.6,https://github.com/facebook/osquery/releases/tag/2.4.6,https://api.github.com/repos/facebook/osquery/zipball/2.4.6,2.4.6,False,False
+6520797,2017-05-26T22:24:33Z,2017-05-26T22:38:59Z,2.4.5,,https://api.github.com/users/muffins,1328916,muffins,https://api.github.com/repos/facebook/osquery/releases/6520797/assets,https://api.github.com/repos/facebook/osquery/releases/6520797,master,https://api.github.com/repos/facebook/osquery/tarball/2.4.5,https://github.com/facebook/osquery/releases/tag/2.4.5,https://api.github.com/repos/facebook/osquery/zipball/2.4.5,2.4.5,False,True
+6373019,2017-05-12T23:38:16Z,2017-05-12T23:50:25Z,2.4.4,"## New features in 2.4.4:
+
+#3267 New SQLite functions: `md5`, `sha1`, and `sha256`
+#2956 Augeas' lenses are now bundled with osquery packages
+#3226 External build systems can disable YARA, TSK, or LLDB with `SKIP_` environment variables.
+
+### Bug fixes
+
+#3219 Fix extensions use of database during reset phase
+#3248 Submodules will now update correctly on Windows
+#3257 The IPv4 route gateways on Windows now work
+
+### Table changes (from 2.4.2 to 2.4.4):
+
+Added column `args` (`TEXT_TYPE`) to table `startup_items`
+Added column `channel` (`INTEGER_TYPE`) to table `wifi_status`
+Added column `channel` (`INTEGER_TYPE`) to table `wifi_survey`
+
+Added table `pkg_packages` to FreeBSD
+Added table `docker_container_labels` to POSIX-compatible Plaforms
+Added table `docker_container_mounts` to POSIX-compatible Plaforms
+Added table `docker_container_networks` to POSIX-compatible Plaforms
+Added table `docker_container_ports` to POSIX-compatible Plaforms
+Added table `docker_container_processes` to POSIX-compatible Plaforms
+Added table `docker_container_stats` to POSIX-compatible Plaforms
+Added table `docker_containers` to POSIX-compatible Plaforms
+Added table `docker_image_labels` to POSIX-compatible Plaforms
+Added table `docker_images` to POSIX-compatible Plaforms
+Added table `docker_info` to POSIX-compatible Plaforms
+Added table `docker_network_labels` to POSIX-compatible Plaforms
+Added table `docker_networks` to POSIX-compatible Plaforms
+Added table `docker_version` to POSIX-compatible Plaforms
+Added table `docker_volume_labels` to POSIX-compatible Plaforms
+Added table `docker_volumes` to POSIX-compatible Plaforms
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/6373019/assets,https://api.github.com/repos/facebook/osquery/releases/6373019,master,https://api.github.com/repos/facebook/osquery/tarball/2.4.4,https://github.com/facebook/osquery/releases/tag/2.4.4,https://api.github.com/repos/facebook/osquery/zipball/2.4.4,2.4.4,False,True
+6243694,2017-04-30T22:08:07Z,2017-05-01T19:45:56Z,2.4.3,This is a pre-release for FreeBSD's port.,https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/6243694/assets,https://api.github.com/repos/facebook/osquery/releases/6243694,master,https://api.github.com/repos/facebook/osquery/tarball/2.4.3,https://github.com/facebook/osquery/releases/tag/2.4.3,https://api.github.com/repos/facebook/osquery/zipball/2.4.3,2.4.3,False,True
+6172897,2017-04-24T19:16:10Z,2017-04-24T19:19:54Z,2.4.2,"## New features in 2.4.2:
+
+### Bug fixes
+
+#3157 Use poll over select in inotify (and auditd, udev) publisher
+#3169 Adding bounds checks and key checks for appcompat shims table
+#3170 Fixing stringToWstring crashes with wide character strings
+#3187 Drop permissions properly on Linux (fixes `rpm_packages` on CentOS7)
+#3179 Add database initialization retry
+
+### Config options / CLI flags changes
+
+The `host_identifier` can now take a `specified` (explicit) identifier.
+
+`--host_identifier VALUE` Field used to identify the host running osquery (hostname, uuid, instance, ephemeral, specified)
+`--specified_identifier VALUE` Field used to specify the host_identifier when set to ""specified""
+
+### Table changes (from 2.4.0 to 2.4.2):
+
+Moved table `routes` to All Platforms
+Added table `event_taps` to Darwin (Apple OS X)
+Added table `time_machine_backups` to Darwin (Apple OS X)
+Added table `time_machine_destinations` to Darwin (Apple OS X)
+Added table `scheduled_tasks` to Microsoft Windows
+
+Added hidden column `eid` (`TEXT_TYPE`) to all `*_events` (used for testing)
+",https://api.github.com/users/muffins,1328916,muffins,https://api.github.com/repos/facebook/osquery/releases/6172897/assets,https://api.github.com/repos/facebook/osquery/releases/6172897,master,https://api.github.com/repos/facebook/osquery/tarball/2.4.2,https://github.com/facebook/osquery/releases/tag/2.4.2,https://api.github.com/repos/facebook/osquery/zipball/2.4.2,2.4.2,False,False
+6154786,2017-04-21T23:01:50Z,2017-04-21T23:11:53Z,2.4.1,,https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/6154786/assets,https://api.github.com/repos/facebook/osquery/releases/6154786,master,https://api.github.com/repos/facebook/osquery/tarball/2.4.1,https://github.com/facebook/osquery/releases/tag/2.4.1,https://api.github.com/repos/facebook/osquery/zipball/2.4.1,2.4.1,False,True
+6006192,2017-04-06T22:57:44Z,2017-04-06T23:02:28Z,2.4.0,"## New features in 2.4.0:
+
+### Important changes
+
+#3073 The Windows `registry` table was refactored to have a look and feel like the `file` table.
+#3049 Distributed (ad-hoc) queries now support discovery queries.
+#3087 & #3091 Improve events tables performance and protect against multiple queries overwriting sliding window optimizations.
+#3100 Add globbing support to the Windows `registry` table.
+#3120 Add the `auid` column to all Audit-based tables.
+#3115 Add status logging to AWS-based logger plugins.
+
+### Bug fixes
+
+#3065 Set a max size for RocksDB `MANIFEST` logs, this helps protect against very large transaction logs leading to massive on-disk files.
+#3098 Fix crash when sanitizing REG_NONE types from Windows registry.
+#3106 Return blank or `NULL` values for `sha`, `md5` and `sha256` when files cannot be hashed.
+#3116 Fix potential deadlock with periodic database reset.
+#3142 Fix reentry bug with our GLog logger sink leading to potential deadlocks.
+
+### Config options / CLI flags changes
+
+`--logger_min_status VALUE` Minimum level for status log recording 1=INFO, 2=WARNING, 3=ERROR
+
+### Table changes (from 2.3.4 to 2.4.0):
+
+Moved table `startup_items` from Darwin to All Platforms
+
+Added table `lldp_neighbors` to POSIX-compatible Plaforms
+Added table `python_packages` to POSIX-compatible Plaforms
+Added column `auid` (`BIGINT_TYPE`) to table `process_events`
+Added column `auid` (`BIGINT_TYPE`) to table `socket_events`
+Added column `auid` (`BIGINT_TYPE`) to table `user_events`
+
+Renamed table `syslog` to `syslog_events` on Ubuntu, CentOS (the alias `syslog` still exists)
+
+### Breaking Table API changes
+
+Removed column `hive` (`TEXT_TYPE`) from table `registry`
+Removed column `subkey` (`TEXT_TYPE`) from table `registry`
+The `hive` and `subkey` columns have been combined into a `path` column.
+",https://api.github.com/users/muffins,1328916,muffins,https://api.github.com/repos/facebook/osquery/releases/6006192/assets,https://api.github.com/repos/facebook/osquery/releases/6006192,master,https://api.github.com/repos/facebook/osquery/tarball/2.4.0,https://github.com/facebook/osquery/releases/tag/2.4.0,https://api.github.com/repos/facebook/osquery/zipball/2.4.0,2.4.0,False,False
+5593998,2017-02-28T13:22:29Z,2017-02-28T13:24:11Z,2.3.4,"There are several table API changes but this is mostly a bug-fix release to support macOS < 10.12, IPv6-only stacks, and fix a crash on Linux `platform_info` or `smbios_tables` tables.
+
+### New Features
+
+#2922 The package build now produces a sindle DEB and RPM
+#3022 FreeBSD build working again and ports bumped
+#3020 IPv6-only stack now supported
+
+### Bug fixes
+
+#3018 Fix crash on Linux with platform_info table",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/5593998/assets,https://api.github.com/repos/facebook/osquery/releases/5593998,master,https://api.github.com/repos/facebook/osquery/tarball/2.3.4,https://github.com/facebook/osquery/releases/tag/2.3.4,https://api.github.com/repos/facebook/osquery/zipball/2.3.4,2.3.4,False,False
+5481290,2017-02-15T22:17:40Z,2017-02-16T17:56:20Z,2.3.3,,https://api.github.com/users/muffins,1328916,muffins,https://api.github.com/repos/facebook/osquery/releases/5481290/assets,https://api.github.com/repos/facebook/osquery/releases/5481290,master,https://api.github.com/repos/facebook/osquery/tarball/2.3.3,https://github.com/facebook/osquery/releases/tag/2.3.3,https://api.github.com/repos/facebook/osquery/zipball/2.3.3,2.3.3,False,True
+5424553,2017-02-10T19:49:23Z,2017-02-10T19:55:41Z,2.3.2,"## New Features in 2.3.2:
+
+This release brings about better behavior to the watcher, config plugin, and extensions framework. Additionally this release brings the Windows Event log publisher to Windows, as well as a more robust Windows chocolatey packaging and experimental support for Windows 7 and Server 2008. 
+
+### Bug fixes
+
+#2916 A deadlock existed between the decorator and status log messages being written
+#2734 Moving the OpenSSL requirement to the utility to additional libraries greatly simplified the building of `libosquery`
+#2912 An update in `0.10.0` of thrift required transport connections to be `.close`d before an `.open` would be successful.
+#2881 Dependency builds were failing due to a change in our hosted glibc mirror
+#2983 The memory_map table in Linux did not check for malformed input
+
+### Config options / CLI flags changes
+
+`--windows_event_channels` Overrides which Windows Event log channels are subscribed to.
+
+### Table Changes (from 2.2.0 to 2.3.2):
+
+Added table `arp_cache` to All Platforms
+Added table `hash` to All Platforms
+Added table `logged_in_users` to All Platforms
+Added table `windows_events` to Microsoft Windows
+Added column `instance_id` (`TEXT_TYPE`) to table `osquery_info`
+Added column `uuid` (`TEXT_TYPE`) to table `osquery_info`
+Added column `country_code` (`TEXT_TYPE`) to table `wifi_status`
+Added column `country_code` (`TEXT_TYPE`) to table `wifi_survey`
+Removed table `arp_cache` from POSIX-compatible Plaforms
+Removed table `logged_in_users` from POSIX-compatible Plaforms
+Removed table `hash` from Utility
+",https://api.github.com/users/muffins,1328916,muffins,https://api.github.com/repos/facebook/osquery/releases/5424553/assets,https://api.github.com/repos/facebook/osquery/releases/5424553,master,https://api.github.com/repos/facebook/osquery/tarball/2.3.2,https://github.com/facebook/osquery/releases/tag/2.3.2,https://api.github.com/repos/facebook/osquery/zipball/2.3.2,2.3.2,False,False
+5403895,2017-02-08T03:10:37Z,2017-02-09T04:14:14Z,2.3.1,,https://api.github.com/users/muffins,1328916,muffins,https://api.github.com/repos/facebook/osquery/releases/5403895/assets,https://api.github.com/repos/facebook/osquery/releases/5403895,master,https://api.github.com/repos/facebook/osquery/tarball/2.3.1,https://github.com/facebook/osquery/releases/tag/2.3.1,https://api.github.com/repos/facebook/osquery/zipball/2.3.1,2.3.1,False,True
+5372519,2017-02-06T09:17:38Z,2017-02-06T16:36:09Z,2.3.0,,https://api.github.com/users/muffins,1328916,muffins,https://api.github.com/repos/facebook/osquery/releases/5372519/assets,https://api.github.com/repos/facebook/osquery/releases/5372519,master,https://api.github.com/repos/facebook/osquery/tarball/2.3.0,https://github.com/facebook/osquery/releases/tag/2.3.0,https://api.github.com/repos/facebook/osquery/zipball/2.3.0,2.3.0,False,True
+5223179,2017-01-20T22:03:21Z,2017-01-20T22:04:05Z,2.2.3,,https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/5223179/assets,https://api.github.com/repos/facebook/osquery/releases/5223179,master,https://api.github.com/repos/facebook/osquery/tarball/2.2.3,https://github.com/facebook/osquery/releases/tag/2.2.3,https://api.github.com/repos/facebook/osquery/zipball/2.2.3,2.2.3,False,True
+5196629,2017-01-18T01:18:03Z,2017-01-18T17:28:11Z,2.2.2,,https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/5196629/assets,https://api.github.com/repos/facebook/osquery/releases/5196629,master,https://api.github.com/repos/facebook/osquery/tarball/2.2.2,https://github.com/facebook/osquery/releases/tag/2.2.2,https://api.github.com/repos/facebook/osquery/zipball/2.2.2,2.2.2,False,True
+4946877,2016-12-17T02:20:24Z,2016-12-17T04:03:16Z,2.2.1,"## New features in 2.2.1:
+
+This is a very small release, addressing some bugs in `2.2.0`.
+
+#2867 Removed stream name checking for AWS `kinesis` and `firehose`
+#2878 Fix fault in `apt_sources` systems without `apt` and `dpkg`
+#2879 Allow `EINTR` to continue the Thrift Transport reducing stops when using privilege dropping tables and extensions-based logger plugins
+#2880 Fix exception in OS X `platform_info` table
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/4946877/assets,https://api.github.com/repos/facebook/osquery/releases/4946877,master,https://api.github.com/repos/facebook/osquery/tarball/2.2.1,https://github.com/facebook/osquery/releases/tag/2.2.1,https://api.github.com/repos/facebook/osquery/zipball/2.2.1,2.2.1,False,False
+4902919,2016-12-13T02:00:49Z,2016-12-13T07:56:56Z,2.2.0,"## New features in 2.2.0:
+
+This release is focused on stability.
+
+It improves the backing store database use both by increasing performance and by identifying and fixing logic bugs. Several threading issues have been fixed reducing hard-to-triage errors from complex virtual table and logger plugin use.
+
+Some care has been given to the Linux audit publisher resulting in a safer experience.
+
+### Important changes
+
+#2665 For events-based tables the `--events_optimize` flag is now applied per-query
+#2703 The `kinesis` logger plugin now only sends failed data when retrying
+#2181 Add support for `augeas` configuration parsing, this table needs the supporting lenses installed
+#2785 Configuration JSON may include escaped newlines
+#2787 ""[Multi-pack](http://osquery.readthedocs.io/en/stable/deployment/configuration/#query-packs)"" configuration support
+#2792 With Linux [process and socket auditing](http://osquery.readthedocs.io/en/stable/deployment/process-auditing/), the Linux audit configuration is now optimized
+#2817 The `make deps` target is now split into `make sysprep` and `deps`
+#2855 Allow module and extension autoload paths to include directories
+
+### Bug fixes
+
+#2751 Fix potential crash in Linux FIM where a patch inode is added without a corresponding path string
+#2806 Temporary permissions dropping now uses per-thread syscalls and pthread APIs
+#2749 Fix deadline in RocksDB when errors occur and logging is needed
+#2847 Use local reference to binary name to avoid memory corruption with syslog
+#2865 Fix potential fault when parsing strings in plists
+
+### Config options / CLI flags changes
+
+`--enroll_always` On startup, send a new enrollment request
+`--watchdog_memory_limit VALUE` Override watchdog profile memory limit
+`--watchdog_utilization_limit VALUE` Override watchdog profile CPU utilization limit
+`--logger_syslog_prepend_cee` Prepend ""@cee:"" tag to logged JSON messages
+
+### Table changes (from 2.1.2 to 2.2.0):
+
+Moved table `listening_ports` to All Platforms from POSIX
+Moved table `process_open_sockets` to All Platforms from POSIX
+
+Added table `wifi_status` to Darwin (Apple OS X)
+Added table `wifi_survey` to Darwin (Apple OS X)
+Added table `drivers` to Microsoft Windows
+Added table `patches` to Microsoft Windows
+Added table `augeas` to POSIX-compatible Plaforms
+Added table `sudoers` to POSIX-compatible Plaforms
+Added table `portage_keywords` to Ubuntu, CentOS
+Added table `portage_packages` to Ubuntu, CentOS
+Added table `portage_use` to Ubuntu, CentOS
+Added column `idrops` (`BIGINT_TYPE`) to table `interface_details`
+Added column `odrops` (`BIGINT_TYPE`) to table `interface_details`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/4902919/assets,https://api.github.com/repos/facebook/osquery/releases/4902919,master,https://api.github.com/repos/facebook/osquery/tarball/2.2.0,https://github.com/facebook/osquery/releases/tag/2.2.0,https://api.github.com/repos/facebook/osquery/zipball/2.2.0,2.2.0,False,True
+4567789,2016-11-04T06:54:55Z,2016-11-04T07:29:12Z,2.1.2,"## New features in 2.1.2:
+
+This is a very small release, addressing some nice-to-haves from `2.1.1`.
+
+#2718 OS X will try to build RPMs if `fpm` exists
+#2714 OS X's `safari_extensions` table uses `libxar` to improve parsing coverage
+#2719 The `./build/darwin` folder will be used as the most-recent `darwin` build folder
+#2708 The TLS config plugins uses the correct VERB corresponding to the API documentation
+#2700 If the `logger_path` becomes unusable the daemon will stop with an error to syslog
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/4567789/assets,https://api.github.com/repos/facebook/osquery/releases/4567789,master,https://api.github.com/repos/facebook/osquery/tarball/2.1.2,https://github.com/facebook/osquery/releases/tag/2.1.2,https://api.github.com/repos/facebook/osquery/zipball/2.1.2,2.1.2,False,False
+4522131,2016-10-30T23:23:22Z,2016-10-30T23:24:05Z,2.1.1,"## New features in 2.1.1:
+
+This is a very small release, addressing some nice-to-haves from `2.1.0`.
+
+To help improve some debugging scenarios we've added `.features` and `.summary` to `osqueryi`.
+#2695 Also adds some color to the `osquery>` prompt if your terminal emulator supports 256-color output.
+
+#2692 Extensions will activate their distributed plugin
+#2694 OS X's `preferences` table now supports `LIKE`
+#2693 Several Linux publishers are fixed to `tearDown` during destruction
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/4522131/assets,https://api.github.com/repos/facebook/osquery/releases/4522131,master,https://api.github.com/repos/facebook/osquery/tarball/2.1.1,https://github.com/facebook/osquery/releases/tag/2.1.1,https://api.github.com/repos/facebook/osquery/zipball/2.1.1,2.1.1,False,False
+4513198,2016-10-26T04:03:51Z,2016-10-28T18:42:44Z,2.1.0,"## New features in 2.1.0:
+
+This version adds lots of fixes for Windows.
+
+Please see the important changes and bug fixes section.
+
+### Plugin API changes
+
+Version 2.1.0 is backward compatible with extensions SDK to version 1.7.3. A warning will be emitted if an older extension is connected.
+
+### Important changes
+
+#2613 The readline implementation is replaced with linenoise-ng
+#2624 Drop privileges when reading RPM and DPKG databases
+#2650 Update dependency hashes for OS X Sierra
+#2670 The distributed APIs may now use custom plugins
+#2673 Systems may install a default `flagfile` at `/etc/osquery/osquery.flags.default`
+
+### Bug fixes
+
+#2593 The table column option INDEX is used to prioritize scanning cost
+#2596 Allow custom HTTP redirects within AWS plugins
+#2561 RPM packages are saved with the correct filename format
+#2612 Linux SMBIOS tables prefer sysfs nodes and content over memory reads
+#2616 Promote UUID to version 3 and strip trailing NULL bytes
+#2617 Fix pidfile read errors on Windows Server 2012
+#2627 TLS logger re-enrollment now includes enrollment data
+#2621 Prioritize reading `node_invalid` when handling TLS response errors
+#2634 Ignore pidfile parsing errors when starting `osqueryd`
+#2654 Limit virtual table usage 'help' messages in `osqueryi`
+#2677 Add SQLite prepare lock to fix fast extension load bugs
+#2682 Prevent Linux audit from default-enabling `socket_events`
+#2684 Fix Linux `routes` table inconsistencies
+
+### Config options / CLI flags changes
+
+`--extensions_require VALUE` Comma-separated list of required extensions
+`--extension VALUE` Path to a single extension to autoload
+
+### Table changes (from 2.0.0 to 2.1.0):
+
+Added table `chrome_extensions` to All Platforms
+Added table `etc_services` to All Platforms
+Added table `kernel_info` to All Platforms
+Added table `platform_info` to All Platforms
+
+Added table `appcompat_shims` to Microsoft Windows
+Added table `services` to Microsoft Windows
+
+Added column `codename` (`TEXT_TYPE`) to table `os_version`
+Added column `platform` (`TEXT_TYPE`) to table `os_version`
+Added column `platform_like` (`TEXT_TYPE`) to table `os_version`
+Added column `version` (`TEXT_TYPE`) to table `os_version`
+Added column `query_language` (`TEXT_TYPE`) to table `wmi_event_filters`
+",https://api.github.com/users/muffins,1328916,muffins,https://api.github.com/repos/facebook/osquery/releases/4513198/assets,https://api.github.com/repos/facebook/osquery/releases/4513198,master,https://api.github.com/repos/facebook/osquery/tarball/2.1.0,https://github.com/facebook/osquery/releases/tag/2.1.0,https://api.github.com/repos/facebook/osquery/zipball/2.1.0,2.1.0,False,True
+4294762,2016-10-03T19:23:46Z,2016-10-04T00:31:54Z,2.0.0,"## New features in 2.0.0:
+
+This release brings osquery to Windows! Currently only Windows 8+ is supported, and many features that exist on POSIX platforms are still being ported. Our Windows support includes an abstraction on top of the WMI architecture provided by Microsoft thus allowing rapid development of new virtual tables. We include a dependency and build management system to statically compile binaries independent of system location or supported platform. More simply, we can support a single build that may be deployed to any Windows version (8+).
+
+This release introduces a new Brew-based build redesign (#2251) for Linux and OS X. This has enabled a variety of new CI features, including:
+- `clang-format` checking to insure style uniformity.
+- `cppcheck` to catch performance bugs via static-analysis.
+- Version-pinned LLVM with sanitization frameworks for nightly dynamic-analysis and memory leak checking.
+- `zzuf` for DIY fuzz testing via `make fuzz`.
+- And of course, far-fewer dependency errors due to build host drift.
+
+As always, we hold performance as an essential feature and project goal. With 2.0 we are also including a user-experience focus. The most significant related change is to `TablePlugin`s; we have added a column-attribute and table-attribute description language so SQLite and the `osqueryi` shell can make decisions based on how tables and columns are used. As a quick example, consider selecting from `file`-- in 2.0 if you do not include a path or directory the table will emit a warning; if you include an `_events`-based table in your schedule the set-difference calculations will be skipped. 
+
+### Plugin API changes
+
+#2412 Rename `phys_footprint` to `total_size` in the `processes` table.
+#2525 Promote host UUID to version 2 meaning Linux UUIDs become board UUIDs.
+#2527 Add extensions SDK incompatibility checking.
+
+Version 2.0.0 is backward compatible with extensions SDK to version 1.7.3. A warning will be emitted if an older extension is connected.
+
+### Important changes
+
+#2523 Refactor events and remove the 10/3600 indexes this yields ~4x speed improvement.
+#2500 Improve Thrift exit verbosity on all platforms by forwarding output to Glog.
+#2504 Change `--utc` to default as `true`.
+
+### Bug fixes
+
+#2309 Fix race conditions in Linux inotify publisher configuration
+#2316 Add size check to `package_bom` variable address bounds checking
+#2320 Properly intialize `BufferedLogForwarder` for TLS output plugin
+#2345 Avoid constructor ambiguity in table headers for extensions
+#2348 Use seconds for `--profile_delay` precision
+#2416 Fix Linux `memory_map` printing and convert to using IOMEM-mappings
+#2417 Handle empty Linux pwd structures members
+#2422 Improve status logging when using multi-loggers
+#2447 Multiple bug fixes in the `crashes` virtual table
+#2455 Fix minor `sandboxes` virtual table performance issues and plist parsing exceptions
+#2457 Fix potential string casting issue in `memory_info` virtual table
+#2508 Remove time-override for events add API
+#2528 Correct config-loaded boolean meaning to become has-run-load
+#2529 Create temp directory for exceptional shell uses and fallback to home directories
+#2530 Initialize `VirtualTableContent` attributes for extesnions
+#2562 Fix memory leak within `osqueryi` when using the `-A` flag
+
+### Config options / CLI flags changes
+
+`—install` flag added for windows to install the daemon with the Windows Service Manager
+`—uninstall` flag added for windows to remove the daemon from the Windows Service Manager
+
+`--aws_sts_arn_role` AWS STS ARN role
+`--aws_sts_region` AWS STS region
+`--aws_sts_session_name` AWS STS session name
+`--aws_sts_timeout` AWS STS assume role credential validity in seconds (default 3600)
+
+### Table changes (from 1.8.2 to 2.0.0):
+
+Added table `carbon_black_info` to All Platforms
+Added table `etc_hosts` to All Platforms
+Added table `etc_protocols` to All Platforms
+
+Added table `kernel_panics` to Darwin (Apple OS X)
+
+Added table `apt_sources` to Ubuntu, CentOS
+Added table `deb_packages` to Ubuntu, CentOS
+Added table `rpm_package_files` to Ubuntu, CentOS
+Added table `rpm_packages` to Ubuntu, CentOS
+
+Added table `programs` to Microsoft Windows
+Added table `registry` to Microsoft Windows
+Added table `shared_resources` to Microsoft Windows
+Added table `wmi_cli_event_consumers` to Microsoft Windows
+Added table `wmi_event_filters` to Microsoft Windows
+Added table `wmi_filter_consumer_binding` to Microsoft Windows
+Added table `wmi_script_event_consumers` to Microsoft Windows
+
+Renamed column `phys_footprint` to `total_size` (`BIGINT_TYPE`) in table `processes`
+Renamed column `restarts` to `refreshes` (`INTEGER_TYPE`) in table `osquery_events`
+
+Added column `type` (`TEXT_TYPE`) to table `logged_in_users`
+Added column `name` (`TEXT_TYPE`) to table `memory_map`
+Added column `active` (`INTEGER_TYPE`) to table `osquery_packs`
+Added column `threads` (`INTEGER_TYPE`) to table `processes`
+Added column `datetime` (`TEXT_TYPE`) to table `syslog`
+
+Removed column `region` (`INTEGER_TYPE`) from table `memory_map`
+Removed column `type` (`TEXT_TYPE`) from table `memory_map`
+",https://api.github.com/users/muffins,1328916,muffins,https://api.github.com/repos/facebook/osquery/releases/4294762/assets,https://api.github.com/repos/facebook/osquery/releases/4294762,master,https://api.github.com/repos/facebook/osquery/tarball/2.0.0,https://github.com/facebook/osquery/releases/tag/2.0.0,https://api.github.com/repos/facebook/osquery/zipball/2.0.0,2.0.0,False,False
+3772509,2016-07-29T03:09:28Z,2016-07-29T18:02:08Z,1.8.2,"## New features in 1.8.2:
+
+This is a breakfix release for those using the AWS logger plugins on OS X.
+
+The `firehose` and `kinesis` logger plugins use the cpp-netlib TLS client libraries, which depend on ASIO, boost, and a TLS implementation provided by OpenSSL or LibreSSL. This release allows the plugins to take advantage of `--tls_server_certs` and other TLS-related configuration options. If you are using these logger plugins and receiving invalid certificate issue, you need to provide a PEM bundle using the aforementioned flag.
+
+### Bug fixes
+
+#2285 Fix 'off the end' potential bug in crashes table
+#2287 Use ""UTC"" for timezone when no timezone is present in the `time` table
+#2299 Use `TLSTransport` HTTPS client within AWS logger plugins
+
+### Config options / CLI flags changes
+
+`--buffered_log_max` Maximum number of logs in buffered output plugins (0 = unlimited)
+
+### Table changes (from 1.8.1 to 1.8.2):
+
+Added table `memory_info` to Ubuntu, CentOS
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/3772509/assets,https://api.github.com/repos/facebook/osquery/releases/3772509,master,https://api.github.com/repos/facebook/osquery/tarball/1.8.2,https://github.com/facebook/osquery/releases/tag/1.8.2,https://api.github.com/repos/facebook/osquery/zipball/1.8.2,1.8.2,False,False
+3713811,2016-07-21T21:29:17Z,2016-07-21T21:39:03Z,1.8.1,"## New features in 1.8.1:
+
+This is a bugfix release for version 1.8.0.
+
+### Critical Bug fixes:
+
+#2259 Fixed memory leak in QueryContext affecting watchdog processes
+#2275 Fix regression from 1.7.7 where the Linux daemon searched for a config in `/var/osquery`
+
+### Bug fixes:
+
+#2255 Improved defaults for systemd service unit
+#2266 Fix kernel extension build and COMM version requirement
+#2267 The `process_file_events` subscriber was incorrectly added to Linux
+
+### Config options / CLI flags changes
+
+`--audit_allow_sockets` Enable the `socket_events` on Linux
+
+### Table changes (from 1.8.0 to 1.8.1):
+
+Added table `user_ssh_keys` to POSIX-compatible Plaforms
+Added column `watcher` (`INTEGER_TYPE`) to table `osquery_info`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/3713811/assets,https://api.github.com/repos/facebook/osquery/releases/3713811,master,https://api.github.com/repos/facebook/osquery/tarball/1.8.1,https://github.com/facebook/osquery/releases/tag/1.8.1,https://api.github.com/repos/facebook/osquery/zipball/1.8.1,1.8.1,False,False
+3660782,2016-07-13T18:29:07Z,2016-07-14T19:52:21Z,1.8.0,"## New features in 1.8.0:
+
+This is a release rollup of fixes since 1.7.4.
+
+There is an optional Thrift API change for extensions: the `shutdown` method.
+The osquery core, extension manager, will attempt to call this optionally-implemented method
+immediately before it shuts down. This request is blocking and allows an extension to perform
+cleanup before its watcher thread quits.
+
+### Plugin API changes
+
+#2224 Add `shutdown()` method to extensions API
+#2229 The logger facilities now write catastrophic errors to syslog
+#2241 Distributed queries will log verbose events indicating their query requests
+
+### Bug fixes:
+
+#2205 Fix milli/micro conversion when waiting for active plugins (regression from 1.7.4)
+#2207 Restore extension respawn limits to 20s (regression from 1.7.4)
+#2217 Fix SQLite local access after ASIO URL usage (OS X)
+#2228 Force RocksDB to sync writes for non-event domains
+#2234 Fix various Linux process path parsing errors
+
+### Config options / CLI flags changes
+
+`--decorations_top_level` Add decorators as top level JSON objects
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/3660782/assets,https://api.github.com/repos/facebook/osquery/releases/3660782,master,https://api.github.com/repos/facebook/osquery/tarball/1.8.0,https://github.com/facebook/osquery/releases/tag/1.8.0,https://api.github.com/repos/facebook/osquery/zipball/1.8.0,1.8.0,False,False
+3534920,2016-06-27T23:39:04Z,2016-06-28T00:29:22Z,1.7.7,"## New features in 1.7.7:
+
+This is a quick bug-fix pre-release.
+
+### Bug fixes:
+
+#2195 Most `boost::filesystem` API calls are now `noexcept`
+#2187 Fix regression add in 1.7.6 leading to `nullptr` dereferences in `PlatformFile`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/3534920/assets,https://api.github.com/repos/facebook/osquery/releases/3534920,master,https://api.github.com/repos/facebook/osquery/tarball/1.7.7,https://github.com/facebook/osquery/releases/tag/1.7.7,https://api.github.com/repos/facebook/osquery/zipball/1.7.7,1.7.7,False,True
+3486790,2016-06-20T06:27:16Z,2016-06-21T06:01:21Z,1.7.6,"## New features in 1.7.6:
+
+This is a quick bug-fix pre-release.
+
+### Plugin API changes
+
+#2166 The AWS Firehose logger plugin now inserts newlines ""\n""
+
+### Bug fixes:
+
+#2163 The systemd osqueryd service unit is installed correctly on Ubuntu 16.04
+#2174 The OS X Launch Daemon script arguments have been corrected
+
+### Config options / CLI flags changes
+
+`--ephemeral` Can be used for `osqueryd` to choose a random pidfile.
+`--disable_database` Can be used to select an in-memory transient database. This is turned on by-default for the shell.
+`--pack PACKNAME` Can be used by the shell to execute all queries in a pack.
+
+`--aws_kinesis_random_partition_key` Added to the AWS Kinesis logger plugin.
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/3486790/assets,https://api.github.com/repos/facebook/osquery/releases/3486790,master,https://api.github.com/repos/facebook/osquery/tarball/1.7.6,https://github.com/facebook/osquery/releases/tag/1.7.6,https://api.github.com/repos/facebook/osquery/zipball/1.7.6,1.7.6,False,True
+3403036,2016-06-08T18:14:36Z,2016-06-08T19:19:32Z,1.7.5,"## New features in 1.7.5:
+
+#2077 Within-query caching allows for more efficient subqueries
+#2079 Remove the `::logHealth` methods from logger plugins
+#2088 Add an optional `::logEvent` API for logger plugins
+#2089 Add Ubuntu Xenial 16.04 build support
+#2093 Add `--pack` option to the `osqueryi` shell
+#2101 Introduce table options to represent keyed-columns in SQLite
+#2104 Introduce table aliases to support future deprecation of table names
+#2123 Add basic math functions to SQLite: `pow`, `sqrt`, `log`, `floor`, etc
+#2124 Add string splitting functions to SQLite: `split`, `split_regex`, etc
+#2137 Update SQLite to 3.14.0 to support combined `LIKE` and `=` in single predicates
+#2139 Update the AWS APIs to version 0.12.4
+
+### Plugin API changes
+
+There are two breaking API changes to **TablePlugin** and **LoggerPlugin** that will affect extensions.
+
+TablePlugins must now return `osquery::TableColumns` as a set of `tuple`s:
+
+``` cpp
+class exampleTablePlugin : public TablePlugin {
+private:
+  TableColumns columns() const {
+    return {
+      std::make_tuple(""key"", TEXT_TYPE, DEFAULT),
+      std::make_tuple(""value"", TEXT_TYPE, DEFAULT),
+    };
+  }
+};
+```
+
+Logger plugins use `::init` and `::logStatus` must (1) change the return type for `::init` to `void` and define a `::usesLogStatus` method:
+
+``` cpp
+class exampleLoggerPlugin : LoggerPlugin {
+ public:
+  void init(const std::string& name,
+      const std::vector<StatusLogLine>& log) override;
+
+  bool usesLogStatus() override { return true; }
+};
+```
+
+### Bug fixes:
+
+The provision scripts (`make deps`) for several distributions have been improved.
+
+#2151 Fix autoloading of the osquery kernel extension on OS X
+#2135 Limit SMBIOS reads to the 1M-2M region
+#2116 Add `::removeService` to the Dispatcher API to fix kernel tests
+
+### Table changes (from 1.7.4 to 1.7.5):
+
+The `process_events` table was significantly changes. The time-related column names now match `file`.
+
+Added table `quicklook_cache` to Darwin (Apple OS X)
+Renamed column `access_time` to `atime` in table `process_events`
+Renamed column `create_time` to `btime` in table `process_events`
+Renamed column `change_time` to `ctime` in table `process_events`
+Renamed column `modify_time` to `mtime` in table `process_events`
+Renamed column `environment` to `env` in table `process_events`
+Renamed column `environment_count` to `env_count` in table `process_events`
+Renamed column `environment_size` to `env_size` in table `process_events`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/3403036/assets,https://api.github.com/repos/facebook/osquery/releases/3403036,master,https://api.github.com/repos/facebook/osquery/tarball/1.7.5,https://github.com/facebook/osquery/releases/tag/1.7.5,https://api.github.com/repos/facebook/osquery/zipball/1.7.5,1.7.5,False,False
+3182595,2016-05-06T20:14:06Z,2016-05-09T06:45:56Z,1.7.4,"## New features in 1.7.4:
+
+#1983 [Decorator queries](http://osquery.readthedocs.io/en/stable/deployment/configuration/#decorator-queries) allow the configuration to extend every scheduled query by adding 'decorations'.
+#2036 Buffered log forwarding simplifies new logger pluggin development.
+#2015 Basic build support for Windows 10 and Visual Studio 2015.
+#2046 Add AWS SDK to build dependencies for Kinesis and Firehose integration.
+#2064 Begin cut over to UTC, some columns and UNIX times are still local-time based; version 1.8.0 will complete the cut over.
+#2064 Add a `version` field to buffered status logs.
+
+The change to UTC times (where UTC is not already used) can be started now by enabling `--utc`, this option will become default in version 1.8.0.
+
+### Bug fixes:
+
+#2053 Prevent client errors when TLS plugin responses are empty.
+#2060 Send `Content-Encoding` header when using TLS logging compression: `--logger_tls_compress`.
+#2061 Add an `{action: snapshot}` to snapshot results.
+
+### Table changes (from 1.7.3 to 1.7.4):
+
+Added table `crashes` to Darwin (Apple OS X)
+Added table `package_install_history` to Darwin (Apple OS X)
+Added table `syslog` to Ubuntu, CentOS
+
+Added column `time` (`INTEGER_TYPE`) to table `shell_history`
+Added column `datetime` (`TEXT_TYPE`) to table `time`
+Added column `local_time` (`INTEGER_TYPE`) to table `time`
+Added column `local_timezone` (`TEXT_TYPE`) to table `time`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/3182595/assets,https://api.github.com/repos/facebook/osquery/releases/3182595,master,https://api.github.com/repos/facebook/osquery/tarball/1.7.4,https://github.com/facebook/osquery/releases/tag/1.7.4,https://api.github.com/repos/facebook/osquery/zipball/1.7.4,1.7.4,False,False
+2911784,2016-03-30T00:37:14Z,2016-03-30T00:37:43Z,1.7.3,"## New features in 1.7.3:
+
+This release fixes #1972, which was introduced in 1.7.2.
+
+#1963 YARA events `yara_events` now include MOVE file events.
+
+### Bug fixes:
+
+#1972 Fix deadlock when using `osquery_schedule` (only present in 1.7.2)
+#1966 Clear cache of distributed query results
+
+Additional fix-ups to the osquery systemd service.
+
+### Table changes (from 1.7.2 to 1.7.3):
+
+Added column `disabled` (`INTEGER_TYPE`) to table `browser_plugins`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/2911784/assets,https://api.github.com/repos/facebook/osquery/releases/2911784,master,https://api.github.com/repos/facebook/osquery/tarball/1.7.3,https://github.com/facebook/osquery/releases/tag/1.7.3,https://api.github.com/repos/facebook/osquery/zipball/1.7.3,1.7.3,False,True
+2859235,2016-03-21T22:58:47Z,2016-03-22T00:18:00Z,1.7.2,"## New features in 1.7.2:
+
+The SQLite included in 1.7.2 includes support for `IN` and `OR` operators!
+RocksDB can now be swapped with SQLite as the backing store to help support new platforms.
+The certificates table on OS X now supports both DER and PEM formats.
+The use of `boost::thread` has been removed, as well as shared mutexes.
+TLS SNI support via cpp-netlib's 0.12-rc1 build.
+
+### Extensions should no longer use `Initializer::shutdown()`
+
+Prior to 1.7.2 an extension's main file resembled:
+
+``` cpp
+ int main(int argc, char* argv[]) {
+   osquery::Initializer runner(argc, argv, OSQUERY_EXTENSION);
+  auto status = startExtension(""your_name"", ""1.0.0"", ""1.7.2"");
+   if (!status.ok()) {
+     LOG(ERROR) << status.getMessage();
+   }
+
+  // Finally shutdown.
+  runner.shutdown();
+   return 0;
+ }
+```
+
+It should now use the following flow:
+
+``` cpp
+int main(int argc, char* argv[]) {
+  osquery::Initializer runner(argc, argv, OSQUERY_EXTENSION);
+  auto status = startExtension(""your_name"", ""1.0.0"", ""1.7.2"");
+  if (!status.ok()) {
+    LOG(ERROR) << status.getMessage();
+    runner.requestShutdown(status.getCode());
+  }
+
+  // Finally wait for a signal / interrupt to shutdown.
+  runner.waitForShutdown();
+  return 0;
+}
+```
+
+### `NULL`s in results
+
+`NULL` values are now allowed in column results. 
+This means values which were NOT filled in for `INTEGER`, `BIGINT`, and `DOUBLE` types would previously, in error, return a -1. This was very confusing as we do not differentiate between signed/unsigned SQLite types so it was difficult to determine if the -1 indicated an error. Expect these values to return empty JSON strings in logs. Eventually table implementation will be able to explicitly return a `null` type, which will propagate into JSON.
+
+### Bug fixes:
+
+#1888 OS X's process table would generate a result row for 'fake' pids if a pid was used in the query constraint
+#1893 libdevmapper is now built and linked statically for CentOS6/7 packages
+#1913 Process 'state' on Linux and OS X was overloaded and typed incorrectly
+#1936 Event expiring in 1.7.1 left stay events in the outer indexes
+#1944 TLS-based configuration could lead to a spurious final config request on shutdown
+#1946 The 'unsupported' Debian package build scripts were adding incorrect package dependencies 
+
+### Table changes (from 1.7.1 to 1.7.2):
+
+Added table `asl` to Darwin (Apple OS X)
+Added table `cpu_time` to Ubuntu, CentOS
+Added column `name` (`TEXT_TYPE`) to table `fan_speed_sensors`
+Added column `authority` (`TEXT_TYPE`) to table `signature`
+Added column `cdhash` (`TEXT_TYPE`) to table `signature`
+Added column `team_identifier` (`TEXT_TYPE`) to table `signature`
+
+### Table API breaking changes in 1.7.2:
+
+Renamed column `group` to `pgroup` in table `processes`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/2859235/assets,https://api.github.com/repos/facebook/osquery/releases/2859235,master,https://api.github.com/repos/facebook/osquery/tarball/1.7.2,https://github.com/facebook/osquery/releases/tag/1.7.2,https://api.github.com/repos/facebook/osquery/zipball/1.7.2,1.7.2,False,False
+2694140,2016-02-26T05:23:50Z,2016-02-26T06:16:12Z,1.7.1,"## New features in 1.7.1:
+
+#1836 Extensions autoloading is now supported in `osqueryi`.
+#1850 String parsing, tokenization, and UTF8 conversions methods have been removed from the public API.
+#1858 SQLite has been bumped to 3.11.0, this adds support for `LIKE` within query constraints.
+
+### SQLite 3.11.0 and `LIKE`
+
+The bump to 3.11.0 (#1858) and support for `LIKE` has induced a breaking table spec API change. The `pattern` column has been removed from `file` and `yara` as it was used has a small hack to support `LIKE`-style operations.
+
+Prior to osquery 1.7.1 a query would use:
+
+``` sql
+SELECT * FROM file WHERE pattern = '/etc/%';
+```
+
+Now you must use the more natural:
+
+``` sql
+SELECT * FROM file WHERE path LIKE '/etc/%';
+```
+
+### Notes:
+
+#1829 Adds significant hardening around dispatcher / extension thread safety for the osquery core. An equivalent study is yet to be committed for extension processes.
+#1831 Thrift 0.9.3 is now required to build-- packages prior to 1.7.1 used 0.9.1.
+#1847 CTRL^C will now exit the shell, previously only CTRL^D exited.
+#1856 If using cpp-netlib version 0.12+, osquery will attempt SNI for TLS plugins.
+#1868 Setting an invalid option within the config will generate a WARNING status log.
+
+### Bug fixes:
+
+#1815 Prevent duplicate events for Linux inotify events
+#1813 Use 'rom' on OS X to report `platform_info`
+#1823 Handle `osqueryi` usage by users with restricted (or without) home directories
+#1841 Setting `file_paths` within packs now applies platform/shard restrictions.
+#1863 The filesystem logger plugin now adds a newline for snapshot queries.
+#1872 The Linux init-script has sane Default Start/Stop levels.
+
+### Config options / CLI flags changes:
+
+The `--flagfile` option has always existed, but it is not outputted with `--help`.
+
+`--flagfile=PATH` Line-delimited file of additional flags 
+
+### Table changes (from 1.7.0 to 1.7.1):
+
+Added table `dns_resolvers` to All Platforms
+Added table `fan_speed_sensors` to Darwin (Apple OS X)
+Added table `power_sensors` to Darwin (Apple OS X)
+Added table `temperature_sensors` to Darwin (Apple OS X)
+Added column `user_uuid` (`TEXT_TYPE`) to table `disk_encryption`
+Added column `developer_id` (`TEXT_TYPE`) to table `safari_extensions`
+Added column `uuid` (`TEXT_TYPE`) to table `users`
+
+### Table API breaking changes in 1.7.1:
+
+Removed column `pattern` (`TEXT_TYPE`) from table `file`
+Removed column `pattern` (`TEXT_TYPE`) from table `yara`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/2694140/assets,https://api.github.com/repos/facebook/osquery/releases/2694140,master,https://api.github.com/repos/facebook/osquery/tarball/1.7.1,https://github.com/facebook/osquery/releases/tag/1.7.1,https://api.github.com/repos/facebook/osquery/zipball/1.7.1,1.7.1,False,False
+2533912,2016-02-02T01:10:57Z,2016-02-02T01:48:58Z,1.7.0,"## New features in 1.7.0:
+
+Query packs can now include FIM categories and paths.
+OS X TLS-based plugins now require an explicit path to a certificate authority PEM bundle.
+The TLS-based plugins continue to receive performance and feature improvements.
+For CentOS and RHEL 7 builds the `make packages` macro will include a basic systemd unit.
+
+### Notes:
+
+The OS X `signature` table now only reports success if the target path passes 'strict' code signing checks.
+This release marks the first release build built using 10.11, and the TLS implementation uses LibreSSL.
+For a short period between 1.6.3 and 1.6.4 the RocksDB options were not compatible with previous databases. There are no compatibility issues with 1.7.0 and previous releases.
+
+### Bug fixes:
+
+#1796 Query constraints tracking support for multi-sub queries
+#1801 Fix ROWID constraint interpreted as a column index
+
+### Plugin API change:
+
+#1581 Logger plugin `logString` methods are called once per logline
+
+### Config options / CLI flags changes:
+
+`--events_max=COUNT` Maximum number of events per type to buffer
+`--logger_tls_compress=False` GZip compress TLS/HTTPS request body
+`--logger_tls_max=COUNT` Max size in bytes allowed per log line
+
+### Table changes (from 1.6.3 to 1.7.0):
+
+Added table `sip_config` to Darwin (Apple OS X)
+Added table `smc_keys` to Darwin (Apple OS X)
+Added column `key_strength` (`TEXT_TYPE`) to table `certificates`
+Added column `uid` (`TEXT_TYPE`) to table `disk_encryption`
+Added column `hardware_vendor` (`TEXT_TYPE`) to table `system_info`
+Added column `hardware_version` (`TEXT_TYPE`) to table `system_info`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/2533912/assets,https://api.github.com/repos/facebook/osquery/releases/2533912,master,https://api.github.com/repos/facebook/osquery/tarball/1.7.0,https://github.com/facebook/osquery/releases/tag/1.7.0,https://api.github.com/repos/facebook/osquery/zipball/1.7.0,1.7.0,False,False
+2423868,2016-01-13T17:43:21Z,2016-01-14T00:18:31Z,1.6.4,"This `1.6.4` release does not include binary packages, a brew commit, or change logs docs.
+
+This is used as a demarcation for building on OS X 10.11 for integration tests and packages.
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/2423868/assets,https://api.github.com/repos/facebook/osquery/releases/2423868,master,https://api.github.com/repos/facebook/osquery/tarball/1.6.4,https://github.com/facebook/osquery/releases/tag/1.6.4,https://api.github.com/repos/facebook/osquery/zipball/1.6.4,1.6.4,False,True
+2309835,2015-12-18T06:32:57Z,2015-12-18T07:58:38Z,1.6.3,"## New features in 1.6.3:
+
+This version is a quick release on top of 1.6.2.
+
+### Bug fixes:
+
+#1735 Remove `OPENED` events from `file_events`
+#1736 Allow TLS endpoints to return `node_invalid` multiple times.
+
+### Table changes (from 1.6.2 to 1.6.3):
+
+Added column `issuer` (`TEXT_TYPE`) to table `certificates`
+Added column `self_signed` (`INTEGER_TYPE`) to table `certificates`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/2309835/assets,https://api.github.com/repos/facebook/osquery/releases/2309835,master,https://api.github.com/repos/facebook/osquery/tarball/1.6.3,https://github.com/facebook/osquery/releases/tag/1.6.3,https://api.github.com/repos/facebook/osquery/zipball/1.6.3,1.6.3,False,False
+2301289,2015-12-16T22:36:12Z,2015-12-16T22:38:57Z,1.6.2,"## New features in 1.6.2:
+
+The Sleuth Kit integration is complete, use `device_`\* tables to list partitions, files and hashes.
+Results for 'expired' queries are now purged from the backing store (RocksDB).
+The `file_events` tables are now designed for modification/alter events only.
+The `file_access_events` tables have been superseded by `process_file_events`, accesses use the new [`file_accesses`](http://osquery.readthedocs.org/en/stable/deployment/file-integrity-monitoring/#file-accesses) configuration key.
+Additionally, the `file_events` table include many more helpful fields populated at event time.
+SQLite has been updated to 3.10.0 and the [JSON-extensions](https://www.sqlite.org/json1.html) are now enabled.
+File hashing now includes algorithm parallelism, but all algorithms are still always run regardless of selections.
+For debugging the `osqueryi` client can be used to dump configuration JSON or the backing store items.
+The configuration can now specify multiple loggers, for example `--config_plugin=filesystem,syslog`.
+Packs and queries now support a `shard=N` [option](http://osquery.readthedocs.org/en/stable/deployment/configuration/#options).
+
+### Bug fixes:
+
+#1660 Fixes NETLINK errors with `routes` table on CentOS 6
+#1676 Clear `node_key` when TLS plugins respond with `node_invalid=True`
+#1689 Boost 1.59 removed support for comments in JSON files, we now 'only' support #-style.
+#1714 Columns with the `DOUBLE` type no longer return '-1'
+
+### Config options / CLI flags changes:
+
+`--config_check` Check the format of an osquery config and exit
+`--config_dump` Dump the contents of the configuration
+`--database_dump` Dump the contents of the backing store
+`--disable_reenrollment` Disable re-enrollment attempts if related plugins return invalid
+`--header` Toggle column headers true/false
+`--planner` Enable osquery runtime planner output
+
+### Table changes (from 1.6.1 to 1.6.2):
+
+Added table `device_file` to All Platforms
+Added table `device_hash` to All Platforms
+Added table `device_partitions` to All Platforms
+Added table `platform_info` to All Platforms
+Added table `process_file_events` to Darwin (Apple OS X)
+
+Added column `btime` (`BIGINT_TYPE`) to table `file`
+Added column `atime` (`BIGINT_TYPE`) to table `file_events`
+Added column `ctime` (`BIGINT_TYPE`) to table `file_events`
+Added column `gid` (`BIGINT_TYPE`) to table `file_events`
+Added column `hashed` (`INTEGER_TYPE`) to table `file_events`
+Added column `inode` (`BIGINT_TYPE`) to table `file_events`
+Added column `mode` (`TEXT_TYPE`) to table `file_events`
+Added column `mtime` (`BIGINT_TYPE`) to table `file_events`
+Added column `size` (`BIGINT_TYPE`) to table `file_events`
+Added column `uid` (`BIGINT_TYPE`) to table `file_events`
+Added column `shard` (`INTEGER_TYPE`) to table `osquery_packs`
+
+### Table API breaking changes in 1.6.2:
+
+Removed table `passwd_changes` from All Platforms
+Removed table `file_access_events` from Darwin (Apple OS X)
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/2301289/assets,https://api.github.com/repos/facebook/osquery/releases/2301289,master,https://api.github.com/repos/facebook/osquery/tarball/1.6.2,https://github.com/facebook/osquery/releases/tag/1.6.2,https://api.github.com/repos/facebook/osquery/zipball/1.6.2,1.6.2,False,False
+2203883,2015-11-30T02:59:27Z,2015-11-30T03:10:56Z,1.6.1,"## New features in 1.6.1:
+
+This release introduces schedule caching, greatly improving performance when using default packs.
+The `getQueryColumns` thrift API now uses heuristics to determine expression types.
+OS X's `hardware_events` table is now backed by an IOKit eventing API (previously it only included HID events).
+Constraints stacking within subqueries is improved (part 4 of #1651).
+
+Tables that act on user data (on Linux) have been refactored to require a `JOIN` against `users` to enumerate. There are still several tables on OS X that search user-owned directories, they will eventually be refactored too. In all cases, the pack queries operating on these tables have been updated to include `JOIN users USING (uid)`.
+
+### Bug fixes:
+
+#1527 Building from source is no longer required for profiling with `./tools/profile.py`
+#1635 Dropping privileges temporarily on Linux would cause thrift sockets to close
+#1675 Constraints ""stacked"" onto the same table would overwrite subquery constraints
+#1685 OS X's LaunchDaemon's ProgramArguments rewrite `argv[0]` and could trample status log filenames
+
+#### Breaking changes
+
+#1647 Remove ""result="" from logs sent to the syslog logger plugin, see #1212
+
+### Config options / CLI flags changes:
+
+`--disable_caching` Disable scheduled query caching
+`--logger_mode MODE` Mode for log files (default '0640')
+`--profile COUNT` Enable profile mode when non-0, set number of iterations
+
+### Table changes (from 1.6.0 to 1.6.1):
+
+Added table `authorized_keys` to All Platforms
+Added table `known_hosts` to All Platforms
+Added table `signature` to Darwin (Apple OS X)
+Added table `user_events` to Ubuntu, CentOS
+Added column `sgid` (`BIGINT_TYPE`) to table `processes`
+Added column `suid` (`BIGINT_TYPE`) to table `processes`
+
+Added column `uid` (`BIGINT_TYPE`) to table `browser_plugins`
+Added column `uid` (`BIGINT_TYPE`) to table `chrome_extensions`
+Added column `uid` (`BIGINT_TYPE`) to table `firefox_addons`
+Added column `uid` (`BIGINT_TYPE`) to table `opera_extensions`
+Added column `uid` (`BIGINT_TYPE`) to table `safari_extensions`
+Added column `uid` (`BIGINT_TYPE`) to table `shell_history`
+Added column `timezone` (`TEXT_TYPE`) to table `time`
+Added column `signing_algorithm` (`TEXT_TYPE`) to table `certificates`
+Added column `subject` (`TEXT_TYPE`) to table `certificates`
+
+### Table API breaking changes in 1.6.1:
+
+Removed column `username` (`TEXT`) from table `shell_history`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/2203883/assets,https://api.github.com/repos/facebook/osquery/releases/2203883,master,https://api.github.com/repos/facebook/osquery/tarball/1.6.1,https://github.com/facebook/osquery/releases/tag/1.6.1,https://api.github.com/repos/facebook/osquery/zipball/1.6.1,1.6.1,False,False
+2073621,2015-11-04T22:05:58Z,2015-11-04T22:16:14Z,1.6.0,"## New features in 1.6.0:
+
+Improved scheduling logic focused on reliable and deterministic query execution.
+More usable and performant Linux file integrity monitoring.
+Facilities for dropping privileges within table implementations when operating on user controlled data.
+Linux audit-based socket binds and connect tracking.
+
+### Bug fixes:
+
+#1537 Correct `config_valid` boolean in `osquery_info` table
+#1536 Fix pack discovery queries from losing cached results
+#1545 Fix JSON syntax error in example configuration
+#1549 Limit RocksDB LITE warnings and swap EFI path delimiters in `kernel_info` on OS X
+#1554 Fix file descriptor leak in Linux `interface_details` table
+#1550 The extension manager should clean managed extension UNIX socks on exit
+#1559 Prevent boost exceptions when invalid `LC_CTYPE` variable is used
+#1579 Fix potential crashes when calling `getifaddrs(3)` on Linux `interface_details`
+#1580 Protect against invalid `/proc` data when parsing memory maps
+#1598 Fix various filesystem access TOCTOU errors
+#1621 Fix schedule iteration restoration logic to use UNIX time instead of a 0-60 seconds modulus
+#1631 Use blank values for missing keys in OS X `startup_items`
+
+### Config options / CLI flags changes:
+
+`--pack_delimiter SYMBOL`  Delimiter for pack and query names
+`--distributed_enabled` renamed to `--disable_distributed` and the default is now `false`
+`--distributed_poll_interval` renamed to `--distributed_interval`
+`--read_user_links` has been removed
+
+### Table changes (from 1.5.3 to 1.6.0):
+
+Added table `system_info` to All Platforms
+Added table `wifi_networks` to Darwin (Apple OS X)
+Added table `socket_events` to Ubuntu, CentOS
+Added column `type` (`TEXT`) to table `file`
+Added column `start_time` (`INTEGER`) to table `osquery_info`
+Added column `last_executed` (`BIGINT`) to table `osquery_schedule`
+Added column `fd` (`BIGINT`) to table `process_open_sockets`
+
+### Table API breaking changes in 1.6.0:
+
+Change column `config_md5` to `config_hash` (`TEXT`) in table `osquery_info`
+Change column `cpu_serial` to `hardware_serial` (`TEXT`) in table `system_info`
+Removed column `is_block` (`INTEGER`) from table `file`
+Removed column `is_char` (`INTEGER`) from table `file`
+Removed column `is_dir` (`INTEGER`) from table `file`
+Removed column `is_file` (`INTEGER`) from table `file`
+Removed column `is_link` (`INTEGER`) from table `file`
+Removed column `md5` (`TEXT`) from table `kernel_info`
+Removed column `config_path` (`TEXT`) from table `osquery_info`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/2073621/assets,https://api.github.com/repos/facebook/osquery/releases/2073621,master,https://api.github.com/repos/facebook/osquery/tarball/1.6.0,https://github.com/facebook/osquery/releases/tag/1.6.0,https://api.github.com/repos/facebook/osquery/zipball/1.6.0,1.6.0,False,False
+1880963,2015-09-29T01:06:53Z,2015-09-29T02:50:06Z,1.5.3,"## New features in 1.5.3:
+
+Support for Linux process events using libaudit.
+Packs and pack queries can now be included inline with configuration content.
+Distributed query support has been refactored/improved but is still in alpha.
+Simultaneous `osqueryi` shells are now supported.
+Removed building Google benchmark and cpp-netlib in third party.
+
+### Bug fixes:
+
+#1432 Improved USB device reporting on OS X
+#1455 Add libgcrypt11 to package dependency list for Debian/Ubuntu
+#1506 OS X kernel driver is only loaded if the package is installed
+#1517 Fix YARA sigfile cachine (previously, sigfiles were only applied once)
+#1522 OS X startup items includes more search paths
+
+### Config options / CLI flags changes:
+
+`--config_tls_max_attempts INT` Number of times to attempt a request
+`--schedule_default_interval SECONDS` Query interval to use if none is provided
+`--pack_refresh_interval SECONDS` Cache expiration for a packs discovery queries
+`--enroll_secret_env VALUE` Name of environment variable holding enrollment-auth secret
+
+### Table changes (from 1.5.2 to 1.5.3):
+
+Added table `magic` to All Platforms
+Added table `process_events` to All Platforms
+Added table `system_info` to Darwin (Apple OS X)
+Added table `xprotect_meta` to Darwin (Apple OS X)
+Added table `osquery_events` to Utility
+
+Added column `config_valid` (`INTEGER`) to table `osquery_info`
+Added column `discovery_cache_hits` (`INTEGER`) to table `osquery_packs`
+Added column `discovery_executions` (`INTEGER`) to table `osquery_packs`
+Added column `group` (`BIGINT`) to table `processes`
+Added column `nice` (`INTEGER`) to table `processes`
+Added column `state` (`TEXT`) to table `processes`
+Added column `author` (`TEXT`) to table `safari_extensions`
+Added column `description` (`TEXT`) to table `safari_extensions`
+Added column `identifier` (`TEXT`) to table `safari_extensions`
+Added column `sdk` (`TEXT`) to table `safari_extensions`
+Added column `update_url` (`TEXT`) to table `safari_extensions`
+Added column `version` (`TEXT`) to table `safari_extensions`
+
+Removed table `process_events` from Darwin (Apple OS X)
+Removed column `description` (`TEXT`) from table `osquery_packs`
+Removed column `interval` (`INTEGER`) from table `osquery_packs`
+Removed column `path` (`TEXT`) from table `osquery_packs`
+Removed column `query` (`TEXT`) from table `osquery_packs`
+Removed column `query_name` (`TEXT`) from table `osquery_packs`
+Removed column `scheduled` (`INTEGER`) from table `osquery_packs`
+Removed column `scheduled_name` (`TEXT`) from table `osquery_packs`
+Removed column `value` (`TEXT`) from table `osquery_packs`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/1880963/assets,https://api.github.com/repos/facebook/osquery/releases/1880963,master,https://api.github.com/repos/facebook/osquery/tarball/1.5.3,https://github.com/facebook/osquery/releases/tag/1.5.3,https://api.github.com/repos/facebook/osquery/zipball/1.5.3,1.5.3,False,False
+1717111,2015-08-24T17:14:39Z,2015-08-25T00:17:38Z,1.5.2,"## New features in 1.5.2:
+
+#1415 Build support for OS X 10.9 
+#1443 Build support for OS X 10.11 (beta)
+#1335 Support for file access events from OS X kernel extension (beta)
+
+Several components are now benchmarked: binary size, events performance, SQL performance, etc
+
+Several high-impact performance optimizations:
+
+#1448 Use faster casting for SQLite table type data
+#1448 Cache YARA signature compilations when using ad-hoc YARA scans
+#1451 Allow Read-Only RocksDB usage and improve record lookups
+#1452 Remove unneeded virtual table rotations
+
+### Bug fixes:
+
+#1412 Use SIGKILL on OS X when force replacing daemon processes
+#1422 Query options from pack queries are now applied
+#1423 Fix executions on 10.11 (still not supported in Jenkins)
+
+### Table changes (from 1.5.1 to 1.5.2):
+
+Added table `uptime` to All Platforms
+Added table `authorization_mechanisms` to Darwin (Apple OS X)
+Added table `authorizations` to Darwin (Apple OS X)
+Added table `disk_events` to Darwin (Apple OS X)
+Added column `day` (`INTEGER`) to table `time`
+Added column `iso_8601` (`TEXT`) to table `time`
+Added column `month` (`INTEGER`) to table `time`
+Added column `timestamp` (`TEXT`) to table `time`
+Added column `unix_time` (`INTEGER`) to table `time`
+Added column `weekday` (`TEXT`) to table `time`
+Added column `year` (`INTEGER`) to table `time`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/1717111/assets,https://api.github.com/repos/facebook/osquery/releases/1717111,master,https://api.github.com/repos/facebook/osquery/tarball/1.5.2,https://github.com/facebook/osquery/releases/tag/1.5.2,https://api.github.com/repos/facebook/osquery/zipball/1.5.2,1.5.2,False,False
+1589270,2015-07-27T01:11:42Z,2015-07-27T07:30:38Z,1.5.1,"## New features in 1.5.1:
+
+Several important bug fixes!
+
+### Bug fixes:
+
+#1368 Restore OS X autostart post-install scripts (custom packaging)
+#1367 Disable reads from user-controlled FIFOs
+#1369 Limit IOKit HID remove and unhelpful (information sparse) events
+#1371 Fix duplicate events in YARA subscribers
+#1380 Fix query packs version checker
+#1385 Remove high-false positive generators from query packs
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/1589270/assets,https://api.github.com/repos/facebook/osquery/releases/1589270,master,https://api.github.com/repos/facebook/osquery/tarball/1.5.1,https://github.com/facebook/osquery/releases/tag/1.5.1,https://api.github.com/repos/facebook/osquery/zipball/1.5.1,1.5.1,False,False
+1558993,2015-07-20T09:37:24Z,2015-07-20T09:55:02Z,1.5.0,"## New features in 1.5.0:
+
+#1171 Allow file read restrictions on size, user-controlled size, and symlink modes
+#1194 Unofficial support for Ubuntu 10.04 dependency building
+#1216 OS X's Disk Arbitration-based publishers, and related disk-event tables
+#1259 Use RocksDB's LITE version to reduce binary size
+#1266 Use ""mostly"" POSIX globbing, along with SQLite, style wildcarding for FIM
+#1277 Forward status logs to worker processes when using osqueryd
+#1321 Use OpenSSL's x509 certificate parsing to improve speed/memory on OS X
+#1330 OS X kernel extension (beta, optional, not included in release builds)
+
+Version 1.5.0 introduces Facebook's “Query Packs”, a method to share and utilize high-value queries. 
+
+### Bug fixes:
+
+#1237 Fix certificate table crash on OS X
+#1276 Add subscriber optimizations to reduce diff latency using `—events_optimize`
+#1283 Include 'epoch' number to package dependencies on Redhat 7 based distros
+#1284 Require libsnappy headers and functionality for RocksDB
+#1308 Fix TLS plugin client user agent string versions
+#1312 Fix potential crash in interface enumeration on Ubuntu
+#1341 Include `osqueryctl` in Homebrew builds
+
+### Config options / CLI flags changes:
+
+`—config_tls_refresh VALUE` Optional interval in seconds to re-read configuration (min=10)
+`—events_optimize` Optimize subscriber select queries (scheduler only)
+`—read_max VALUE` Maximum file read size
+`—read_user_links` Read user-owned filesystem links
+`—read_user_max VALUE` Maximum non-su read size
+
+### Table changes (from 1.4.7 to 1.5.0):
+
+Added table `uptime` to All Platforms
+Added table `authorization_mechanisms` to Darwin (Apple OS X)
+Added table `authorizations` to Darwin (Apple OS X)
+Added table `disk_events` to Darwin (Apple OS X)
+Added column `day` (`INTEGER`) to table `time`
+Added column `iso_8601` (`TEXT`) to table `time`
+Added column `month` (`INTEGER`) to table `time`
+Added column `timestamp` (`TEXT`) to table `time`
+Added column `unix_time` (`INTEGER`) to table `time`
+Added column `weekday` (`TEXT`) to table `time`
+Added column `year` (`INTEGER`) to table `time`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/1558993/assets,https://api.github.com/repos/facebook/osquery/releases/1558993,master,https://api.github.com/repos/facebook/osquery/tarball/1.5.0,https://github.com/facebook/osquery/releases/tag/1.5.0,https://api.github.com/repos/facebook/osquery/zipball/1.5.0,1.5.0,False,False
+1446368,2015-06-22T16:38:24Z,2015-06-22T16:50:11Z,1.4.7,"## New features in 1.4.7:
+
+Note: this is a minor update!
+
+#1212 A new logger plugin: syslog (use `--logger_plugin=syslog`, see #1207)
+#1224 Support for SQLite's DOUBLE type
+
+### Bug fixes:
+
+#1202 osqueryd workers could `\0`-out their argv, not friendly
+#1205 Average memory reporting in schedule monitor mode does not wrap
+#1224 Fix OS X `package_receipts` reporting installed time as a DOUBLE
+#1224 Fix check of `extensions_socket` in the shell
+
+### Config options / CLI flags changes:
+
+`--logger_syslog_facility` when using the `--logger_plugin=syslog` set a specific facility (0-23, default 19)
+
+### Table changes (from 1.4.6 to 1.4.7):
+
+Added table `app_schemes` to Darwin (Apple OS X)
+Added table `keychain_acls` to Darwin (Apple OS X)
+Added table `sandboxes` to Darwin (Apple OS X)
+",https://api.github.com/users/marpaia,927168,marpaia,https://api.github.com/repos/facebook/osquery/releases/1446368/assets,https://api.github.com/repos/facebook/osquery/releases/1446368,master,https://api.github.com/repos/facebook/osquery/tarball/1.4.7,https://github.com/facebook/osquery/releases/tag/1.4.7,https://api.github.com/repos/facebook/osquery/zipball/1.4.7,1.4.7,False,False
+1387396,2015-06-07T21:04:45Z,2015-06-08T07:38:44Z,1.4.6,"## New features in 1.4.6:
+
+Added ""[Query Packs](http://osquery.readthedocs.org/en/1.4.6/deployment/configuration/#query-packs)"", a way to easily distribute sets of related scheduled queries.
+Now using RocksDB 3.10.2 on Linux/OS X, with more control over CPU optimizations.
+Support for Vagrant building in AWS/EC2: RHEL, Amazon Linux, and older platforms.
+Now building libcryptsetup inline and linking statically, removed install-time package dependencies.
+Various FreeBSD tables and ""beta"" support for building in ports.
+Simple TLS-based config and logger plugins, (see [Remote Settings](http://osquery.readthedocs.org/en/1.4.6/deployment/remote/)).
+More control over scheduled query output: removed-less mode and [snapshot](http://osquery.readthedocs.org/en/1.4.6/deployment/logging/#snapshot-logs)-mode.
+New default processes scheduling and filesystem I/O limiting and niceness.
+Table and column APIs are more expressive about actions/indexes.
+
+### Bug fixes:
+
+#1104 Limit the number (10) and type (WARNING) of RocksDB logs.
+#1111 Apply `safePermissions` check to worker process execs.
+#1121 Fix `.show` meta command crash in osqueryi.
+#1131 Fix missing install-time dependency for cryptsetup libraries.
+#1151 Fix crontab parsing paths on RHEL6.5/7.
+#1163 Use UTFTime for OS X certificates `not_valid_before/after` columns.
+#1195 Parse OS X process `cmdline` and environment variables correctly.
+#1195 Enable faster JOINs with OpenDirectory selections on OS X.
+#1195 Limit `shell_history` searches to current user or context actions via `username`.
+#1197 Emit multiple FSEvents actions for transactions-multiplexed events.
+#1199 Include UNIX domain sockets in `process_open_sockets` on OS X/Linux.
+
+### Config options / CLI flags changes:
+
+Version 1.4.6 adds optional TLS plugins for configuration and logging.
+See the wiki on optional remote settings for more information.
+
+| flag | description |
+| --- | --- |
+| `--disable_enrollment` | Disable enrollment functions on related config/logger plugins |
+| `--enroll_secret_path=PATH` | Path to an optional client enrollment-auth secret |
+| `--enroll_tls_endpoint=ENDPOINT` | TLS/HTTPS endpoint for client enrollment |
+| `--tls_client_cert=PATH` | Optional path to a TLS client-auth PEM certificate |
+| `--tls_client_key=ENDPOINT` | Optional path to a TLS client-auth PEM private key |
+| `--tls_hostname=HOSTNAME` | TLS/HTTPS hostname for Config, Logger, and Enroll plugins |
+| `--tls_server_certs=PATH` | Optional path to a TLS server PEM certificate(s) bundle |
+
+### Table changes (from 1.4.5 to 1.4.6):
+
+Added table `user_groups` to All Platforms
+Added table `iptables` to Ubuntu, CentOS
+Added table `msr` to Ubuntu, CentOS
+Added table `osquery_packs` to Utility
+
+Added column `path` (`TEXT`) to table `process_open_sockets`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/1387396/assets,https://api.github.com/repos/facebook/osquery/releases/1387396,master,https://api.github.com/repos/facebook/osquery/tarball/1.4.6,https://github.com/facebook/osquery/releases/tag/1.4.6,https://api.github.com/repos/facebook/osquery/zipball/1.4.6,1.4.6,False,False
+1257046,2015-05-05T00:16:41Z,2015-05-05T01:14:30Z,1.4.5,"## New features in 1.4.5:
+
+OS X extended attributes generalization (merged `quarantine`/`xattr_where_from`)
+RHEL6.5/7 supported building and custom RPM creation
+Schedule logs now report UTC calendar time (with a "" UTC"" suffix) instead of localtime
+Moved our Github Wiki to ReadTheDocs (https://osquery.readthedocs.org)
+Less SQLite shell flags and switches, now with -A/-L for easy full-table querying
+Barebones TLS/HTTP-based plugin interfaces, examples for external plugin development
+Build YARA and snappy locally and compile/link statically (easier deploy)
+Monitor schedule performance using the `osquery_schedule` table and `--enable_monitoring`
+
+### Bug fixes:
+
+#921 Keychain table crashing with empty keychains
+#915 Skip initialization tasks when only checking configurations
+#922 Normalized EventSubscriber time, expected seconds since epoch
+#937 osqueryd initscript correct error codes
+#953 Empty SQLite predicate parsing in virtual table modules
+#964 Restrict APT sources to AMD64 (no more x86-32)
+#968 User-local LaunchAgents not found
+#991 Debug and Optimized build overlaps (increased build time)
+#1000 Upgrade SQLite to 3.8.9, bug fixes from libfuzz
+#1040 Unknown EventSubscriber table implementations will crash
+#1080 Raw sockets in Linux are not included (only TCP/UDP)
+
+### Config options / CLI flags changes:
+
+Removed bail, batch, column, echo, explain, header, html, interactive, and stats from shell CLI
+Added `--A` that takes a single table name arg and acts like: `SELECT * FROM table`
+Added `--L` that lists all tables names
+`--disabled_tables` takes a comma-delimited set of table names to runtime remove
+Consolidated beta distributed flags into `--distributed_retries`
+`--enable_monitor` keeps runtime schedule stats in `osquery_schedule`
+
+### Table changes (from 1.4.4 to 1.4.5):
+
+**API Change:** Renamed table `file_changes` to `file_events` for All Platforms
+**API Change:** Merged tables `xattr_where_from` and `quarantine` into `extended_attributes`
+
+Moved table `chrome_extensions` to All Platforms
+Moved table `firefox_addons` to All Platforms
+Moved table `opera_extensions` to All Platforms
+Moved table `disk_encryption` to All Platforms
+Moved table `process_memory_map` to All Platforms
+
+Added table `etc_protocols` to All Platforms
+Added table `yara` to All Platforms
+Added table `yara_events` to All Platforms
+Added table `rpm_package_files` to CentOS
+Added table `launchd_overrides` to Darwin (Apple OS X)
+Added table `managed_policies` to Darwin (Apple OS X)
+Added table `osquery_schedule` to Utility
+
+Added column `pattern` (`TEXT`) to table `file`
+Added column `build` (`TEXT`) to table `os_version`
+Added column `name` (`TEXT`) to table `os_version`
+Added column `build_distro` (`TEXT`) to table `osquery_info`
+Added column `build_platform` (`TEXT`) to table `osquery_info`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/1257046/assets,https://api.github.com/repos/facebook/osquery/releases/1257046,master,https://api.github.com/repos/facebook/osquery/tarball/1.4.5,https://github.com/facebook/osquery/releases/tag/1.4.5,https://api.github.com/repos/facebook/osquery/zipball/1.4.5,1.4.5,False,False
+1108189,2015-03-30T22:36:56Z,2015-03-30T23:16:18Z,1.4.4,"## New features in 1.4.4:
+
+Async configuration updates
+Static compilation of libsnappy on CentOS 6.5 + 7
+
+### Bug fixes:
+
+#878 Speed up shell when using the default pretty-print mode
+#885 Homebrew package lists
+#884 Incorrect Linux initscript return codes
+#895 OS X preference table subkey stacking
+#883 Remove escaped ""/"" from JSON log results output
+#907 Limit the number of glog files by using date instead of data-time.pid
+#908 Remove libproc dependency on Ubuntu/CentOS
+
+### Table changes (from 1.4.3 to 1.4.4):
+
+Added table `ad_config` to Darwin (Apple OS X)
+Added table `package_bom` to Darwin (Apple OS X)
+Added table `package_receipts` to Darwin (Apple OS X)
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/1108189/assets,https://api.github.com/repos/facebook/osquery/releases/1108189,master,https://api.github.com/repos/facebook/osquery/tarball/1.4.4,https://github.com/facebook/osquery/releases/tag/1.4.4,https://api.github.com/repos/facebook/osquery/zipball/1.4.4,1.4.4,False,False
+1062001,2015-03-17T22:41:53Z,2015-03-17T22:45:26Z,1.4.3,"## New features in 1.4.3:
+
+Load dependent extensions plugins for Config and Logger in osqueryd
+Python integration testing for watchdog/shell/extensions loading
+Monitor folders for new files using `file_changes` API and subscribers
+Read osqueryd startup flags from `/etc/osquery/osquery.flags` on Linux
+
+### Bug fixes:
+
+#833 Thrift/glog are now built on CentOS/Ubuntu without debug info and asserts
+#808 Use `/private/var/osquery` instead of `/var/osquery` on OS X
+#818 Allow watchdog worker to fail nicely with incorrect DB paths
+
+### Table changes (from 1.4.2 to 1.4.3):
+
+Added table `file_changes` to All Platforms
+Added table `system_controls` to All Platforms
+Added table `chrome_extensions` to Darwin (Apple OS X)
+Added table `firefox_addons` to Darwin (Apple OS X)
+Added table `keychain_items` to Darwin (Apple OS X)
+Added table `safari_extensions` to Darwin (Apple OS X)
+Added table `safari_plugins` to Darwin (Apple OS X)
+Renamed table `osx_version` to `os_version`, for All Platforms
+Renamed table `ca_certs` to `certificates` on Darwin (Apple OS X)
+Added column `path` (`TEXT`) to table `kernel_extensions`
+Renamed column `is_pseudo` to `pseudo` (`INTEGER`) to table `process_memory_map`
+Removed column `wired` (`BIGINT`) from table `kernel_extensions`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/1062001/assets,https://api.github.com/repos/facebook/osquery/releases/1062001,master,https://api.github.com/repos/facebook/osquery/tarball/1.4.3,https://github.com/facebook/osquery/releases/tag/1.4.3,https://api.github.com/repos/facebook/osquery/zipball/1.4.3,1.4.3,False,False
+984938,2015-02-24T21:52:40Z,2015-02-24T23:32:12Z,1.4.2,"## New features in 1.4.2:
+
+The local [thrift](https://github.com/facebook/osquery/blob/master/osquery.thrift) extensions API and osquery SDK.
+[`osqueryctl`](https://github.com/facebook/osquery/blob/master/tools/deployment/osqueryctl) tool with several helpful deployment macros.
+
+### Bug fixes:
+
+#758 `startup_items` now emits the correct OS X Alias-type path
+#769 `osquery_extensions` used to include an incorrect "".0"" for extension sockets
+#789 The osqueryd watcher process would fail if using PATH-expanded locations
+#788 Parent pids on OS X when using a `WHERE pid = <INT>` were set to -1
+#792 Linux process sockets used a GCC 4.8-broken std::regex
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/984938/assets,https://api.github.com/repos/facebook/osquery/releases/984938,master,https://api.github.com/repos/facebook/osquery/tarball/1.4.2,https://github.com/facebook/osquery/releases/tag/1.4.2,https://api.github.com/repos/facebook/osquery/zipball/1.4.2,1.4.2,False,False
+951393,2015-02-13T23:35:33Z,2015-02-13T23:44:15Z,1.4.1,"## New features in 1.4.1:
+
+CentOS 7 support
+Improved query scheduling performance
+Improved file table and ""directory"" predicate: `select * from file where directory = '/'`
+Extensions details and list tables
+OS X defaults: `defaults read` is `select * from preferences` optionally uses a file predicate.
+
+### Bug fixes:
+
+OS X apps table was missing information
+Package update/reinstallation failed in `make deps`
+
+### Table changes (from 1.4.0 to 1.4.1):
+
+Added table `osquery_extensions` to All Platforms
+Added table `preferences` to Darwin (Apple OS X)
+Added column `element` (`TEXT`) to table `apps`
+Added column `environment` (`TEXT`) to table `apps`
+Added column `directory` (`TEXT`) to table `file`
+Added column `extensions` (`TEXT`) to table `osquery_info`
+Added column `cwd` (`TEXT`) to table `processes`
+Added column `root` (`TEXT`) to table `processes`
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/951393/assets,https://api.github.com/repos/facebook/osquery/releases/951393,master,https://api.github.com/repos/facebook/osquery/tarball/1.4.1,https://github.com/facebook/osquery/releases/tag/1.4.1,https://api.github.com/repos/facebook/osquery/zipball/1.4.1,1.4.1,False,False
+935313,2015-02-09T22:04:39Z,2015-02-09T23:33:26Z,1.4.0,"## New features in 1.4:
+- [Extensions](https://github.com/facebook/osquery/wiki/SDK-extensions) Thrift API 
+- osqueryd ""worker"" performance monitoring
+- Filesystem QueryContext wildcards
+
+## Potential API incompatibility changes:
+
+Removed column `name` (`TEXT`) from table `process_envs`
+Removed column `path` (`TEXT`) from table `process_envs`
+
+### Config options / CLI flags changes:
+
+`--config_retriever` renamed `--config_plugin`
+`--config_check` will check the config parsing status and exit
+`--event_pubsub=true` renamed `--disable_events=false`
+`--disable_watchdog=false` controls the osqueryd worker process usage
+`--extensions_socket=/var/osquery/osquery.em` added
+`--force=false` if set will attempt to kill previously running osqueryd daemons
+`--log_receiver` renamed `--logger_plugin`
+`--watchdog_level=1` controls the acceptable performance impact of osqueryd workers
+
+## Additional API changes:
+
+Added table `block_devices` to All Platforms
+Added table `kernel_info` to All Platforms
+Added table `xattr_where_from` to Darwin (Apple OS X)
+Added table `memory_map` to Ubuntu, CentOS
+Added table `process_memory_map` to Ubuntu, CentOS
+Added table `shared_memory` to Ubuntu, CentOS
+Added column `atime` (`BIGINT`) to table `file`
+Added column `block_size` (`INTEGER`) to table `file`
+Added column `ctime` (`BIGINT`) to table `file`
+Added column `device` (`BIGINT`) to table `file`
+Added column `gid` (`BIGINT`) to table `file`
+Added column `hard_links` (`INTEGER`) to table `file`
+Added column `inode` (`BIGINT`) to table `file`
+Added column `is_block` (`INTEGER`) to table `file`
+Added column `is_char` (`INTEGER`) to table `file`
+Added column `mode` (`TEXT`) to table `file`
+Added column `mtime` (`BIGINT`) to table `file`
+Added column `size` (`BIGINT`) to table `file`
+Added column `uid` (`BIGINT`) to table `file`
+Removed table `block_devices` from Ubuntu, CentOS
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/935313/assets,https://api.github.com/repos/facebook/osquery/releases/935313,master,https://api.github.com/repos/facebook/osquery/tarball/1.4.0,https://github.com/facebook/osquery/releases/tag/1.4.0,https://api.github.com/repos/facebook/osquery/zipball/1.4.0,1.4.0,False,False
+875780,2015-01-22T19:07:19Z,2015-01-22T19:08:25Z,1.3.1,,https://api.github.com/users/marpaia,927168,marpaia,https://api.github.com/repos/facebook/osquery/releases/875780/assets,https://api.github.com/repos/facebook/osquery/releases/875780,master,https://api.github.com/repos/facebook/osquery/tarball/1.3.1,https://github.com/facebook/osquery/releases/tag/1.3.1,https://api.github.com/repos/facebook/osquery/zipball/1.3.1,1.3.1,False,False
+869436,2015-01-21T00:04:32Z,2015-01-21T00:05:12Z,1.3.0,"## Table changes (from 1.2.2 to 1.3.0):
+
+#### Potential API incompatibility changes:
+
+Added table `rpm_packages` to CentOS, removed from Linux/Ubuntu
+Added table `kernel_extensions` to Darwin (Apple OS X), renamed from `kextstat`
+The process_open_files table has changed drastically, please see the new `process_open_files` and `process_open_sockets` tables. These two new tables take the place of `port_inode` and `socket_inode` on Linux.
+
+#### Additional API changes:
+
+Added table `acpi_tables` to All Platforms
+Added table `interface_addresses` to All Platforms
+Added table `interface_details` to All Platforms
+Added table `listening_ports` to All Platforms
+Added table `process_open_sockets` to All Platforms
+Added table `smbios_tables` to All Platforms
+Added table `iokit_devicetree` to Darwin (Apple OS X)
+Added table `iokit_registry` to Darwin (Apple OS X)
+Added table `nfs_shares` to Darwin (Apple OS X)
+Added table `xprotect_entries` to Darwin (Apple OS X)
+Added table `xprotect_reports` to Darwin (Apple OS X)
+Added table `kernel_integrity` to Ubuntu, CentOS
+Added table `apt_sources` to Ubuntu
+Added table `deb_packages` to Ubuntu
+Added column `sha1` (`TEXT`) to table `hash`
+Added column `sha256` (`TEXT`) to table `hash`
+Added column `fd` (`BIGINT`) to table `process_open_files`
+Added column `path` (`TEXT`) to table `process_open_files`
+Removed column `file_type` (`TEXT`) from table `process_open_files`
+Removed column `local_host` (`TEXT`) from table `process_open_files`
+Removed column `local_path` (`TEXT`) from table `process_open_files`
+Removed column `local_port` (`TEXT`) from table `process_open_files`
+Removed column `remote_host` (`TEXT`) from table `process_open_files`
+Removed column `remote_port` (`TEXT`) from table `process_open_files`
+",https://api.github.com/users/marpaia,927168,marpaia,https://api.github.com/repos/facebook/osquery/releases/869436/assets,https://api.github.com/repos/facebook/osquery/releases/869436,master,https://api.github.com/repos/facebook/osquery/tarball/1.3.0,https://github.com/facebook/osquery/releases/tag/1.3.0,https://api.github.com/repos/facebook/osquery/zipball/1.3.0,1.3.0,False,False
+788947,2014-12-16T20:42:22Z,2014-12-16T22:32:21Z,1.2.2,"Including self-monitoring tables.
+",https://api.github.com/users/theopolis,981645,theopolis,https://api.github.com/repos/facebook/osquery/releases/788947/assets,https://api.github.com/repos/facebook/osquery/releases/788947,master,https://api.github.com/repos/facebook/osquery/tarball/1.2.2,https://github.com/facebook/osquery/releases/tag/1.2.2,https://api.github.com/repos/facebook/osquery/zipball/1.2.2,1.2.2,False,False
+767194,2014-12-09T10:21:01Z,2014-12-09T10:21:22Z,1.2.1,,https://api.github.com/users/marpaia,927168,marpaia,https://api.github.com/repos/facebook/osquery/releases/767194/assets,https://api.github.com/repos/facebook/osquery/releases/767194,master,https://api.github.com/repos/facebook/osquery/tarball/1.2.1,https://github.com/facebook/osquery/releases/tag/1.2.1,https://api.github.com/repos/facebook/osquery/zipball/1.2.1,1.2.1,False,False
+766118,2014-12-09T00:11:43Z,2014-12-09T00:24:55Z,1.2.0,,https://api.github.com/users/marpaia,927168,marpaia,https://api.github.com/repos/facebook/osquery/releases/766118/assets,https://api.github.com/repos/facebook/osquery/releases/766118,master,https://api.github.com/repos/facebook/osquery/tarball/1.2.0,https://github.com/facebook/osquery/releases/tag/1.2.0,https://api.github.com/repos/facebook/osquery/zipball/1.2.0,1.2.0,False,False
+714590,2014-11-18T19:32:17Z,2014-11-18T19:44:10Z,1.1.0,,https://api.github.com/users/marpaia,927168,marpaia,https://api.github.com/repos/facebook/osquery/releases/714590/assets,https://api.github.com/repos/facebook/osquery/releases/714590,master,https://api.github.com/repos/facebook/osquery/tarball/1.1.0,https://github.com/facebook/osquery/releases/tag/1.1.0,https://api.github.com/repos/facebook/osquery/zipball/1.1.0,1.1.0,False,False
+695394,2014-11-11T16:04:53Z,2014-11-11T16:05:21Z,1.0.5,,https://api.github.com/users/marpaia,927168,marpaia,https://api.github.com/repos/facebook/osquery/releases/695394/assets,https://api.github.com/repos/facebook/osquery/releases/695394,master,https://api.github.com/repos/facebook/osquery/tarball/1.0.5,https://github.com/facebook/osquery/releases/tag/1.0.5,https://api.github.com/repos/facebook/osquery/zipball/1.0.5,1.0.5,False,False
+695376,2014-11-11T14:31:40Z,2014-11-11T16:01:35Z,1.0.4,,https://api.github.com/users/marpaia,927168,marpaia,https://api.github.com/repos/facebook/osquery/releases/695376/assets,https://api.github.com/repos/facebook/osquery/releases/695376,master,https://api.github.com/repos/facebook/osquery/tarball/1.0.4,https://github.com/facebook/osquery/releases/tag/1.0.4,https://api.github.com/repos/facebook/osquery/zipball/1.0.4,1.0.4,False,False
+657269,2014-10-27T19:29:51Z,2014-10-27T19:30:49Z,1.0.3,,https://api.github.com/users/marpaia,927168,marpaia,https://api.github.com/repos/facebook/osquery/releases/657269/assets,https://api.github.com/repos/facebook/osquery/releases/657269,master,https://api.github.com/repos/facebook/osquery/tarball/1.0.3,https://github.com/facebook/osquery/releases/tag/1.0.3,https://api.github.com/repos/facebook/osquery/zipball/1.0.3,1.0.3,False,False
+632444,2014-10-16T07:00:35Z,2014-10-16T20:54:57Z,1.0.2,,https://api.github.com/users/marpaia,927168,marpaia,https://api.github.com/repos/facebook/osquery/releases/632444/assets,https://api.github.com/repos/facebook/osquery/releases/632444,master,https://api.github.com/repos/facebook/osquery/tarball/1.0.2,https://github.com/facebook/osquery/releases/tag/1.0.2,https://api.github.com/repos/facebook/osquery/zipball/1.0.2,1.0.2,False,False

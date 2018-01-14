@@ -1,0 +1,355 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8169543,2017-10-18T16:40:50Z,2017-10-18T17:09:26Z,v4.0 release,"# LiteDB v4 released
+
+## New Features
+- Add support to NETStandard 2.0 (with support to `Shared` mode)
+- New document `Expression` parser/executor - see [Expression Wiki](https://github.com/mbdavid/LiteDB/wiki/Expressions)
+- Support index creation with expressions
+```C#
+col.EnsureIndex(x => x.Name, ""LOWER($.Name)"");
+col.EnsureIndex(""GrandTotal"", ""SUM($.Items[*].Qtd * $.Items[*].Price)"");
+```
+- Query with `Include` it´s supported in Engine level with ANY nested includes
+```C#
+col.Include(x => x.Users)
+   .Include(x => x.Users[0].Address)
+   .Include(x => x.Users[0].Address.City)
+   .Find(...)
+```
+- Support complex Linq queries using `LinqQuery` compiler (works as linq to object)
+  - `col.Find(x => x.Name == ""John"" && x.Items.Length.ToString().EndsWith == ""0"")`
+- Better execution plan (with debug info) in multi query statements
+- No more external journal file - use same datafile to store temporary data
+- Fixed concurrency problems (keeps thread/process safe)
+- Convert `Query.And` to `Query.Between` when possible
+- Add support to `Query.Between` open/close interval
+- **Same datafile from LiteDB `v3` (no upgrade needed)**
+
+## Shell
+- New UPDATE/SELECT statements in shell
+- Shell commands parser/executor are back into LiteDB.dll
+- Better shell error messages in parser with position in error
+- Print query execution plan in debug
+`(Seek([Age] > 10) and Filter([Name] startsWith ""John""))`
+(preparing to new visual LiteDB database management tool)
+
+## Break changes
+- Remove transactions
+- Remove auto-id register function for custom type
+- Remove index definitions on mapper (fluent/attribute)
+- Remove auto create index on query execution. If the index is not found do full scan search (use `EnsureIndex` on initialize database)
+
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/8169543/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/8169543,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v4.0.0,https://github.com/mbdavid/LiteDB/releases/tag/v4.0.0,https://api.github.com/repos/mbdavid/LiteDB/zipball/v4.0.0,v4.0.0,False,False
+7962407,2017-10-02T11:56:26Z,2017-10-02T12:06:49Z,,"- Add `KEYS`, `MOD` expression function
+- Add support for `(` and `)` inside expressions
+- Improve expression reader/parser
+- Bugfix: return `_id` when insert
+- Minor bugfixes",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/7962407/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/7962407,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v4.0.0-beta2,https://github.com/mbdavid/LiteDB/releases/tag/v4.0.0-beta2,https://api.github.com/repos/mbdavid/LiteDB/zipball/v4.0.0-beta2,v4.0.0-beta2,False,True
+7537413,2017-08-27T23:53:09Z,2017-08-28T00:31:35Z,v4 Beta release,"# Break changes
+
+- Remove transactions
+- Remove auto-id register function for custom type
+- Remove index definitions on mapper (fluent/attribute)
+- Remove auto create index on query execution. If the index is not found do full scan search (use `EnsureIndex` on initialize database)
+
+# New Features
+
+- New Expressions/Path
+- New shell command: UPDATE fields only
+- New shell command: SELECT with transform
+- Remove physical journal file (store journal pages after file ends)
+- Add auto-id in engine level with pre-defined common types
+- Add collection sequence (`ulong`) to use in engine level auto-id
+- Auto-id default true to `_id` with `BsonType` = `ObjectId`, `Guid`, `DateTime`, `Int32` or `Int64`
+- Add include in engine/document level with any level
+- Compiled in NET35 for Unity3D support, NET40 and NETSTANDARD 1.3
+- Implement FilterDocument option in all query implementations (full scan document)
+- In `Query.And` use only one index side with full scan on other
+- Print query execution plan in Query.ToString() `(Seek([Age] > 10) and Filter([Name] startsWith ""John""))`
+- Convert `Query.And` to `Query.Between` when possible
+- Add support to `Query.Between` open/close interval
+- QueryLinq for non resolved linq expression on visitor `col.Find(x => x.Id < 10 && x.Name.Length > 10)`
+- Support index creation with expressions
+- Support expression on full searchs
+- Better shell error messages in parser with position in error
+- Fix simple lock control (multi-read/single write) in thread/process. Removed reserved lock state
+- Upgrade to VS2017
+
+# Bugfixes
+
+- Upload from local disk on storage
+- DateTime.Now indexed date (milliseconds problem)
+- When query using > or < must use same BsonType (do not returns `null` values)
+- Remove return Duplicate values in MultiKey indexes",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/7537413/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/7537413,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v4.0.0-beta1,https://github.com/mbdavid/LiteDB/releases/tag/v4.0.0-beta1,https://api.github.com/repos/mbdavid/LiteDB/zipball/v4.0.0-beta1,v4.0.0-beta1,False,True
+7418869,2017-08-16T23:27:29Z,2017-08-16T23:30:56Z,,"# Fixes
+- Sign dll to use in GAC
+- Fix decimal index #693 ",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/7418869/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/7418869,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v.3.1.4,https://github.com/mbdavid/LiteDB/releases/tag/v.3.1.4,https://api.github.com/repos/mbdavid/LiteDB/zipball/v.3.1.4,v.3.1.4,False,False
+7373901,2017-08-13T14:11:39Z,2017-08-13T14:13:45Z,,"# Bugfix
+
+- Fix .csproj to compile .NET 4.x to .NET 3.5",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/7373901/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/7373901,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v3.1.3,https://github.com/mbdavid/LiteDB/releases/tag/v3.1.3,https://api.github.com/repos/mbdavid/LiteDB/zipball/v3.1.3,v3.1.3,False,False
+7283449,2017-08-04T10:50:35Z,2017-08-04T10:51:02Z,,"# Bugfix
+- Nuget/Assembly version fixed to 3.1.2
+
+- Upgrade to VS2017",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/7283449/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/7283449,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v3.1.2,https://github.com/mbdavid/LiteDB/releases/tag/v3.1.2,https://api.github.com/repos/mbdavid/LiteDB/zipball/v3.1.2,v3.1.2,False,False
+6645342,2017-06-08T09:06:54Z,2017-06-08T09:07:26Z,,"# Bugfix
+
+- Flush journal file #582 
+- Implemented BsonDocument#Copy #577 
+- Fix data pagesize #533 
+- Fix shrink large database
+
+# New
+
+- Insert bulk method with batch size",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/6645342/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/6645342,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v3.1.1,https://github.com/mbdavid/LiteDB/releases/tag/v3.1.1,https://api.github.com/repos/mbdavid/LiteDB/zipball/v3.1.1,v3.1.1,False,False
+5713207,2017-03-11T17:01:42Z,2017-03-11T22:06:01Z,,"# Added
+
+- New `LiteRepository` to access data
+- Support NonPublic members to netstandard
+- Support sync over async in UWP app (to access any directory)
+- Static method do create empty datafile `LiteEngine.CreateDatabase`
+- Named convetion for collection names when null are used (default `typeof(T).Name`)
+
+# Changes
+- Better way to get id field (preserve precedence order: `BsonId`, `Id` or `<ClassName>Id`)
+- Better message to wrong file detection
+- Bugfix in recovery lock
+- Bugfix that datafile keep opened when an exception occurs during initialize",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/5713207/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/5713207,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v3.1.0,https://github.com/mbdavid/LiteDB/releases/tag/v3.1.0,https://api.github.com/repos/mbdavid/LiteDB/zipball/v3.1.0,v3.1.0,False,False
+5462568,2017-02-15T10:06:57Z,2017-02-15T10:12:39Z,,"# Bugfix
+- Upgrade from v2 
+
+# Changes
+- Shell now are disconected (each command connect, execute, finalize)
+- Do not support transaction in FileStoage Read/Write operations
+- Better delete operation in FileStorage #483
+- Support build connection string object and pass to LiteDatabase.Ctor
+- Better invalid datafile exception message
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/5462568/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/5462568,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v3.0.1,https://github.com/mbdavid/LiteDB/releases/tag/v3.0.1,https://api.github.com/repos/mbdavid/LiteDB/zipball/v3.0.1,v3.0.1,False,False
+5213216,2017-01-24T09:35:12Z,2017-01-28T18:04:17Z,v3.0.0,"# New LiteDB v3 release
+- Thread safe AND process safe (support single or multiple instances)
+- Multikey index (support array index values)
+- Faster than ever - [compare with SQLite here](https://github.com/mbdavid/LiteDB-Perf)
+- BsonDocument implements IDictionary, BsonArray implements IList
+- New: Upsert, FindIndex, Query.Not(Query), Query.Where(Func<>)
+- New BsonMapper class: support Fields and NonPublic members
+- Added new `LiteEngine` class to access data
+- LiteStorage now supports `OpenWrite() Stream`
+- Update your datafile from `v2` using `;upgrade=true` in connection string
+- LiteDB support **.NET 3.5** and **NETStandard 1.4** (Supports UWP, Xamarin, Core, Mono)
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/5213216/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/5213216,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v3.0.0,https://github.com/mbdavid/LiteDB/releases/tag/v3.0.0,https://api.github.com/repos/mbdavid/LiteDB/zipball/v3.0.0,v3.0.0,False,False
+5011130,2016-12-25T18:10:39Z,2016-12-25T18:18:21Z,,"# News
+- Back support for shared mode - multi process (can open multiple instances) - (not supported in NetStandard)
+- Removed checkpoint cache
+- Support `Include` using string path
+- Datafile upgrade support from v2
+- Support PredicateBuilder
+- Bugfixes
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/5011130/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/5011130,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v3.0.0-beta3,https://github.com/mbdavid/LiteDB/releases/tag/v3.0.0-beta3,https://api.github.com/repos/mbdavid/LiteDB/zipball/v3.0.0-beta3,v3.0.0-beta3,False,True
+4766424,2016-11-27T11:17:24Z,2016-11-27T11:22:15Z,,"# News
+- Change compiler do C# 4.0 to be compatible with Unity3D
+- Add Upsert in LiteCollection
+- Add missing LiteDatabase method (RenameCollection, Shrink, DropCollection, GetCollectionNames)
+
+# BugFix
+- Fix Unbox in NetStandard
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/4766424/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/4766424,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v3.0.0-beta2,https://github.com/mbdavid/LiteDB/releases/tag/v3.0.0-beta2,https://api.github.com/repos/mbdavid/LiteDB/zipball/v3.0.0-beta2,v3.0.0-beta2,False,True
+4708733,2016-11-20T10:48:48Z,2016-11-20T11:00:48Z,,"# New Features
+- Thread Safe - share your LiteDatabase instance across threads
+- MultiKey index - support index in array field
+- Faster than ever - compare results with SQLite here
+- LiteEngine - new simple class to access your documents
+- New checkpoint cache to support large transactions using journal file
+- BsonDocument implements IDictionary, BsonArray implements IList
+- Autocommit disabled support
+- Less 96 bytes per document
+- New: Upsert, FindIndex, Query.Not(Query), Query.Where(Func<>)
+- New BsonMapper class: support Fields and NonPublic members
+- FileStorage now supports OpenWrite(""fileId"")
+- Virtual index fields -.Index(""total"", x => x.Products.Sum(p => p.Price))
+- [BsonRefAttribute]
+- Shrink with change password
+- Open datafile in ReadOnly mode
+- LiteDB.Core was removed - LiteDB.dll is now NETStandard 1.4 (Supports UWP, Xamarin, Core, Mono)
+
+# Changes
+- Some methods are moved from `LiteDatabase` to `LiteEngine` (`GetCollectionNames`, `CollectionExists`, `DropCollection`, `RenameCollection`, `Shrink`). To access, use: `db.Engine.GetCollectionNames()`.
+- New datafile version - no update yet
+
+# Roadmap to final release
+- Bugfixes
+- Upgrade datafile from v1.x and v2.x to 3
+- API be more compatible with 2.x (using [Obsolate])
+- LiteEngine.Dump
+- Update Wiki/Site
+- Write some code examples
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/4708733/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/4708733,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v3.0.0-beta,https://github.com/mbdavid/LiteDB/releases/tag/v3.0.0-beta,https://api.github.com/repos/mbdavid/LiteDB/zipball/v3.0.0-beta,v3.0.0-beta,False,False
+4596370,2016-11-07T22:45:21Z,2016-11-07T22:36:02Z,,"# Changes
+- Cache checkpoint removed
+- New parser ConnectionString
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/4596370/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/4596370,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v2.0.4,https://github.com/mbdavid/LiteDB/releases/tag/v2.0.4,https://api.github.com/repos/mbdavid/LiteDB/zipball/v2.0.4,v2.0.4,False,False
+3967621,2016-08-25T00:02:07Z,2016-08-25T00:06:59Z,,"Bugfix #284 - Revert connection string regex
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/3967621/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/3967621,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v2.0.2,https://github.com/mbdavid/LiteDB/releases/tag/v2.0.2,https://api.github.com/repos/mbdavid/LiteDB/zipball/v2.0.2,v2.0.2,False,False
+3945450,2016-08-22T22:30:36Z,2016-08-22T22:40:04Z,,"## Bugfixes
+- Better error messages in deserialize #278 
+- Connection string supports filename with ""
+- Fix detect old version in shell
+- Tests missing password in encrypted datafile
+- Fix shrink bug 
+- Adds FileHandler for UWP for better performance
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/3945450/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/3945450,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v2.0.1,https://github.com/mbdavid/LiteDB/releases/tag/v2.0.1,https://api.github.com/repos/mbdavid/LiteDB/zipball/v2.0.1,v2.0.1,False,False
+3780187,2016-07-31T23:22:14Z,2016-07-31T23:42:59Z,,"## New features in v2
+- Portable version: LiteDB.Core (Supports UWP 8.1/10, Xaramin.iOS and Xaramin.Android)
+- Generic data access layer - can use any `Stream` or you can write your own disk access layer
+- Database encription option (using `password=` in connection string)
+- New memory cache manager (do not consume too memory in large inserts/updates)
+- Better mapping class from your entity to `BsonDocument` (like Configurations in EntityFramework)
+- Better cross reference with `DbRef` mapping (see unit tests examples)
+- Lazy engine load (open datafile only when run a command)
+- Reduce your database size with `shrink()`
+- Support for `Initial Size` and `Limit Size` database (connection string)
+- Complete re-write engine classes width full debug logger
+- Complete stats about data/index usage
+- Dump file to Import/Export your data using shell commands 
+- Full documentation for v2 on Wiki
+- See more examples in http://www.litedb.org/
+
+## Changes
+- New datafile - to update, check here: https://github.com/mbdavid/LiteDB/wiki/Update-Datafile 
+- Transaction API changes (now transaction is a class, use: `using(var transaction = db.BeginTrans()) { ... }`
+- `InsertBulk` is only `Insert`
+- No more datafile version control (still have a `UserVersion` to dev make your own version control)
+- Removed `DbRef<T>` class, see: https://github.com/mbdavid/LiteDB/wiki/DbRef
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/3780187/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/3780187,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v2.0.0,https://github.com/mbdavid/LiteDB/releases/tag/v2.0.0,https://api.github.com/repos/mbdavid/LiteDB/zipball/v2.0.0,v2.0.0,False,False
+3704908,2016-07-23T14:52:00Z,2016-07-20T23:47:29Z,,"# New features in RC2
+- Portable version: NuGet package: `Lite.Core` that support PCL/UWP
+- New disk access (for safe concurrency) implementation
+- Transactions are back
+- No more **ThreadSafe** (only **ProcessSafe**). Always create `LiteDatabase` instances.
+- Close datafile after each command execution
+- `BsonMapper.Global` are back
+- `RegisterAutoId<T>` are back
+
+# Changes in RC2
+- To implement new disk read/write access, new datafile version was required.
+- Removed `OnModelCreating`. Use `BsonMapper.Global` instance
+- Removed `UserVersion` update checking. Now `UserVersion` is only an `int` stored in header page (update version must be developed in your solution)
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/3704908/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/3704908,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v2.0.0-rc2,https://github.com/mbdavid/LiteDB/releases/tag/v2.0.0-rc2,https://api.github.com/repos/mbdavid/LiteDB/zipball/v2.0.0-rc2,v2.0.0-rc2,False,True
+2338617,2015-12-24T18:25:56Z,2016-07-23T15:31:13Z,,"# New features in RC
+- Datafile encryption: now you can use password to protect your datafile (uses DES cryptography)
+- Database upgrade from v.0.9.0 and 1.0.x (use `LiteDB.Shell.exe myold.db --upgrade mynew.db`)
+- Export database as dump file (insert commands)
+- Added collections stats (data/index pages, disk usage, ...) shell: `db.collection.stats`
+
+# Changes in RC
+- Remove virtual fields
+- Better concurrency support
+- Better memory manager: using disk cache/journal in big transactions. Now LiteDB avoid too many memory consume when are reading/writing too long data loop in a collection.
+
+# Roadmap to v2
+- Compile in Portable Class Library
+- Only bug fixes
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/2338617/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/2338617,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v2.0.0-rc,https://github.com/mbdavid/LiteDB/releases/tag/v2.0.0-rc,https://api.github.com/repos/mbdavid/LiteDB/zipball/v2.0.0-rc,v2.0.0-rc,False,True
+2163787,2015-11-20T23:40:04Z,2015-11-20T23:56:38Z,,"## New features in v2.0.0-beta
+- Generic data access layer - can use any `Stream` or you can write your own disk access layer
+- Better mapping class from your entity to `BsonDocument` (like Configurations in EntityFramework)
+- Virtual property (Formula) as index field
+- Better cross reference with `DbRef` mapping (see unit tests examples)
+- ThreadSafe / ProcessSafe
+- Lazy engine load (open datafile only when run a command)
+- Reduce your database size with `shrink()`
+- Support for `Initial Size` and `Limit Size` database (connection string)
+- Complete re-write engine classes width full debug logger
+- See more examples in http://www.litedb.org/
+
+## Breaking changes
+- Datafile version changed
+- `InsertBulk` is only `Insert`
+- There is no more transactions (`begin`, `commit` and `rollback`)
+- Removed `UserVersion`
+- There are more minor details that will be in wiki document with a ""upgrade from 1.0 to 2.0"" before release final version
+
+> This version is beta and can be changed before final release.
+
+## Roadmap to v2
+- A new implementation of `UserVersion`
+- CLIent tool (with shell support) for common tasks, like Import/Export/Shrink with of old versions (v0.9, v1.0.x) supports and data migrations
+- Update all wiki documentation (move to readme.io)
+- Compile in Portable Class Library (PCL) for mobile
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/2163787/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/2163787,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v2.0.0-beta,https://github.com/mbdavid/LiteDB/releases/tag/v2.0.0-beta,https://api.github.com/repos/mbdavid/LiteDB/zipball/v2.0.0-beta,v2.0.0-beta,False,True
+2020668,2015-10-26T17:52:42Z,2015-10-26T17:57:48Z,,"# Changes
+- Bugfix #60 - Incorrect BsonIndex ctor
+- Bugifx #61 - Deserialize nullable values
+- #69 Sign assembly to NuGet
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/2020668/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/2020668,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v1.0.4,https://github.com/mbdavid/LiteDB/releases/tag/v1.0.4,https://api.github.com/repos/mbdavid/LiteDB/zipball/v1.0.4,v1.0.4,False,False
+1775583,2015-09-06T22:55:58Z,2015-09-06T22:57:50Z,,"# Changes
+- Bugfix #49 
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/1775583/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/1775583,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v1.0.3,https://github.com/mbdavid/LiteDB/releases/tag/v1.0.3,https://api.github.com/repos/mbdavid/LiteDB/zipball/v1.0.3,v1.0.3,False,False
+1305137,2015-05-17T13:15:54Z,2015-05-17T13:18:25Z,v1.0.2,"# Changes
+- Fix some bugs with `_type` on BsonMapper
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/1305137/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/1305137,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v1.0.2,https://github.com/mbdavid/LiteDB/releases/tag/v1.0.2,https://api.github.com/repos/mbdavid/LiteDB/zipball/v1.0.2,v1.0.2,False,False
+1282207,2015-05-11T13:12:47Z,2015-05-11T13:30:00Z,v1.0.1,"# Changes
+- Remove full document scan in `Find` operations - using auto-creation index when there is no field index
+- Bugfix #21 and #29 
+- Implements `_type` when using interfaces/generic object #32 and #27  - thanks to @francoislg 
+- Added support to boolean Linq operations, like `x => x.IsActive` - thanks to Lars Stenberg
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/1282207/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/1282207,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v1.0.1,https://github.com/mbdavid/LiteDB/releases/tag/v1.0.1,https://api.github.com/repos/mbdavid/LiteDB/zipball/v1.0.1,v1.0.1,False,False
+1101551,2015-03-28T16:49:20Z,2015-03-28T17:08:54Z,v1.0.0,"# New
+- New [Wiki documentation](https://github.com/mbdavid/LiteDB/wiki) !! :smiley:
+- New `BsonSerializer` removing fastBinaryJson and implement real BSON specification
+- New `BsonMapper` to get more configurable POCO from/to BsonDocument
+- `BsonMapper` supports user custom type converter
+- New `JsonReader` implementation: 4 times faster
+- New `ObjectId` to be used in Id documents
+- `BsonDocument` supports only BSON data types as specification
+- Index creation options - remove whitespaces, remove accents, ignore case.
+- `[BsonIndex]` to mark your entity property to auto create index when query
+- Autogeneration Id for entity Id property
+- `Find()` can be executed without an index (will execute a full document scan)
+- Index use same MongoDB data type order when `CompareTo()`
+- `FindAll()` supports ascending/descending results
+- New `Query.Contains`
+- `Min()`/`Max()` value from an index
+- `DbRef<>` - a simple class for reference document
+
+# Changes
+- Drop collection and drop index improved
+- Removed `_master` collection - avoid 1 page read
+- Removed WebShell from this repository
+- New file format: v4
+
+# Breaking changes
+
+To prepare LiteDB to future, **version 1.x break compatibility with 0.x**. Small external changes, but very important to make a better source structure:
+
+Upgranding from v0.x
+- .NET Framework 4 only (to use `Task<>` in future)
+- `LiteEngine` is now `LiteDatabase`
+- `Collection` is now `LiteCollection`
+- `FileEntry` is now `LiteFileInfo`
+- Remove `BsonObject` - now only exits `BsonDocument`
+- Remove `BsonDocument#Id` - use `BsonDocument#[""_id""]`
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/1101551/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/1101551,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v1.0.0,https://github.com/mbdavid/LiteDB/releases/tag/v1.0.0,https://api.github.com/repos/mbdavid/LiteDB/zipball/v1.0.0,v1.0.0,False,False
+920426,2015-02-05T11:02:22Z,2015-02-05T11:26:38Z,v0.9.0,"# New
+- New read/write pages to get a very fast disk operations
+- Diferent free spaces on diferent page types (DataPage and IndexPage)
+- Support for `Id` and `<ClassName>Id` identity in POCO class
+- New datafile format
+
+# Changes
+- Updates on README
+- Bugfix on load ExtendPages
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/920426/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/920426,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v0.9.0,https://github.com/mbdavid/LiteDB/releases/tag/v0.9.0,https://api.github.com/repos/mbdavid/LiteDB/zipball/v0.9.0,v0.9.0,False,False
+904569,2015-01-31T18:46:42Z,2015-01-31T18:49:24Z,,"## New
+- Improve disk writes. More than 200% performance increase on upload files.
+- Improve write ExtendPage - no more recursive
+- Improve performance for search available page
+- Increase MaxDocumentSize to 1MB
+- Static bulk method for insert 
+- Added and/or operators for query filter in shell
+- Added ""timer"" command on shell
+- Minor code fixes
+
+## Changes
+- Removed unfinish code. Will be release in future versions
+- Remove MaxFileLength
+- Move shell commands to LiteDB project
+",https://api.github.com/users/mbdavid,1137197,mbdavid,https://api.github.com/repos/mbdavid/LiteDB/releases/904569/assets,https://api.github.com/repos/mbdavid/LiteDB/releases/904569,master,https://api.github.com/repos/mbdavid/LiteDB/tarball/v0.8.0,https://github.com/mbdavid/LiteDB/releases/tag/v0.8.0,https://api.github.com/repos/mbdavid/LiteDB/zipball/v0.8.0,v0.8.0,False,False

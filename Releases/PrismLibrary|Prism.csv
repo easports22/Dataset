@@ -1,0 +1,264 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8113381,2017-10-13T15:59:54Z,2017-10-13T16:40:37Z,Prism 7.0.0-pre3,"## Prism.Core
+
+* .NET Standard Support 
+* Added method to clear all errors on ErrorsContainer  
+* Removed requirement for parameter in delegate definition of DelegateCommand.ObservesCanExecute 
+
+**Breaking** 
+Example: 
+Old (v6.3): `ObservesCanExcute((**vm**) => Property)` 
+New (v7.0): `ObservesCanExecute(() => Property)` 
+ 
+* Add capability to DelegateCommand's ObservesProperty to observe properties of complex types 
+
+Example: 
+`ObservesProperty(() => Property.NestedProperty.NestedPoperty)` 
+
+## Prism.Forms
+
+* Fixed #650: Navigating between Tabs **Breaking** 
+* Fixed #683: .NET Standard support 
+* Fixed #765: Deep linking within a NavigationPage results in an incorrect ContentPage Title on Android  
+* Fixed #921: Add ability to Remove pages from the navigation stack 
+* Fixed #1007: Re-license to MIT, following the Microsoft led projects  
+* Fixed #1008: NavigationParameters: Not possible to specify parent type as generic parameter T 
+* Fixed #1111: Include pdb file in nuget package 
+* Fixed #1024: XF: NavigationService swallowing Exceptions  
+* Fixed #1025: Xamarin.Forms deprecated the Device.OS property in favor of the RuntimePlatform property.  The following changes were made to accommodate these changes: 
+**IDeviceService** 
+* deprecated OnPlatform methods 
+* added DeviceRuntimePlatform property - this mimics the XF API and returns a string 
+* added RuntimePlatform property which returns an Enum of type RuntimePlatform and wraps the XF string-based values 
+ 
+* Fixed #1027: Support macOS 
+* Fixed #1044: When Detail of MasterDetailPage is null, Modal Navigation is possible  
+* Fixed #1045: When calling NavigateAsync with NavigationPage, old page's Destroy on the stack is not called  
+* Fixed #1046: When calling DeepLink from Navigation Stack, the second page becomes Modal navigation  
+* Fixed #1054: When deep linking within NavigationPage, page order is reversed  
+* Fixed #1063: Master of MasterDetailPage will not be destroyed 
+* Fixed #1085: Error occurs if null path is specified in EventToCommandBehavior  
+* Fixed #1089: DebugLogger does not work in nuget-package  
+* Fixed #1132: Prism Forms Modularity extension methods 
+* Fixed #1133: IModuleCatalog AddModule returns wrong type  
+* Fixed #1139: Modularity Enhancements 
+* Fixed #1076: IActiveAware not working when ContentPage (as child of a TabbedPage) is wrapped into a NavigationPage 
+* Fixed #1166: Custom NavigationPage is not working properly Prism 7  
+* Fixed #1187: Change TabbedPage navigation behavior **Breaking** 
+* Fixed #1198: Rename IApplicationLifecycle to IApplicationLifecycleAware **Breaking** 
+* Fixed #1200: Add GoBackToRoot method  
+* added IPageLifecycleAware and PageLifecycleAwareBehavior to enable responding to the Page's Appearing and Disappearing events 
+* adds ability to create tabs in a TabbedPage dynamically through the querystring 
+ 
+You can now dynamically create tabs when navigating to a TabbedPage by using the KnownNavigationParameters.CreateTab constant or by using the ""createTab"" parameter name. 
+`_navigationService.NavigateAsync(""MyTabbedPage?createTab=ViewA&createTab=ViewB"");` 
+This will create a TabbedPage and then create two tabs, ViewA and ViewB. 
+To create a tab that wraps a page in a NavigationPage, simply denote this as a nested hierarchy using the | character. 
+`_navigationService.NavigateAsync(""MyTabbedPage?createTab=NavigationPage|ViewA"");` 
+ 
+**Container Extensions** 
+* deprecated the RegisterTypeForNavigationOnPlatform signature that requires explicit platform parameters 
+* added new signature that accepts new IPlatform objects 
+Example: 
+``` 
+Container.RegisterTypeForNavigationOnPlatform<MainPage, MainPageViewModel>(""Main"",  
+new Platform<MainPage_Android>(RuntimePlatform.Android), 
+new Platform<MainPage_iOS>(RuntimePlatform.iOS)); 
+``` 
+ 
+# TabbedPage Navigation Behavior Change - BREAKING 
+## Current Behavior (v6.3.0) 
+`NavigateAsync(""TabbedPage/ViewA/ViewB"")` will select the tab ViewA in the TabbedPage if it exists, then continue navigating.  If ViewA does not exist as a tab, then you will continue to navigate as expected. 
+ 
+`NavigateAsync(""TabbedPage/NavigationPage/ViewA/ViewB"")` would search the TabbedPage for the first instance of a tab that was a NavigationPage, then navigate within the Navigation page the remaining ViewA and ViewB pages.  This provided the ability to deep link into a tab's nested navigation page, but there was no way to opt-out of this behavior. 
+ 
+Also, the INavigationAware methods did not get called to all tabs meaning that you would be responsible for forwarding any parameters to all your tabs. 
+ 
+## New Behavior 
+`NavigateAsync(""TabbedPage/ViewA/ViewB"")` will **no longer** select any tabs, but rather continue processing the navigation as separate pages on the navigation stack. 
+ 
+If you wish to select a tab, you will now use a parameter called ""selectedTab"" to indicate which tab you would like to select. 
+ 
+`NavigateAsync(""TabbedPage?selectedTab=MiddleTab/ViewA/ViewB"")` 
+ 
+This will navigate to the TabbedPage, selected the ""MiddleTab"" and continue navigating ViewA and ViewB onto the navigation stack. 
+ 
+For tabs that are wrapped inside a NavigationPage, you do not need to change anything. The syntax is the same. This will search each tab to see if it is a navigation page and if the CurrentPage of the NavigationPage matches ""MiddleTab"", the tab will be selected.  This is much more flexible than the existing behavior as before it would take the first instance of the NavigationPage found.  Now you can choose which tab exactly. 
+ 
+There is a constant in the `KnownNavigationParameters` called `SelectedTab` that you can use instead of a string. 
+ 
+`NavigateAsync($""TabbedPage?{KnownNavigationParameters.SelectedTab}=MiddleTab"")` 
+ 
+Some INavigationAware methods are now fired on all Tabs: 
+- OnNavigatingTo will be invoked on the TabbedPage and ALL TABS. 
+- OnNavigatedTo will be invoked on the TabbedPage and only the SELECTED TAB. 
+- OnNavigatedFrom will be invoked on the TabbedPage and only the SELECTED TAB. 
+ 
+**Note**: the parameter key `selectedTab` is now a reserved parameter name.  Similar to a reserved keyword in C#.  If you use this in your app as a key, you may experience undesired behavior. 
+ 
+**Note**: At this time there is no native support for deep linking into a Tab that is a navigation page.  Please let me know if you need this functionality. 
+ 
+## Remove pages from navigation stack  
+This feature allows you to remove pages form the navigation stack of a NavigationPage while at the same time navigating to a new page.  For each page you wish to remove, prefix your navigation path with `../`. 
+ 
+**Example** 
+Our app requires a user to login in order to edit ""User"" profile information.  This will require the user to be prompted to login and then once successful continue to edit the profile.  This leaves us with the following navigation stack: 
+ 
+""NavigationPage/UserList/UserDetails/LoginPage/EditUser"" 
+ 
+If we were to hit the back button from the `EditUser` page, we would be returned to the `LoginPage`.  This is not the desired experience.  Instead, we want to go back to the `UserDetails` which was just updated.  To achieve this we provide the following navigation URI from the **LoginPage** page with a successful login attempt. 
+ 
+`NavigationService.NavigateAsync(""../EditUser"");` 
+ 
+This would remove the LoginPage and then immediately navigate to the ""EditUser"" page which we now have access to. 
+ 
+You can chain the `../` instruction for each page that needs to be removed from the stack. 
+ 
+Given:  ""NavigationPage/ViewA/ViewB/ViewC/ViewD"" 
+Navigate from ViewD with: `NavigationService.NavigateAsync(""../../../ViewE"");` 
+Results in: ""NavigationPage/ViewA/ViewE"" 
+ 
+**Note**: This only works when navigating within a NavigationPage! Modal pages are not supported. ",https://api.github.com/users/dansiegel,3860573,dansiegel,https://api.github.com/repos/PrismLibrary/Prism/releases/8113381/assets,https://api.github.com/repos/PrismLibrary/Prism/releases/8113381,master,https://api.github.com/repos/PrismLibrary/Prism/tarball/7.0.0-pre3,https://github.com/PrismLibrary/Prism/releases/tag/7.0.0-pre3,https://api.github.com/repos/PrismLibrary/Prism/zipball/7.0.0-pre3,7.0.0-pre3,False,True
+8018496,2017-10-05T19:42:26Z,2017-10-06T00:06:10Z,Prism 7.0.0 - Preview 2,"## Prism.Core
+* .NET Standard Support
+* Added method to clear all errors on ErrorsContainer 
+* Add capability to DelegateCommand's ObservesProperty to observe properties of complex types
+Example:
+`ObservesProperty(() => Property.NestedProperty.NestedPoperty)`
+
+## Prism.Forms
+* Fixed #683: .NET Standard support
+* Fixed #765: Deep linking within a NavigationPage results in an incorrect ContentPage Title on Android 
+* Fixed #1008: NavigationParameters: Not possible to specify parent type as generic parameter T
+* Fixed #1024: XF: NavigationService swallowing Exceptions 
+* Fixed #1025: Xamarin.Forms deprecated the Device.OS property in favor of the RuntimePlatform property.
+* Fixed #1027: Support macOS
+* Fixed #1044: When Detail of MasterDetailPage is null, Modal Navigation is possible 
+* Fixed #1045: When calling NavigateAsync with NavigationPage, old page's Destroy on the stack is not called 
+* Fixed #1046: When calling DeepLink from Navigation Stack, the second page becomes Modal navigation 
+* Fixed #1054: When deep linking within NavigationPage, page order is reversed 
+* Fixed #1063: Master of MasterDetailPage will not be destroyed
+* Fixed #1085: Error occurs if null path is specified in EventToCommandBehavior 
+* Fixed #1089: DebugLogger does not work in nuget-package 
+* Fixed #1132: Prism Forms Modularity extension methods
+* Fixed #1133: IModuleCatalog AddModule returns wrong type 
+* Fixed #1139: Modularity Enhancements
+* Fixed #1076: IActiveAware not working when ContentPage (as child of a TabbedPage) is wrapped into a NavigationPage
+
+**IDeviceService**
+* deprecated OnPlatform methods
+* added DeviceRuntimePlatform property - this mimics the XF API and returns a string
+* added RuntimePlatform property which returns an Enum of type RuntimePlatform and wraps the XF string-based values
+
+**Container Extensions**
+* deprecated the RegisterTypeForNavigationOnPlatform signature that requires explicit platform parameters
+* added new signature that accepts new IPlatform objects
+Example:
+```
+Container.RegisterTypeForNavigationOnPlatform<MainPage, MainPageViewModel>(""Main"", 
+	new Platform<MainPage_Android>(RuntimePlatform.Android),
+	new Platform<MainPage_iOS>(RuntimePlatform.iOS));
+```
+
+# TabbedPage Navigation Behavior Change - BREAKING
+## Current Behavior (v6.3.0)
+`NavigateAsync(""TabbedPage/ViewA/ViewB"")` will select the tab ViewA in the TabbedPage if it exists, then continue navigating.  If ViewA does not exist as a tab, then you will continue to navigate as expected.
+
+`NavigateAsync(""TabbedPage/NavigationPage/ViewA/ViewB"")` would search the TabbedPage for the first instance of a tab that was a NavigationPage, then navigate within the Navigation page the remaining ViewA and ViewB pages.  This provided the ability to deep link into a tab's nested navigation page, but there was no way to opt-out of this behavior.
+
+Also, the INavigationAware methods did not get called to all tabs meaning that you would be responsible for forwarding any parameters to all your tabs.
+
+## New Behavior
+`NavigateAsync(""TabbedPage/ViewA/ViewB"")` will **no longer** select any tabs, but rather continue processing the navigation as separate pages on the navigation stack.
+
+If you wish to select a tab, you will now use a parameter called ""selectedTab"" to indicate which tab you would like to select.
+
+`NavigateAsync(""TabbedPage?selectedTab=MiddleTab/ViewA/ViewB"")`
+
+This will navigate to the TabbedPage, selected the ""MiddleTab"" and continue navigating ViewA and ViewB onto the navigation stack.
+
+For tabs that are wrapped inside a NavigationPage, you can use the ""|"" symbol to indicate the hierarchy.
+
+`NavigateAsync(""TabbedPage?selectedTab=NavigationPage|MiddleTab"")`
+
+There is a constant in the `KnownNavigationParameters` called `SelectedTab` that you can use instead of a string.
+
+`NavigateAsync($""TabbedPage?{KnownNavigationParameters.SelectedTab}=MiddleTab"")`
+
+This will search each tab to see if it is a navigation page and if the first page on the stack matches ""MiddleTab"".  This is much more flexible than the existing behavior as before it would take the first instance of the NavigationPage found.  Now you can choose which tab exactly.
+
+Some INavigationAware methods are now fired on all Tabs:
+- OnNavigatingTo will be invoked on the TabbedPage and ALL TABS.
+- OnNavigatedTo will be invoked on the TabbedPage and only the SELECTED TAB.
+- OnNavigatedFrom will be invoked on the TabbedPage and only the SELECTED TAB.
+
+**Note**: the parameter key `selectedTab` is now a reserved parameter name.  Similar to a reserved keyword in C#.  If you use this in your app as a key, you may experience undesired behavior.
+
+**Note**: At this time there is no native support for deep linking into a Tab that is a navigation page.  Please let me know if you need this functionality.",https://api.github.com/users/brianlagunas,835562,brianlagunas,https://api.github.com/repos/PrismLibrary/Prism/releases/8018496/assets,https://api.github.com/repos/PrismLibrary/Prism/releases/8018496,master,https://api.github.com/repos/PrismLibrary/Prism/tarball/7.0.0-pre2,https://github.com/PrismLibrary/Prism/releases/tag/7.0.0-pre2,https://api.github.com/repos/PrismLibrary/Prism/zipball/7.0.0-pre2,7.0.0-pre2,False,True
+7849385,2017-09-20T17:50:16Z,2017-09-22T03:23:08Z,Prism 7.0.0 - Preview 1,"## Prism.Core
+* .NET Standard Support
+* Added method to clear all errors on ErrorsContainer 
+* Add capability to DelegateCommand's ObservesProperty to observe properties of complex types
+Example:
+`ObservesProperty(() => Property.NestedProperty.NestedPoperty)`
+
+## Prism.Forms
+* Fixed #683: .NET Standard support
+* Fixed #765: Deep linking within a NavigationPage results in an incorrect ContentPage Title on Android 
+* Fixed #1008: NavigationParameters: Not possible to specify parent type as generic parameter T
+* Fixed #1024: XF: NavigationService swallowing Exceptions 
+* Fixed #1025: Xamarin.Forms deprecated the Device.OS property in favor of the RuntimePlatform property.
+* Fixed #1027: Support macOS
+* Fixed #1044: When Detail of MasterDetailPage is null, Modal Navigation is possible 
+* Fixed #1045: When calling NavigateAsync with NavigationPage, old page's Destroy on the stack is not called 
+* Fixed #1046: When calling DeepLink from Navigation Stack, the second page becomes Modal navigation 
+* Fixed #1054: When deep linking within NavigationPage, page order is reversed 
+* Fixed #1063: Master of MasterDetailPage will not be destroyed
+* Fixed #1085: Error occurs if null path is specified in EventToCommandBehavior 
+* Fixed #1089: DebugLogger does not work in nuget-package 
+* Fixed #1132: Prism Forms Modularity extension methods
+* Fixed #1133: IModuleCatalog AddModule returns wrong type 
+* Fixed #1139: Modularity Enhancements
+* Fixed #1076: IActiveAware not working when ContentPage (as child of a TabbedPage) is wrapped into a NavigationPage
+
+**IDeviceService**
+* deprecated OnPlatform methods
+* added DeviceRuntimePlatform property - this mimics the XF API and returns a string
+* added RuntimePlatform property which returns an Enum of type RuntimePlatform and wraps the XF string-based values
+
+**Container Extensions**
+* deprecated the RegisterTypeForNavigationOnPlatform signature that requires explicit platform parameters
+* added new signature that accepts new IPlatform objects
+Example:
+```
+Container.RegisterTypeForNavigationOnPlatform<MainPage, MainPageViewModel>(""Main"", 
+	new Platform<MainPage_Android>(RuntimePlatform.Android),
+	new Platform<MainPage_iOS>(RuntimePlatform.iOS));
+```",https://api.github.com/users/brianlagunas,835562,brianlagunas,https://api.github.com/repos/PrismLibrary/Prism/releases/7849385/assets,https://api.github.com/repos/PrismLibrary/Prism/releases/7849385,master,https://api.github.com/repos/PrismLibrary/Prism/tarball/7.0.0-pre1,https://github.com/PrismLibrary/Prism/releases/tag/7.0.0-pre1,https://api.github.com/repos/PrismLibrary/Prism/zipball/7.0.0-pre1,7.0.0-pre1,False,True
+5865527,2016-11-02T20:42:26Z,2017-03-25T01:05:57Z,Prism 6.3.0,"- Prism for Universal Windows Platform
+- Prism for Xamarin.Forms
+- Prism for WPF
+
+[Release Notes](https://github.com/PrismLibrary/Prism/wiki/Release-Notes-6.3.0)",https://api.github.com/users/brianlagunas,835562,brianlagunas,https://api.github.com/repos/PrismLibrary/Prism/releases/5865527/assets,https://api.github.com/repos/PrismLibrary/Prism/releases/5865527,master,https://api.github.com/repos/PrismLibrary/Prism/tarball/Prism.v6.3.0,https://github.com/PrismLibrary/Prism/releases/tag/Prism.v6.3.0,https://api.github.com/repos/PrismLibrary/Prism/zipball/Prism.v6.3.0,Prism.v6.3.0,False,False
+3851486,2016-08-09T18:31:46Z,2016-08-09T23:46:38Z,Prism 6.2.0,"- Prism for Universal Windows Platform
+- Prism for Xamarin.Forms
+- Prism for WPF
+
+[Release Notes](https://github.com/PrismLibrary/Prism/wiki/Release-Notes-6.2.0)
+",https://api.github.com/users/brianlagunas,835562,brianlagunas,https://api.github.com/repos/PrismLibrary/Prism/releases/3851486/assets,https://api.github.com/repos/PrismLibrary/Prism/releases/3851486,master,https://api.github.com/repos/PrismLibrary/Prism/tarball/Prism.v6.2.0,https://github.com/PrismLibrary/Prism/releases/tag/Prism.v6.2.0,https://api.github.com/repos/PrismLibrary/Prism/zipball/Prism.v6.2.0,Prism.v6.2.0,False,False
+2019702,2015-10-26T14:50:51Z,2015-10-26T15:38:04Z,Prism for Xamarin.Forms 6.0.1,"- Fixed issue #254 - PageDialogService is not setting Page property correctly
+- Added XML documentation
+",https://api.github.com/users/brianlagunas,835562,brianlagunas,https://api.github.com/repos/PrismLibrary/Prism/releases/2019702/assets,https://api.github.com/repos/PrismLibrary/Prism/releases/2019702,master,https://api.github.com/repos/PrismLibrary/Prism/tarball/Prism.Formsv6.0.1,https://github.com/PrismLibrary/Prism/releases/tag/Prism.Formsv6.0.1,https://api.github.com/repos/PrismLibrary/Prism/zipball/Prism.Formsv6.0.1,Prism.Formsv6.0.1,False,False
+2009024,2015-10-23T14:51:56Z,2015-10-23T15:15:49Z,Prism 6 for Windows UWP 6.0.1,"This release included some refactoring of PrismApplication, PrismUnityApplication, and PrismAutofacApplication to removed sealed on a couple members that were inadvertantly sealed in the 6.0.0 release, as well as to incorporate bootstrapping patterns for containers similar to what the Prism.Wpf bootstrappers do.
+
+[Release Notes](https://github.com/PrismLibrary/Prism/wiki/Release-Notes-Prism.Windows-6.0.1)
+",https://api.github.com/users/briannoyes,4534445,briannoyes,https://api.github.com/repos/PrismLibrary/Prism/releases/2009024/assets,https://api.github.com/repos/PrismLibrary/Prism/releases/2009024,master,https://api.github.com/repos/PrismLibrary/Prism/tarball/Prism.Windows6.0.1,https://github.com/PrismLibrary/Prism/releases/tag/Prism.Windows6.0.1,https://api.github.com/repos/PrismLibrary/Prism/zipball/Prism.Windows6.0.1,Prism.Windows6.0.1,False,False
+1963054,2015-10-14T23:34:32Z,2015-10-15T00:20:15Z,Prism 6.1.0,"- Prism for Universal Windows Platform
+- Prism for Xamarin.Forms
+- Prism for WPF
+
+[Release Notes](https://github.com/PrismLibrary/Prism/wiki/Release-Notes---6.1.0)
+",https://api.github.com/users/brianlagunas,835562,brianlagunas,https://api.github.com/repos/PrismLibrary/Prism/releases/1963054/assets,https://api.github.com/repos/PrismLibrary/Prism/releases/1963054,master,https://api.github.com/repos/PrismLibrary/Prism/tarball/Prismv6.1.0,https://github.com/PrismLibrary/Prism/releases/tag/Prismv6.1.0,https://api.github.com/repos/PrismLibrary/Prism/zipball/Prismv6.1.0,Prismv6.1.0,False,False
+1799188,2015-09-10T15:49:50Z,2015-09-11T10:29:07Z,Prism for WPF release 6.0.1,"First release of Prism, release notes here: https://github.com/PrismLibrary/Prism/wiki/Release-Notes---6.0.0.
+6.0.1 just added the XML doc comments files for intellisense.
+",https://api.github.com/users/briannoyes,4534445,briannoyes,https://api.github.com/repos/PrismLibrary/Prism/releases/1799188/assets,https://api.github.com/repos/PrismLibrary/Prism/releases/1799188,master,https://api.github.com/repos/PrismLibrary/Prism/tarball/WPFv6.0.1,https://github.com/PrismLibrary/Prism/releases/tag/WPFv6.0.1,https://api.github.com/repos/PrismLibrary/Prism/zipball/WPFv6.0.1,WPFv6.0.1,False,False

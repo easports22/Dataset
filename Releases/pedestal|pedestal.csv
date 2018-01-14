@@ -1,0 +1,466 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7978952,2017-10-03T14:04:53Z,2017-10-03T14:12:21Z,Incremental Improvements,"Thanks to everyone who helped on all changes that went into 0.5.3!
+
+### Changes
+
+#### Smaller changes
+
+ * Adding the CSRF interceptor now implies that `body-params` is also in the interceptor chain.  This makes the user experience of turning CSRF easier and more ""automatic"" -- `default-interceptors` does the right thing.
+ * `url-for` internal linker map is now delayed, improving per-request performance.
+ * `not-found` and `request-logging` default interceptors are now optional and can be configured via the Service Map.  The docstring has been updated.
+
+#### Verb-neutral Routing
+
+At this point, all routers can operate in a verb-neutral way.  Users can use the routers to route any application protocol request, not just HTTP requests.  The Table Routes format also supports verb-neutral routes, allowing you to use the data format to express routing for any application protocol (eg: 9P, Kafka, etc.).
+
+#### Template updates
+
+Content-Security Policy (CSP) is loosened up in ""dev-mode"" to be as flexible as possible when starting off.  The `service.clj` file contains suggestions on how to tailor the CSP policy for production based on your application's needs.
+
+
+### Bugfixes
+
+ * `url-for` correctly handles trailing slashes
+ * Clojure 1.9.0 // core.async spec issues have been resolved by updating dependencies
+ * The Servlet Chain Provider correctly handles multi-value headers
+
+
+### Upcoming Work
+
+There will be a 0.5.4 release with the dependencies refreshed and some small code clean-up.  Pedestal will support AWS Lambda as a Chain Provider in a future release (the work is currently [sitting on a branch](https://github.com/pedestal/pedestal/tree/aws-lambda)).  This will allow you to take any Pedestal service (even if it's configured to run with Jetty as an UberJar), and run it as an [AWS Lambda](https://aws.amazon.com/lambda/) behind [API Gateway](https://aws.amazon.com/api-gateway/).  Work continues to make Pedestal better for non-HTTP Chain Providers.
+
+Again, thanks to everyone who has helped push Pedestal forward, and to all of those who use it!
+
+For a full list of changes, please see this comparison of [0.5.2...0.5.3](https://github.com/pedestal/pedestal/compare/0.5.2...0.5.3)",https://api.github.com/users/ohpauleez,153929,ohpauleez,https://api.github.com/repos/pedestal/pedestal/releases/7978952/assets,https://api.github.com/repos/pedestal/pedestal/releases/7978952,master,https://api.github.com/repos/pedestal/pedestal/tarball/0.5.3,https://github.com/pedestal/pedestal/releases/tag/0.5.3,https://api.github.com/repos/pedestal/pedestal/zipball/0.5.3,0.5.3,False,False
+5143372,2017-01-12T17:12:38Z,2017-01-12T17:17:19Z,Bugfixes and security updates,"Thanks to everyone who helped on all changes that went into 0.5.2!
+
+### Changes
+
+#### Immutant WebSocket support
+
+Pedestal's WebSocket support was extended to also work with Immutant (same options and setup as the Jetty WebSocket code).  Many thanks to @yokolet to help pull those changes together.  See the [WebSocket Sample](https://github.com/pedestal/pedestal/tree/master/samples/jetty-web-sockets) to get get started.
+
+#### Dependency refresh and updated logback config
+
+Across all the modules many of the dependencies were updated.  The latest logback release has changed some of the config options -- configs across the project were updated and the Pedestal Service Template uses a new-style config as well.  Please see [the new config](https://github.com/pedestal/pedestal/blob/master/service-template/src/leiningen/new/pedestal_service/logback.xml) for details (including tips on performance tweaks and quieting Logback's status reporting).
+
+#### Sample and doc updates
+
+Many of the samples continued to get refreshed and enhanced.  The HTTP/2 sample now includes an example of using Push.  The docs and guides continued to be improved - check out the [Pedestal Site](http://pedestal.io/).  Various doc strings were cleaned up.  Thanks to all who helped on all of these efforts!
+
+#### Secure Headers and security updates
+
+Secure Headers now include Content Security Policy, Download Options, and Cross Domain Policies toggles.  Details can be found in #466.  The Ring dependency was updated to patch the path-traversal vulnerability - details in #492.  Container-identifying information/headers are no longer sent (on Jetty and Tomcat).
+
+### Bugfixes
+
+#### `response-for` and Transit bodies
+
+There was a small bug with response-for when returning Transit bodies, which had to do with missing method definitions for the proxied/reified Servlet (and its Input and Output Streams).
+
+#### CSRF double-submit cookie
+
+The double-submit cookie didn't bootstrap itself correctly when it was used in isolation (without any other CSRF token present) - the response would be 404.  That is now fixed - all CSRF setups should work correctly.
+
+#### Metric names and StatsD
+
+The original format of the metric names broke how some stat aggregators (like StatsD) parsed values.  The format was changed and refactored into a function.
+
+### Upcoming work
+
+Major work coming up involves Pedestal's interceptor chain to be platform agnostic (allowing it to be used within ClojureScript applications) and enabling the Pedestal router to be verb-neutral (allowing it to support other protocols outside of HTTP).  We also might have a few surprises for you ;)
+
+Again, thanks to everyone who has helped push Pedestal forward, and to all of those who use it!
+
+For a full list of changes, please see this comparison of [0.5.1...0.5.2](https://github.com/pedestal/pedestal/compare/0.5.1...0.5.2)
+",https://api.github.com/users/ohpauleez,153929,ohpauleez,https://api.github.com/repos/pedestal/pedestal/releases/5143372/assets,https://api.github.com/repos/pedestal/pedestal/releases/5143372,master,https://api.github.com/repos/pedestal/pedestal/tarball/0.5.2,https://github.com/pedestal/pedestal/releases/tag/0.5.2,https://api.github.com/repos/pedestal/pedestal/zipball/0.5.2,0.5.2,False,False
+3985048,2016-08-26T16:46:21Z,2016-08-26T17:17:50Z,Progress and documentation,"Thanks to all who helped with the 0.5.1 released.  I'm going to keep the notes short and to the point!
+
+### Changes
+
+#### New module/artifact layout
+
+Pedestal's core pieces have been broken out into their own artifacts.  This means you can now use the [Interceptor Chain](https://github.com/pedestal/pedestal/tree/master/interceptor) as a standalone piece within your own systems.  Other new artifacts include [log](https://github.com/pedestal/pedestal/tree/master/log) (with the metrics capabilities) and [route](https://github.com/pedestal/pedestal/tree/master/route).
+
+The standard modules are all still there as well `jetty`, `tomcat`, `immutant`, `service`, `service-tools`, and `service-template`.
+
+#### Enhancements to WebSockets
+
+Previously, Pedestal closed-over the listener function when using Jetty's websockets.  A small addition was made to pass in the listener function directly, giving you more control over the websocket creation and management.
+
+#### SSL Options on Jetty
+
+There are new options for SSL available on Jetty.  You may pass in your own `:ssl-context-factory` in place of Pedestal building one for you.  Truststores can also be referenced by string path now.
+
+#### Disable HTTP on Jetty
+
+It is now possible to completely disable HTTP on Jetty, if you have HTTPS fully setup.  This is handy if you want to guarantee you _only_ handle encrypted traffic, or if you want to ensure you're only serve HTTP/2 traffic.
+
+#### HTTP/2 / ALPN Java-Agent
+
+The Pedestal Service template now uses an ALPN Java Agent instead of the boot-classpath dependencies.  This makes using HTTP/2 more straightforward and prevents odd cross-dependency SSL bugs.
+
+#### Documentation updates!
+
+A HUGE thank you to @mtnygard for working to update the Pedestal documentation, rebuild the Pedestal site, and build our a new series of guides for newcomers to Pedestal.  While he's working on that, @ohpauleez will be working to refresh and add to the samples.
+
+### Bugfixes
+
+#### CSRF arguments
+
+There was an issue when bootstrapping CSRF protection through the use of cookies.  This was patched up to correctly bootstrap.
+
+#### Transit
+
+There is a bug in Transit when handling an empty input stream (which happens in Pedestal when the `body` is empty).  This is now guarded against.
+
+#### Core.async multi-catch bug for async responses
+
+There is a bug in `core.async` regarding multiple catch statements within an async block.  While handling async requests, Pedestal hit this bug when cleaning up disconnected clients.  The Pedestal code was patched to move around the bug in core.async.
+
+#### CORS arguments
+
+The CORS handling didn't fully match the docstring.  A small code update now ensure handling matches the docstring.  Additionally, the CORS check was moved from a linear search to a hash lookup.
+
+### Upcoming work
+
+We'll continue to focus on the documentation efforts moving forward.  There will probably be an 0.5.2 release before the end of the year to refresh the projects' dependencies and push out a few lingering enhancements that didn't make it into this release.
+
+Again, thanks to everyone who has helped push Pedestal forward, and to all of those who use it!
+
+For a full list of changes, please see this comparison of [0.5.0...0.5.1](https://github.com/pedestal/pedestal/compare/0.5.0...0.5.1)
+",https://api.github.com/users/ohpauleez,153929,ohpauleez,https://api.github.com/repos/pedestal/pedestal/releases/3985048/assets,https://api.github.com/repos/pedestal/pedestal/releases/3985048,master,https://api.github.com/repos/pedestal/pedestal/tarball/0.5.1,https://github.com/pedestal/pedestal/releases/tag/0.5.1,https://api.github.com/repos/pedestal/pedestal/zipball/0.5.1,0.5.1,False,False
+3358395,2016-06-02T12:48:32Z,2016-06-02T13:03:21Z,"0.5.0 - Steady, noticeable progress!","Thank you to everyone who helped with Pedestal 0.5.0!
+
+This release continued the initial work started in the 0.4.x changes -- Simplifying interfaces, removing redundant abstractions, improving the cohesion of the namespaces/modules, significant performance improvements, and enhanced tooling.  Samples were added; bugs were fixed.
+
+At this point, Pedestal's API is stable throughout the code base - this will be the 1.0 API for Pedestal.  Now, onto the changes!
+
+### Changes
+
+#### Map-tree router
+
+Pedestal 0.5.0 ships with a new default router, the [map-tree router](https://github.com/pedestal/pedestal/pull/422).  In 0.4.0, the prefix-tree router was introduced, offering O(log n) space and runtime complexity, which resulted in a [huge performance boost](https://github.com/pedestal/pedestal/pull/330) over traditional linear routing as found in most Clojure web applications.
+The map-tree router is an optimization of the prefix-tree.  If all of your routes/URLs are static (that is, you don't use route-params or wildcard routes), the entire tree can be compressed into a single hash lookup, O(log32 N), effectively constant-time.  On my laptop, a route can be resolved, with all constraints applied, in under 60ns (the prefix-router resolves the same route in about 1500-2000ns; The linear router in 3000-5000ns).
+
+The advice going forward is to use ""static"" URLs and push all parameters to the query string or POST data.
+
+#### Servlet Independence and Chain Providers
+
+Pedestal no longer requires a Servlet container - it's possible to run Pedestal on any container.  Interceptor Chain Providers expose the bootstrapping of an Interceptor Chain to developers. See details in the [pull-request](https://github.com/pedestal/pedestal/pull/421) and review the [sample](https://github.com/pedestal/pedestal/blob/master/samples/chain-providers/src/chain_providers/service.clj).  This means Pedestal can now run directly on Netty, Vert.x, Aleph, nginx, and others.  This also allows users to write [high-performance backends](https://github.com/pedestal/pedestal/tree/master/samples/fast-pedestal) tailored to take advantage of key container functionality.
+
+In the future, this functionality will be enhanced to allow Pedestal to stand on other containers of other protocols as well.
+
+#### HTTP/2 and ALPN support
+
+HTTP/2 and ALPN support are now [available for Jetty](https://github.com/pedestal/pedestal/pull/404).  To use HTTP/2, you'll need to ensure you have an ALPN boot classpath dependency jar (included in the new Pedestal service template), and you'll need SSL enabled. All other configuration options are set in `:container-options`.  Jetty also enabled HTTP/2 Cleartext by default (if your browser supports HTTP/2 without SSL).  Take a look at the [HTTP/2 Sample](https://github.com/pedestal/pedestal/tree/master/samples/http2)
+
+#### WebSocket support
+
+WebSockets are now [supported in Jetty](https://github.com/pedestal/pedestal/pull/421) and support for Immutant will land soon.  The [WebSocket sample](https://github.com/pedestal/pedestal/tree/master/samples/jetty-web-sockets) illustrates how to specify WebSocket routes.
+
+Originally, WebSockets were planned to be supported within the route table like SSE, but every container exposes WebSockets differently.  Based on that, and based on how we saw WebSockets used in the wild, it made sense to separate out the WebSocket routes, and pass them in separately, directly to container.  Interceptor chains can still be used WebSockets with the new API/Controls that were added.
+
+#### Interceptor Chain API
+
+The interceptor chain is fully exposed as a first-class API to Pedestal users.  As part of this [refactor](https://github.com/pedestal/pedestal/pull/421), the chain can also be run in a single direction.  This allows interceptor chains to process streams of data, as well as request-reply interactions.  I encourage everyone to take a look at the [interceptor test](https://github.com/pedestal/pedestal/blob/interceptor-providers/service/test/io/pedestal/interceptor_test.clj)
+
+#### Metrics API
+
+Logging is great, but it's not enough for robust, production-grade applications and services.  Understanding the distributions, rates, and runtime status of our services is critical for effective management.  Pedestal now ships with a [Metrics API](https://github.com/pedestal/pedestal/pull/421) that supports counters, meters, gauges, and histograms.  The publishing backend is pluggable and configurable -- by default, the metrics are published to JMX (viewable with JConsole or JVisualVM), but support exists for StatsD, CloudWatch, and others.  See the [metrics sample](https://github.com/pedestal/pedestal/tree/master/samples/helloworld-metrics) for more details on hooking up alternative reporting/publishing backends.
+
+#### Docker, OSv, and other enhancements for the template
+
+The Pedestal Service Template, created with `lein new pedestal-service myapp`, now ships with a `Dockerfile` and a `Capstan` file.  This enables you to take your Pedestal application directly in a Docker container or an OSv Unikernel.
+
+The template also comes pre-configured for an ALPN or HTTP/2 setup.  This may be changed in 0.5.1, as it causes problems with dependencies that have older SSL implementations (like Netty 3 deps).
+
+The Template also produces a `service.clj` file that illustrates all available routing formats available by default.
+
+#### Route Format/Definition API
+
+Hasn't Pedestal always had a Route Definition API?  Yes, in fact, it had two and half.  In 0.5.0, those layers were collapsed and redundant abstractions were removed.  This [changeset](https://github.com/pedestal/pedestal/pull/421), also removed the need for `defroutes` now that routing (definition and route-table transformation) are all programmed against the same protocol.  `defroutes` still exists (and will continue to exist) for backwards compatibility, but all it does is a syntax quote on the route definition/table.
+
+#### Table-route format added
+
+A new route format, [table-routes](https://github.com/pedestal/pedestal/pull/395) was added.  The table-route format is a flat, non-nested data description of routes.  While it requires some more repetition than the terse routes (interceptors are attached individually per-route), it has superior clarity, is less prone to human-error, and has extremely clear error reporting.
+
+#### Improved parsing and debugging for Terse-route format (vectors)
+
+Many errors were difficult to diagnose in the terse-route format.  In the worst case, a component of your routing was tossed to a protocol, and the developer saw an obscure protocol error.  Mike Nygard [vastly improved the parsing and error reporting](https://github.com/pedestal/pedestal/pull/394) for the terse-routes.
+
+#### Request API; Zero-copy requests
+
+In the process of writing the changes for Servlet independence, common request-handling code was [refactored](https://github.com/pedestal/pedestal/pull/422) to make it reusable across all containers and chain providers. As part of these changes, it became possible to swap out the underlying Request object.  Pedestal now provides three options: A Zero-copy request (similar to that used in Aleph), a Lazy request (similar to that used in Immutant), and the standard Clojure Map request (used in Ring).  After profiling and benchmarking real-world applications, we decided the default should be the Clojure Map request.
+
+#### SSE Event-Id Handling
+
+Pedestal's SSE Handling now looks for Event-Id data in the message payloads, which can be used by clients to ""resume"" an SSE connection if disconnected.  The [SSE Sample](https://github.com/pedestal/pedestal/tree/master/samples/server-sent-events) was updated to show how to transmit the event-id.
+
+#### Content-Negotiation Interceptor
+
+Pedestal includes functionality and an interceptor for [processing Accept-\* headers](https://github.com/pedestal/pedestal/blob/0.5.0/service/src/io/pedestal/http/content_negotiation.clj).  The content-negotiation interceptor can also configured to look at different parts of the request (e.g. a specific query-string arg) for the Accept-\* information.  **The interceptor does no coerce the data format based on the Accept-\* headers.**  The final data encoding is left to the handler/endpoint function.
+
+#### Tomcat SSL support
+
+SSL support was added to Embedded Tomcat.
+
+#### WAR tooling in `service-tools`
+
+Functionality was added to `service-tools` to enable [creating a WAR from the REPL](https://github.com/pedestal/pedestal/blob/master/service-tools/src/io/pedestal/service_tools/war.clj).  This new functionality is also available to other tools, like [lein-pedestal](https://github.com/ohpauleez/lein-pedestal).  For those seeking WAR-based deployment, a new [WAR sample](https://github.com/pedestal/pedestal/tree/master/samples/war-example) was also added.
+
+### Breaking changes and migration
+
+#### Error handlers and old Interceptor Chain code
+
+Because of the namespace migration with the `interceptor.chain`, if you previously developed directly against `:io.pedestal.impl.interceptor/error`, you'll need to update that to `:io.pedestal.interceptor.chain/error`
+
+#### ALPN, Boot classpath deps, and SSL
+
+ALPN requires a Boot Classpath Dependency, which can cause issues with older SSL implementations.  If you're not using ALPN or HTTP/2, it's recommended that you comment out or remove the boot deps from your `project.clj` (assuming you generated a project from the service-template).  In a future release, these will be commented out within the template.
+
+#### Optional routing format migration
+
+Given the final routing definition/format refactor, if you programmed directly against a function or protocol, you may need to update your code to the latest API changes.  There will be no more major API changes between here and 1.0
+
+### Upcoming work
+
+There are a few changes slotted for 0.5.1 - mostly small tweaks and a few bug fixes.  The next big push will be breaking out parts of Pedestal into separate modules - `log`, `route`, `interceptor` - allowing others to use those pieces in their own projects.  Pedestal service will still be the combination of those modules, the packaged interceptors, and default chain providers (ie: nothing will change for Pedestal Service).  We're also starting a big push to rewrite all the documentation, restore the web presence, and open up the community wiki, now that Pedestal's internal APIs are stable.
+
+Again, thanks to everyone who has helped push Pedestal forward, and to all of those who use it!
+
+For a full list of changes, please see this comparison of [0.4.1...0.5.0](https://github.com/pedestal/pedestal/compare/0.4.1...0.5.0)
+",https://api.github.com/users/ohpauleez,153929,ohpauleez,https://api.github.com/repos/pedestal/pedestal/releases/3358395/assets,https://api.github.com/repos/pedestal/pedestal/releases/3358395,master,https://api.github.com/repos/pedestal/pedestal/tarball/0.5.0,https://github.com/pedestal/pedestal/releases/tag/0.5.0,https://api.github.com/repos/pedestal/pedestal/zipball/0.5.0,0.5.0,False,False
+2071072,2015-11-04T15:22:52Z,2015-11-04T15:39:36Z,0.4.1 - Project refresh,"This is a small release that contains bug fixes, API corrections, and dependency updates.
+- All dependencies were updated (although, some may be a little lagged now)
+- A small bug was patched in the new router - you'll no longer fall off the tree because of a missed route.
+- The Samples and some Docs were patched up to better illustrate techniques and patterns
+- `response-for` was pulled apart to better enable instrumentation
+- `response-for` now works for async tests
+- SSE was patched up to facilitate more options and better cleanup handling
+- A bug was fixed regarding the SSE async buffers (you can't reuse buffers)
+- Dedicated branches were created for HTTP2 support, and WebSockets (not integrated into the interceptor chain)
+- The Pedestal Roadmap has been captured within the GitHub issues
+
+For a full list of changes, please see this comparison of [0.4.0...0.4.1](https://github.com/pedestal/pedestal/compare/0.4.0...0.4.1)
+",https://api.github.com/users/ohpauleez,153929,ohpauleez,https://api.github.com/repos/pedestal/pedestal/releases/2071072/assets,https://api.github.com/repos/pedestal/pedestal/releases/2071072,master,https://api.github.com/repos/pedestal/pedestal/tarball/0.4.1,https://github.com/pedestal/pedestal/releases/tag/0.4.1,https://api.github.com/repos/pedestal/pedestal/zipball/0.4.1,0.4.1,False,False
+1182494,2015-04-17T19:35:29Z,2015-04-17T20:17:41Z,0.4.0 - Interface overhaul,"Moving forward from the 0.3.x releases, this release simplifies Pedestal's APIs, enhances performance significantly, adds new cutting-edge capabilities to handle errors, fixes a number of small bugs, and updates all of the samples.
+
+Unlike previous releases, each major change was fairly well documented in Pull-Requests.
+
+### Changes
+
+#### Prefix-tree router and open routing
+
+Pedestal's previous router performed a linear scan across a sequence of maps to find a matching handler.  In this release, the default router is now a prefix-tree based one, that is extremely efficient in terms of time and space.  Additionally, we've opened up the router core of Pedestal, allowing developers to use the `:prefix-tree`, `:linear-scan`, or their own router (passed as a function that takes a single argument, the route table).  Details can be found in the [router pull-request](https://github.com/pedestal/pedestal/pull/330)
+
+#### New error-handler
+
+In any sophisticated Pedestal service, one must handle `:error`s at various points throughout the interceptor chain.  It becomes increasingly difficult to keep the error handling coherent as the system grows - sometimes you're handling errors from handlers/business logic, other times you're handling errors from processing that occurs within the interceptor chain itself.  Async operations only further exacerbate things.
+With this release comes a new error-handler interceptor that will pattern match on exceptions throughout your _entire_ interceptor chain.  This allows developers to consolidate error handling, while providing stronger capabilities to target errors precisely.  The design is largely inspired by the X10 parallel programming language.  Details and instructions can be found in the [error-handler pull request](https://github.com/pedestal/pedestal/pull/302)
+
+#### Overhauled Interceptor API
+
+The previous API for creating interceptors had a rather large surface area.  While those functions and macros all served a purpose, many people wanted something smaller at the core.  A new interceptor API was designed around a protocol that embodied the common interceptor-creation cases.  This change also allowed interceptor creation to be open for extension.  Details and instructions can be found in the [interceptor API pull-request](https://github.com/pedestal/pedestal/pull/301)
+
+#### Documentation updates
+
+All of the samples have been updated to a much more recent version of Pedestal
+
+### Breaking changes and migration
+
+This release has two major breaking changes.  Please see the Pull-Requests for specific details.
+1. The Interceptor API is different, and the previous functions and macros have been moved into a new namespace.  You will need to patch up your namespaces.
+2. The default router is now the tree-based router.  Certain routing capabilities will no longer work.  That said, you can always use the `:linear-search` router, if you need those capabilities.
+
+### Upcoming work
+- Request optimizations - we're still working hard to figure out the best data structure for minimizing allocations per request
+- Servlet-less Pedestal - we have a design for removing the Servlet-specific pieces of Pedestal.  This would allow Pedestal to work on top of other servers, in other contexts, and enable us to unlock more performance per container/platform.  We would still have support for running a Servlet-enabled Pedestal.
+- Dependency refresh - in short order, we'll cut 0.4.1 with updated dependencies.  This was pushed off to ease migration.
+
+Thanks to everyone who has helped push Pedestal forward, and to all of those who use it!
+
+For a full list of changes, please see this comparison of [0.3.1...0.4.0](https://github.com/pedestal/pedestal/compare/0.3.1...0.4.0)
+",https://api.github.com/users/ohpauleez,153929,ohpauleez,https://api.github.com/repos/pedestal/pedestal/releases/1182494/assets,https://api.github.com/repos/pedestal/pedestal/releases/1182494,master,https://api.github.com/repos/pedestal/pedestal/tarball/0.4.0,https://github.com/pedestal/pedestal/releases/tag/0.4.0,https://api.github.com/repos/pedestal/pedestal/zipball/0.4.0,0.4.0,False,False
+617536,2014-10-09T23:23:17Z,2014-10-10T12:04:23Z,0.3.1 - Go Go Gadget,"Continuing on the themes from 0.3.0, this release solidifies Pedestal's dedication to being a set of web libraries that are robust, secure, and performant.  Updates happened across a large portion of the code base and we integrated a new platform.  There is some migration needed for those using SSE from 0.3.0 - see the notes below.
+
+#### NIO support
+
+The biggest change in 0.3.1 was the added support for NIO response bodies.  This change is a container-specific change, since the Servlet spec doesn't support NIO responses.  Jetty and Immutant are the only containers that support this functionality.  Hats off to Allen Rohner for pushing Pedestal in this direction.
+
+**What is NIO and why should I care?**
+In a [recent email thread](https://groups.google.com/d/msg/clojure/rKqT13Ofy4k/H9xvkZA9Yy4J), Paul deGrandis stated there are really two notions of an asynchronous operations in server-side web technology - handling the request without blocking the main thread, and placing the response ""on the wire"" without performing blocking IO.  NIO allows Pedestal to utilize non-blocking interactions throughout the entire container, which is very beneficial (and even necessary) for some workloads.  In contrast, the Servlet spec requires blocking I/O (output stream), to place responses ""on the wire.""  In some benchmarks, the NIO changes allow for performance characteristics comparable to nginx.
+
+**Sounds awesome, how do I use it?**
+Given that you're running on Jetty or Immutant, you simply need to return a ByteBuffer or ReadableByteChannel as the response body from your endpoint handler.  These are both common in tools and utilities that use NIO (like async http clients), making integration straightforward.
+
+**Words of caution**
+Please benchmark your services before jumping straight to NIO.  NIO for very small responses with a very low number of concurrent connections will perform worse than the standard, blocking IO approach.
+
+#### Immutant added
+
+Thanks to Jim and Toby's hard work, `:immutant` is now a recognized platform type that you can specify in your service map.  Immutant fully supports the NIO options listed above.  Immutant2 has shaped up to be a fantastic project.
+
+Additionally, what used to be called `:jetty-options` within the service map, is now called `:container-options`.  See the Immutant container code to see the specific options it supports.  **You'll need to update** any service map that uses `:jetty-options`.
+
+#### SSE updates
+
+**SSE in 0.3.1 introduces a breaking change that requires migration.**  In 0.3.0, the full context (containing the request) wasn't being passed to the SSE `start-fn` that performed the channel/connection initialization.  In 0.3.1, the `start-fn` now takes two arguments - the event channel (a core.async channel), and the context map (which contains the request, response, etc).  Additionally in the context, you'll find the `:response-channel` - the core.async channel that connects directly to the output stream, should you ever have to hand-control the SSE messages or connection.  To end the connection, just close either the event channel or the response channel.  It's advised that you only ever use the event channel, and ignore the response channel (unless you absolutely need it).
+
+There are a few migration notes for the new SSE changes beyond those just mentioned.  First, the default event is no longer named ""event"".  Instead, it omits the name and lets browsers use the standardized event (which is ""message"").  Additionally, you can pass maps (not just strings) to the SSE channel - with the keys `:name` (the event name you'd like to use) and `:data` (the data of the SSE event).
+
+There is an updated [sample](https://github.com/pedestal/pedestal/tree/master/samples/server-sent-events) that illustrates the usage, and documents the updates.
+
+#### Transit support
+
+Transit support was added for requests (via `body-params`) and responses (via `transit-body`, `transit-json-body`, and `transit-msgpack-body`).  All default options use json encoding for Transit.
+
+#### Map-based terse route format introduced
+
+You may now specify your terse routes in a map, instead of a vector-of-vectors.  Internally, Pedestal will convert your map into the vector-of-vectors format.  The new map format is useful when specifying routes as edn, where metadata (used to specify interceptors and constraints) doesn't exist.
+
+There are some tradeoffs to the map-format.  It is less expressive - it assumes you're only specifying HTTP routes (no HTTPS support), and you can't attach interceptors on a per-endpoint-verb basis (only across all verbs for a given route).
+
+Unless you absolutely need the map-format, it is advised you continue to use the vector-of-vectors format.
+
+#### Servlet integration updates
+
+The servlet integration now uses the Clojure Java API instead of RT.  This cleaned up the code a bit.
+
+For a full list of changes, please see this comparison of [0.3.0...0.3.1](https://github.com/pedestal/pedestal/compare/0.3.0...0.3.1) 
+",https://api.github.com/users/ohpauleez,153929,ohpauleez,https://api.github.com/repos/pedestal/pedestal/releases/617536/assets,https://api.github.com/repos/pedestal/pedestal/releases/617536,master,https://api.github.com/repos/pedestal/pedestal/tarball/0.3.1,https://github.com/pedestal/pedestal/releases/tag/0.3.1,https://api.github.com/repos/pedestal/pedestal/zipball/0.3.1,0.3.1,False,False
+386476,2014-06-20T19:43:21Z,2014-06-20T19:59:46Z,0.3.0 - A grand step forward,"This is a sizeable release that has evolved the public API for creating, composing, starting, and stopping Pedestal services.  It also features a full namespace refactor (dropping the service name).
+
+This release continued the focus on fast-by-default, secure-by-default.  It features CSRF and Secure Headers by default, faster connection code, performance optimizations and more.
+
+It also embraces the host more - you can now reach deep into the container on which Pedestal is running, letting you set things like ServletFilters along the way.  Fast gzip, DDoS protection, QoS throttling, SpringSecurity and more are all fair game directly in your Pedestal applications.
+
+We also now require a minimum of Java 1.7.  If you're on an older JDK version, you must use an older Pedestal version.
+
+For a full list of changes, please see this comparison of [0.2.2...0.3.0](https://github.com/pedestal/pedestal/compare/0.2.2...0.3.0).
+
+Stay tuned for more docs covering all the new features.
+",https://api.github.com/users/ohpauleez,153929,ohpauleez,https://api.github.com/repos/pedestal/pedestal/releases/386476/assets,https://api.github.com/repos/pedestal/pedestal/releases/386476,master,https://api.github.com/repos/pedestal/pedestal/tarball/0.3.0,https://github.com/pedestal/pedestal/releases/tag/0.3.0,https://api.github.com/repos/pedestal/pedestal/zipball/0.3.0,0.3.0,False,False
+85431,2013-11-05T17:59:26Z,2013-11-05T18:59:48Z,0.2.2: Final bug fix release before 0.3.0,"This is a bug fix release preceding some exciting (and breaking) 0.3.0 changes. Unless any major bugs are discovered, no further work will continue on the 0.2.x stream.
+
+For a full list of changes, please see this comparison of [0.2.1...0.2.2](https://github.com/pedestal/pedestal/compare/0.2.1...0.2.2).
+
+To update, bump your Pedestal library versions from `""0.2.1""` to `""0.2.2""`
+",https://api.github.com/users/rkneufeld,13017,rkneufeld,https://api.github.com/repos/pedestal/pedestal/releases/85431/assets,https://api.github.com/repos/pedestal/pedestal/releases/85431,master,https://api.github.com/repos/pedestal/pedestal/tarball/0.2.2,https://github.com/pedestal/pedestal/releases/tag/0.2.2,https://api.github.com/repos/pedestal/pedestal/zipball/0.2.2,0.2.2,False,False
+36671,2013-09-01T14:37:45Z,2013-09-01T14:39:03Z,App-template bug fixes,"This is a quick one to fix some issues noted by @cldwalker in #194.
+",https://api.github.com/users/rkneufeld,13017,rkneufeld,https://api.github.com/repos/pedestal/pedestal/releases/36671/assets,https://api.github.com/repos/pedestal/pedestal/releases/36671,master,https://api.github.com/repos/pedestal/pedestal/tarball/0.2.1,https://github.com/pedestal/pedestal/releases/tag/0.2.1,https://api.github.com/repos/pedestal/pedestal/zipball/0.2.1,0.2.1,False,False
+36114,2013-08-31T00:53:54Z,2013-08-31T00:55:29Z,Pedestal 0.2.0: Dev tool extravaganza,"This is a big one folks. Developer tooling has moved from generated projects into
+the app- and service-tools libraries.
+
+**If you want to take advantage of all the super-awesome new features then further action is required.**
+See the respective changelogs in App and Service for more info.
+
+## App
+- Developer tooling has moved in its entirety to app-tools.
+  
+  Notable improvements:
+  - Tooling functions are automatically included when running `lein repl`.
+  - App configuration can be reloaded with `(reload-config)`
+  - Future upgrades to tooling will be incorporated more easily.
+  
+  Additionally, app configuration is specified by an EDN file (instead of an
+  executable Clojure file.) New projects will make use of this feature, but
+  pre-0.2.0 generated projects will not.
+  
+  **You do not _have_ to make this upgrade, but we _suggest_ you do.**
+  
+  The easiest way to upgrade is to re-generate your application with the 0.2.0
+  app-template and transfer your existing code into it. It is possible, however,
+  to migrate your existing application.
+  
+  **How to migrate a 0.1.x project to 0.2.0:**
+      1. Upgrade your project's pedestal-app dependencies to version `""0.2.0""`
+      2. Remove the `dev/` folder.
+      3. `$ touch config/user.clj` -- This is needed for `:repl-options` with `:init user` to work.
+      4. Update your `project.clj`'s `:main` and `:repl-options` keys [like so](https://github.com/pedestal/pedestal/blob/4a148bf23c255baee420d7b725677b98de325120/app-template/src/leiningen/new/pedestal_app/project.clj#L14-L23).
+      5. Add the [piggieback dependency](https://github.com/pedestal/pedestal/blob/4a148bf23c255baee420d7b725677b98de325120/app-template/src/leiningen/new/pedestal_app/project.clj#L9) to your `project.clj` (`[com.cemerick/piggieback ""0.1.0""]`).
+      6. Update your application's `config.clj` file. There are two ways to do this...
+          1. _If you have not modified your `config.clj`: Generate a new
+             application with the same name as your existing application, and
+             steal the `config.edn` file from it.
+          2. *If you have changed your `config.clj`, or you're a glutten for
+             punishment_ perform these steps (looking like
+             [this](https://github.com/pedestal/pedestal/blob/4a148bf23c255baee420d7b725677b98de325120/app-template/src/leiningen/new/pedestal_app/config/config.edn)
+             is our goal):
+              1. `mv config/config.clj config/config.edn`
+              2. Remove the `ns` declaration.
+              3. Unwrap the `configs` def into a raw map.
+              4. At path `[:build :watch-files]`,
+                 `(compile/html-files-in ""app/templates"")` should become a map
+                 of tags to regex pattern strings like
+                 `{:html [""^app/templates""]}`. Note these are **string** regex
+                 patterns, not regexps--regexps aren't supported by EDN.
+              5. At path `[:build :triggers]`, existing strings should be
+                 converted to string regex patterns. For example, the original
+                 `{:html [""project-name/rendering.js""]}` would become
+                 `{:html [""project-name//rendering\\.js$""]}`.
+- Tooling's `cljs-repl` is now provided by Chas Emerick's [Piggieback](https://github.com/cemerick/piggieback).
+- Tooling's `cljs-repl` is now more clear about usage. This fixes [#93](https://github.com/pedestal/pedestal/issues/93), [#90](https://github.com/pedestal/pedestal/issues/90).
+- App's ClojureScript dependency has been bumped to r1835. Namespaced keywords are now allowed (`::msg/topic`)!
+- Logging in the browser is now grouped. [#95](https://github.com/pedestal/pedestal/pull/95)
+- The template now includes a `:ui` aspect for rendering the `simulated` behavior. [#184](https://github.com/pedestal/pedestal/pull/184), [#187](https://github.com/pedestal/pedestal/pull/187)
+- Added the `:read-as` option for `msg/param`. Setting to `:data` causes collected values to be parsed by the Clojure reader. [#166](https://github.com/pedestal/pedestal/pull/166)*
+
+## Service
+- Service tooling has moved out of generated projects into a service-tools library.
+  
+  Notable improvements:
+  - Tooling functions are automatically included when running `lein repl`.
+  - Future upgrades to tooling will be incorporated more easily.
+  
+  There is a bit of migration necessary to move existing projects to 0.2.0 tooling.
+  **You don't _have_ to make this change, but we _suggest_ you do**.
+  
+  **How to migrate a 0.1.x project to 0.2.0:**
+      1. Upgrade your project's pedestal-app dependencies to version `""0.2.0""`
+      2. Remove the `dev/` folder
+      3. `$ touch config/user.clj` -- This is needed for `:repl-options` with `:init user` to work.
+      4. Update your `project.clj`'s `:main` and `:repl-options` keys to match
+         [the new template project.clj](https://github.com/pedestal/pedestal/blob/4a148bf23c255baee420d7b725677b98de325120/service-template/src/leiningen/new/pedestal_service/project.clj#L18-L32).
+      5. Pare down your src/**/server.clj file to match
+         [the new template server.clj](https://github.com/pedestal/pedestal/blob/4a148bf23c255baee420d7b725677b98de325120/service-template/src/leiningen/new/pedestal_service/server.clj).
+- Service now uses [Cheshire](https://github.com/dakrone/cheshire)
+  instead of [clojure.data.json](https://github.com/clojure/data.json) for constructing
+  [`json-response`s](../1eeff6a56c20a4cb617148a7d2f22773d0e640ee/service/src/io/pedestal/service/http.clj#L49)
+  and [parsing json
+  bodies](../1eeff6a56c20a4cb617148a7d2f22773d0e640ee/service/src/io/pedestal/service/http/body_params.clj#L79). [#162](https://github.com/pedestal/pedestal/issues/162)
+  
+  **This change _does_ eliminate some JSON parsing options that were previously
+  possible in 0.1.10.** Specifically the following options are no longer supported:
+  - `:eof-error?` - ""If true (default) will throw exception if the stream is empty.""
+  - `:eof-value` - ""Object to return if the stream is empty and eof-error? is false. Default is nil.""
+  
+  If your application makes use of these options you will need to construct a
+  `body-params` interceptor with a `parser-map` where you have swapped in your
+  own `#""^application/json""` key with a `custom-json-parser` similar to the [old
+  version](../7d9d3a028b9529963ec1f46633ef10a73054d140/service/src/io/pedestal/service/http/body_params.clj#L78).
+  
+  That might look something like this:
+  
+  ``` clojure
+    ;; In a utility namespace
+    (require '[io.pedestal.service.http.body-params :as bp])
+    (defn old-style-json-parser ...)
+  
+    (def my-body-params (bp/body-params (-> (bp/default-parser-map)
+                                            (assoc #""^application/json"" (old-style-json-parser)))))
+  ```
+- The default behavior of the `body-params` interceptor now keywordizes JSON
+  keys. To retain the old behavior, create a `body-params` interceptor like so:
+  
+  ``` clojure
+    (require '[io.pedestal.service.http.body-params :as bp])
+    (def string-keys-body-params (bp/body-params (bp/default-parser-map :json-options {:key-fn nil})))
+  ```
+- A bug with CORS headers has been fixed.
+- The default MIME type has been returned to text/plain (it was a bug that it changed to octet-stream.) \* The template now includes a `:ui` aspect for rendering the `simulated` behavior. [#184](https://github.com/pedestal/pedestal/pull/184), [#187](https://github.com/pedestal/pedestal/pull/187)
+
+## Miscellaneous bug-fixes and improvements
+
+For a full list of changes, please see this comparison of [0.1.10...0.2.0](https://github.com/pedestal/pedestal/compare/0.1.10...0.2.0).
+",https://api.github.com/users/rkneufeld,13017,rkneufeld,https://api.github.com/repos/pedestal/pedestal/releases/36114/assets,https://api.github.com/repos/pedestal/pedestal/releases/36114,442ff8155aff0c46cf39efe9a7d273155680fa4b,https://api.github.com/repos/pedestal/pedestal/tarball/0.2.0,https://github.com/pedestal/pedestal/releases/tag/0.2.0,https://api.github.com/repos/pedestal/pedestal/zipball/0.2.0,0.2.0,False,False

@@ -1,0 +1,139 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+6597328,2017-06-04T10:19:46Z,2017-06-04T10:33:08Z,,"## New
+- add `encodeCallbackURL` to oauth 2 to URL encore callback URL. Seems to be needed for some services issue #339, pr #325
+- in SafariURLHandler `presentViewControllerAnimated` variable added by @felipeflorencio 
+- Optionally add callback URL to authorize URL using `addCallbackURLToAuthorizeURL` field of OAuth1Swift , as requested by PR #373 
+- add NounProject and Digu to demo app
+
+## Change
+- swift 3.1 warning @patricks @hiragram
+- restore OAuth1Swift `init` without URL parameters @josephquigley
+- Allow changing grand type of device token authorisation Fix #377
+- Add `parameters` parameter to renewAccessToken @wesley-dynamicowl 
+
+## Fix
+- Do not send oauth_verifier query parameter if not necessary ie. if allowMissingOAuthVerifier=true, Fix #334
+- Fix a crash when encoding credentials in a test target @eunikolsky ",https://api.github.com/users/phimage,8875768,phimage,https://api.github.com/repos/OAuthSwift/OAuthSwift/releases/6597328/assets,https://api.github.com/repos/OAuthSwift/OAuthSwift/releases/6597328,master,https://api.github.com/repos/OAuthSwift/OAuthSwift/tarball/1.1.2,https://github.com/OAuthSwift/OAuthSwift/releases/tag/1.1.2,https://api.github.com/repos/OAuthSwift/OAuthSwift/zipball/1.1.2,1.1.2,False,False
+5574475,2016-11-14T07:50:08Z,2017-02-26T10:36:46Z,,"# Change
+- Now success Handler return a `OAuthSwiftResponse`, which contains the `Data`, the `HTTPURLResponse` and `URLRequest` 
+  - On this object you can get decoded json object, string value, ...
+  - You can extends `OAuthSwiftResponse` to use some JSON decoded like `SwiftyJSON` or any object mapper
+- If there is some problem to encode URL with OAuth2,  ""handle"" is not returned (request is cancelled)
+
+# New
+- `OAuthSwiftError` implement `CustomNSError` protocol
+- Ability to specify body data for POST request
+- Add wordpress in demo
+
+# Fix
+- Fix multipart request with some parameter #287 @ktakayama
+- Fix OAuthSwiftCredential.Version init(:) error @bzmario 
+",https://api.github.com/users/phimage,8875768,phimage,https://api.github.com/repos/OAuthSwift/OAuthSwift/releases/5574475/assets,https://api.github.com/repos/OAuthSwift/OAuthSwift/releases/5574475,master,https://api.github.com/repos/OAuthSwift/OAuthSwift/tarball/1.1.1,https://github.com/OAuthSwift/OAuthSwift/releases/tag/1.1.1,https://api.github.com/repos/OAuthSwift/OAuthSwift/zipball/1.1.1,1.1.1,False,False
+4581246,2016-11-05T16:39:34Z,2016-11-05T17:01:04Z,,"In success handler/closure an `OAuthSwiftResponse` object is now returned instead of multiple objects (data and http response)
+
+``` swift
+oauthswift.client.get(""an url"",
+      success: { response in
+           let data = response.data // response.string for utf8 decoded string from data
+      },
+...
+```
+
+You can extends `OAuthSwiftResponse` to return a decoded object by reading JSON for instance
+
+You can also get the `URLRequest` send to the server into this `OAuthSwiftResponse` object
+
+---
+
+Backward compatibility with Objective C work with prefixed `objc_` functions
+",https://api.github.com/users/phimage,8875768,phimage,https://api.github.com/repos/OAuthSwift/OAuthSwift/releases/4581246/assets,https://api.github.com/repos/OAuthSwift/OAuthSwift/releases/4581246,master,https://api.github.com/repos/OAuthSwift/OAuthSwift/tarball/1.1.0,https://github.com/OAuthSwift/OAuthSwift/releases/tag/1.1.0,https://api.github.com/repos/OAuthSwift/OAuthSwift/zipball/1.1.0,1.1.0,False,False
+4322536,2016-10-06T11:54:32Z,2016-10-06T12:50:50Z,,"Update to swift 3
+- functions renamed (ex: `authorizeWithCallbackURL(` -> `authorize(withCallbackURL:`)
+- error in callback is typed `OAuthSwiftError`
+- variable with `_` renamed (ex: `oauthSwift.client.credential.oauth_token`->  `oauthSwift.client.credential.oauthToken`)
+- add some type alias (ex: `OAuthSwift.Headers` , `OAuthSwift.Parameters`)
+- ...
+
+Take a look to also updated project [OAuthSwiftAlamofire](https://github.com/OAuthSwift/OAuthSwiftAlamofire) if you want to use Alamofire to make request
+",https://api.github.com/users/phimage,8875768,phimage,https://api.github.com/repos/OAuthSwift/OAuthSwift/releases/4322536/assets,https://api.github.com/repos/OAuthSwift/OAuthSwift/releases/4322536,master,https://api.github.com/repos/OAuthSwift/OAuthSwift/tarball/1.0.0,https://github.com/OAuthSwift/OAuthSwift/releases/tag/1.0.0,https://api.github.com/repos/OAuthSwift/OAuthSwift/zipball/1.0.0,1.0.0,False,False
+3764813,2016-07-28T20:24:31Z,2016-07-28T20:42:13Z,,"- See [Milestone](https://github.com/OAuthSwift/OAuthSwift/milestone/1?closed=1) for bug fix
+- many change from @FGoessler  PR #219  
+  - fix memory leak
+  - allow to cancel request
+  - ..
+- Fix and customisation on provided web view controller presentation and dismissal
+- Demo app have now a form to choose url handler and fill key and secret
+- add SoundCloud to OAuthSwiftDemo @satoshin2071
+
+:warning: If you update and use `SafariURLHandler`, you will have a compilation issue: `SafariURLHandler`init now take an `OAuthSwift`object as parameter
+",https://api.github.com/users/phimage,8875768,phimage,https://api.github.com/repos/OAuthSwift/OAuthSwift/releases/3764813/assets,https://api.github.com/repos/OAuthSwift/OAuthSwift/releases/3764813,master,https://api.github.com/repos/OAuthSwift/OAuthSwift/tarball/0.6.0,https://github.com/OAuthSwift/OAuthSwift/releases/tag/0.6.0,https://api.github.com/repos/OAuthSwift/OAuthSwift/zipball/0.6.0,0.6.0,False,False
+2961408,2016-04-05T15:30:51Z,2016-04-06T07:53:03Z,,"# Fix
+- on oauth1 signature (@danielbmarques)
+- use of oauthswift into app extension 
+- request that start with &
+
+# Change
+- swift 2.2 warnings (@lyptt)
+- allow to refresh token for oauth2 (@fabiomassimo )
+- add an enum OAuthSwiftErrorCode (@fabiomassimo )
+- added a method to OAuthSwiftClient to perform requests via NSURLRequest objects (@FGoessler)
+- allow to cancel OAuthSwiftHTTPRequest (@FGoessler)
+
+# Other
+- added to demo Goodreads, Typetalk, Buffer, Trello
+",https://api.github.com/users/phimage,8875768,phimage,https://api.github.com/repos/OAuthSwift/OAuthSwift/releases/2961408/assets,https://api.github.com/repos/OAuthSwift/OAuthSwift/releases/2961408,master,https://api.github.com/repos/OAuthSwift/OAuthSwift/tarball/v0.5.2,https://github.com/OAuthSwift/OAuthSwift/releases/tag/v0.5.2,https://api.github.com/repos/OAuthSwift/OAuthSwift/zipball/v0.5.2,v0.5.2,False,False
+2669241,2016-02-22T14:14:44Z,2016-02-23T10:10:51Z,,"# Fix
+- fix fatal error if no `access_token_url` defined but  needed
+- do not silently do nothing if failed to create authorize url 
+- encode authorize url  (fix scope with space)
+- remove percent encoding from oauth_token 
+
+# Change
+- Add method `removeCallbackNotificationObserver` to release the observer (which wait on callback url called by website provider)
+- Add ""Response-Body"" when request failed (@lyptt)
+- oauth_verifier now public (@itchingpixels)
+- Add 'state' check when receiving code #182
+- Allow to send oauth parameter in URL instead of header (Withings,  @jdrevet)
+
+# Other
+- add to demo 500px, hatena
+- document and use in demo iOS9 UIApplicationDelegate new method to handle url
+",https://api.github.com/users/phimage,8875768,phimage,https://api.github.com/repos/OAuthSwift/OAuthSwift/releases/2669241/assets,https://api.github.com/repos/OAuthSwift/OAuthSwift/releases/2669241,master,https://api.github.com/repos/OAuthSwift/OAuthSwift/tarball/0.5.1,https://github.com/OAuthSwift/OAuthSwift/releases/tag/0.5.1,https://api.github.com/repos/OAuthSwift/OAuthSwift/zipball/0.5.1,0.5.1,False,False
+2343829,2015-12-26T12:25:14Z,2015-12-27T14:18:01Z,,"# Fix
+- JSON parsing to get access token when there is one parameter with only number
+- Presentation of `OAuthWebViewController` by choosing the good parent view controller, not only the root one
+
+# Change
+- Add `parameters` to OAuth1 callback  #81(@quangbuule #152)
+- Add WatchOS support #135 (as proof of concept, you must do find a way to handle authorisation URL, maybe open on iOS)
+- Allow to change dispatch queue used by HTTP request (default: main queue)
+- Factorise code between OAuth1Swift & OAuthSwift2 :
+
+## After updating you must edit your code:
+- For OAuth1  you must change the callback `credential, response in` by `credential, response, parameters in` or `credential, response, _ in` 
+- :warning:  `response` into callback could now be nil
+- `OAuth1Swift.handleOpenURL(url:)` & `OAuth2Swift.handleOpenURL(url:)` are replaced by `OAuthSwift.handleOpenURL(url:)`
+
+If you don't want to edit your code, do not update OAuthSwift.
+You can with carthage and cocoapod for instance use ""~> 0.4.8""
+",https://api.github.com/users/phimage,8875768,phimage,https://api.github.com/repos/OAuthSwift/OAuthSwift/releases/2343829/assets,https://api.github.com/repos/OAuthSwift/OAuthSwift/releases/2343829,master,https://api.github.com/repos/OAuthSwift/OAuthSwift/tarball/0.5.0,https://github.com/OAuthSwift/OAuthSwift/releases/tag/0.5.0,https://api.github.com/repos/OAuthSwift/OAuthSwift/zipball/0.5.0,0.5.0,False,False
+2205630,2015-11-28T12:11:29Z,2015-11-30T12:07:59Z,,"## New
+- Add TVOS support  (as proof of concept, webview not allowed on TVOS) 
+- Add SafariURLHandler to handle URL into a SFSafariViewController (iOS9)
+- Add Gitter & Facebook service into demo
+
+## Fix
+- initialisation from stored token by setting OAuth version at object init
+- #129 Allow to use in application extension
+- #142 error on signature if url contains query parameters (@pculligan)
+- #140 some errors if service return no data or no token (@pculligan, @srna, @mikeMTOL)
+- #139 header with basic password (for instance for FitBit OAuth2)
+- #80 allow to specify header to POST Json data and fix OAuth1 signature
+- No OAuth2 Authorization header if no token (#151 @gufo)
+
+## Internal
+- Add unit tests
+- Add contributing guide
+- Merge OSX and iOS demo code
+- Change the way to configure demo app consumer key and secret Demo-application
+",https://api.github.com/users/phimage,8875768,phimage,https://api.github.com/repos/OAuthSwift/OAuthSwift/releases/2205630/assets,https://api.github.com/repos/OAuthSwift/OAuthSwift/releases/2205630,master,https://api.github.com/repos/OAuthSwift/OAuthSwift/tarball/0.4.8,https://github.com/OAuthSwift/OAuthSwift/releases/tag/0.4.8,https://api.github.com/repos/OAuthSwift/OAuthSwift/zipball/0.4.8,0.4.8,False,False

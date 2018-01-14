@@ -1,0 +1,685 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8280324,2017-10-26T02:24:52Z,2017-10-26T23:19:43Z,v2.0.0-beta1,"Improvements and bug fixes since 1.5.2
+
+- Breaking changes
+  - Most packages are now targetting .NET Standard 2.0 (which mean they can be used from either .NET Framework or .NET Core 2.0).
+    - These packages still target .NET Framework 4.6.1: `Microsoft.Orleans.TestingSiloHost`, `Microsoft.Orleans.ServiceFabric`, `Microsoft.Orleans.OrleansTelemetryConsumers.Counters`, `Microsoft.Orleans.OrleansTelemetryConsumers.NewRelic` and the PowerShell module.
+  - Deprecated the Orleans Logging infrastructure.
+    - Orleans now uses the `Microsoft.Extensions.Logging` abstractions package (MEL for short from now on).
+    - The legacy Orleans' `Logger` abstraction is preserved as obsolete for backwards compatibility in a new `Microsoft.Orleans.Logging.Legacy` package, but it's just a wrapper that forwards to `ILogger` from MEL. It is recommended that you migrate to it directly.
+    - This package also contains a provider for the new MEL abstraction that allows forwarding to `ILogConsumer`, in case the end-user has a custom implementation of that legacy interface. Similarly, it is recommended to rewrite the custom log consumer or telemetry consumer and implement `ILoggerProvider` from MEL instead.
+    - The APM methods (TrackXXX) from `Logger` were separated into a new `ITelemetryProducer` interface, and it's currently only being used by Orleans to publish metrics. #3390
+    - Logging configuration is no longer parsed from the XML configuration, as the user would have to configure MEL instead.
+  - Created a `Microsoft.Orleans.Core.Abstractions` nuget package and moved/refactored several types into it. We plan to rev and do breaking changes to this package very infrequently.
+  - NuGet package names were preserved for beta1, but several DLL filenames were renamed.
+  - Runtime code generation was removed (`Microsoft.Orleans.OrleansCodeGenerator` package). You should use build-time codegen by installing the `Microsoft.Orleans.OrleansCodeGenerator.Build` package in the grain implementations' and interfaces' projects.
+  - `SiloHostBuilder` and `ClientBuilder` are intended to replace the previous ways of initializing Orleans. They are not at 100% parity with `ClusterConfiguration` and `ClientConfiguration` so these are still required for beta1, but they will be eventually deprecated.
+  - Note that when using `SiloHostBuilder` and `ClientBuilder`, Orleans will no longer scan every single assembly loaded in the AppDomain by default, and instead you need to be explicit to which ones you use by calling the `AddApplicationPartXXX` methods from each of the builders.
+  - Silo membership (and its counterpart Gateway List Provider on the client) and `MessagingOptions` can be configured using the utilities in the `Microsoft.Extensions.Options` package. Before the final 2.0.0 release, the plan is to have everything moved to that configuration infrastructure.
+  - Upgraded several dependencies to external packages that are .NET Standard compatible
+  - Add support for Scoped services. This means that each grain activation gets its own scoped service provider, and Orleans registers `IGrainActivationContext` that can be injected into Transient or Scoped service to get access to activation specific information and lifecycle events #2856 #3270 #3385
+  - Propagate failures in `Grain.OnActivateAsync` to callers #3315
+  - Removed obsolete `GrainState` class #3167
+
+- Non-breaking improvements
+  - Build-time codegen and silo startup have been hugely improved so that the expensive type discovery happens during build, but at startup it is very fast. This can remove several seconds to startup time, which can be especially noticeable when using `TestCluster` to spin up in-memory clusters all the time #3518
+  - Add commit hash information in published assemblies #3575
+  - First version of Transactions support (still experimental, and will change in the future, not necessarily back-compatible when it does). Docs coming soon.
+  - Fast path for message addressing #3119
+  - Add extension for one-way grain calls #3224
+  - Google PubSub Stream provider #3210
+  - Lease based queue balancer for streams #3196 #3237 #3333
+  - Allow localhost connection in AWS SQS Storage provider #3485
+
+- Non-breaking bug fixes
+  - Fix occasional NullReferenceException during silo shutdown #3328
+  - Avoid serializing delegates and other non-portable types #3240
+  - ServiceFabric membership: ensure all silos reach a terminal state #3568
+  - Limit RequestContext to messaging layer. It is technically a change in behavior, but not one that end users could have relied upon, but listing it here in case someone notices side-effects due to this #3546",https://api.github.com/users/jdom,1361686,jdom,https://api.github.com/repos/dotnet/orleans/releases/8280324/assets,https://api.github.com/repos/dotnet/orleans/releases/8280324,61e917e24b6408c3340cff654ce5b6c827c90469,https://api.github.com/repos/dotnet/orleans/tarball/v2.0.0-beta1,https://github.com/dotnet/orleans/releases/tag/v2.0.0-beta1,https://api.github.com/repos/dotnet/orleans/zipball/v2.0.0-beta1,v2.0.0-beta1,False,True
+8154994,2017-10-17T18:17:31Z,2017-10-17T19:23:35Z,v1.5.2,"Improvements and bug fixes since 1.5.1.
+
+- Non-breaking bug fixes
+  - Fix memory leak when using grain timers #3452
+  - Fix infrequent `NullReferenceException` during activation collection #3399
+  - Improve resiliency in in client message pump loop #3367
+  - Service Fabric: fix leak in registration of partition notifications #3411
+  - Fixed duplicate stream message cache monitoring bug #3522
+  - Several minor bug fixes and perf improvements #3419 #3420 #3489
+
+- Non-breaking improvements
+  - Support for PostgreSql as a Storage provider #3384
+  - Make JsonConverters inside OrleansJsonSerializer public #3398
+  - Set TypeNameHandling in OrleansJsonSerializer according to configuration #3400",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/8154994/assets,https://api.github.com/repos/dotnet/orleans/releases/8154994,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.5.2,https://github.com/dotnet/orleans/releases/tag/v1.5.2,https://api.github.com/repos/dotnet/orleans/zipball/v1.5.2,v1.5.2,False,False
+7549850,2017-08-28T22:11:40Z,2017-08-28T22:23:31Z,v1.5.1,"*Known issue (not new to 1.5.1): if your Orleans client project uses ASP.NET Core, there is a breaking change in the `Microsoft.Extensions.DependencyInjection` package when upgrading to 2.0.0 of it (which is required in ASP.NET Core 2). See https://github.com/dotnet/orleans/issues/3325 for more info.*
+
+Improvements and bug fixes since 1.5.0
+- Non-breaking bug fixes
+  - Support implicit authentication to DynamoDB (via IAM Roles) #3229
+  - Added missing registration for 7-component tuple and several collection interfaces #3282 #3313
+  - Support custom silo names in Service Fabric integration #3241
+  - Fix scheduling of notification interfaces (which impacted Service Fabric integration) #3290
+  - Dispose `IServiceProvider` during client shutdown #3249
+  - `ClusterClient.Dispose()` is now equivalent to `Abort()` #3306
+  - Avoid `BadImageFormatException` from being written in the log during Silo or client startup #3216
+  - Add build-time code generation to `Microsoft.Orleans.OrleansServiceBus` package #3344
+  - Several minor bug fixes and perf improvements, as well as reliability in our test code #3234 #3250 #3258 #3283 #3301 #3309 #3311",https://api.github.com/users/jdom,1361686,jdom,https://api.github.com/repos/dotnet/orleans/releases/7549850/assets,https://api.github.com/repos/dotnet/orleans/releases/7549850,1.5.1,https://api.github.com/repos/dotnet/orleans/tarball/v1.5.1,https://github.com/dotnet/orleans/releases/tag/v1.5.1,https://api.github.com/repos/dotnet/orleans/zipball/v1.5.1,v1.5.1,False,False
+6957716,2017-07-06T17:30:40Z,2017-07-06T21:23:31Z,v1.5.0,"### Major new features
+- Non-static grain client via ClientBuilder enables connecting to multiple Orleans cluster from the same app domain and connecting to other clusters from within a silo.
+- Support for versioning of grain interfaces for non-downtime upgrades.
+- Support for custom grain placement strategies and directors.
+- Support for hash-based grain placement.
+
+### Changelog (1.5.0, 1.5.0-beta, and 1.5.0-rc)
+- Breaking changes
+  - Bug fix: Azure storage providers now throw `InconsistenStateException` instead of `StorageException` when eTags do not match #2971
+  - Automatically deactivate a grain if it bubbles up `InconsistentStateException` (thrown when there is an optimistic concurrency conflict when writing to storage) #2959
+  - Upgraded minimum framework dependency to .NET 4.6.1 #2945
+  - Support for non-static client via ClientBuilder (although static GrainClient still works but will be removed in a future version). You can now start many clients in the same process, even if you are inside a Silo #2822.
+    There are a few differences though:
+    - Several changes to SerializationManager, mainly to make it non-static #2592
+      - When deserializing a GrainReference from storage, you might need to re-bind it to the runtime by calling `grain.BindGrainReference(grainFactory)` on it or you would get `GrainReferenceNotBoundException` when attempting to use it #2738
+      - Removed `RegisterSerializerAttribute` (and corresponding static Register method for registering a custom serializer). If you were using that, please read https://dotnet.github.io/orleans/Documentation/Advanced-Concepts/Serialization.html#writing-custom-serializers for alternative ways to register your custom serializer #2941
+  - Better serialization of `Type` values (but can cause compatibility issues if these were persisted by using the Serialziation Manager) #2952
+  - Providers are now constructed using Dependency Injection. The result is that custom providers must have a single public constructor with either no arguments or arguments which can all be injected, or they need to be explicitly registered in the ServiceCollection. #2721 #2980
+  - Replaced `CacheSizeInMb` setting with `DataMaxAgeInCache` and `DataMinTimeInCache` in stream providers #3126
+  - Renamed the `Catalog.Activation.DuplicateActivations` counter to `Catalog.Activation.ConcurrentRegistrationAttempts` to more accurately reflect what it tracks and its benign nature #3130
+  - Change default stream subscription faulting to false in EventHub and Memory stream providers, as is in other providers #2974
+  - Allow `IGrainWithGuidCompoundKey` as implicit subscription grain, and sets the stream namespace as the grain key extension (subtle breaking change: previous to 1.5 `IGrainWithGuidCompoundKey` wasn't technically supported, but if you did use it, the grain key extension would have had a `null` string) #3011 
+  - The static `GrainReference.FromKeyString` method is no longer accessible, it has been replaced with `IGrainReferenceConverter.GetGrainFromKeyString`, which is accessible from the `IServiceProvider`.
+
+- Non-breaking improvements
+  - Support for custom placement strategies and directors #2932
+  - Grain interface versioning to enable no-downtime upgrades #2837 2837 #3055
+  - Expose available versions information in placement context #3136
+  - Add support for hash-based grain placement #2944
+  - Support fire and forget one-way grain calls using `[OneWay]` method attribute #2993
+  - Replace `CallContext.LogicalSetData` with AsyncLocal #2200 #2961
+  - Support multiple silo request interceptors #3083
+  - Ability to configure `FabricClient` when deploying to Service Fabric #2954
+  - Added extension points to EventHubAdapterFactory #2930
+  - Added SlowConsumingPressureMonitor for EventHub streams #2873
+  - Dispose all registered services in the container when shutting down #2876
+  - Try to prevent port collisions when starting in-memory `TestCluster` #2779
+  - Deprecated `TestingSiloHost` in favor of `TestCluster` (although the former is still available for this version) #2919
+  - Support exceptions with reference cycles in ILBasedExceptionSerializer #2999
+  - Add extensibility point to replace the grain activator and finalizer #3002
+  - Add statistics to EventHub stream provider ecosystem
+  - Add flag to disable FastKill on CTRL-C #3109
+  - Avoid benign `DuplicateActivationException` from showing up in the logs #3130
+  - Programmable stream subscribe API #2741 #2796 #2909
+  - Allow complex streaming filters in `ImplicitStreamSubscriptionAttribute` #2988
+  - Make `StreamQueueBalancer` pluggable #3152
+  - ServiceFabric: Register `ISiloStatusOracle` implementation in `ServiceCollection` #3160
+
+- Non-breaking bug fixes
+  - Improve resiliency in stream PubSub when facing ungraceful shutdown of producers and silos #3003 #3128
+  - Fixes to local IP address resolution #3069
+  - Fixed a few issues with the Service Fabric membership provider #3059 #3061 #3128
+  - Use PostgreSQL synchronous API to avoid locking in DB thread with newer versions of Npgsql #3164
+  - Fix race condition on cancelling of `GrainCancellationTokenSource` #3168
+  - Fixes and improvements for the Event Hub stream provider #3014 #3096 #3041 #3052 #2989
+  - Fix `NullReferenceException` when no `LogConsistencyProvider` attribute is provided #3158
+  - Several minor bug fixes and perf improvements, as well as reliability in our test code
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/6957716/assets,https://api.github.com/repos/dotnet/orleans/releases/6957716,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.5.0,https://github.com/dotnet/orleans/releases/tag/v1.5.0,https://api.github.com/repos/dotnet/orleans/zipball/v1.5.0,v1.5.0,False,False
+6790224,2017-06-19T18:11:43Z,2017-06-21T17:12:18Z,v1.5.0-RC,"Improvements and bug fixes **since 1.5.0-beta1** (checkout [v1.5.0-beta1 release notes](https://github.com/dotnet/orleans/releases/tag/v1.5.0-beta1) for changes since 1.4.X)
+
+- Breaking changes
+  - Bug fix: Azure storage providers now throw `InconsistenStateException` instead of `StorageException` when eTags do not match #2971
+  - Renamed the `Catalog.Activation.DuplicateActivations` counter to `Catalog.Activation.ConcurrentRegistrationAttempts` to more accurately reflect what it tracks and its benign nature #3130
+  - Upgraded `WindowsAzure.ServiceBus` package dependency to 4.1.0 #3127
+  - Replaced `CacheSizeInMb` setting with `DataMaxAgeInCache` and `DataMinTimeInCache` in stream providers #3126
+  - Allow `IGrainWithGuidCompoundKey` as implicit subscription grain, and sets the stream namespace as the grain key extension (subtle breaking change: previous to 1.5 `IGrainWithGuidCompoundKey` wasn't technically supported, but if you did use it, the grain key extension would have had a `null` string) #3011
+- Non-breaking improvements
+  - Enable runtime policy change for Silo versioning #3055
+  - Expose available versions information in placement context #3136
+  - Add support for hash-based grain placement #2944
+  - Allow complex streaming filters in `ImplicitStreamSubscriptionAttribute` #2988
+  - Support fire and forget one-way grain calls using `[OneWay]` method attribute #2993
+  - Support exceptions with reference cycles in ILBasedExceptionSerializer #2999
+  - Add extensibility point to replace the grain activator and finalizer #3002
+  - Generate serializers for more types #3035
+  - Expose IsOrleansShallowCopyable for external custom serializers #3077
+  - Detect if activation is in `Deactivating` state for too long and remove it from the directory if needed #3082
+  - Support grains with key extensions containing `+` symbols #2956
+  - Allow `TimeSpan.MaxValue` in configuration #2985
+  - Add statistics to EventHub stream provider ecosystem
+  - Support for us-gov-west-1 as a possible AWS region endpoint #3017
+  - Support `CultureInfo` via built-in serializer #3036
+  - Support multiple silo request interceptors #3083
+  - Add flag to disable FastKill on CTRL-C #3109
+  - Avoid benign `DuplicateActivationException` from showing up in the logs #3130
+- Non-breaking bug fixes
+  - Fix various unhandled exceptions happening during client closing #2962
+  - Improve resiliency in stream PubSub when facing ungraceful shutdown of producers and silos #3003 #3128
+  - SMS: Ensure items are copied before yielding the thread in OnNextAsync #3048 #3058
+  - Remove unneeded extra constructors to play nicer with some non fully-conforming 3rd party containers #2996 #3074
+  - Fixes to local IP address resolution #3069
+  - Fixed a few issues with the Service Fabric membership provider #3059 #3061 #3128
+  - Fixes and improvements for the Event Hub stream provider #3014 #3096 #3041 #3052 #2989",https://api.github.com/users/jdom,1361686,jdom,https://api.github.com/repos/dotnet/orleans/releases/6790224/assets,https://api.github.com/repos/dotnet/orleans/releases/6790224,1.5.0-rc,https://api.github.com/repos/dotnet/orleans/tarball/v1.5.0-rc,https://github.com/dotnet/orleans/releases/tag/v1.5.0-rc,https://api.github.com/repos/dotnet/orleans/zipball/v1.5.0-rc,v1.5.0-rc,False,True
+6665860,2017-06-09T15:35:16Z,2017-06-09T18:27:11Z,v1.4.2,"Improvements and bug fixes since 1.4.1
+
+- Non-breaking improvements
+  - Generate serializers for more types #3035
+  - Improvements to GrainServices API #2839
+  - Add extensibility point to replace the grain activator #3002
+  - Expose IsOrleansShallowCopyable for external custom serializers #3077
+  - Detect if activation is in `Deactivating` state for too long and remove it from the directory if needed #3082
+  - Support grains with key extensions containing `+` symbols #2956
+  - Allow `TimeSpan.MaxValue` in configuration #2985
+  - Support for us-gov-west-1 as a possible AWS region endpoint #3017
+  - Support `CultureInfo` via built-in serializer #3036
+- Non-breaking bug fixes
+  - Change how message expiration is handled to account for server clock skew #2922
+  - Fix various unhandled exceptions happening during client closing #2962
+  - SMS: Ensure items are copied before yielding the thread in OnNextAsync #3048 #3058
+  - Remove unneeded extra constructors to play nicer with some non fully-conforming 3rd party containers #2996 #3074",https://api.github.com/users/jdom,1361686,jdom,https://api.github.com/repos/dotnet/orleans/releases/6665860/assets,https://api.github.com/repos/dotnet/orleans/releases/6665860,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.4.2,https://github.com/dotnet/orleans/releases/tag/v1.4.2,https://api.github.com/repos/dotnet/orleans/zipball/v1.4.2,v1.4.2,False,False
+6229313,2017-04-28T00:03:12Z,2017-04-29T00:39:31Z,v1.5.0-beta1,"Improvements and bug fixes since 1.4.1.
+- Breaking changes
+  - Upgraded minimum framework dependency to .NET 4.6.1 #2945
+  - Support for non-static client via ClientBuilder (although static GrainClient still works but will be removed in a future version). You can now start many clients in the same process, even if you are inside a Silo #2822.
+    There are a few differences though:
+    - Several changes to SerializationManager, mainly to make it non-static #2592
+      - When deserializing a GrainReference from storage, you might need to re-bind it to the runtime by calling `grain.BindGrainReference(grainFactory)` on it or you would get `GrainReferenceNotBoundException` when attempting to use it #2738
+      - Removed `RegisterSerializerAttribute` (and corresponding static Register method for registering a custom serializer). If you were using that, please read https://dotnet.github.io/orleans/Documentation/Advanced-Concepts/Serialization.html#writing-custom-serializers for alternative ways to register your custom serializer #2941
+  - Better serialization of `Type` values (but can cause compatibility issues if these were persisted by using the Serialization Manager) #2952
+  - Automatically deactivate a grain if it bubbles up `InconsistentStateException` (thrown when there is an optimistic concurrency conflict when writing to storage) #2959
+  - Providers are now constructed using Dependency Injection. The result is that custom providers must have a single public constructor with either no arguments or arguments which can all be injected, or they need to be explicitly registered in the ServiceCollection. #2721 #2980
+  - Change default stream subscription faulting to false in EventHub and Memory stream providers, as is in other providers #2974
+  - Bug fix: Azure storage providers now throw `InconsistenStateException` instead of `StorageException` when eTags do not match #2971
+- Non-breaking improvements
+  - Grain interface versioning to enable no-downtime upgrades #2837 2837
+  - Programmable stream subscribe API #2741 #2796 #2909
+  - Support for custom placement strategies and directors #2932
+  - Improvements to GrainServices API #2839
+  - Replace `CallContext.LogicalSetData` with AsyncLocal #2200 #2961
+  - Ability to configure `FabricClient` when deploying to Service Fabric #2954
+  - Added extension points to EventHubAdapterFactory #2930
+  - Added SlowConsumingPressureMonitor for EventHub streams #2873
+  - Dispose all registered services in the container when shutting down #2876
+  - Try to prevent port collisions when starting in-memory `TestCluster` #2779
+  - Deprecated `TestingSiloHost` in favor of `TestCluster` (although the former is still available for this version) #2919
+- Non-breaking bug fixes
+  - Change how message expiration is handled to account for server clock skew #2922
+  - Several minor bug fixes and perf improvements, as well as reliability in our test code",https://api.github.com/users/jdom,1361686,jdom,https://api.github.com/repos/dotnet/orleans/releases/6229313/assets,https://api.github.com/repos/dotnet/orleans/releases/6229313,1.5.0-beta1,https://api.github.com/repos/dotnet/orleans/tarball/v1.5.0-beta1,https://github.com/dotnet/orleans/releases/tag/v1.5.0-beta1,https://api.github.com/repos/dotnet/orleans/zipball/v1.5.0-beta1,v1.5.0-beta1,False,True
+5901487,2017-03-27T21:56:59Z,2017-03-28T22:25:59Z,v1.4.1,"Improvements and bug fixes since 1.4.0.
+Addressed the known issue in 1.4.0: ""*When the silo starts up, it will register IServiceProvider in the container, which can be a circular reference registration when using 3rd party containers such as AutoFac.*""
+
+- Improvements
+  - Fix a cleanup issue in TestCluster after a failure #2734
+  - Remove unnecessary service registration of IServiceProvider to itself, which improves support for 3rd party containers #2749
+  - Add a timeout for socket connection #2791
+  - Support for string grain id in OrleansManager.exe #2815
+  - Avoid reconnection to gateway no longer in the list returned by IGatewayListProvider #2824
+  - Handle absolute path in IntermediateOutputPath to address issue 2864 #2865, #2871
+  - Rename codegen file to be excluded from analyzers #2872
+  - ProviderTypeLoader: do not enumerate types in ReflectionOnly assembly. #2869
+  - Do not throw when calling Stop on AsynchQueueAgent after it was disposed.
+- Bug fixes
+  - NodeConfiguration.AdditionalAssemblyDirectories was not 'deeply' copied in the copy constructor #2758
+  - Fix AsReference() in generated code for null values #2756
+  - Avoid a NullReferenceException in SerializationManager.Register(...) #2768
+  - Fix missing check for empty deployment id #2786
+  - Fix to make OrleansPerfCounterTelemetryConsumer still work for grain-specific counters. (part of #2807)
+  - Fix typos in format strings #2853
+  - Fix null reference exception in simple queue cache. #2829 ",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/5901487/assets,https://api.github.com/repos/dotnet/orleans/releases/5901487,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.4.1,https://github.com/dotnet/orleans/releases/tag/v1.4.1,https://api.github.com/repos/dotnet/orleans/zipball/v1.4.1,v1.4.1,False,False
+5528161,2017-02-21T23:09:46Z,2017-02-21T23:17:17Z,v1.4.0,"### Major new features
+- Revamped JournaledGrain for event sourcing with support for geo-distributed log-based consistency providers.
+- Abstraction of Grain Services with fixed-placed per-silo application components with their workload partitioned via cluster consistency ring.
+- Support for heterogeneous silos with non-uniform distribution of available grain classes.
+- Cluster membership provider for Service Fabric.
+
+### Changelog (1.4.0 and 1.4.0-beta)
+
+#### New in v1.4.0 since beta
+- Known issues
+  - When the silo starts up, it will register IServiceProvider in the container, which can be a circular reference registration when using 3rd party containers such as AutoFac. This is bein addressed for 1.4.1, but there is a simple workaround for it at [#2747](https://github.com/dotnet/orleans/issues/2747)
+  - The build-time code generator required (and automatically added) a file named `Properties\orleans.codegen.cs` to the project where codegen was being ran. The new MSBuild targets no longer do that, so when upgrading a solution with a previous version of Orleans, you should delete this orleans.codegen.cs file from your grain projects.
+- Improvements
+  - Support for grains with generic methods #2670
+  - Do native PE files check before assembly loading to avoid misleading warnings on startup #2714
+  - Throw explicit exception when using streams not in Orleans Context #2683
+  - Several improvements to `JournaledGrain` API #2651 #2720
+  - Allow overriding MethodId using [MethodId(id)] on interface methods #2660
+- Bug fixes
+  - EventHubSequenceToken not used consistently #2724
+  - Support grains with generic state where the state param do not match the grain type params #2715
+  - Fix ServiceFabric IFabricServiceSiloResolver registration in DI container #2712
+  - Fix ConditionalCheckFailedException when updating silo 'IAmAlive' field in DynamoDB #2678
+  - Ensure DynamoDB Gateway Provider only returns silos with a proxy port configured #2679
+  - Fix e-Tag issue in AzureBlobStorage when calling ClearStateAsync (#2669)
+  - Other minor fixes: #2729 #2691
+
+#### Changes in v1.4.0-beta
+- Noteworthy breaking changes:
+  - Azure table storage throws InconsistentStateException #2630
+  - All grain instances and providers are constructed using the configured Dependency Injection container. The result is that all grains must have a single parameterless public constructor or single constructor with arguments which can all be injected. If no container is configured, the default container will be used. #2485
+- Improvements
+  - Optional IL-based fallback serializer #2162
+  - IncomingMessageAcceptor sockets change from APM to EAP #2275
+  - Show clearer error when ADO.NET provider fails to init #2303, #2306
+  - In client, when a gateway connection close reroute not yet sent message to another gateway #2298
+  - MySQL Script: Minor syntax tweak to support previous server versions #2342
+  - Azure Queue provider message visibility config #2401
+  - Propagate exceptions during message body deserialization #2364
+  - Check IAddressable before DeepCopy #2383
+  - Modified stream types to not use fallback serializer and allow external #2330
+  - Add ""Custom/"" prefix for NewRelic metrics #2453
+  - Ignore named EventWaitHandle when not available in platform #2462
+  - Heterogenous silos support  #2443
+  - Update to Consul 0.7.0.3 nuget package, because of breaking change in Consul API. #2498
+  - Grain Services by @jamescarter-le #2531
+  - Expose IMembershipOracle & related interfaces #2557
+  - Trigger registration of clients connected to the gateways in the directory when a silo is dead #2587
+  - Log Consistency Providers #1854
+  - In XML config, if SystemStoreType set to Custom but no ReminderTableAssembly are specified, assume that ReminderServiceProviderType is set to Disabled #2589
+  - In config XML, when SystemStoreType is set to MembershipTableGrain, set ReminderServiceType to ReminderTableGrain #2590
+  - Service Fabric cluster membership providers #2542
+  - Adds optional native JSON support to MySQL #2288
+  - Allow serializers to have multiple [Serializer(...)] attributes #2611
+  - Removed GrainStateStorageBridge from GrainCreator to allow better control of the IStorage used when using non-silo unit tests. #2243
+  - Failsafe Exception serialization #2633
+  - Added a data adapter to azure queue stream provider #2658
+  - Client cluster disconnection #2628
+  - Tooling improvements in build-time codegen #2523
+- Performance
+  - Several major performance improvements: #2220, #2221, #2170, #2218, #2312, #2524, #2510, #2481, #2579
+  - Release BinaryTokenStreamWriter buffers after use in more cases. #2326
+- Bug fixes
+  - Empty deployment Id in Azure #2230
+  - Remove zero length check in Protobuf serializer #2251
+  - Make PreferLocalPlacement activate in other silos when shutting down #2276
+  - Reset GrainClient.ClientInvokeCallback when uninitializing GrainClient #2299
+  - Fix ObjectDisposedException in networking layer #2302
+  - Reset client gateway reciever buffer on socket reset. #2316
+  - Removed calling Trace.Close() from TelemetryConsumer.Close() #2396
+  - Removes deadlocking and corrupted hashing in SQL storage provider #2395
+  - Fix #2358: Invoke interceptor broken for generic grains #2502
+  - Only a hard coded set of statistics were going to telemetry consumers.  Now all non-string statistics are tracked. #2513
+  - Fix invocation interception for grain extensions #2514
+  - Fix type assertion in AdaptiveDirectoryCacheMaintainer #2525
+  - MembershipTableFactory should call InitializeMembershipTable on membership table. #2537
+  - CodeGen: fix check on parameters to generic types with serializers #2575
+  - EventHubQueueCache failing to write checkpoints on purge #2613
+  - Fix code copy-paste errors discovered by Coverity #2639
+  - GrainServices are now Started by the Silo on Startup #2642
+
+_For the full changelog and up-to-date known issues, see [Changelog](https://github.com/dotnet/orleans/blob/master/changelog.md)_
+",https://api.github.com/users/jdom,1361686,jdom,https://api.github.com/repos/dotnet/orleans/releases/5528161/assets,https://api.github.com/repos/dotnet/orleans/releases/5528161,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.4.0,https://github.com/dotnet/orleans/releases/tag/v1.4.0,https://api.github.com/repos/dotnet/orleans/zipball/v1.4.0,v1.4.0,False,False
+5334186,2017-02-01T23:25:19Z,2017-02-01T23:41:01Z,v1.4.0-beta,"- Major new features
+  - Revamped JournaledGrain for event sourcing with support for geo-distributed log-based consistency providers.
+  - Abstraction of Grain Services with fixed-placed per-silo application components with their workload partitioned via cluster consistency ring.
+  - Support for heterogeneous silos with non-uniform distribution of available grain classes.
+  - Cluster membership provider for Service Fabric.
+- Improvements
+  - IL-based fallback serializer #2162
+  - IncomingMessageAcceptor sockets change from APM to EAP #2275
+  - Show clearer error when ADO.NET provider fails to init #2303, #2306
+  - In client, when a gateway connection close reroute not yet sent message to another gateway #2298
+  - MySQL Script: Minor syntax tweak to support previous server versions #2342
+  - Azure Queue provider message visibility config #2401
+  - Propagate exceptions during message body deserialization #2364
+  - Check IAddressable before DeepCopy #2383
+  - Modified stream types to not use fallback serializer and allow external #2330
+  - Add ""Custom/"" prefix for NewRelic metrics #2453
+  - Ignore named EventWaitHandle when not available in platform #2462
+  - Heterogenous silos support  #2443
+  - Update to Consul 0.7.0.3 nuget package, because of breaking change in Consul API. #2498
+  - Grain Services by @jamescarter-le #2531
+  - Expose IMembershipOracle & related interfaces #2557
+  - Trigger registration of clients connected to the gateways in the directory when a silo is dead #2587
+  - Log Consistency Providers #1854
+  - In XML config, if SystemStoreType set to Custom but no ReminderTableAssembly are specified, assume that ReminderServiceProviderType is set to Disabled #2589
+  - In config XML, when SystemStoreType is set to MembershipTableGrain, set ReminderServiceType to ReminderTableGrain #2590
+  - Service Fabric cluster membership providers #2542
+  - Adds optional native JSON support to MySQL #2288
+  - Azure table storage throws InconsistentStateException #2630
+  - Allow serializers to have multiple [Serializer(...)] attributes #2611
+  - Removed GrainStateStorageBridge from GrainCreator to allow better control of the IStorage used when using non-silo unit tests. #2243
+  - Failsafe Exception serialization #2633
+  - Added a data adapter to azure queue stream provider #2658
+  - Client cluster disconnection #2628
+- Performance
+  - Several major performance improvements: #2220, #2221, #2170, #2218, #2312, #2524, #2510, #2481, #2579
+  - Replace CallContext.LogicalSetData with AsyncLocal #2200
+  - Release BinaryTokenStreamWriter buffers after use in more cases. #2326
+- Bug fixes
+  - Empty deployment Id in Azure #2230
+  - Remove zero length check in Protobuf serializer #2251
+  - Make PreferLocalPlacement activate in other silos when shutting down #2276
+  - Reset GrainClient.ClientInvokeCallback when uninitializing GrainClient #2299
+  - Fix ObjectDisposedException in networking layer #2302
+  - Reset client gateway reciever buffer on socket reset. #2316
+  - Removed calling Trace.Close() from TelemetryConsumer.Close() #2396
+  - Removes deadlocking and corrupted hashing in SQL storage provider #2395
+  - Fix #2358: Invoke interceptor broken for generic grains #2502
+  - Only a hard coded set of statistics were going to telemetry consumers.  Now all non-string statistics are tracked. #2513
+  - Fix invocation interception for grain extensions #2514
+  - Fix type assertion in AdaptiveDirectoryCacheMaintainer #2525
+  - MembershipTableFactory should call InitializeMembershipTable on membership table. #2537
+  - CodeGen: fix check on parameters to generic types with serializers #2575
+  - EventHubQueueCache failing to write checkpoints on purge #2613
+  - Fix code copy-paste errors discovered by Coverity #2639
+  - GrainServices are now Started by the Silo on Startup #2642 
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/5334186/assets,https://api.github.com/repos/dotnet/orleans/releases/5334186,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.4.0-beta,https://github.com/dotnet/orleans/releases/tag/v1.4.0-beta,https://api.github.com/repos/dotnet/orleans/zipball/v1.4.0-beta,v1.4.0-beta,False,False
+4668877,2016-11-15T22:29:16Z,2016-11-15T22:32:13Z,v1.3.1,"Improvements and bug fixes since 1.3.0.
+- Improvements
+  - Ability to specify interleaving per message type (was needed for Orleankka) #2246
+  - Support serialization of enums backed by non-Int32 fields #2237 
+  - Add TGrainState constraints to document clearly what is needed by folks implementing stateful grains. #1923
+  - Serialization fixes #2295
+  - Update OrleansConfiguration.xsd with DI info #2314
+  - Reroute client messages via a different gateway upon a gateway disconnection #2298
+  - Add helper methods to ease ADO.NET configuration #2291
+  - EventHubStreamProvider improvements #2377
+  - Add queue flow controller that is triggered by silo load shedding. #2378
+  - Modify JenkinsHash to be stateless. #2403
+  - EventHub flow control customization knobs #2408
+- Performance
+  - Invoker codegen: methods returning Task<object> do not need Box() calls #2221
+  - CodeGen: Avoid wrapping IGrainMethodInvoker.Invoke body in try/catch #2220
+  - Remove contention point in GrainDirectoryPartition #2170
+  - Optimize the scheduler, remove redundant semaphore and interlocked exchange. #2218
+  - Remove delegate allocation #2312
+  - Release BinaryTokenStreamWriter buffers after use in more cases. #2326
+  - Provide better handling in Grain when the GrainRuntime or GrainIdentity is null #2338
+- Bug fixes
+  - Reset client gateway reciever buffer on socket reset. #2316
+  - Removes potential deadlocking and corrupted hashing in ADO.NET storage provider #2395
+  - LoadShedQueueFlowControl cast fix #2405
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/4668877/assets,https://api.github.com/repos/dotnet/orleans/releases/4668877,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.3.1,https://github.com/dotnet/orleans/releases/tag/v1.3.1,https://api.github.com/repos/dotnet/orleans/zipball/v1.3.1,v1.3.1,False,False
+4370458,2016-10-12T15:23:44Z,2016-10-12T15:31:10Z,v1.3.0,"**NB: There is a subtle breaking change in this release, which is unfortunately easy to miss.**
+_If you are using `AzureSilo.Start(ClusterConfiguration config, string deploymentId)` in your code, that overload has been removed, but the new one that replaced it has the same argument signature with a different second argument: `(ClusterConfiguration config, string connectionString)`. Deployment ID now has to be passed as part of the `config` argument: config.Globals.DeploymentId. This removed the ambiguous possibility of passing two different Deployment IDs, but unfortunately at the cost of the breaking API change._
+- Bug fixes
+  - Empty deployment Id in Azure #2230
+  - Remove zero length check in Protobuf serializer #2251
+  - Make PreferLocalPlacement revert to RandomPlacement on non-active silos #2276
+- Streaming
+  - Updated MemoryStreamProvider to support custom message serialization #2271
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/4370458/assets,https://api.github.com/repos/dotnet/orleans/releases/4370458,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.3.0,https://github.com/dotnet/orleans/releases/tag/v1.3.0,https://api.github.com/repos/dotnet/orleans/zipball/v1.3.0,v1.3.0,False,False
+4314925,2016-10-05T19:05:46Z,2016-10-05T22:25:24Z,v1.2.4,"Bug fix: Prevent null reference exception after clearing PubSubRendezvousGrain state #2040
+",https://api.github.com/users/jdom,1361686,jdom,https://api.github.com/repos/dotnet/orleans/releases/4314925/assets,https://api.github.com/repos/dotnet/orleans/releases/4314925,1.2.4,https://api.github.com/repos/dotnet/orleans/tarball/v1.2.4,https://github.com/dotnet/orleans/releases/tag/v1.2.4,https://api.github.com/repos/dotnet/orleans/zipball/v1.2.4,v1.2.4,False,False
+4245253,2016-09-27T15:34:46Z,2016-09-27T21:06:16Z,v1.3.0-beta2,"**NB: There is a subtle breaking change in this release, which is unfortunately easy to miss.**
+_If you are using `AzureSilo.Start(ClusterConfiguration config, string deploymentId)` in your code, that overload has been removed, but the new one that replaced it has the same argument signature with a different second argument: `(ClusterConfiguration config, string connectionString)`. Deployment ID now has to be passed as part of the `config` argument: config.Globals.DeploymentId. This removed the ambiguous possibility of passing two different Deployment IDs, but unfortunately at the cost of the breaking API change._
+- Notable new features
+  - Support for geo-distributed multi-cluster deployments #1108 #1109 #1800
+  - Added new Amazon AWS basic Orleans providers [#2006](https://github.com/dotnet/orleans/issues/2006)
+  - Support distributed cancellation tokens in grain methods #1599
+- Providers
+  - Remove confusing parameter from AzureSilo.Start #2109
+  - Minimal Service Fabric integration #2120
+  - Update blob storage provider to throw on storage exceptions #1902
+  - Decode protobuf using MessageParser, not dynamic #2136
+  - Service Provider is no longer required by EventHubAdapter #2044
+  - Preliminary relational persistence queries #1682
+  - Add a function that checks the connection string for use during initialization #1987 
+  - A new ADO.NET storage provider that is significantly easier to setup, which replaces the the previous one. This change is not backwards compatible and does not support sharding
+    (likely be replaced later with Orleans sharding provider). The most straightforward migration plan is likely to persist the state classes from Orleans application code.
+    More information in [#1682](https://github.com/dotnet/orleans/pull/1682) and in [#1682 (comment)](https://github.com/dotnet/orleans/pull/1682#issuecomment-234371701).
+  - Support for PostgreSql #2113
+  - Memory Storage eTag enforcement less strict. #1885
+  - Added option to perform provider commands quietly #1762
+  - CreateOrleansTables_SqlServer.sql: Removed support for SQL Server 2000 and 2005 #1779
+- Streaming
+  - EventHub stream provider made more extensible #1861 1714
+  - EventHub stream provider with improved monitoring logging #1857 #2146
+  - EventHub stream provider time based message purge #2093
+  - Add Memory Stream Provider #2063
+  - Persistent stream pulling agent now uses exponential backoff #2078
+  - Add dynamic adding / removing stream providers functionality. #1966
+  - Consistent implicit subscription Id generation. #1828
+  - Event hub stream provider EventData to cached data mapping #1727
+- Bug fixes
+  - CodeGen: fix generated DeepCopy method to call RecordObject earlier #2135
+  - Fix support for serializing SByte[] #2140
+  - Fix synchronization bug in Orleans/Async/BatchWorker #2133
+  - Fix #2119 by allowing full uninitialization in SiloHost #2127
+  - Persistent Stream Provider initialization timeout fix. #2065
+  - Fix null reference in StreamPubSub grain. #2040
+  - Some EventHub stream provider bug fixes #1760 #1935 #1921 #1922
+  - Allow comments in configuration XML #1994
+  - Fixed null MethodInfo in Interceptors #1938
+  - EventHub stream provider Object Pools not pooling fix. #1937 
+  - Harden explicit subscription pubsub system #1884
+  - Fix #1869. Grain Extensions + method interception should function correctly #1874
+  - Fix bug with generic state parameter caused by inconsistent use of grainClassName / genericArgument / genericInterface #1897
+  - Throw meaningful exception if grain timer is created outside grain context #1858
+  - Do not deactivate Stateless Workers upon grain directory partition shutdown. #1838
+  - Fixed a NullReferenceException bug in ClientObserverRegistrar. #1823
+- Test
+  - Allow liveness config in TestCluster #1818
+  - Fix for strange bug in BondSerializer #1790
+  - Some improvements for unit testing #1792 #1802
+- Other
+  - Move JSON serialization methods into OrleansJsonSerializer #2206
+  - Updated package dependencies for Azure Storage, ServiceBus, ZooKeeperNetEx, Protobuf and codegen related
+  - Remove UseStandardSerializer and UseJsonFallbackSerializer options #2193 #2204
+  - Make IGrainFactory injectable #2192
+  - Recover types from ReflectionTypeLoadException #2164
+  - Moved Orleans Performance Counters into its own Telemetry Consumer. Now you need to explicitly register the `OrleansPerfCounterTelemetryConsumer` either by code or XML. More information in [#2122](https://github.com/dotnet/orleans/pull/2122) and docs will come later. `Microsoft.Orleans.CounterControl` can still be used to install the performance counters or you can use `InstallUtil.exe OrleansTelemetryConsumers.Counters.dll` to install it without depending on `OrleansCounterControl.exe`
+  - New PowerShell client Module #1990
+  - Expose property IsLongKey for IAddressable #1939
+  - Removed OrleansDependencyInjection package and instead Orleans references Microsoft.Extensions.DepedencyInjection #1911 #1901 #1878
+  - Now using Microsoft.Extensions.DepedencyInjection.ServiceProvider as the default service provider if the user does not override it. Grains are still not being injected automatically unless the user opts in by specifying his own Startup configuration that returns a service provider.
+  - Do not require explicitly registering grains in ServiceCollection #1901 
+  - ClusterConfiguration extension for setting Startup class #1842
+  - Log more runtime statistics on the client. #1778
+  - Added ManagementGrain.GetDetailedHosts() #1794
+  - Can get a list of active grains in Orleans for monitoring #1772 
+  - Rename InstanceName to SiloName. #1740
+  - Reworked documentation to use DocFX #1970
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/4245253/assets,https://api.github.com/repos/dotnet/orleans/releases/4245253,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.3.0-beta2,https://github.com/dotnet/orleans/releases/tag/v1.3.0-beta2,https://api.github.com/repos/dotnet/orleans/zipball/v1.3.0-beta2,v1.3.0-beta2,False,False
+3774843,2016-07-27T22:44:46Z,2016-07-30T00:33:50Z,v1.3.0-beta1,"Beta1 release of Microsoft Orleans v1.3.0
+It does not yet include all the features that will go into the final 1.3.0 release. Most notably, the Global Single Instance protocol for Multi-Clusters (#1800).
+
+See https://github.com/dotnet/orleans/issues/1972 for pending work that should go into the final release of 1.3.0
+",https://api.github.com/users/jdom,1361686,jdom,https://api.github.com/repos/dotnet/orleans/releases/3774843/assets,https://api.github.com/repos/dotnet/orleans/releases/3774843,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.3.0-beta1,https://github.com/dotnet/orleans/releases/tag/v1.3.0-beta1,https://api.github.com/repos/dotnet/orleans/zipball/v1.3.0-beta1,v1.3.0-beta1,False,True
+3641378,2016-07-11T22:54:26Z,2016-07-12T18:47:20Z,v1.2.3,"- Ability to force creation of Orleans serializers for types not marked with [Serializable] by using GenerateSerializer, KnownType or KnownAssembly.TreatTypesAsSerializable #1888 #1864 #1855
+- Troubleshooting improvements:
+  - Fixed stacktrace preservation in exceptions from grain calls (bug introduced in 1.2.0) #1879 #1808
+  - Better messaging when silo fails to join due to initial connectivity problems #1866 #1933
+  - Throw meaningful exception if grain timer is created outside grain context #1858
+- Bug fixes:
+  - Do not deactivate Stateless Workers upon grain directory partition shutdown #1838
+  - interception works with Streams and grain extensions #1874
+  - Memory Storage provider properly enforces etags for any state that has been added or removed, but does not enforce etags for newly added state. #1885
+  - Other minor bug fixes #1884 #1823
+",https://api.github.com/users/jdom,1361686,jdom,https://api.github.com/repos/dotnet/orleans/releases/3641378/assets,https://api.github.com/repos/dotnet/orleans/releases/3641378,1.2.3,https://api.github.com/repos/dotnet/orleans/tarball/v1.2.3,https://github.com/dotnet/orleans/releases/tag/v1.2.3,https://api.github.com/repos/dotnet/orleans/zipball/v1.2.3,v1.2.3,False,False
+3443897,2016-06-15T04:56:26Z,2016-06-14T20:22:19Z,v1.2.2,"- Bugfix: Remote stacktrace is once again being included in the exception that bubbles up to the caller (bug introduced in 1.2.0). https://github.com/dotnet/orleans/pull/1808
+- Bugfix: Memory Storage provider no longer throws NullReferenceException after the grain state is cleared. https://github.com/dotnet/orleans/pull/1804
+- Microsoft.Orleans.OrleansCodeGenerator.Build package updated to not add the empty orleans.codegen.cs content file at install time, and instead create it at build time (should be more compatible with NuGet Transitive Restore). https://github.com/dotnet/orleans/pull/1720
+- Added GrainCreator abstraction to enable some unit testing scenarios.https://github.com/dotnet/orleans/pull/1802/ https://github.com/dotnet/orleans/pull/1792/
+- ServiceBus package dependency upgraded to 3.2.2 https://github.com/dotnet/orleans/pull/1758/
+",https://api.github.com/users/jdom,1361686,jdom,https://api.github.com/repos/dotnet/orleans/releases/3443897/assets,https://api.github.com/repos/dotnet/orleans/releases/3443897,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.2.2,https://github.com/dotnet/orleans/releases/tag/v1.2.2,https://api.github.com/repos/dotnet/orleans/zipball/v1.2.2,v1.2.2,False,False
+3255264,2016-05-18T21:43:54Z,2016-05-18T21:51:16Z,v1.2.1,"Bug fixes:
+- SupressDuplicateDeads: Use SiloAddress.Endpoint instead of InstanceName. https://github.com/dotnet/orleans/pull/1728
+- Added support for complex generic grain parameters https://github.com/dotnet/orleans/pull/1732
+- Fix race condition bugs in LocalReminderService https://github.com/dotnet/orleans/pull/1757
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/3255264/assets,https://api.github.com/repos/dotnet/orleans/releases/3255264,1.2.1,https://api.github.com/repos/dotnet/orleans/tarball/v1.2.1,https://github.com/dotnet/orleans/releases/tag/v1.2.1,https://api.github.com/repos/dotnet/orleans/zipball/v1.2.1,v1.2.1,False,False
+3144371,2016-05-02T23:41:04Z,2016-05-02T23:48:09Z,v1.2.0,"In addition to all the changes in 1.2.0-beta.
+- Azure storage 7.0 compatibility https://github.com/dotnet/orleans/pull/1704.
+- Updated to latest version of Consul and ZooKeeper NuGets.
+- Added ability to throw exceptions that occur when starting silo https://github.com/dotnet/orleans/pull/1711.
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/3144371/assets,https://api.github.com/repos/dotnet/orleans/releases/3144371,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.2.0,https://github.com/dotnet/orleans/releases/tag/v1.2.0,https://api.github.com/repos/dotnet/orleans/zipball/v1.2.0,v1.2.0,False,False
+3047996,2016-04-18T23:54:41Z,2016-04-19T04:10:08Z,v1.2.0-beta,"- Major improvements
+  - Added an EventHub stream provider based on the same code that is used in Halo 5.
+  - Increased throughput by between 5% and 26% depending on the scenario. https://github.com/dotnet/orleans/pull/1586
+  - Migrated all but 30 functional tests to GitHub.
+  - Grain state doesn't have to extend `GrainState` anymore (marked as `[Obsolete]`) and can be a simple POCO class. 
+  - Added support for per-grain-class and global server-side interceptors. https://github.com/dotnet/orleans/pull/965 https://github.com/dotnet/orleans/pull/963
+  - Added support for using Consul 0.6.0 as a Membership Provider. https://github.com/dotnet/orleans/pull/1267
+  - Support C# 6. https://github.com/dotnet/orleans/pull/1479
+  - Switched to xUnit for testing as a step towards CoreCLR compatibility. https://github.com/dotnet/orleans/pull/1455
+- Codegen & serialization
+  - Added support for generic type constraints in codegen. https://github.com/dotnet/orleans/pull/1137
+  - Added support for Newtonsoft.Json as a fallback serializer. https://github.com/dotnet/orleans/pull/1047
+  - Added generation of serializers for type arguments of `IAsyncObserver<T>`. https://github.com/dotnet/orleans/pull/1319
+  - Improved support for F# interfaces. https://github.com/dotnet/orleans/pull/1369
+  - Consolidated two compile time codegen NuGet packages into one `Microsoft.Orleans.OrleansCodeGenerator.Build`. `Microsoft.Orleans.Templates.Interfaces` and `Microsoft.Orleans.Templates.Grains` are now meta-packages for backward compatibility only. https://github.com/dotnet/orleans/pull/1501
+  - Moved to Newtonsoft.Json 7.0.1. https://github.com/dotnet/orleans/pull/1302
+- Programmatic config
+  - Added helper methods for programmatic test configuration. https://github.com/dotnet/orleans/pull/1411
+  - Added helper methods to `AzureClient` and `AzureSilo` for easier programmatic config. https://github.com/dotnet/orleans/pull/1622
+  - Added extension methods for using programmatic config. https://github.com/dotnet/orleans/pull/1623
+  - Remove config filed from Server and Client NuGet packages. https://github.com/dotnet/orleans/pull/1629
+- Other
+  - Improved support for SQL membership, reminders, and grain storage.
+    https://github.com/dotnet/orleans/pull/1060
+  - Improved propagation of exception, so that the caller gets the originally thrown exception instead of an `AggregateException` wrapping it. https://github.com/dotnet/orleans/pull/1356
+  - Added a storage provider for Azure Blob (graduated from `OrleansContrib`). https://github.com/dotnet/orleans/pull/1376
+  - Start Reminder Service initial load in the background. https://github.com/dotnet/orleans/pull/1520
+  - Added automatic cleanup of dead client stream producers and consumers. https://github.com/dotnet/orleans/pull/1429 https://github.com/dotnet/orleans/pull/1669
+  - Added GetPrimaryKeyString extension method for `IAddressable`. https://github.com/dotnet/orleans/pull/1675
+  - Added support for additional application directories. https://github.com/dotnet/orleans/pull/1674
+- Many other fixes and improvements.
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/3047996/assets,https://api.github.com/repos/dotnet/orleans/releases/3047996,1.2.0-beta,https://api.github.com/repos/dotnet/orleans/tarball/v1.2.0-beta,https://github.com/dotnet/orleans/releases/tag/v1.2.0-beta,https://api.github.com/repos/dotnet/orleans/zipball/v1.2.0-beta,v1.2.0-beta,False,False
+2778245,2016-03-09T18:06:27Z,2016-03-09T19:28:30Z,v1.1.3,"A patch release with a set of bug fixes.
+- https://github.com/dotnet/orleans/pull/1345 Initialize SerializationManager before CodeGeneratorManager
+- https://github.com/dotnet/orleans/pull/1348 Avoid unnecessary table scan when finding reminder entries to delete
+- https://github.com/dotnet/orleans/pull/1351 Stop a stuck BlockingCollection.Take operation that caused thread leak on the client.
+- https://github.com/dotnet/orleans/pull/1381 Fixed Azure table property being not sanitized.
+- https://github.com/dotnet/orleans/pull/1384 Fixed String.Format arguments in DetailedGrainReport.ToString()
+- https://github.com/dotnet/orleans/pull/1405 Increment and DecrementMetric methods in Orleans.TraceLogger had same body
+- https://github.com/dotnet/orleans/pull/1414 Update the custom serializer warning message to adequately reflect the OSS status of Orleans
+- https://github.com/dotnet/orleans/pull/1503 Fix retry timeout when running under debugger
+- https://github.com/dotnet/orleans/pull/1478 Networking bug fix: Reset receive buffer on error.
+- https://github.com/dotnet/orleans/pull/1518 Fixed performance regression in networking
+- https://github.com/dotnet/orleans/pull/1520 Start ReminderService initial load in the background
+- https://github.com/dotnet/orleans/pull/1534 Safe load of types from failing assemblies in TypeUtils.GetTypes
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/2778245/assets,https://api.github.com/repos/dotnet/orleans/releases/2778245,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.1.3,https://github.com/dotnet/orleans/releases/tag/v1.1.3,https://api.github.com/repos/dotnet/orleans/zipball/v1.1.3,v1.1.3,False,False
+2457590,2016-01-20T04:56:23Z,2016-01-20T05:41:11Z,v1.1.2,"A patch release with bug fixes, primarily for codegen and serializer corner cases.
+- https://github.com/dotnet/orleans/pull/1137 Add support for generic type constraints in codegen
+- https://github.com/dotnet/orleans/pull/1178 Correctly specify struct type constraint in generated code
+- https://github.com/dotnet/orleans/pull/1182 fix issue:GetReminder throws exception when reminder don't exists #1167
+- https://github.com/dotnet/orleans/pull/1240 Cleanup/fix usage of IsNested vs. IsNestedXXX & serialize nested types.
+- https://github.com/dotnet/orleans/pull/1241 Correctly serialize [Obsolete] fields and properties.
+- https://github.com/dotnet/orleans/pull/1249 Nested serialization of Guid with Json serializer.
+- https://github.com/dotnet/orleans/pull/1261 Fix a race in StreamConsumer.SubscribeAsync.
+- https://github.com/dotnet/orleans/pull/1280 fix deepcopy issue #1278
+- https://github.com/dotnet/orleans/pull/1284 Check declaring types when performing accessibility checks for code gen.
+- https://github.com/dotnet/orleans/pull/1285 Allow to configure PubSub for SMS.
+- https://github.com/dotnet/orleans/pull/1270 Make Namespace access modifier public in ImplicitStreamSubscriptionAttribute. Add Provider property.
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/2457590/assets,https://api.github.com/repos/dotnet/orleans/releases/2457590,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.1.2,https://github.com/dotnet/orleans/releases/tag/v1.1.2,https://api.github.com/repos/dotnet/orleans/zipball/v1.1.2,v1.1.2,False,False
+2406319,2016-01-11T16:14:34Z,2016-01-11T16:25:02Z,v1.1.1,"A patch release for two bug fixes.
+- https://github.com/dotnet/orleans/pull/1134 Missing argument to trace format in TraceLogger.Initialize
+- https://github.com/dotnet/orleans/pull/1195 Make ConsoleText resilient to ObjectDisposedExceptions
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/2406319/assets,https://api.github.com/repos/dotnet/orleans/releases/2406319,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.1.1,https://github.com/dotnet/orleans/releases/tag/v1.1.1,https://api.github.com/repos/dotnet/orleans/zipball/v1.1.1,v1.1.1,False,False
+2287078,2015-12-14T23:05:18Z,2015-12-14T23:06:19Z,v1.1.0,"- New Roslyn-based codegen, compile time and run time
+- Public APIs:
+  - Core API for Event Sourcing
+  - Most methods of `Grain` class are now virtual
+  - ASP.NET vNext style Dependency Injection for grains
+  - New telemetry API
+- Portability:
+  - Support for C# 6.0
+  - Improved support for F# and VB
+  - Code adjustments towards CoreCLR compliance
+  - Orleans assemblies are not strong-named anymore
+- SQL:
+  - `OrleansSQLUtils.dll` for SQL-related functionality
+  - MySQL is now supported as a cluster membership store
+  - Storage provider for SQL Server
+- Serialization:
+  - Support for pluggable external serializers
+  - Bond serializer plugin
+  - Support for Json.Net as a fallback serializer
+  - Added `[KnownType]` attribute for generating serializers for arbitrary types
+- Upgraded to Azure Storage 5.0
+- Upgraded to .NET 4.5.1
+- Other fixes and improvements
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/2287078/assets,https://api.github.com/repos/dotnet/orleans/releases/2287078,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.1.0,https://github.com/dotnet/orleans/releases/tag/v1.1.0,https://api.github.com/repos/dotnet/orleans/zipball/v1.1.0,v1.1.0,False,False
+2229181,2015-12-02T18:51:55Z,2015-12-03T19:00:16Z,v1.1.0-beta2,"- New Roslyn-based codegen, compile time and run time
+- Support for C# 6.0
+- ASP.NET vNext style Dependency Injection for grains
+- Core API for Event Sourcing
+- Code adjustments towards CoreCLR compliance
+- `OrleansSQLUtils.dll` for SQL-related functionality
+- MySQL is now supported as a cluster membership store
+- Most methods of `Grain` class are now virtual
+- Orleans assemblies are not strong-named anymore
+- Storage provider for SQL Server
+- Support for pluggable external serializers
+- Bond serializer plugin
+- Support for Json.Net as a fallback serializer
+- Improved support for F# and VB
+- Added `[KnownType]` attribute for generating serializers for arbitrary types
+- New telemetry API
+- Upgraded to Azure Storage 5.0
+- Other fixes and improvements
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/2229181/assets,https://api.github.com/repos/dotnet/orleans/releases/2229181,1a613de6b1574646d535edd174455cbe0ee84aab,https://api.github.com/repos/dotnet/orleans/tarball/v1.1.0-beta2,https://github.com/dotnet/orleans/releases/tag/v1.1.0-beta2,https://api.github.com/repos/dotnet/orleans/zipball/v1.1.0-beta2,v1.1.0-beta2,False,False
+2067110,2015-11-03T17:45:01Z,2015-11-03T23:56:25Z,v1.1.0-beta1,"- New Roslyn-based codegen, compile time and run time
+- Support for C# 6.0
+- ASP.NET vNext style Dependency Injection for grains
+- Core API for Event Sourcing
+- Code adjustments towards CoreCLR compliance
+- `OrleansSQLUtils.dll` for SQL-related functionality
+- Most methods of `Grain` class are now virtual
+- Orleans assemblies are not strong-named anymore
+- Other fixes and improvements (including progress on CoreCLR compatability)
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/2067110/assets,https://api.github.com/repos/dotnet/orleans/releases/2067110,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.1.0-beta1,https://github.com/dotnet/orleans/releases/tag/v1.1.0-beta1,https://api.github.com/repos/dotnet/orleans/zipball/v1.1.0-beta1,v1.1.0-beta1,False,False
+1850096,2015-09-22T14:56:10Z,2015-09-22T21:21:15Z,v1.0.10,"General:
+- No SDK msi anymore, only NuGets from now on
+- Removed support for grain state interfaces and code generation of state classes
+- Removed code generated `MyGrainFactory.GetGrain()` factory methods
+- `StorageProvider` attribute is now optional
+- Membership and reminder table implementations were made pluggable
+- Improvements to `ObserverSubscriptionManager`
+- Strong guarantee for specified max number of `StatelessWorker` activations per silo
+- General purpose interface for sending run time control commands to providers
+- Named event to trigger silo shutdown
+
+Streaming:
+- Support for multiple `ImplicitSubscription` attributes for streams
+- Support for rewinding of implicit stream subscriptions
+- Propagate request context via persistent streams
+- More options for stream Queue Balancers
+- Delayed repartitioning of stream queues
+- Improved cleanup of client stream producers/consumers when client shuts down
+- Config option and management grain API for controlling start/stop state of stream pulling agents
+- Azure Queue stream provider fixed to guarantees at least once delivery
+- Numerous bug fixes and improvements, mostly to streaming
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/1850096/assets,https://api.github.com/repos/dotnet/orleans/releases/1850096,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.0.10,https://github.com/dotnet/orleans/releases/tag/v1.0.10,https://api.github.com/repos/dotnet/orleans/zipball/v1.0.10,v1.0.10,False,False
+1530657,2015-07-10T04:04:50Z,2015-07-16T01:21:44Z,v1.0.9,"- Graceful shutdown of a silo with deactivation of all grains hosted in it.
+- Support for Dependency Injection and better testability of grains:
+  - Direct instantiation of grains with passing `IGrainIdentity` and `IGrainRuntime` to constructor.
+  - `IGrainRuntime` is a mockable interface that includes a set of system service interfaces, also mockable.
+  - `GrainFactory` is a non-static class that is accessed via `base.GrainFactory` from within a grain and via `GrainClient.GrainFactory` on the client.
+- Deprecated generated per-interface `GetGrain` static factory methods.
+- Added support for concrete grain state classes, deprecated grain state interfaces and code generation of grain classes.
+- Removed `Read/Write/ClearStateAsync` methods from `IGrainState` and moved them to `Grain<T>`.
+- Performance optimizations of messaging with up to 40% improvements in throughput.
+- Added `ZooKeeper` based cluster membership storage option.
+- Removed compile time dependency on `Microsoft.WindowsAzure.ServiceRuntime.dll.`
+- Consolidated dependencies on Azure in `OrleansAzureUtils.dll`, which is now optional.
+- Refactored SQL system store to be more robust and vendor agnostic.
+- Added streaming event deliver policy and failure reporting.
+- Changed VS project templates to use only NuGet packages and not the SDK.
+- Removed binaries and local silo environment from the SDK.
+- Numerous bug fixes and other improvements.
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/1530657/assets,https://api.github.com/repos/dotnet/orleans/releases/1530657,5b914ccfeaca07424c543845a24f076dff16b5a1,https://api.github.com/repos/dotnet/orleans/tarball/v1.0.9,https://github.com/dotnet/orleans/releases/tag/v1.0.9,https://api.github.com/repos/dotnet/orleans/zipball/v1.0.9,v1.0.9,False,False
+1343822,2015-05-26T18:29:51Z,2015-05-27T16:49:52Z,v1.0.8,"Fixed versions of references Orleans NuGet packages to match the current one.
+Switched message header keys from strings to enums for performance.
+Fixed a deadlock issue in deactivation process.
+Added a NuGet package to simplify testing of grain projects - Microsoft.Orleans.TestingHost.
+Fixed regression of reporting codegen error to Visual Studio Errors window.
+Added version to SDK msi product and folder name.
+Other fixes and improvements.
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/1343822/assets,https://api.github.com/repos/dotnet/orleans/releases/1343822,718bb0f24804233908882a7c7a7c2c3c560df51a,https://api.github.com/repos/dotnet/orleans/tarball/v1.0.8,https://github.com/dotnet/orleans/releases/tag/v1.0.8,https://api.github.com/repos/dotnet/orleans/zipball/v1.0.8,v1.0.8,False,False
+1302591,2015-05-15T21:32:27Z,2015-05-15T21:33:16Z,v1.0.7,"Major refactoring of the stream adapter API.
+Improvements to the steaming API to support subscription multiplicity.
+Made IAddressable.AsReference strongly-typed.
+Added a Chocolatey package.
+Added support for private storage keys for testing.
+Replaced ExtendedPrimaryKeyAttribute with IGrainWithGuidCompoundKey and IGrainWithIntegerCompoundKey.
+Added support for grain classes that are implementations of generic grain interfaces with concrete type arguments.
+Numerous other fixes and improvements.
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/1302591/assets,https://api.github.com/repos/dotnet/orleans/releases/1302591,master,https://api.github.com/repos/dotnet/orleans/tarball/v1.0.7,https://github.com/dotnet/orleans/releases/tag/v1.0.7,https://api.github.com/repos/dotnet/orleans/zipball/v1.0.7,v1.0.7,False,False
+1074872,2015-03-30T18:17:24Z,2015-03-20T23:31:31Z,v1.0.5,"Major reorganization of NuGet packages and project templates.
+Fixes to reflection-only assembly inspection and loading for side-by-side versioning.
+Improved scalability of observers.
+Programmatic configuration of providers.
+Numerous other fixes and improvements.
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/1074872/assets,https://api.github.com/repos/dotnet/orleans/releases/1074872,cbbc2a4b73490dcdbf304e557fc27c1a5c12c8c8,https://api.github.com/repos/dotnet/orleans/tarball/v1.0.5,https://github.com/dotnet/orleans/releases/tag/v1.0.5,https://api.github.com/repos/dotnet/orleans/zipball/v1.0.5,v1.0.5,False,False
+934890,2015-02-09T19:35:16Z,2015-02-09T21:24:32Z,v1.0.0 updated to include Newtonsoft.Json.dll,"Stable production-quality release identical to v1.0.0 but with Newtonsoft.Json.dll added to LocalSilo and OrleansServer folders. Azure Table persistence provider has a dependency on Newtonsoft.Json.dll for JSON serialization.
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/934890/assets,https://api.github.com/repos/dotnet/orleans/releases/934890,v1.0.0,https://api.github.com/repos/dotnet/orleans/tarball/v1.0.1,https://github.com/dotnet/orleans/releases/tag/v1.0.1,https://api.github.com/repos/dotnet/orleans/zipball/v1.0.1,v1.0.1,False,False
+927432,2015-02-06T01:20:03Z,2015-02-06T18:41:37Z,v1.0.0,"Initial stable production-quality release.
+",https://api.github.com/users/sergeybykov,8248806,sergeybykov,https://api.github.com/repos/dotnet/orleans/releases/927432/assets,https://api.github.com/repos/dotnet/orleans/releases/927432,v1.0.0,https://api.github.com/repos/dotnet/orleans/tarball/v1.0.0,https://github.com/dotnet/orleans/releases/tag/v1.0.0,https://api.github.com/repos/dotnet/orleans/zipball/v1.0.0,v1.0.0,False,False

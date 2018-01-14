@@ -1,0 +1,3122 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+2762564,2016-03-07T20:25:09Z,2016-03-07T21:05:49Z,RxJS v4.1.0,"We are happy to announce the release of RxJS version 4.1.  With this release came a few new additions as well as a new system for pulling in what you want.
+
+Some of the changes are the following:
+- Build What You Want with `@rxjs/rx`
+- Adding `repeatWhen`
+- Parity with RxJS v5 names
+- Other changes
+
+## Build What You Want with `@rxjs/rx`
+
+One of the biggest requests with RxJS was to build only what you wanted.  In previous attempts, we looked at a CLI to build what you wanted, but that was suboptimal experience.  Instead, we have ported the existing code base to CommonJS format so that it works right out of the box with Node.js, or with your favorite bundler whether it is Browserify, Webpack, Rollup, etc.
+
+By default, this brings in all of RxJS when you require the `@rxjs/rx` module:
+
+``` js
+const Rx = require('@rxjs/rx');
+
+const subscription = Rx.Observable.from([1,2,3])
+  .filter(x => x % 2 === 0)
+  .map(x => x + 2)
+  .subscribe(x => console.log(`The answer is ${x}`));
+// => The answer is 4 
+```
+
+Now it is possible to bring in as much or as little as you want by only including the operators you want:
+
+``` js
+const fromArray = require('@rxjs/rx/observable/fromArray');
+const filter = require('@rxjs/rx/observable/filter');
+const map = require('@rxjs/rx/observable/map');
+
+const source = fromArray([1,2,3]);
+
+const filtered = filter(source, x => x % 2 === 0);
+
+const mapped = map(filtered, x => x + 2);
+
+const subscription = mapped.subscribe( x => console.log(`The answer is ${x}`) );
+// => The answer is 4 
+```
+
+Not only can you bring in certain operators, but you can also add each one to the prototype if you want the nice chaining feature as well.
+
+``` js
+const Observable = require('@rxjs/rx/observable');
+
+// Add class methods 
+Observable.addToObject({
+  fromArray: require('@rxjs/rx/observable/fromarray')
+});
+
+// Add instance methods 
+Observable.addToPrototype({
+  filter: require('@rxjs/rx/observable/filter'),
+  map: require('@rxjs/rx/observable/map')
+});
+
+const subscription = Observable.fromArray([1,2,3])
+  .filter(x => x % 2 === 0)
+  .map(x => x + 2)
+  .subscribe(x => console.log(`The answer is ${x}`));
+```
+
+In addition, we also added some distributions that you will find under our `src/modular/dist` folder which contains all of RxJS built in a UMD style as well as a ""lite"" version as well.  This should give you the building blocks for creating your own builds of RxJS and taking the only the operators you need.
+
+## Adding `repeatWhen`
+
+We often try to keep parity with other Rx versions such as RxJava.  To that end, we've added `repeatWhen` which complements the `retryWhen` we've had for quite some time.  Rather than buffering and replaying the sequence from the source Observable, the `repeatWhen` resubscribes to and mirrors the source Observable, but only conditionally based upon the Observable you return from the call.
+
+Here is an example where we can repeat a sequence twice with a delay of 200ms in between time.
+
+``` js
+const source = Rx.Observable.just(42)
+  .repeatWhen(function(notifications) {
+    return notifications.scan((acc, x) => return acc + x, 0)
+    .delay(200)
+    .takeWhile(count => count < 2);
+  });
+
+var subscription = source.subscribe(
+  x => console.log(`Next ${x}`,
+  err => console.log(`Error ${err}`),
+  () => console.log('Completed')
+);
+
+// => Next: 42
+// 200 ms pass
+// => Next: 42
+// 200 ms pass
+// => Completed
+```
+
+## Parity with RxJS v5 names
+
+Given the differences between [RxJS v4 and RxJS v5](https://github.com/ReactiveX/RxJS/blob/master/MIGRATION.md), we've made the migration path easier by creating aliases for you such as the following:
+
+``` js
+// Prototype methods
+Observable.prototype.race = Observable.prototype.amb;
+Observable.prototype.mergeMap = Observable.prototype.flatMap;
+Observable.prototype.switchMap = Observable.prototype.flatMapLatest;
+Observable.prototype.exhaustMap = Observable.prototype.flatMapFirst;
+Observable.prototype.exhaust = Observable.prototype.switchFirst;
+Observable.prototype.publishReplay = Observable.prototype.replay;
+
+// Object methods
+Observable.bindCallback = Observable.fromCallback;
+Observable.bindNodeCallback = Observable.fromNodeCallback;
+Observable.race = Observable.amb;
+```
+
+## Other Changes
+- Bug fixes such as to `ConnectableObservable` so that if the underlying `Subject` has been disposed, we will no longer attempt to resubscribe to it.
+- The `startWith` operator no longer uses `Scheduler.currentThread` and now uses `Scheduler.immediate`, as that caused issues with the backpressure operators such as `pausable` and `pausableBuffered`.
+- Documentation bug fixes
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/2762564/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/2762564,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v4.1.0,https://github.com/Reactive-Extensions/RxJS/releases/tag/v4.1.0,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v4.1.0,v4.1.0,False,False
+1962702,2015-10-13T23:27:21Z,2015-10-14T22:45:17Z,RxJS Version 4.0.6,"This is a bug fix release of the Reactive Extensions for JavaScript (RxJS) for version 4.0 to fix a number of issues.  The most prominent being the issue with `fromPromise(promise)` was swallowing errors from `Observable` instances which is now fixed.  Looking forward, we will continue to work on performance as well as the modular design for those who want to pick and choose which pieces from NPM they want to use.
+
+## Performance Work
+
+Work continued on performance with `Rx.Observable.onErrorResumeNext`, `Rx.Observable.mergeDelayError` as well as our join patterns. Expect this to continue throughout the lifecycle of v4.x.
+
+## Bugs Fixed:
+
+These were the bugs fixed during this release since 4.0.0:
+- #969 - fix for `timeout` without other `Observable`
+- #964 - fixed shared state for `zip`, `combineLatest` and `withLatestFrom` in `subscribeCore`
+- #963 - Angular broken with latest release
+- #957 - fix issue with `fromEvent` not firing
+- #955 - `rx.d.ts` compilation issue fix 
+- #949 - add null handling for `isIterable` check
+- #947 - add `initialValue` to `publishValue.md`
+- #941 - fix for `timer` which was firing immediately
+- #939 - documentation fix for `find`
+- #938 - fix `defaultIfEmpty` with default value. 
+- #936 - fix `fromPromise` behavior not to swallow errors when used with `Rx.Observable.spawn`
+- #934 - fix `BehaviorSubject` inheritance from `Observer`
+- #932 - include `zip` in TypeScript exports
+- #931 - include `merge` in TypeScript exports
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/1962702/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/1962702,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v4.0.6,https://github.com/Reactive-Extensions/RxJS/releases/tag/v4.0.6,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v4.0.6,v4.0.6,False,False
+1870842,2015-09-25T22:35:16Z,2015-09-26T11:11:40Z,RxJS Version 4.0,"This is another release in terms of cleaning up our technical debt by simplifying a number of our infrastructure, including our schedulers both for regular usage as well as testing.  There were will be a few more point releases from this repository before a switch over the more modern [RxJS vNext](github.com/reactivex/rxjs), including modularity, expression trees, and so forth.
+
+Before we go further, it's worth mentioning that since Microsoft Edge supports [ES 2016 Async Functions](https://tc39.github.io/ecmascript-asyncawait/), you can take advantage of them in whole new ways in RxJS, because as we've had support for returning Promises, we support async functions as well.  
+
+With a very quick example, we can do the following:
+
+``` js
+const source = Rx.Observable.of(1,2,3)
+  .flatMap(async function (x, i) {
+    var result = await Promise.resolve(x * i);
+    return result;
+  });
+
+source.subscribe((x) => console.log(`Next:  ${x}`))
+// => Next: 0
+// => Next: 2
+// => Next: 6
+```
+
+Included in this release are the following:
+- A More Complete `rx.all.js`
+- Scheduler rewrite
+- Testing rewrite
+- Collapsing of operators
+- Performance upgrades
+
+What's coming next in this release?
+- Modularity
+- More Performance Upgrades
+
+# A More Complete `rx.all.js`
+
+In previous releases, `rx.all.js` and its compat counterpart `rx.all.compat.js` contained all of the operators in RxJS, but did not include any of the testing infrastructure.  This has been changed so that you no longer need to bring in `rx.testing` in order to write your own tests.
+
+# Scheduler Rewrite
+
+The schedulers have long had a long of technical debt when brought over directly from the .NET world.  To simplify this, we will now have the following contract on the `Scheduler` as written in TypeScript so that it makes sense as an interface.  You will notice that the previous versions which did not have state associated with them are no longer supported.  This caused too much overhead to support both, so if you have no state to pass, simply pass `null` for the state.
+
+``` typescript
+interface IDisposable {
+  dispose(): void
+}
+
+interface IScheduler {
+  // Current time
+  now(): number;
+
+  // Schedule immediately
+  schedule<TState>(state: TState, action: (scheduler: IScheduler, state: TState) => IDisposable) : IDisposable;
+
+  // Schedule relative
+  scheduleFuture<TState>(state: TState, dueTime: number, action: (scheduler: IScheduler, state: any) => IDisposable) : IDisposable;
+
+  // Schedule absolute
+  scheduleFuture<TState>(state: TState, dueTime: Date, action: (scheduler: IScheduler, state: TState) => IDisposable) : IDisposable;
+
+  // Schedule recursive
+  scheduleRecursive<TState>(state: TState, action: (state: TState, action: (state: TState) => void) => void): IDisposable;
+
+  // Schedule recursive relative
+  scheduleRecursiveFuture<TState>(state: TState, dueTime: number, action: (state: TState, action: (state: TState, dueTime: number) => void) => void): IDisposable;
+
+  // Schedule recursive absolute
+  scheduleRecursiveFuture<TState>(state: TState, dueTime: Date, action: (state: TState, action: (state: TState, dueTime: Date) => void) => void): IDisposable;
+
+  // Schedule periodic
+  schedulePeriodic<TState>(state: TState, period: number, action: (state: TState) => TState): IDisposable;
+}
+```
+
+Now, to schedule something immediately, you must follow the following code snippet.  The return value is optional as we will automatically fix it to be a `Disposable` if you do not provide us with one.
+
+``` js
+var d = scheduler.schedule(null, function (scheduler, state) {
+  console.log('scheduled ASAP');
+  return Rx.Disposable.empty;
+});
+```
+
+Same applies to scheduling in the future:
+
+``` js
+// Scheduled 5 seconds in the future with absolute time
+var d = scheduler.scheduleFuture(null, new Date(Date.now() + 5000), function (scheduler, state) {
+  console.log('scheduled using absolute time');
+  return Rx.Disposable.empty;
+});
+
+// Scheduled 5 seconds in the future with relative time
+var d = scheduler.scheduleFuture(null, 5000 function (scheduler, state) {
+  console.log('scheduled using relative time');
+  return Rx.Disposable.empty;
+});
+```
+
+You will also notice that the recursive scheduling as well as periodic scheduling removed the versions where no state was involved.  Also, it is necessary to enforce that with `scheduleRecursiveFuture` determines the relative or absolute timing by the return value from the `recurse` call for example.  If you don't wish to use state for the `recurse` call, simply use `recurse(null, dueTime)`.
+
+``` js
+// Absolute scheduling
+scheduler.scheduleRecursiveFuture(1, new Date(Date.now() + 5000), function (state, recurse) {
+  if (state < 10) {
+    recurse(state + 1, new Date(Date.now() + (state * 1000));
+  }
+});
+
+// Relative scheduling
+scheduler.scheduleRecursiveFuture(1, 5000, function (state, recurse) {
+  if (state < 10) {
+    recurse(state + 1, state * 1000);
+  }
+});
+```
+
+# Testing Rewrite
+
+One of the biggest undertakings in this release was to standardize and clean up our unit tests.  Over the past releases, there was a bit of technical debt that needed to be paid off.  In this release, our virtual time system as well as our test scheduling was rewritten as to put it more in line with the regular schedulers.  We rid ourselves of the `WithState` operators, simply renaming them to their basic operators such as `scheduleAsbolute` and `scheduleRelative`.
+
+With the `TestScheduler`, we cleaned it up so that you can easily specify when a particular timing for the creation, subscription and disposal of the Observable sequence.  This is a quick example of a test in action using timing where in the `scheduler.startScheduler` method as the second parameter, you can pass in an object with some timings for creation, subscription disposal.  If you omit this, it will default to the normal timings of `100` for `created`, `200` for `subscribed` and `1000` for `disposed`.
+
+``` js
+test('first default', function () {
+  var scheduler = new TestScheduler();
+
+  var xs = scheduler.createHotObservable(
+    onNext(150, 1),
+    onCompleted(250)
+  );
+
+  var res = scheduler.startScheduler(
+    function () {
+      return xs.first({defaultValue: 42});
+    },
+    { created: 100, subscribed: 200, disposed: 1000 }
+  );
+
+  res.messages.assertEqual(
+    onNext(250, 42),
+    onCompleted(250)
+  );
+
+  xs.subscriptions.assertEqual(
+    subscribe(200, 250)
+  );
+});
+```
+
+All tests should look like this now making them much easier to read going forward.
+
+# Collapsing of Operators
+
+Previously, we had a number of operators such as `debounceWithSelector` and `timeoutWithSelector` that were simply overloads of their respective `debounce` and `timeout` methods.  To avoid confusion having more named operators, we have simply condensed those into `debounce` and timeout` so that they look like the following:
+
+Debounce with relative due time:
+`Rx.Observable.prototype.debounce(dueTime, [scheduler])`
+
+Debounce with selector:
+`Rx.Observable.prototype.debounce(durationSelector)`
+
+Timeout with relative or absolute due time:
+`Rx.Observable.prototype.timeout(dueTime, [other], [scheduler])`
+
+Timeout with selector and optional first timeout:
+`Rx.Observable.prototype.timeout([firstTimeout], timeoutDurationSelector, [other])`
+
+# Performance Upgrades
+
+In this version, we addressed more performance as we rewrote many operators to minimize chained scopes in addition to writing operators from the bottom up instead of relying on composition from other operators. This had some significant increases in some areas.  In addition, we also did some shortcuts for example if the `Rx.Scheduler.immediate` was used, we could swap that out for an inline call with returning an empty disposable.
+
+In RxJS vNext, many of the performance concerns will be addressed and have shown great progress.
+
+# What's Next
+
+There will be a number of more releases for 4.x until vNext is ready which will address a number of issues including:
+- Modularity
+- Performance
+
+## Modularity
+
+Now that the operators and schedulers have largely stabilized for performance, we're going to fix more of the modularity story, allowing you to bring in only what you need. Work had already begun on this part of the project, but now that the majority of the technical debt has been paid, this makes for a much easier transition.
+
+## Performance
+
+Although many operators have been rewritten to minimized chained scopes, there are a number of operators that have not.  In this release, we intend to get those operators such as `timeout` to be optimized for performance and making it more optimized for the GC.
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/1870842/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/1870842,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v4.0.0,https://github.com/Reactive-Extensions/RxJS/releases/tag/v4.0.0,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v4.0.0,v4.0.0,False,False
+1707095,2015-08-21T20:50:26Z,2015-08-21T21:08:28Z,RxJS Version 3.1.1,"This is a minor release with a patch for a regression for `zip` when given an array of values and closes issue #867 
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/1707095/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/1707095,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v3.1.1,https://github.com/Reactive-Extensions/RxJS/releases/tag/v3.1.1,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v3.1.1,v3.1.1,False,False
+1691647,2015-08-19T05:05:36Z,2015-08-19T05:54:45Z,RxJS Version 3.1,"This is a slight update to RxJS since 3.0 which contains a number of fixes and new features.  This should be the last of the 3.x releases moving forward with 4.0 to include the large scheduler changes to improve performance as well as get rid of some more technical debt.
+
+Some of the features included in this release include:
+- Result Selectors now optional on `zip` and `combineLatest`
+- Changes to `zip`
+- Added `zipIterable`
+- Introduction of `Rx.Observable.wrap`
+- New TypeScript Definitions
+- Bug fixes
+
+## Result Selectors Now Optional
+
+In previous releases of RxJS, the `zip` and `combineLatest` took either an array of Observables or Promises and followed by a `resultSelector` function which took the values projected from each sequence and allowed you to combine them any which way you wanted.  With version 3.1, the `resultSelector` has been made completely optional.
+
+Previously, if you wanted to combine three sequences, you had to have a result selector as well, even if it were as trivial as adding all of the values to an array.
+
+``` js
+var source = Rx.Observable.zip(
+  Rx.Observable.of(1,2,3),
+  Rx.Observable.of(4,5,6),
+  Rx.Observable.of(7,8,9),
+  function (x, y, z) { return [x, y, z]; });
+
+// => [1, 4, 7]
+// => [2, 5, 8]
+// => [3, 6, 9]
+```
+
+With the result selector being optional you can now omit the last parameter and the aforementioned behavior will be done automatically for you.  This applies to all versions of `zip` and `combineLatest` whether it is on the prototype or the Observable itself.
+
+``` js
+var source = Rx.Observable.zip(
+  Rx.Observable.of(1,2,3),
+  Rx.Observable.of(4,5,6),
+  Rx.Observable.of(7,8,9));
+
+// => [1, 4, 7]
+// => [2, 5, 8]
+// => [3, 6, 9]
+```
+
+## Changes to `zip`
+
+The `zip` function is very useful and very flexible about its input.  So much so, that we tried to allow for iterables such as `Map`, `Set`, and `Array`, but making this a solid API was too difficult, so instead `zip` now only accepts Observables and Promises so now you can have full parity between the method signatures of `combineLatest` and `zip` with either arguments or an array of Observables or Promises.
+
+``` js
+/* Arguments version */
+var source = Rx.Observable.zip(
+  Rx.Observable.of(1,2,3),
+  Rx.Observable.of(4,5,6),
+  Rx.Observable.of(7,8,9)
+);
+
+/* Array version */
+var source = Rx.Observable.zip([
+  Rx.Observable.of(1,2,3),
+  Rx.Observable.of(4,5,6),
+  Rx.Observable.of(7,8,9)
+]);
+```
+
+## Introducing `zipIterable`
+
+As noted above there were some issues with `zip` trying to accept iterables as well as Observable and Promises given that we accepted both arguments and arrays.  To fix this, we have introduced `zipIterable` which allows you to zip an Observable with any iterable whether it be an `Array`, `Map`, `Set` or even `Generator`.  
+
+``` js
+var source = Rx.Observable.of(1,2,3).zipIterable(
+  [4, 5, 6],
+  [7, 8, 9]
+);
+
+// => [1, 4, 7]
+// => [2, 5, 8]
+// => [3, 6, 9]
+```
+
+With a generator it can be even more fun such as:
+
+``` js
+var source = Rx.Observable.of(1,2,3).zipIterable(
+  (function* () { yield 4; yield 5; yield 6; })();
+  (function* () { yield 7; yield 8; yield 9; })();
+);
+
+// => [1, 4, 7]
+// => [2, 5, 8]
+// => [3, 6, 9]
+```
+
+## Introduction to `Rx.Observable.wrap`
+
+In the previous release, we redid `Rx.Observable.spawn` so that it could accept a number of yieldable arguments such as Observable, Promises, Arrays and Objects and returned an Observable. In this release we went a bit further by adding `Rx.Observable.wrap` which creates an Observable from a function which now takes arguments.
+
+``` js
+var fn = Rx.Observable.wrap(function* (value) {
+    return [
+        yield Rx.Observable.just(value + 2).delay(2000),
+        yield Rx.Observable.just(value)
+    ];
+});
+
+fn(1000).subscribe(next => console.log('Next %s', next));
+// => [1002, 1000]
+```
+
+With some fixes with this release and `wrap` we can create pretty complex objects and have it yield properly.
+
+``` js
+var fn = Rx.Observable.wrap(function* (v) {
+  return {
+    1: {
+      3: yield [
+        Rx.Observable.just(20).delay(5000), [
+          Rx.Observable.just(30).delay(2000), Rx.Observable.just(40).delay(3000)
+        ]
+      ]
+    },
+    2: yield Promise.resolve(v)
+  };
+});
+
+fn(1000).subscribe(next => console.log('Next %s', next));
+```
+
+Many thanks to @xgrommx for his help on this effort!
+
+## New TypeScript Definitions
+
+Many people have a lot of interest in the TypeScript definitions for RxJS.  Many thanks to @david-driscoll for stepping up to the plate and completely rewriting them from scratch!  
+
+## Bug Fixes
+- #832 - UMD Header Bug
+- #848 - Rewrite TypeScript definitions
+- #850 - Global `this` is undefined
+- #851 - Support for Arrays in `Rx.Observable.spawn`
+- #855 - Support for nested objects in `Rx.Observable.spawn`
+- #862 - Fix leaking `comparerEquals`
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/1691647/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/1691647,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v3.1.0,https://github.com/Reactive-Extensions/RxJS/releases/tag/v3.1.0,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v3.1.0,v3.1.0,False,False
+1624054,2015-08-03T21:49:08Z,2015-08-04T02:12:19Z,RxJS Version 3.0,"Here is the long awaited RxJS version 3.0!  This has many changes since our last release of v2.5.3.  This release contains a great number of changes for the better including `rx.core.js` and the Rx-Core family as well as the `rx.lite.js` and the Rx-Lite family of libraries.  Rx-Core allows you to implement the bare bones of the Observable contract so that your library is compatible with RxJS with additions for multicast operations via `rx.core.binding.js` and testing with `rx.core.testing.js`.  In addition, the Rx-Lite family allows you to stick with `rx.lite.js` and then require only the `lite` packages you need as you need them.
+
+In this release, we tried to pay down some of our technical debt that has incurred over the years since we started releasing RxJS five years ago.  To that end, there are some breaking changes, hence the major version bump to 3.0 most of which are dealing with ridding ourselves of aliases that did not properly reflect the code and has reduced to a single name.
+
+Here are some of the highlights:
+- Rx Core Packages
+- Rx Lite Packages
+- New Operators
+- `Rx.Observable.fromEvent` Changes
+- `Rx.Observable.spawn` Changes
+- `Rx.Observable.prototype.scan` Changes
+- `OrDefault` Method Changes
+- Deprecations
+- Performance Improvements
+- Bug Fixes
+
+What's next for us?  We're working on the following items during the 3.x timeframe including:
+- Bonsai Tree serialization to allow RxJS to cross boundaries
+- Single module exports per operator
+- Moving towards a new testing system
+
+## Rx Core Packages
+
+There have been many questions over the years as to a minimal implementation of RxJS so that developers can provide shims for Observables instead of shipping the entire library.  To that end, we have shipped a minimal implementation of Rx Observables along with a base scheduler and some disposables.  We also ship for those who want multicast behavior on their created Observables we also ship that library as well.  And finally, we also have a shim for testing just in case you want to test your shims in the exact same style that RxJS uses.
+
+We ship three main files to support this:
+- `rx.core.js`
+- `rx.core.binding.js`
+- `rx.core.testing.js`
+
+Each of these can be found in their own respective NPM packages
+- [`rx-core`](https://www.npmjs.com/package/rx-core)
+- [`rx-core-binding`](https://www.npmjs.com/package/rx-core-binding)
+- [`rx-core-testing`](https://www.npmjs.com/package/rx-core-testing)
+
+We'd like to get them as lean and mean as possible so any suggestions and we're all ears.
+
+## Rx Lite Packages
+
+In previous releases of RxJS, we shipped Lite packages which were meant to be a stripped down version of RxJS to the most commonly used operators.  To stay more productive, developers would eventually bring in more operators as they need them with such things as time-based operators, virtual-time, testing and so forth.  Not only that, but they would need to support older environments as well as newer ones.  To fix this, the team has introduced a number of new NPM packages to support the Lite workflow.  Each package has a compat counterpart so all the way up the chain it uses the right version of RxJS for you.
+
+We have created the following NPM packages to support Rx Lite:
+- [`rx-lite`](https://www.npmjs.com/package/rx-lite) - [`rx-lite-compat`](https://www.npmjs.com/package/rx-lite-compat)
+- [`rx-lite-extras`](https://www.npmjs.com/package/rx-lite-extras) - [`rx-lite-extras-compat`](https://www.npmjs.com/package/rx-lite-extras-compat)
+- [`rx-lite-aggregates`](https://www.npmjs.com/package/rx-lite-aggregates) - [`rx-lite-aggregates-compat`](https://www.npmjs.com/package/rx-lite-aggregates-compat)
+- [`rx-lite-async`](https://www.npmjs.com/package/rx-lite-async) - [`rx-lite-async-compat`](https://www.npmjs.com/package/rx-lite-async-compat)
+- [`rx-lite-backpressure`](https://www.npmjs.com/package/rx-lite-backpressure) - [`rx-lite-backpressure-compat`](https://www.npmjs.com/package/rx-lite-backpressure-compat)
+- [`rx-lite-coincidence`](https://www.npmjs.com/package/rx-lite-coincidence) - [`rx-lite-coincidence-compat`](https://www.npmjs.com/package/rx-lite-coincidence-compat)
+- [`rx-lite-experimental`](https://www.npmjs.com/package/rx-lite-experimental) - [`rx-lite-experimental-compat`](https://www.npmjs.com/package/rx-lite-experimental-compat)
+- [`rx-lite-joinpatterns`](https://www.npmjs.com/package/rx-lite-joinpatterns) - [`rx-lite-joinpatterns-compat`](https://www.npmjs.com/package/rx-lite-joinpatterns-compat)
+- [`rx-lite-testing`](https://www.npmjs.com/package/rx-lite-testing) - [`rx-lite-testing-compat`](https://www.npmjs.com/package/rx-lite-testing-compat)
+- [`rx-lite-time`](https://www.npmjs.com/package/rx-lite-time) - [`rx-lite-time-compat`](https://www.npmjs.com/package/rx-lite-time-compat)
+- [`rx-lite-virtualtime`](https://www.npmjs.com/package/rx-lite-virtualtime) - [`rx-lite-virtualtime-compat`](https://www.npmjs.com/package/rx-lite-virtualtime-compat)
+
+## New Operators
+
+People are always looking for new ways to combine sequences using variations of `flatMap`, whether it is to control the amount of concurrency to whether the first or the last value is cut and disposed.  RxJS version 3.0 has added the following operators to help with those efforts.
+- [`flatMapFirst`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/flatmapfirst.md)
+- [`flatMapWithMaxConcurrency`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/flatmapwithmaxconcurrent.md)
+
+## `Rx.Observable.fromEvent` Changes
+
+In previous releases, `Rx.Observable.fromEvent`, if given a selector function, would pass the raw arguments to the selector function to allow the developer to pick which items to project.  This has been found to be clumsy so instead, the function is applied with the given arguments, thus making it a more natural experience.
+
+For example, previously, you would have to do the following:
+
+``` js
+var Rx = require('rx');
+var EventEmitter = require('events').EventEmitter;
+
+var e = new EventEmitter();
+
+var changes = Rx.Observable.fromEvent(e, 'changes', function (args) {
+  return { first: args[0], second: args[1] };
+});
+```
+
+This has been simplified to instead so that the arguments are directly applied on the selector function:
+
+``` js
+var Rx = require('rx');
+var EventEmitter = require('events').EventEmitter;
+
+var e = new EventEmitter();
+
+var changes = Rx.Observable.fromEvent(e, 'changes', function (first, second) {
+  return { first: first, second: second };
+});
+```
+
+## `Rx.Observable.spawn` Changes
+
+Originally, RxJS shipped with a very primitive version of handling generator functions through `Rx.spawn`.  This has been changed to [`Rx.Observable.spawn`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/spawn.md) which now instead of returning a Node.js style callback, will now return an `Observable` for consistency with the rest of RxJS.
+
+This enables a number of exciting scenarios mixing in support for Promises, Arrays, Generators, Node-style callbacks, and yes of course, Observables.  
+
+``` js
+var Rx = require('rx');
+
+var nodeCallBack = function (val) {
+  return function (cb) {
+    cb(null, val);
+  };
+};
+
+var spawned = Rx.Observable.spawn(function* () {
+  var v = yield nodeCallBack(12);
+  var w = yield [24];
+  var x = yield Rx.Observable.just(42);
+  var y = yield Rx.Observable.just(56);
+  var z = yield Promise.resolve(78);
+  return v + w[0] + x + y + z;
+});
+
+spawned.subscribe(
+  function (x) { console.log('next %s', x); },
+  function (e) { console.log('error %s', e); },
+  function () { console.log('completed'); }
+);
+
+// => next 212
+// => completed
+```
+
+## \- `Rx.Observable.prototype.scan` Changes
+
+In previous releases, the `scan` method followed the now removed `aggregate` method syntax which had the seed first, followed by the aggregate function.  For RxJS 3.0, this has been reversed to match the `reduce` signature which better matches the natures of JavaScript and the Array#extras.
+
+Previously, the signature was the following:
+
+``` js
+observable.scan(0 /*seed*/, function (acc, x) {
+  return acc + x;
+});
+```
+
+Now has been changed to the following:
+
+``` js
+observable.scan(function (acc, x) {
+  return acc + x;
+}, 0 /*seed*/
+```
+
+## `OrDefault` Method Changes
+
+In previous releases of RxJS, we had methods for a number of operators such as `first`, `last`, `elementAt` and `single` with `OrDefault` suffixes on them which determined whether they would throw on an error or return some default value. Instead of having more operators, this has been condensed into one single operator for each:
+- [`elementAt`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/elementat.md)
+- [`first`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/first.md)
+- [`last`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/last.md)
+- [`single`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/single.md)
+
+Each of those APIs have changed to allow a much nicer workflow.  For example, in previous releases, we wanted to have a default value if there was no first element, then we'd have to provide the argument for the default value as the third parameter.
+
+``` js
+observable.firstOrDefault(null /*selector*/, null /*thisArg*/, 42 /*defaultValue*/);
+```
+
+Instead, this has been radically simplified with the following:
+
+``` js
+observable.first({defaultValue: 42});
+```
+
+Note that if a default value is omitted, then the function will throw upon not meeting the condition or being empty.
+
+## Deprecations
+
+Note that the following method aliases have had their accompanied aliases removed:
+<center>
+
+<table>
+   <th>Method</th><th>Removed Aliases</th>
+   <tr>
+      <td>catch</td>
+      <td>catchError, catchException</td>
+   </tr>
+   <tr>
+      <td>do</td>
+      <td>doAction</td>
+   </tr>
+   <tr>
+      <td>every</td>
+      <td>all</td>
+   </tr>
+   <tr>
+      <td>finally</td>
+      <td>finallyAction</td>
+   </tr>
+   <tr>
+      <td>reduce</td>
+      <td>aggregate</td>
+   </tr>
+   <tr>
+      <td>return / just</td>
+      <td>returnValue</td>
+   </tr>
+   <tr>
+      <td>some</td>
+      <td>any</td>
+   </tr>
+   <tr>
+      <td>throw</td>
+      <td>throwError, throwException</td>
+   </tr>
+   <tr>
+      <td>while</td>
+      <td>whileDo</td>
+   </tr>
+</table>
+
+</center>
+
+## Performance Improvements
+
+As always we continue to strive towards better performance as we continue with RxJS.  To that end, we fixed a number of hot points where we could reduce closure scope and chained scopes.
+
+The following methods were given new performance enhancements to better suit performance:
+- `Rx.Observable.fromCallback`
+- `Rx.Observable.fromEvent`
+- `Rx.Observable.fromNodeCallback`
+
+Other minor changes were made to aggregation operators to reduce closure scope which had significant gains as well.
+
+## Bug Fixes
+
+The following bug fixes were completed with many thanks to our contributors!
+- #694 - Ensure `HTMLCollection` is captured for multiple events
+- #720 - Fix `take(n)`
+- #725 - Fix `querySelectorAll` issue for IE8 compat 
+- #727 - Fix `sample` laziness
+- #745 - Fix `pausableBuffered`
+- #763 - Fix `do` observer issues
+- [`controlled issue`](https://github.com/Reactive-Extensions/RxJS/commit/0a66a3abe7baa02cd440dd55ef1e4cfc9bde14e8) 
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/1624054/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/1624054,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v3.0.0,https://github.com/Reactive-Extensions/RxJS/releases/tag/v3.0.0,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v3.0.0,v3.0.0,False,False
+1177939,2015-04-11T18:00:04Z,2015-04-17T16:38:30Z,RxJS version 2.5,"This is the first stable release of RxJS version 2.5.  Once again with version 2.4, we've focused on performance, modularity among other topics.
+
+To that end, here is what is included in the latest release.
+- Moving node.js Specific Bindings
+- Improved Performance of Creation Operators
+- Addition of More Rx-Lite NPM Modules
+
+## Moving node.js Specific Bindings
+
+In previous versions, `index.js` included [node.js](http://nodejs.org) specific bindings to such things as the `EventEmitter`, Streams, and more.  This added extra bloat to RxJS, especially for those using browserify to create their appplications when many of these functions were not needed.  This also caused issues for users of React and React Native.  The functionality that was previously in `index.js` has been moved to a node.js specific NPM module called [rx-node](https://www.npmjs.com/package/rx-node).  
+
+For those wishing to still have `Rx.Node` still in your application can simply do the following:
+
+``` js
+var Rx = require('rx');
+Rx.Node = require('rx-node');
+```
+
+Existing methods that were added to `Rx.Observable` have been moved directly into RxJS itself such as `Rx.Observable.prototype.pipe` which handles node.js style streams and interoperates with such libraries such as Highland.js.
+
+## Improved Performance Of Creation Operators
+
+In previous releases of RxJS, we focused on improving the performance of the most common used instance operators such as `map`, `filter`, `mergeAll`, `concatAll`, and various creation operators such as `fromArray`, `from`, `of`, `range` among others.  In this release, we focused on some of the more basic operators such as `just`, `throw`, `empty`, `never`, and `pairs`.
+
+Some of the performance gains are immense.  This numbers come from node.js v0.12.2 running on a MacBook Pro with 16GB RAM.
+
+Operator `just`/`return`
+
+``` bash
+$ node just.js
+old x 330,062 ops/sec ±2.25% (86 runs sampled)
+new x 747,616 ops/sec ±1.60% (90 runs sampled)
+Fastest is new
+```
+
+Operator `throw`/`throwError`
+
+``` bash
+$ node throw.js
+old x 336,647 ops/sec ±2.37% (85 runs sampled)
+new x 867,807 ops/sec ±2.18% (76 runs sampled)
+Fastest is new
+```
+
+Operator `empty`
+
+``` bash
+$ node empty.js
+old x 312,889 ops/sec ±2.47% (80 runs sampled)
+new x 844,512 ops/sec ±1.72% (91 runs sampled)
+Fastest is new
+```
+
+Operator `never`
+
+``` bash
+$ node never.js
+old x 350,545 ops/sec ±2.49% (81 runs sampled)
+new x 1,307,236 ops/sec ±1.65% (62 runs sampled)
+Fastest is new
+```
+
+Operator `pairs`
+
+``` bash
+$ node pairs.js
+old x 125,360 ops/sec ±1.36% (90 runs sampled)
+new x 178,085 ops/sec ±1.08% (95 runs sampled)
+Fastest is new
+```
+
+We're not even close to finishing performance optimization as we're looking at `zip`, `combineLatest`, `withLatestFrom`, as well as more aggregate operations such as `scan` in the upcoming releases.
+
+## Addition of Rx-Lite Modules
+
+In the previous release, we released a smaller version of RxJS with the [`rx-lite`](https://www.npmjs.com/package/rx-lite), [`rx-lite-compat`](https://www.npmjs.com/package/rx-lite-compat) and its extras of [`rx-lite-extras`](https://www.npmjs.com/package/rx-lite-extras) and [`rx-lite-extras-compat`](https://www.npmjs.com/package/rx-lite-extras-compat) which allowed you to use only `rx.lite.js` and `rx.lite.extras.js` and its older browser compatible versions.  To that end, we also added the capability to add in every other module into `rx-lite` so that you can pick and choose to bring in certain functionality instead of getting all of the `rx` module.  This is due mostly that people are using NPM to create their client-side applications so keeping the footprint of RxJS low is ideal.
+
+These include:
+- [`rx-lite-aggregates`](https://www.npmjs.com/package/rx-lite-aggregates) / [`rx-lite-aggregates-compat`](https://www.npmjs.com/package/rx-lite-aggregates-lite)
+- [`rx-lite-async`](https://www.npmjs.com/package/rx-liteasync) / [`rx-lite-async-compat`](https://www.npmjs.com/package/rx-lite-async-compat)
+- [`rx-lite-backpressure`](https://www.npmjs.com/package/rx-lite-backpressure) / [`rx-lite-backpressure-compat`](https://www.npmjs.com/package/rx-lite-backpressure-compat)
+- [`rx-lite-coincidence`](https://www.npmjs.com/package/rx-lite-coincidence) / [`rx-lite-coincidence-compat`](https://www.npmjs.com/package/rx-lite-coincidence-compat)
+- [`rx-lite-experimental`](https://www.npmjs.com/package/rx-lite-experimental) / [`rx-lite-experimental-compat`](https://www.npmjs.com/package/rx-lite-experimental-compat)
+- [`rx-lite-joinpatterns`](https://www.npmjs.com/package/rx-lite-joinpatterns) / [`rx-lite-joinpatterns-compat`](https://www.npmjs.com/package/rx-lite-joinpatterns-compat)
+- [`rx-lite-testing`](https://www.npmjs.com/package/rx-lite-testing) / [`rx-lite-testing-compat`](https://www.npmjs.com/package/rx-lite-testing-compat)
+- [`rx-lite-time`](https://www.npmjs.com/package/rx-lite-time) / [`rx-lite-time-compat`](https://www.npmjs.com/package/rx-lite-compat)
+- [`rx-lite-virtualtime`](https://www.npmjs.com/package/rx-lite-virtualtime) / [`rx-lite-virtualtime-compat`](https://www.npmjs.com/package/rx-lite-virtualtime-compat)
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/1177939/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/1177939,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.5.2,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.5.2,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.5.2,v2.5.2,False,False
+1100123,2015-03-27T21:21:50Z,2015-03-27T22:39:43Z,RxJS version 2.4,"This is the first stable release of RxJS 2.4!  There have been several things at the forefront of our mind which is performance and modularity.  
+
+To that end, we focused on the following for this release:
+- Performance Enhancements
+- New NPM Packages
+- New operators/methods
+- Non-breaking Changes
+- Breaking Changes
+
+## Performance Enhancements
+
+Performance has been a key aspect of the past RxJS releases and for 2.4 will continue to be a work in progress. You will note that we have included performance tests using [benchmark.js](http://benchmarkjs.com/) which tests 2.4.x against previous 2.3.x releases in the [`tests/perf/operators`](https://github.com/Reactive-Extensions/RxJS/tree/master/tests/perf/operators) folder.
+
+You can run them to see what kinds of gains we were able to get for example, this is a check of the new `map` implementation versus the previous version.
+
+``` js
+function square(x) { return x * x; }
+function double(x) { return x + x; }
+
+Rx.Observable.range(0, 50)
+  .map(square)
+  .map(double).subscribe();
+```
+
+Running this code between versions, we can see a definite speedup:
+
+``` bash
+$ node map.js
+old x 12,968 ops/sec ±3.44% (89 runs sampled)
+new x 15,079 ops/sec ±4.34% (81 runs sampled)
+Fastest is new
+```
+
+We can also test the two different versions of `range` to see what kinds of gains we were able to make:
+
+``` js
+Rx.Observable.range(0, 25).subscribe();
+```
+
+Running that sample, we can find the difference pretty staggering.
+
+``` bash
+$ node range.js
+old x 26,711 ops/sec ±3.81% (87 runs sampled)
+new x 37,831 ops/sec ±4.33% (83 runs sampled)
+Fastest is new
+```
+
+### What Changes Did We Make?
+
+There were a number of rules that we followed that allowed us to get faster code.  They include:
+1. Do not let `arguments` leave the scope of the method
+2. Do not perform `Array.prototype.slice` on `arguments` and instead do a local copy
+3. Avoid try/catch/finally if possible such as the work Bluebird did
+4. Use the state based methods for scheduling which reduced scope chains
+5. Use classes instead of anonymous classes created by scope chains.
+6. Use method fusion when possible to chain together `map` with `map` calls, and `filter` with `filter` calls.
+
+To cover some of them in more detail, we can for example reduce chained scopes by using the scheduler, let's look at the following example.  Let's just use `scheduleRecursive` which does not allow for state to be passed in.  Instead, we would have to close over it in our inner scope.
+
+``` js
+Observable.range = function (start, count, scheduler) {
+  isScheduler(scheduler) || (scheduler = currentThreadScheduler);
+  return new AnonymousObservable(function (observer) {
+    var i = 0;
+    return scheduler.scheduleRecursive(function (self) {
+      if (i < count) {
+        observer.onNext(start + (i++));
+        self();
+      } else {
+        observer.onCompleted();
+      }
+    });
+  });
+};
+```
+
+Instead, we could use our state based which will rid ourselves of the `i` variable and capture the state solely within our scheduler.
+
+``` js
+Observable.range = function (start, count, scheduler) {
+  isScheduler(scheduler) || (scheduler = currentThreadScheduler);
+  return new AnonymousObservable(function (observer) {
+    return scheduler.scheduleRecursiveWithState(0, function (i, self) {
+      if (i < count) {
+        observer.onNext(start + i);
+        self(i + 1);
+      } else {
+        observer.onCompleted();
+      }
+    });
+  });
+};
+```
+
+Of course we went further by turning the `range` operator into its own class.  You can find the optimized operators in the [`src/core/perf/operators`](https://github.com/Reactive-Extensions/RxJS/tree/master/src/core/perf/operators) folder.
+
+We also looked into method fusion, for example, if the current operation is a `map` and the next operation is also a `map`, then we can shortcut it so that we only use a single `Observer` for them both.
+
+``` js
+return this instanceof MapObservable ?
+  this.internalMap(selectorFn, thisArg) :
+  new MapObservable(this, selectorFn, thisArg);
+```
+
+Then the `internalMap` function might look like the following where we have the two selector functions chained together for our new selector function.
+
+``` js
+MapObservable.prototype.internalMap = function (selector, thisArg) {
+  var self = this;
+  return new MapObservable(
+    this.source, 
+    function (x, i, o) { return selector(self.selector(x, i, o), i, o); }, thisArg);
+};
+```
+
+This is by no means the end of our optimizations.  We must carefully weigh the changes made here with the performance gains obtained versus the code size that we produce and that we are going for larger optimizations and not micro-optimizations.
+
+## New NPM Packages
+
+Many users of RxJS want better modularity and smaller builds of RxJS using only what they need.  One of the ways we have done this is by creating `rx.lite.js` which is a subset of the complete RxJS which has the most used operators in a single package.  
+
+We have now made the following packages also available on NPM:
+- [`rx.lite`](https://www.npmjs.com/package/rx-lite) - Includes `rx.lite.js`
+- [`rx.lite.compat`](https://www.npmjs.com/package/rx-lite-compat) - Includes `rx.lite.js` for browsers older than IE9
+- [`rx.lite.extras`](https://www.npmjs.com/package/rx-lite-extras) - Includes extras in `rx.js` not in `rx.lite.js`
+- [`rx.lite.extras.compat`](https://www.npmjs.com/package/rx-lite-extras-compat) - Includes extras in `rx.js` not in `rx.lite.js` for browsers older than IE9
+
+## New Operators/Methods
+
+We have introduced two new operators/methods in this release:
+- `Rx.Observable.mergeDelayError(..args)`
+- `Rx.BehaviorSubject.prototype.getValue()`
+
+### `Rx.Observable.mergeDelayError(..args)`
+
+The first operator, `mergeDelayError` flattens an Observable that emits Observables into one Observable, in a way that allows an Observer to receive all successfully emitted items from all of the source Observables without being interrupted by an error notification from one of them.
+
+This behaves like `Observable.prototype.mergeAll` except that if any of the merged Observables notify of an error via the Observer's `onError`, `mergeDelayError` will refrain from propagating that error notification until all of the merged Observables have finished emitting items.
+
+``` js
+var source1 = Rx.Observable.of(1,2,3);
+var source2 = Rx.Observable.throwError(new Error('woops'));
+var source3 = Rx.Observable.of(4,5,6);
+
+var source = Rx.Observable.mergeDelayError(source1, source2, source3);
+
+var subscription = source.subscribe(
+  function (x) {
+    console.log('Next: %s', x);
+  },
+  function (err) {
+    console.log('Error: %s', err);
+  },
+  function () {
+    console.log('Completed');
+  });
+
+// => 1
+// => 2
+// => 3
+// => 4
+// => 5
+// => 6
+// => Error: Error: woops
+```
+
+### `Rx.BehaviorSubject.prototype.getValue()`
+
+Another operator that was added was to properly get the current value from a `BehaviorSubject`.  In previous releases, you could use the `value` field, but it was not guarded against improper access.  This value is frozen in time once `onCompleted` has been called.  If `onError` has been called, calling this method will cause the `Error` from the `onError` call to be thrown.
+
+``` js
+var b = new Rx.BehaviorSubject(42);
+console.log(b.getValue());
+// => 42
+
+b.onNext(56);
+console.log(b.getValue());
+
+try {
+  b.onError(new Error('woops'));
+  var x = b.getValue();
+} catch (e) {
+  console.log(e.message);
+}
+// => woops
+```
+
+## Non-Breaking Changes
+
+Sometimes we feel that in a previous release, we did not consider naming and now we're stuck with it, whether we like it or not.  
+
+### Aliasing `Rx.Scheduler.timeout` to `Rx.Scheduler.default`
+
+Such is the case for `Rx.Scheduler.timeout` which in the old days of RxJS used `setTimeout` indeed to schedule items.  But, it is much more than that now that it should be the default scheduler used for asynchronous operations.  To that, we have created an alias to it for `Rx.Scheduler.default` to indicate its new status and we have changed our documentation appropriately.
+
+## Breaking Changes
+
+For point releases, RxJS will keep any changes to a minimum until we get to version 3 and beyond.  There are some instances where there are breaking changes on internal code, not meant for public consumption.
+
+### Current Thread and Immediate Scheduler Changes
+
+In previous releases, the `Rx.Scheduler.immediate` and `Rx.Scheduler.currentThread` allowed for blocking on the main thread for future scheduling with either relative or absolute time.  This is now disallowed and will throw an `Error` if it is attempted.  The affected APIs are:
+
+``` js
+Rx.Scheduler.immediate.scheduleWithRelative
+Rx.Scheduler.immediate.scheduleWithRelativeAndState
+Rx.Scheduler.currentThread.scheduleWithRelative
+Rx.Scheduler.currentThread.scheduleWithRelativeAndState
+```
+
+Note that these were internal APIs not meant for public consumption, so none of your code should be affected.  We wanted to ensure the proper usage of schedulers, hence disallowing anything that might block the main thread.
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/1100123/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/1100123,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.4.7,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.4.7,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.4.7,v2.4.7,False,False
+927673,2015-02-06T01:00:00Z,2015-02-06T20:08:37Z,RxJS version 2.3.25,"This release was mainly focused on performance as we continue to push RxJS forward.
+
+In this release, there were the following changes:
+- Performance Upgrades
+- Method Fusion
+- `Observable.prototype.pluck` Changes
+- Fixes
+
+## Performance Upgrades
+
+RxJS has been committed to bringing the best performance possible.  Lately we have been making changes to make it even faster while keeping the memory footprint low.  To that end, we've been making strides little by little to identify bottlenecks and eliminate them.
+
+We've been doing the following to ensure performance:
+- Add benchmarks versus previous versions
+- Optimize scheduler usage
+- Reducing scope chains
+- Method Fusion
+- Enhance for Engine Optimizations
+
+### Add Benchmarks
+
+To measure our progress, we have set up benchmark tests for performance in the [`tests/perf/operators`](https://github.com/Reactive-Extensions/RxJS/tree/master/tests/perf/operators) folder using [benchmark.js](http://benchmarkjs.com/) which compares the previous version of RxJS to the current edge version.  This will also give you insight into what changes we are making and how much of a difference it is making.
+
+To give a concrete example, we were able to make the following improvements to operators such as `Observable.prototype.map`:
+
+Using node.js v0.10.36 on a Surface 2 Pro as your mileage may vary based upon your machine.
+
+``` bash
+λ node map.js
+old x 5,471 ops/sec ±5.04% (82 runs sampled)
+new x 7,529 ops/sec ±4.61% (87 runs sampled)
+Fastest is new
+```
+
+As you'll notice, the operations per second increase is rather dramatic in some cases, especially for `map` and `filter` where we reduced method scopes and created classes for both an `Observable` and `Observer`.
+
+### Optimize Scheduler Usage
+
+Another optimization we made is to use schedulers more efficiently, especially around using `scheduleWithState`, and `scheduleRecursiveWithState` which are more efficient than their non-state counterparts of `schedule` and `scheduleRecursive`.  One such example is how `Observable.fromArray` was optimized.  Previously, we had an index outside the scope of the scheduler which was incremented, and chained scopes can be expensive if you mutate variables.  In this case, we are no longer doing that and instead, start with a state of 0 and then incrementing it via the recursive call to `self(i + 1)`.
+
+``` js
+Observable.fromArray = function (array, scheduler) {
+  var len = array.length;
+  isScheduler(scheduler) || (scheduler = currentThreadScheduler);
+  return new AnonymousObservable(function (observer) {
+    return scheduler.scheduleRecursiveWithState(0, function (i, self) {
+      if (i < len) {
+        observer.onNext(array[i]);
+        self(i + 1);
+      } else {
+        observer.onCompleted();
+      }
+    });
+  });
+};
+```
+
+And we're not stopping here to make schedulers more efficient since they are the heart of Rx.
+
+### Reducing Scope Chains
+
+If you looked at previous implementations of `map`, you'll notice there are nested scope chains, especially with mutation of the `count` variable.  
+
+``` js
+Observable.prototype.map = function (selector, thisArg) {
+  var selectorFn = isFunction(selector) ? bindCallback(selector, thisArg, 3) : function () { return selector; },
+      source = this;
+  return new AnonymousObservable(function (o) {
+    var count = 0;
+    return source.subscribe(function (value) {
+      try {
+        var result = selectorFn(value, count++, source);
+      } catch (e) {
+        return o.onError(e);
+      }
+      o.onNext(result);
+    }, function (e) { o.onError(e); }, function () { o.onCompleted(); });
+  }, source);
+};
+```
+
+To get around this we created classes for `map` with an `Observable` and `Observer` [here](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/perf/operators/map.js).  This allows us also future optimizations such as method fusion which we will get into later.
+
+### Method Fusion
+
+Another way we could squeeze more performance through the technique of method fusion, meaning the ability to fuse two calls into one.  For example, if you have two `filter` calls in a row, we could easily flatten that into a single `filter` call, and the same applies to `map` as well.
+
+``` js
+Observable.prototype.map = function (selector, thisArg) {
+  var selectorFn = isFunction(selector) ? selector : function () { return selector; };
+  return this instanceof MapObservable ?
+    this.internalMap(selector, thisArg) :
+    new MapObservable(this, selectorFn, thisArg);
+};
+```
+
+Here we are detecting if there are two `map` calls in a row, and then can flatten them into a single call:
+
+``` js
+MapObservable.prototype.internalMap = function (selector, thisArg) {
+  var self = this;
+  return new MapObservable(
+    this.source,
+    function (x, i, o) { return selector(self.selector(x, i, o), i, o); }, thisArg)
+};
+```
+
+### Enhance For Engine Optimizations
+
+One bit more involved is to ensure that we are optimizing for the ways that JavaScript engines work.  For example, the Bluebird library team has a good document on [optimization killers for V8](https://github.com/petkaantonov/bluebird/wiki/Optimization-killers).
+
+One simple example was to ensure that we were not leaking arguments anywhere.  To fix that is simple, simply a call such as the following where instead of calling `slice` on `arguments` which can be expensive, we can simply inline the `arguments` into a new `Array` with the proper size.
+
+``` js
+Observable.of = function() {
+  var a = new Array(arguments.length), len = a.length;
+  for(var i = 0; i < len; i++) { a.push(arguments[i]);   }
+  observableOf(null, a);
+};
+```
+
+We are looking into the next version of fixing all functions with `try/catch` and `try/finally` to ensure that we have faster speeds which will come in the next release.
+
+## `Observable.prototype.pluck` Changes
+
+One request that we've had for some time is having the ability to get nested properties using the `Observable.prototype.pluck` operator.  To that and, we have added the ability to get to nested properties by giving an argument list of properties to pluck.  So, for example, we could pull out the `event.target.value` from the `event` argument.
+
+``` js
+var element = document.querySelector('#input');
+var source = Rx.Observable.fromEvent(element, 'keyup')
+  .pluck('target', 'value');
+```
+
+This is equivalent to using `map` in this way:
+
+``` js
+var element = document.querySelector('#input');
+var source = Rx.Observable.fromEvent(element, 'keyup')
+  .map(function(event) { return event.target.value; });
+```
+
+Why didn't we just allow a single string to pluck the values like some other libraries have done?  That's because there's no easy way to break them up, after all, having a dot in the name of a variable is acceptable, thus leading to unpredictable behavior.
+
+``` js
+var foo = {
+  '.bar': {
+    '.baz': 42
+  }
+};
+```
+
+If you try to use a string like `target.value` it will not work in that case.
+
+Many thanks to @sergi for his help in creating this operator.
+
+## Fixes
+- Issue #495 - Fix links - @38elements
+- Issue #496 - Fix documentation - @38elements
+- Issue #497 - fixed typo - @g00fy-
+- Issue #500 - fix link in observable.md - @38elements
+- Issue #502 - fix sample code - @38elements
+- Issue #505 - Fix trailing comma in `intro.js` - @mattpodwysocki
+- Issue #506 - fix links - @38elements
+- Issue #507 - documentation fixes - @38elements
+- Issue #509 - Rename `contains` to `includes`
+- Issue #510 - Fix valueOf for hash calls - @wasphub
+- Issue #511 - Documentation fixes - @38elements
+- Issue #513 - Regression in `AnonymousSubject.prototype.subscribe` - @mattpodwysocki
+- Issue #514 - Fixing documentation links - @zebulonj
+- Issue #516 - Minor sample code fix - @zebulonj
+- Issue #517 - Fix example in document - @38elements
+- Issue #518 - Fix callbacks.md - @varunmc
+- Issue #520 - Fix scheduler.md - @38elements
+- Issue #525 - Documentation fixes - @38elements
+- Issue #526 - Implement `deepPluck` - @sergi
+- Issue #530 - Fix parentheses in `spawn` - @cultofmetatron
+- Issue #534 - Fix html - @rutsky
+- Issue #535 - `subscribe` ignores `thisArg` - @mattpodwysocki 
+- Issue #578 - Fixing small issue in docs - @unao
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/927673/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/927673,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.3.25,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.3.25,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.3.25,v2.3.25,False,False
+852639,2015-01-14T20:17:38Z,2015-01-14T21:31:50Z,RxJS version 2.3.23,"This release has a number of new features as well as improvements to the existing codebase.  
+
+Of note, there are the following items changed:
+- New Operators
+- Performance Enhancements
+- Bug Fixes
+- Documentation fixes
+
+## New Operators
+
+In this version, a number of new operators are now available 
+- [`Observable.pairs`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/pairs.md)
+- [`Observable.prototype.retryWhen`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/retrywhen.md)
+- [`Observable.prototype.withLatestFrom`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/withlatestfrom.md)
+
+### `Observable.pairs`
+
+One question that was posed to the team, what if we could take an object and turn it into an observable of key/value pairs?  To that end, we have implemented [`Observable.pairs`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/pairs.md), which is an implementation which mirrors [Lo-Dash](https://lodash.com/) and [Underscore.js](http://underscorejs.org/) but instead of returning an array of key/value arrays, it returns an `Observable` of key/value arrays.
+
+Using this together with ES6 produces quite a nice result with destructuring of the arrays.
+
+``` js
+let obj = {
+  foo: 42,
+  bar: 56,
+  baz: 78
+};
+
+let source = Rx.Observable.pairs(obj);
+
+let subscription = source.subscribe(
+  [key, value] => {
+    console.log('Key:', key, 'Value:', value);
+  },
+  err => {
+    console.log('Error: %s', err);
+  },
+  => () {
+    console.log('Completed');
+  });
+
+// => Key: 'foo' Value: 42
+// => Key: 'bar' Value: 56
+// => Key: 'baz' Value: 78
+// => Completed
+```
+
+This is a great alternative to using a much longer form of:
+
+``` js
+var obj = {
+  foo: 42,
+  bar: 56,
+  baz: 78
+};
+
+var source = Observable.from(Object.keys(obj))
+  .map(function (x) { return [x, obj[x]]; });
+```
+
+### `Observable.prototype.retryWhen`
+
+In previous releases of RxJS, for retrying behavior, we had a single operator of `Observable.prototype.retry` which would try running the observable the specified number of times.  This is acceptable behavior for immediate retries, but for more complex scenarios, we want this behavior to be more configurable.  To that end, we have implemented [`Observable.prototype.retryWhen`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/retrywhen.md) which comes from [RxJava](https://github.com/ReactiveX/RxJava).
+
+The `retryWhen` operator is similar to `retry` but decides whether or not to resubscribe to and mirror the source `Observable` by passing the `Error` from the `onError` notification to a function that generates a second `Observable`, and observes its result to determine what to do. If that result is an emitted item, `retryWhen` resubscribes to and mirrors the source and the process repeats; if that result is an `onError` notification, `retryWhen` passes this notification on to its observers and terminates. 
+
+This allows for an eventual back-off strategy to handle failures such as the following:
+
+``` js
+var source = Observable.create(function (o) {
+    console.log('subscribing');
+    o.onError(new Error('always fails'));
+  })
+  .retryWhen(function(attempts) {
+    return attempts
+      .zip(Observable.range(1, 3), function (n, i) { return i; })
+      .flatMap(function(i) { 
+        console.log('delay retry by', i, 'second(s)');
+        return Observable.timer(i * 1000 /*ms*/);
+      });
+  }); 
+
+source.subscribe();
+/*
+subscribing
+delay retry by 1 second(s)
+subscribing
+delay retry by 2 second(s)
+subscribing
+delay retry by 3 second(s)
+subscribing
+*/
+```
+
+Many thanks to @blesh for the implementation!
+
+### `Observable.prototype.withLatestFrom`
+
+RxJS has many ways of combining observable sequences whether it is `zip` which waits for pairs, which could penalize the faster of the observables which produce values.  RxJS also has `combineLatest` which allows you to combine the latest value from each of the observable sequences which allows you to no longer be penalized by a slower observable sequence, instead, you will get each one in turn, as part of the pair.
+
+There may be times, however, when you only want the latest values from the other sequences, produced with the source sequence.  To that end, we have introduced the `Observable.prototype.withLatestFrom` method which merges the specified observable sequences into one observable sequence by using the selector function only when the source observable sequence (the instance) produces an element.
+
+``` js
+/* Have staggering intervals */
+var source1 = Rx.Observable.interval(140)
+    .map(function (i) { return 'First: ' + i; });
+
+var source2 = Rx.Observable.interval(50)
+    .map(function (i) { return 'Second: ' + i; });
+
+// When source1 emits a value, combine it with the latest emission from source2.
+var source = source1.withLatestFrom(
+    source2,
+    function (s1, s2) { return s1 + ', ' + s2; }
+).take(4);
+
+var subscription = source.subscribe(
+    function (x) {
+        console.log('Next: ' + x.toString());
+    },
+    function (err) {
+        console.log('Error: ' + err);
+    },
+    function () {
+        console.log('Completed');
+    });
+
+// => Next: First: 0, Second: 1
+// => Next: First: 1, Second: 4
+// => Next: First: 2, Second: 7
+// => Next: First: 3, Second: 10
+// => Completed
+```
+
+Many thanks to @staltz for the implementation!
+
+## Performance Improvements
+
+RxJS is committed to being as high performance as possible.  To fix some issues, we have reverted the usage of `Function.prototype.bind` which is incredibly slow as of this date.  In addition, we have removed some composition from some operators and implementing them as standalone operators.
+
+The following operators should have much better performance including:
+- `Observable.prototype.concatAll`
+- `Observable.prototype.concatMap`
+- `Observable.prototype.filter`
+- `Observable.prototype.flatMap`
+- `Observable.prototype.map`
+- `Observable.prototype.merge`
+- `Observable.prototype.mergeAll`
+- `Observable.prototype.reduce`
+
+In the coming point releases, we will be continuously striving for better performance.
+
+## Bug Fixes
+
+The following bugs were fixed:
+- #484 - Fix Long Stack Traces with Subjects - @trxcllnt 
+- #485 - Add current time to Immediate Scheduler loop - @trxcllnt 
+
+## Documentation Fixes
+
+As always, we are adding more documentation for RxJS to help you better understand the library and why you should use RxJS versus other libraries, as well as the mapping concepts between the libraries.
+
+Going forward, you will be able to find the RxJS documentation along with all other languages supported on the [reactivex.io](http://reactivex.io/) home page, which is the home for all implementations of Rx.
+
+We'd like to thank the following for submitting bug fixes for our documentation: @scouten, @artemyarulin, @lazaruslarue, @andrewk, @adm72, @eladb, @YuvalZiegler, @jca02266, @erykpiast, @saraid, @paddlefish, @kt3k, and @38elements!  You are what make RxJS so awesome! 
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/852639/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/852639,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.3.23,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.3.23,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.3.23,v2.3.23,False,False
+775536,2014-12-11T13:07:31Z,2014-12-11T18:41:01Z,RxJS version 2.3.22,"This is a significant update from the previous supported release of [v2.3.18](https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.3.18) which contains a number of new pieces.
+
+The major items in this release are:
+- Long Stack Traces Support
+- Tessel Support
+- More Backpressure Operators
+- TypeScript Definitions Updates
+- Documentation and Code Updates
+- More Examples
+
+## Long Stack Traces Support
+
+When dealing with large RxJS applications, debugging and finding where the error occurred can be a difficult operation.  As you chain more and more operators together, the longer the stack trace gets, and the harder it is to find out where things went wrong.  This has been a request from the community for quite some time, so now your wish is our command.  We took inspiration from the [`Q`](https://github.com/kriskowal/q) library from @kriskowal which helped us get started.
+
+RxJS now comes with optional support for “long stack traces,” wherein the stack property of Error from `onError` calls is rewritten to be traced along asynchronous jumps instead of stopping at the most recent one. As an example:
+
+``` js
+var Rx = require('rx');
+
+var source = Rx.Observable.range(0, 100)
+  .timestamp()
+  .map(function (x) {
+    if (x.value > 98) throw new Error();
+    return x;
+  });
+
+source.subscribeOnError(
+  function (err) {
+    console.log(err.stack);
+  });
+```
+
+The error stack easily becomes unreadable and hard to find where the error actually occurred:
+
+``` bash
+$ node example.js
+
+  Error
+  at C:\GitHub\example.js:6:29
+  at AnonymousObserver._onNext (C:\GitHub\rxjs\dist\rx.all.js:4013:31)
+  at AnonymousObserver.Rx.AnonymousObserver.AnonymousObserver.next (C:\GitHub\rxjs\dist\rx.all.js:1863:12)
+  at AnonymousObserver.Rx.internals.AbstractObserver.AbstractObserver.onNext (C:\GitHub\rxjs\dist\rx.all.js:1795:35)
+  at AutoDetachObserverPrototype.next (C:\GitHub\rxjs\dist\rx.all.js:9226:23)
+  at AutoDetachObserver.Rx.internals.AbstractObserver.AbstractObserver.onNext (C:\GitHub\rxjs\dist\rx.all.js:1795:35)
+  at AnonymousObserver._onNext (C:\GitHub\rxjs\dist\rx.all.js:4018:18)
+  at AnonymousObserver.Rx.AnonymousObserver.AnonymousObserver.next (C:\GitHub\rxjs\dist\rx.all.js:1863:12)
+  at AnonymousObserver.Rx.internals.AbstractObserver.AbstractObserver.onNext (C:\GitHub\rxjs\dist\rx.all.js:1795:35)
+  at AutoDetachObserverPrototype.next (C:\GitHub\rxjs\dist\rx.all.js:9226:23)
+```
+
+Instead, we can turn on this feature by setting the following flag:
+
+``` js
+Rx.config.longStackSupport = true;
+```
+
+When running the same example again with the flag set at the top, our stack trace looks much nicer and indicates exactly where the error occurred:
+
+``` js
+$ node example.js
+  Error
+  at C:\GitHub\example.js:6:29
+  From previous event:
+  at Object.<anonymous> (C:\GitHub\example.js:3:28)
+  From previous event:
+  at Object.<anonymous> (C:\GitHub\example.js:4:4)
+  From previous event:
+  at Object.<anonymous> (C:\GitHub\example.js:5:4)
+```
+
+As you'll see our error did occur exactly at line 6 with throwing an error and only shows the user code in this point.  This is very helpful for debugging, as otherwise you end up getting only the first line, plus a bunch of RxJS internals, with no sign of where the operation started.
+
+This feature does come with a serious performance and memory overhead, however, If you're working with lots of RxJS code, or trying to scale a server to many users, you should probably keep it off. In development, this is perfectly fine for finding those pesky errors!
+
+In a future release, we may also release support for a node.js environment variable so that you can set it and unset it fairly easily.
+
+## Tessel Support
+
+RxJS has a mission to be supported on every JavaScript platform, ranging from node.js, to the browser, in the OS runtime, and even directly on hardware.  To that point, we aimed to get RxJS supported on the [Tessel](http://tessel.io) board.  There were several issues with RxJS that had to be addressed due to the following [Tessel Runtime](https://github.com/tessel/runtime/) issues.
+- [Issue 682: ES3 Object#propertyIsEnumerable missing](https://github.com/tessel/runtime/issues/682)
+- [Issue 658: Lua has a hard limit on 200 local variables](https://github.com/tessel/runtime/issues/658)
+
+To overcome Issue 682, we implemented a naive version of `Object.prototype.propertyIsEnumerable` if it is missing.  This also will overcome a bug in Safari 2 as well.  In order to solve Issue 658, you can only use `rx.lite` or `rx.lite.compat` directly with the Tessel at this time of the release.  
+
+We now ship the [blinky example](https://github.com/Reactive-Extensions/RxJS/blob/master/examples/tessel/blinky.js) for the Tessel using RxJS in our [examples folder](https://github.com/Reactive-Extensions/RxJS/tree/master/examples).
+
+``` js
+// Run with ""tessel run blinky.js""
+
+// Import the interface to Tessel hardware
+var tessel = require('tessel');
+
+// Must use lite compat due to https://github.com/tessel/runtime/issues/658
+var Observable = require('../../dist/rx.lite').Observable;
+
+// Set the led pins as outputs with initial states
+// Truthy initial state sets the pin high
+// Falsy sets it low.
+var led1 = tessel.led[0].output(1);
+var led2 = tessel.led[1].output(0);
+
+Observable.interval(100)
+  .subscribe(function () {
+    console.log('first blinks');
+    led1.toggle();
+  });
+
+Observable.interval(150)
+  .subscribe(function () {
+    console.log('second blinks');
+    led2.toggle();
+  });
+
+```
+
+We hope those issues get resolved soon so that you can use the entire RxJS.  If you wish, you could also create a custom build of RxJS as well with fewer methods which would solve the issues.
+
+## More Backpressure Operators
+
+In previous releases of RxJS, we have implemented some basic backpressure operators, whether lossy or lossless through `pausable`, `pausableBuffered` and `controlled`.  In this release we took the idea of the `controlled` operator even further with two further specializations with ""Stop and Wait"" and ""Sliding Window"".  Much of this work is derived work from [Johann Laanstra](https://github.com/jlaanstra/) in his [BackPressureRx](https://github.com/jlaanstra/BackpressureRx/) project.
+
+### Stop-and-wait
+
+The most simple flow control algorithm is [stop-and-wait](http://en.wikipedia.org/wiki/Stop-and-wait_ARQ). It works by simply producing a value and wait until is has been processed completely. Stop-and-wait is a special case of the [Sliding Window protocol](http://en.wikipedia.org/wiki/Sliding_window_protocol), which will be discussed later, where the window has size.
+
+In the implementations of these flow control algortihms for RxJS we don’t have to take into account acknowledgments and damage of values, This allows us to simplify stop-and-wait by removing the need for an Automatic Repeat reQuest (ARQ) mechanism and CRC checks on the values.
+
+ works by default similar to stop-and-wait. The `onNext` call blocks until the value has been processed by the chain or until the value gets scheduled on a different scheduler. If there or no switches between scheduler in a chain, this means there will always be a single value in the chain at any moment. Using  the `controlled` operator we can use the increased flexibility to also make he case with different schedulers work, by requesting only one value at a time.
+
+Stop-and-wait has been implemented as the `stopAndWait` combinator on a `ControlledObservable`. It represents the most basic synchronous case, where a thread starts requesting items and those items are pushed on that same thread.
+
+``` js
+StopAndWaitObserver.prototype.next = function (value) {
+  this.observer.onNext(value);
+
+  var self = this;
+  Rx.Scheduler.timeout.schedule(function () {
+    self.observable.source.request(1);
+  });
+};
+```
+
+When an observer subscribes to the `stopAndWait`, it subscribes to the underlying `ControlledObservable` and attaches itself as the controller. It starts by requesting a single value and then every time a value has come to its `onNext` method, it asynchronously requests a new value. Multiple subscribers can be attached but there will only be a single controller active. The logic to do this can be seen in the `subscribe` method. As soon as all subscribers have been detached, the controller will also be detached. As you can see in the above code the observer is wrapped in a `StopAndWaitObserver` class. This class request the new value as soon as the current one has been processed by the queue, which can be seen in the `next` method.
+
+An example of this in action is the following:
+
+``` js
+var source = Rx.Observable.interval(1000)
+  .timestamp()
+  .controlled();
+
+source.stopAndWait().subscribe(function (x) {
+  // Do something with the value
+});
+```
+
+### Sliding Window Protocol
+
+A more advanced flow control algorithm is a [Sliding Window](http://en.wikipedia.org/wiki/Sliding_window_protocol). Sliding Window is a method of flow control in which a receiver gives a transmitter permission to transmit data until a window is full. When the window is full, the transmitter must stop transmitting until the receiver advertises a larger window. Sliding Window is the protocol used by TCP to do flow control. For the Sliding Window protocol we can perform the same optimizations as for the Stop-and-Wait protocol. RxJS does not have to take care of damaged or lost values.
+
+We on the Rx team created a sliding window combinator based on the code for `stopAndWait` called `windowed`. RxJS wants to request a new value as soon as there is a slot available in the window, but instead of requesting a single value to begin with, RxJS requests multiple at the start, and thereby defining the window size that will be used by the observable. By using `windowed(1)`, will gives us the stop-and-wait algorithm, which now could be simply implemented using the `windowed` operator.
+
+``` js
+WindowedObserver.prototype.next = function (value) {
+  this.observer.onNext(value);
+
+  this.received = ++this.received % this.observable.windowSize;
+  if (this.received === 0) {
+    var self = this;
+    Rx.Scheduler.timeout.schedule(function () {
+      self.observable.source.request(self.observable.windowSize);
+    });
+  }
+};
+```
+
+The code for the `WindowedObservable` is almost identical to the `StopAndWaitObservable` in that the only difference is the window size.  Now we can use this to request 10 at a time in our sliding window.
+
+``` js
+var source = Rx.Observable.interval(1000)
+  .timestamp()
+  .controlled();
+
+source.windowed(10).subscribe(function (x) {
+  // Do something with the value
+});
+```
+
+## TypeScript Definition Updates
+
+The community is to thank for the TypeScript bindings that ship with RxJS.  We on the RxJS team have a lot of gratitude towards @Igorbek, @PublicParadise, @danko-d and others who have helped us tremendously.  The type definition files should be up to date modulo the new changes with the backpressure operators and perhaps some of the methods such as `flatMap`/`selectMany` and `concatMap`/`selectConcat` accepting Iterables as return values, like `Array`, `Set`, or `Map`.
+
+## Documentation and Code Updates
+
+Documentation has also been improved in this release, many of it adding more examples for each project type, whether it is using React or some other framework.  
+
+For example, we now have better React frameworks that work with RxJS such as:
+- [Rx-React](https://github.com/fdecampredon/rx-react)
+- [Rx-Flux](https://github.com/fdecampredon/rx-flux)
+
+In addition, we are continuing to add more documentation to [differentiate RxJS from other libraries](https://github.com/Reactive-Extensions/RxJS/tree/master/doc#mapping-rxjs-from-different-libraries).  For example, here is a start on [""Why RxJS versus Bacon.js""](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/mapping/bacon.js/whyrx.md) and will be adding more technical differences mapping between the two libraries soon, as well as others such as async.js, highland.js and others.
+
+For documentation fixes, we'd like to thank the following for their efforts: @jayphelps, @juniorz, @scouten,  @andrewsf, @sergi, @dziemid, @safareli, @mathbruyen, @RodEsp, @mmv, @jpmossin, @ReubenBond, @sebagomez and many others.
+
+For code fixes, we'd like to thank the following for their hard work: @patrickkamin, @lukegb, @bparadie among others. 
+
+## More Examples
+
+One thing we pride ourselves on is [our great set of examples](https://github.com/Reactive-Extensions/RxJS/tree/master/examples) on how to get started with RxJS.  
+
+The following examples have been added:
+- [Backpressure Example](https://github.com/Reactive-Extensions/RxJS/tree/master/examples/backpressure)
+- [Mario Elm Example Ported to RxJS](https://github.com/Reactive-Extensions/RxJS/tree/master/examples/mario) - Thanks @fudini
+- [Stock Server Price Spike Example](https://github.com/Reactive-Extensions/RxJS/tree/master/examples/stockserver)
+- [Tessel Blinky Example](https://github.com/Reactive-Extensions/RxJS/blob/master/examples/tessel/blinky.js)
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/775536/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/775536,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.3.22,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.3.22,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.3.22,v2.3.22,False,False
+707457,2014-11-15T15:17:06Z,2014-11-16T01:20:29Z,RxJS version 2.3.18,"This is a minor update from version [2.3.14](https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.3.14).  This release will probably be one of the last in the version 2.3 series before we start on the more ambitious plans for 2.4 including mirroring the `lift` based approach of RxJava, as well as backpressure built into the subscription level instead of the operator level, as well as plans for expression tree parsing.
+
+In coming releases, we are going to try and get rid of some of our technical debt including some of our poorly named operators such as `throttle` which we discuss below as well as other ones such as `fromArray` instead of using `from`.
+
+The major items for this release are:
+- Backpressure Fixes
+- Debounce and Throttle Changes
+- Scheduler Changes
+- Testing with Promises
+- JSCS and Google Coding Standards Enforcement
+- Improved Documentation
+
+## Backpressure Fixes
+
+There was an issue with a prior release of the [`pausableBuffered`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/pausablebuffered.md) operator which was noted in issue  #349 where if the stream ended before the stream resumed, data would have been automatically pushed anyhow.  In addition, there were issues where errors were immediately processed regardless of whether the stream was in a paused state.  Those two bugs have now been fixed and can be verified with these test cases. 
+
+**Success Case**
+
+``` js
+  var scheduler = new TestScheduler();
+
+  var results = scheduler.createObserver();
+
+  var xs = scheduler.createHotObservable(
+    onNext(150, 1),
+    onNext(210, 2),
+    onNext(230, 3),
+    onNext(301, 4),
+    onNext(350, 5),
+    onNext(399, 6),
+    onNext(450, 7),
+    onNext(470, 8),
+    onCompleted(500)
+  );
+
+  var controller = scheduler.createHotObservable(
+    onNext(201, true),
+    onNext(300, false),
+    onNext(600, true)
+  );
+
+  var results = scheduler.startWithCreate(function () {
+    return xs.pausableBuffered(controller);
+  });
+
+  results.messages.assertEqual(
+    onNext(210, 2),
+    onNext(230, 3),
+    onNext(600, 4),
+    onNext(600, 5),
+    onNext(600, 6),
+    onNext(600, 7),
+    onNext(600, 8),
+    onCompleted(600)
+  );
+```
+
+**Error Case**
+
+``` js
+var error = new Error();
+
+var scheduler = new TestScheduler();
+
+var results = scheduler.createObserver();
+
+var xs = scheduler.createHotObservable(
+  onNext(150, 1),
+  onNext(210, 2),
+  onNext(230, 3),
+  onNext(301, 4),
+  onNext(350, 5),
+  onNext(399, 6),
+  onNext(450, 7),
+  onNext(470, 8),
+  onError(500, error)
+);
+
+var controller = scheduler.createHotObservable(
+  onNext(201, true),
+  onNext(300, false),
+  onNext(600, true)
+);
+
+var results = scheduler.startWithCreate(function () {
+  return xs.pausableBuffered(controller);
+});
+
+results.messages.assertEqual(
+  onNext(210, 2),
+  onNext(230, 3),
+  onNext(600, 4),
+  onNext(600, 5),
+  onNext(600, 6),
+  onNext(600, 7),
+  onNext(600, 8),
+  onError(600, error)
+);
+```
+
+As you will note, the values are yielded after the sequence had already ended and instead were yielded when the controller resumed. 
+
+## Debounce and Throttle Changes
+
+There has been a bit of confusion around some of the operators in RxJS such as `throttle`.  Our version of `throttle` acted instead of a throttling operator, it acted more as a `debounce` operator.  RxJava, while designing their APIs came across this inconsistency   This was noted in issue #352 where we would deprecate `throttle` in favor of [`debounce`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/debounce.md) or [`throttleWithTimeout`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/debounce.md).  Note that in upcoming versions, warnings will occur to stop using `throttle`.  We also introduced [`throttleFirst`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/throttlefirst.md) which acts as a proper throttle is expected to do.  Thanks to @L8D for the help!
+
+## Scheduler Changes
+
+[Node.js](http://nodejs.org) Recently made some changes in the 10.x release where warnings would occur if the use of `process.nextTick` were used for a recursive function call.  This caused issues in any number of our time-based operators as noted in issue #344. To fix this, we simply changed the order to use `setImmediate` if available in Node.js, else default back to `process.nextTick` for older versions in the `Rx.Scheduler.timeout`.
+
+## Testing with Promises
+
+RxJS prides itself on deterministic testing with virtual time.  As RxJS has evolved, we have added Promise support to many of our operators as noted in our [Bridging to Promises](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/promises.md) documentation.  This was addressed in issue #331 where you have the ability to create both a resolved and rejected Promise which is synchronous and records in virtual time via the `createResolvedPromise` and `createRejectedPromise` on the `Rx.TestScheduler` class.
+
+Now you can test using these Promises for exact timing information!
+
+**Resolved Promise**
+
+``` js
+var scheduler = new TestScheduler();
+
+var xs = scheduler.createResolvedPromise(201, 1);
+
+var results = scheduler.startWithCreate(function () {
+  return Observable.fromPromise(xs);
+});
+
+results.messages.assertEqual(
+  onNext(201, 1),
+  onCompleted(201)
+);
+```
+
+**Rejected Promise**
+
+``` js
+var error = new Error();
+
+var scheduler = new TestScheduler();
+
+var xs = scheduler.createRejectedPromise(201, error);
+
+var results = scheduler.startWithCreate(function () {
+  return Observable.fromPromise(xs);
+});
+
+results.messages.assertEqual(
+  onError(201, error)
+);
+```
+
+This now makes testing when using Promises in your API a snap!
+
+## JSCS and Google Coding Standards Enforcement
+
+RxJS has fairly rigid coding guidelines as outlined in our [Design Guidelines](https://github.com/Reactive-Extensions/RxJS/tree/master/doc/designguidelines) and our [Contribution Guidelines](https://github.com/Reactive-Extensions/RxJS/tree/master/doc/contributing).  To enforce this, we have added [JSCS](https://github.com/jscs-dev/node-jscs)  to our Grunt-based build system to include the rules that Google uses for their [JavaScript Style Guide](https://github.com/jscs-dev/node-jscs/blob/master/presets/google.json) as noted in issue #359.  Thanks to @hzoo for making this happen.
+
+## Improved Documentation
+
+Documentation has been one of the biggest focus areas for learning RxJS.  To that end, we've added a number of documents that are helpful in learning RxJS including:
+- How we build RxJS
+  - [Design Guidelines](https://github.com/Reactive-Extensions/RxJS/tree/master/doc/designguidelines)
+  - [Contribution Guidelines](https://github.com/Reactive-Extensions/RxJS/tree/master/doc/contributing)
+- Which Operator should I use?
+  - [Creation Operators](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/which-static.md)
+  - [Instance Operators](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/which-instance.md)
+- Getting to know RxJS
+  - [Bridging to Promises](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/promises.md)
+  - [Generators and Observable Sequences](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/generators.md)
+  - [Backpressure and Observable Sequences](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/backpressure.md)
+
+Many thanks to @trxcllnt for the help on the which operators to use.
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/707457/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/707457,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.3.18,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.3.18,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.3.18,v2.3.18,False,False
+650093,2014-10-23T03:09:27Z,2014-10-24T00:27:23Z,RxJS version 2.3.14,"This release of RxJS is a minor release which followed 2.3.13, which was only a fix for `Rx.spawn` to ensure it was thoroughly tested.  
+
+This release contained the following:
+- Transducers Support
+- Adding Iterable Support to `flatMap`/`seleectMany` and `concatMap` /`selectConcat`
+
+## Transducers Support
+
+Much like Language Integrated Query (LINQ), Transducers are composable algorithmic transformations. They, like LINQ, are independent from the context of their input and output sources and specify only the essence of the transformation in terms of an individual element. Because transducers are decoupled from input or output sources, they can be used in many different processes - collections, streams, observables, etc. Transducers compose directly, without awareness of input or creation of intermediate aggregates.  There are two major libraries currently out there, Cognitect's [`transduce.js`](https://github.com/cognitect-labs/transducers-js) and James Long's [`transduce-js`](https://github.com/jlongster/transducers.js) which are both great for getting high performance over large amounts of data.  Because it is collection type neutral, it is a perfect fit for RxJS to do transformations over large collections.
+
+The word `transduce` is just a combination of `transform` and `reduce`. The reduce function is the base transformation; any other transformation can be expressed in terms of it (`map`, `filter`, etc).
+
+``` js
+var arr = [1, 2, 3, 4];
+
+arr.reduce(
+  function(result, x) { return result.concat(x + 1); }, []);
+
+// => [ 2, 3, 4, 5 ]
+```
+
+Using transducers, we can model the following behavior while breaking apart the map aspect of adding 1 to the concat operation, adding the seed and then the ""collection"" to transduce.
+
+``` js
+var arr = [1, 2, 3, 4];
+
+function increment(x) { return x + 1; }
+function concatItem(acc, x) { return acc.concat(x); }
+
+transduce(map(increment), concatItem, [], arr);
+
+// => [ 2, 3, 4, 5 ]
+```
+
+Using Cognitect's [`transduce.js`](https://github.com/cognitect-labs/transducers-js) library, we can easily accomplish what we had above.  
+
+``` js
+var t = transducers;
+
+var arr = [1, 2, 3, 4];
+
+function increment(x) { return x + 1; }
+
+into([], t.comp(t.map(increment)), arr);
+
+// => [ 2, 3, 4, 5 ]
+```
+
+We can go a step further and add filtering as well to get only even values.
+
+``` js
+var t = transducers;
+
+var arr = [1, 2, 3, 4];
+
+function increment(x) { return x + 1; }
+function isEven(x) { return x % 2 === 0; }
+
+into([], t.comp(t.map(increment), t.filter(isEven)), arr);
+
+// => [ 2, 4 ]
+```
+
+Since it works so well using Arrays, there's no reason why it cannot work for Observable sequences as well.  To that end, we have introduced the [`transduce`](https://github.com/Reactive-Extensions/RxJS/tree/master/doc/api/core/operators/transduce.md) method which acts exactly like it does for Arrays, but for Observable sequences.  Once again, let's go over the above example, this time using an Observable sequence.
+
+``` js
+var t = transducers;
+
+var source = Rx.Observable.range(1, 4);
+
+function increment(x) { return x + 1; }
+function isEven(x) { return x % 2 === 0; }
+
+var transduced = source.transduce(t.comp(t.map(increment), t.filter(isEven)));
+
+transduced.subscribe(
+  function (x) { console.log('Next: %s', x); },
+  function (e) { console.log('Error: %s', e); },
+  function ()  { console.log('Completed'); });
+
+// => Next: 2
+// => Next: 4
+// => Completed
+```
+
+Note that this above example also works the same with `transducers.js` as well with little to no modification.  This example will in fact work faster than the traditional LINQ style (as of now) which most use currently.
+
+``` js
+var source = Rx.Observable.range(1, 4);
+
+function increment(x) { return x + 1; }
+function isEven(x) { return x % 2 === 0; }
+
+var transduced = source.map(increment).filter(isEven);
+
+transduced.subscribe(
+  function (x) { console.log('Next: %s', x); },
+  function (e) { console.log('Error: %s', e); },
+  function ()  { console.log('Completed'); });
+
+// => Next: 2
+// => Next: 4
+// => Completed
+```
+
+This opens up a wide new set of possibilities making RxJS even faster over large collections with no intermediate Observable sequences.
+
+## Iterable Support for `flatMap`/`seleectMany` and `concatMap` /`selectConcat`
+
+In order to maintain parity with the Reactive Extensions for .NET, RxJS has now added support for Arrays and ES6 iterables (Map, Set, Generator).  So now, it is possible to do the following:
+
+``` js
+/* Using an array */
+Rx.Observable.of(1,2,3)
+  .flatMap(
+    function (x, i) { return [x,i]; },
+    function (x, y, ix, iy) { return x + y + ix + iy; }
+  );
+
+var subscription = source.subscribe(
+    function (x) {
+        console.log('Next: ' + x);
+    },
+    function (err) {
+        console.log('Error: ' + err);
+    },
+    function () {
+        console.log('Completed');
+    });
+
+// => Next: 2
+// => Next: 2
+// => Next: 5
+// => Next: 5
+// => Next: 8
+// => Next: 8
+// => Completed
+```
+
+We can also have that for a Set as well:
+
+```
+/* Using an array */
+Rx.Observable.of(1,2,3)
+  .flatMap(
+    function (x, i) { return new Set[x,i]; },
+    function (x, y, ix, iy) { return x + y + ix + iy; }
+  );
+
+var subscription = source.subscribe(
+    function (x) {
+        console.log('Next: ' + x);
+    },
+    function (err) {
+        console.log('Error: ' + err);
+    },
+    function () {
+        console.log('Completed');
+    });
+
+// => Next: 2
+// => Next: 2
+// => Next: 5
+// => Next: 5
+// => Next: 8
+// => Next: 8
+// => Completed
+```
+
+And finally, we could also have it for an ES6 generator as well:
+
+``` js
+/* Using an array */
+Rx.Observable.of(1,2,3)
+  .flatMap(
+    function (x, i) { return function* () { yield x; yield i; }(); },,
+    function (x, y, ix, iy) { return x + y + ix + iy; }
+  );
+
+var subscription = source.subscribe(
+    function (x) {
+        console.log('Next: ' + x);
+    },
+    function (err) {
+        console.log('Error: ' + err);
+    },
+    function () {
+        console.log('Completed');
+    });
+
+// => Next: 2
+// => Next: 2
+// => Next: 5
+// => Next: 5
+// => Next: 8
+// => Next: 8
+// => Completed
+```
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/650093/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/650093,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.3.14,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.3.14,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.3.14,v2.3.14,False,False
+494760,2014-09-30T23:00:19Z,2014-10-03T23:40:32Z,RxJS Version 2.3,"This is the first stable release of RxJS version 2.3.  This has been a long time in the making and thank you to the community for help making this happen.  There are a lot of exciting things in store for RxJS in this release including a custom build system, a commitment to standards, as well as handy things such as smaller Rx-Lite builds.
+
+There are many changes in this release including:
+- A Commitment to Standards
+- Custom Builds
+- A lighter Lite
+- New Operators
+- Operator Changes
+
+## A Commitment to Standards
+
+We on the RxJS team are committed to standards put out by TC39 and the JavaScript community.  We will try to add features to take advantage of browser and runtime features as they become available, allowing RxJS to really shine!
+
+### Promises Promises
+
+For example, you will find many operators that gladly accept `Promise` objects as parameters which are then converted to RxJS `Observable` objects.  RxJS will use the native `Promise` object if present in the browser, but can also be configured to use your own library as long as it follows the ES6 standard for construction.  Such libraries include RSVP, Q, when.js, and more.  
+
+To specify which promise library to use, you can specify it in the `Rx.config.Promise` property.  Note that this is only used if you use `Rx.Observable.prototype.toPromise` operator.
+
+Some of the operators that support promises natively include:
+- `Rx.Observable.amb` | `Rx.Observable.prototype.amb`
+- `Rx.Observable.case`
+- `Rx.Observable.catch` | `Rx.Observable.prototype.catch`
+- `Rx.Observable.combineLatest` | `Rx.Observable.prototype.combineLatest`
+- `Rx.Observable.concat` | `Rx.Observable.prototype.concat`
+- `Rx.Observable.prototype.concatMap`
+- `Rx.Observable.prototype.concatMapObserver`
+- `Rx.Observable.defer`
+- `Rx.Observable.prototype.flatMap`
+- `Rx.Observable.prototype.flatMapLatest`
+- `Rx.Observable.forkJoin` | `Rx.Observable.prototype.forkJoin`
+- `Rx.Observable.if`
+- `Rx.Observable.merge`
+- `Rx.Observable.prototype.mergeAll`
+- `Rx.Observable.onErrorResumeNext` | `Rx.Observable.prototype.onErrorResumeNext`
+- `Rx.Observable.prototype.selectMany`
+- `Rx.Observable.prototype.selectSwitch`
+- `Rx.Observable.prototype.sequenceEqual`
+- `Rx.Observable.prototype.skipUntil`
+- `Rx.Observable.startAsync`
+- `Rx.Observable.prototype.switch`
+- `Rx.Observable.prototype.takeUntil`
+- `Rx.Observable.prototype.throttleWithSelector`
+- `Rx.Observable.prototype.timeoutWithSelector`
+- `Rx.Observable.while`
+- `Rx.Observable.prototype.window`
+- `Rx.Observable.zip` | `Rx.Observable.prototype.zip`
+
+### Array Extras Redux
+
+In addition, we have implemented a number of operators on `Observable` to mimic what is coming in ES Next for Arrays including:
+- `Rx.Observable.from`
+- `Rx.Observable.of`
+- `Rx.Observable.prototype.contains`
+- `Rx.Observable.prototype.indexOf`
+
+### Maps and Sets
+
+We also want to support the new data structures coming in a browser near you.  Consider that we already have `Rx.Observable.prototype.toArray`, we will now support converting to a `Set` or `Map` if they are available in your environment via:
+- `Rx.Observable.prototype.toMap`
+- `Rx.Observable.prototype.toSet`
+
+### Generators Support
+
+But, we're not done yet, because now we also have support for generators with `Rx.Observable.spawn` which allows you to use RxJS in an async/await style in addition to Promises and callbacks.
+
+``` js
+var Rx = require('rx');
+var request = require('request').request;
+var get = Rx.Observable.fromNodeCallback(request);
+
+Rx.spawn(function* () {
+  var data;
+  try {
+    var data = yield get('http://bing.com').retry(3);
+  } catch (e) {
+    console.log('Error %s', e);
+  } 
+
+  console.log(data);
+});
+```
+
+You can also use generators with `Rx.Observable.from` as well, for example this Fibonacci server.
+
+``` js
+function* fibonacci(){
+  var fn1 = 1;
+  var fn2 = 1;
+  while (1){
+    var current = fn2;
+    fn2 = fn1;
+    fn1 = fn1 + current;
+    yield current;
+  }
+}
+
+Rx.Observable.from(fibonacci())
+  .take(10)
+  .subscribe(function (x) {
+    console.log('Value: %s', x);
+  });
+
+//=> Value: 1
+//=> Value: 1
+//=> Value: 2
+//=> Value: 3
+//=> Value: 5
+//=> Value: 8
+//=> Value: 13
+//=> Value: 21
+//=> Value: 34
+//=> Value: 55
+```
+
+And we're just getting started, with looking at `Object.observe` and other places where RxJS can make your development experience better.
+
+## Custom Builds
+
+Custom builds are an exciting new piece of RxJS to allow you to include the operators you wish.  We have many files that contain many operators, however, it may come down to only wanting a handful of them to keep the size of your file to a minimum.  With the [`rx-cli`](https://www.npmjs.org/package/rx-cli) project, you have that ability to specify methods, either directly in the command prompt or in a file, and also specify whether you want to have a compatibility build to handle older browsers.  
+
+For example, you can specify you with only just a few operators to be included.
+
+``` bash
+$ {sudo} npm install -g rx-cli
+$ rx --compat --methods map,flatmap,flatmaplatest,takeuntil,fromevent,filter 
+```
+
+This is still an early version and feedback is welcome!
+
+## A Liter Lite`
+
+One main goal of RxJS to make the most used operators easily available in a smaller sized package, as in `rx.lite.js`.  In this release, we have made `rx.lite.js` even smaller, down to 9kb gzipped.
+
+To that end, the following time-bsed operators have been removed from `rx.lite.js` entirely:
+- `Rx.Observable.prototype.delaySubscription`
+- `Rx.Observable.prototype.delayWithSelector`
+- `Rx.Observable.prototype.skipLastWithTime`
+- `Rx.Observable.prototype.skipUntilWithTime`
+- `Rx.Observable.prototype.takeLastWithTime`
+- `Rx.Observable.prototype.takeLastBufferWithTime`
+- `Rx.Observable.prototype.takeUntilWithTime`
+- `Rx.Observable.prototype.throttleWithSelector`
+- `Rx.Observable.prototype.timeoutWithSelector`
+
+If you still need those operators, it's very easy to just pull in `rx.time.js` which has all of those operators.  In addition, anything that was in `rx.js` that is not in `rx.lite.js` is kept in `rx.lite.extras.js` to minimize size once again.
+
+## New Operators
+
+RxJS added a few new operators in this release to keep parity with RxJava and Rx .NET.  
+
+There are the aforementioned operators from the Array#extras and ES Next features including:
+- `Rx.Observable.from`
+- `Rx.Observable.of`
+- `Rx.Observable.prototype.contains`
+- `Rx.Observable.prototype.indexOf`
+
+There are other new operators that were introduced to bring compatibility with the Reactive Extensions for .NET:
+- [`Observable.selectManyObserver`/`Observable.flatMapObserver`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/flatmapobserver.md)
+- [`Observable.selectConcatObserver`/`Observable.concatMapObserver`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/concatmapobserver.md)
+
+## Operator Changes
+
+There were also a number of changes that were introduced to operators that altered their behavior from version 2.2.
+
+### Node.js Support
+
+Node.js support grew during this release to further support the new Streams.  To that end, we made the following changes:
+- Allowed `objectMode` to be set so that items are pushed in their native format instead of in a `Buffer` or `String` when using `Rx.Node.writeToStream`
+- Fixed `Rx.Node.fromStream` so that is uses the 'end' event by default to signify the end of a stream, but allows to be overridden.
+- Created the following toStream shortcuts to support all streams
+  - `Rx.Node.fromReadableStream`
+  - `Rx.Node.fromWritableStream`
+  - `Rx.Node.fromTransformStream`
+
+### `Rx.Observable.fromEvent` changes
+
+There were a number of changes in how `Rx.Observable.fromEvent` worked.  We wanted to ensure that `fromEvent` was as flexible as possible to utilize the framework you were already using, but also, to use just plain old events just in case.
+
+First off, we added support for Backbone and Backbone Marionette which then brings us up to supporting the following libraries natively:
+- Angular.js - `angular.element.on` and `angular.element.off`
+- Backbone and Marionette - binds to `element.addListener` and `element.removeListener`
+- Ember - binds to `Ember.addListener` and `Ember.removeListener`
+- jQuery - binds to `jQuery.fn.on` and `jQuery.fn.off`
+- Zepto.js - binds to `Zepto.fn.on` and `Zepto.fn.off`
+
+Although we support using these events if they are present, we also offer a way to opt out and only use DOM or Node.js specific events only.  By setting the `Rx.config.useNativeEvents` flag to `true`, this will only use native DOM events or in Node.js if you're using Node. 
+
+``` js
+Rx.config.useNativeEvents = true;
+
+var mousemove = Rx.Observable.fromEvent(document, 'mousemove');
+
+// Note since jQuery unwraps, this is stil supported
+var mousemove = Rx.Observable.fromEvent($document, 'mousemove');
+```
+
+### Renaming of `Rx.Observable.prototype.then`
+
+Libraries that use Promises typically do a check to see whether it is a promise by doing the following:
+
+``` js
+function isPromise(p) { 
+  return p && p.then && typeof p.then === 'function';
+}
+```
+
+The problem with that is that RxJS also had a `then` method which caused the function to return true, although the RxJS `then` has nothing to do with Promises, and instead has to deal with join patterns/join calculus.  In order to prevent collision with Promise libraries, we have renamed `Rx.Observable.prototype.then` to `Rx.Observable.prototype.thenDo` so there should be no more false positives when it comes to checking whether an object is a Promise.
+
+### Moving Operators
+
+Another change was moving some operators to a different file to keep the core size of `rx.js` smaller.  This includes moving `Rx.Observable.prototype.groupBy` and `Rx.Observable.prototype.groupByUntil` to `rx.coincidence.js` to go along with other coincidence operators such as `groupJoin`, `join`, `buffer` and `window`.
+
+### Changing Method signatures
+
+There were a few changes to some method signatures as well due to feedback from the community and looking at its usage.  This shouldn't affect many people as the changes are very slight.  In fact, you may not notice them at all.
+
+### Callback Changes
+
+The first such change was to remove the schedulers required from `Rx.Observable.fromCallback` and `Rx.Observable.fromNodeCallback`.  The reason is that the concurrency is already handled by the callback, there is no need to introduce another layer of concurrency.
+
+Below is the old version which had schedulers as a parameter.
+
+``` js
+Rx.Observable.fromCallback = function (func, scheduler, context, selector) {
+Rx.Observable.fromNodeCallback = function (func, scheduler, context, selector) {
+```
+
+And here is the updated version which removes the schedulers.
+
+``` js
+Rx.Observable.fromCallback = function (func, context, selector) {
+Rx.Observable.fromNodeCallback = function (func, context, selector) {
+```
+
+Now you can easily use the callback functions such as:
+
+``` js
+var $elem = $('#elem');
+var fadeIn = Rx.Observable.fromCallback($elem.fadeIn, $elem)(1000);
+```
+
+### Start and ToAsync Changes
+
+There was another change of ordering of parameters for a couple of methods `Rx.Observable.start` and `Rx.Observable.toAsync` where it made the API a bit nicer.  Before, the scheduler, which was usually set by default, was the second parameter, and was moved to the third parameter as it was purely optional.  The context was instead moved to the second parameter as it was more likely to be used.
+
+Below is the old version which had the context third and scheduler second.
+
+``` js
+Rx.Observable.start = function (func, scheduler, context) {
+Rx.Observable.toAsync = function (func, scheduler, context) {
+```
+
+Now the last two parameters have been reversed.
+
+``` js
+Rx.Observable.start = function (func, context, scheduler) {
+Rx.Observable.toAsync = function (func, context, scheduler) {
+```
+
+This allows for much smoother behavior when a context is needed.
+
+``` js
+function logMessage(msg) {
+  this.log('Message: %s', msg);
+}
+
+var asyncLog = Rx.Observable.toAsync(logMessage, console);
+
+asyncLog('foobar').subscribe();
+// => Message: foobar
+```
+
+## Conclusion
+
+We hope you enjoy these new and changed features of RxJS.  We'd love your feedback by creating issues for us, pull requests and so forth.  Documentation, tutorials and other things welcome!
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/494760/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/494760,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.3.12,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.3.12,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.3.12,v2.3.12,False,False
+425364,2014-07-11T22:23:40Z,2014-07-11T22:44:32Z,Reactive Extensions for JavaScript (RxJS) version 2.2.28,"Minor update from previous versions to include the following:
+
+## New Features
+- Added `Rx.Observable.of` to match `Array.of`
+
+### `Rx.Observable.of`
+
+To match the semantics of ES6 Arrays, we have added [`Rx.Observable.of`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableofargs) and [`Rx.Observable.ofWithScheduler`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservablewithschedulerscheduler-args) to match the ES6 proposal of [`Array.of`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/of).  The latter is required for scheduling purposes if you wish to swap a scheduler for the default scheduler.
+
+Below is an example of its usage:
+
+``` js
+var source = Rx.Observable.of(1,2,3);
+
+var subscription = source.subscribe(
+    function (x) {
+        console.log('Next: ' + x);
+    },
+    function (err) {
+        console.log('Error: ' + err);   
+    },
+    function () {
+        console.log('Completed');   
+    });
+
+// => Next: 1
+// => Next: 2
+// => Next: 3
+// => Completed
+```
+
+## Bug Fixes
+- Issue #203 - `Rx.Observable.timer` fails with `rx.lite.js`
+- Issue #196 - Add back `Rx.Observable#shareReplay` to all distributions
+- Issue #189 - `Rx.AnonymousObservable` refactored
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/425364/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/425364,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.28,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.28,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.28,v2.2.28,False,False
+358057,2014-06-05T06:16:51Z,2014-06-05T06:46:08Z,Reactive Extensions v2.2.25,"This is a minor update from [RxJS version 2.2.24](https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.24) which includes the following changes including new operators of `concatMap` or its alias `selectConcat`
+
+## ConcatMap/SelectConcat
+
+A new operator was introduced to help chain together serial asynchronous operations and preserve order called `concatMap` or its alias `selectConcat`.  This operator in its intent is nothing more than `map(...).concat()`.  In contrast with `flatMap` or its alias `selectMany`, is nothing more than `map(...).merge()` where order is not preserved in order, but instead as to the time that the observable responds.
+
+Below is an example of its usage.
+
+``` js
+var source = Rx.Observable.range(0, 5)
+    .concatMap(function (x, i) {
+        return Rx.Observable
+            .interval(100)
+            .take(x).map(function() { return i; }); 
+    });
+
+var subscription = source.subscribe(
+    function (x) {
+        console.log('Next: ' + x);
+    },
+    function (err) {
+        console.log('Error: ' + err);   
+    },
+    function () {
+        console.log('Completed');   
+    });
+
+// => Next: 1 
+// => Next: 2 
+// => Next: 2 
+// => Next: 3 
+// => Next: 3 
+// => Next: 3 
+// => Next: 4 
+// => Next: 4 
+// => Next: 4 
+// => Next: 4 
+// => Completed 
+```
+
+Also, note that just like `flatMap` and `selectMany`, these methods also accept JavaScript Promises as inputs.
+
+``` js
+var source = Rx.Observable.fromArray([1,2,3,4])
+    .concatMap(function (x, i) {
+        return Promise.resolve(x + i);
+    });
+
+var subscription = source.subscribe(
+    function (x) {
+        console.log('Next: ' + x);
+    },
+    function (err) {
+        console.log('Error: ' + err);   
+    },
+    function () {
+        console.log('Completed');   
+    });
+
+// => Next: 4
+// => Next: 4 
+// => Next: 4 
+// => Next: 4 
+// => Completed   
+```
+
+## Closed Issues
+- #172 - Passing Handlers to Ember
+- #171 - `selectConcat` / `concatMap` in docs but not in NPM
+- #170 - Fix path for Alphabet Invasion example
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/358057/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/358057,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.25,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.25,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.25,v2.2.25,False,False
+333758,2014-05-21T18:24:40Z,2014-05-22T00:46:13Z,Reactive Extensions v2.2.24,"This is another minor release of the Reactive Extensions for JavaScript which contains mostly bug fixes as we move towards version 2.3.  This release includes some great stuff including a complete build (minus the testing), RxJS Lite Extras, and some fixes to behaviors such as with `finally`.
+
+## RxJS Complete Build
+
+One feature that was requested often was to have a complete build of all RxJS operators in a single file, so that you don't have to hunt down which file contains the desired operator.  This is good for prototyping where you are undecided about which operators you are going to use.  Later on, you may decide you may need only a subset which might be only in `rx.lite.js`.  The only parts that are not included in this file are for testing, which you can easily reference yourself.
+
+To that end, we now ship `rx.all.js` for modern browsers and `rx.all.compat.js` for older browsers.
+
+## RxJS Lite Extras
+
+Another requested feature was for the ability to include the operators that were included in the main `rx.js` file, but not included in `rx.lite.js`.  We have created `rx.lite.extras.js` which contains the missing operators, which makes including other files such as `rx.joinpatterns.js`, `rx.coincidence.js` or others easier without worrying if something is missing.
+
+The following operators included are:
+
+### `Observable Methods`
+- [`amb`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableambargs)
+- [`onErrorResumeNext`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableonerrorresumenextargs)
+- [`using`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableusingresourcefactory-observablefactory)
+
+### `Observable Instance Methods`
+- [`amb`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypeambrightsource)
+- [`bufferWithCount`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypebufferwithcountcount-skip)
+- [`distinct`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypedistinctkeyselector-keyserializer)
+- [`groupBy`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypegroupbykeyselector-elementselector-keyserializer)
+- [`groupByUntil`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypegroupbyuntilkeyselector-elementselector-durationselector-keyserializer)
+- [`observeOn`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypeobserveonscheduler)
+- [`onErrorResumeNext`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypeonerrorresumenextsecond)
+- [`subscribeOn`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypesubscribeonscheduler)
+- [`windowWithCount`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypewindowwithcountcount-skip)
+
+## Finally Behavior Fix
+
+An issue was brought to our attention that if the subscribe is empty and an exception is thrown, the `finally` will not be called because there was no try/catch around the `subscribe` call.  Below was the previous behavior which would not call the `finally`.
+
+``` js
+Rx.Observable.throw(new Error())
+  .finally(function () { /* never would be hit */ })
+  .subscribe();
+// Error thrown
+```
+
+This has been corrected so we now get the expected behavior:
+
+``` js
+Rx.Observable.throw(new Error())
+  .finally(function () { console.log('finally'); })
+  .subscribe();
+
+// => finally
+// Error thrown
+```
+
+## Removal of rxjs Node.js Module
+
+A point of confusion was the existence of the `rxjs` Node.js module, which confused many as the official supported module is `rx`.  We have since contact the author and it has been removed.
+
+## Closed Issues
+- #168: Error: Cannot find module './rx.all' on Node.js
+- #167: Fix data binding example
+- #166: rx.js throws exception when used in web worker
+- #165: Update observable.md
+- #164: fix broken anchor links: shareValue/shareReplay
+- #163: fix broken anchor link on concatAll
+- #162: correct broken anchor link to mergeAll
+- #161: correct pausableBuffered docs
+- #160: s/teh/the/
+- #159: correct typo in `last` docs
+- #158: correct typo in lastOrDefault docs
+- #156: warn against 'npm install rxjs' 3rd party version
+- #154: Move compiled output to dist to clean up main folder
+- #153: Create extras build for lite
+- #152: Create all build
+- #151 Add an asyncMap that will map an async operator over an Observable
+- #147: Corrected minor spelling mistakes.
+- #146: finallyAction does not happen when there is an error
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/333758/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/333758,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.24,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.24,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.24,v2.2.24,False,False
+270285,2014-04-12T03:14:18Z,2014-04-14T04:08:21Z,RxJS Release v2.2.20,"Slight update to include bug fixes from [RxJS v2.2.19](https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.19) and adding more Promises support
+
+## Promises Support
+
+The `sequenceEqual` operator now supports promises via https://github.com/Reactive-Extensions/RxJS/commit/21ecc9051ffc36b12670c883dbf2be428268ede5.  You can now specify a Promise as the other value such as the following:
+
+``` js
+var sequence = Rx.Observable.return(42);
+var promise = new RSVP.Promise(function (res, rej) { res(42); });
+
+var equal = sequence.sequenceEqual(promise);
+var subscription = equal.subscribe(console.log.bind(console));
+// => true
+```
+
+## Bugs Closed
+- Issue #137 - Fixed jQuery bridge
+- Issue #138 - Created reference to `Rx.Scheduler.timeout`
+- Issue #139 - Fixed jQuery bridge
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/270285/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/270285,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.20,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.20,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.20,v2.2.20,False,False
+258723,2014-04-06T00:27:33Z,2014-04-06T01:01:21Z,RxJS Release v2.2.19,"This is a bit of an update from [v2.2.18](https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.18) with a couple of changes including:
+- Rx.Observable.fromEvent Changes
+- Backpressure Changes
+
+Note that there are no breaking changes in this release.
+
+## Rx.Observable.fromEvent Changes
+
+RxJS at its core will now support a number of libraries to help developers be productive without having to bring in other library specific RxJS bindings such as RxJS-jQuery. It will now support the following libraries
+- jQuery
+- Zepto
+- AngularJS
+- Ember
+
+RxJS will now shortcut to use native methods for jQuery, Zepto, Angular's jqLite, and Ember, thus giving you the same experience had you used the library directly.  The only caveat is that this method does not support a `selector` string which jQuery, Zepto and Ember support.
+
+## Backpressure Changes
+
+In previous releases, the mechanism to pause and resume on both the `pausable` and `pausableBuffered` methods was to use the Subject directly to pass in either `true` or `false` depending on whether you wanted to pause or resume.  In this release, this has been simplified to be able to use `pause` and `resume` to make it much more intuitive.
+
+``` js
+var pauser = new Rx.Subject();
+
+// Create pausable
+var pausable = Rx.Observable.fromEvent(document, 'mousemove').pausable(pauser);
+var subscription = pausable.subscribe(function (next) {
+  // Do something with values
+});
+
+// Now pause/resume
+// unpause
+pausable.resume();
+
+// Stop and resume every five seconds
+// Note: can use the outside Subject still too, no breaking changes.
+var shouldRun = true;
+setInterval(function () {
+  if (shouldRun = !shouldRun) {
+    pausable.pause();
+  } else {
+    pausable.resume();
+  }
+}, 5000);
+```
+
+In addition, the requirement for an external `Rx.Subject` has been made optional, so that the subject can stay internal and therefore not shared.
+
+``` js
+// With no outside controller
+var pausable = Rx.Observable.fromEvent(document, 'mousemove').pausable();
+var subscription = pausable.subscribe(function (next) {
+  // Do something with values
+});
+```
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/258723/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/258723,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.19,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.19,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.19,v2.2.19,False,False
+249963,2014-03-31T23:36:46Z,2014-04-01T00:00:18Z,RxJS Release v2.2.18,"Update from [RxJS v2.2.17](https://github.com/Reactive-Extensions/RxJS/releases/tag/v.2.2.17) to include the following changes.
+
+## Helper Functions
+
+In order to facilitate people using default parameters, RxJS exports helper functions in the `Rx.helpers` object including:
+- `noop` - No operation
+- `identity` - Passthrough function which returns the parameter value.
+- `defaultNow` - Default function for getting the current time.
+- `defaultComparer` - Default comparer which uses the interval `Rx.internals.isEqual` function.
+- `defaultSubComparer` - Default comparer for using comparisons of greater than, less than or equal to.
+- `defaultKeySerializer` Default key serializer function which calls `.toString` by default.
+- `defaultError` - Throws the given error
+- `isPromise` - Used to detect whether the given object is a Promise.
+- `asArray`\- Converts the arguments of the function into an array.
+- `not` - Returns the opposite of the current function's return value.
+
+## More Promises Support
+
+In addition to the previous support for Promises from the previous release for `flatMap`/`selectMany`,we have now extended it to the following:
+- `Rx.Observable.catch`
+- `Rx.Observable.concat`
+- `Rx.Observable.defer`
+
+An example for defer would look like the following:
+
+``` js
+// Concat on Promises to execute sequentially
+var promises = [ur1, url2, url3].map(function (url) {
+  // Ensure we don't fire each until it is subscribed
+  return Rx.Observable.defer(function () { 
+    return getJSON(url); 
+  });  
+});
+
+var sources = Rx.Observable.concat(promises).toArray();
+sources.subscribe(function (results) {
+  // Get all the results as an array
+});
+```
+
+In addition, this works with `concat` such as the following:
+
+``` js
+/* Concat as arguments */
+var sources = Rx.Observable.concat(promise1, promise2, promise3);
+
+/* Concat as an array */
+var sources = Rx.Observable.concat([promise1, promise2, promise3]);
+
+/* Concat on an Observable */
+var newSource = source.concat(promise1);
+```
+
+In addition, this works nicely with `catch` as well.
+
+``` js
+/* Catch as arguments */
+var sources = Rx.Observable.catch(promise1, promise2, promise3);
+
+/* Catch as an array */
+var sources = Rx.Observable.catch([promise1, promise2, promise3]);
+
+/* Catch on an Observable */
+var newSource = source.catch(promise1);
+```
+
+As time goes on, we'll also be looking at other areas for support for promises within RxJS.
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/249963/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/249963,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.18,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.18,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.18,v2.2.18,False,False
+229704,2014-03-18T23:38:30Z,2014-03-18T23:57:27Z,RxJS Release v2.2.17,"Slight update to [RxJS v2.2.16](https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.16) by fixing the algorithm for detecting whether the object is a promise.
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/229704/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/229704,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v.2.2.17,https://github.com/Reactive-Extensions/RxJS/releases/tag/v.2.2.17,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v.2.2.17,v.2.2.17,False,False
+229591,2014-03-18T22:25:21Z,2014-03-18T22:43:44Z,RxJS Release v2.2.16,"Minor fixes from [RxJS v2.2.15](https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.15) to include bug fixes and changes to Enumerable to make it ES6 compatible.
+
+## From Iterable
+
+This release has a new function which makes it ES6 compatible with iterables.  We now have [`Rx.Observable.fromIterable`](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/fromiterable.js) method which takes in an iterable and converts it to observable sequence.
+
+``` js
+var set = new Set([1,2,3]);
+var observable = Rx.Observable.fromIterable(set);
+
+var subscription = observable.subscribe(console.log.bind(console));
+// => 1
+// => 2
+// => 3
+```
+
+## Bugs Fixed
+1. #122 - changed `fromGenerator` to `fromIterable` 
+2. #123 - fixed Promise detection which was picking up on Join Patterns.
+3. #124 - same as above
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/229591/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/229591,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.16,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.16,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.16,v2.2.16,False,False
+228098,2014-03-18T03:29:14Z,2014-03-18T04:02:17Z,RxJS Release v2.2.15,"This is a slight update to [RxJS v2.2.14 release](https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.14) to fix some bugs associated with backpressure.  This is a much more tested solution complete with controlled to get the number of requested items.
+
+## BackPressure
+
+This is the first experimental release of backpressure.  The idea is to pause and resume for a particular observable if the observer cannot keep up for whatever reason.  To do this automatically seems to us naive, and instead, we should not punish the producer if the consumer cannot keep up, so we've set a pretty high bar for getting it right.  You can now find them in their own file `rx.backpressure.js` or if you're using `rx.lite.js`, then you're already in luck because you have them already.
+
+There are many ways around this problem of backpressure including using `throttle` if you're ok with losing some data, the `buffer` methods by time, count, etc, if you'd like the results in batch for a particular count or timeframe.  In addition, if you want only a value in a given time span, then you could use `sample`.  In this case, we've added three methods, [`pausable`](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/backpressure/pausable.js), [`pausableBuffered`](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/backpressure/pausablebuffered.js) and [`controlled`](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/backpressure/controlled.js).  
+
+With [`pausable`](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/backpressure/pausable.js), you have the ability to pause a hot observable, such as mouse movements and then resume, but you will lose data in between the pause and resume methods.  Below is an example of it in action.
+
+``` js
+var controller = new Rx.Subject();
+var events = Rx.Observable.fromEvent(document, 'mousemove');
+
+// Control the events by the controller
+var controlled = events.pausable(controller);
+
+var subscription = controlled.subscribe(function (e) {
+  // Do something with events
+  // Woops, too fast
+  // Pause the event stream
+  controller.onNext(false);
+
+  // When you want to start again, call this: 
+  controller.onNext(true);
+});
+
+// Start listening
+controller.onNext(true);
+```
+
+For a more comprehensive view of it in action, check out the tests for [`pausable`](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/pausable.js).
+
+The other is `[`pausableBuffered`](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/backpressure/pausablebuffered.js) where you will not lose data, in fact, it will be kept in a buffer until you are ready to start consuming again.
+
+``` js
+var controller = new Rx.Subject();
+var interval = Rx.Observable.interval(1000).timeInterval();
+
+// Control the events by the controller
+var controlled = interval.pausableBuffered(controller);
+
+var subscription = controlled.subscribe(function (x) {
+  console.log('x', x.value);
+});
+
+// Start it
+var shouldRun = true;
+controller.onNext(shouldRun);
+
+// Make it pause every so often, and then will backfill with results emptying the buffer
+setInterval(function () {
+  controller.onNext(shouldRun = !shouldRun);
+}, 5000);
+```
+
+Once again, to see a more comprehensive view of this in action, check the associated tests for [`pausableBuffererd`](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/pausablebuffered.js)
+
+Finally, we have the [`controlled`](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/backpressure/controlled.js) operator, which turns the observable sequence into a push/pull scenario in which we can request the number of items we want at a time.  This gives the observer the chance to tell the observable sequence how many items it wants at any point, unlike any of the `buffer` methods.
+
+``` js
+var source = Rx.Observable.range(0, 1000).controlled();
+
+source.subscribe(function(x) {
+  console.log('x', x);
+});
+
+// Get 10 items
+source.request(10);
+
+// Maybe later get another
+source.request(5);
+```
+
+You can get a better sense of the method's details, check out the associated tests for [`controlled`](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/controlled.js)
+
+## What's Next?
+
+Before we hit the 2.3 mark, we'd like to get more feedback on the backpressure items, including if some of the other implementations such as windowed and stop and wait mechanisms are worthwhile.  In addition, we are starting the expression parsing work in order to enable scenarios like remote communication with serialized observable sequences.
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/228098/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/228098,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.15,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.15,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.15,v2.2.15,False,False
+227497,2014-03-17T18:19:35Z,2014-03-17T18:56:17Z,RxJS Release v2.2.14,"This will be one of the last updates before we start making our way to version 2.3.  
+
+This release includes the following:
+- **Promises Integration**
+- **BackPressure**
+- **Bug Fixes**
+
+## Promises Integration
+
+A major highlight of this release is the integration with JavaScript Promises.  With the upcoming ES6 standardization, and Promises showing up in browsers such as Chrome, now is the time to strike.  In order for Promises integration to work with RxJS, the Promise implementation must be compatible with ES6, in that the constructor must look like the following:
+
+``` js
+var promise = new Promise(function (resolve, reject) {
+  resolve(42);
+});
+```
+
+In previous releases, we've had the ability to convert a Promise to an Observable by using `Rx.Observable.fromPromise`, but now, we have the ability to create Promises from Observable sequences by using the `toPromise` method.  You can either give the constructor to the `toPromise` method or use our configuration with `Rx.config.Promise`.
+
+``` js
+// Using the constructor
+var promise = Rx.Observable.return(42).toPromise(RSVP.Promise);
+promise.then(console.log.bind(console));
+
+// Using configuration
+Rx.config.Promise = RSVP.Promise;
+var promise = Rx.Observable.return(42).toPromise();
+promise.then(console.log.bind(console));
+```
+
+We have also implemented overloads to the following methods as to accept Promises, or even in some cases Observable of Promises.  We have implemented `flatMap`/`selectMany`, `concatAll`/`concatObservable`, `mergeAll`/`mergeObservable`, `switch`/`switchLatest`, and finally `startAsync`.
+
+``` js
+// Using flatMap/selectMany with a promise
+var observable = Rx.Observable.return(42)
+  .flatMap(RSVP.Promise.resolve(56));
+observable.subscribe(console.log.bind(console));
+
+// Using flatMap/selectMany with a promise inside a function
+var observable = Rx.Observable.return(42)
+  .flatMap(function (x, i) { return RSVP.Promise.resolve(x + 1); });
+observable.subscribe(console.log.bind(console));
+// => 43
+
+// Using flatMap/selectMany with a promise inside a function with a result selector
+var observable = Rx.Observable.return(42)
+  .flatMap(
+    function (x, i) { return RSVP.Promise.resolve(x + 1); },
+    function (x, y, i) { return { fst: x + i, snd: y }});
+observable.subscribe(console.log.bind(console));
+// => { fst: 42, snd: 43 }
+
+// Concat support
+var sources = Rx.Observable
+  .fromArray([
+    RSVP.Promise.resolve(42),
+    RSVP.Promise.resolve(56),
+    RSVP.Promise.resolve(72)]
+  )
+  .concatAll();
+
+sources.subscribe(console.log.bind(console));
+// => 42
+// => 56
+// => 72
+
+// Merge support
+var sources = Rx.Observable
+  .fromArray([
+    RSVP.Promise.resolve(42),
+    RSVP.Promise.resolve(56),
+    RSVP.Promise.resolve(72)]
+  )
+  .mergeAll();
+
+sources.subscribe(console.log.bind(console));
+// => 42
+// => 56
+// => 72
+
+// Switch support
+var sources = Rx.Observable
+  .fromArray([
+    RSVP.Promise.resolve(42),
+    RSVP.Promise.resolve(56),
+    RSVP.Promise.resolve(72)]
+  )
+  .switch();
+
+sources.subscribe(console.log.bind(console));
+// => 72
+
+// StartAsync Support
+var source = Rx.Observable.startAsync(function () {
+ return RSVP.Promise.resolve(42);
+});
+source.subscribe(console.log.bind(console));
+// => 42
+```
+
+## BackPressure
+
+This is the first experimental release of backpressure.  The idea is to pause and resume for a particular observable if the observer cannot keep up for whatever reason.  To do this automatically seems to us naive, and instead, we should not punish the producer if the consumer cannot keep up, so we've set a pretty high bar for getting it right.  You can now find them in their own file `rx.backpressure.js` or if you're using `rx.lite.js`, then you're already in luck because you have them already.
+
+There are many ways around this problem of backpressure including using `throttle` if you're ok with losing some data, the `buffer` methods by time, count, etc, if you'd like the results in batch for a particular count or timeframe.  In this case, we've added two methods, `pausable` and `pausableBuffer`.  
+
+With `pausable`, you have the ability to pause a hot observable, such as mouse movements and then resume, but you will lose data in between the pause and resume methods.  Below is an example of it in action.
+
+``` js
+var controller = new Rx.Subject();
+var events = Rx.Observable.fromEvent(document, 'mousemove');
+
+// Control the events by the controller
+var controlled = events.pausable(controller);
+
+var subscription = controlled.subscribe(function (e) {
+  // Do something with events
+  // Woops, too fast
+  // Pause the event stream
+  controller.onNext(false);
+
+  // When you want to start again, call controller.onNext(true);
+});
+
+// Start listening
+controller.onNext(true);
+```
+
+The other is `pausableBuffer` where you will not lose data, in fact, it will be kept in a buffer until you are ready to start consuming again.
+
+``` js
+var controller = new Rx.Subject();
+var interval = Rx.Observable.interval(1000).timeInterval();
+
+// Control the events by the controller
+var controlled = interval.pausable(controller);
+
+var subscription = controlled.subscribe(function (x) {
+  console.log('x', x.value);
+});
+
+// Start it
+var shouldRun = true;
+controller.onNext(shouldRun);
+
+// Make it pause every so often
+setIterval(function () {
+  controller.onNext(shouldRun = !shouldRun);
+}, 5000);
+```
+
+In future releases, we will also cover ideas on how you can request a number of items each time, such as the following.
+
+``` js
+var source = Rx.Observable.range(0, 1000).controlled();
+
+source.subscribe(function(x) {
+  console.log('x', x);
+});
+
+// Get 10 items
+source.request(10);
+
+// Maybe later get another
+source.request(5);
+```
+
+This is just a first exploration into what's possible, but we're pretty excited about this.
+
+## Bug Fixes
+
+Closed the following bugs:
+1. Issue #115 
+2. Issue #119 
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/227497/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/227497,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.14,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.14,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.14,v2.2.14,False,False
+137721,2014-01-04T22:43:32Z,2014-01-04T22:51:39Z,RxJS Release 2.2.12,"This is a minor update from 2.2.12 with the following changes.
+
+ChangeList:
+- Fixed `TestScheduler.createHotObservable` to handle multiple observers [Issue #89](https://github.com/Reactive-Extensions/RxJS/issues/89)
+- Using `MutationObserver` or `WebKitMutationObserver` as a scheduling mechanism [Issue #91](https://github.com/Reactive-Extensions/RxJS/issues/91)
+
+The `TestScheduler` will now use the following logic to determine the fastest immediate scheduling if available:
+- `MutationObserver` or `WebKitMutationObserver`
+- `process.nextTick` in [Node.js](http://nodejs.org)
+- `window.setImmediate` 
+- `window.postMessage`
+- `window.MessageChannel`
+- `script.readystatechanged` with script injection
+- `window.setTimeout`
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/137721/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/137721,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.12,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.12,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.12,v2.2.12,False,False
+133275,2013-12-28T21:30:16Z,2013-12-28T21:32:05Z,Reactive Extensions for JavaScript (RxJS) version 2.2.10,"Minor update from [RxJS version 2.2.9](https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.9), which has the following fixes:
+- Make the following operators cold observables instead of hot
+  - `Rx.Observable.fromCallback`
+  - `Rx.Observable.fromNodeCallback`
+  - `Rx.Observable.fromPromise`
+- Fix `Rx.Observable.zipArray` to accept both parameters and an array. 
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/133275/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/133275,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.10,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.10,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.10,v2.2.10,False,False
+105961,2013-11-27T21:13:06Z,2013-11-27T22:26:05Z,Reactive Extensions for JavaScript (RxJS) version 2.2.9,"Slight update to 2.2.7 to include shortcut operators for adding a reference counter for all connectable observables, by calling `refCount`.  Adding the `share()`, `shareValue()`, and `shareReplay()` methods. These methods are optimized for the 80% case, in which the developer simply wants to share side effects among multiple concurrent observer. This allows developers simple code like this:
+
+``` js
+var interval = Rx.Observable.interval(1000);
+
+var source = interval
+    .take(2)
+    .do(function (x) {  console.log('Side effect'); })
+    .share();
+
+// When the number of observers subscribed to published observable goes from 
+// 0 to 1, we connect to the underlying observable sequence.
+source.subscribe(createObserver('SourceA'));
+
+// When the second subscriber is added, no additional subscriptions are added to the
+// underlying observable sequence. As a result the operations that result in side 
+// effects are not repeated per subscriber.
+source.subscribe(createObserver('SourceB'));
+
+function createObserver(tag) {
+    return Rx.Observer.create(
+        function (x) {
+            console.log('Next: ' + tag + x);
+        },
+        function (err) {
+            console.log('Error: ' + err);
+        },
+        function () {
+            console.log('Completed');
+        }
+    );
+}
+```
+
+Other changes:
+- Fixed Bower version issue
+- Added SauceLabs testing
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/105961/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/105961,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.9,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.9,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.9,v2.2.9,False,False
+97027,2013-11-18T23:15:23Z,2013-11-19T00:07:16Z,Reactive Extensions for JavaScript (RxJS) version 2.2.7,"Slight update to [2.2.5](https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.5) which updates the following:
+
+Changes:
+- `rx.js` | `rx.compat.js`
+  - Generalized `throttle` to use `throttleWithSelector` thus cutting code duplication
+- `rx.lite.js` | `rx.lite.compat.js` :
+  - Removed `generateWithRelativeTime` and `removeWithAbsoluteTime` and replaced with `generateWithTime`
+  - Removes absolute time scheduling from:
+    - `delay`
+    - `timer`
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/97027/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/97027,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.7,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.7,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.7,v2.2.7,False,False
+95931,2013-11-17T22:37:36Z,2013-11-17T22:59:17Z,Reactive Extensions for JavaScript (RxJS) version 2.2.5,"Important update to the Reactive Extensions for JavaScript (RxJS) including the addition of the notion of a lite file, which contains most of what the user needs in one file.
+
+Changes:
+- `Rx.Observable.create` now takes either a `Disposable` as a return in the function, a function, or nothing.
+
+``` js
+/* With a disposable */
+var observable = Rx.Observable.create(function (observer) {
+    observer.onNext(42);
+    observer.onCompleted();
+
+    return Rx.Disposable.create(function () {
+        console.log('disposed!');
+    });
+});
+
+/* With a function*/
+var observable = Rx.Observable.create(function (observer) {
+    observer.onNext(42);
+    observer.onCompleted();
+
+    return function () {
+        console.log('disposed!');
+    };
+});
+
+/* With no retutnr*/
+var observable = Rx.Observable.create(function (observer) {
+    observer.onNext(42);
+    observer.onCompleted();
+
+    // Nothing to dispose
+});
+```
+
+New Files:
+- **rx.lite.js** - a lighter version of RxJS which contains most operators used on a daily basis including standard operators, time-based, and async event, callback and promise based operators.
+- **rx.lite.compat.js** - much like `rx.lite.js` but has compatibility back to IE6
+
+New NuGet Packages:
+- **RxJS-Lite** - A NuGet package containing both `rx.lite.js` and `rx.lite.compat.js`.
+
+Operators included in RxJS-Lite:
+- **Creation Operators**
+  - `create`
+  - `defer`
+  - `empty`
+  - `fromArray`
+  - `generate`
+  - `never`
+  - `range`
+  - `repeat`
+  - `return`
+  - `throw`
+- **Multiple Value Operators**
+  - `catch`
+  - `combineLatest`
+  - `concat`
+  - `concatObservable` | `concatAll`
+  - `merge`
+  - `mergeObservable` | `mergeAll`
+  - `skipuntil`
+  - `switch`
+  - `takeuntil`
+  - `zip`
+  - `ziparray`
+- **Single Value Operators**
+  - `asObservable`
+  - `dematerialize`  
+  - `distinctUntilChanged`
+  - `do`
+  - `finally`
+  - `ignoreElements`
+  - `materialize`
+  - `repeat`
+  - `retry`
+  - `scan`
+  - `skipLast`
+  - `startWith`
+  - `takeLast`
+  - `takeLastBuffer`
+- **Standard Query Operators**
+  - `select` | `map`
+  - `selectMany` | `flatMap`
+  - `selectSwitch` | `flatMapLatest`
+  - `skip`
+  - `skipWhile`
+  - `take`
+  - `takeWhile`
+  - `where` | `filter`  
+- **Async Operators**
+  - `fromCallback`
+  - `fromNodeCallback`
+  - `fromEvent`
+  - `fromEventPattern`
+  - `fromPromise`
+- **Binding Operators**
+  - `multicast`
+  - `publish`
+  - `publishLast`
+  - `publishValue`
+  - `replay`  
+- **Time-based Operators**
+  - `interval`
+  - `timer`
+  - `delay`
+  - `throttle`
+  - `timeInterval` 
+  - `timestamp`
+  - `sample`
+  - `timeout`
+  - `generateWithAbsolutetime` 
+  - `generateWithRelativetime`
+  - `delaySubscription`
+  - `delayWithSelector`
+  - `timeoutWithSelector`
+  - `throttleWithSelector`
+  - `skipLastWithTime`
+  - `takeLastWithTime`
+  - `takeLastBufferWithtime`
+  - `takewithtime`
+  - `skipWithTime`
+  - `skipUntilWithTime`
+  - `takeUntilWithtime`  
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/95931/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/95931,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.5,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.5,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.5,v2.2.5,False,False
+77694,2013-10-28T04:48:19Z,2013-10-28T04:56:01Z,Reactive Extensions for JavaScript (RxJS) version 2.2.4,"Minor update from [v2.2.3](https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.3) which shortcuts behavior for callbacks with only a single value.
+
+The old behavior of `Rx.Observable.fromCallback` and `Rx.Observable.fromNodeCallback` was to by default return an array, even if only a single value.  
+
+``` js
+var Rx = require('rx'),
+    fs = require('fs');
+
+var stat = Rx.Observable.fromNodeCallback(
+    fs.stat,
+    null, /* default scheduler */
+    null, /* default context */,
+    function (arr) { return arr[0]; }); /* only return the first */
+
+var files = ['file1.txt', 'file2.txt', 'file3.txt'];
+
+Rx.Observable
+    .for(files, function (file) {
+        return stat(file);
+    })
+    .toArray()
+    .subscribe(
+        function (results) {
+            results.forEach(function (result) {
+                console.log('is file: ' + result.isFile());
+            });
+        },
+        function (err) {
+            console.log('err ' + err);
+        }
+    );
+```
+
+The new behavior shortcuts this if there is only one parameter and returns it as a single value.
+
+``` js
+var Rx = require('rx'),
+    fs = require('fs');
+
+var stat = Rx.Observable.fromNodeCallback(fs.stat);
+
+var files = ['file1.txt', 'file2.txt', 'file3.txt'];
+
+Rx.Observable
+    .for(files, function (file) {
+        return stat(file);
+    })
+    .toArray()
+    .subscribe(
+        function (results) {
+            results.forEach(function (result) {
+                console.log('is file: ' + result.isFile());
+            });
+        },
+        function (err) {
+            console.log('err ' + err);
+        }
+    );
+```
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/77694/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/77694,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.4,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.4,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.4,v2.2.4,False,False
+77603,2013-10-28T00:53:19Z,2013-10-28T01:07:33Z,Reactive Extensions for JavaScript (RxJS) version 2.2.3,"Minor update from [v2.2.2](https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.2) which undoes the changes from v2.2.2 and continues the deprecation of the `Rx.Node.fromEvent`, `Rx.Node.fromCallback` and `Rx.Node.fromNodeCallback`.
+
+**Additions**
+- Add optional `selector` overloads for event methods
+  - [`Rx.Observable.fromEvent`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservablefromeventelement-eventname-selector)
+  - [`Rx.Observable.fromEventPattern`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservablefromeventpatternaddhandler-removehandler-selector)
+- Add optional `selector` overloads for callback methods
+  - [`Rx.Observable.fromCallback`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservablefromcallbackfunc-scheduler-context-selector)
+  - [`Rx.Observable.fromNodeCallback`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservablefromnodecallbackfunc-scheduler-context-selector)
+
+**Removal**
+- Undo Rx.Node.fromEvent changes from [v2.2.2](https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.0)
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/77603/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/77603,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.3,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.3,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.3,v2.2.3,False,False
+77599,2013-10-24T23:54:15Z,2013-10-28T01:00:36Z,Reactive Extensions for JavaScript (RxJS) version 2.2.2,"Minor update from Minor update from [v2.2.1](https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.1) which adds the following functionality:
+
+**Changes**
+- Add functionality to pass an array to Rx.Node.fromEvent
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/77599/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/77599,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.2,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.2,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.2,v2.2.2,False,False
+77597,2013-10-24T21:51:19Z,2013-10-28T00:58:40Z,Reactive Extensions for JavaScript (RxJS) version 2.2.1,"Minor update from [v2.2.0](https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.0) which adds the following functionality:
+
+**Additions**
+- Add `let` alias for `letBind`
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/77597/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/77597,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.1,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.1,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.1,v2.2.1,False,False
+73755,2013-10-22T15:28:53Z,2013-10-23T05:06:46Z,Reactive Extensions for JavaScript (RxJS) version 2.2,"RxJS is moving towards web standards and getting lean and mean.  For the core of RxJS, we have dropped support for older browsers including IE8 and we've renamed `rx.modern.js` to `rx.js`.  For those still needing compatibility to older browsers, there are a number of options including using `rx.compat.js` which adds polyfills for functions such as `Function#bind` and `Array#extras`, or you can include your own polyfill library.
+
+In this release, several new features were added to the Reactive Extensions for JavaScript (RxJS) core due to popular demand, including events, callbacks and promises in a new file `rx.async.js`.  Going forward, you will now be able to bind to events using your favorite library without needing a bridge library such as [RxJS-jQuery](https://github.com/Reactive-Extensions/RxJS-jQuery), [RxJS-Dojo](https://github.com/Reactive-Extensions/RxJS-Dojo), [RxJS-DOM](https://github.com/Reactive-Extensions/RxJS-DOM), etc.  This library was once again built with standards in mind.  However, to support older browsers, we also ship `rx.async.compat.js` which normalizes events across browsers.
+
+We have completed our API documentation and are including our getting started guide along with common asked questions [here](https://github.com/Reactive-Extensions/RxJS/tree/master/doc).
+
+Additions:
+- `rx.async.js`
+  - [`Rx.Observable.fromEvent`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservablefromeventelement-eventname)
+  - [`Rx.Observable.fromEventPattern`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservablefromeventpatternaddhander-removehandler)
+  - [`Rx.Observable.fromCallback`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservablefromcallbackfunc-scheduler-context)
+  - [`Rx.Observable.fromNodeCallback`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservablefromnodecallbackfunc-scheduler-context)
+  - [`Rx.Observable.fromPromise`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservablefrompromisepromise)
+- `rx.virtualtime.js`
+  - Moved `Rx.VirtualTimeScheduler` and `Rx.HistoricalScheduler` out of core to its own file
+
+Breaking Changes
+- `rx.modern.js` renamed to `rx.js` and old `rx.js` renamed to `rx.compat.js` for older browser support
+- `VirtualTimeScheduler` and `HistoricalScheduler` classes moved to `rx.virtualtime.js`
+- `Rx.Observable.start` and `Rx.Observable.prototype.toAsync` methods moved to `rx.async.js`
+
+Deprecation Warnings:
+- The following Node,js specific methods in `rx.node.js` will be removed in favor of those in `rx.async.js`
+  - `Rx.Node.fromEvent`     => `Rx.Observable.fromEvent`
+  - `Rx.Node.fromCallback` => `Rx.Observable.fromCallback`
+  - `Rx.Node.fromNodeCallback` => `Rx.Observable.fromNodeCallback`
+",https://api.github.com/users/mattpodwysocki,49051,mattpodwysocki,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/73755/assets,https://api.github.com/repos/Reactive-Extensions/RxJS/releases/73755,master,https://api.github.com/repos/Reactive-Extensions/RxJS/tarball/v2.2.0,https://github.com/Reactive-Extensions/RxJS/releases/tag/v2.2.0,https://api.github.com/repos/Reactive-Extensions/RxJS/zipball/v2.2.0,v2.2.0,False,False

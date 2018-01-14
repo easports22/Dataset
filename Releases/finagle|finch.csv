@@ -1,0 +1,1326 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8039846,2017-10-08T20:00:39Z,2017-10-08T20:23:57Z,Finch 0.16-M3,"Another (hopefully the last one) milestone release before 0.16. This time with Scala Futures syntax support.
+
+## Scala Syntax Support
+
+In #834, @ImLiar suggested a new type-class, `ToTwitterFuture` to abstract over a concrete IO primitive powering endpoint's asynchrony. Right now there are only Scala Futures instances available for `ToTwitterFuture`, but one can imagine this approach to be scaled to any Futures implementations available for Scala.
+
+Importing `io.finch.syntax.scala._` allows to `scala.concurrent.Future` from within endpoints (assuming `ExecutionContext` is available in the scope).
+
+```scala
+import io.finch._, io.finch.syntax.scala._
+import scala.concurrent.{Future, ExecutionContext.Implicits.global}
+
+scala> val e = get(""foo"") { Future.successful(Ok(""bar"")) }
+e: io.finch.Endpoint[String] = GET /foo
+
+scala> e(Input.get(""/foo"")).awaitValueUnsafe()
+res0: Option[String] = Some(bar)
+```
+
+## Deprecations
+
+Old-style path matchers such as `int`, `string`, `boolean`, etc are being deprecated in favor of more explicit `path[Int]`, `path[String]`, `path[Boolean]` and so on. We believe new API will make path matchers more discoverable and easier to reason about. See #844 for more context.
+
+## Dependencies
+
+- Finagle has been bumped to 7.1 (see #842)",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/8039846/assets,https://api.github.com/repos/finagle/finch/releases/8039846,master,https://api.github.com/repos/finagle/finch/tarball/0.16.0-M3,https://github.com/finagle/finch/releases/tag/0.16.0-M3,https://api.github.com/repos/finagle/finch/zipball/0.16.0-M3,0.16.0-M3,False,False
+7544808,2017-08-28T04:49:47Z,2017-08-28T15:50:12Z,Finch 0.16-M2,"This milestone release brings new performance improvements (reducing the gap between Finagle and Finch to only 5%) as well as new `finch-iteratee` module enabling generic request/response streaming.
+
+## Iteratee Streaming
+
+Integration with [iteratee library](https://github.com/travisbrown/iteratee) was one of the most wanted features in Finch. Travis Brown (@travisbrown) started experimenting with it almost a year ago (see #557) yet that work was only finished now (see #812), by a tireless effort of Sergey Kolbasov (@ImLiar).
+
+Essentially it's now possible to 
+ - receive chunked payloads in a form of `io.iteratee.Enumerator[Future, A]` (when it's known how to `io.finch.iteratee.Enumerate[CT, A]`)
+ - send chunked payloads in a form of `io.iteratee.Enumerator[Future, B]` (when it's known how to `io.finch.Encode.Aux[CT, B]`)
+
+For example, importing both
+
+```scala
+import io.finch.circe._, io.finch.iteratee._
+```
+
+enables new-line-delimited JSON streaming in Finch.
+
+```scala
+import io.finch._
+import io.finch.circe._
+import io.finch.iteratee._
+import io.circe.generic.auto._
+import io.iteratee._
+import com.twitter.util.Future
+
+case class Foo(bar: Int)
+
+// Streaming request payload.
+val sum: Endpoint[Int] =
+  post(""foos"" :: enumeratorJsonBody[Foo]) { (foos: Enumerator[Future, Foo]) =>
+    val ints: Enumerator[Future, Int] = foos.through(map[Foo, Int](_.bar))
+    val sum: Future[Int] = ints.into(fold[Int, Int](0)(_ + _))
+
+    sum.map(Ok) // a future will be completed when whole stream is folded
+}
+
+// Streaming response payload.
+val foos: Endpoint[Enumerator[Future, Foo]] = get(""foos"") {
+  Ok(enumList(List(Foo(1), Foo(2)))
+}
+```
+
+See more details in the [docs](https://finagle.github.io/finch/user-guide.html#streaming).
+
+## Performance Improvements
+
+I learned this simple technics allowing to reduce allocations around closures from Flavio Brasil (@fwbrasil). Applying them to Finch yield quite significant performance gain (see #807) reducing the gap between Finch and Finagle to just 5% (was 10-12% before).
+
+Here are some numbers for running time (less is better):
+
+```
+NEW:
+
+MapBenchmark.map                             avgt   10   633.837 ±  14.613   ns/op
+MapBenchmark.mapAsync                        avgt   10   624.249 ±  22.426   ns/op
+MapBenchmark.mapOutput                       avgt   10   734.677 ±  30.215   ns/op
+MapBenchmark.mapOutputAsync                  avgt   10   737.170 ±  29.808   ns/op
+ProductBenchmark.bothMatched                 avgt   10  1175.716 ±  44.236   ns/op
+ProductBenchmark.leftMatched                 avgt   10    26.510 ±   2.335   ns/op
+ProductBenchmark.rightMatched                avgt   10     5.081 ±   0.112   ns/op
+
+OLD:
+
+MapBenchmark.map                             avgt   10   624.174 ±  28.621   ns/op
+MapBenchmark.mapAsync                        avgt   10   647.369 ±  30.775   ns/op
+MapBenchmark.mapOutput                       avgt   10  1221.053 ±  39.319   ns/op
+MapBenchmark.mapOutputAsync                  avgt   10  1202.541 ±  44.432   ns/op
+ProductBenchmark.bothMatched                 avgt   10  1224.278 ±  49.114   ns/op
+ProductBenchmark.leftMatched                 avgt   10    29.856 ±   0.709   ns/op
+ProductBenchmark.rightMatched                avgt   10     5.209 ±   0.112   ns/op
+```
+
+In a nutshell:
+
+- `map*` operations are now up to **40% faster** (400 bytes fewer allocations on each call)
+- `::` is now up to **5% faster** (120 bytes fewer allocations on each call)
+
+## Dependencies
+
+- [Finagle 7.0](http://finagle.github.io/blog/2017/08/17/release-notes-7-00)
+- Circe 0.9.0-M1
+- Cats 1.0.0-MF",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/7544808/assets,https://api.github.com/repos/finagle/finch/releases/7544808,master,https://api.github.com/repos/finagle/finch/tarball/0.16.0-M2,https://github.com/finagle/finch/releases/tag/0.16.0-M2,https://api.github.com/repos/finagle/finch/zipball/0.16.0-M2,0.16.0-M2,False,False
+6730124,2017-06-16T00:11:56Z,2017-06-16T01:51:52Z,Finch 0.16-M1,"# Meet Bootstrap
+
+The intention of this early 0.16 release (hence M1) is to allow people to experiment with the new `Bootstrap` abstraction that supposed to allow serving multiple content-types out of a single `Service` (i.e., coproduct endpoint). This was one of the most-wanted features since the type-level content type was shipped, over a year ago.
+
+See the following tickets for more context/history on the subject:
+
+- Content-Type as a Type #541
+- Supporting multiple Content-Types in a single endpoint/service #575
+- ServiceBulder (abandoned) #583 
+- Bootstrap (merged) #794
+
+In a nutshell, the new `Bootstrap` abstraction is pretty much an evolution of `ServiceBuilder` (see #583) that also has a notion of a configuration params for derived services (i.e., `Service[Request, Response]`). At this point, we only support two options: `includeServerHeader` (enabled by default) and `includeDateHeader` (enabled by default), but one can easily imagine this machinery to be scaled to support a wide spectrum of use cases:
+
+- Reporting stats per endpoint into a given stats receiver (see #781)
+- Supporting HTTP 405 (see #784)
+
+The quick start example looks pretty straightforward:
+
+```scala
+import io.finch._
+import io.finch.circe._
+import io.finch.generic._
+import com.twitter.finagle.Http
+
+scala> val json = get(""json"") { Ok(Map(""foo"" -> ""bar"")) }
+json: io.finch.Endpoint[scala.collection.immutable.Map[String,String]] = GET /json
+
+scala> val text = get(""text"") { Ok(""Hello, World!"") }
+text: io.finch.Endpoint[String] = GET /text
+
+scala> val s = Bootstrap.configure(includeServerHeader = false)
+  .serve[Application.Json](json)
+  .serve[Text.Plain](text)
+  .toService
+s: com.twitter.finagle.Service[com.twitter.finagle.http.Request,com.twitter.finagle.http.Response] = <function1>
+
+scala> Http.server.serve("":8081"", s)
+Jun 15, 2017 5:35:01 PM com.twitter.finagle.Init$$anonfun$5 apply$mcV$sp
+INFO: Finagle version 6.45.0 (rev=fadc80cdd804f2885ebc213964542d5568a4f485) built at 20170609-103047
+res1: com.twitter.finagle.ListeningServer = com.twitter.finagle.server.ListeningStackServer$$anon$1@1da24919
+```
+
+And then using HTTPie:
+
+```
+$ http :8081/text
+HTTP/1.1 200 OK
+Content-Type: text/plain
+Date: Fri, 16 Jun 2017 00:35:57 GMT
+
+Hello, World!
+
+$ http :8081/json
+HTTP/1.1 200 OK
+Content-Type: application/json
+Date: Fri, 16 Jun 2017 00:36:01 GMT
+
+{
+    ""foo"": ""bar""
+}
+```
+
+If you need more examples, here is how Finch TechEmpower benchmark is evolved after this release: https://github.com/TechEmpower/FrameworkBenchmarks/pull/2869/
+
+# Other changes
+
+- Slightly faster parsing of integer paths (#800)
+- Slightly faster date header (#792)",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/6730124/assets,https://api.github.com/repos/finagle/finch/releases/6730124,master,https://api.github.com/repos/finagle/finch/tarball/0.16.0-M1,https://github.com/finagle/finch/releases/tag/0.16.0-M1,https://api.github.com/repos/finagle/finch/zipball/0.16.0-M1,0.16.0-M1,False,False
+6714970,2017-06-14T17:59:19Z,2017-06-14T18:05:33Z,Finch 0.15.1,"A patch release that contains two fixes/additions:
+
+- #788: Upgrading Catbird dependency and Scala versions (thanks @travisbrown )
+- #796: Fixing optional bodies so they return `None` on empty payloads (thanks @JoeEnnever)",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/6714970/assets,https://api.github.com/repos/finagle/finch/releases/6714970,vk/0.15.1,https://api.github.com/repos/finagle/finch/tarball/0.15.1,https://github.com/finagle/finch/releases/tag/0.15.1,https://api.github.com/repos/finagle/finch/zipball/0.15.1,0.15.1,False,False
+6668331,2017-06-09T21:51:31Z,2017-06-09T23:01:19Z,Finch 0.15,"## Netty 4 is a default now
+
+Finagle 6.45 brings HTTP implementation based on Netty 4. It's now a default transport for both servers and clients created with Finagle. At this point, it's known that finagle-http running Netty 4 might be performing slightly worse than Netty 3 given the overhead the outdated Netty 3-based HTTP model involves. The Finagle team is aware of that and is working hard to remove the Netty 3 dependency from finagle-http hence make it faster with Netty 4.
+
+If you're cautious about the performance degradations (roughly 15%-20% slower on our ""Hello, World!"" benchmark) during the upgrade, stick to Netty 3 for now (as shown below):
+
+```scala
+import com.twitter.finagle.Http
+
+val server = Http.server.configured(Http.Netty3Impl)
+```
+
+## Default exception encoders
+
+We decided to stop supplying the default instances of exception JSON encoders (i.e., `Encode.Json[Exception]`) given the amount of confusion and ambiguity they bring on the table (examples: #765, #737). The default behavior now (unless an instance of `Encode` is provided) is to encode exceptions to just empty payloads.
+
+## New syntax package
+
+We're starting to decouple `Endpoint`s from their syntax (i.e., `Mapper`). The fact they were coupled together caused lots of surprising compile errors in the past (especially in the Scala 2.10 times) and we're quite happy to start drawing a line between a concept and its syntax. As of this release, there are no breaking changes such that the `Endpoint.apply(Mapper)` is still supported (although not directly) but we're planning to start hiding things behind the `io.finch.syntax` namespace in the next release. See #779 for more details.
+
+## New API for path matching
+
+We're promoting a new and more explicit API for path matching. Now there is a `path` method that acts as following (see #771 for more details):
+
+- `path(""foo"")` - matches a path ""foo"" (was `""foo"": Endpoint[HNil]` before)
+- `path[String]` - extracts a string path (was `string` before)
+
+Note that the previous API (i.e., `int`, `string`, etc) is still supported and we're pending its depreciation given the successful adoption of the new API.
+
+While the new way is definitely more verbose (see example bellow) we think it is much more explicit and clear for the reader. At some point (when we merged request readers with endpoints), symbols as `int`, `string`, etc become ambiguous (i.e., does `int` means ""path as int"" or ""param as int"") and are not something we'd like to see as part of 1.0 API (stable API).
+
+```scala
+val a = get(""add"" :: path[Int] :: path[Int]) { (a: Int, b: Int) => Ok(a + b) } // new
+val b = get(""bar"" :: int :: int) { (a: Int, b: Int) => Ok(a + b) } // old
+```
+
+## Other changes
+
+- `io.finch.Input` is now fully immutable such that all calls to its `with` methods produces a new `Input` (see #766)
+- The performance degradation with binary printing is now fixed as of Circe 0.8 (see #772)",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/6668331/assets,https://api.github.com/repos/finagle/finch/releases/6668331,master,https://api.github.com/repos/finagle/finch/tarball/0.15.0,https://github.com/finagle/finch/releases/tag/0.15.0,https://api.github.com/repos/finagle/finch/zipball/0.15.0,0.15.0,False,False
+6176361,2017-04-24T21:42:48Z,2017-04-25T03:44:44Z,finch-core/finch-circe 0.14.1,"This release only publishes finch-core & finch-circe artifacts and rolls back string-less encoding for Circe. While it was known that byte-targeted printing might be a little slower for small/tiny input (see https://github.com/circe/circe/issues/542), we didn't realize it might hit Finch really hard in the TechEmpower benchmark (-30%).
+
+We're going to put string-less encoding back when we know more about the issue.",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/6176361/assets,https://api.github.com/repos/finagle/finch/releases/6176361,vk/0.14.1,https://api.github.com/repos/finagle/finch/tarball/0.14.1,https://github.com/finagle/finch/releases/tag/0.14.1,https://api.github.com/repos/finagle/finch/zipball/0.14.1,0.14.1,False,False
+5939481,2017-03-31T17:06:04Z,2017-03-31T17:35:38Z,Finch 0.14,"## HTTP/2 Support
+
+This release brings **experimental HTTP/2 support** via [Finagle 6.43][finagle-643].
+
+As usual, there are two ways enabling it in Finch's applications: via a toggle override or programmatically. Supply the following CLI flag to globally switch each HTTP client/server running in the same process:
+
+```
+-com.twitter.finagle.toggle.flag.overrides=com.twitter.finagle.http.UseHttp2=1.0
+```
+
+Or control the HTTP version on a per-client/per-server basis:
+
+```scala
+import io.finch._
+import com.twitter.finagle.Http
+import com.twitter.util.Await
+
+Await.ready(
+  Http.server
+    .configuredParams(Http.Http2)
+    .serve("":8081"", Endpoint.lift(""foo"").toServiceAs[Text.Plain])
+)
+```
+
+## New Site
+
+[Finch's user guide, best practices, and the cookbook][site] are now published within the [microsite] with all the source code snippets type-checked by [tut] (thanks @erikwj, see #751).
+
+## Other changes
+
+* HTTP `Date` header returned from a Finch service is now conforms the spec format (thanks @rpless, see #752)
+* New Finch module `finch-generic` now provides some basic machinery allowing for generic derivation of endpoints (thanks @ilya-murzinov, see #716).
+
+[finagle-643]: http://finagle.github.io/blog/2017/03/14/release-notes-6-43/ 
+[microsite]: https://47deg.github.io/sbt-microsites/
+[tut]: https://github.com/tpolecat/tut
+[site]: https://finagle.github.io/finch
+
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/5939481/assets,https://api.github.com/repos/finagle/finch/releases/5939481,master,https://api.github.com/repos/finagle/finch/tarball/0.14.0,https://github.com/finagle/finch/releases/tag/0.14.0,https://api.github.com/repos/finagle/finch/zipball/0.14.0,0.14.0,False,False
+5499738,2017-02-18T18:44:00Z,2017-02-18T18:53:05Z,Finch 0.13.1,"This patch-release contains a fix to #747 (decoding errors with Netty 4). Huge thanks to @rpless for reporting the bug and verifying the fix.
+
+Note: no need to update from 0.13 if you're not using Netty 4.
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/5499738/assets,https://api.github.com/repos/finagle/finch/releases/5499738,vk/0.13.1-patch-release,https://api.github.com/repos/finagle/finch/tarball/0.13.1,https://github.com/finagle/finch/releases/tag/0.13.1,https://api.github.com/repos/finagle/finch/zipball/0.13.1,0.13.1,False,False
+5430213,2017-02-11T21:30:42Z,2017-02-11T21:53:56Z,Finch 0.13,"This release is intended to accommodate [Finagle 6.42 with its brand-new Netty 4 support](http://finagle.github.io/blog/2017/02/06/finagle-loves-netty4/). As of Finch 0.13, you may now (and should!) switch the underlying transport implementation over to Netty 4.
+
+## Netty 4 support
+
+Historically, Finch was using some Netty 3-specific optimizations (i.e., hacks) to perform zero-copy retrieving of the HTTP payloads. In this release, we made everything Netty-agnostic and made sure it's still as efficient as it was before. This means you may now consider switching the underlying transport over to Netty 4 not worrying about potential performance penalties.
+
+Switching to Netty 4 right now means staying aligned with future resiliency and performance improvements in finagle-http. At this point, there is no known difference in the throughput between finagle-http servers running Netty 3 and Netty 4. However, several major improvements for Netty 4 HTTP transport are planned to be shipped in the future Finagle releases. To mention a few: memory pooling (fewer allocations) and HTTP/2 support.
+
+To jump into the Netty 4 land, supply the following CLI flag to your Finch application:
+
+```
+-Dcom.twitter.finagle.toggle.flag.overrides=com.twitter.http.UseNetty4=1.0
+```
+
+Or specify Netty 4 implementation programmatically on your `Http.Server` instance:
+
+``` scala
+import io.finch._
+import com.twitter.finagle.Http
+import com.twitter.util.Await
+
+Await.ready(
+  Http.server
+    .configured(Http.Netty4Impl)
+    .serve("":8081"", Endpoint.lift(""foo"").toServiceAs[Text.Plain])
+)
+```
+
+## Other changes
+- There is now a `Date` header severed along with any Finch response (as it's required by spec). See #730 (thanks @n4to4)
+- [10 seconds startup delay and Netty warning](https://github.com/twitter/finagle/issues/581) on Scala 2.12 are now fixed in Finagle 6.42
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/5430213/assets,https://api.github.com/repos/finagle/finch/releases/5430213,master,https://api.github.com/repos/finagle/finch/tarball/0.13.0,https://github.com/finagle/finch/releases/tag/0.13.0,https://api.github.com/repos/finagle/finch/zipball/0.13.0,0.13.0,False,False
+5173653,2017-01-18T03:05:28Z,2017-01-18T03:10:46Z,Finch 0.12,"## Scala 2.12
+
+This release finally brings Scala 2.12 support (see #668, thanks @ilya-murzinov, @travisbrown, @clhodapp). As for 0.12, Finch is cross-published for both 2.11 and 2.12.
+
+## String-less Encoding with Circe/Jackson
+
+Since 0.11, Finch parses JSON directly from bytes (not strings), which improved its throughput quite dramatically (see #671). This time we're moving towards ""string-less encoding"" (see #676) with Circe and Jackson by printing directly into a byte buffer and returning that as an HTTP payload (see #717 and #714, thanks @ImLiar, @travisbrown).
+
+The benchmark numbers look inspiring and demonstrate quite well how the initial idea of hiding the serialization/deserialization logic behind functional abstractions is starting paying back. Being able to control this part of request lifecycle allows for optimizations specific to a concrete JSON library.
+
+Overall, the numbers confirm that printing directly to bytes cuts allocations in half (and improves the throughput).
+
+```
+circe-core (string)
+
+[info] Benchmark                                               Mode  Cnt        Score        Error   Units
+[info] ToServiceBenchmark.foos                                thrpt   20      463.981 ±     24.913   ops/s
+[info] ToServiceBenchmark.foos:·gc.alloc.rate.norm            thrpt   20  5002135.084 ±   3252.704    B/op
+[info] ToServiceBenchmark.ints                                thrpt   20     2118.919 ±     49.846   ops/s
+[info] ToServiceBenchmark.ints:·gc.alloc.rate.norm            thrpt   20   873272.466 ±    106.930    B/op
+
+circe-core (bytes)
+
+[info] Benchmark                                               Mode  Cnt        Score        Error   Units
+[info] ToServiceBenchmark.foos                                thrpt   20      523.730 ±     21.871   ops/s
+[info] ToServiceBenchmark.foos:·gc.alloc.rate.norm            thrpt   20  2602833.269 ±     76.806    B/op
+[info] ToServiceBenchmark.ints                                thrpt   20     2234.631 ±    111.156   ops/s
+[info] ToServiceBenchmark.ints:·gc.alloc.rate.norm            thrpt   20   545837.968 ±  43806.910    B/op
+```
+
+## EndpointResult
+
+Previously, `Endpoint` result was modeled as `Option[Tuple2[Input, Rerunnable[Output[_]]]]` indicating that result could be either skipped (i.e., `None`) or matched and both remainder and the output is returned. This release introduces a new type `EndpointResult` (see #707) that encodes this very behavior as an ADT with two cases `Matched` and `Skipped`.
+
+A standalone abstraction not only simplifies the reasoning about endpoints but also improves their performance. Technically, `EndpointResult` is a flattened version of `Option[Tuple2[_, _]]` so instead of two nested objects we only need one to carry the result. This simple idea impacts nearly all endpoint operations slightly reducing allocations and improving throughput (up to 5% better on [some benchmarks](https://gist.github.com/vkostyukov/e54092f843280dc3f8930c1d359db342)).
+
+Here are the numbers from `map*` variants (before and after):
+
+```
+[info] MapBenchmark.mapAsync                               avgt    6   429.113 ±   43.297   ns/op
+[info] MapBenchmark.mapAsync:·gc.alloc.rate.norm           avgt    6   776.000 ±    0.001    B/op
+[info] MapBenchmark.mapAsync                               avgt    6   407.126 ±   12.807   ns/op
+[info] MapBenchmark.mapAsync:·gc.alloc.rate.norm           avgt    6   720.000 ±    0.001    B/op
+
+[info] MapBenchmark.mapOutputAsync                         avgt    6   821.786 ±   52.045   ns/op
+[info] MapBenchmark.mapOutputAsync:·gc.alloc.rate.norm     avgt    6  1376.001 ±    0.001    B/op
+[info] MapBenchmark.mapOutputAsync                         avgt    6   777.654 ±   26.444   ns/op
+[info] MapBenchmark.mapOutputAsync:·gc.alloc.rate.norm     avgt    6  1320.001 ±    0.001    B/op
+```
+
+## Better Testing APIs
+
+Methods for querying a rerunnable `Output` returned from an `Endpoint` have been renamed to be explicitly alerting about their blocking nature. Now they all prefixed with `await` and take an optional `Duration` indicating the upper bound of await time (previously 10 seconds).
+
+Deprecation schema:
+- `value` -> `awaitValueUnsafe()`
+- `tryValue` -> `awaitValue()`
+- `output` -> `awaitOutputUnsafe()`
+- `tryOutput` -> `awaitOutput()`
+
+## Basic HTTP Auth
+
+Finch's implementation of Basic HTTP Auth has been moved to its own project [finagle-http-auth](https://github.com/finagle/finagle-http-auth) and promoted to Finagle filter so it could be used with bare metal finagle-http.
+
+To enable the Basic HTTP Auth on Finch's endpoint, apply the `BasicAuth.Server` filter to the service yield from `toService` call.
+
+``` scala
+
+scala> import com.twitter.finagle.http.BasicAuth, io.finch._
+
+scala> val ba = BasicAuth.serverFromCredentials(""admin"", ""12345"")
+ba: com.twitter.finagle.http.BasicAuth.Server = <function2>
+
+scala> val s = ba.andThen(Endpoint.const(""foo"").toServiceAs[Text.Plain])
+s: com.twitter.finagle.Service[Request, Response]
+```
+
+## Other Changes
+- New method `Endpoint.liftToTry` that works in a similar fashion to `Future.liftToTry` (see #710)
+- New method `Endpoint.productWith` that also accepts a function `(A, B) => C` (see #692, thanks @ImLiar)
+- Jackson's `ObjectMapper` is now embedded in `io.finch.jackson`. No need for an implicit instance anymore (see #714)
+
+## Dependencies
+- Finagle 6.41
+- Circe 0.7
+- Cats 0.9
+- Shapeless 2.3.2
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/5173653/assets,https://api.github.com/repos/finagle/finch/releases/5173653,master,https://api.github.com/repos/finagle/finch/tarball/0.12.0,https://github.com/finagle/finch/releases/tag/0.12.0,https://api.github.com/repos/finagle/finch/zipball/0.12.0,0.12.0,False,False
+4935865,2016-12-15T23:32:42Z,2016-12-15T23:42:04Z,Finch 0.11.1,"A patch release with couple of bug-fixes (and updated Jackson dependency)
+- Handle `io.finch.Errors` (thanks @crispywalrus, #700)
+- JSON Encoding of `Exception` with `null` messages (thanks @akozhemiakin, #699)
+- Update Jackson to 2.8.5 (to be aligned with Finagle) (#702)
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/4935865/assets,https://api.github.com/repos/finagle/finch/releases/4935865,vk/0.11.1,https://api.github.com/repos/finagle/finch/tarball/0.11.1,https://github.com/finagle/finch/releases/tag/0.11.1,https://api.github.com/repos/finagle/finch/zipball/0.11.1,0.11.1,False,False
+4900557,2016-12-13T17:54:11Z,2016-12-13T19:06:02Z,Finch 0.11,"**NOTE:** If you're upgrading from 0.10, see changes in the milestone releases as well: 
+- [0.11-M1](https://github.com/finagle/finch/releases/tag/0.11.0-M1)
+- [0.11-M2](https://github.com/finagle/finch/releases/tag/0.11.0-M2)
+- [0.11-M3](https://github.com/finagle/finch/releases/tag/0.11.0-M3)
+- [0.11-M4](https://github.com/finagle/finch/releases/tag/0.11.0-M4)
+
+## Goodbye Scala 2.10 and Java 7
+
+We've finally decided to drop 2.10 and Java 7 support and align with the most recent version of Finagle (6.40 at this point). See #686. For the reference, Finagle and Co [dropped 2.10 support in 6.35](http://finagle.github.io/blog/2016/04/20/scala-210-and-java7/) (five releases ago).
+
+## Server Sent Events
+
+Finch now provides very basic support to [SSE](https://en.wikipedia.org/wiki/Server-sent_events). See #655  and [the new cookbook example](https://github.com/finagle/finch/blob/master/docs/cookbook.md#server-sent-events) (thanks @rpless).
+
+Long story short, serving `AsyncStream[io.finch.sse.ServerSentEvent[A]]`, for which, `cats.Show[A]` is defined will stream generated events back to the client until the connection is closed or the stream is empty.
+
+## New Decoding Machinery
+
+In 0.11-M1 we've made a decent progress on making encoding in Finch less magical by introducing a type-level content type. This removed a lot of ambiguity when more than one implicit encoder present in the scope.
+
+This time, we did a similar trick for `Decode` type class. Now it embeds a type-level string indicating a content-type this decoder can decode. This highlighted an obvious difference between decoding query-string param as `Int` and HTTP body as JSON. These are clearly two different use case that should be handled separately. Thus there is a new type class for decoding HTTP entities (not bodies) in Finch: `DecodeEntity` that (1) doesn't embed a content-type and (2) decodes from `String`. `Decode`, on the other hand, know about content-type and (now) decodes from `Buf` (as it should). See #663 for more details.
+
+This work not only made the decoding story in Finch more explicit (clear separation of concerns, decoders for HTTP bodies are now resolved w.r.t. their content-types) but also allowed a performance optimization for `body*` endpoints. Given that we now can decode directly from `Buf`, we can eliminate one extra copy of going from `Buf` to `String` (to satisfy the `DecodeEntity` input type). At this point, we managed to improve the throughput on out end-to-end test by **12.5%**. See #671 (thanks @rpless) for more details.
+
+All these benefits came with the cost of breaking API. See API changes for more details.
+
+## Decoding with Content-Type
+
+Now that we have type-level content-type in place, we can enforce the implicit resolution to pick the right decoder for an expected request. We introduce a new API for `body*` endpoints that also accept the desired content-type. See #695 for more details.
+
+**NOTE:** `body.as[User]` is still supported and defaults to `body[User, Application.Json]`.
+
+``` scala
+// before (deprecated in this version)
+body.as[User]
+
+// after
+body[User, Application.Json]
+// or using an alias method
+jsonBody[User]
+```
+
+Previously, it was also possible to run `as[User]` to decode a `User` from JSON sent as a query string param or header. This indeed really powerful and allows some questionable design patterns, which are not necessary useful. Instead of being super generic here, we're trying to reduce the number of ways things could be built. This not only makes them easy to reason about but also quite efficient (b/c you now, specialization).
+
+That said, we're promoting a new way of decoding HTTP payloads. Instead of using `.as[A]`, we make it less powerful and more explicit. By limiting the responsibility of the `Decode` type-class, we tight it directly with HTTP payloads. This means constructing `body*` endpoints could be done in a single step, instead of producing 3-nested structures hence reduce allocations.
+
+Quick experiments showed that we could save **15% of running time and 20% of allocations** by just beeing explicit (`json2` is the new `body[A, Application.Json]`, `json` is `body.as[A]`).
+
+```
+[info] BodyBenchmark.json                       avgt    6  4824.580 ± 1205.444   ns/op
+[info] BodyBenchmark.json:·gc.alloc.rate.norm   avgt    6  5896.004 ±  147.449    B/op
+[info] BodyBenchmark.json2                      avgt    6  4179.209 ±  673.098   ns/op
+[info] BodyBenchmark.json2:·gc.alloc.rate.norm  avgt    6  4936.004 ±   73.723    B/op
+
+[info] BodyBenchmark.jsonOption                       avgt    6  4335.755 ±  150.928   ns/op
+[info] BodyBenchmark.jsonOption:·gc.alloc.rate.norm   avgt    6  5712.004 ±    0.001    B/op
+[info] BodyBenchmark.jsonOption2                      avgt    6  4050.681 ±  685.263   ns/op
+[info] BodyBenchmark.jsonOption2:·gc.alloc.rate.norm  avgt    6  4940.004 ±   36.862    B/op   
+```
+
+## Fixing Mistakes in Errors
+
+Some of the Finch's core components, including its error types, were designed a couple of years ago. Mistakes were made. We acknowledge it and fixing them now.  See #694 for the full discussion.
+
+Here is the summary of what's changed:
+- A misleading type for error accumulation (`RequestErrros`) now represents a flat non-empty list of Finch's own errors (previously, a recursive `Seq` of generic `Throwable`s). Technically, the new type tells exactly what happens at runtime (which is exactly why need types) - we always flatten errors while collecting, not nest them.
+- Now product endpoint only accumulates Finch's own errors and fails-fast with the first non-Finch error observed. We think this is a sane default behavior given that's not safe to keep evaluating endpoints while one of them failed with an unknown reasons that could have side-affected an entire application.
+
+## Lift Your Stuff
+
+`Endpoint.liftX` is a collection of factory methods allowing to build Finch `Endpoint`s out of anything. Presumably, these could be useful for wrapping functions returning arbitrary value within an [Endpoint] context.
+
+``` scala
+// The following endpoint will recompute a random integer on each request.
+val nextInt: Endpoint[Int] = Endpoint.lift(scala.util.random.nextInt)
+```
+
+## Behaviour Changes
+- Finch now defines a very basic instance of `Encode.Aux[Exception, ?]` that is polymorphic to the content type. This means, if no `Encode[Exception]` is provided for a given content-type, Finch app will still compile using this default instance (see #683).
+
+## API Changes
+- `body` and `bodyOption` endpoints now return `Buf` instead of `String`. Thus `body.as[User]` should still work as expected, but there is a new `stringBody` instance that might be used in place of `body` where a UTF-8 string of an HTTP body is expected.
+- `Encode` instance for `Either` is removed (this shouldn't be defined in Finch). See #689.
+
+## Bug Fixes
+- Extra new line character on streamed responses (see #652, thanks @ilya-murzinov)
+- Exceptions encoded in JSON are now properly char-escaped (see #680, thanks @akozhemiakin)
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/4900557/assets,https://api.github.com/repos/finagle/finch/releases/4900557,master,https://api.github.com/repos/finagle/finch/tarball/0.11,https://github.com/finagle/finch/releases/tag/0.11,https://api.github.com/repos/finagle/finch/zipball/0.11,0.11,False,False
+4403702,2016-10-17T03:34:17Z,2016-10-17T03:57:30Z,Finch 0.11-M4,"- Endpoints testing now easier with polymorphic `withBody` (see #646)
+- Simplifying the behavior around empty entries (see #642)
+- Better error messages in `finch-circe` (see #648)
+
+## Polymorphic `Input.withBody`
+
+It's now possible to utilize content-types (type-level strings) in `Input.withBody` such that a proper encoder (i.e., `io.finch.Encode`) is picked for the arbitrary value.
+
+Before:
+
+``` scala
+Input.post(""/"").withBody(Buf.Utf8(""text""), Some(""text/plain;charset=utf8""))
+Input.post(""/"").withJson(Map(""a"" -> ""b""), Some(Charsets.Utf8))
+```
+
+Now:
+
+``` scala
+// Now:
+Input.post(""/"").withBody[Text.Plain](""text"", Some(Charsets.Utf8))
+Input.post(""/"").withBody[Application.Json](Map(""a"" -> ""b""), Some(Charsets.Utf8))
+
+// We get the following for free:
+import cats.instances.int._
+Input.post(""/"").withBody[Text.Plain](42)
+```
+
+## Empty strings are now treated as `Some("""")`, not `None`
+
+For the sake of principle of least astonishment, we decided to simplify Finch's core endpoints such as `header`, `param`, and `body` so they resolve into `Some("""")` if the given entity is represented as an empty string (`None` before). This makes these endpoints both more flexible and less powerful (and actually more lightweight).
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/4403702/assets,https://api.github.com/repos/finagle/finch/releases/4403702,master,https://api.github.com/repos/finagle/finch/tarball/0.11.0-M4,https://github.com/finagle/finch/releases/tag/0.11.0-M4,https://api.github.com/repos/finagle/finch/zipball/0.11.0-M4,0.11.0-M4,False,False
+4015208,2016-08-31T17:49:35Z,2016-08-31T17:54:38Z,Finch 0.11-M3,"- `Endpoint[Response]` is now a first class citizen (see #624)
+- The behavior for `params` endpoint is changed a bit to make it easier to reason about (see #625)
+- There is new API for testing endpoints (see #619)
+- Cats updated to 0.7.0
+
+## Downgrading Endpoints
+
+This release makes it easier to work with raw Finagle `Response`s in the context of Finch `Endpoint`s such that they can be used instead of `Output`s.
+
+This now works (no need to wrap with `Output`):
+
+``` scala
+val foo: Endpoint[Response] = get(/) { Response(Status.Ok) }
+```
+
+Finagle `Response`s play an essential role in Finch's applications when it's much easier to take a shortcut and deal with HTTP types directly. This is why their support should be vital. For example, until 0.11 is here, dealing with raw `Response`s is the only way to serve multiple content types within a single service.
+
+## Endpoints Testing
+
+This release makes it easier to test `Endpoint`s by proving a lightweight API for `Input` and exposing some useful methods on `Output`.
+
+Here is an example of how `Input.post` and `Output.value` might be used to write simple tests similar to how functions are tested:
+
+``` scala
+scala> val sum: Endpoint[Int] = post(int :: int) { (a: Int, b: Int) => Ok(a + b) }
+sum: io.finch.Endpoint[Int] = POST /:int/:int
+
+scala> sum(Input.post(""/10/20"")).value == Some(30)
+res1: Boolean = true
+
+scala> sum(Input.get(""/foo/bar"")).value == None
+res2: Boolean = true
+```
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/4015208/assets,https://api.github.com/repos/finagle/finch/releases/4015208,master,https://api.github.com/repos/finagle/finch/tarball/0.11.0-M3,https://github.com/finagle/finch/releases/tag/0.11.0-M3,https://api.github.com/repos/finagle/finch/zipball/0.11.0-M3,0.11.0-M3,False,False
+3674414,2016-07-17T17:46:05Z,2016-07-17T18:07:31Z,Finch 0.11-M2,"This bug-fix release contains the following fixes since 0.11-M1:
+- There is now a `ToResponse` instance for `Response` (see #612)
+- Charset is not set for empty responses (see #613)
+- Coproducts that mix `AsyncStream[?]` now compile (see #616)
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/3674414/assets,https://api.github.com/repos/finagle/finch/releases/3674414,master,https://api.github.com/repos/finagle/finch/tarball/0.11.0-M2,https://github.com/finagle/finch/releases/tag/0.11.0-M2,https://api.github.com/repos/finagle/finch/zipball/0.11.0-M2,0.11.0-M2,False,False
+2952444,2016-07-13T16:49:21Z,2016-07-13T18:17:38Z,Finch 0.11-M1,"This release is a result of fixing an old known issue when an encoder, resolved for a given type `A` doesn't take into an account a Content-Type of `A`. This is why, for example, an import `io.finch.circe._` makes everything JSON.
+
+This release also made it a new record: 24 contributors! Thank you!
+
+Before looking closely into the changes were made, it's worth mentioning that there is now a [Roadmap 1.0](https://github.com/finagle/finch/wiki/Roadmap-1.0) available as a wiki page. It's not super clear yet how long it will take, but at least, we now have a finite list of things to-do.
+
+### Why M1?
+
+This is just a first step (marked as M1) towards more type safety in Finch. While the solution released here is not complete, I decided to wrap up a release and let people play with initial bits, while postponing the rest of the things to M2. It's been almost 6 months since the previous release and I feel it's important to do a release (even the M-prefixed one) now, given that besides type-level content type, it also contains a number of improvements for memory and performance.
+
+Please, note that the solution is presented here doesn't allow (doesn't compile) mixing endpoints of different content types in a single call `.toService`. While this sounds like a dramatic restriction, this should be viewed as a temporary step towards fully working solution that should a part of 0.11.
+
+That said, **please, consider upgrade if you only serve JSON (or anything) within your Finch server.** Otherwise, would be reasonable to wait for 0.11.
+
+### Content-Type as a Type
+
+There is now a much better way to handle content-types in Finch. A content-type is now a type-level string (see #541) and it does affect an implicit resolution of encoders, so, for example, if you ask for `Encode.Text[A]`, and you only have Circe's encoders (JSON encoders) in the scope, your program won't compile. This a huge step towards a better utilization of Scala's type-system and capturing just a little more information in types.
+
+Given that content-type is now a separate concept, which is neither attached to `Endpoint` nor `Output`, a way to specify it is to explicitly pass a requested content-type to a `toService` method call (using `toServiceAs` variant).
+
+Please, note that `Output.withContentType` is gone since it was just a lie.
+
+Before (broken at runtime):
+
+``` scala
+// helloWorld is a text/plain endpoint that will be encoded by whatever encoder is in the scope
+// (eg: if Circe is imported it will be a JSON string)
+val api: Service[Request, Response] = (
+  getUsers :+: postUsers :+: helloWorld
+).toService
+```
+
+After (broken at compile time):
+
+``` scala
+val api: Service[Request, Response] = (
+  getUsers :+: postUsers :+: helloWorld
+).toServiceAs[Application.Json]
+```
+
+JSON (i.e., `Application.Json`) is a default content-type for the `to.Service` call.
+
+### Charsets Make Difference
+
+Previously, charsets set on `Output` don't make much of difference to the HTTP response service with Finch, rather than changing the `Content-Type` header. Now they are propagated to the encoder (see #610). For the sake of type-safety, a charset is now `java.nio.charset.Charset`, not `String`.
+
+This change implies some default behaviour that should be explained. By default, a charset on `Output` is `None` so it's not copied over to the HTTP response. Although, an encoder will be using UTF-8 as a default. That said, everything will be encoded as UTF-8, but the `Content-Type` header won't be caring information about the charset.
+
+Set charset either on `Endpoint` or `Output` to make it explicit (and propogated to the HTTP response).
+
+### New Endpoints
+
+There are two new endpoints (see #606): 
+- `Endpoint.empty[A]` that never matches
+- `root: Endpoint[Request]` that extracts an entire HTTP requests 
+
+### Better Performance
+
+Finch now uses [Catbird's `Rerunnable[A]`](https://github.com/travisbrown/catbird/releases) instead of `Eval[Future[A]]` (see #578) and performs 20-30% better due to a reduced number of allocations.
+
+### Better Cats Integration
+1. There is now an `Alternative` instance for `Endpoint` provided out of the box (see #551).
+2. New endpoint `paramsNel` returns Cat's `NonEmptyList` (see #582)
+
+### Better Encoding
+1. It's now possible to JSON stream anything that has a JSON encoder (see #566)
+2. Anything that has a `cats.Show` instance now derives `Encode.PlainText` and so might be served as `text/plain` (see #561)
+
+### New Packages
+1. Support for Play JSON (see #538)
+2. Support for Spray JSON (see #568)
+
+### Better Generic Derivation
+
+`Endpoint.derive[Foo].fromParams` now takes into an account optional params deriving `paramOption` and multi-value params deriving either `params` or `paramsNel` (see #577).
+
+### Updated Dependencies
+1. Finagle 6.35
+2. Circe 0.5.0-M2
+3. Cats 0.6
+4. Shapeless 2.3
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/2952444/assets,https://api.github.com/repos/finagle/finch/releases/2952444,master,https://api.github.com/repos/finagle/finch/tarball/0.11.0-M1,https://github.com/finagle/finch/releases/tag/0.11.0-M1,https://api.github.com/repos/finagle/finch/zipball/0.11.0-M1,0.11.0-M1,False,False
+2626454,2016-02-16T19:51:26Z,2016-02-16T19:52:06Z,Finch 0.10,"This release is about unifying request readers and endpoints (see #524): now there is only `Endpoint[A]` abstraction in Finch that takes a request and returns a value of type `A`. `RequestReader` are just a type alias for `Endpoint` for now.
+
+#### Updated dependencies
+- Finagle 6.33
+- Circe 0.3
+- Cats 0.4.1
+
+#### Breaking API Changes
+- `RequestReader.flatMap` is gone - use `::` instead
+
+#### New Features
+- An `Output` ADT now has a third case - an `Empty` output (see #508)
+- Request readers are now endpoints (see #524)
+- There is now very basic support for `Buf`-streaming (see #515 and [example](https://github.com/finagle/finch/blob/master/examples/src/main/scala/io/finch/streaming/Main.scala))
+
+As usual, all the [docs](https://github.com/finagle/finch/blob/master/docs/index.md), [best-practices](https://github.com/finagle/finch/blob/master/docs/best-practices.md) and [cookbook recipes](https://github.com/finagle/finch/blob/master/docs/cookbook.md) have been updated.
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/2626454/assets,https://api.github.com/repos/finagle/finch/releases/2626454,master,https://api.github.com/repos/finagle/finch/tarball/0.10.0,https://github.com/finagle/finch/releases/tag/0.10.0,https://api.github.com/repos/finagle/finch/zipball/0.10.0,0.10.0,False,False
+2329814,2015-12-22T20:59:58Z,2015-12-22T21:02:56Z,Finch 0.9.3,"This release fixes a couple of silly bugs that have been introduced during performance optimizations on `body` readers as well as put some new [examples](https://github.com/finagle/finch/tree/master/examples/src/main/scala/io/finch/eval) and [best practices](https://github.com/finagle/finch/blob/master/docs/best-practices.md).
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/2329814/assets,https://api.github.com/repos/finagle/finch/releases/2329814,master,https://api.github.com/repos/finagle/finch/tarball/0.9.3,https://github.com/finagle/finch/releases/tag/0.9.3,https://api.github.com/repos/finagle/finch/zipball/0.9.3,0.9.3,False,False
+2237632,2015-12-05T17:21:52Z,2015-12-05T17:25:01Z,Finch 0.9.2,"This release contains a variety of performance improvements for body readers and extracting endpoints as well as new API for failures.
+
+## Upgraded Dependencies
+- Finagle 6.31
+- Circe 0.2.1
+- Cats 0.3.0 (yes! Finch now uses Cats' `Eval` to empower endpoints' laziness)
+
+## Breaking API Changes
+- All the `finch-core` is now available by a single import `io.finch._`. To migrate remove imports `io.finch.request.*` from your codebase.
+- `io.finch.request.RequestError` has been renamed to `io.finch.Error`.
+- `x.toFuture` and `x.toFutureException` have been removed. Use `Future.value` and `Future.exception` instread.
+
+## Deprecations
+- `Output.Failure(map: Map[String, String])` is deprecated in favor of `Output.Failure(cause: Exception)` and will be removed in 0.9.3.
+
+## Performance Improvements
+
+This is the first Finch release with first bits of performance work:
+- 30% less allocations and 20% less running time for `body*` readers.
+- 10% less allocations and 10% less running time for extractors `int`, `string`, `long`, `boolean`.
+
+The bottom line is Finch now gives only 5-6% overhead (both allocations and running time) on top of bare metal Finagle.
+
+## New Features
+
+### New Failures API
+
+`Output.Failure` now wraps `Exception`, which might be encoded into an HTTP response by `EncodeResponse[Exception]`. See [docs](https://github.com/finagle/finch/blob/master/docs/endpoint.md#outputs) for more details.
+
+### Pretty Printers for Argonaut and Circe
+
+It's now possible to override the default pretty printer for Circe and Argonaut. For example, the following import defines Circe's encoder that drops null keys in JSON objects. See [docs](https://github.com/finagle/finch/blob/master/docs/json.md#circe) for more details.
+
+``` scala
+import io.finch.circe.dropNullKeys._
+```
+
+### New Examples and Best Practices
+- There is a new sub-project [`examples`](https://github.com/finagle/finch/tree/master/examples/src/main/scala/io/finch) that contains always up-to-date Finch examples.
+- New docs section called [""Best Practices""](https://github.com/finagle/finch/blob/master/docs/best-practices.md) is aimed to collect all the known approaches and techniques that work reasonably good with Finch. Feel free to open a PR to share your experience.
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/2237632/assets,https://api.github.com/repos/finagle/finch/releases/2237632,master,https://api.github.com/repos/finagle/finch/tarball/0.9.2,https://github.com/finagle/finch/releases/tag/0.9.2,https://api.github.com/repos/finagle/finch/zipball/0.9.2,0.9.2,False,False
+2112908,2015-11-12T04:02:30Z,2015-11-12T04:22:36Z,Finch 0.9.1,"This release contains a bug fix [discovered by](https://github.com/finagle/finch/commit/a456e8e6a6a2721a6ca139793d97ee5cf70e9bcd#commitcomment-14323355) @nafg and [fixed by](https://github.com/finagle/finch/pull/435) @ImLiar.
+
+## Breaking API Changes
+
+This release is source compatible with most of the Finch API 0.9.0 except for `Outputs` API.
+
+Before:
+
+``` scala
+val ok: Output[Unit] = Ok
+val err: Output[Nothing] = BadRequest
+```
+
+After:
+
+``` scala
+val ok: Output[Unit] = Ok()
+val err: Output[Nothing] = BadRequest()
+```
+
+# New Features
+
+Finch now provides [a very basic instance](https://github.com/finagle/finch/blob/master/core/src/main/scala/io/finch/response/EncodeResponse.scala#L53-L56) of `EncodeResponse[Map[String, String]]`, which is unlikely useful for production projects but it's helpful to provide this out of the box and be more friendly for newcomers.
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/2112908/assets,https://api.github.com/repos/finagle/finch/releases/2112908,master,https://api.github.com/repos/finagle/finch/tarball/0.9.1,https://github.com/finagle/finch/releases/tag/0.9.1,https://api.github.com/repos/finagle/finch/zipball/0.9.1,0.9.1,False,False
+2092318,2015-11-09T01:22:49Z,2015-11-09T01:55:01Z,Finch 0.9.0,"This release is mostly about reworking the `Endpoint` API. Thanks to all the amazing contributors who helped to make this happen: @travisbrown, @ImLiar, @arnihermann, @rpless, @roanta, @longcao and many more!
+
+As usual, all the [docs](https://github.com/finagle/finch/blob/master/docs/index.md) have been upgraded to the current state!
+
+# Upgraded Dependencies
+- Finagle 6.30
+- Circe 0.2.0
+
+# Breaking API Changes
+- Finagle HTTPx renamed to Finagle HTTP. Use [this guide](https://gist.github.com/vkostyukov/130dd016dd25389275c9) to migrate.
+
+# Deprecations
+- `io.finch.route.Router` (deprecated) is renamed to `io.finch.Endpoint`
+- `/>` and `/>>` combinators are deprecated - use `Endpoint.apply` instead
+- `io.finch.response` package is deprecated - use `io.Finch.Output` instead
+- HTTP verb matchers `Get`, `Post`, etc are deprecated - use functions `get: Endpoint[A] => Endpoint[A]` instead
+
+# New Features
+
+## Finch ♥ OAuth2
+
+[finagle-oauth2](https://github.com/finagle/finagle-oauth2) is now supported in Finch! See [docs](https://github.com/finagle/finch/blob/master/docs/auth.md#authorization-with-oauth2) for more details.
+
+## UUIDs
+
+`java.util.UUID`s are supported out of the box in all the possible settings:
+- as request reader `param(""uuid"").as[UUID]: RequestReader[UUID]`
+- as endpoint `uuid: Endpoint[UUID]`
+
+## Output
+
+The new way of capturing the output context: headers, cookies, content type, etc. See [outputs](https://github.com/finagle/finch/blob/master/docs/endpoint.md#outputs) for more details.
+
+## Error Handling
+
+Brand new methods `Endpoint.handle` and `Endpoint.rescue` allows to handle the failed future from the endpoint. See [error handling](https://github.com/finagle/finch/blob/master/docs/endpoint.md#error-handling) for more details.
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/2092318/assets,https://api.github.com/repos/finagle/finch/releases/2092318,master,https://api.github.com/repos/finagle/finch/tarball/0.9.0,https://github.com/finagle/finch/releases/tag/0.9.0,https://api.github.com/repos/finagle/finch/zipball/0.9.0,0.9.0,False,False
+1634003,2015-08-10T15:52:54Z,2015-08-10T15:53:20Z,Finch 0.8.0,"This release introduces a bunch of neat features as well as some housekeeping cleanups. 
+
+## Breaking API Changes
+- `finch-auth` has been removed from the project (see new feature ""Basic HTTP Auth"")
+- Type aliases `io.finch.HttpRequest` and `io.finch.HttpResponse` were removed (use Finagle's types instead)
+- The `flatMap` method on `Router` has been replaced with `ap`
+
+## Deprecated API
+- All the old-style endpoints are deprecated: `io.finch.Endpoint` and `io.finch.Endpoint` in favour of coproduct routers
+- The custom request types are also deprecated (see [this note](https://github.com/finagle/finch/blob/master/docs/request.md#a-note-about-custom-request-types))
+- All the implicit classes (the bang! operator) on top of `Service` and `Filter` are deprecated
+
+## New Packages
+- `finch-circe` - enables [circe](https://github.com/travisbrown/circe) support in Finch
+- `petstore` - the brand new implementation of the [popular demo project](http://petstore.swagger.io)
+
+## New Features
+
+#### Basic HTTP Auth
+
+Use the following API in order to enable Basic HTTP Auth on the given `Router`.
+
+``` scala
+val r: Router[String] = Router.value(""protected"")
+val authR: Router[String] = basicAuth(""username"", ""password"")(r)
+```
+
+#### Smart `Router`s Composition
+
+When compositing two coproduct `Router`s the yielded `Router` will always be flattened.
+
+``` scala
+val r1: RequestReader[Int :+: String :+: CNil] = Router.value(10) :+: Router.value(""s1"")
+val r2: Router[Boolean :+: String :+: CNil] = Router.value(true) :+: Router.value(""s2"")
+val r3: Router[Int :+: String :+: Boolean :+: String :+: CNil] = r1 :+: r2
+```
+
+#### Compose `RequestReader`s and `Router`s
+
+Since 0.8.0 it's possible to compose `Router` and `RequestReader` together with the `?` combinator.
+
+``` scala
+val r1: RequestReader[Int :: String :: HNil] = param(""a"").as[Int] :: param(""b"")
+val r2: Router[Boolean] = Router.value(true)
+val r3: Router[Boolean :: Int :: String :: HNil] = r2 ? r1
+```
+
+#### Method Matchers
+
+It's now recommended to use new API for matching the HTTP methods.
+
+``` scala
+// Before
+val r1: Router0 = Get / ""users""
+
+// After
+val r2: Router0 = get(""users"")
+```
+
+#### `Router` Mapper
+
+There is a new API for mapping routers to either functions `A => B` or `A => Future[B]`. Use an `apply` method on `Router` instead of methods `/>>` and `>`, which are going to be deprecated in 0.9.0.
+
+``` scala
+val r1: Router[Int] = get(""users"" / int) { id: Int => id * 42 }
+val r2: Router[String] = get(""hello"") { Future.value(""Hello, World!"") }
+```
+
+There is just one downside of this feature: you have to always specify all the types in the function you're passing.
+
+#### Tail Extractors
+
+For each route extractor (i.e., `int`, `string`), there is now a corresponding _tail_ extractor that extracts a `Seq[A]` from the tail of the current route.
+
+``` scala
+// will match ""/users/10/20/30"" and extract Seq(10, 20, 30)
+val r: Router[Seq[Int]] = ""users"" / ints
+```
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/1634003/assets,https://api.github.com/repos/finagle/finch/releases/1634003,master,https://api.github.com/repos/finagle/finch/tarball/0.8.0,https://github.com/finagle/finch/releases/tag/0.8.0,https://api.github.com/repos/finagle/finch/zipball/0.8.0,0.8.0,False,False
+1389750,2015-06-08T03:28:31Z,2015-06-08T16:44:50Z,Finch 0.7.0,"This release is mostly a result of @travisbrown's heroic efforts on replacing ugly hacks (eg. types `/` and `~`) with [Shapeless'](https://github.com/milessabin/shapeless) primitives. As a result, a bunch of API has been marked deprecated.
+
+Some inspiring statistics: 
+- 17 contributors pushed 136 commits since 0.6.0, which is a new record
+- 3 new adopters since 0.6.0, which is a new record
+
+## Breaking API Changes
+- the `/` type (case class) is removed in favour of `HList` (see details below)
+
+## Deprecated API
+- `finch-json` is completely deprecated (and will be removed in 0.8.0) in favour `finch-argonaut`
+- `finch-jawn` is deprecated (and will be removed in 0.8.0) in favour other JSON libraries
+- both `~` type (case class) and `~` `RequestReader`s compositor are deprecated in favour of `HList`-based readers (see details below)
+- `finch-micro` is deprecated (and will be removed in 0.8.0) in favour of coproduct routers (see details below)
+
+## New Packages
+- `finch-json4s` - JSON4S support in Finch (contributed by @ImLiar)
+
+## New Infrastructure
+
+Finch is moving towards better stability and performance by integrating well-known tools: [ScalaCheck](https://www.scalacheck.org/) and [JMH](http://openjdk.java.net/projects/code-tools/jmh/). Property-based testing helped us to completely cover the JSON packages (and some API from`finch-core`) with tests. Benchmarking allowed us to establish the initial performance characteristic of the major Finch components.
+
+## New Features
+
+Most of the new features have landed in the `finch-core` package.
+
+#### `HList`-powered `RequestReader`
+
+The `::` compositor is now used instead of `~` in the applicative syntax of `RequestReader`. The main different is that `::` constructs a `RequestReader[A :: B :: HNil]` instead of `RequestReader[A ~ B]`. The main advantage of this migration is that a well-known method `as` is now can be used more generically, allowing to convert any underlying `HList` into a case class.
+
+``` scala
+case class Foo(i: Int, s: String)
+val foo: RequestReader[Foo] =
+  (param(""i"").as[Int] :: param(""s"")).as[Foo]
+```
+
+See section [""Applicative Syntax""](https://github.com/finagle/finch/blob/master/docs/request.md#applicative-syntax) for more details.
+
+#### `HList`-powered `Router`
+
+The `/` case class has been replaced with `HList`. This change shouldn't affect end users, except for the cases when `/` extractor is used. See section [""Composing Routers""](https://github.com/finagle/finch/blob/master/docs/route.md#composing-routers) for more details.
+
+#### Coproduct Routers
+
+This is another attempt (as well as `finch-micro`) to solve the problem of programming with types that matter. The basic idea behind this is that it's now possible to compose two routers of different types using the `:+:` compositor that constructs a `Router[C <: Coproduct]`.
+
+``` scala
+val router: Router[Foo :+: Bar :+: CNil] =
+  (foo: Router[Foo]) :+: (bar: Router[Bar])
+```
+
+The killer feature of coproduct routers is that they can be safely converted into a Finagle services using the `toService` method.
+
+``` scala
+val router: Router[String :+: HttpResponse :+: CNil] = ???
+val service: Service[HttpRequest, HttpResonse] = router.toService
+```
+
+See section [""Coproduct Routers""](https://github.com/finagle/finch/blob/master/docs/route.md#coproduct-routers) for more details.
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/1389750/assets,https://api.github.com/repos/finagle/finch/releases/1389750,master,https://api.github.com/repos/finagle/finch/tarball/0.7.0,https://github.com/finagle/finch/releases/tag/0.7.0,https://api.github.com/repos/finagle/finch/zipball/0.7.0,0.7.0,False,False
+1096177,2015-03-27T23:19:31Z,2015-03-27T23:19:55Z,Finch 0.6.0,"This release involves several improvements of the `core` package as well as a new ""easter egg"" mode of Finch with codename ""Your REST API as a Monad"". Although, this release is 100% source-compatible with a previous version.
+
+Please, note that while the old-style `io.finch.Endopint` is not deprecated yet, it's highly recommended to consider migration to route combinators.
+
+### Deprecations
+
+There is a new naming conversion for `RequestReader`s that is heavily inspired by Scala standard library:
+- Every `RequiredX` is now just `x`, eg. `param(""a"")`
+- Every `OptionalX` is now `xOption`, eg. `headerOption(""X-Secret"")`
+
+There is just one exclusion from this scheme:
+- `RequiredParams` is now `paramsNonEmpty`
+- `OptionalParams` is now `params`
+
+### New Features
+- There is a secret Finch mode available: deal with types that matter (see details bellow)
+- The `RequestReader` is now polymorphic in terms of request type (see details bellow)
+- There are two new `RequestReader`s: `fileUpload` and `fileUploadOption` that can read an _upload_ (a `multipart/form`) param from the request
+- Both `param`and `paramOption` are also looking at `multipart/form` content for param values
+- Two new combinators `~>` and `~~>` are available on `RequestReader` (see details bellow)
+- The `/>` combinator on `Router` is now more useful (see details bellow)
+- There is router `**` that always matches an _entire_ route
+
+##### Your REST API as a Monad
+
+There is a secret (ninja) mode available in this release. It's fully described in [docs/micro.md](https://github.com/finagle/finch/blob/master/docs/micro.md). The basic idea is to replace `Service` (a function) with `RequestReader` (a monad), which basically does the same job but implies insane composability. While it's still an experimental approach, we believe that it solves the ""Finch Puzzle"" and dramatically simplifies the whole picture. We personally believe that his way is ""the way"" to write idiomatic and robust Finch code.
+
+##### Polymorphic `RequestReader[A]` a la `PRequestReader[R, A]`
+
+While this tiny change doesn't affect API, this is a huge step towards flexibility. Code speaks for them self, here is the current picture:
+
+``` scala
+trait PRequestReader[R, A] {
+  def apply(req: R): Future[A]
+}
+
+type RequestReader[A] = PRequestReader[HttpRequest, A]
+```
+
+That said, all the monadic and applicative operations are defined over the output type `A` (right associative).
+
+##### Magic behind `~>`, `~~>` and `/>` combinators
+
+Both `~>` and `~~>` compositors allow to threat underlying type `A ~ B .. ~ Z` as `(A, B, ..., Z)`. So, the following code compiles:
+
+``` scala
+def sum(i: Int, j: Int) = i + j
+val r: RequestReader[Int] = 
+  param(""i"").as[Int] ~ param(""j"").as[Int] ~> sum
+```
+
+Using the `~~>` we can make _long_ calls to the underlying async API (considering that `Micro` is `RequestReader`):
+
+``` scala
+def fetchUserFromDb(id: Int): Future[User] = ???
+def getUser: Micro[User] = RequiredParam(""id"").as[Int] ~~> fetchUserFromDb
+```
+
+Compositor `/>` basically implies the same idea but for types `A / B / C ... Z`.
+
+---
+
+By tradition, kudos to awesome contributors: @jenshaase, @ImLiar and @suls!
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/1096177/assets,https://api.github.com/repos/finagle/finch/releases/1096177,master,https://api.github.com/repos/finagle/finch/tarball/0.6.0,https://github.com/finagle/finch/releases/tag/0.6.0,https://api.github.com/repos/finagle/finch/zipball/0.6.0,0.6.0,False,False
+949988,2015-02-13T17:30:20Z,2015-02-13T17:30:30Z,Finch 0.5.0,"This release is probably the most important and big one since 0.1.0. A bunch of cool and fancy features as well as some breaking API changes are introduced here.  We decided to get them all out of the way at once rather than incrementally breaking API. Although, we don't plan to make big API changes in further releases. So, this release might be treated as early pre-alpha 1.0.0.
+
+## New Features
+
+We will start with new features. There are two of them:
+- New route combinators API
+- New request reader API
+
+### Route Combinators
+
+The route combinators API is introduced in favour of `io.finch.Endpoint`. While we haven't deprecated the old-style endpoint yet, it's highly recommended to consider migration to the new API. The example bellow, shows how the old-style endpoint might be rewritten using the route combinators API. 
+
+``` scala
+// The old-style endpoint
+object Users extends Endpoint {
+  def route {
+    case Method.Get -> Root / ""users"" => GetAllUsers
+    case Method.Get -> Root / ""users"" / id => GetUser(id)
+  }
+}
+
+// The new-style endpoint
+val users = 
+  (Get / ""users"" /> GetAllUsers) |
+  (Get / ""users"" / int /> GetUser)
+```
+
+See [docs on routers](https://github.com/finagle/finch/blob/master/docs/route.md) for more details.
+
+### Applicative Request Reader
+
+`RequestReader`s applicative behaviour introduces a new way to compose readers together. In addition to monadic API, request readers are support applicative API via operand `~`. The main advantage of using the applicative API is that it allows to _collect errors_ rather then _fail-fast_. We recommend to migrate the monadic request readers to applicative request readers and respond clients the rich set of errors rather then only first one. The following example shows how monadic request reader might be rewritten in the applicative style.
+
+``` scala
+// the monadic style
+val monadicUser = for {
+  name <- RequiredParam(""name"")
+  age <- RequiredIntParam(""age"")
+} yield User(name, age)
+
+// the applicate style
+val applicativeUser = 
+  RequiredParam(""name"") ~ RequiredParam(""age"") map {
+    case name ~ age => User(name, age)
+  }
+```
+
+See [docs on applicative API](https://github.com/finagle/finch/blob/master/docs/request.md#combining-and-reusing-readers).
+
+### Reusable Validation Rules
+
+This item goes to features but it also brakes the current API around `ValidationRule`. Since version 0.5.0 validation rule is no longer an instance of `RequestReader` but standalone abstraction, which might be composed with request readers. Brand new request reader API introduces a new approach of validating request items. Instead of old-style `ValidationRule` the `should` or `shouldNot` methods should be used. The following example shows the difference between the old-style and new-style validation.
+
+``` scala
+// the old-style validation
+val oldNumber = for {
+  n <- RequiredIntParam(""n"")
+  _ <- ValidationRule(""n"", ""should be greater than 0"") { n > 0 }
+  _ <- ValidationRule(""n"", ""should be less than 100"") { n < 100 }
+} yield n
+
+// the new-style inline validation
+val newNumber = 
+  RequiredIntParam(""n"") should(""be greater than 0"") { _ > 0 } should(""be less than 100"") { _ < 100 }
+```
+
+The most beauty thing about new validation is that reusable `ValidationRule`s might dramatically simplify the example above. Keeping in mind that validation rules are composable and there are built-in rules `beGreaterThan` and `beLessThan`, the example might be rewritten as shown bellow.
+
+``` scala
+val newNumber = RequiredIntParam(""n"") should (beGreaterThan(0) and beLessThan(100))
+```
+
+See [docs on request validation](https://github.com/finagle/finch/blob/master/docs/request.md#validation).
+
+### `as[A]` method as a replacement for typed readers
+
+This release also introduces new style of defining typed readers, i.e., `RequiredIntParam`, `OptionalFloatParam`, etc. It's recommended to use new `as[A]` API instead. The following example shows the difference.
+
+``` scala
+// old-style typed reader
+val a = RequredIntParam(""a"")
+
+// new-style typed reader
+val b = RequiredParam(""a"").as[Int]
+```
+
+See [docs on type conversions](https://github.com/finagle/finch/blob/master/docs/request.md#type-conversion).
+
+## Breaking API Changes
+
+### Request Reader Errors
+
+The whole exceptions hierarchy was revised. We ended up having just three base exceptions thrown by `RequestReader`: `NotPresent`, `NotParsed` and `NotValid`. The following example shows a pattern according to which exception handling should be changed.
+
+``` scala
+// the old-style handling
+x handle {
+  case ParamNotFound(param) => ???
+}
+
+// the new style-handling
+y handle {
+  case NotPresent(ParamItem(param)) => ???
+}
+```
+
+See [docs on error handling](https://github.com/finagle/finch/blob/master/docs/request.md#error-handling).
+
+### Renamed Things
+
+The only thing we renamed in this release is body readers. In the following list `X` means either `Required` or `Optional`.
+- `XStringBody` renamed to `XBody`
+- `XArrayBody` renamed to `XBinaryBody`
+
+## Downloads
+
+Grad the new release at Maven Central:
+
+``` scala
+libraryDependencies ++= Seq(
+  ""com.github.finagle"" %% ""[finch-module]"" % ""0.5.0""
+)
+```
+
+Thanks to awesome contributors @jenshalm, @rpless, @travisbrown who made this release possible!
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/949988/assets,https://api.github.com/repos/finagle/finch/releases/949988,master,https://api.github.com/repos/finagle/finch/tarball/0.5.0,https://github.com/finagle/finch/releases/tag/0.5.0,https://api.github.com/repos/finagle/finch/zipball/0.5.0,0.5.0,False,False
+859348,2015-01-19T07:41:16Z,2015-01-19T07:43:50Z,Finch 0.4.0,"#### Highlights
+- New package `jackson` - a [Jackson](https://github.com/FasterXML/jackson-module-scala) support
+- New method `ResponseBuilder.withCookies()`
+- Updated `demo` with custom request type and implicit conversion: `Seq[ToJson] => ToJson`
+- [Scaladoc](http://finagle.github.io/finch/docs/#io.finch.package)
+
+---
+
+Finch becomes more general! Three major components of Finch were generalised in this release:
+- `Endpoint` is no longer depend on `HttpRequest`: any `Req` type may be used instead
+- `ResponseBuilder` is no longer depend on JSON response type: any media type may be built with it
+- `RequestReader` is no longer depend on JSON: any type `A` may be read with `RequiredBody[A]` and `OptionalBody[A]`
+
+##### Implicit view `Req => HttpRequest` instead sub-typing
+
+Finch moved forward to _composition_ from _inheritance_. Since, 0.4.0 release, an `Endpoint` changed its type-parameters bound from `Endpoint[Req <: HttpRequest]` to `Endpoint[Req, Rep]`. Thus, in fact, any request type may be used in the endpoint, even the custom case class like
+
+``` scala
+// we compose MyRequest with HttpRequest but not extend it
+case class MyRequest(http: HttpRequest)
+val e: Endpoint[MyRequest, HttpResponse]
+```
+
+There is also an implicit conversion in `io.finch._` that converts `Endpoint[Req, Rep]` to Finagle `Service[Req, Rep]`. Thus, the method `Endpoint.toService` is no longer exist. In order to enable the implicit conversion there is should be an implicit view `Req => HttpRequest` available in the scope. For example for `MyRequest` it looks like:
+
+``` scala
+implicit val myReqEv = (req: MyRequest) => req.http
+```
+
+Having an implicit view imported in the scope, an `Endpoint` may be treated as a usual Finagle `Service`:
+
+``` scala
+case class MyRequest(http: HttpRequest)
+implicit val myReqEv = (req: MyRequest) => req.http
+val e: Endpoint[MyRequest, HttpResponse]
+// an endpoint `e` will be converted to service implicitly
+Httpx.serve(new InetSocketAddress(8081), e)
+```
+
+Note, that in case of using pure `HttpRequest` and `HttpEndpoint` there is no need to define an implicit view from `HttpRequest => HttpRequest` since it's already defined in Scala's Predef.
+
+This new functionality is also supported by `RequestReader`, which previously had a signature:
+
+``` scala
+trait RequestReader[A] {
+  def apply(req: HttpRequest): Future[A]
+}
+```
+
+Since release 0.4.0 `RequestReader` takes any request type, which has an implicit view to `HttpRequest`. In fact, signature has been changed to:
+
+``` scala
+trait RequestReader[A] {
+  def apply[Req](req: Req)(implicit ev: Req => HttpRequest): Future[A]
+}
+```
+
+This allows to use requests readers smoothly even with custom request types like `MyRequest`:
+
+``` scala
+case class MyRequest(http: HttpRequest)
+implicit val myReqEv = (req: MyRequest) => req.http
+val req: MyRequest = ???
+// we don't need to call it as `req.http` since there is an implicit view available
+val s: Future[String] = RequiredParam(""name"")(req)
+```
+
+Finch provides the developers all the suitable abstractions to switch from inheritance to composition. While it's still possible to extends `HttpRequest` and pass it around, the composition in form `MyRequest(http: HttpRequest)` is preferred.
+
+##### Generalized `EncodeResponse`/`DecodeRequest` instead of `EncodeJson`/`DecodeJson`
+
+Finch moved away from JSON dependency to general concept of some type `A` that might be decoded from request using the `DecodeRequest` and encoded to response using the `EncodeResoponse`. This gives the opportunity to support not just JSON but any format (i.e., XML, [EDN](https://github.com/edn-format/edn) or even custom case class). Unless it looks like a big change, the JSON support via pluggable libraries remanned the same with type changes in API:
+- `RequiredBody`/`OptionalBody` renamed to `RequiredArrayBody`/`OptionalArrayBody`
+- `RequiredJsonBody`/`OptionalJsonBody` renamed to `RequiredBody`/`OptionalBody`
+
+Thus the usage of new API with `finch-json` looks like:
+
+``` scala
+val readJson: RequestReader[Json] = RequiredBody[Json]
+```
+
+The following example demonstrates the power of new concept by defining a custom decoder for `Double` values. Thus the double values encoded in request body may be read with predefined reader `RequiredBody`.
+
+``` scala
+implicit val decodeDouble = new DecodeRequest[Double] {
+  def apply(s: String): Option[Double] =
+    try { Some(s.toDouble) } catch { case _: NumberFormatException => None }
+}
+val req: HttpRequest = ???
+val readDouble: RequestReader[Double] = RequiredBody[Double]
+val double = readDouble(req)
+```
+
+Grab on Maven Central:
+
+``` scala
+libraryDependencies ++= Seq(
+  ""com.github.finagle"" %% ""[finch-module]"" % ""0.4.0""
+)
+```
+
+As always kudos to awesome contributors: @pasviegas, @rodrigopr, @rpless, @travisbrown!
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/859348/assets,https://api.github.com/repos/finagle/finch/releases/859348,master,https://api.github.com/repos/finagle/finch/tarball/0.4.0,https://github.com/finagle/finch/releases/tag/0.4.0,https://api.github.com/repos/finagle/finch/zipball/0.4.0,0.4.0,False,False
+779368,2014-12-16T18:21:07Z,2014-12-16T18:26:38Z,Finch 0.3.0,"This is another big step for Finch. An enormous work has been done by core contributors: @benjumanji, @rodrigopr and @rpless. Thank you guys!
+
+The following changes are made:
+- Finch is on Scala 2.11.4!
+- Finch is now on `finagle-httpx` (Netty-free implementation of HTTP), which means that new client/server construction API may be used instead of deprecated `ServerBuilder`:
+
+``` scala
+Await.ready(Httpx.serve(new InetSocketAddress(8080), endpoint.toService))
+```
+- An `Endpoint` companion object has an `apply` method that builds new endpoints on the fly:
+
+``` scala
+val e = Endpoint[String, String] {
+  case Method.Get -> Root / ""a"" => ???
+  case Method.Get -> Root / ""b"" => ???
+}
+```
+- Futures may be used instead of services in the `Endpoint` route's destination:
+
+``` scala
+val e = Endpoint[String, String] {
+  case Method.Get -> Root / ""a"" -> ""a"".toFuture
+  case Method.Get -> Root / ""b"" -> stringService
+}
+```
+- Finch supports the [Argonaut](http://argonaut.io/) library that provides purely functional JSON API.
+- The code coverage has been dramatically improved.
+
+Grab it on _Maven Central_:
+
+``` scala
+libraryDependencies ++= Seq(
+  ""com.github.finagle"" %% ""finch-module"" % ""0.3.0""
+)
+```
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/779368/assets,https://api.github.com/repos/finagle/finch/releases/779368,master,https://api.github.com/repos/finagle/finch/tarball/0.3.0,https://github.com/finagle/finch/releases/tag/0.3.0,https://api.github.com/repos/finagle/finch/zipball/0.3.0,0.3.0,False,False
+757813,2014-12-05T06:03:27Z,2014-12-05T06:10:29Z,Finch.io 0.2.0,"This release is a result of a huge project redesign: instead of mono-project, it's multi-project now. We've managed to resolve the _plugabble JSON libraries_ ticket. So, there are two new JSON modules in Finch.io: `finch-json` (own immutable JSON) and `finch-jawn` (bindings to [Jawn](https://github.com/non/jawn) library). Finally, Finch.io is on Maven Central now:
+
+``` scala
+""com.github.finagle"" %% ""finch-module"" % ""0.2.0""
+```
+
+Many thanks to @BenWhitehead, @rpless, @travisbrown, @rodrigopr!
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/757813/assets,https://api.github.com/repos/finagle/finch/releases/757813,master,https://api.github.com/repos/finagle/finch/tarball/0.2.0,https://github.com/finagle/finch/releases/tag/0.2.0,https://api.github.com/repos/finagle/finch/zipball/0.2.0,0.2.0,False,False
+499509,2014-08-19T02:53:00Z,2014-08-19T03:17:20Z,Finch.io 0.1.6,"This release is a result of @rpless's hard work on tests. All the major components are tested now. Also a couple of minor bugs has been fixed during testing.
+
+The [documentation](https://github.com/finagle/finch/blob/master/docs/index.md) has been improved.
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/499509/assets,https://api.github.com/repos/finagle/finch/releases/499509,master,https://api.github.com/repos/finagle/finch/tarball/0.1.6,https://github.com/finagle/finch/releases/tag/0.1.6,https://api.github.com/repos/finagle/finch/zipball/0.1.6,0.1.6,False,False
+480805,2014-08-09T02:48:23Z,2014-08-09T02:58:31Z,Finch.io 0.1.5,"This release contains the following changes:
+- Better names for `ConstParam`/`NoParams`: `ConstReader`/`EmptyReader`
+- Support for double/float params via `RequiredDoubleParam`, `OptionalDoubleParam`, etc.
+- `Redirect` factory object that generates redirect microservices. Thanks @rpless! 
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/480805/assets,https://api.github.com/repos/finagle/finch/releases/480805,master,https://api.github.com/repos/finagle/finch/tarball/0.1.5,https://github.com/finagle/finch/releases/tag/0.1.5,https://api.github.com/repos/finagle/finch/zipball/0.1.5,0.1.5,False,False
+463491,2014-07-31T16:47:23Z,2014-07-31T16:59:27Z,Finch.io 0.1.4,"This release are mostly about request reader:
+- There are only async readers in Finch.io (no country for `Param`, only `RequiredParam` and `OptionalParam`, only hard-core)
+- New request reader that reads constant value: `ConstParam()` (useful for passing URI params)
+- Headers may be fetched with `RequiredHeader` and `OptionalHeader` readers
+
+So, all the things are build around common interface of `RequestReader`, which means everything may be composed in a single for-comprehension chain:
+
+``` scala
+val magic = for {
+  a <- RequiredParam(""a"")
+  b <- OptionalParam(""b"")
+  c <- RequiredHeader(""c"")
+  d <- ConstParam(10)
+  _ <- ValidationRule(""d"", ""should be 10"") { d == 10 }
+} yield Seq(a, b, c, d)
+```
+
+Enjoy!
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/463491/assets,https://api.github.com/repos/finagle/finch/releases/463491,master,https://api.github.com/repos/finagle/finch/tarball/0.1.4,https://github.com/finagle/finch/releases/tag/0.1.4,https://api.github.com/repos/finagle/finch/zipball/0.1.4,0.1.4,False,False
+456629,2014-07-29T11:48:17Z,2014-07-29T11:49:43Z,Finch.io 0.1.3,"This release contains several functional improvements:
+
+`ValidationRule` accepts `param` name in order to pass it into the exception. So, a fancy errors may be generated out the expections `ParamNotFound` and `ValidationFailed`
+
+``` scala
+val params = for {
+  name <- RequiredParam(""name"")
+  _ <- ValidationRule(""name"", ""should be longer then 5 chars"") { name.length > 5 }
+} yield name
+
+val a = new Service[HttpRequest, HttpResponse] {
+  def apply(req: HttpRequest) = for {
+    name <- params(req)
+  } yield Ok()
+}
+
+val req: HttpRequest = ???
+
+a(req) handle {
+  case e: ParamNotFound => BadRequest(s""${e.param} not found"")
+  case e: ValidationFailed => BadRequest(s""${e.param} is not validated: ${e.rule}"")
+}
+```
+
+Also, a `Respond` builder may consume HTTP headers with `withHeaders` method:
+
+``` scala
+val ok: Respond = Ok.withHeaders(""Header-A"" - > ""a"", ""Header-B"" -> B)
+val rep: HttpRequest = ok()
+```
+
+Also, a new right-hand-side operand for pipe `!` operator is pure service. Services, filters and endpoints may be piped to other service like following.
+
+Composing services:
+
+``` scala
+val ab: Service[A, B] = ???
+val bc: Service[B, C] = ???
+val ac: Service[A, C] = ab ! bc
+```
+
+Composing endpoints:
+
+``` scala
+val ab: Endpoint[A, B] = ???
+val bc: Endpoint[B, C] = ???
+val ac: Endpoint[A, C] = ab ! bc
+```
+
+Finally, `TurnJsonIntoHttp` is no longer a filter but pure service. So, it may be constructred without request type.
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/456629/assets,https://api.github.com/repos/finagle/finch/releases/456629,master,https://api.github.com/repos/finagle/finch/tarball/0.1.3,https://github.com/finagle/finch/releases/tag/0.1.3,https://api.github.com/repos/finagle/finch/zipball/0.1.3,0.1.3,False,False
+452663,2014-07-26T12:05:27Z,2014-07-26T12:10:02Z,Finch.io 0.1.2,"The package structure is improved in this release. Also a `setup` function is no longer required for converting the endpoint into service. Facets are just a special kind of filters: filters that don't change request type but change the response type. Finally, everything (filters, services and endpoints) may be _piped_ with pipe `!` operator.
+
+See more details in `README.md` file.
+
+Enjoy!
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/452663/assets,https://api.github.com/repos/finagle/finch/releases/452663,master,https://api.github.com/repos/finagle/finch/tarball/0.1.2,https://github.com/finagle/finch/releases/tag/0.1.2,https://api.github.com/repos/finagle/finch/zipball/0.1.2,0.1.2,False,False
+446356,2014-07-23T14:44:51Z,2014-07-23T14:49:43Z,Finch.io 0.1.1,"This release contains cosmetic code improvements and also [HTTP Basic Auth](http://en.wikipedia.org/wiki/Basic_access_authentication) support via `BasicallyAuthorize` finagled filter.
+
+Usage:
+
+``` scala
+val respond: Service[HttpRequest, HttpResponse] = ???
+val protectedRespond = BasicallyAuthorize(""user"", ""password"") andThen respond
+```
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/446356/assets,https://api.github.com/repos/finagle/finch/releases/446356,master,https://api.github.com/repos/finagle/finch/tarball/0.1.1,https://github.com/finagle/finch/releases/tag/0.1.1,https://api.github.com/repos/finagle/finch/zipball/0.1.1,0.1.1,False,False
+434341,2014-07-17T03:39:05Z,2014-07-17T03:40:26Z,Finch.io 0.1.0,"A production-ready release. See all the details in `README.md` file.
+",https://api.github.com/users/vkostyukov,1098539,vkostyukov,https://api.github.com/repos/finagle/finch/releases/434341/assets,https://api.github.com/repos/finagle/finch/releases/434341,master,https://api.github.com/repos/finagle/finch/tarball/0.1.0,https://github.com/finagle/finch/releases/tag/0.1.0,https://api.github.com/repos/finagle/finch/zipball/0.1.0,0.1.0,False,False

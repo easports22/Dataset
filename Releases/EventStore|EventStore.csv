@@ -1,0 +1,775 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7821997,2017-09-27T07:29:17Z,2017-09-28T08:03:36Z,Event Store 4.0.3,"## Event Store Server
+ 
+- (#1442) - **(All Platforms)** - Exempt internal tcp service from PendingSendBytes
+- (#1438) - **(All Platforms)** - Fix bug when Replaying parked Messages with an empty park stream
+- (#1434) - **(All Platforms)** - Fix slave-to-master forwarding issues when a header has the wrong formatting
+- (#1417) - **(All Platforms)** - Prevent perfcounters from stopping MonitoringService
+- (#1424) - **(Windows)** - Fetch the correct performance counter instance for specific process specific
+- (#1426) - **(All Platforms)** - Allow the skipping of index scans on reads
+- (#1397) - **(All Platforms)** - Forward ack and nack http requests for persistent subscriptions to the master node.
+
+## Event Store Projections
+
+- (#1444) - **(All Platforms)** - Fault a projection if it encounters an unexpected event number to prevent it from computing a potentially incorrect state. This can happen when starting a projection and the next expected event has been deleted from the stream (for example, if applying $maxAge or $maxCount to the stream). The projection needs to be manually reset.
+- (#1440) - **(All Platforms)** - Only start projections on the master node
+- (#1418) - **(All Platforms)** - Delete order stream when projection is deleted
+- (#1425) - **(All Platforms)** - Handle stream deletions in MultiStreamEventReader
+- (#1398) - **(All Platforms)** - Use a unique projection control stream id
+- (#1400) - **(All Platforms)** - When stopping projections ensure that all the relevant processes related to the projections are stopped. This resolves an issue which surfaces as `An event emitted in recovery differs from the originally emitted event` If you have any projections affected by this, the projection will not automatically be fixed and a manual reset is required.
+- (#1404) - **(All Platforms)** - Don't fail if there are duplicate projection created events
+- (#1410) - **(All Platforms)** - Resolve an issue where projections are stuck on startup.
+
+## Event Store UI
+
+- (https://github.com/EventStore/EventStore.UI/pull/160) - Show projection failure reason in list.
+- (https://github.com/EventStore/EventStore.UI/pull/162) - Allow users to get projection state by a partition
+- (https://github.com/EventStore/EventStore.UI/pull/163) - Query this stream
+- (https://github.com/EventStore/EventStore.UI/pull/165) - Enable maximize/minimize projection editor on edit screen
+- (https://github.com/EventStore/EventStore.UI/pull/168) - Allow user to add an event to a stream
+- (https://github.com/EventStore/EventStore.UI/pull/169) - Remember the last query in local storage unless overrides are specified
+- (https://github.com/EventStore/EventStore.UI/pull/172) - Add new events to any (arbitrary) stream from the stream browser
+- (https://github.com/EventStore/EventStore.UI/pull/173) - Set ace edit language to text for special projections
+
+## .NET Client
+ #1438
+- (#1394) - **(All Platforms)** - Change the catchup subscription for $all to use a do..while loop
+- (#1396) - **(All Platforms)** - Fixed ProjectionsManager's GetResultAsync and GetPartitionResultAsync
+- (#1414) - **(All Platforms)** - Make ProjectionsManager work with Hostname
+- (#1415) - **(All Platforms)** - Cleans up handling of creating connection from gossip seeds or uri
+- (#1435) - **(All Platforms)** - Allow changing of custom metadata properties in the client StreamMetadataBuilder
+",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/7821997/assets,https://api.github.com/repos/EventStore/EventStore/releases/7821997,release-v4.0.3,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v4.0.3,https://github.com/EventStore/EventStore/releases/tag/oss-v4.0.3,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v4.0.3,oss-v4.0.3,False,False
+7789288,2017-08-16T10:03:48Z,2017-09-18T09:45:13Z,Event Store Client 4.0.2,"## .NET Embedded Client
+
+ - (#1266) - **(All Platforms)** - Fix acking for embedded persistent subscriptions
+
+## .NET Client
+
+- (#1285) - **(All Platforms)** - Allow use name of catch-up subscription in connection verbose logging
+- (#1262) - **(All Platforms)** - Add client API for executing queries and awaiting results
+- (#1310, #1323) - **(All Platforms)** - Support async OnEventAppeared for subscriptions
+- (#1365) - **(All Platforms)** - Fix memory leak in ReadEventsInternalAsync for subscriptions",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/7789288/assets,https://api.github.com/repos/EventStore/EventStore/releases/7789288,release-v4.0.4,https://api.github.com/repos/EventStore/EventStore/tarball/dotnet-client-v4.0.2,https://github.com/EventStore/EventStore/releases/tag/dotnet-client-v4.0.2,https://api.github.com/repos/EventStore/EventStore/zipball/dotnet-client-v4.0.2,dotnet-client-v4.0.2,False,False
+7423368,2017-08-16T10:03:48Z,2017-08-29T06:31:53Z,Event Store 4.0.2,"## Event Store Server
+
+- (#1383) - **(All Platforms)** - Commit count from master can come last.
+- (#1265) - **(All Platforms)** - Add functionality to parse Dictionaries via Rags
+- (#1277) - **(All Platforms)** - Correctly convert the subscription confirmations
+- (#1282) - **(Mono)** - Reduce CPU usage of idling Event Store on mono
+- (#1287) - **(All Platforms)** - Improve GetHashCode
+- (#1336) - **(All Platforms)** - Remove unnecessary logging filling up client's log files
+- (#1369) - **(All Platforms)** - Limit pending send bytes and drop messages to closed connections
+- (#1298) - **(All Platforms)** - Remove PAdmin in favor of the ES CLI
+
+## Event Store Server - Projections
+
+- (#1380, #1381) - **(All Platforms)** - Set number of writes in flight to unbounded to return projections to their former behaviour.
+- (#1272, #1312) - **(All Platforms)** - Disallow the deletion of System Projections
+- (#1273) - **(All Platforms)** - Support any valid json as partition state
+- (#1279) - **(All Platforms)** - Handle all messages in queue even if a consumer throws an error
+- (#1281) - **(All Platforms)** - Partition should handle empty string as simple state
+- (#1299) - **(All Platforms)** - Safe guard collection causing ""Collection was modified when running projections"" errors
+- (#1303) - **(All Platforms)** - Fix cases where projections are just buffering
+- (#1305) - **(All Platforms)** - Projection Processing Phase can be null
+- (#1307) - **(All Platforms)** - Add additional logging for failure conditions
+- (#1309) - **(All Platforms)** - Improve multi stream reader feedback loop
+- (#1314) - **(Windows)** - Fix projection compilation timeout on Windows
+- (#1325) - **(All Platforms)** - Change how registered projections are read to prevent deleted projections coming back to life
+- (#1326) - **(All Platforms)** - Add 'fromCategories' helper
+- (#1338) - **(All Platforms)** - Checkpoint after a certain period
+- (#1346) - **(All Platforms)** - Time out reads in the ProjectionManagerResponseReader
+- (#1351) - **(All Platforms)** - Dont allow the checkpoint to be enabled for a one time projection as
+- (#1357, #1356, #1360) - **(All Platforms)** - Make use of the idempotency checks when attempting rewrites
+- (#1359) - **(All Platforms)** - Replace strings with constants
+- (#1368) - **(All Platforms)** - Handle read timeouts during projection recovery
+- (#1370) - **(All Platforms)** - Fix projections getting stuck in preparing when a node becomes master
+- (#1373) - **(All Platforms)** - Limit the number of inflight writes per projection to 1
+- (#1374) - **(All Platforms)** - Expose config options for projections
+
+## Event Store Server - Persistent Subscriptions
+
+- (#1302) - **(All Platforms)** - Fix checkpoint bug where events could be skipped
+
+## Event Store UI
+
+- (https://github.com/EventStore/EventStore.UI/pull/156) - Show the returned error when the projection cannot be deleted.
+- (https://github.com/EventStore/EventStore.UI/pull/154) - Allow read/update of projection config
+
+## .NET Embedded Client
+
+ - (#1266) - **(All Platforms)** - Fix acking for embedded persistent subscriptions
+
+## .NET Client
+
+- (#1285) - **(All Platforms)** - Allow use name of catch-up subscription in connection verbose logging
+- (#1262) - **(All Platforms)** - Add client API for executing queries and awaiting results
+- (#1310, #1323) - **(All Platforms)** - Support async OnEventAppeared for subscriptions
+- (#1365) - **(All Platforms)** - Fix memory leak in ReadEventsInternalAsync for subscriptions",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/7423368/assets,https://api.github.com/repos/EventStore/EventStore/releases/7423368,release-v4.0.2,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v4.0.2,https://github.com/EventStore/EventStore/releases/tag/oss-v4.0.2,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v4.0.2,oss-v4.0.2,False,False
+7315622,2017-08-04T14:15:44Z,2017-08-10T07:57:35Z,Event Store 4.0.2 Release Candidate 2,"## Event Store Server
+
+- (#1383) - **(All Platforms)** - Commit count from master can come last.
+
+## Event Store Server - Projections
+
+- (#1380, #1381) - **(All Platforms)** - Set number of writes in flight to unbounded to return projections to their former behaviour.
+
+## Event Store UI
+
+- (https://github.com/EventStore/EventStore.UI/pull/156) - Show the returned error when the projection cannot be deleted.",https://api.github.com/users/hayley-jean,5140165,hayley-jean,https://api.github.com/repos/EventStore/EventStore/releases/7315622/assets,https://api.github.com/repos/EventStore/EventStore/releases/7315622,release-v4.0.2,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v4.0.2-rc2,https://github.com/EventStore/EventStore/releases/tag/oss-v4.0.2-rc2,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v4.0.2-rc2,oss-v4.0.2-rc2,False,True
+7315252,2017-08-04T14:07:37Z,2017-08-08T08:53:53Z,Event Store 4.0.1 Hotfix 4,"## Event Store Server
+
+- (#1383) - **(All Platforms)** - Prepare count from master can come last
+
+## Event Store Server - Projections
+
+- (#1303) - **(All Platforms)** - Fix cases where projections are just buffering
+- (#1305) - **(All Platforms)** - Projection Processing Phase can be null
+- (#1307) - **(All Platforms)** - Add additional logging for failure conditions
+- (#1309) - **(All Platforms)** - Improve multi stream reader feedback loop
+- (#1314) - **(All Platforms)** - Fix projection compilation timeout on Windows",https://api.github.com/users/hayley-jean,5140165,hayley-jean,https://api.github.com/repos/EventStore/EventStore/releases/7315252/assets,https://api.github.com/repos/EventStore/EventStore/releases/7315252,release-v4.0.1-hotfix4,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v4.0.1-hotfix4,https://github.com/EventStore/EventStore/releases/tag/oss-v4.0.1-hotfix4,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v4.0.1-hotfix4,oss-v4.0.1-hotfix4,False,False
+7225841,2017-07-31T10:56:16Z,2017-07-31T13:18:04Z,Event Store 4.0.2 Release Candidate 1,"## Event Store Server
+
+- (#1265) - **(All Platforms)** - Add functionality to parse Dictionaries via Rags
+- (#1277) - **(All Platforms)** - Correctly convert the subscription confirmations
+- (#1282) - **(Mono)** - Reduce CPU usage of idling Event Store on mono
+- (#1287) - **(All Platforms)** - Improve GetHashCode
+- (#1336) - **(All Platforms)** - Remove unnecessary logging filling up client's log files
+- (#1369) - **(All Platforms)** - Limit pending send bytes and drop messages to closed connections
+- (#1298) - **(All Platforms)** - Remove PAdmin in favor of the ES CLI
+
+## Event Store Server - Projections
+
+- (#1272, #1312) - **(All Platforms)** - Disallow the deletion of System Projections
+- (#1273) - **(All Platforms)** - Support any valid json as partition state
+- (#1279) - **(All Platforms)** - Handle all messages in queue even if a consumer throws an error
+- (#1281) - **(All Platforms)** - Partition should handle empty string as simple state
+- (#1299) - **(All Platforms)** - Safe guard collection causing ""Collection was modified when running projections"" errors
+- (#1303) - **(All Platforms)** - Fix cases where projections are just buffering
+- (#1305) - **(All Platforms)** - Projection Processing Phase can be null
+- (#1307) - **(All Platforms)** - Add additional logging for failure conditions
+- (#1309) - **(All Platforms)** - Improve multi stream reader feedback loop
+- (#1314) - **(Windows)** - Fix projection compilation timeout on Windows
+- (#1325) - **(All Platforms)** - Change how registered projections are read to prevent deleted projections coming back to life
+- (#1326) - **(All Platforms)** - Add 'fromCategories' helper
+- (#1338) - **(All Platforms)** - Checkpoint after a certain period
+- (#1346) - **(All Platforms)** - Time out reads in the ProjectionManagerResponseReader
+- (#1351) - **(All Platforms)** - Dont allow the checkpoint to be enabled for a one time projection as
+- (#1357, #1356, #1360) - **(All Platforms)** - Make use of the idempotency checks when attempting rewrites
+- (#1359) - **(All Platforms)** - Replace strings with constants
+- (#1368) - **(All Platforms)** - Handle read timeouts during projection recovery
+- (#1370) - **(All Platforms)** - Fix projections getting stuck in preparing when a node becomes master
+- (#1373) - **(All Platforms)** - Limit the number of inflight writes per projection to 1
+- (#1374) - **(All Platforms)** - Expose config options for projections
+
+## Event Store Server - Persistent Subscriptions
+
+- (#1302) - **(All Platforms)** - Fix checkpoint bug where events could be skipped
+
+## Event Store UI
+
+- (https://github.com/EventStore/EventStore.UI/pull/154) - Allow read/update of projection config
+
+## Embedded client
+
+ - (#1266) - **(All Platforms)** - Fix acking for embedded persistent subscriptions
+
+## .NET Client
+
+- (#1285) - **(All Platforms)** - Allow use name of catch-up subscription in connection verbose logging
+- (#1262) - **(All Platforms)** - Add client API for executing queries and awaiting results
+- (#1310, #1323) - **(All Platforms)** - Support async OnEventAppeared for subscriptions
+- (#1365) - **(All Platforms)** - Fix memory leak in ReadEventsInternalAsync for subscriptions",https://api.github.com/users/hayley-jean,5140165,hayley-jean,https://api.github.com/repos/EventStore/EventStore/releases/7225841/assets,https://api.github.com/repos/EventStore/EventStore/releases/7225841,release-v4.0.2-source,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v4.0.2-rc1,https://github.com/EventStore/EventStore/releases/tag/oss-v4.0.2-rc1,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v4.0.2-rc1,oss-v4.0.2-rc1,False,True
+6261527,2017-04-26T11:47:59Z,2017-05-03T11:36:01Z,Event Store 3.9.4,"## Event Store Server
+
+- (2dda2f21d41a0f25f7165bdcd833be4923d6c47f) - Let 3.9.4 understand the changes that were included in 4.0.0
+- (#1156) - Add support for X-Forwarded-Prefix
+- (#1188) - Add option for disabling insecure TCP
+- (#1205) - Amend the prepare position returned from a read all
+
+The [blog post](https://geteventstore.com/blog/20170503/event-store-3.9.4-released/index.html) detailing the 3.9.4 release.",https://api.github.com/users/hayley-jean,5140165,hayley-jean,https://api.github.com/repos/EventStore/EventStore/releases/6261527/assets,https://api.github.com/repos/EventStore/EventStore/releases/6261527,release-v4.0.2,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.9.4,https://github.com/EventStore/EventStore/releases/tag/oss-v3.9.4,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.9.4,oss-v3.9.4,False,False
+6151105,2017-04-21T09:23:47Z,2017-04-21T16:30:20Z,Event Store 4.0.1,"## Event Store Server
+- (#1280) - **(All Platforms)** - Revert to legacy queued handlers until further notice. There is an issue that manifests itself whereby the rebuilding of the index would not complete. The issue has been isolated to the recent introduction of the MPSC queues. The issue only occurs on Amazon Linux, but may be present in other distros.",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/6151105/assets,https://api.github.com/repos/EventStore/EventStore/releases/6151105,release-v4.0.2,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v4.0.1,https://github.com/EventStore/EventStore/releases/tag/oss-v4.0.1,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v4.0.1,oss-v4.0.1,False,False
+6118827,2017-04-19T06:57:32Z,2017-04-19T08:45:42Z,Event Store Client 3.9.5,"## Event Store Server
+
+No changes. This is a client release only
+
+## .NET Client
+- (#1230) - The client can now be configured to randomly select a node in the cluster instead of preferring master. This can help spread the load, specifically around reads for clients connecting to a cluster.
+
+e.g.
+```
+var clusterSettings = ClusterSettings.Create()
+.DiscoverClusterViaGossipSeeds()
+.SetGossipSeedEndPoints(
+	new GossipSeed(new IPEndPoint(IPAddress.Parse(""127.0.0.1""), 1113)), 
+	new GossipSeed(new IPEndPoint(IPAddress.Parse(""127.0.0.1""), 2113)))
+.PreferRandomNode();
+```
+
+## .NET Embedded Client
+- (#1266) - Fix acking for persistent subscriptions
+",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/6118827/assets,https://api.github.com/repos/EventStore/EventStore/releases/6118827,release-v4.0.1,https://api.github.com/repos/EventStore/EventStore/tarball/dotnet-client-v3.9.5,https://github.com/EventStore/EventStore/releases/tag/dotnet-client-v3.9.5,https://api.github.com/repos/EventStore/EventStore/zipball/dotnet-client-v3.9.5,dotnet-client-v3.9.5,False,False
+5844127,2017-03-23T10:08:13Z,2017-03-23T14:26:13Z,Event Store 4.0.0,"## Event Store Server - Projections
+- (#1101) - **(All Platforms)** - Upgrade V8. 
+  This provides the ability for projections to be written in ECMASCRIPT 6 as well as stability and performance improvements that came with the upgrade.
+- (#1129) - **(All Platforms)** - Handling message expiry on reads for projections
+- (#1133) - **(All Platforms)** - Prevent system events from being passed through the event by type filter
+- (#1139) - **(All Platforms)** - Handling of message expiry in the Event By Type Index Reader
+- (#1178) - **(All Platforms)** - Remove `whenAny` from the projections API.
+- (#1193) - **(All Platforms)** - Fault projections with more details as part of the exception to allow for better information when debugging projection related issues.
+- (#1203) - **(All Platforms)** - Fault the projection on failed subscription handle and in these cases previously the other projections would never see the event.
+- (#1205) - **(All Platforms)** - When reading from all which is something that projections do, there existed a case where an event might be skipped. This is now being catered for.
+- (#1224) - **(All Platforms)** - Stop attempting to infinitely retry on projection creates
+- (#1241) - **(All Platforms)** - Fault a projection that is attempting to emit a bad event
+- (#1255) - **(All Platforms)** - Resubscribe a paused projection
+
+## Event Store Server
+- (#1066) - **(All Platforms)** - Upgrade to Mono 4.6.2 and .NET 4.6
+- (#1096) - **(All Platforms)** - Add ConditionalAppendToStream which returns the status instead of throwing an exception in cases of stream version mismatch
+- (#1121) - **(All Platforms)** - Use Environment.Exit when exiting to prevent hanging on shut down
+- (#1138) - **(All Platforms)** - Provide the ability to not timeout messages in competing consumers
+- (#1156) - **(All Platforms)** - Add support for x-forwarded prefix
+- (#1161) - **(All Platforms)** - Allow single node to gossip for testing purposes
+- (#1164) - **(All Platforms)** - Support TLS 1.0/1.1/1.2 and SSL 3.0
+- (#1165) - **(All Platforms)** - Remove the System.Net.Http PCL
+- (#1188) - **(All Platforms)** - Add option for disabling insecure TCP
+- (#1205) - **(All Platforms)** - Amend the prepare position returned from a read all
+- (#1210) - **(All Platforms)** - Monitoring service now includes Ssl tcp connections in tcp stats
+- (#1213) - **(All Platforms)** - Support 64bit Event Numbers.
+- (#1225) - **(All Platforms)** - Log expired operations
+- (#1248) - **(All Platforms)** - Get client connection name when client is identified
+
+## .NET Client
+- (#1111) - **(All Platforms)** - Make it possible to set logger when using the connection string
+- (#1216) - **(All Platforms)** - Show current version on a WrongExpectedVersion error
+- (#1230) - **(All Platforms)** - Add option to prefer a randomly selected node
+
+## Event Store UI
+- (https://github.com/EventStore/EventStore.UI/pull/143) - Separate projection status and checkpoint status
+- (https://github.com/EventStore/EventStore.UI/pull/144) - Changed Competing Consumers label to Persistent Subscriptions
+- (https://github.com/EventStore/EventStore.UI/pull/146) - Show the client's connection name on the dashboard
+
+## Breaking Changes
+There is no migration necessary for a 3.x database to be written to and read from when upgrading to 4.0.0. However, once new data is written by an Event Store 4.0.0 node the database would be considered invalid/corrupt by a 3.x node.
+
+## Projections
+We have removed the `whenAny` function in favour of `$any`.
+
+## Before upgrading
+Please read the [release blog post](https://geteventstore.com/blog/20170323/event-store-4.0.0-released/index.html)",https://api.github.com/users/hayley-jean,5140165,hayley-jean,https://api.github.com/repos/EventStore/EventStore/releases/5844127/assets,https://api.github.com/repos/EventStore/EventStore/releases/5844127,release-v4.0.0,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v4.0.0,https://github.com/EventStore/EventStore/releases/tag/oss-v4.0.0,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v4.0.0,oss-v4.0.0,False,False
+5754498,2017-03-15T14:06:05Z,2017-03-15T15:17:46Z,Event Store 4.0.0 Release Candidate 3,"## Event Store Server
+- (#1245) - **(All Platforms)** - Change EventNumber.Invalid from long.MinValue to int.MinValue",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/5754498/assets,https://api.github.com/repos/EventStore/EventStore/releases/5754498,release-v4.0.0,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v4.0.0-rc3,https://github.com/EventStore/EventStore/releases/tag/oss-v4.0.0-rc3,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v4.0.0-rc3,oss-v4.0.0-rc3,False,True
+5722799,2017-03-13T12:12:23Z,2017-03-13T14:55:36Z,Event Store 4.0.0 Release Candidate 2,"## Event Store Server
+- (#1224) - **(All Platforms)** - Stop attempting to infinitely retry on projection creates
+- (#1225) - **(All Platforms)** - Log expired operations
+- (#1226) - **(All Platforms)** - Handle hard deletes correctly
+- (#1234) - **(All Platforms)** - Fix incorrect casts when resolving link tos
+- (#1241) - **(All Platforms)** - Fault a projection that is attempting to emit a bad event
+
+## .NET Client
+- (#1230) - **(All Platforms)** - Add option to prefer a randomly selected node
+
+## Event Store UI
+- (https://github.com/EventStore/EventStore.UI/pull/144) - Changed Competing Consumers label to Persistent Subscriptions",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/5722799/assets,https://api.github.com/repos/EventStore/EventStore/releases/5722799,release-v4.0.0,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v4.0.0-rc2,https://github.com/EventStore/EventStore/releases/tag/oss-v4.0.0-rc2,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v4.0.0-rc2,oss-v4.0.0-rc2,False,True
+5511874,2017-02-20T16:23:58Z,2017-02-20T16:55:58Z,Event Store 4.0.0 Release Candidate 1,"## Event Store Server
+- (#1213) - **(All Platforms)** - Support 64bit Event Numbers.
+- (#1066) - **(All Platforms)** - Upgrade to Mono 4.6.2 and .NET 4.6
+- (#1129) - **(All Platforms)** - Handling message expiry on reads for projections
+- (#1133) - **(All Platforms)** - Prevent system events from being passed through the event by type filter
+- (#1138) - **(All Platforms)** - Provide the ability to not timeout messages in competing consumers
+- (#1139) - **(All Platforms)** - Handling of message expiry in the Event By Type Index Reader
+- (#1165) - **(All Platforms)** - Remove the System.Net.Http PCL
+- (#1101) - **(All Platforms)** - Upgrade V8. 
+  This provides the ability for projections to be written in ECMASCRIPT 6 as well as stability and performance improvements that came with the upgrade.
+- (#1178) - **(All Platforms)** - Remove `whenAny` from the projections API.
+- (#1193) - **(All Platforms)** - Fault projections with more details as part of the exception to allow for better information when debugging projection related issues.
+- (#1203) - **(All Platforms)** - Fault the projection on failed subscription handle and in these cases previously the other projections would never see the event.
+- (#1205) - **(All Platforms)** - When reading from all which is something that projections do, there existed a case where an event might be skipped in a special case. This is now being catered for.
+- (#1210) - **(All Platforms)** - Monitoring service now includes Ssl tcp connections in tcp stats
+
+## Breaking Changes
+There is no migration necessary for a 3.x database to be written to and read from when upgrading to 4.0.0. However, once new data is written by an Event Store 4.0.0 node the database would be considered invalid/corrupt by a 3.x node.
+",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/5511874/assets,https://api.github.com/repos/EventStore/EventStore/releases/5511874,release-v4.0.0,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v4.0.0-rc1,https://github.com/EventStore/EventStore/releases/tag/oss-v4.0.0-rc1,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v4.0.0-rc1,oss-v4.0.0-rc1,False,True
+4997903,2016-12-22T09:02:54Z,2016-12-23T07:26:35Z,Event Store Client 3.9.4,"## Event Store Server
+
+No changes. This is a client release only
+
+## .NET Embedded Client
+- (#1092) - Add connection string translator for UserCredentials
+",https://api.github.com/users/hayley-jean,5140165,hayley-jean,https://api.github.com/repos/EventStore/EventStore/releases/4997903/assets,https://api.github.com/repos/EventStore/EventStore/releases/4997903,release-v4.0.4,https://api.github.com/repos/EventStore/EventStore/tarball/dotnet-client-v3.9.4,https://github.com/EventStore/EventStore/releases/tag/dotnet-client-v3.9.4,https://api.github.com/repos/EventStore/EventStore/zipball/dotnet-client-v3.9.4,dotnet-client-v3.9.4,False,False
+4926950,2016-12-09T11:54:02Z,2016-12-15T08:27:40Z,Event Store Client 3.9.3,"## Event Store Server
+
+No changes. This is a client release only
+
+## .NET Embedded Client
+- (#1111) - Make it possible to set logger when using the connection string
+- (#1087) - Prevent possible errors when setting the task result for a catchup subscription
+",https://api.github.com/users/hayley-jean,5140165,hayley-jean,https://api.github.com/repos/EventStore/EventStore/releases/4926950/assets,https://api.github.com/repos/EventStore/EventStore/releases/4926950,release-v4.0.0,https://api.github.com/repos/EventStore/EventStore/tarball/dotnet-client-v3.9.3,https://github.com/EventStore/EventStore/releases/tag/dotnet-client-v3.9.3,https://api.github.com/repos/EventStore/EventStore/zipball/dotnet-client-v3.9.3,dotnet-client-v3.9.3,False,False
+4739675,2016-11-30T11:53:30Z,2016-11-30T13:02:45Z,Event Store 3.9.3,"## Event Store Server
+- (#1099) - **(All Platforms)** - Fix 2 additional duplicate entry issues.
+  - when the duplicate entry is in the memory table and when rebuilding the memory table on node startup
+  - when the duplicate entry is cached as the last event number.
+- (#1080) - **(All Platforms)** - Fix performance counters for a process.
+- (#1078) - **(All Platforms)** - Fix expectations from exhausting the hash collision read limit.
+- (#1075) - **(All Platforms)** - Start the persistent subscription from the event after the checkpoint.
+- (#1104) - **(All Platforms)** - Add option to always keep scavenged chunks.
+",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/4739675/assets,https://api.github.com/repos/EventStore/EventStore/releases/4739675,release-v4.0.0,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.9.3,https://github.com/EventStore/EventStore/releases/tag/oss-v3.9.3,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.9.3,oss-v3.9.3,False,False
+4357572,2016-10-10T08:22:10Z,2016-10-11T13:00:05Z,Event Store 3.9.2,"## Event Store Server
+- (#1068) - **(All Platforms)** - Fixed issue when merging mixed indexes where hash collisions occur
+- (#1062) - **(All Platforms)** - Fixed an issue where the user-provided advertise info was being overridden when the ip address was set to 0.0.0.0
+- (#1048) - **(All Platforms)** - Master must now acknowledge a write before it will be acknowledged to the client
+- (#1049) - **(All Platforms)** - Fixed an issue in persistent subscriptions where the checkpoint would set the last known message to 0 if the subscription does a take over and is perfectly caught up, with nothing connected to it
+",https://api.github.com/users/hayley-jean,5140165,hayley-jean,https://api.github.com/repos/EventStore/EventStore/releases/4357572/assets,https://api.github.com/repos/EventStore/EventStore/releases/4357572,release-v4.0.0,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.9.2,https://github.com/EventStore/EventStore/releases/tag/oss-v3.9.2,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.9.2,oss-v3.9.2,False,False
+4050191,2016-09-04T16:51:08Z,2016-09-05T08:20:27Z,Event Store 3.9.1,"## Event Store Server
+- (#1041) - **(All Platforms)** - Improve performance of ptable merges.
+",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/4050191/assets,https://api.github.com/repos/EventStore/EventStore/releases/4050191,release-v3.9.1,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.9.1,https://github.com/EventStore/EventStore/releases/tag/oss-v3.9.1,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.9.1,oss-v3.9.1,False,False
+3904049,2016-08-27T10:30:03Z,2016-08-28T20:33:02Z,Event Store 3.9.0,"## Event Store Server
+- (#1021) - **(All Platforms)** - Introducing 64bit indexes. This reduces the possibility of stream hash collision occurring.
+- (#993) - **(All Platforms)** - (Projections) When failing to initialize a projection, surface the error to the user.
+- (#995) - **(All Platforms)** - (Projections) Remove the option to force a projection name.
+- (#996) - **(All Platforms)** - (Projections) Allow the user to delete a faulted projection.
+- (#997) - **(All Platforms)** - Add `ReaderThreadCount` command line option.
+- (#998) - **(All Platforms)** - Deny persistent subscription operations being performed on a slave.
+- (#1003) - **(All Platforms)** - Make midpoints and validate at same time to speed up loading the readIndex.
+- (#1005) - **(All Platforms)** - (Projections) Fail on reading a null checkpoint tag for an emitted stream.
+- (#1008) - **(All Platforms)** - Calculate the appropriate index cache depth automatically.
+- (#999) - **(All Platforms)** - (Projections) Fault the projection on checkpoint write fail.
+- (#1009) - **(All Platforms)** - Fix Transfer-Encoding:Chunked requests failing on slaves.
+- (#1023) - **(All Platforms)** - Continue scavenge if an exception is thrown while scavenging a chunk.
+
+## .NET Client
+- (#987) - **(All Platforms)** - Added an option to create a StreamMetadataBuilder from existing metadata.
+- (#989) - **(All Platforms)** - Add track and delete emitted streams options to ProjectionsManager.
+
+## Event Store UI
+- (https://github.com/EventStore/EventStore.UI/pull/135) - Display the reason when there is an error creating a competing consumer
+- (https://github.com/EventStore/EventStore.UI/pull/134) - Show errors thrown when a chunk has been scavenged
+",https://api.github.com/users/hayley-jean,5140165,hayley-jean,https://api.github.com/repos/EventStore/EventStore/releases/3904049/assets,https://api.github.com/repos/EventStore/EventStore/releases/3904049,release-v3.9.0,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.9.0,https://github.com/EventStore/EventStore/releases/tag/oss-v3.9.0,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.9.0,oss-v3.9.0,False,False
+3729878,2016-07-22T14:15:48Z,2016-07-26T06:48:14Z,Event Store 3.8.1,"## Event Store Server
+- (#985) - **(All Platforms)** - Use X-Forwarded-\* headers for generating atom feed urls.
+- (#986) - **(All Platforms)** - Limit the number of entries returned from PTable. This only affects the path wherein a hash collision between stream ids occur and results in very long running loop to find the correct stream id.
+",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/3729878/assets,https://api.github.com/repos/EventStore/EventStore/releases/3729878,release-v3.9.0,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.8.1,https://github.com/EventStore/EventStore/releases/tag/oss-v3.8.1,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.8.1,oss-v3.8.1,False,False
+3647474,2016-07-12T11:39:42Z,2016-07-13T15:27:07Z,Event Store 3.8.0,"## Event Store Server
+- (#970) - **(All Platforms)** - (Projections) Allow the user to enable tracking of the streams emitted by a projection, and to delete the emitted streams when deleting the projection.
+- (#973) - **(All Platforms)** - (HTTP API) Only use external or advertised http ip address for links returned over http
+- (#979) - **(All Platforms)** - Retry deleting the scavenge temp file if an error occurs during deletion, and stops the scavenge if the temp files cannot be deleted.
+
+## .NET Client
+- (#966) - **(All Platforms)** - Fix a race condition when subscribing to a persistent subscription.
+
+## Event Store UI
+- (https://github.com/EventStore/EventStore.UI/pull/128) - **(All Platforms)** - Add an option to track and delete the streams a projection emits to.
+- (https://github.com/EventStore/EventStore.UI/pull/130) - **(All Platforms)** - Show failures and errors for scavenges on the admin and scavenge screens.
+",https://api.github.com/users/hayley-jean,5140165,hayley-jean,https://api.github.com/repos/EventStore/EventStore/releases/3647474/assets,https://api.github.com/repos/EventStore/EventStore/releases/3647474,release-v3.8.0,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.8.0,https://github.com/EventStore/EventStore/releases/tag/oss-v3.8.0,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.8.0,oss-v3.8.0,False,False
+3529344,2016-06-28T13:55:23Z,2016-06-29T07:26:15Z,Event Store 3.7.0,"## Event Store Server
+- (#902) - **(All Platforms)** - Add ExpectedVersion.StreamExists which will only allow appending to a stream if it already exists
+- (#915) - **(All Platforms)** - Use the Embedded Client's builder internally to build the ClusterVNode
+- (#921) - **(All Platforms)** - (HTTP API) Add application/octet-stream in HTTP API to support just data events
+- (#925) - **(All Platforms)** - Wait for subsystems to initialise before publishing the system ready message
+- (#934) - **(All Platforms)** - (Projections) Add RunProjections method for backwards compatibility for clients upgrading to the embedded client pre 4.0
+- (#935) - **(All Platforms)** - Change the config file default option to correctly reflect its source
+- (#937) - **(All Platforms)** - Ensure persistent subscription checkpoint version doesn't get corrupted when an error occurs while writing a checkpoint
+- (#938) - **(All Platforms)** - (Projections) Only initialise projections when the core worker readers are ready
+- (#951) - **(All Platforms)** - Fixed an error caused by the ContentType header on a forwarded http message being null
+- (#953) - **(All Platforms)** - (Projections) Fixed complete TF position required error
+- (#956) - **(All Platforms)** - (HTTP API) Use the advertised IP address to build the atom links, if they are set
+- (#959) - **(All Platforms)** - (HTTP API) Return the current version on a WrongExpectedVersion response over HTTP 
+- (#962) - **(All Platforms)** - Fixed an issue where we weren't retrying on the writes of scavenge statuses.
+
+## .NET Embedded Client
+- (#915) - **(All Platforms)** - Use the Embedded Client's builder internally to build the ClusterVNode
+
+## .NET Client
+- (#902) - **(All Platforms)** - Add ExpectedVersion.StreamExists which will only allow appending to a stream if it already exists
+
+## Event Store UI
+- (https://github.com/EventStore/EventStore.UI/pull/127) - **(All Platforms)** - Add a note to indicate to the user that there might have been an issue writing the status of the scavenge to disk if the scavenge status does not appear to be updating.
+",https://api.github.com/users/hayley-jean,5140165,hayley-jean,https://api.github.com/repos/EventStore/EventStore/releases/3529344/assets,https://api.github.com/repos/EventStore/EventStore/releases/3529344,release-v3.7.0,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.7.0,https://github.com/EventStore/EventStore/releases/tag/oss-v3.7.0,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.7.0,oss-v3.7.0,False,False
+3364743,2016-05-12T11:40:26Z,2016-06-03T05:15:40Z,Event Store Client 3.6.2,"## Event Store Server
+
+No changes. This is a client release only
+
+## .NET Embedded Client
+- (#918) - Allow using a connection string with only gossipSeeds
+",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/3364743/assets,https://api.github.com/repos/EventStore/EventStore/releases/3364743,release-v4.0.4,https://api.github.com/repos/EventStore/EventStore/tarball/dotnet-client-v3.6.2,https://github.com/EventStore/EventStore/releases/tag/dotnet-client-v3.6.2,https://api.github.com/repos/EventStore/EventStore/zipball/dotnet-client-v3.6.2,dotnet-client-v3.6.2,False,False
+3364734,2016-05-20T12:37:05Z,2016-06-03T05:13:28Z,Event Store Client 3.6.3,"## Event Store Server
+
+No changes. This is a client release only
+
+## .NET Embedded Client
+- (#924) - Revert of Make EventStoreCatchUpSubscription Async
+",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/3364734/assets,https://api.github.com/repos/EventStore/EventStore/releases/3364734,release-v4.0.4,https://api.github.com/repos/EventStore/EventStore/tarball/dotnet-client-v3.6.3,https://github.com/EventStore/EventStore/releases/tag/dotnet-client-v3.6.3,https://api.github.com/repos/EventStore/EventStore/zipball/dotnet-client-v3.6.3,dotnet-client-v3.6.3,False,False
+3322120,2016-05-27T14:56:54Z,2016-06-02T09:01:44Z,Event Store 3.6.3,"## Event Store Server
+- (#930) - **(Linux)** - The *Nix versions of Event Store will now include the PCL version of `System.Net.Http` of which we make use of the HttpClient
+",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/3322120/assets,https://api.github.com/repos/EventStore/EventStore/releases/3322120,release-v3.7.0,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.6.3,https://github.com/EventStore/EventStore/releases/tag/oss-v3.6.3,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.6.3,oss-v3.6.3,False,False
+3202280,2016-05-11T07:44:03Z,2016-05-11T13:02:51Z,Event Store 3.6.2,"## Event Store Server
+- (#916) - **(All Platforms)** - Revert ""Make midpoints and validate at same time"". This caused a regression in the Windows Version of Event Store and has subsequently been removed from the downloads on the Event Store website.
+",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/3202280/assets,https://api.github.com/repos/EventStore/EventStore/releases/3202280,release-v4.0.4,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.6.2,https://github.com/EventStore/EventStore/releases/tag/oss-v3.6.2,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.6.2,oss-v3.6.2,False,False
+3202185,2016-05-08T16:22:32Z,2016-05-11T12:52:18Z,Event Store 3.6.1,"## Event Store Server
+- (#914) - **(All Platforms)** - Use correct method for constructing the MediaTypeHeaderValue
+- (#909) - **(All Platforms)** - (HTTP API) Treat `application/xml` and `text/xml` the same way when parsing events to be written 
+",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/3202185/assets,https://api.github.com/repos/EventStore/EventStore/releases/3202185,release-v4.0.4,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.6.1,https://github.com/EventStore/EventStore/releases/tag/oss-v3.6.1,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.6.1,oss-v3.6.1,False,False
+3077728,2016-04-22T10:15:55Z,2016-04-24T16:31:44Z,Event Store 3.6.0,"## Event Store Server
+- (#829) - **(All Platforms)** - Fixed events not appearing in catchupsubscriptons on embedded connection
+- (#832) - **(All Platforms)** - (HTTP API) Omit the metadata json field if there is no metadata on a feed entry
+- (#836) - **(All Platforms)** - Fixed maxSubscriberCount which was ignored when creating/updating persistent subscriptions
+- (#843) - **(All Platforms)** - Fixed ordering of the Internal and external heartbeat timeouts
+- (#846) - **(All Platforms)** - (Projections) Fix the parameters in partitionBy which was causing some of the parameters to be out of place. (e.g. isJson containing the streamid)
+- (#847) - **(All Platforms)** - Reduce the flushtimeout on the storage chaser from 100 to 10ms which could cause occasional tail latencies on mono
+- (#848) - **(All Platforms)** - Cluster replication will immediately be triggered after flush to speed up writes.
+- (#853) - **(All Platforms)** - Add new option to indicate that hard deletes can be removed during scavenge (-UnsafeIgnoreHardDelete)
+- (#856) - **(All Platforms)** - Projection will now throw exception if attempting to emit a null stream id
+- (#862) - **(All Platforms)** - Introduce a new flag when turned on would ensure that writes are processed in the order they are received from the client (If the stream id is null, the transaction id is used for queue affinity) (-BetterOrdering)
+- (#866) - **(All Platforms)** - (HTTP) Fixes an issue where the server would format dates on parse (e.g. possibly messing up timezones)
+- (#869) - **(All Platforms)** - Chaser Histogram will now produce accurate measurements
+- (#870) - **(All Platforms)** - Introduced 2 new histograms (TCP/HTTP)
+- (#871) - **(All Platforms)** - (HTTP) When the server is too busy it will now return the appropriate HTTP status code (503 instead of 500)
+- (#876) - **(All Platforms)** - The server will now properly handle index tables that have great than 2 billion items
+- (#883) - **(All Platforms)** - Include Prepare/Commit position to WithCorrelationId
+- (#885) - **(All Platforms)** - The server will now validate and cache midpoints together which will reduce startup time
+- (#889) - **(All Platforms)** - Non-admin users can now login to the admin ui. See (https://github.com/EventStore/EventStore.UI/pull/122)
+- (#892) - **(All Platforms)** - Projections fromAll will now honour the includeLinks option and filter them out appropriately
+- (#895) - **(All Platforms)** - Added time to live for any http messages that go through http send
+
+## Event Store UI
+- (https://github.com/EventStore/EventStore.UI/pull/118) - Changed the wording on scavenge screen from `Running` to `Not Finished`
+- (https://github.com/EventStore/EventStore.UI/pull/119) - The partition method expects the isJson as the second parameter. (See #846)
+- (https://github.com/EventStore/EventStore.UI/pull/121) - Fixed ""projections not enabled"" error when refreshing the projections page.
+- (https://github.com/EventStore/EventStore.UI/pull/122) - Allow non-admin users to log in to the admin UI.
+
+## .NET Embedded Client
+- (#839) - **(All Platforms)** -  Add the ability to set logging of http requests via the EmbeddedVNode.
+- (#863) - **(All Platforms)** -  CatchupSubscriptions have been moved into a unit and now exposes MaxPushQueueSize
+
+## .NET Client
+- (#837) - **(All Platforms)** - EventStoreCatchUpSubscription is now async
+- (#840) - **(All Platforms)** - The ConnectionSettings the Event Store Connection was setup with is now available on the EventStoreConnection
+- (#894) - **(All Platforms)** - Persistent Subscriptions now includes an async method for Connecting (`ConnectToPersistentSubscriptionAsync`)
+",https://api.github.com/users/hayley-jean,5140165,hayley-jean,https://api.github.com/repos/EventStore/EventStore/releases/3077728/assets,https://api.github.com/repos/EventStore/EventStore/releases/3077728,release-v3.6.0,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.6.0,https://github.com/EventStore/EventStore/releases/tag/oss-v3.6.0,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.6.0,oss-v3.6.0,False,False
+2758227,2016-03-07T10:41:31Z,2016-03-07T11:07:11Z,Event Store Client 3.5.2,"## Event Store Server
+
+No changes. This is a client release only
+
+## .NET Embedded Client
+- (#825) - Change prelude js files to embedded resources
+- (#829) - Use ClientResolvedEvent if OriginalPosition not null. This fixes an issue where some events were not being delivered to the catch up subscription
+",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/2758227/assets,https://api.github.com/repos/EventStore/EventStore/releases/2758227,release-v4.0.4,https://api.github.com/repos/EventStore/EventStore/tarball/dotnet-client-v3.5.2,https://github.com/EventStore/EventStore/releases/tag/dotnet-client-v3.5.2,https://api.github.com/repos/EventStore/EventStore/zipball/dotnet-client-v3.5.2,dotnet-client-v3.5.2,False,False
+2703025,2016-02-26T20:41:14Z,2016-02-27T19:52:48Z,Event Store 3.5.0,"## Event Store Server
+- (#782) - **(All Platforms)** - Show scavenges and their statuses in the UI.
+- (#792) - **(All Platforms)** - Show TCP connections and their statistics in the UI.
+- (#793) - **(All Platforms)** - Default the db to the current directory if an Access Denied exception is encountered.
+- (#794) - **(All Platforms)** - Adds logging for http requests and responses. Enable with --log-http-requests
+- (#799) - **(All Platforms)** - Shows statistics about replicas in a cluster
+- (#808) - **(All Platforms)** - External TCP service will now use the correct heartbeat interval.
+- (#809) - **(All Platforms)** - Projections routes will now return 404 if projections aren't enabled. Was previously timing out.
+- (#811) - **(All Platforms)** - Add Trusted Writes to TCP. This enables nodes to send writes over the internal TCP connection if the user is a trusted user. In this case, system.
+- (#813) - **(All Platforms)** - Fix stuck projections and include common logging
+- (#816) - **(All Platforms)** - Fix incorrect arguments in verbose logging in the client api.
+- (#818) - **(All Platforms)** - Persistent Subscription correctly reflect last known event number
+- (#819) - **(All Platforms)** - Introduce a System Ready message
+
+## Event Store UI
+- (https://github.com/EventStore/EventStore.UI/pull/108) - Show scavenges in the UI.
+- (https://github.com/EventStore/EventStore.UI/pull/111) - Show TCP stats in the UI
+- (https://github.com/EventStore/EventStore.UI/pull/113) - Shows stats about replicas in a cluster
+- (https://github.com/EventStore/EventStore.UI/pull/114) - Adding seconds on the Created Date and Timestamp columns
+- (https://github.com/EventStore/EventStore.UI/pull/116) - Redirect the user if they try to access projections when they're disabled
+
+## .NET Embedded Client
+- (#807) - **(All Platforms)** - Embedded Client will now correctly set stats on public. Was previously setting admin on public.
+- (#798) - **(All Platforms)** - Fixing Occasional Race Condition With Authentication
+",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/2703025/assets,https://api.github.com/repos/EventStore/EventStore/releases/2703025,release-v3.5.0,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.5.0,https://github.com/EventStore/EventStore/releases/tag/oss-v3.5.0,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.5.0,oss-v3.5.0,False,False
+2303616,2015-12-17T08:30:17Z,2015-12-17T17:04:18Z,Event Store 3.4.0,"## Event Store Server
+- (#780) - **(All Platforms)** - Correctly set head of stream when reading forward (Only Affects Atom Feeds)
+- (#777) - **(All Platforms)** - Introduce a new competing consumers strategy (Pinned)
+- (#776) - **(All Platforms)** - Add a plugin model for persistent subscription consumer strategies
+- (#770) - **(All Platforms)** - Expose Authentication Config via options
+- (#768) - **(All Platforms)** - Fix histogram race condition
+- (#766 #765) - **(All Platforms)** - Remove check for first/last on AlreadyCommitted for case where many events with same ids are used
+- (https://github.com/EventStore/EventStore/commit/1450ab78802f45b467d78cc40aa23f59625f1669) - **(All Platforms)** - Check for null event and data on event when processing events for projections
+- (#762) - **(All Platforms)** - Move usages of dates to Utc Now from Now
+- (#759) - **(All Platforms)** - Introduce a new role (ops) which has permissions to perform scavenge, monitor through the web ui as well as shutting down event store nodes. With this a new default user will be introduced called `ops`
+- (#749) - **(All Platforms)** - Set a sane default for message timeouts (10 seconds) (Competing Consumers)
+- (#737) - **(All Platforms)** - Add HTTP Competing Consumers. Documentation can be found here: http://docs.geteventstore.com/http-api/3.4.0/competing-consumers/
+
+## Event Store UI
+- (https://github.com/EventStore/EventStore.UI/pull/106) - Update the stored/cookie credentials when necessary
+
+## .NET Client
+- (#722) - Add ability to fetch partition state and result to the ProjectionManager in the .Net client
+",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/2303616/assets,https://api.github.com/repos/EventStore/EventStore/releases/2303616,release-v3.4.0,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.4.0,https://github.com/EventStore/EventStore/releases/tag/oss-v3.4.0,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.4.0,oss-v3.4.0,False,False
+2245861,2015-11-10T13:33:06Z,2015-12-08T12:19:43Z,Event Store 3.3.1,"## Event Store Server
+- (#729) - **(All Platforms)** - Ensure that the max client read size (4096) is adhered to. Check the status of the projection before handling an enable.
+- (#728) - **(All Platforms)** - Remove the double hash in run-node scripts.
+- (#727) - **(All Platforms)** - Add the ability to specify where the index is to be stored. This option is exposed via the options system (command line, environment and config file).
+- (#744) - **(All Platforms)** - Message timeouts now uses UTC instead of local timestamps
+- (#740) - **(All Platforms)** - Moving the subscriptions to concurrent dictionary. There were issues related due to dictionary and threading highlighted in the following groups discussion (https://groups.google.com/forum/#!topic/event-store/991cAF157bM)
+- (#734) - **(All Platforms)** - Improved replication performance in 5 node clusters.
+- (#730) - **(All Platforms)** - Honour projection authorisation.
+
+## Event Store UI
+- (https://github.com/EventStore/EventStore.UI/commit/f177ebc7f4cfa76bcecb49479bfb15634cb9a534) - When creating a persistent subscription and it fails, show the reason for the failure.
+- (https://github.com/EventStore/EventStore.UI/commit/3383d8c827aff62d15c902d457634c388fc6e074) - 
+  Include a view to show the status of the cluster.
+",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/2245861/assets,https://api.github.com/repos/EventStore/EventStore/releases/2245861,release-v3.4.0,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.3.1,https://github.com/EventStore/EventStore/releases/tag/oss-v3.3.1,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.3.1,oss-v3.3.1,False,False
+2097450,2015-10-11T21:32:24Z,2015-11-09T20:54:36Z,Event Store Client 3.3.1,"## Event Store Server
+
+No changes. This is a client release only
+
+## .NET Client
+- (#722) - Guard against null GossipSeeds
+- (#723) - Set drop information if none is specified (Affects CatchupSubscriptions)
+
+## .NET Embedded Client
+- (#724) - Honour default credentials set on connections
+",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/2097450/assets,https://api.github.com/repos/EventStore/EventStore/releases/2097450,release-v4.0.4,https://api.github.com/repos/EventStore/EventStore/tarball/dotnet-client-v3.3.1,https://github.com/EventStore/EventStore/releases/tag/dotnet-client-v3.3.1,https://api.github.com/repos/EventStore/EventStore/zipball/dotnet-client-v3.3.1,dotnet-client-v3.3.1,False,False
+1917815,2015-10-07T05:37:39Z,2015-10-07T09:23:51Z,Event Store 3.3.0,"## Event Store Server
+- (#692) - **(All Platforms)** - Ensure an ipv4 address is used when resolving dns names for tcp
+- (#695) - **(All Platforms)** - Persistent Subscriptions configuration now handles default values for fields not passed when creating the subscription
+- (#706) - **(All Platforms)** - Split development mode into StartStandardProjections and DisableHTTPCaching
+- (#498) - **(All Platforms)** - Return empty when no metadata is present
+- (#691) - **(All Platforms)** - After a common epoch is found, the next epoch is found to start sending from, if this is not found, all the epochs are read.
+- (#696) - **(All Platforms)** - Splitting of some of the multiline logging to individual log calls. This is to ensure that the logs can be better understood by log readers.
+
+## Event Store UI
+- (https://github.com/EventStore/EventStore.UI/issues/77) - Disable update button on updating of the query.
+- (https://github.com/EventStore/EventStore.UI/issues/76) - 
+  Improvements to the debugging experience which includes
+  - Disables and Resets the query ready for the debugging session to commence.
+  - Read the information (state, stats, etc) from the projection before enabling (this gets rid of some projections (transient) that run until completion and no longer produce a position which the UI uses to read events
+  - When there are no further events for the projection to process, set running status as true (i.e. the projection is not being paused for debugging)
+  - When we update the projection, we disable it to stop it from updating and running to completion, we will enable it when the debugging session has reloaded
+- (https://github.com/EventStore/EventStore.UI/pull/86) - Fix grammatical error in failure msg
+- (https://github.com/EventStore/EventStore.UI/issues/79) - Create Persistent Subscriptions from the UI
+- (https://github.com/EventStore/EventStore.UI/issues/84) - Retain the user's query where an update causes compilation to fail
+- (https://github.com/EventStore/EventStore.UI/pull/91) - Inform the user when the state query didn't return an ES-Position and possible causes.
+- (https://github.com/EventStore/EventStore.UI/issues/83) - Show a possible causes of 404 on Query updating
+- (https://github.com/EventStore/EventStore.UI/issues/82) - Show a message to the user telling them that they should press the update button for their ""changed"" query to take effect
+- (https://github.com/EventStore/EventStore.UI/issues/90) - Credentials will now be stored against the domain and port. This addresses an issue where previously only the domain was used and the UI will use the same credentials on the same domain (but different ports). The result is that the user will only see data from the first logged in instance
+
+## .NET Client
+- (#704) - Handle null Uri that gets passed when retrieving credentials
+- (#717) - Change formatting of the CorrelationID in Subscription/Operation(Item) to not include the brackets. This fixes a bug where if this were to be passed to the method that tries to format it will throw a FormatException
+
+## .NET Embedded Client
+- (#702) - Take a hard dependency on EventStore.Client of the same version
+- (#705) - Include Prelude in Embedded Client
+",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/1917815/assets,https://api.github.com/repos/EventStore/EventStore/releases/1917815,release-v3.3.0,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.3.0,https://github.com/EventStore/EventStore/releases/tag/oss-v3.3.0,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.3.0,oss-v3.3.0,False,False
+1831266,2015-09-17T17:45:29Z,2015-09-17T22:23:11Z,Event Store 3.2.2,"## Event Store Server
+- (#687) - **(All Platforms)** - Fix copying the request headers on forwarding. When copying the protected http headers, we will check them in a case insensitive manner
+",https://api.github.com/users/pgermishuys,1062417,pgermishuys,https://api.github.com/repos/EventStore/EventStore/releases/1831266/assets,https://api.github.com/repos/EventStore/EventStore/releases/1831266,release-v4.0.4,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.2.2,https://github.com/EventStore/EventStore/releases/tag/oss-v3.2.2,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.2.2,oss-v3.2.2,False,False
+1789945,2015-09-09T17:11:22Z,2015-09-09T19:07:45Z,Event Store 3.2.1,"## Event Store Server
+- (#672) - **(All Platforms)** - Atom feeds now exhibit the pre-v3.1.0 behaviour of having no previous link when the head of the feed is reached.
+- (#676) - **(All Platforms)** - Passing an empty stream name for a persistent subscription will now fail with a ""Bad Stream Name""
+
+## .NET Client API
+- (#671) - **(All Platforms)** - Connection strings are now parsed in a culture-invariant manner.
+
+## .NET Embedded Client
+- (#666) - **(Windows)** - `js1.dll` is now located correctly within the NuGet package.
+",https://api.github.com/users/jen20,548524,jen20,https://api.github.com/repos/EventStore/EventStore/releases/1789945/assets,https://api.github.com/repos/EventStore/EventStore/releases/1789945,release-v3.3.0,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.2.1,https://github.com/EventStore/EventStore/releases/tag/oss-v3.2.1,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.2.1,oss-v3.2.1,False,False
+1775690,2015-09-06T20:35:47Z,2015-09-07T00:19:04Z,Event Store 3.2.0,"## Event Store Server
+- #599 - **(All Platforms)** - Event streams now support the competing consumer pattern. This is known as ""persistent subscriptions"", for which subscription state is stored server side. This provides at-least-once guarantees. Currently this is supported over TCP only.  (#599)
+- #646 - **(All Platforms)** - HTTP Prefixes are no longer automatically added when an interface address is specified as `0.0.0.0` and `--add-interface-prefixes` is set to `false`.
+- #612 - **(All Platforms)** - Several types of operation now present metrics as histograms in order to help diagnose performance issues in some environments (for example, the percentiles for latency of the storage writer can now be determined). These are enabled with `--enable-histograms`, and are disabled by default.
+- #653 - **(All Platforms)** - Fixed a bug which could cause events not yet acknowledged by a majority of nodes in a cluster to be returned when reading from the `$all` stream.
+- #623 - **(All Platforms)** - Index cache depth can now be specified. This can significantly improve performance when working with large databases
+- #630 - **(All Platforms)** - A new statistic, `proc_cpuScaled` has been introduced, which is scaled by the number of logical processors.
+- #616 - **(All Platforms)** - HTTP redirects now respect event numbers instead of redirecting to the head of a stream.
+- #619 - **(All Platforms)** - A new `NotReady` response to client API requests which are received before the server is ready (e.g. authentication set up) is used.
+- #602 - **(All Platforms)** - Shutdown requests issued over HTTP now succeed
+- #642 - **(All Platforms)** - Response sizes are now bounded to the maximum TCP package size.
+- #643 - **(All Platforms)** - Requests now expire correctly rather than processing during queue build up.
+- #590 - **(Linux and Mac OS X)** - The use of locking concurrent connections on Mono has been removed, resulting in a 15-20% performance increase when running on Linux.
+- #604 - **(All Platforms)** - The use of SpinLocks has been removed.
+- #601 - **(Mac OS X)** - Memory statistics now work correctly on OS X
+- #635 - **(All Platforms)** - Several occurences of poor English grammar in exception and log messages have been rectified.
+- Config - **(All Platforms)** - The `/info` endpoint now reports the correct version number. 
+- #582 - **(All Platforms)** - Windows packages now have the correct ordering of filename components.
+- #583 - **(Mac OS X)** - Mac OS X packaging scripts are now compatible with BSD `sed` as well as GNU `sed`.
+
+## .NET Client API
+- #585 - **(All Platforms)** - Connection strings are now used to specify options for the .NET Client API. The older builder methods will be deprecated in the next release.
+- #586 - **(All Platforms)** - Several types which did not form part of the public contract are now marked as internal (#586)
+- #603 - **(All Platforms)** - `ProjectionManager` now exposes the HTTP response status code (#603)
+- #608 - **(All Platforms)** - Users can now be created, edited and deleted via the Client API (#608)
+- #610 - **(All Platforms)** - Requests are now subject to a limit of 4096 items (#610)
+- #622 - **(All Platforms)** - A better error message is now present in the case that a message size is too large to fit in a frame (#622)
+- #645 - **(All Platforms)** - An `InvalidOperationException` which could occur when running the Client API on Mono is now caught and treated in the same manner as bad connect. This looks to be a Mono regression in 4.0. (#645)
+- #586 - **(All Platforms)** -A new type heirarchy now exists for subscriptions in order to allow support for Persistent subscriptions (competing consumers).
+
+## .NET Embedded Client
+- #589 - **(All Platforms)** -  Authentication is now supported in the Embedded Client (#589)
+",https://api.github.com/users/jen20,548524,jen20,https://api.github.com/repos/EventStore/EventStore/releases/1775690/assets,https://api.github.com/repos/EventStore/EventStore/releases/1775690,release-v3.2.0,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.2.0,https://github.com/EventStore/EventStore/releases/tag/oss-v3.2.0,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.2.0,oss-v3.2.0,False,False
+1628102,2015-08-06T09:13:43Z,2015-08-11T21:25:15Z,Event Store 3.1.0,"## Event Store Server
+- #553 - **(Linux)** - The primary distribution mechanism for EventStore is now via Debian packages. Consequently data, log and content directories now have more sensible platform defaults. On Linux, the defaults are now:
+  - `/var/lib/eventstore` - default database path
+  - `/var/log/eventstore` - default log file path
+  - `/etc/eventstore` - default configuration file path
+  - `/usr/share/eventstore` - default content (e.g. Web UI) directory.
+  
+  This structure is created when the Debian packages are installed.
+- 84ef2ef - **(Linux and MacOS X)** - the binary distribution with Mono statically linked has had the executable `clusternode` renamed to `eventstored` to more accurately describe itself in `ps` listings.
+- #454/#477 - **(All Platforms)** - the English in exception and log messages has had spelling and grammatical errors corrected.
+- f3513b1 - **(All Platforms)** - the new `--development-mode` flag forces the responses to HTTP requests that would normally be cacheable to include the header `Cache-Control: max-age=0, no-cache, must-revalidate`. This is often useful when running on local development machines.
+- 2827c61 - **(Linux and MacOS X)** - The Mono thread pool size is automatically set to 10 by default on machines with a single CPU. This fixes #296.
+- d5e9064 - **(All Platforms)** - The options parser has been changed from PowerArgs to a custom parser. This fixes a number of issues including #272, and improves the display of modified options and their sources.
+- a971d18 - **(All Platforms)** - A user account which has been previously deleted can now be re-created. It will inherit the permissions granted to the old account of the same name.
+- #529 - **(All Platforms)** - When forwarding requests amongst nodes over HTTP, the `X-Forwarded-Host` header is sent along with the forwarded request.
+- #537 - **(All Platforms)** - The state of each cluster node (`master`, `slave` or `clone`) is now available on the `/info` endpoint of each node.
+- 030fe30 - **(All Platforms)** - Event metadata is now included in the `vnd.eventstore.events+json` media type when the `embed` parameter is set to `body`.
+- 6a1655c - **(All Platforms)** - Event ID is now included in the `vnd.eventstore.events+json` media type.
+- 8550801 - **(All Platforms)** - HTTP Prefixes can now be set independently for the internal and external network interface services.
+- c5900b7 - **(All Platforms)** - Creating a user with the same password as the one which already exists now returns `201 Created` else it returns `409 Conflict`.
+- #556 - **(All Platforms)** - Allow cluster nodes to advertise themselves as being at a different address than the one which they are bound to. This is useful when running behind a NAT server, or if a node is bound to all interfaces (0.0.0.0).
+- #569 - **(All Platforms)** - PTables are now disposed correctly in all cases. This can reduce the frequency with which index rebuilds occur.
+- b34677e - **(Linux and MacOS X)** - Better default garbage collector settings are chosen by default for the versions of Event Store with Mono statically linked, because of an upstream bug in Mono.
+
+## Event Store Management UI
+- EventStore/EventStore.UI#66 - **(All Platforms)** - Bug fix with poller incorrectly being created (Polling).
+- EventStore/EventStore.UI@cd9ffe3 - **(All Platforms)** - Fix misspelt variable that was causing the state not to be displayed (Projections).
+- EventStore/EventStore.UI#69 - **(All Platforms)** - Fixed a series of bugs related to the poller (Polling).
+- EventStore/EventStore.UI@ff0110b - **(All Platforms)** - Fixed styling inconsistency (Enable Users).
+- EventStore/EventStore.UI@8b092e2 - **(All Platforms)** - Fixed deletion of user (Users).
+- EventStore/EventStore.UI@fff6c07 - **(All Platforms)** -  Ensure styling consistency in notifications - Success when enabling user (Users).
+
+## Event Store Server (Projections)
+- #349 - **(All Platforms)** - User management no longer makes use of projections. _Consequently the default mode for projections has been changed to `None`, rather than `System`_.
+- #517 - **(All Platforms)** - Projections now use a soft delete by default, which means it is possible to recreate them.
+- #503 - **(All Platforms)** - Projection administration HTTP requests are now idempotent.
+- d1f261f - **(All Platforms)** - libjs1 (used for projections) is now const correct and compiles without warning on modern C++ compilers.
+- a147274 - **(Linux and MacOS)** - libv8 and its dependencies are now statically linked into libjs1 in order to prevent conflicts with other programs which install libv8.
+
+## Embedded .NET Client
+- 84ef2ef - **(All Platforms)** - The embedded client API is now tolerant of missing assemblies, which may occur during the assembly scan for types derived from `Message` during startup.
+",https://api.github.com/users/jen20,548524,jen20,https://api.github.com/repos/EventStore/EventStore/releases/1628102/assets,https://api.github.com/repos/EventStore/EventStore/releases/1628102,dev,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.1.0,https://github.com/EventStore/EventStore/releases/tag/oss-v3.1.0,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.1.0,oss-v3.1.0,False,False
+1361884,2015-05-26T18:51:16Z,2015-06-01T15:48:38Z,Event Store 3.0.5,"Event Store OSS v3.0.5 immediately replaces v3.0.4. This is necessary as the Windows binaries previously provided for download of v3.0.4 had been built from an incorrect source tag and contained breaking changes. v3.0.4 binaries have been withdrawn from download.
+
+Consequently, the Linux and MacOS builds are the same as v3.0.4 except for the version number. The changes to the from v3.0.3 are listed below:
+
+## Event Store Server
+- Fixed a bug which could cause a replica to enter an infinite loop during initial replication of merged chunks.
+
+## Event Store UI
+- Fixed an issue that was preventing copying event data from the head of a stream. EventStore/EventStore.UI#60
+- The UI will now redirect to desired page after authentication. EventStore/EventStore.UI#59
+- Fixed a series of memory/performance issues plaguing the UI. EventStore/EventStore.UI#58
+- The poller now behaves correctly and on the head of a stream, the user will now see events as they appear in the stream. The user also has the ability to pause the poller such that event data can be copied or inspective. https://github.com/EventStore/EventStore.UI/commit/6cd04029f64bd5cfadffac08500710c9f37262e8
+",https://api.github.com/users/jen20,548524,jen20,https://api.github.com/repos/EventStore/EventStore/releases/1361884/assets,https://api.github.com/repos/EventStore/EventStore/releases/1361884,dev,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.0.5,https://github.com/EventStore/EventStore/releases/tag/oss-v3.0.5,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.0.5,oss-v3.0.5,False,False
+1049121,2015-03-13T17:56:05Z,2015-03-13T23:38:52Z,Event Store 3.0.3,"Event Store OSS v3.0.3 includes a fix for an issue some users have experienced where scavenging a transaction file chunk which consists of ten or more previously merged chunks never completed.
+
+The changes are listed below:
+
+## Event Store Server
+- Fixed a bug which could cause an infinite loop during scavenging when more than 10 chunks had previously been merged.
+",https://api.github.com/users/jen20,548524,jen20,https://api.github.com/repos/EventStore/EventStore/releases/1049121/assets,https://api.github.com/repos/EventStore/EventStore/releases/1049121,dev,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.0.3,https://github.com/EventStore/EventStore/releases/tag/oss-v3.0.3,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.0.3,oss-v3.0.3,False,False
+1030501,2015-03-07T16:04:44Z,2015-03-09T16:23:40Z,Event Store 3.0.2,"Event Store OSS v3.0.2 includes a critical fix recommended for all users of Event Store, as well as some minor updates to the User Interface. This also co-incides with the release of the commercial edition of Event Store HA 3.0.2, and version 3.0.2 of the .NET client API, which is available on NuGet.
+
+The changes are listed below:
+
+## Event Store Server
+- A bug which can cause the read index to fail to rebuild has been fixed (Commercial support inquiry, no issue number). Inclusion of this fix means that version 3.0.2 is recommended for all users of Event Store.
+- Better diagnostic logging has been added to several log messages.
+- The lock held during index merging is now held for significantly less time. This reduces the chances of index corruption, especially on slow disks.
+- Requesting a stream as HTML redirects to the new UI rather than presenting broken HTML.
+
+## Event Store UI
+- Fixed a consistency issue in the styling of buttons https://github.com/EventStore/EventStore.UI/pull/46
+- Included a friendlier notification system using Toastr. https://github.com/EventStore/EventStore.UI/pull/48
+- Fixed a bug of the incorrect usage of positionEventNumber https://github.com/EventStore/EventStore.UI/pull/50
+- Another consistency fix where the ""Include Queries"" check box has now been changed to a button that toggles on/off. https://github.com/EventStore/EventStore.UI/pull/55
+- Bug fix: stop the projection before we attempt to delete it. https://github.com/EventStore/EventStore.UI/pull/56
+- Bug fix: ensure that we check if the stream id exists before we add it to the list of streams. https://github.com/EventStore/EventStore.UI/pull/57
+
+## Event Store .NET Client API
+- Fixed a bug which can cause a deadlock during reconnection under certain network conditions.
+- Fixed a packaging issue which required the embedded client to also reference Protocol Buffers .NET. This dependency is now internalized.
+",https://api.github.com/users/jen20,548524,jen20,https://api.github.com/repos/EventStore/EventStore/releases/1030501/assets,https://api.github.com/repos/EventStore/EventStore/releases/1030501,dev,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.0.2,https://github.com/EventStore/EventStore/releases/tag/oss-v3.0.2,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.0.2,oss-v3.0.2,False,False
+650114,2014-10-23T20:56:21Z,2014-10-24T00:43:10Z,Event Store 3.0.1,"Event Store OSS v3.0.1 includes a number of fixes for the previous v3.0.0, including improvements to the server, .NET client API and the ES Query tool. They are listed below along with the relevant issue numbers.
+
+## Event Store Server
+- OS X binaries are now compatible with Mac OS 10.7 and above (#275)
+- Gossip can be requested as `application/xml` or `text/xml` in addition to `application/json` (#275)
+- It is no longer required to specify an event type when posting stream metadata, it is assumed to be `$settings`
+- `X-Forwarded-Port` and `X-Forwarded-Proto` are now supported to enable easier reverse proxying of the Event Store (#244)
+- Link events are now served correctly when content is embedded in atom feeds (#228)
+- Garbage collection flags on the shell script for starting nodes on Linux and Windows are removed as no longer necessary (#271)
+- Metadata streams no longer have a link to themselves for metadata.
+- Bundled UI is now from EventStore/EventStore.UI commit
+  - UI is bundled and minified, making the binary distribution signficantly smaller when unpacked
+  - Some stray development text removed (#252)
+  - Resolved issue with projections detail sometimes not displaying (#227)
+  - UI now displays linked events correctly (#226)
+  - UI indicates events which are invalid due to windowing or deletion (#269)
+  - UI no longer presents non-existent metadata stream for the synthesized `$all` stream (#284)
+
+## ES Query
+- Content length is now set correctly on some requests from ESQuery which were previously calling failures (#283)
+
+## .NET Client API
+- Client-side subscription queue is now bounded (#246)
+- EventStore.EmbeddedClient package now has the dependency on EventStore.Client correctly set (#242)
+- Embedded client now exposes the correct types for `ResolvedEvent` rather than `ResolvedIndexEvent` (#286)
+- Embedded client now includes necessary files for the Projections environment
+",https://api.github.com/users/jen20,548524,jen20,https://api.github.com/repos/EventStore/EventStore/releases/650114/assets,https://api.github.com/repos/EventStore/EventStore/releases/650114,dev,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.0.1,https://github.com/EventStore/EventStore/releases/tag/oss-v3.0.1,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.0.1,oss-v3.0.1,False,False
+566424,2014-09-17T15:42:34Z,2014-09-18T11:38:00Z,Event Store 3.0.0,"## Headline features
+- Version 3.0.0 supports quorum-based high availability clustering.
+- In-memory mode allows the Event Store to run without writing to disk.
+- Embedded mode allows hosting of the Event Store in your own processes.
+- New UI which uses HTML5 and JavaScript to access the public API of the Event Store.
+- Binaries for Mac OS X and Linux are statically linked with Mono; no runtime installation is required.
+- Support for soft-deleting streams, allowing a new stream with the same name to be recreated later as the default.
+
+## Breaking changes
+- A number of messages in the client API protocol have changed - only client APIs designed for version 3 of Event Store should be used with a version 3 server.
+- Synchronous overloads of methods are no longer available in the .NET client API.
+- `EventStore.SingleNode.exe` has been removed in favour of a reconfigured `EventStore.ClusterNode.exe` which runs as a single node if a larger cluster size is not specified.
+- Deletes over HTTP and the Client API protocol now default to soft-deletion.
+- Configuration files are now written in YAML instead of JSON.
+- Default configuration file locations are no longer assumed.
+- Introduced new media types, `application/vnd.eventstore.events+json` and `application/vnd.eventstore.events+xml` for the previous syntax which mixes request metadata with event metadata and data in request bodies.
+- `POST` requests to a stream with the media type `application/json`, `application/xml` or `text/xml` assume a single event is contained in the body. Event ID and expected version can be specified via headers on the request, or an idempotent URI can be posted to allow for retries if client-side ID generation is not possible.
+
+## Other changes
+- Options parsing now uses PowerArgs instead of NDesk.Options, which allows options to be specified in a wider variety of ways.
+- Fixed bugs with reading link events pointing to events which no longer exist because of $maxCount, $truncateBefore or stream deletion.
+- All necessary CORS headers to run the new user interface (see EventStore/EventStore.UI) are now allowed.
+- Fixed failover of projections in a clustered environment.
+- Added configurable timeouts for gossip in a cluster.
+- Added a new overload for gossip seeds which allows a host header to be set if necessary in the Client API.
+- Creating performance counters in Windows is now retried in the case of failure.
+- Verifying database files now uses unbuffered IO on Windows in order to avoid causing the file cache to fill up immediately.
+- `esquery` tool allows basic evaluation of queries and to subscribe to streams via a REPL.
+- Fixed a bug which could allow records which were larger than the size limit to be written to the database and subsequently report a corrupted database.
+- Projections support distributed map-reduce in a cluster.
+- More information (e.g. timestamp) is available to Client APIs about events on read.
+- Certificates can now be loaded from a Windows certificate store by thumbprint.
+- Effective configuration can be determined by using the `-WhatIf` or `--what-if` flags to terminate immediately after resolving the configuration.
+- Various other minor bug fixes.
+- Internal and external heartbeat timeouts and intervals can now be independently set.
+",https://api.github.com/users/jen20,548524,jen20,https://api.github.com/repos/EventStore/EventStore/releases/566424/assets,https://api.github.com/repos/EventStore/EventStore/releases/566424,dev,https://api.github.com/repos/EventStore/EventStore/tarball/oss-v3.0.0,https://github.com/EventStore/EventStore/releases/tag/oss-v3.0.0,https://api.github.com/repos/EventStore/EventStore/zipball/oss-v3.0.0,oss-v3.0.0,False,False
+500981,2014-08-19T00:01:07Z,2014-08-19T17:30:00Z,Event Store 3.0.0-rc9,"This preview release contains numerous improvements and fixes over RC2 of Event Store 3.0.0, including:
+- Synchronous methods in the Client API have been removed in favour of their asynchronous counterparts. To continue with the previous semantics, use `.Result` or `.Wait()` on calls
+- `EventStore.SingleNode.exe` has been removed in favour of a reconfigured `EventStore.ClusterNode.exe` which runs as a single node if a larger cluster size is not specified
+- Binaries for Mac OS X and Linux are statically linked with Mono; no runtime installation is required
+- Configuration files are now written in YAML instead of JSON
+- Default configuration file locations are no longer assumed
+- Options parsing now uses PowerArgs instead of NDesk.Options, which allows options to be specified in a wider variety of ways.
+- Fixed bugs with reading link events pointing to events which no longer exist because of `$maxCount`, `$truncateBefore` or stream deletion
+- All necessary CORS headers to run the new user interface (see [EventStore/EventStore.UI](https://github.com/EventStore/EventStore.UI)) are now allowed
+- Fix automatically collapsing preview in existing UI
+- Introduced new media types, `application/vnd.eventstore.events+json` and `application/vnd.eventstore.events+xml` for the previous syntax which mixes request metadata with event metadata and data in request bodies.
+- `POST`ing to a stream with the media type `application/json`, `application/xml` or `text/xml` assume a single event is contained in the body. Event ID and expected version can be specified via headers on the request, or an idempotent URI can be posted to allow for retries if client-side ID generation is not possible
+- Fixed failover of projections in a clustered environment
+- Added configurable timeouts for gossip in a cluster
+- Added a new overload for gossip seeds which allows a host header to be set if necessary
+",https://api.github.com/users/jen20,548524,jen20,https://api.github.com/repos/EventStore/EventStore/releases/500981/assets,https://api.github.com/repos/EventStore/EventStore/releases/500981,dev,https://api.github.com/repos/EventStore/EventStore/tarball/OSS-v3.0.0-rc9,https://github.com/EventStore/EventStore/releases/tag/OSS-v3.0.0-rc9,https://api.github.com/repos/EventStore/EventStore/zipball/OSS-v3.0.0-rc9,OSS-v3.0.0-rc9,False,True
+19521,2013-08-01T17:26:54Z,2013-08-01T18:58:27Z,Event Store 2.0.1 (.NET),"For full details of this release, see this blog post: http://geteventstore.com/blog/20130801/version-2-0-1-released/
+",https://api.github.com/users/jen20,548524,jen20,https://api.github.com/repos/EventStore/EventStore/releases/19521/assets,https://api.github.com/repos/EventStore/EventStore/releases/19521,master,https://api.github.com/repos/EventStore/EventStore/tarball/ES-NET-v2.0.1,https://github.com/EventStore/EventStore/releases/tag/ES-NET-v2.0.1,https://api.github.com/repos/EventStore/EventStore/zipball/ES-NET-v2.0.1,ES-NET-v2.0.1,False,False
+19517,2013-08-01T17:26:54Z,2013-08-01T18:56:31Z,Event Store 2.0.1 (Mono),"For full details of this release, see this blog post: http://geteventstore.com/blog/20130801/version-2-0-1-released/
+",https://api.github.com/users/jen20,548524,jen20,https://api.github.com/repos/EventStore/EventStore/releases/19517/assets,https://api.github.com/repos/EventStore/EventStore/releases/19517,master,https://api.github.com/repos/EventStore/EventStore/tarball/ES-Mono-v2.0.1,https://github.com/EventStore/EventStore/releases/tag/ES-Mono-v2.0.1,https://api.github.com/repos/EventStore/EventStore/zipball/ES-Mono-v2.0.1,ES-Mono-v2.0.1,False,False
+12542,2013-07-19T18:32:39Z,2013-07-19T20:00:45Z,Event Store 2.0.0 (Mono),"For full details of this release check out our blog post:
+http://geteventstore.com/blog/20130719/v2-0-binaries-released/
+",https://api.github.com/users/rcknight,548432,rcknight,https://api.github.com/repos/EventStore/EventStore/releases/12542/assets,https://api.github.com/repos/EventStore/EventStore/releases/12542,master,https://api.github.com/repos/EventStore/EventStore/tarball/ES-Mono-v2.0.0,https://github.com/EventStore/EventStore/releases/tag/ES-Mono-v2.0.0,https://api.github.com/repos/EventStore/EventStore/zipball/ES-Mono-v2.0.0,ES-Mono-v2.0.0,False,False
+12538,2013-07-19T18:32:39Z,2013-07-19T20:01:12Z,Event Store 2.0.0 (.NET),"For full details of this release check out our blog post:
+http://geteventstore.com/blog/20130719/v2-0-binaries-released/
+",https://api.github.com/users/rcknight,548432,rcknight,https://api.github.com/repos/EventStore/EventStore/releases/12538/assets,https://api.github.com/repos/EventStore/EventStore/releases/12538,master,https://api.github.com/repos/EventStore/EventStore/tarball/ES-NET-v2.0.0,https://github.com/EventStore/EventStore/releases/tag/ES-NET-v2.0.0,https://api.github.com/repos/EventStore/EventStore/zipball/ES-NET-v2.0.0,ES-NET-v2.0.0,False,False

@@ -1,0 +1,341 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7182793,2017-07-26T23:20:33Z,2017-07-26T23:21:47Z,0.14.0,"This release contains [72 changes from 12 contributors](https://github.com/SirCmpwn/sway/compare/0.13...0.14). New features include support for tray icons and support for KDE's Wayland extension for client-side border negotiation. Several smaller features and many bug fixes are also included. Updates to wlc also improve touchscreen support and fix the old extra cursor gdm issue.
+
+Tray icons are now supported via SNI, and Xembed support is in-progress and planned for a future release. Tray icons for programs using the new specification should work correctly, but older programs using Xembed will not. Border negotiation requries participation from the client - a patch for GTK+ is available [here](https://bugzilla.gnome.org/show_bug.cgi?id=781909).
+
+You may have heard that we're replacing wlc, a library that does a lot of low-level plumbing work for Sway. I'm happy to announce that our replacement project, [wlroots](https://github.com/SirCmpwn/wlroots), is progressing at a great pace - largely thanks to financial support from [Nyantec](https://nyantec.com/), who offered to sponsor me to work full time on Sway for 3 weeks during this release cycle. Additional support has come from supporters of my new [Patreon page](https://patreon.com/sircmpwn) - many thanks! Dramatic improvements to Sway will be possible when wlroots is ready. Look forward to it!
+
+# Changes
+
+* libdbus is now an optional dependency for tray icon support (package maintainers, take note)
+* Non-logind systems now report configuration errors more verbosely (@Hummer12007 - #1218)
+* asciidoc is now optional; without it man pages will not be built (@SirCmpwn - cf4ea4c)
+
+# New Features
+
+* SNI tray icon support in swaybar (@4e554c4c - #1234)
+* KDE's server decorations protocol is now supported (@SirCmpwn - #1199)
+* Mouse button bindings (@janza - #1209)
+* i3's `no_focus` command is now supported (@SirCmpwn - #1196)
+
+# Bugs fixed
+
+* Specifying fewer than 5 colors during configuration did not work (@SirCmpwn - #1201)
+* `layout auto` with no additional arguments no longer crashes Sway (@zandrmartin - #1204)
+* Issues with the Firefox address bar dropdown have been fixed (@SirCmpwn - d158e18308e91f0c4ae81ac86976b0540e5efd84)
+* Nested child processes of swaybar are now killed correctly (@ykrivopalov - #1236)
+* Minor documentation fixes via @4e554c4c, @zandrmartin, @wdbw, @her001 
+* @johalun fixed some FreeBSD issues and is now the FreeBSD point of contact (#1232)
+* Use-after-free bug fixed in bindsym (@tobiasblass - #1270)
+* Fail gracefully when security policies cannot be allocated (@Hummer12007 - #1255)",https://api.github.com/users/SirCmpwn,1310872,SirCmpwn,https://api.github.com/repos/swaywm/sway/releases/7182793/assets,https://api.github.com/repos/swaywm/sway/releases/7182793,master,https://api.github.com/repos/swaywm/sway/tarball/0.14.0,https://github.com/swaywm/sway/releases/tag/0.14.0,https://api.github.com/repos/swaywm/sway/zipball/0.14.0,0.14.0,False,True
+6313963,2017-05-08T16:35:22Z,2017-05-08T16:40:06Z,0.13.0,"This release contains [103 changes from 12 contributors](https://github.com/SirCmpwn/sway/compare/refs/tags/0.12...refs/tags/0.13.0). New features include support for i3's marks feature, ""immediate"" criteria commands, and experimental support for the nvidia proprietary driver. Many small improvements to i3 compatibility and many bugfixes are also included.
+
+For nvidia users, nouveau is still **strongly** recommended. The proprietary driver mostly works, but is **unsupported** - do not report bugs unless you attach a patch. Unless your hardware is unsupported by nouveau, you should continue using nouveau. Using sway with the proprietary drivers requires additional configuration - sway will output the necessary information if you attempt it without a correct configuration.
+
+Package maintainers: please update your packages to use `-DVERSION=major.minor.patch`. Normally the version is sourced from git, but if you build from a tarball then you'll have to specify it manually.
+
+# Changes
+
+* The `new_window` and `new_float` commands are deprecated in favor of `default_border` and `default_floating_border`. A similar change is expected from i3. (@zandrmartin - #1105)
+* 444 is now an acceptable file mode for security configs (@jnsaff - #1117)
+* Any executable that is not owned by root will receive the default security policy regardless of any additional configured permissions (@JerziKaminsky)
+
+# New features
+
+* i3-style marks are now supported (@4e554c4c - #1145 & #1155)
+* You may now configure the color of swaylock UI elements via the command line (@4e554c4c - #1078)
+* Floating containers may now be moved with the `move` command (@4e554c4c - #1092)
+* swaymsg pretty-prints its output if stdout is a tty (@SirCmpwn - #1146)
+* `[criteria] command` has been implemented (@4e554c4c - #1149)
+* nvidia proprietary driver support has been implemented in wlc (@vially - https://github.com/Cloudef/wlc/pull/245) and sway was updated as necessary (@SirCmpwn - #1147)
+* Security policies can now refer to symlinked executables (@JerziKaminsky - #1173)
+* Version string can now be specified at build time (@snoack - #1194)
+
+# Bugs fixed
+
+* Missing swaylock security settings were added (@SirCmpwn - 21ad45b622eb1fc2c68d1036fd9763a37fec668b)
+* -Werror issues on the latest gcc have been corrected (@Fale - #1086)
+* The codebase is more POSIXly correct and does not rely on GNUisms (@SirCmpwn - 9aed9d9)
+* Issues building against a local copy of wlc has been fixed (@snoack - #1115)
+* A problem with keyboard code in sway's Wayland clients was fixed (@zandrmartin - #1121)
+* Focus could be stolen from fullscreen windows under some conditions (@zandrmartin - #1126)
+* Spaces are now permitted in workspace names (@4e554c4c - #1101)
+* Issues with workspace assignment have been corrected (@zandrmartin - #1105)
+* Man page typos fixed (@johnchen902 - #1113)
+* Crashiness with `move [next|prev]` was fixed (@oranenj - #1130)
+* Regular expressions are now handled with PCRE for better i3 compatibility (@ascent12 - #1151)
+* Dangling file descriptors on IPC client termination was fixed (@SirCmpwn, @ascent12 - #1153)
+* libcap is now explicitly required in our CMakeLists.txt (@JerziKaminsky - #1150)
+* `move [to] scratchpad` did not support the ""to"" syntax (@wasamasa - #1180)
+* Windows leaving the scratchpad are now sized to match i3 behavior (@wasamasa - #1181)
+* Specifying fewer than 5 colors with `client.*` now matches i3 behavior (@SirCmpwn - #1201)",https://api.github.com/users/SirCmpwn,1310872,SirCmpwn,https://api.github.com/repos/swaywm/sway/releases/6313963/assets,https://api.github.com/repos/swaywm/sway/releases/6313963,master,https://api.github.com/repos/swaywm/sway/tarball/0.13.0,https://github.com/swaywm/sway/releases/tag/0.13.0,https://api.github.com/repos/swaywm/sway/zipball/0.13.0,0.13.0,False,True
+5957913,2017-04-03T15:00:55Z,2017-04-03T15:06:28Z,0.12.2,"# Changes
+
+* 444 is permitted as an access mode for security configs (@jnsaff - #1117)
+
+# Bugs fixed
+
+* `move next` could cause crashes (@oranenj - #1130)
+* New windows could steal focus from fullscreen windows (@zandrmartin - #1126)
+* Fix problem with workspace_layout auto (@oranenj - #1119)
+* Fix build for systems where wlc headers are not installed globally (@snoack - #1115)",https://api.github.com/users/SirCmpwn,1310872,SirCmpwn,https://api.github.com/repos/swaywm/sway/releases/5957913/assets,https://api.github.com/repos/swaywm/sway/releases/5957913,master,https://api.github.com/repos/swaywm/sway/tarball/0.12.2,https://github.com/swaywm/sway/releases/tag/0.12.2,https://api.github.com/repos/swaywm/sway/zipball/0.12.2,0.12.2,False,True
+5732866,2017-03-14T03:15:48Z,2017-03-14T03:18:10Z,,"## Bugs Fixed
+
+* Workspace output assignment issues (@zandrmartin - https://github.com/SirCmpwn/sway/pull/1105)
+* Typo in sway(5) (@johnchen902 - https://github.com/SirCmpwn/sway/pull/1113)",https://api.github.com/users/SirCmpwn,1310872,SirCmpwn,https://api.github.com/repos/swaywm/sway/releases/5732866/assets,https://api.github.com/repos/swaywm/sway/releases/5732866,master,https://api.github.com/repos/swaywm/sway/tarball/0.12.1,https://github.com/swaywm/sway/releases/tag/0.12.1,https://api.github.com/repos/swaywm/sway/zipball/0.12.1,0.12.1,False,True
+5664732,2017-03-07T14:43:35Z,2017-03-07T14:49:20Z,0.12,"This release contains 93 changes from 11 contributors. Changes in this release include redshift support (currently requires a patched redshift), new automatic layout modes for Awesome migrants, security improvements, and many bugfixes. Please take careful note of the changes to IPC security configuration - these are backwards-incompatible and will require user intervention if you have customized your security configuration.
+
+Package maintainers - `/etc/sway/security` has been moved to `/etc/sway/security.d/00-defaults`, and users are no longer expected to edit this file. FreeBSD users should take special note of these changes and will likely want to introduce a new file in `/etc/sway/security.d/` that applies a liberal security policy for IPC-related features - the FreeBSD port is unable to enforce per-application IPC rules and you'll want to add a default rule that permits everything for now.
+
+For those hoping to configure sway's default keybindings and behavior to be more like Awesome, see [awesome.config](https://github.com/SirCmpwn/sway/blob/master/contrib/awesome.config)
+
+# Changes
+
+* `/etc/sway/security` has been moved to `/etc/sway/security.d/00-defaults` and users are now encouraged to add their own security configurations as additional files in `/etc/sway/security.d/`. Maintainers of software that integrates with sway and require special permissions are encouraged to ship security configs in this directory as well (@SirCmpwn - #1080)
+* If not specified at build time, LD_LIBRARY_PATH will be unset, rather than defaulting to /usr/lib (@Hummer12007 - #1050)
+* Default backgrounds have been losslessly re-compressed and should reduce the package weight if enabled (@Jesin - #1032)
+* Previously undocumented features (swaygrab -f and hide_edge_borders) are now covered by their respective manuals (@Hummer12007, @ametisf - #1073, #1051)
+* Environment logging now occurs prior to compositor initialization, which helps diagnose certain kinds of problems (@SirCmpwn - 41f7aaa)
+
+# New Features
+
+* New automatic layouts unique to sway have been implemented that behave like similar features in WMs like Awesome. See sway(5) and look for `layout auto` for details. (@willakat - #1024)
+* Sway now supports gamma adjustment, which you can take advantage of with a [patched redshift](https://github.com/giucam/redshift) (@SirCmpwn - #1019)
+* IPC features can now be secured on a per-application basis - see sway-security(7) (@SirCmpwn - #1080)
+* __focused__ is now available in window criteria (@Hummer12007 - #1053)
+* `output [left|right]` now matches i3's wrapping behavior (@dkess - #1048)
+* XWayland window instances are now shown in title bars if necessary (@Hummer12007 - #1052)
+* `hide_edge_borders smart` is now implemented, following i3 4.13 (@ametisf - #1044)
+
+# Bugs Fixed
+
+* Issues compiling sway on gcc 7 have been resolved (@Fale - #1086)
+* Capabilities are more carefuly handled when transitioning from euid 0 to a normal user, which fixes some problems on systems without logind (@Hummer12007 - #1043)
+* xdg-shell v6 support has been fleshed out in both wlc and sway, which should fix things like broken right click menus on GTK apps (@Hummer12007 - #1070, #1055)
+* Floating windows were created with the incorrect geometry, which has been corrected (@zandrmartin - #1075)
+* Image scaling specified at the swaylock command line was ignored, and now works correctly (@zandrmartin - #1017)
+* Inconsistencies with workspace layouts in IPC messages between i3 and sway were corrected (@Hummer12007 - #1030)
+* Workspaces with spaces in their names are now supported more consistently with i3 (@4e554c4c - #1011)",https://api.github.com/users/SirCmpwn,1310872,SirCmpwn,https://api.github.com/repos/swaywm/sway/releases/5664732/assets,https://api.github.com/repos/swaywm/sway/releases/5664732,master,https://api.github.com/repos/swaywm/sway/tarball/0.12,https://github.com/swaywm/sway/releases/tag/0.12,https://api.github.com/repos/swaywm/sway/zipball/0.12,0.12,False,True
+5019905,2016-12-27T16:58:56Z,2016-12-27T17:04:06Z,Sway 0.11,"This release includes 139 changes from 12 authors. The biggest feature 0.11 offers is the first steps towards the goal of a secure Wayland desktop by adding new knobs to secure your sway installation - read sway-security(7) for details. These are only the first steps towards a secure sway, and no promises are made about how well it works. Please test it and look for ways to break it and provide feedback on your experiences.
+
+Package maintainers - consider reading through sway-security(7) and seeing if there are any security-related configuration changes you'd like to ship with your sway installation. SYS_CAP_PTRACE is now required on /usr/bin/sway. Sway also hardcodes LD_LIBRARY_PATH on startup  now - you can change this with `-DLD_LIBRARY_PATH=...` if you set this to something other than /usr/lib in your distro.
+
+FreeBSD users - note that we cannot enforce security policies on a per-executable basis until [this issue](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=215202) is resolved. The default security policy will be applied to all executables.
+
+Also note that today I'm happy to introduce the sway bounty program - contribute some cash to support the development of the features you want, or write the code and claim the bounty! Information about this is available here: https://github.com/SirCmpwn/sway/issues/986
+
+# Changes
+- Sway now depends on libcap on Linux
+- Moving between containers now wraps according to i3 behavior (@thejan2009 - #936)
+- Alpha blending is now done with CAIRO_OPERATOR_SOURCE (@SirCmpwn - c0916f6)
+- bar pango_markup defaults to false, following i3 change (@Hummer12007 - #958)
+- -Denable-binding-event is no longer available - see sway-security(7) (@SirCmpwn - #981)
+- New floating windows now spawn in the center of the screen (@alkino - #1001)
+
+# New Features
+- Clicking titlebars now focuses that window (@alkino, @thejan2009 - #933, #934, #945)
+- Changing focus between floating containers is now supported (@thejan2009 - #935)
+- Numeric character references in bar are now supported (@thejan2009 - #936)
+- Pango markup in workspaces names is now supported (@thejan2009 - #936)
+- Input device configuration can now enable `left_handed` (@t3hknr - #961)
+- Improvements to logging (@SirCmpwn - 0d6cbca...d3e55f8)
+- New bar colors following new i3 features - see sway-bar(5) (@thejan2009 - #965)
+- New security-related features - see sway-security(7) (@SirCmpwn - #981)
+
+# Bugs Fixed
+- Errors in swaybar's hidpi rendering were corrected (@thejan2009 - #920)
+- Bug fixed where IPC events were emitted before IPC initialization (@gutsoo - #923)
+- Segfault during edge case on workspace switching was fixed (@zandrmartin - #924)
+- An IPC tree response compatability issue was corrected (@zandrmartin - #925)
+- Buggy font selection issues were fixed in swaylock (@wasamasa - #928)
+- Fixes to scale factor in text scaling (@alkino - #937)
+- Issue creating a sibling of a floating window fixed (@alkino - #938)
+- Some commands were not matched during command matching (@thejan2009 - #940)
+- Indicator border no longer shown on floating windows (@thejan2009 - #941)
+- An issue with for_window [] move scratchpad was fixed (@thejan2009 - #942)
+- You can now move empty workspaces (@alkino - #947)
+- Fixes with default workspace layouts (@thejan2009 - #945)
+- `layout toggle split` behavior fixed for tabbed/stacked layouts (@thejan2009 - #966)
+- When swaylock exited, it would not focus whatever you were using before (@cyphar - #1014)
+",https://api.github.com/users/SirCmpwn,1310872,SirCmpwn,https://api.github.com/repos/swaywm/sway/releases/5019905/assets,https://api.github.com/repos/swaywm/sway/releases/5019905,master,https://api.github.com/repos/swaywm/sway/tarball/0.11,https://github.com/swaywm/sway/releases/tag/0.11,https://api.github.com/repos/swaywm/sway/zipball/0.11,0.11,False,True
+4483334,2016-10-25T21:50:14Z,2016-10-25T22:39:36Z,Sway 0.10,"This release includes 118 changes from 19 authors. 0.10 is mostly bug fixes and i3 compatability issues, but major 0.10 news includes FreeBSD support and a package in the official Fedora repositories. A possible privledge escalation vulnerability was fixed in 0.10 - see the changelog for details.
+
+# New Features
+- sway now runs on FreeBSD! (thanks @yohanesu75!)
+- swaymsg now pretty prints the JSON response (thanks @acrisci!)
+- The application class is displayed in titlebars if the title is missing (thanks @thejan2009!)
+- Disabling outputs at runtime might work (thanks @thejan2009!)
+- i3's indicator border color feature is now supported (thanks @guiniol, @thejan2009!)
+- Input device names in input configurations now support `*` (thanks @SirCmpwn!)
+- Initial support for HiDPI was added to swaybar, swaybg, and swaylock (thanks @SirCmpwn, @thejan2009!)
+- Moving views across an output's edge is now supported (thanks @mikkeloscar!)
+- swaygrab can now screenshot the focused container via -f (thanks @zandrmartin!)
+
+# Bugs Fixed
+- A security issue was fixed - you are affected if you have users on your system that use sway but do not have root access - details in #884 (thanks @Fale!)
+- A number of changes were made to IPC for better i3 compatability (thanks @acrisci, @zandrmartin!)
+- An uninitialized variable fixed the default config for `wrap_scroll` (thanks @minus7!)
+- Color parsing previously could cause values to clamp and lose information (thanks @progandy!)
+- `workspace back_and_forth` and `workspace_auto_back_and_forth` had issues getting along (thanks @thejan2009!)
+- Weirdness in edge cases with moving windows was fixed (thanks @Hummer12007!)
+- Edge case in workspace handling during view creation was fixed (thanks @thejan2009!)
+- A problem with `move container to workspace` was fixed (thanks @thejan2009!)
+- Null pointer dereference during config load edge case was fixed (thanks @kb100!)
+- The behavior of `hide_edge_borders` was fixed (thanks @lukaslihotzki!)
+- Fullscreen windows previously had input priority over swaylock (thanks @SirCmpwn!)
+- The behavior of pango markup on swaybar was fixed (thanks @zandrmartin!)
+- swaybar previously couldn't switch between workspaces with spaces in their names (thanks @thejan2009!)
+- swaybars could be loaded before all outputs were loaded, which could cause a segfault (thanks @RyanDwyer!)
+- An IPC-related segfault during initialization was fixed (thanks @gutsoo!)
+- Possible use-after-free in focus handling was fixed (thanks @zandrmartin!)
+
+# Changes
+- Some improvements were made to the default config (thanks @mayhewj, @goetzc, @zandrmartin!)
+- Some internal refactoring around focus (thanks @acrisci!)
+- Some internal refactoring around commands (thanks @zandrmartin!)
+- Improvements were made to man pages (thanks @minus7, @mmlb!)
+- `pango_markup` in your bar config now defaults to false, following the same change in i3 (thanks @Hummer12007!)
+",https://api.github.com/users/SirCmpwn,1310872,SirCmpwn,https://api.github.com/repos/swaywm/sway/releases/4483334/assets,https://api.github.com/repos/swaywm/sway/releases/4483334,master,https://api.github.com/repos/swaywm/sway/tarball/0.10,https://github.com/swaywm/sway/releases/tag/0.10,https://api.github.com/repos/swaywm/sway/zipball/0.10,0.10,False,True
+3792507,2016-08-02T11:42:29Z,2016-08-02T18:33:35Z,Sway 0.9,"This release comes with lots of cool things, including experimental HiDPI support, mouse support for swaybar, and more, including lots of bugfixes and documentation improvements. This also marks 1 year since I started the Sway project. Check out the [state of sway](https://drewdevault.com/2016/08/02/Sway-0.9-in-retro.html) blog post, too.
+
+# New Features
+- Experimental HiDPI support. Add `scale 2` to your output line, see sway(5) for details and #797 for status (thanks @SirCmpwn and the wlc team!)
+- Mouse support for swaybar (thanks @deklov!)
+- New bar command `wrap_scroll [yes|no]` allows you to wrap when scrolling through workspaces with swaybar (thanks @SirCmpwn!)
+- Windows that have a parent (i.e. most dialog windows) are now floated by default (thanks @SirCmpwn!)
+- The IPC `get_tree` message is implemented (thanks @zandrmartin!)
+- IPC window events have been implemented (thanks @Hummer12007!)
+- Swaylock has a new -f option which will cause it to fork into the background (which matches i3lock's behavior) (thanks @SethBarberee!)
+- The `focus child` i3 command has been implemented (thanks @acrisci!)
+- Spawned processes now keep track of what workspace was active when they were started and will open subsequent windows there (thanks @zandrmartin!)
+- Backgrounds can now be a solid color (thanks @zandrmartin!)
+
+# Bugs Fixed
+- A crash could occur in tabbed/stacking parent checks (thanks @Hummer12007!)
+- Strange split{h|v} regressions were corrected (thanks @Hummer12007!)
+- A corner case with tacked/stabbed containers as the default layout was fixed (thanks @thejan2009!)
+- An edge case that could cause crashes when destroying workspaces was fixed (thanks @Hummer12007!)
+- An error with the `move position` command was fixed (thanks @deklov!)
+- Event bitmasks in the IPC server were incorrect and fixed (thanks @Hummer12007!)
+- A regression and a bug in `hide_edge_borders` was fixed (thanks @zandrmartin and @thejan2009!)
+- A bug with `smart_gaps` and outer gaps 0 was fixed (thanks @thejan2009!)
+- floating_scroll events are no longer passed through to windows (thanks @thejan2009!)
+- IPC command results are encapsulated in a JSON array to match i3 behavior (thanks @acrisci!)
+- `focus parent` no longer attempts to focus anything higher than a workspace (thanks @acrisci!)
+- Window titles are now rendered appropriately when a parent of them is focused (thanks @acrisci!)
+- Windows spawned on empty workspaces with the tabbed/stacked layouts could spawn with 0x0 geometry (thanks @thejan2009!)
+- Killing a container now kills all of its children (thanks @thejan2009!)
+- Edge cases with various border styles in tabbed/stacked were fixed (thanks @thejan2009!)
+- Edge cases with tabbed/stacked layouts on layout switch were fixed (thanks @thejan2009!)
+- Focus handling was improved to better handle cases when containers were being focused (thanks @acrisci!)
+- Floating containers cache their size when being fullscreened and return to that size when unfullscreened (thanks @zandrmartin!)
+
+# Changes
+- The mouse cursor used over the wallpaper and bar can be customized with the SWAY_CURSOR_THEME and SWAY_CURSOR_SIZE environment variables (thanks @SirCmpwn!)
+- SIGSERV and SIGABORT are no longer handled. We just let the core dump happen, which we'll be asking you to upload for us when reporting crashes (thanks @SirCmpwn!)
+- Title bars of containers are now constructed based on their children's app IDs instead of their titles, which matches i3 behavior more or less (thanks @thejan2009!)
+- Log messages are now timestamped (thanks @acrisci!)
+- Some performance improvements in the form of more timely window arrangement calls were made (thanks @zandrmartin!)
+- Various improvements to the documentation (thanks lots of people)
+",https://api.github.com/users/SirCmpwn,1310872,SirCmpwn,https://api.github.com/repos/swaywm/sway/releases/3792507/assets,https://api.github.com/repos/swaywm/sway/releases/3792507,master,https://api.github.com/repos/swaywm/sway/tarball/0.9,https://github.com/swaywm/sway/releases/tag/0.9,https://api.github.com/repos/swaywm/sway/zipball/0.9,0.9,False,True
+3470004,2016-06-11T23:39:39Z,2016-06-17T17:45:49Z,Sway 0.8,"This release comes with many new features and bugfixes, as well as some significant updates to the documentation. During this release cycle, sway was packaged for openSUSE Tumbleweed!
+
+# New Features
+- You can clear the password buffer in swaylock with ESC or C-u (thanks @zandrmartin!)
+- swaylock now supports the --no-unlock-indicator option (thanks @zandrmartin!)
+- Floating views now have sane (and configurable) minimum and maximum sizes (thanks @thuck!)
+- Escaping line breaks in your configuration file is now supported (thanks @roosemberth!)
+- Using `exec` to launch applications now opens their windows on the workspace they were exec-d on (thanks @zandrmartin!) - note: does not presently work with x clients
+
+# Bugs Fixed
+- When hotplugging an output, workspace assignment rules are re-enforced (thanks @zandrmartin!)
+- Spaces in quoted output command arguments now behave properly (thanks @Hummer12007!)
+- Changing focus into an output with a fullscreen view now behaves correctly (thanks @zandrmartin!)
+- A number of IPC-related memory leaks were closed (thanks @1ace!)
+- A segfault was fixed involving an edge case of `include` with `*` (thanks @thuck!)
+- Your wallpaper is now updated on config file reload (thanks @zandrmartin!)
+- `hide_edge_borders` with `smart_gaps` enabled now behaves correctly (thanks @zandrmartin!)
+
+# Changes
+- Creating a variable via `set` without the leading `$` is automatically corrected to include it (thanks @thuck!)
+- When hotplugging outputs, workspaces are now sorted correctly and maintain their sort order on replug (thanks @zandrmartin!)
+- The documentation was corrected to remove the (currently unimplemented) left/right bar placement options (thanks @SirCmpwn!)
+- Missing layout modes (stacking and tabbed) were documented in sway(5) (thanks @wdbw!)
+- The `assign` command was documented in sway(5) (thanks @zandrmartin!)
+- Several other small improvements to the man pages were made (thanks @SirCmpwn!)
+",https://api.github.com/users/SirCmpwn,1310872,SirCmpwn,https://api.github.com/repos/swaywm/sway/releases/3470004/assets,https://api.github.com/repos/swaywm/sway/releases/3470004,master,https://api.github.com/repos/swaywm/sway/tarball/0.8,https://github.com/swaywm/sway/releases/tag/0.8,https://api.github.com/repos/swaywm/sway/zipball/0.8,0.8,False,True
+3279578,2016-05-21T13:58:13Z,2016-05-22T19:05:46Z,Sway 0.7,"# New Features
+- Bind actions to $mod+[scroll whell] via `floating_scroll` (thanks @Hummer12007!)
+- Set the acceleration profile for input devices via `accel_profile` (thanks @tajjada!)
+
+# Bugs Fixed
+- Window titles are updated when the application requests it (thanks @mikkeloscar!)
+- Screwing with the border settings on tabbed and stacking layouts caused breakage (thanks @tajjada!)
+- Several memory leaks, double frees, etc were fixed (thanks @neosilky!)
+- Several double closes, buffer overflows, etc were fixed (thanks @1ace!)
+- Many other small bugs were fixed (thanks @mikkeloscar, @xerpi, @1ace!)
+- Some typos were found and fixed in the man pages (thanks @cyberhuman!)
+
+# Changes
+- The hardcoded $mod+scroll actions introduced in sway 0.4 has been removed.
+- You can now use a relative path to your wallpaper (thanks @Hummer12007!)
+- ZSH completions are no longer included in the default build
+- Cairo and Pango are now required dependencies (previously they were only
+  required if you wanted swaybg or swaybar support)
+",https://api.github.com/users/SirCmpwn,1310872,SirCmpwn,https://api.github.com/repos/swaywm/sway/releases/3279578/assets,https://api.github.com/repos/swaywm/sway/releases/3279578,master,https://api.github.com/repos/swaywm/sway/tarball/0.7,https://github.com/swaywm/sway/releases/tag/0.7,https://api.github.com/repos/swaywm/sway/zipball/0.7,0.7,False,True
+3127961,2016-04-29T14:09:30Z,2016-04-29T14:19:08Z,Sway 0.6,"# New Features
+- Tabbed & stacking layouts (thanks @mikkeloscar!)
+- [Pango markup](https://developer.gnome.org/pango/stable/PangoMarkupFormat.html) on swaybar (thanks @SirCmpwn and @Hummer12007!)
+
+# Bugs Fixed
+- bindcode was incorrectly implemented and was corrected (thanks @mikkeloscar!)
+- Window borders no longer render under transparent fullscreen windows (thanks @mikkeloscar!)
+- swaylock's PAM configuration has been fixed on Debian derivatives (thanks @wdbw!)
+- A double free issue was discovered and fixed (thanks @fluxchief!)
+
+# Changes
+- Some improvements were made to the build process (thanks @sleep-walker!)
+- Several clang warnings were squelched (thanks @mikkeloscar!)
+- Small fixes were made to the default config (thanks @mikkeloscar, @nrechn!)
+",https://api.github.com/users/SirCmpwn,1310872,SirCmpwn,https://api.github.com/repos/swaywm/sway/releases/3127961/assets,https://api.github.com/repos/swaywm/sway/releases/3127961,master,https://api.github.com/repos/swaywm/sway/tarball/0.6,https://github.com/swaywm/sway/releases/tag/0.6,https://api.github.com/repos/swaywm/sway/zipball/0.6,0.6,False,True
+3034043,2016-04-16T14:23:42Z,2016-04-16T14:25:27Z,Sway 0.5,"This release addresses a breaking change in the wlc API.
+",https://api.github.com/users/SirCmpwn,1310872,SirCmpwn,https://api.github.com/repos/swaywm/sway/releases/3034043/assets,https://api.github.com/repos/swaywm/sway/releases/3034043,master,https://api.github.com/repos/swaywm/sway/tarball/0.5,https://github.com/swaywm/sway/releases/tag/0.5,https://api.github.com/repos/swaywm/sway/zipball/0.5,0.5,False,True
+3030726,2016-04-15T18:57:43Z,2016-04-15T19:03:51Z,Sway 0.4,"# New Features
+- i3 commands: new_window, new_float (thanks @mikkeloscar!)
+- Border colors are now configurable (thanks @fluxchief!)
+
+# Bugs Fixed
+- Crash if default layout is stacked/tabbed (thanks @mikkeloscar!)
+- swaybar doesn't crash if given no args (thanks @crondog!)
+- Borders don't freak out if partially off-screen (thanks @crondog!)
+- Swaylock doesn't crash on OOM (thanks @mikkeloscar!)
+- A few memory leaks have been fixed (thanks @cl91!)
+
+# Changes
+- Improved visual feedback for swaylock (thanks @fluxchief!)
+- Improved wayland event handling for swaylock (thanks @fluxchief!)
+- Tweaks to default wallpapers
+",https://api.github.com/users/SirCmpwn,1310872,SirCmpwn,https://api.github.com/repos/swaywm/sway/releases/3030726/assets,https://api.github.com/repos/swaywm/sway/releases/3030726,master,https://api.github.com/repos/swaywm/sway/tarball/0.4,https://github.com/swaywm/sway/releases/tag/0.4,https://api.github.com/repos/swaywm/sway/zipball/0.4,0.4,False,True
+2915626,2016-03-30T13:26:10Z,2016-03-30T13:29:04Z,Sway 0.3,"Missed an important bug in the last release, and I fixed a new feature as well so let's announce it for 0.3!
+
+## New Features
+- Your `floating_modifier` plus your mouse's scroll whell will adjust gaps. Will be configurable in a future version.
+
+## Bugs Fixed
+- Crash under certain conditions when updating window borders (notably reproducable by initiating a download in Firefox)
+",https://api.github.com/users/SirCmpwn,1310872,SirCmpwn,https://api.github.com/repos/swaywm/sway/releases/2915626/assets,https://api.github.com/repos/swaywm/sway/releases/2915626,master,https://api.github.com/repos/swaywm/sway/tarball/0.3,https://github.com/swaywm/sway/releases/tag/0.3,https://api.github.com/repos/swaywm/sway/zipball/0.3,0.3,False,True
+2915289,2016-03-30T12:38:36Z,2016-03-30T12:47:13Z,Sway 0.2,"## New Features
+- Window borders (thanks @mikkeloscar!)
+- Per-output background configuration for swaylock (thanks @nuew!)
+- Graphical feedback from swaylock during password entry (thanks @fluxchief!)
+- New `include` command includes another config file (thanks @mikkeloscar!)
+
+## Changes
+- bindsym can now be used at runtime
+- ""pango:"" prefix on fonts in your config is no longer required
+
+## Bugs fixed
+- Backspace works in swaylock (thanks @jcaesar)
+",https://api.github.com/users/SirCmpwn,1310872,SirCmpwn,https://api.github.com/repos/swaywm/sway/releases/2915289/assets,https://api.github.com/repos/swaywm/sway/releases/2915289,master,https://api.github.com/repos/swaywm/sway/tarball/0.2,https://github.com/swaywm/sway/releases/tag/0.2,https://api.github.com/repos/swaywm/sway/zipball/0.2,0.2,False,True
+2883467,2016-03-24T18:12:56Z,2016-03-24T18:25:33Z,Sway 0.1,"Initial pre-release of Sway. This version of sway supports most of i3's features and is suitable for daily use.
+",https://api.github.com/users/SirCmpwn,1310872,SirCmpwn,https://api.github.com/repos/swaywm/sway/releases/2883467/assets,https://api.github.com/repos/swaywm/sway/releases/2883467,master,https://api.github.com/repos/swaywm/sway/tarball/0.1,https://github.com/swaywm/sway/releases/tag/0.1,https://api.github.com/repos/swaywm/sway/zipball/0.1,0.1,False,True

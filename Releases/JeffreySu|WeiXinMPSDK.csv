@@ -1,0 +1,520 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7821033,2017-09-19T16:58:36Z,2017-09-20T09:41:32Z,Senparc.Weixin v4.16.1，Senparc.Weixin.MP v14.7.1,"# 重要提示
+此版本是最后一个单独包含.NET Framework 4.5代码的版本，此版本发布后，项目将升级到同时支持 .NET Framwork 4.5/.NET Core 1.1/.NET Core 2.0 的多版本项目（目前仅支持VS2017打开），其解决方案（.sln）或项目文件（.csproj）前可看到`.vs2017`字样。
+
+升级将是完全向下兼容的，也就是说我们保留了原有的.NET Framework 4.5解决方案文件和项目文件，您仍然可以使用之前的方式（解决方案文件）打开.NET Framework 4.5项目。
+
+同时，原有的 `Developer_FullDotNet` 分支将完成使命，合并入 `Developer` 分支并最终发布到 `master ` 分支，完成后，`Developer_FullDotNet` 分支将被关闭。
+
+## 本次更新
+```
+基础库
+v4.15.0
+1、添加 WeixinNullReferenceException 异常类型
+2、添加 UrlUtility（Url工具类），生成 OAuth 用的额 CallbackUrl 参数
+v4.15.1 优化 DateTimeHelper 计算方式
+v4.16.0 添加 Senparc.Weixin.Config.UseSandBoxPay 属性，使用微信支付接口时自动判断是否调用沙箱
+v4.16.1 （.NET Core）添加CoreWebProxy.cs
+
+MP
+v14.7.0 TenPayV3的接口添加对 UseSandBoxPay 的判断，可以自动使用沙箱
+v14.7.1（.NET Core）恢复从.NET Framework中移植的RequestUtility.SetHttpProxy()和RemoveHttpProxy()方法
+
+WxOpen： v1.5.0 添加获取用户手机号方法（同时提供了Demo）
+
+Work：
+v1.0.1 完善GetUserInfoResult属性
+v1.1.0 添加 OAuth2Api.GetUserDetail()方法
+v1.1.1 GetCheckinDataJsonResult_Result 添加 mediaids 属性（打卡的附件media_id，可使用media/get获取附件）
+v1.1.2 GetCheckinDataJsonResult 修改 checkindata 属性名称
+v1.1.3 添加发送textcard消息方法：MassApi.SendTextCard()
+
+
+MVC：
+v4.7.0 增加SenparcOAuthAttribute方法对于HTTPS（443端口）的处理
+
+Open
+v2.7.5
+1、修复小程序可见状态
+2、修复bug
+```
+
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/7821033/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/7821033,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v14.7.1,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v14.7.1,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v14.7.1,v14.7.1,False,False
+7602910,2017-09-01T07:40:00Z,2017-09-01T09:35:56Z,Senparc.Weixin v4.14.3，Senparc.Weixin.MP v14.6.10,"基础库
+v4.14.3 重构MD5生成方法，并提供小写MD5方法
+
+MP：
+v14.6.8 添加Event下“微信认证事件推送”一系列事件类型：
+1 qualification_verify_success - 资质认证成功（此时立即获得接口权限）
+2 qualification_verify_fail - 资质认证失败
+3 naming_verify_success - 名称认证成功（即命名成功）
+4 naming_verify_fail - 名称认证失败（这时虽然客户端不打勾，但仍有接口权限）
+5 annual_renew - 年审通知
+6 verify_expired - 认证过期失效通知
+
+v14.6.9 添加：小程序审核事件推送
+
+v14.6.10 添加接口：普通红包发送(服务商）
+
+WebSocket
+v0.3.2 注册WebSocketMessageHandler，自定义对象的实例化方法，用以支持Spring等框架的注入
+
+Open 
+v2.7.2 添加小程序“code 换取 session_key”（微信登录）接口
+v2.7.3 添加小程序“小程序模板设置”接口
+
+Work v0.4.2 添加 GetMemberResult.order 属性
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/7602910/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/7602910,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v14.6.10,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v14.6.10,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v14.6.10,v14.6.10,False,False
+7510875,2017-08-24T14:59:16Z,2017-08-24T15:03:44Z,Senparc.Weixin v4.14.2，Senparc.Weixin.MP v14.6.7,"## 重要提示
+
+由于目前微信官方已将微信企业号（QY）全部迁移到企业微信（Work），
+Senparc.Weixin SDK也已经同步完成移植工作（Senparc.Weixin.QY.dll -> Senparc.Weixin.Work.dll），
+即日起，Senparc将对Senparc.Weixin.Work.dll进行持续更新，停止对Senparc.Weixin.QY.dll的更新。
+如果您还在使用QY.dll，建议升级到Work.dll（Nuget：https://www.nuget.org/packages/Senparc.Weixin.Work），
+为了让开发者可以实现无缝升级，两个类库暂时只对命名空间进行了修改（QY->Work），无需修改逻辑代码。
+
+此版本为最后一个Senparc.Weixin.QY更新的版本，今后将停止对QY的更新。
+
+
+## 更新内容
+
+Senparc.Weixin 更新：
+
+```
+     v4.12.5 提供对企业微信的支持：添加WorkJsonResult（企业微信返回消息基类）、ReturnCode_Work（枚举）
+     v4.12.6 添加ASCIISort比较类，用于ASCII字典排序
+
+     v4.13.0
+     1、IJsonResult 接口添加 ErrorCodeValue 属性
+     2、添加MutipleCacheTestHelper类（多种缓存测试帮助类）
+     3、添加ReflectionHelper类（反射帮助类）
+     4、完善本地缓存策略插入key
+     v4.13.1 优化ApiHandlerWapperBase.TryCommonApiBaseAsync()方法
+     v4.13.2 添加RequestMessageTextExtension的大小写是否敏感设置
+     v4.13.3 为RequestUtility.HttpGet()方法添加Accept、UserAgent、KeepAlive设置
+     v4.13.4 修改企业微信APPId判断标准错误（使用新规则）
+
+     v4.13.5
+     1、完善AppId未注册提示
+     2、修复ApiHandlerWapperBase.TryCommonApiBase()方法自动刷新AccessToken的问题
+     3、提供统一的EntityHelper
+     4、ReturnCode添加：没有留言权限 = 88000
+
+     v4.14.0
+     1、修复RequestMessageTextExtension.GetResponseMessage()方法判断问题
+     2、支持.NET Core 2.0
+```
+
+Senparc.Weixin.MP 更新：
+
+```
+     v14.4.14 修改 JSSDKHelper.GetcardExtSign()和CreateNonekeySha1() 方法，使用 ASCII 字典排序
+
+     v14.5.0
+     1、AccessTokenResult 加入 IAccessTokenResult 接口
+     2、启用新版本的ApiHandlerWapper
+     v14.5.1 完善异步方法async/await
+     v14.5.2 Card_MemberCardData添加wx_activate_after_submit和wx_activate_after_submit_url
+     v14.5.3
+     1、添加 QrCode_ActionName.QR_STR_SCENE
+     2、解决了QrCode_ActionName.QR_STR_SCENE下临时二维码有效时间expire_seconds不生效的问题
+     v14.5.4 添加“一次性订阅消息”接口
+
+     v14.5.5
+     1、修改Container中的锁及异步调用方法
+     2、支持H5支付（同时已发布Demo）
+     3、为Tencent命名空间添加Senparc.Weixin.MP前缀
+     4、完善RequestMessageEvent_MassSendJobFinish（群发判断转载）
+     5、提取EntityHelper.FillClassValue()方法，优化FillEntityWithXml()方法
+     6、添加了NewsModel下的need_open_comment、only_fans_can_comment属性
+     7、查询红包接口（SearchRedPack）添加refund_amount和remark两个参数获取
+     8、增加“获取商品二维码”接口（ScanApi.GetQrCode()），同时提供配套异步方法
+     9、更新CardApi.CardBatchGet()方法的statusList参数传值
+
+     v14.6.0
+     1、新增 刷卡支付 撤销订单接口
+     2、支持.NET Core 2.0
+     v14.6.1 撤销订单接口（TenPayV3.Reverse()）添加证书设置
+     v14.6.2 回滚AccessTokenContainer
+     v14.6.3 回滚JsApiTicketContainer和OAuthAccessTokenContainer
+     v14.6.4 撤销订单接口（TenPayV3.Reverse()）添加证书设置
+     v14.6.5 回滚 AccessTokenContainer
+     v14.6.6 添加 JSSDKHelper.GetJsSdkUiPackageAsync() 异步方法
+     v14.6.7 增加更多自定义菜单类型：media_id、view_limited
+```
+
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/7510875/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/7510875,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v14.6.7,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v14.6.7,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v14.6.7,v14.6.7,False,False
+6903786,2017-06-30T16:20:59Z,2017-07-02T05:34:30Z,图书第一版代码：Senparc.Weixin v4.12.5，Senparc.Weixin.MP v14.4.13,《微信开发深度解析：公众号、小程序高效开发秘籍》出版时的代码快照。,https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/6903786/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/6903786,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v14.4.13.0,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v14.4.13.0,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v14.4.13.0,v14.4.13.0,False,False
+6727865,2017-06-15T16:42:18Z,2017-06-15T16:51:06Z,Senparc.Weixin v4.12.4，Senparc.Weixin.MP v14.4.13,"Senparc.Weixin 更新：
+```
+      v4.11.10 恢复.net core版本中的EncryptHelper.GetSha1()方法可用
+      v4.11.11 添加MessageHandlerExtensions
+
+      v4.12.0 优化最新 .NET Core 模块
+      v4.12.1 修复因为netstandard1.6条件编译符不正确造成的部分代码短路
+      v4.12.2 修复HttpUtility.UrlEncode .net core方法错误
+      v4.12.3 修复HttpUtility.UrlEncode .net 4.5方法错误
+      
+      v4.12.1 修复因为netstandard1.6条件编译符不正确造成的部分代码短路
+              添加SenparcWeixinSetting配置类
+      v4.12.2修复HttpUtility.UrlEncode .net core方法错误
+      v4.12.3修复HttpUtility.UrlEncode .net 4.5方法错误
+      v4.12.4 MessageHandler基类默认开启消息去重，不再需要手动设置（messageHandler.OmitRepeatedMessage = true）
+```
+
+Senparc.Weixin.MP更新：
+```
+      v14.3.143 修复上一版本造成的菜单获取错误问题
+
+      v14.4.5 完善微信支付退款申请接口
+      v14.4.6 修复企业付款接口无法指定证书的问题（TenpayV3.Transfers）
+      v14.4.7 iBeacon设备接口GroupGetAdddevice()方法更新
+      
+      v14.4.5 完善微信支付退款申请接口
+      v14.4.6 修复企业付款接口无法指定证书的问题（TenpayV3.Transfers）
+      v14.4.7 iBeacon设备接口GroupGetAdddevice()方法更新
+      v14.4.8 
+        1、完善TenPayLibV3.GetNoncestr()方法；
+        2、优化TenPayLibV3.BuildRandomStr()方法
+      
+      v14.4.9 
+        1、修改CardAPI的卡信息更新设置
+        2、修改TenPayUtil.GetNoncestr()方法，将编码由GBK改为UTF8
+      
+      v14.4.10 
+      1、CardApi.CardBatchGet()方法增加statusList参数
+      2、修改Card_CashData属性类型（int）
+      v14.4.11 完善CommonJsonSend.SendAsync()方法参数
+      v14.4.12 1、修改 UTF-8 编码设置
+              2、修复 CustomServiceApi.GetMsgList() 方法时间戳问题
+      v14.4.13 修复二级菜单小程序无法设置的问题
+```
+
+其他各模块更新请关注公众号“盛派网络小助手”的群发记录，或对应Nuget的“Release Notes”。",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/6727865/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/6727865,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v14.4.13,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v14.4.13,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v14.4.13,v14.4.13,False,False
+6073221,2017-04-13T14:11:10Z,2017-04-13T14:12:55Z,Senparc.Weixin v4.11.9，Senparc.Weixin.MP v14.3.142,"更新：
+v4.11.7 请求证书都改为 X509Certificate2 类型
+v4.11.8 （MessageHandler V3.2）修复 TextResponseMessage 不输出加密信息的问题
+v4.11.9 修改Download方法
+
+（下一版本或之后再发布）Senparc.Weixin v4.12.1 添加【ReturnCode.小程序Appid不存在】枚举类型（invalid weapp appid，40166）
+
+MP
+v14.3.140 
+1、添加BaseGroupMessageDataByGroupId.send_ignore_reprint属性
+2、优化代码
+v14.3.141 修改amount为decimal类型
+v14.3.142 RequestUtility中的所有请求证书由X509Certificate类型改为X509Certificate2
+SendResult文件添加了msg_data_id字段，此字段用于统计分析
+
+MvcExtension 
+v4.3.0 
+优化FixWeixinBugWeixinResult提高效率
+修改 .net core mvc 的ExecuteResult(ActionContext context)方法
+
+Senparc.Weixin.Cache.Redis（支持.net core）
+提供.net core版本
+
+Senparc.Weixin.Cache.Redis.RedLock（支持.net core）
+v0.0.3 提供 .net core 版本
+
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/6073221/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/6073221,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v14.3.142,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v14.3.142,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v14.3.142,v14.3.142,False,False
+5722311,2017-03-13T09:53:35Z,2017-03-13T11:16:49Z,Senparc.Weixin v4.11.4，Senparc.Weixin.MP v14.3.132,"本次重要更新内容：
+1、fix bug：微信支付统一订单接口。将 totalFee 参数类型由 decimal 改为 int。
+2、修复浏览器状态判断问题
+3、修改小程序模板消息接口URL
+4、优化代码
+5、修改EncryptHelper.GetSha1(string encypStr)方法算法
+注意：本次更新同时更新了 .NET4.0 / 4.5 两个版本！
+
+Senparc.Weixin v4.11.4（支持.net core）
+
+Nuget：https://www.nuget.org/packages/Senparc.Weixin
+更新内容：
+v4.11.1 ：
+添加【ReturnCode.appsecret不正确】枚举类型（invalid appsecret，40125）
+v4.11.2 ：
+修改SideInWeixinBrowser判断逻辑
+v4.11.3 ：
+日志中添加对线程的记录
+v4.11.4 ：
+修改EncryptHelper.GetSha1(string encypStr)方法算法
+
+Senparc.Weixin.MP v14.3.132（支持.net core）
+
+Nuget：https://www.nuget.org/packages/Senparc.Weixin.MP
+更新内容：
+v14.3.127 ：
+fix bug：微信支付统一订单接口。将 totalFee 参数类型由 decimal 改为 int。
+v14.3.128：
+完善PoiApi.GetPoiList()方法返回参数中的GetStoreList_BaseInfo信息
+v14.3.129 ：
+设置TransactionId和OutTradeNo时判断是否为null，如果是则提供空字符串""""
+修改订单查询接口的参数顺序，sign_type参数有的话必须参与签名，也就是放在md5之前，否则微信服务器会返回签名错误
+v14.3.131 ：
+1·为MediaApi.Get()方法提供ApiHandlerWapper.TryCommonApi()方法支持，可以传入AppId
+ v14.3.132：
+添加Get.DownloadAsync(string url, string dir)方法
+
+Senparc.Websocket 
+
+更新内容：
+优化WebSocket通讯机制
+
+Senparc.Weixin.MP.MvcExtension v4.2.0
+
+Nuget：https://www.nuget.org/packages/Senparc.Weixin.MP.MVC
+更新内容：
+修复浏览器状态判断问题
+
+Senparc.Weixin.WxOpen v1.2.1
+
+更新内容：
+fix bug：修改模板消息接口URL
+​
+Senparc.Weixin.QY v4.2.2
+
+更新内容：
+腾讯已于2016.4.20 下线“邀请成员关注接口” 
+
+Senparc.Weixin.MP.Sample Demo
+
+更新内容：
+更新了自定义菜单编辑器（http://sdk.weixin.senparc.com/Menu）
+更新了MessageHandler中的视频上传等测试
+修改主页错别字和微信支付页面样式",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/5722311/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/5722311,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v14.3.132,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v14.3.132,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v14.3.132,v14.3.132,False,False
+5543951,2017-02-22T16:39:35Z,2017-02-23T04:12:35Z,Senparc.Weixin v4.11，Senparc.Weixin.MP v14.3.127,"Senparc.Weixin
+为AsUrlData方法添加null判断
+v4.9.15 添加AES加密、解密算法
+v4.10.0 添加TemplateMessageBase作为所有模板消息数据实体基类
+Senparc.Weixin v4.10.1 添加SerializerHelper.GetObject方法
+v4.10.3 BaseContainer添加RemoveFromCache方法
+v4.10.4 优化FileHelper.GetFileStream方法
+v4.11.0 重构分布式锁
+
+MP
+优化微信支付
+TenPayV3UnifiedorderRequestData类调整sign_type设置顺序
+（准备做，需要测试：TenPayV3RefundQueryRequestData类暂时注释掉signType传入）
+14.3.123
+废除SHA1UtilHelper及MD5UtilHelper，方法合并到Senparc.Weixin.Helpers.EncryptHelper下（Senparc.Weixin.dll中）
+v14.3.124 修改lang属性为string类型，并添加LangEnum作为枚举
+v14.3.125 重新调整sign_type设置顺序，v14.3.122版本中不应该做调整
+v14.3.126 更新微信支付接口
+`v14.3.127 fix bug：v14.3.127中的统一订单接口bug。同时统一订单接口的totalFee参数类型改为int。`
+
+WxOpen
+WxOpen v1.1.0 添加CreateWxQRCode重写方法，直接保存文件
+添加SessionContainer，SessionHelper，EncryptHelper
+WxOpen v1.2.0 添加消息解密方法
+
+Redis
+v1.2.0 重构分布式锁
+
+memcached 
+v0.2.0 重构分布式锁
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/5543951/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/5543951,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v14.3.127,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v14.3.127,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v14.3.127,v14.3.127,False,False
+5497488,2017-02-17T11:28:51Z,2017-02-18T05:35:32Z,Senparc.Weixin v4.11，Senparc.Weixin.MP v14.3.126,"Senparc.Weixin
+为AsUrlData方法添加null判断
+v4.9.15 添加AES加密、解密算法
+v4.10.0 添加TemplateMessageBase作为所有模板消息数据实体基类
+Senparc.Weixin v4.10.1 添加SerializerHelper.GetObject方法
+v4.10.3 BaseContainer添加RemoveFromCache方法
+v4.10.4 优化FileHelper.GetFileStream方法
+v4.11.0 重构分布式锁
+
+MP
+优化微信支付
+TenPayV3UnifiedorderRequestData类调整sign_type设置顺序
+（准备做，需要测试：TenPayV3RefundQueryRequestData类暂时注释掉signType传入）
+14.3.123
+废除SHA1UtilHelper及MD5UtilHelper，方法合并到Senparc.Weixin.Helpers.EncryptHelper下（Senparc.Weixin.dll中）
+v14.3.124 修改lang属性为string类型，并添加LangEnum作为枚举
+v14.3.125 重新调整sign_type设置顺序，v14.3.122版本中不应该做调整
+v14.3.126 更新微信支付接口
+
+WxOpen
+WxOpen v1.1.0 添加CreateWxQRCode重写方法，直接保存文件
+添加SessionContainer，SessionHelper，EncryptHelper
+WxOpen v1.2.0 添加消息解密方法
+
+Redis
+v1.2.0 重构分布式锁
+
+memcached 
+v0.2.0 重构分布式锁
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/5497488/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/5497488,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v14.3.126,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v14.3.126,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v14.3.126,v14.3.126,False,True
+5248043,2017-01-24T07:27:01Z,2017-01-24T09:00:56Z,Senparc.Weixin v4.9.12，Senparc.Weixin.MP v14.3.121,"MP 
+v14.3.118 
+微信普通红包返回结果NormalRedPackResult，修改return_code和result_code的数据类型。
+微信红包接口中，将订单号作为参数输入。
+将ShakeAroundApi.SearchDeviceByApplyId()方法中的lastSeen参数调整为long类型
+CreateQRResultJson添加url和show_qrcode_url属性
+v14.3.119 
+OnEvent_ShakearoundUserShake接口默认返回ResponseMessageNoResponse类型消息
+修改BatchGetUserInfoData.lang属性为int类型
+v14.3.120
+Senparc.Weixin.MP.TenPayLibV3.RequestHandler添加SetParameterWhenNotNull()方法
+完善微信支付统一下单接口参数（TenPayV3UnifiedorderRequestData）
+v14.3.121 TryCommonApiAsync方法返回代码改为return await result;避免死锁的可能。
+
+WxOpen
+1、完善后端Demo代码
+2、添加小程序Demo
+
+Open
+v2.3.7 修复：ApiConfirmAuth的URL中带空格
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/5248043/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/5248043,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v14.3.121,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v14.3.121,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v14.3.121,v14.3.121,False,False
+5099557,2017-01-08T18:31:41Z,2017-01-08T19:04:39Z,Senparc.Weixin v4.9.11，Senparc.Weixin.MP v14.3.117,"WxOpen（小程序）
+v0.1.0 添加基础库，已包含模板消息API
+v0.2.0
+1、添加WxOpenMessageHandler
+2、添加SuccessResponseMessage类型响应信息
+v0.3.0
+根据MP的架构重构框架
+v1.0.0 2017年1月9日随官方同步发布
+
+Weixin
+v4.9.1 重写WxJsonResult.ToString()方法，输出带格式的内容。
+v4.9.2 Senparc.Weixin v4.9.2 添加FileHelper
+v4.9.3 添加小程序返回码添加小程序返回码
+v4.9.5 添加Sex枚举
+v4.9.6 修改错别字Browser->Browser，请注意全局替换更新
+v4.9.7 
+1、WeixinTrace使用同步锁，取代原先的本地锁
+2、修改日志储存路径，新路径为/App_Data/WeixinTraceLog/SenparcWeixinTrace-yyyyMMdd.log
+3、完善异常日志记录
+v4.9.8 将SendLog方法改名为SendApiLog
+v4.9.9
+1、优化WeixinTrace
+2、统一MessageHandlerException、UnknownRequestMsgTypeException的构造函数调用（将第一个构造函数的base改为this）；
+3、修改UnknownRequestMsgTypeException的基类为MessageHandlerException
+4、添加【ReturnCode.template_id】不正确枚举
+5、修改ErrorJsonResultException日志记录格式
+v4.9.11 添加SuccessResponseMessageBase类型响应信息基类
+
+MP
+v14.3.105 优化红包，添加裂变红包
+v14.3.106 
+删除Senparc.Weixin.MP.Helpers.FileHelper，合并到Senparc.Weixin.Helpers.FileHelper类中（开发时只需要注意修改命名空间）
+为Senparc.Weixin.Helpers.FileHelper添加DownLoadFileFromUrl()方法
+v14.3.107
+SearchRedPack方法修改证书初始化方法
+RedPackHBInfo去除status属性
+为TenPayLibV3.RequestHandler.ParseXML()方法添加v==null的判断
+v14.3.107
+fix bug：普通红包加入场景值之后的签名问题
+v14.3.113
+修正了WiFiApi中GetQrcode函数的返回值数据类型。
+修正了ShakeAroundApi中申请iBeacon设备的申请批次ID(appId)的数据类型从int改为long。
+修正了ShakeAroundApi中查询iBeacon设备传递的参数(begin => last_seen)，跟随微信更新。
+修正了WiFiApi中GetQrcodeResult的bug。
+v14.3.114 优化微信支付方法
+v14.3.115 CommonApi.GetMenu()方法，当发生菜单不存在等错误的时候会抛出WeixinMenuException异常。
+v14.3.116 TryCommonApi抛出ErrorJsonResultException、WeixinException异常时加入了accessTokenOrAppId参数
+v14.3.117 添加SuccessResponseMessage类型响应信息
+
+MP.Mvc
+v4.1.2 修改错别字Browser->Browser
+
+Open
+v2.3.1 为GetAuthorizerInfoResult方法添加authorizerBag.AuthorizationInfo更新
+v2.3.4 
+优化 优化TryGetAuthorizerAccessToken方法，避免authorization_info.authorizer_access_token值为空
+添加 AuthorizerContainer.GetAuthorizationInfoAsync()异步方法
+v2.3.5 OAuthAccessTokenResult添加序列化特性
+v2.3.6 添加SuccessResponseMessage类型响应信息，ResponseMsgType添加SuccessResponse枚举
+
+QY
+v4.2.0
+增加企业客服实体赋值
+完善客服功能
+v4.2.1
+添加SuccessResponseMessage类型响应信息
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/5099557/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/5099557,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v14.3.117,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v14.3.117,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v14.3.117,v14.3.117,False,False
+4469132,2016-10-24T16:28:20Z,2016-10-24T17:28:08Z,Senparc.Weixin v4.9.0，Senparc.Weixin.MP v14.3.104,"本次升级除了更新了发红包接口等接口之外，最重要的是重构了缓存模块。
+
+更新文档见：http://www.cnblogs.com/szw/p/5994480.html
+
+## 说明
+
+本次更新之后看似某些部分缓存初始化的代码会更长一些（多数存在于SDK内部，开发者不会感觉到，所有的接口调用方法没有任何改变），但是对于SDK的扩展能力来说是一个新的里程碑：以前缓存策略专为Container设计（或者说Container优先），而目前的缓存策略已经可以支持几乎所有的缓存类型！这次升级为接下来SDK更多的功能升级提供了强有力的底层保证，尤其下一步包括**小程序**在内的实时互动开发提前奠定基础。
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/4469132/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/4469132,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v14.3.104,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v14.3.104,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v14.3.104,v14.3.104,False,False
+4409645,2016-10-17T16:49:32Z,2016-10-17T16:55:38Z,Senparc.Weixin v4.8.1，Senparc.Weixin.MP v14.3.101,"更新**Senparc.Weixin**
+
+**Senparc.Weixin.MP**
+修改TenPayUtil.BuildRandomStr()方法
+.NET Core:修改编码；删除第一版微信支付代码（TenPayLib）
+
+**Senparc.Weixin.QY**
+修改TenPayUtil.BuildRandomStr()方法
+
+**Memcached v0.0.5**  添加ServerList配制方法
+
+**Redis v1.0.0** 修改缓存策略，将储存类型由String改为Hash
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/4409645/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/4409645,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v14.3.101,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v14.3.101,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v14.3.101,v14.3.101,False,False
+4243174,2016-09-27T16:40:26Z,2016-09-27T17:31:46Z,Senparc.Weixin v4.8.0，Senparc.Weixin.MP v14.3.100,"Weixin：v4.8.0 修正在ResponseMessage都null的情况下， 没有对_textResponseMessage做判断就直接返回空字符串的问题
+
+MP：v14.3.10 添加获取API：获取微信服务器的ip段
+QY：更新卡券字段，修改企业号Container
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/4243174/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/4243174,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v14.3.100,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v14.3.100,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v14.3.100,v14.3.100,False,False
+3880588,2016-08-13T07:55:54Z,2016-08-13T08:22:34Z,Senparc.Weixin v4.7.5，Senparc.Weixin.MP v14.3.4,"为Container添加TryReRegister()方法，用于自动处理分布式缓存重启（丢失）的情况。
+如果不使用分布式缓存此更新可以忽略。
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/3880588/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/3880588,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v4.7.5,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v4.7.5,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v4.7.5,v4.7.5,False,True
+3871601,2016-08-12T02:18:38Z,2016-08-12T02:25:12Z,Senparc.Weixin v4.7.4,"Senparc.Weixin v4.7.3存在无法注册Container的问题，现已修复，新版本v4.7.4。
+
+本次涉及到的更新包括：
+Senparc.Weixin.dll
+v14.7.3 => v14.7.4
+
+Senparc.Weixin.Cache.Redis.dll
+v0.2.0 => v0.2.1
+
+Senparc.Weixin.Cache.Memcached.dll
+v0.0.2 => v0.0.3
+
+其他模块均不需要升级。
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/3871601/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/3871601,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v14.3.4,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v14.3.4,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v14.3.4,v14.3.4,False,False
+3855511,2016-08-10T12:27:19Z,2016-08-10T12:31:51Z,Senparc.Weixin.MP v14.3.3,"1、重构缓存框架，更好地支持Redis等缓存框架，开始支持分布锁（可以根据当前缓存策略自动选择实现方式）
+2、重构Container缓存，更好地兼容各种扩展缓存框架
+3、更新了一批接口
+4、规范缓存键的命名，方便管理
+5、v14开始支持.NET Core（见.NET Core分支：https://github.com/JeffreySu/WeiXinMPSDK/tree/DotNET-Core）
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/3855511/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/3855511,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v14.3.3,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v14.3.3,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v14.3.3,v14.3.3,False,True
+3165690,2016-05-05T15:22:52Z,2016-05-05T15:36:38Z,v13.7.10 稳定版,"1、BatchGetUserInfoJson类重命名为BatchGetUserInfoJsonResult
+2、重构部分MessageHandler代码
+3、更新卡券接口
+4、完善消息响应功能
+5、完善摇一摇功能
+6、完善wifi功能
+7、添加用户“标签”相关接口
+
+此外Senparc.Weixin增加了IResponseMessageNoResponse接口，用于识别无需返回任何内容（返回空字符串）的情况，MP、MP.Mvc及QY的相关策略也随之改动。
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/3165690/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/3165690,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v13.7.10,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v13.7.10,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v13.7.10,v13.7.10,False,False
+3085744,2016-04-24T10:59:56Z,2016-04-24T11:11:11Z,Senparc.Weixin.MP v13.7.0 beta3,"Senparc.Weixin.MP v13.7.0 beta3
+更新摇一摇周边接口
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/3085744/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/3085744,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v13.7.0-beta3,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v13.7.0-beta3,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v13.7.0-beta3,v13.7.0-beta3,False,True
+3074758,2016-04-22T04:39:10Z,2016-04-22T04:43:58Z,Senparc.Weixin.MP 13.7.0 beta2,"更新卡券接口
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/3074758/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/3074758,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v13.7.0-beta2,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v13.7.0-beta2,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v13.7.0-beta2,v13.7.0-beta2,False,True
+2851528,2016-03-21T02:06:35Z,2016-03-21T02:10:30Z,Senparc.Weixin.MP 13.7.0 beta1,"Senparc.Weixin.MP 13.7.0 beta1
+
+提供Container缓存立即生效的解决方案
+优化缓存方案
+添加短链接接口
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/2851528/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/2851528,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/13.7.0-beta1,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/13.7.0-beta1,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/13.7.0-beta1,13.7.0-beta1,False,True
+2798816,2016-03-12T10:20:45Z,2016-03-12T14:05:28Z,Senparc.Weixin.MP 13.6.8,"正式发布分布式缓存方案；
+优化各模块中对缓存有依赖的Container；
+企业号AccessToken新规则更新；
+更新部分API。
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/2798816/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/2798816,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v13.6.8,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v13.6.8,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v13.6.8,v13.6.8,False,False
+2661096,2016-02-22T10:34:32Z,2016-02-22T10:36:19Z,Senparc.Weixin 4.5.12; Senparc.Weixin.MP 13.6.3,"Senparc.Weixin v4.5.12
+Senparc.Weixin.MP v13.6.3
+
+升级内容：
+优化缓存结构
+优化Container结构
+MP中从AccessTokenContainer中分离JsApiTicketContainer
+fig bugs
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/2661096/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/2661096,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v13.6.3,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v13.6.3,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v13.6.3,v13.6.3,False,False
+2656220,2016-02-21T03:44:15Z,2016-02-21T03:58:16Z,Senparc.Weixin.MP v13.6.2,"以Senparc.Weixin.MP时间线参考，为v13.6.2
+帮助文档下载：http://weixin.senparc.com/Document
+",https://api.github.com/users/JeffreySu,2281927,JeffreySu,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/2656220/assets,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/releases/2656220,master,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/tarball/v13.6.2,https://github.com/JeffreySu/WeiXinMPSDK/releases/tag/v13.6.2,https://api.github.com/repos/JeffreySu/WeiXinMPSDK/zipball/v13.6.2,v13.6.2,False,False

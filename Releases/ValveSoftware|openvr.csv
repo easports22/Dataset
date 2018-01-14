@@ -1,0 +1,723 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7610617,2017-09-01T19:06:07Z,2017-09-01T20:14:52Z,v1.0.10,"OpenVR SDK 1.0.10
+
+IVRCompositor:
+- New IVRCompositor::SetExplicitTimingMode and IVRCompositor::SubmitExplicitTimingData for DX12 (https://github.com/ValveSoftware/openvr/wiki/DirectX12#explicit-timing) and Vulkan (https://github.com/ValveSoftware/openvr/wiki/Vulkan#explicit-timing)
+- Adds Submit_TextureWithPose flag and VRTextureWithPose_t structure so applications can specify the pose the texture was rendered for when calling IVRCompositor::Submit 
+
+IVROverlay:
+- New IVROverlay::CloseMessageOverlay for closing modal dashboard dialogs the process owns
+
+IVRSystem:
+- Adds context to IVRSystem::GetOutputDevice required to discriminate graphics device in Vulkan
+
+Miscellaneous
+- Fixes crashes under some multithreading circumstances using OpenVR VR_* APIs
+- Updates hellovr_vulkan sample to use IVRSystem::GetOutputDevice
+- Fixes a crash with hellovr_opengl sample under macOS",https://api.github.com/users/natbro,355423,natbro,https://api.github.com/repos/ValveSoftware/openvr/releases/7610617/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/7610617,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v1.0.10,https://github.com/ValveSoftware/openvr/releases/tag/v1.0.10,https://api.github.com/repos/ValveSoftware/openvr/zipball/v1.0.10,v1.0.10,False,False
+7101840,2017-07-18T21:52:31Z,2017-07-19T23:43:06Z,v1.0.9,"OpenVR SDK 1.0.9
+Drivers:
+- Added TrackedDeviceDisplayTransformUpdated, which allows HMD drivers to explicitly specify the 4x3 eye-to-head transforms. The classic mechanism of setting Prop_UserIpdMeters_Float is still supported.
+- Added Prop_DriverProvidedChaperonePath_String, which a driver can set on the HMD device to specify a fallback chaperone setup that will be used if no other chaperone data is available for the universe returned by that driver. This string is a JSON object in the same format as the .vrchap file.
+- Added VREvent_WirelessDisconnect and VREvent_WirelessReconnect events for display redirect drivers to notify the runtime of display connection status.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 4059277]",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/7101840/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/7101840,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v1.0.9,https://github.com/ValveSoftware/openvr/releases/tag/v1.0.9,https://api.github.com/repos/ValveSoftware/openvr/zipball/v1.0.9,v1.0.9,False,False
+6717675,2017-06-14T22:01:27Z,2017-06-14T22:03:24Z,v1.0.8,"OpenVR SDK 1.0.8:
+General:
+- Added VRCompositorError_InvalidBounds - This is returned when the application passes texture bounds to Submit that are outside the range of -100.0 to 100.0 or are otherwise invalid.          
+- Added sample programs: hellovr_vulkan and hellovr_dx12.
+
+IVRVirtualDisplay:
+- The IVRVirtualDisplay interface is provided to allow OpenVR driver authors access to the final composited backbuffer intended for the headset's display. The primary expected use case is for wireless transport, though this could also be used for saving output to disk or streaming. From the perspective of the runtime, the VR compositor is interfacing with a virtual rather than an actual display. See https://github.com/ValveSoftware/virtual_display
+
+IVRSystem:
+- GetOutputDevice interface added for applications to know which primary graphics adapter to use.  This returns a LUID on Win32, vk::PhysicalDevice for Vulkan and id<MTLDevice> on OSX.
+
+IVRDriverManager:
+- Public API to query installed device drivers. 
+
+Drivers: 
+- Drivers can now set Prop_DriverDirectModeSendsVsyncEvents_Bool to true to indicate they will call VsyncEvent on their own.  This enables avoiding the hardcoded 2.8ms vsync offset for IVRDriverDirectModeComponent implementations.
+- Allow drivers to specify which graphics adapter to use by settings Prop_GraphicsAdapterLuid_Uint64.  This is a LUID on Win32.
+
+MacOS/OSX:
+ - includes a private framework compatible with Xcode 8 and higher. Embedding frameworks as binaries in your macOS app bundle can be error prone - see detailed instructions in issue #543 #543 (comment)
+
+Cmake Build System (optional):
+ - cmake script changes to better support Cygwin
+ - supports building universal 32/64 binaries on OSX
+ - supports building as a private OSX framework
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 4009583]",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/6717675/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/6717675,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v1.0.8,https://github.com/ValveSoftware/openvr/releases/tag/v1.0.8,https://api.github.com/repos/ValveSoftware/openvr/zipball/v1.0.8,v1.0.8,False,False
+6244485,2017-05-01T21:05:04Z,2017-05-01T21:07:10Z,v1.0.7,"OpenVR SDK 1.0.7:
+General:
+- Updated structure packing to be more consistent across platforms.
+- New property (Prop_SecondsFromPhotonsToVblank_Float) to support rolling illumination displays.
+- New property (Prop_ResourceRoot_String). When present identifies the properly named driver subdir to be used for sourcing resources.
+- New properties which are automatically set based on components a given driver implements.
+  - Prop_HasDisplayComponent_Bool
+  - Prop_HasControllerComponent_Bool
+  - Prop_HasCameraComponent_Bool
+  - Prop_HasDriverDirectModeComponent_Bool
+  - Prop_HasVirtualDisplayComponent_Bool
+
+IVROverlay:
+- Added SetOverlayName method.
+- Added SetOverlayRenderModel method.  Sets render model to draw behind this overlay and the vertex color to use, pass null for pColor to match the overlays vertex color.  The model is scaled by the same amount as the overlay, with a default of 1m.
+- Added GetOverlayRenderModel accessor.
+- Added SetOverlayTransformOverlayRelative method.  Sets the transform to relative to the transform of the specified overlay.  This overlays visibility will also track the parents visibility.
+- Added GetOverlayTransformOverlayRelative accessor.
+
+IVRServerDriverHost:
+- Added GetRawTrackedDevicePoses.  Provides access to device poses for drivers.  Poses are in their ""raw"" tracking space which is uniquely defined by each driver providing poses for its devices.  It is up to clients of this function to correlate poses across different drivers.  Poses are indexed by their device id, and their associated driver and other properties can be looked up via IVRProperties.
+
+IVRVirtualDisplay:
+- New interface drivers can implement to redirect display output.
+- Added new device type (TrackedDeviceClass_DisplayRedirect) for accessories which redirect display output.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 3936268]",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/6244485/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/6244485,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v1.0.7,https://github.com/ValveSoftware/openvr/releases/tag/v1.0.7,https://api.github.com/repos/ValveSoftware/openvr/zipball/v1.0.7,v1.0.7,False,False
+5310389,2017-01-31T01:36:33Z,2017-01-31T01:39:29Z,v1.0.6,"OpenVR SDK 1.0.6:
+General:
+- Updated source code and cmake configurations for openvr_api.dll (and dylib/so) for applications that need a static library.
+- Added VREvent_PropertyChanged event, which is sent when any property changes.
+- Added VREvent_PrimaryDashboardDeviceChanged event, which is sent when the user changes the dashboard laser pointer from one controller to another.
+
+IVRCompositor:
+- Added initial support for DirectX 12 and OSX IOSurfaces. Use at your own risk. Forward compatibility is not guaranteed.
+- Added IVRCompositor::ReleaseMirrorTextureD3D11(). Call ReleaseMirrorTextureD3D11 instead of calling Release directly on the texture.
+
+IVRApplications:
+- Added GetCurrentSceneProcessId(), which returns the process ID of the latest process to call VR_Init with the Scene application type.
+
+Server driver Interface:
+- Greatly simplified IServerTrackedDeviceProvider::Init and its arguments. This function now takes only an IVRDriverContext. From there it can call GetGenericInterface to get the rest of the interface.
+- Added global accessor functions for drivers that are similar to those used by applications. Put this line at the start of your IServerTrackedDeviceProvider::Init function (and the equivalent line in Cleanup) to enable them:
+  VR_INIT_SERVER_DRIVER_CONTEXT( pContext );
+- IServerTrackedDeviceProvider no longer has enumeration functions for drivers. If the provider contains an HMD it should call TrackedDeviceAdded with the details of that HMD before Init returns. Other devices can be added at any time by calls to TrackedDeviceAdded.
+- IVRServerDriverHost::TrackedDeviceAdded now takes all the required values for a new tracked device, including the device class and device driver interface pointer.
+- Replace the property functions on ITrackedDeviceServerDriver with the IVRProperties interface and the CPropertyHelpers helper functions. This should result in significantly less boilerplate code in drivers and allows drivers to invalidate properties immediately instead of waiting for the client-side cache to expire. Use vr::VRProperties() to get the new helper interface. See the sample driver for details.
+- Added a new ""enable"" setting to all drivers that will prevent the driver DLL from being loaded. The enable flag has been removed from the sample driver.
+- IServerDriverHost has been renamed to IVRServerDriverHost no longer contains a few functions that are now handled by property setters.
+  - GetSettings() is now handled with vr::VRSettings()
+  - PhysicalIpdSet() is now handled by setting the Prop_UserIpdMeters_Float property.
+  - TrackedDevicePropertiesChanged() is now handled automatically when a property is set.
+  - MCImageUpdated() was undocumented and not useful outside the Lighthouse driver. It has been removed.
+
+CVRHiddenAreaHelpers:
+- This new helper class provides access to the hidden area mesh via the property system. You can access it with vr::VRHiddenArea() in a server driver.
+
+IDriverLog:
+- This interface has been renamed to IVRDriverLog
+
+IClientTrackedDeviceProvider:
+- Client drivers have been removed from the system. Drivers are no longer loaded into client processes. The functionality that used to be held in client drivers has moved:
+  - BIsHmdPresent is implemented by looking for USB VID and PID values as specified in the driver manifest file: https://github.com/ValveSoftware/openvr/wiki/DriverManifest
+  - GetHiddenAreaMesh is implemented via properties and the CVRHiddenAreaHelpers class. (See above)
+  - GetMCImage was undocumented and not useful outside of the Lighthouse driver. It has been removed.
+  - Watchdog mode, which allows SteamVR to start automatically on hardware activity, has been moved to a new driver type IVRWatchdogProvider.
+
+IVRWatchdogProvider:
+- This provider is only loaded in app type SteamWatchdog. It monitors the hardware for changes and calls vr::VRWatchdogHost()->WatchdogWakeUp() if an event occurs that should start SteamVR. This is entirely optional. A driver that doesn't implement this provider will just not wake up SteamVR on hardware activity.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 3811839]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/5310389/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/5310389,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v1.0.6,https://github.com/ValveSoftware/openvr/releases/tag/v1.0.6,https://api.github.com/repos/ValveSoftware/openvr/zipball/v1.0.6,v1.0.6,False,False
+4898623,2016-12-12T20:02:58Z,2016-12-12T20:04:30Z,v1.0.5,"OpenVR SDK 1.0.5
+General: 
+- Added final support for submitting Vulkan overlays and eye images. See this document for more information: https://github.com/ValveSoftware/openvr/wiki/Vulkan
+- Added TextureType_Vulkan, VRVulkanTextureData_t
+- Rename EGraphicsAPIConvention -> ETextureType.
+- New synchronous MessageOverlay API. Use IVROverlay::ShowMessageOverlay to display a message with up to four buttons.
+- Added ETrackedDeviceClass, GenericTracker
+- Added ETrackedPropertyError, PermissionDenied
+
+IVRSystem (v15):
+- GetProjectionMatrix signature change, removed EGraphicsAPIConvention eProjType
+
+IVRCompositor (v19):
+- Added GetVulkanInstanceExtensionsRequired, GetVulkanDeviceExtensionsRequired
+
+IVROverlay (v14):
+- Added VROverlayFlags_VisibleInDashboard
+- GetOverlayTexture signature change (includes overlay texture bounds)
+- Added GetOverlayFlags
+- Added ShowMessageOverlay
+
+IVRTrackedCamera (v13):
+- Renamed GetCameraIntrinsics
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 3739504]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/4898623/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/4898623,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v1.0.5,https://github.com/ValveSoftware/openvr/releases/tag/v1.0.5,https://api.github.com/repos/ValveSoftware/openvr/zipball/v1.0.5,v1.0.5,False,False
+4678142,2016-11-16T17:39:25Z,2016-11-16T17:40:34Z,v1.0.4,"OpenVR SDK 1.0.4:
+General:
+- Further refinement to Vulkan support. Note: the interface is still subject to change.
+
+IVRSystem (v14):
+- ComputeDistortion signature change. Previous version used nan as error signaling. New version returns explicit success.
+- GetHiddenAreaMesh takes optional EHiddenAreaMeshType argument to request Standard, Inverse, or LineLoop mesh.
+
+IVRCompositor (v18):
+- New submit error, VRCompositorError_AlreadySubmitted (if you submit the same eye twice)
+- GetFrameTimings signature change
+- Exposed GetCurrentFadeColor, GetCurrentGridAlpha
+
+IVROverlay (v13):
+- Added SetOverlayIntersectionMask
+
+IServerDriverHost:
+- Added PollNextEvent
+
+IClientDriverHost:
+- Removed GetSettings
+- Added GetGenericInterface
+
+ClientTrackedDeviceProvider (v5):
+- GetHiddenAreaMesh takes additional argument, EHiddenAreaMeshType
+
+Pull Requests integrated:
+#48 Format README in Markdown
+#58 correct detection of GCC
+#68 helloworldoverlay: Specify c++11 to fix gcc errors
+#76 Remove duplicate, unneeded glBindBuffer call.
+#135 Invert m_mat4HMDPose after assignment copying.
+#191 Document additional methods
+#278 include stdbool.h on non windows platform
+#306 Multi-platform CMake support.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 3697868]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/4678142/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/4678142,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v1.0.4,https://github.com/ValveSoftware/openvr/releases/tag/v1.0.4,https://api.github.com/repos/ValveSoftware/openvr/zipball/v1.0.4,v1.0.4,False,False
+4353299,2016-10-10T23:12:30Z,2016-10-10T23:14:41Z,v1.0.3,"OpenVR SDK 1.0.3:
+
+General:
+- Added preliminary Vulkan support
+- Added Button ID k_EButton_ProximitySensor. Use this for raw access to a proximity sensor if there is one.
+- Fixed spelling error in EVROverlayError, ""VROVerlayError_KeyboardAlreadyInUse""
+
+IVRSettings:
+- Improved default value handling.  Defaults are no longer passed with each individual call to GetBool, GetInt32, GetFloat, and GetString. Instead, system-wide defaults are specified in ""default.vrsettings"" (in the resources/setting/ directory of either the runtime or the driver_xxx directory.) If not explicitly defined, the default will be false, 0, 0.0 or """" with an error of VRSettingsError_UnsetSettingHasNoDefault.
+- Added explicit EVRSettingsError for VRSettingsError_JsonParseFailed
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 3647965]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/4353299/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/4353299,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v1.0.3,https://github.com/ValveSoftware/openvr/releases/tag/v1.0.3,https://api.github.com/repos/ValveSoftware/openvr/zipball/v1.0.3,v1.0.3,False,False
+3593714,2016-07-06T00:00:43Z,2016-07-06T00:03:19Z,v1.0.2,"OpenVR SDK 1.0.2:
+
+General:
+- Split several VR_Init error return values out into unique causes.
+- Added Prop_ControllerRoleHint_Int32, which a controller driver can optionally use to return the best matching ETrackedControllerRole type for the controller. Use this to specify a controller that is physically shaped for one hand only or when the driver is able to determine which hand is holding the controller through sensors or other means.
+- Added VREvent_OverlayFocusChanged, which is sent when an overlay was under the laser mouse and isn?t anymore or when there was no overlay under the laser mouse and now there is.
+
+IVRApplications:
+- Added LaunchApplicationFromMimeType. This allows the caller (usually Steam) to start the application that is associated with that mime type if it is not already running. If the application is not running it will be started with the specified arguments appended to existing arguments for the app. If the application is already running it will receive VREvent_ApplicationMimeTypeLoad and can retrieve the arguments by passing event.applicationLaunch.unArgsHandle to IVRApplications:: GetApplicationLaunchArguments.
+- Added other support functions for mime types.
+
+IVRCompositor:
+- Split out Compositor_FrameTiming's m_flSceneRenderGpuMs into m_flPreSubmitGpuMs and m_flPostSubmitGpuMs.  Post-Submit time was not previously being recorded.
+
+IVROverlay:
+- Added VROverlayFlags_SortWithNonSceneOverlays. This allows the scene application's overlays to sort with other non-scene overlays.
+- Added SetOverlayTexelAspect/GetOverlayTexelAspect. This allows an overlay to control the aspect ratio of its texels. By default all overlay texels are square (i.e. 1.0)
+- Added SetOverlaySortOrder/GetOverlaySortOrder. This allows an overlay to be force to be sorted above or below other overlays. It is most useful for overlays from the scene application that want to explicitly control their draw order.
+
+IVRTrackedCamera:
+- Added accessors to work with tracked camera gpu resources:
+  *\* GetVideoStreamTextureSize
+  *\* GetVideoStreamTextureD3D11
+  *\* GetVideoStreamTextureGL
+  *\* ReleaseVideoStreamTextureGL
+
+IVRResources:
+- New interface to allow access to resource files in the runtime or user-installed drivers.
+
+IVRCameraComponent:
+- Simplified interface by removing duplicate functions already provided by properties and deprecating the arbitrary distortion methods.
+
+IClientDriverHost:
+- Added WatchdogWakeUp. When a client driver is in Watchdog mode it should call this if a hardware event happens that should cause the system to wake up. The Lighthouse driver, for instance, calls this method when a system button is pressed or a controller is turned on.
+
+IClientTrackedDeviceProvider:
+- Added eDriverMode argument to Init. When this is passed as ClientDriverMode_Watchdog the driver should enter a low-power state where hardware is being monitored. If the driver does not support watchdog mode it should return VRInitError_Init_LowPowerWatchdogNotSupported.
+",https://api.github.com/users/JoeLudwig,303656,JoeLudwig,https://api.github.com/repos/ValveSoftware/openvr/releases/3593714/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/3593714,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v1.0.2,https://github.com/ValveSoftware/openvr/releases/tag/v1.0.2,https://api.github.com/repos/ValveSoftware/openvr/zipball/v1.0.2,v1.0.2,False,False
+3420605,2016-06-10T21:06:35Z,2016-06-10T19:17:08Z,v1.0.1,"OpenVR SDK 1.0.1:
+IVROverlay: 
+- Added event VREvent_ImageFailed which is sent when SetOverlayFromFile is called and the file load fails.
+
+IVRScreenshots:
+Added a new API via IVRScreenshots for screenshot support in VR.  This feature is still being developed and is currently in a beta state.  You can enable screenshot capture by selecting Enable Screenshots in the general settings of the VRMonitor.  Documentation for this new API is available at, https://github.com/ValveSoftware/openvr/wiki/IVRScreenshots_Overview
+
+Driver API:
+- Split Oculus driver direct mode into a new component and out of IVRDisplayComponent. Other drivers generally don't need to implement this component.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 3492473]
+ master  v1.0.1
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/3420605/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/3420605,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v1.0.1,https://github.com/ValveSoftware/openvr/releases/tag/v1.0.1,https://api.github.com/repos/ValveSoftware/openvr/zipball/v1.0.1,v1.0.1,False,False
+3297289,2016-05-24T18:29:11Z,2016-05-24T20:40:30Z,v1.0.0,"SDK Release 1.0.0:
+
+IVRApplications:
+- Added VREvent_ApplicationListUpdated event. This is sent whenever an application manifest is added, removed, or updated.
+
+IVRRenderModels:
+- Added VREvent_ModelSkinSettingsHaveChanged event. This is sent when the user has selected a new controller or base station/camera replacement model. If your application uses the IVRRenderModel interface to load the user's actual controllers it should reload them after receiving this event.
+- Added GetRenderModelOriginalPath function. This returns the non-overridden full path to the render model so controller/base station/camera skinning can be avoided if the application requires it.
+- Added GetRenderModelThumbnailURL function. This returns a URL (usually to a file) for a 4x3 aspect ratio thumbnail image that can be used to preview the render model.
+- Added GetRenderModelErrorNameFromEnum so applications don't need to provide their own lookup table to interpret these errors.
+
+IVRCompositor:
+- Added cumulative stats tracked per-application and associated accessor.
+- Added interface to access the mirror textures (per-eye).  This is the undistorted view with chaperone and overlays (e.g. dashboard) drawn on top.
+- Added preliminary support for screenshots. This interface is not stable yet and should be ignored for now.
+
+IVRTrackedCamera:
+- Exposed the initial version. Provides developers access to poll streaming frames from the HMD front facing camera with the associated tracked HMD pose. The image is available as either a pre-corrected distorted view or corrected undistorted view. 
+- Added a thin Qt example for getting and showing the camera image/pose.
+
+IVROverlay:
+- Added interface to get size of a texture used by an overlay.  This is useful when setting the overlay texture by filename.
+- Added ability to render side-by-side stereo content and panoramas.
+
+Driver Interface:
+- IVRCameraComponent is still in a development phase. 
+- Added provider method GetInterfaceVersions. This contains all the version numbers of the other interfaces in the driver. Drivers should return vr::k_InterfaceVersions from the version of openvr_driver.h that they were compiled against.
+- GetTrackedDeviceDriver and FindTrackedDeviceDriver no longer take an interface version. The caller will expect the version of the interface returned in GetInterfaceVesions()
+
+HelloVR sample:
+- Fixed compile error around glDebugMessageCallback that could happen with certain versions of the OpenGL headers.
+- Fixed compile error from LoadRenderModel->LoadRenderModel_Async name change.
+- Fixed compile error from LoadTexture->LoadTexture_Async name change.
+",https://api.github.com/users/JoeLudwig,303656,JoeLudwig,https://api.github.com/repos/ValveSoftware/openvr/releases/3297289/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/3297289,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v1.0.0,https://github.com/ValveSoftware/openvr/releases/tag/v1.0.0,https://api.github.com/repos/ValveSoftware/openvr/zipball/v1.0.0,v1.0.0,False,False
+3152457,2016-05-03T23:26:21Z,2016-05-03T23:28:08Z,v0.9.20,"OpenVR SDK 0.9.20:
+General:
+- Added VREvent_InputFocusChanged - This event is sent whenever input focus changes from one process to another.
+- Added VREvent_AudioSettingsHaveChanged - This event is sent whenever the user changes audio settings.
+- Added VREvent_ReprojectionSettingHasChanged - This event is sent when the user turns interleaved reprojection on or off.
+- Added VRInitError_Compositor_FirmwareRequiresUpdate - This error code will be returned by the compositor when there is a mandatory firmware update pending.
+
+IVRCompositor:
+- Compositor_FrameTiming now contains m_nReprojectionFlags. This will be 0 or more of:
+  . VRCompositor_ReprojectionReason_Cpu
+  . VRCompositor_ReprojectionReason_Gpu
+- Added ForceReconnectProcess. Call this to force a disconnect and reconnect to the compositor.
+- Added SuspendRendering. Call this when you know your process isn't going to render frames for a while. This often happens while loading new maps.
+
+IVROverlay:
+- Added overlay flag VROverlayFlags_TransferOwnershipToInternalProcess. This flag causes overlays owned by one process to be transferred to the new process spawned by a call to IVRApplications::LaunchInternalProcess. This can be useful for smoothing over such transitions from the user's point of view.
+
+Driver Interface:
+- Added VREvent_DriverRequestedQuit - A driver can post this event to ask the system to shut down.
+- Added IVRDisplayComponent:: GetNextSwapTextureSetIndex to retrieve the index in the texture set to use for the next frame's render targets.
+- Changed IVRDisplayComponet:: CreateSwapTextureSet to create three textures to allow a slightly longer round-robin list.
+
+NOTE: As of SDK 0.9.20 the driver interfaces will remain backward-compatible indefinitely. Future runtime changes will not break the ability to load drivers built against at least SDK 0.9.20.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 3426544]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/3152457/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/3152457,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v0.9.20,https://github.com/ValveSoftware/openvr/releases/tag/v0.9.20,https://api.github.com/repos/ValveSoftware/openvr/zipball/v0.9.20,v0.9.20,False,False
+2781346,2016-03-10T01:57:34Z,2016-03-10T01:59:13Z,v0.9.19,"OpenVR SDK 0.9.19:
+IVRRenderModels:
+- Added LoadIntoTextureD3D11_Async.  Loads render model texture asynchronously and copies into provided texture (as opposed to creating one and returning it).
+
+IVROverlay:
+- Added SetOverlayRenderingPid/GetOverlayRenderingPid to let you delegate rendering of an overlay's texture to another process
+- Added new event VREvent_OverlaySharedTextureChanged, this is fired when the backing shared texture for an overlay target changes, which is useful when using GetOverlayTexture
+- Added GetOverlayTexture/ReleaseNativeOverlayHandle to let you retrieve a native texture pointer backing an overlay targe
+
+IVRApplications:
+- Added new application type, templates. Use the ""is_template"" key  in your manifest to define an application of this type, and the LaunchTemplateApplication call to launch this application. Template applications let you override the keys in the manifest a runtime, useful for launching viewer style apps that want optional command line arguments and for you to transition from the application back to itself again.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 3339101]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/2781346/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/2781346,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v0.9.19,https://github.com/ValveSoftware/openvr/releases/tag/v0.9.19,https://api.github.com/repos/ValveSoftware/openvr/zipball/v0.9.19,v0.9.19,False,False
+2749719,2016-03-05T03:27:58Z,2016-03-05T03:29:14Z,v0.9.18,"OpenVR SDK 0.9.18
+General:
+- Added VREvent_Compositor_ChaperoneBoundsShown and VREvent_Compositor_ChaperoneBoundsHidden, which are sent when the chaperone bounds become visible/hidden.
+- Added VREvent_SeatedZeroPoseReset, which is sent whenever the user resets the seated zero pose in the dashboard or via the API.
+
+IVROverlay:
+- Added new overlay flag, VROverlayFlags_ShowTouchPadScrollWheel, to let you cause a scrollwheel to be draw on the active controller even if it isn't in scroll mode
+
+IVRApplications:
+- Added LaunchInternalProcess, which allows an application to switch which process is providing 3D frames for that application without showing any application transition UI.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 3330105]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/2749719/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/2749719,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v0.9.18,https://github.com/ValveSoftware/openvr/releases/tag/v0.9.18,https://api.github.com/repos/ValveSoftware/openvr/zipball/v0.9.18,v0.9.18,False,False
+2701205,2016-02-27T02:48:48Z,2016-02-27T02:50:27Z,v0.9.17,"OpenVR SDK 0.9.17:
+General:
+- Added events for application to temporarily hide and re-show render models (VREvent_HideRenderModels, VREvent_ShowRenderModels).
+- Added VREvent_KeyboardDone  which is sent when DONE button clicked on keyboard.
+- There is a change to how the openvr.h manages talking to the openvr_api.dll. We now have inline functions that acquire the interface pointers so when you build you will get the correct interface pointer even if the underlying openvr_api.dll is newer than the one you built against. This will enable environments where multiple codebases need to coexist in the same process such as some game engines.
+
+IVRApplications:
+
+Compositor:
+- Added new error code for detecting non-D3D11 class hardware (VRInitError_Compositor_D3D11HardwareRequired).
+- New interface for individually getting last tracked device poses returned by WaitGetPoses (GetLastPoseForTrackedDeviceIndex).
+- New API used to determine if the current app should render using lower resources (ShouldAppRenderWithLowResources). Typically this will return true when the dashboard is showing but other scenarios could result in this behavior also.
+
+Settings:
+- New speaker related settings (usingSpeakers, speakersForwardYawOffsetDegrees).
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 3321024]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/2701205/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/2701205,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v0.9.17,https://github.com/ValveSoftware/openvr/releases/tag/v0.9.17,https://api.github.com/repos/ValveSoftware/openvr/zipball/v0.9.17,v0.9.17,False,False
+2620295,2016-02-16T00:41:09Z,2016-02-16T00:42:23Z,v0.9.16,"OpenVR SDK 0.9.16:
+Note: This update includes significant changes to the OpenVR driver interface to simplify driver development and support backward compatibility. Drivers will need to update to at least this version to continue to be supported.
+
+General:
+- Added VREvent_TrackedDeviceRoleChanged, which is sent when right/left handedness of a controller changes.
+
+Settings:
+- Added RemoveSection, which removes an entire section from the settings.
+
+Render Models:
+- Changed render model and texture loading to be asynchronous. LoadRenderModel has become LoadRenderModel_Async and LoadTexture has become LoadTexture_Async.  Check the EVRRenderModelError returned by these functions to determine if the requested resource is loaded asynchronously.
+- LoadTextureD3D11 has become LoadTextureD3D11_Async which loads a texture into a D3D11 resource asynchronously.
+- Added VRComponentProperty_IsScrolled, which can be returned for render model components that are currently scrolling.
+- Added RenderModel_ControllerMode_State_t to GetComponentState. This allows the caller to specify whether the component is scrolled and is used for devices sending scroll events to overlays. Pass NULL if you don't care about this.
+
+Driver Interface:
+- Removed TrackedDeviceDriverInfo_t. The information that used to be in this struct is now provided via properties. Added Prop_DeviceClass_Int32 for the one member of the struct that didn't already have a matching property.
+- IServerDriverHost:: TrackedDeviceAdded now takes a serial number string. The driver will be called back to get specifics via properties.
+- Prop_SerialNumber_String and Prop_DeviceClass_Int32 are now required for every tracked device driver.
+- Added deviceIsConnected to DriverPose_t. When a connection to a device is lost the driver should send another pose with this bool set to false.
+- Removed ITrackedDeviceServerDriver::GetId. This information is retrieved via Prop_SerialNumber_String now.
+- Functions that aren't universal to all tracked devices have been moved onto driver components. These are retrieved with the GetComponent function. 
+- Display-related functions have moved to IVRDisplayComponent. This includes:
+  - GetWindowBounds
+  - IsDisplayOnDesktop
+  - IsDisplayRealDisplay
+  - GetRecommendedRenderTargetSize
+  - GetEyeOutputViewport
+  - GetProjectionRaw
+  - ComputeDistortion
+  - CreateSwapTextureSet
+  - DestroySwapTextureSet
+  - DestroyAllSwapTextureSets
+  - SubmitLayer
+  - Present
+- Controller-related functions have been moved to IVRControllerComponent. This includes:
+  - GetControllerState
+  - TriggerHapticPulse
+- Camera-related functions have moved onto IVRCameraComponent, but this interface is still in flux, so you should avoid implementing it in your driver.
+- IServerDriverHost lost the TrackedDeviceInfoUpdated function. If property values change, the driver should call TrackedDevicePropertiesChanged instead.
+- GetSettings on IServerDriverHost and IClientDriverHost now take an interface string. Pass the version of IVRSettings that your driver was compiled against.
+- Interface versions were added to a few other places to support backward compatibility.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 3299073]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/2620295/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/2620295,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v0.9.16,https://github.com/ValveSoftware/openvr/releases/tag/v0.9.16,https://api.github.com/repos/ValveSoftware/openvr/zipball/v0.9.16,v0.9.16,False,False
+2519753,2016-01-29T22:38:01Z,2016-01-29T22:39:17Z,v0.9.15,"OpenVR SDK 0.9.15
+General:
+- Several event members have been changes from enum values to plain-old-data types to guarantee compatibility across compiler vendors.
+
+IVRSystem:
+- PollNextEvent() and PollNextEventWithPose() now take a parameter for the size in bytes of the VREvent object you are passing in
+- The data member in VREvent_t is now variable length and at the end of the structure. 
+
+IVRApplications:
+- Added VRApplicationProperty_LastLaunchTime_Uint64, which returns the last launch time for an application in seconds since January 1, 1970.
+
+IVRCompositor:
+- Compositor_FrameTiming is totally different. What should we tell people, Aaron?
+
+IVROverlay:
+- Added the ability to render an overlay wrapped around a component on a tracked controller when in the dashboard or compositor.
+- k_EGamepadTextInputModeSubmit added for chat-style use of the keyboard where instead of a ""Done"" button there is a ""Submit"" button and it doesn't make the keyboard go away.
+- PollNextOverlayEvent() now takes a parameter for the size in bytes of the VREvent object you are passing in
+- For overlay applications there are now two new event types you can listen to, VREvent_Scroll and VREvent_TouchPadMove. These events are generated if the VROverlayFlags_SendVRScrollEvents or VROverlayFlags_SendVRTouchpadEvents flag is set on your overlay window.
+
+IVRRenderModels:
+- Added RenderModelHasComponent, which returns true if the named model has the named component.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 3265813]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/2519753/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/2519753,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v0.9.15,https://github.com/ValveSoftware/openvr/releases/tag/v0.9.15,https://api.github.com/repos/ValveSoftware/openvr/zipball/v0.9.15,v0.9.15,False,False
+2356777,2015-12-30T22:31:57Z,2015-12-30T22:34:34Z,v0.9.14,"OpenVR SDK Update 0.9.14:
+- IVRSystem 
+  - Added PerformanceTestEnableCapture(bool) for performance testing tools to toggle when frame timing data should be recorded.
+  - Added PerformanceTestReportFidelityLevelChange(int) for performance testing tools to report when they've changed fidelity settings.
+- General
+  - Added present count field to Compositor_FrameTiming.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 3205113]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/2356777/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/2356777,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v0.9.14,https://github.com/ValveSoftware/openvr/releases/tag/v0.9.14,https://api.github.com/repos/ValveSoftware/openvr/zipball/v0.9.14,v0.9.14,False,False
+2335763,2015-12-23T23:13:25Z,2015-12-23T23:24:14Z,v0.9.13,"OpenVR SDK Update 0.9.13:
+- IVRSystem 
+  - Added new APIs GetTrackedDeviceIndexForControllerRole() and GetControllerRoleForTrackedDeviceIndex() to get the correct devices for the left and right hand controllers.
+- IVRChaperone
+  - API GetBoundsColor has changed to also return pOutputCameraColor.
+- IVROverlay
+  - Added GetTransformForOverlayCoordinates() to return the 3d space transform for a given 2d point in an overlay.
+  - Added SetKeyboardTransformAbsolute() to set the keyboard position in 3d space
+  - Added SetKeyboardPositionForOverlay() to set the keyboard position appropriate for an overlay
+- IVRControlPanel removed
+- Misc new types added
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 3201751]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/2335763/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/2335763,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/0.9.13,https://github.com/ValveSoftware/openvr/releases/tag/0.9.13,https://api.github.com/repos/ValveSoftware/openvr/zipball/0.9.13,0.9.13,False,False
+2209937,2015-11-30T23:54:15Z,2015-11-30T23:57:11Z,v0.9.12,"OpenVR SDK Update 0.9.12:
+- Renamed many enums to a more consistent naming scheme. Typedefs are in place to allow old code to continue building, but those will be removed at some point in the future.
+  - HmdError -> EVRInitError
+  - Hmd_Eye -> EVREye 
+  - GraphicsAPIConvention -> EGraphicsAPIConvention
+  - HmdTrackingResult -> ETrackingResult
+  - TrackedDeviceClass -> ETrackedDeviceClass 
+  - TrackingUniverseOrigin -> ETrackingUniverseOrigin
+  - TrackedDeviceProperty -> ETrackedDeviceProperty
+  - TrackedPropertyError -> ETrackedPropertyError
+  - VRSubmitFlags_t -> EVRSubmitFlags
+  - VRState_t -> EVRState
+  - CollisionBoundsStyle_t -> ECollisionBoundsStyle
+  - VROverlayError -> EVROverlayError
+  - VRFirmwareError -> EVRFirmwareError
+  - VRCompositorError -> EVRCompositorError
+- Renamed all HmdError_\* enum vales to VRInitError_\* to match the new enum name.
+- VR_GetStringForHmdError was renamed to VR_GetVRInitErrorAsEnglishDescription to match the new enum name and make it clear what this function actually does.
+- VR_GetVRInitErrorAsSymbol was added. This returns the literal EVRInitError value name instead of a user-facing string. Use this to look up localized strings to display to users.
+- IVRRenderModels
+  - Introduced Component interface, which allows client applications to draw, label, or interact with tracked object components.
+    Components may define coordinate systems, renderable geometry, associations with button state, and supports button / axis dynamics. 
+    
+    Example uses of the IVRRenderModels Component API
+    -   Compositor controller rendering reflects live button/trackpad/trigger motion dynamics
+    -   Client applications can query controller-agnostic render label ""attachment points""
+    -   Client applications can query controller-agnostic hand-pose
+  - LoadRenderModel does not load textures automatically, instead an additional call to LoadTexture is required.  This enables texture reuse across model components.
+- Added new event VREvent_IpdChanged, which is sent when the physical IPD has changed on hardware that supports that. Because IVRSystem::GetEyeToHeadTransform is based on the user's IPD, applications which cache the matrix returned from that function will need to query it again. Applications that call GetEyeToHeadTransform each frame can safely ignore this event.
+- Functions that are used by an application to create its own window have moved to IVRExtendedDisplay. Calls to get this interface will return NULL and error VRInitError_Init_NotSupportedWithCompositor if VR Compositor is already running. Applications will need to use the compositor in that case. The functions that were moved are:
+  - GetWindowBounds
+  - GetEyeOutputViewport
+  - GetDXGIOutputInfo
+- IVRNotifications has been changed to support different types (transient and persistent) and styles of notifications. The notification system remains a work-in-progress and is not yet fully implemented.
+- Changed several functions that take a texture pointer to take a Texture_t struct instead. This struct allows the caller to identify the API and color space of the source texture in addition to the texture itself.
+- IVROverlay::SetOverlayGamma has been replaced with SetOverlayTextureColorSpace wich allows applications to specify that their texture is in linear or SRGB space.
+- IVRCompositor::Submit may return the following two new errors now rather than silently failing:
+  - TextureUsesUnsupportedFormat
+  - SharedTexturesNotSupported (if your app does not use DXGI 1.1 or greater)
+- IVRCompositor::GetLastError has been removed.  Errors are reported in the log.
+- IVRCompositor::Get/SetVSync has been removed.
+- IVRCompositor::Get/SetGamma has been removed (specify color space when submitting textures now instead).
+- Added IVRCompositor::GetLastPoses - returns the last set of poses returned by WaitGetPoses.
+- Added new application type VRApplication_Background, which will not start SteamVR if it isn't already running and will not keep it running if it would otherwise shutdown.
+- Added IVRSystem::AcknowledgeQuit_Exiting to allow an application to acknowledge an incoming Quit event. This extends the timout before vrserver kills the app from 5 seconds to 60 seconds.
+- Added IVRSystem::AcknowledgeQuit_UserPrompt to allow an application to tell the system that the user should be prompted to save data before exiting. This will cause the dashboard to be shown with UI that prompts the user to cancel the quit/transition request or to quit the app anyway. All timeouts will be cancelled once this call is made to give the user a chance to respond.
+- Quit events now have a bForced field (under event.data.process). If this is this field is true calls to AcknowledgeQuit_UserPrompt will be ignored and the app will be killed automatically after a timeout if it doesn't exit on its own.
+- The concept of a ""home application"" has been removed from the API. No 3D application will be launched automatically when SteamVR starts.
+- Chaperone data is automatically reloaded in all applications when VRServer receives VREvent_ChaperoneSettingsHaveChanged. It's no longer necessary to watch for this event in each application.
+- IVRChaperoneSetup has been added to the API which includes access to Chaperone Bounds polygons.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 3147743]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/2209937/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/2209937,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v0.9.12,https://github.com/ValveSoftware/openvr/releases/tag/v0.9.12,https://api.github.com/repos/ValveSoftware/openvr/zipball/v0.9.12,v0.9.12,False,False
+2009537,2015-10-23T16:21:25Z,2015-10-23T16:23:00Z,v0.9.11,"OpenVR SDK 0.9.11
+
+IVROverlay:
+- Added the concept of gamepad focus to dashboard overlays. Only the overlay with gamepad focus should pay attention to Xinput or other gamepad events. These are supported by new events and these IVROverlay functions:
+  - GetGamepadFocusOverlay - Returns the overlay that currently has gamepad focus.
+  - SetGamepadFocusOverlay - Sets the overlay that currently has gamepad focus. The dashboard will do this automatically for the active overlay.
+  - SetOverlayNeighbor - Set the up/down/left/right relationship between two overlays.
+  - MoveGamepadFocusToNeighbor - Overlays should call this when the user would navigate off of that overlay. OpenVR will shift the focus to the neighbor in that direction if there is one.
+
+IVRCompositor:
+- Added PostPresentHandoff - Should be called immediately after Present, only if you can't call WaitGetPoses instead (e.g. due to not having a separate render thread).
+- Added GetLastPoses - Returns the last set of poses that would normally have been gotten through calling WaitGetPoses.
+
+IVRTrackedCamera:
+- This is a work in progress API for forward facing cameras.
+
+IVRChaperone:
+- Added GetPlayAreaSize - Returns the size of the Play Area in X/Z dimensions.
+- Renamed GetSoftBoundsInfo to GetPlayAreaRect - Returns 4 corners of Play Area centered around the Standing Center.
+- Removed GetHardBoundsInfo
+- Removed GetSeatedBoundsInfo
+
+IVRChaperoneSetup:
+- Added GetWorkingPlayAreaSize - Returns the size of the working Play Area in X/Z dimensions.
+- Renamed GetWorkingSoftBoundsInfo to GetWorkingPlayAreaRect - Returns 4 corners of working Play Area centered around the Standing Center.
+- Replaced SetWorkingSoftBoundsInfo with SetWorkingPlayAreaSize - Sets the X/Z dimensions of the working Play Area.
+- Renamed GetWorkingHardBoundsInfo to GetWorkingCollisionBoundsInfo - Returns quads for the working Collision Bounds.
+- Renamed SetWorkingHardBoundsInfo to SetWorkingCollisionBoundsInfo - Returns quads for the working Collision Bounds.
+- Added GetLiveCollisionBoundsInfo - Returns quads for the current Collision Bounds (formerly known as Hard Bounds).
+- Removed all TagPoses interfaces and functionality.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 3047315]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/2009537/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/2009537,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v0.9.11,https://github.com/ValveSoftware/openvr/releases/tag/v0.9.11,https://api.github.com/repos/ValveSoftware/openvr/zipball/v0.9.11,v0.9.11,False,False
+1927804,2015-10-08T00:51:28Z,2015-10-08T00:54:50Z,v0.9.10,"OpenVR SDK 0.9.10
+- Split VREvent_SceneApplicationChanged into two events. SceneApplicationChanged will be sent when switching from one app drawing the 3D scene to another drawing the 3D scene. SceneFocusChanged will be sent when the process that is allowed to draw in 3D has changed. 
+- Added events to notify launchers when about ongoing application transitions.
+- Added button IDs for DPad and A buttons that will be sent when the user presses on the trackpad while in the VR dashboard.
+- Added new HmdError_ShuttingDown, with will be returned when a new application calls VR_Init while SteamVR is in the process of shutting down.
+- Added new Application errors for when an application can't start because another application transition is already in progress.
+- Added new IVRApplications methods that are intended for launchers, but may be of more general use:
+  - GetTransitionState() - returns what phase of the transition process the system is in
+  - GetStartingApplication() - returns the app key of the application that is starting up
+  - PerformApplicationPrelaunchCheck() - kicks off the application transition process and returns what kind of event the caller should wait for before starting its new application
+  - GetApplicationsTransitionStateNameFromEnum() - Turns the results of GetTransitionState() into a string for logging purposes
+- Added more const to the settings strings to avoid compiler warnings on some platforms.
+- Added IVRCompositor methods:
+  - ShowMirrorWindow/HideMirrorWindow - Shows or hides a window that displays the left undistorted eye that the user is seeing in the HMD
+  - CompositorDumpImages - Writes all textures that the compositor knows about (including overlays) to a ""screenshots"" folder in the root of the runtime
+  - GetFrameTimeRemaining - Returns the time left (in seconds) until the end of the current frame
+  - GetLastFrameRenderer - Returns the process ID of the process that rendered the most recent frame to the HMD. If the compositor is showing its grid, this function will return 0 even if another app has scene focus.
+- Added preliminary support for controller-based keyboard input
+  - Use IVROverlay::ShowKeyboard() to show the keyboard.
+  - Currently only minimal mode is supported
+  - Listen for KeyboardCharInput events to receive key input while the keyboard is up. The cNewInput buffer will contain input.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 3016204]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/1927804/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/1927804,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v0.9.10,https://github.com/ValveSoftware/openvr/releases/tag/v0.9.10,https://api.github.com/repos/ValveSoftware/openvr/zipball/v0.9.10,v0.9.10,False,False
+1797236,2015-09-10T23:30:54Z,2015-09-10T23:35:23Z,v0.9.9,"- Added events (VREvent_TrackedDeviceUserInteractionStarted and VREvent_TrackedDeviceUserInteractionEnded) and a new interface method (IVRSystem:: GetTrackedDeviceActivityLevel) to hint an application about whether a device is being held or worn by a user.
+- Added events (VREvent_FocusEnter and VREvent_FocusLeave). These are sent to overlays with automatic mouse processing when the cursor moves onto or off of an overlay. Use them to clean up hover states in your overlay UI.
+- Dashboard overlays will now be send pressed and unpressed events when they are the current overlay. 
+- Added IVRSystem::GetRawZeroPoseToStandingAbsoluteTrackingPose(), which allows an application to transform between standing and the raw coordinate system. 
+- Added method (IVRChaperone::SetSceneColor) to let the app provide a hint to the compositor about the scene color so it can pick reasonable bounds colors.
+- Added methods to (GetBoundsColor, AreBoundsVisible, ForceBoundsVisible) to let applications query the current state of the bounds.
+- IVRCompositor::Submit now takes a flag parameter that allows an application to submit images that have already been distorted.
+- Added methods (SetSkyboxOverride and ClearSkyboxOverride) to IVRCompositor to allow applications to control the skybox that will be visible when the compositor draws. This is useful for when an application knows it is not going to render for a while (because it is loading a level or doing some other blocking action.)
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 2961972]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/1797236/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/1797236,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v0.9.9,https://github.com/ValveSoftware/openvr/releases/tag/v0.9.9,https://api.github.com/repos/ValveSoftware/openvr/zipball/v0.9.9,v0.9.9,False,False
+1668813,2015-08-13T17:42:02Z,2015-08-13T17:42:38Z,v0.9.8,"General:
+- Added new event VREvent_SceneApplicationChanged. It is sent whenever the application drawing the 3D scene changes.
+- VR_Init now takes an optional argument to specify application type. The types are Scene (an app drawing in 3D), Overlay (a dashboard overlay), and Other. The default is Scene.
+- For Scene applications, VR_Init will now block until the current scene application exits.
+- Added new error return code (HmdError_Init_InitCanceledByUser) from VR_Init when the user decides to not exit the current Scene.
+- Only one Scene application is allowed to be blocking on VR_Init at a time. If a second Scene application tries VR_Init will return HmdError_Init_AnotherAppLaunching.
+
+IVRCompositor:
+- Only Scene applications are allowed to call WaitGetPoses or Submit. VRCompositorError_IsNotSceneApplication will be returned if a non-Scene application tries to call these functions.
+
+IVROverlay:
+- Exposed curve parameters for high-quality overlay.
+
+IVRApplications:
+- This new interface allows the following operations:
+  - Applications, installers, and distribution systems can register applications with the system.
+  - Launchers can enumerate the list of installed applications and information about those applications
+  - Launchers can start applications by key instead of needing to know the details of how to launch the application.
+  - Dashboard overlays can be marked to auto-launch at startup so they are always available.
+  - Scene applications can be set as the Home application so they start when the system does. The user can also access the home application at any time via the Home button on the dashboard.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 2918409]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/1668813/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/1668813,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v0.9.8,https://github.com/ValveSoftware/openvr/releases/tag/v0.9.8,https://api.github.com/repos/ValveSoftware/openvr/zipball/v0.9.8,v0.9.8,False,False
+1640069,2015-08-07T00:08:31Z,2015-08-07T00:10:21Z,v0.9.7,"- Added new function VR_IsRuntimeInstalled() to openvr.h. It returns true if the VR runtime directory was found.
+- Added EVREventType::EVREventType_VREvent_StatusUpdate to notify subscribers of the event that the OpenVR overall system entered a new status state. Possible states are defined by VRStatusState_t and stored in VREvent_status_t
+- Added EVREventType::VREvent_ChaperoneUniverseHasChanged to notify when the universe ID of the chaperone system changed. This message is usually sent once, when the ID changes from 0 to the actual universe ID.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 2912031]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/1640069/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/1640069,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v0.9.7,https://github.com/ValveSoftware/openvr/releases/tag/v0.9.7,https://api.github.com/repos/ValveSoftware/openvr/zipball/v0.9.7,v0.9.7,False,False
+1543417,2015-07-15T23:27:25Z,2015-07-15T23:29:11Z,,"Rearranged type declarations in the headers so they're in the right order.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 2879780]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/1543417/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/1543417,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v0.9.6,https://github.com/ValveSoftware/openvr/releases/tag/v0.9.6,https://api.github.com/repos/ValveSoftware/openvr/zipball/v0.9.6,v0.9.6,False,False
+1537354,2015-07-14T22:34:03Z,2015-07-14T22:35:48Z,,"IVROverlay:
+- Added GetOverlayKey and GetOverlayName which return the key or name of an overlay from its handle.
+- Added GetOverlayImageData which returns the current raw image data from an overlay.
+- Improved reliability of SetOverlayRaw and SetOverlayFromFile.
+- Added VREvent_ImageLoaded, which is sent when SetOverlayRaw or SetOverlayFromFile finish updating the overlay texture.
+- Added VROverlayError_UnableToLoadFile, which may be returned if SetOverlayFromFile fails.
+- Added ShowDashboard, which will make the dashboard visible if a dashboard manager is present. We aren't shipping a dashboard manager quite yet, so this function currently does nothing.
+
+IVRNotifications:
+- This new interface allows applications to post notifications to the user. Details and documentation are coming soon.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 2877976]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/1537354/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/1537354,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v0.9.5,https://github.com/ValveSoftware/openvr/releases/tag/v0.9.5,https://api.github.com/repos/ValveSoftware/openvr/zipball/v0.9.5,v0.9.5,False,False
+1506688,2015-07-07T18:35:11Z,2015-07-07T18:40:33Z,SDK Update 0.9.4,"Removed Microsoft C Runtime DLL dependency from openvr_api.dll. Applications should be able to use this with any C runtime and won't require that the VS2010 C runtime be installed.
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/1506688/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/1506688,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/v0.9.4,https://github.com/ValveSoftware/openvr/releases/tag/v0.9.4,https://api.github.com/repos/ValveSoftware/openvr/zipball/v0.9.4,v0.9.4,False,False
+1502510,2015-07-06T23:27:52Z,2015-07-06T23:28:55Z,SDK Update 0.9.3,"General:
+- Added accessors for all public OpenVR interfaces. These eliminate the need to call VR_GetGenericInterface and then cache a pointer to the result. The functions are:
+  - vr::IVRSystem *VRSystem()
+  - vr:: IVRChaperone*VRChaperone ()
+  - vr:: IVRCompositor*VRCompositor ()
+  - vr:: IVROverlay*VROverlay ()
+  - vr::IVRRenderModels *VRRenderModels()
+  - vr:: IVRControlPanel*VRControlPanel()
+- Added VREvent_Quit to tell applications when they should exit. Applications that don�t exit will be killed after five seconds.
+- Added VREvent_ProcessQuit to tell applications when another OpenVR process has exited.
+
+C API:
+- Added missing ""VR_"" prefixes.
+- Added missing global entry points (VR_Init, VR_Shutdown, etc.).
+
+IVRSystem:
+- Added GetSortedTrackedDeviceIndicesOfClass helper function.  Useful for determining left vs right controller, etc. 
+- Added properties to get battery and changing state for controllers. These are currently returning dummy values in the Lighthouse driver.
+  - Prop_DeviceIsWireless_Bool
+  - Prop_DeviceIsCharging_Bool
+  - Prop_DeviceBatteryPercentage_Float
+  - Prop_StatusDisplayTransform_Matrix34
+
+IVRNotifications:
+- Experimental version of Notifications is now in the SDK. There WILL be a breaking change to this API in a future SDK.
+- Notifications API will enable creating Notification Sources that send alerts to users while they are in a VR experience.
+
+IVRControlPanel:
+- Added QuitProcess(), which tells another OpenVR process to quit. Pass in 0 to tell all OpenVR processes to quit. In the all case, 
+
+IVRCompositor:
+- Compositor_FrameTiming now additionally reports the following values:
+  - m_flFrameIntervalMs
+  - m_flSceneRenderCpuMs
+  - m_flSceneRenderGpuMs
+  - m_flCompositorRenderCpuMs
+  - m_flCompositorRenderGpuMs
+  - m_flPresentCallCpuMs
+  - m_flRunningStartMs
+- Removed IVRCompositor::SetGraphicsDevice. Applications pass in the type of a texture with each Submit call instead.
+- Submit's TextureBounds no longer need to be vertically flipped for OpenGL textures.
+
+IVROverlay:
+- Renamed the �system overlay� to the Dashboard. Added CreateDashboardOverlay() to allow applications to create overlays that are intended to appear in the dashboard. 
+- Removed Set/GetOverlayVisibility. This used to be used to set an overlay as a system overlay. 
+- Added Set/GetOverlayColor. The overlay color (including alpha) is multiplied by the overlay�s output texture value.
+- Applications that use IVROverlay no longer need to call IVRCompositor::SetGraphicsDevice(), but SetOverlayTexture takes a graphics API to identify what kind of texture is being passed in.
+- SetOverlayTexture now takes a texture type.  SetOverlayTextureBounds still needs to be flipped vertically for OpenGL textures.
+
+IVRChaperone:
+*Added ReloadInfo() for forcing reload of bounds data from .vrchap. This is automatically handled by VRMonitor and the Compositor system when the config file is modified.
+
+[git-p4: depot-paths = ""//vr/steamvr/sdk_release/"": change = 2865502]
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/1502510/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/1502510,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/0.9.3,https://github.com/ValveSoftware/openvr/releases/tag/0.9.3,https://api.github.com/repos/ValveSoftware/openvr/zipball/0.9.3,0.9.3,False,False
+1405722,2015-06-11T22:20:26Z,2015-06-11T22:22:00Z,0.9.2,"General:
+- Added openvr_driver.h. This is the API to write an OpenVR driver. It is still very much a work in progress. No backward compatibility is guaranteed for drivers using this interface. It may be useful for development, however. See the documentation for details.
+- Added include guards around VR types in case openvr.h and openvr_driver.h end up included in the same file.
+
+IVRSystem:
+- Added properties to get information about connected wireless dongles.
+- Added properties to determine if the HMD display extends the desktop.
+- Both render model functions have moved to the new IVRRenderModel interface.
+- HandleControllerOverlayInteractionAsMouse has moved to IVROverlay.
+
+IVRCompositor
+- Removed all overlay related functions. Use the new IVROverlay interface.
+- Added the concept of 'scene focus'. Only the application with scene focus can render the 3D scene in the compositor.
+- Focus goes to application that started rendering most recently. 
+- The old scene focus app will receive a VREvent_SceneFocusLost when it loses focus. When an app regains focus (because the application with focus exited) it receives a VREvent_SceneFocusGained.
+- Applications can check for scene focus with the CanRenderScene method. Applications without scene focus should do little to no rendering work and allow the application with focus full access to the CPU and GPU.
+- WaitGetPoses will now block for a while for the application that doesn't have focus and then return an error. If you want to avoid the blocking, call CanRenderScene in your render loop.
+- Submit will now return an error if the current application doesn't have focus.
+
+IVRRenderModel:
+- Added functions to enumerate the list of available render models.
+
+IVROverlay:
+- This is a new interface in this SDK revision. It offers:
+  - Support for multiple overlays in the compositor
+  - The ability to attach an overlay to a controller or other tracked device
+  - Support for registering system overlays, which is what comes up when you hit the tiny black system button on the SteamVR controllers. See the helloworldoverlay sample for an example of how to implement one of these using Qt.
+  - See the documentation for more details.
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/1405722/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/1405722,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/0.9.2,https://github.com/ValveSoftware/openvr/releases/tag/0.9.2,https://api.github.com/repos/ValveSoftware/openvr/zipball/0.9.2,0.9.2,False,False
+1284756,2015-05-12T19:20:04Z,2015-05-11T23:44:24Z,OpenVR SDK Release,"Made openvr_api.dylib a universal binary.
+",https://api.github.com/users/jeremyselan,240544,jeremyselan,https://api.github.com/repos/ValveSoftware/openvr/releases/1284756/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/1284756,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/0.9.1,https://github.com/ValveSoftware/openvr/releases/tag/0.9.1,https://api.github.com/repos/ValveSoftware/openvr/zipball/0.9.1,0.9.1,False,False
+1237100,2015-04-30T16:00:05Z,2015-04-30T03:12:37Z,Initial OpenVR SDK Release,"The API that used to be available in steamvr.h in the Steamworks SDK is now the OpenVR SDK. Support for the old API will be maintained indefinitely, but applications that need any of the new features will need to switch to the new SDK.
+
+Several new interfaces were added and new methods were added to existing interfaces. See the API documentation for details.
+
+Changes from the SteamVR interface in SteamWorks SDK 1.31 to OpenVR SDK 0.9.0 include:
+- IHmd is now [`IVRSystem`](https://github.com/ValveSoftware/openvr/wiki/IVRSystem_Overview).
+- Added support for multiple tracked objects. Call [`IVRSystem::GetTrackedDeviceClass`](https://github.com/ValveSoftware/openvr/wiki/IVRSystem::GetTrackedDeviceClass) on numbers between 0 and k_unMaxTrackedDeviceCount to determine what kind of device is in each slot. The active HMD will always be at k_unHmdTrackedObject (aka 0) in the list.
+- Moved fetching of various values about HMDs and other tracked devices into properties. The TrackedDeviceProperty enum defines the available values. Call [`IVRSystem::Get<type>TrackedDeviceProperty`](https://github.com/ValveSoftware/openvr/wiki/IVRSystem::GetTrackedDeviceProperty) to get the value for an object.
+- Added support for providing applications with models and textures for tracked devices. This allows applications to draw the actual devices being tracked. See [`IVRSystem::LoadRenderModel`](https://github.com/ValveSoftware/openvr/wiki/IVRSystem::LoadRenderModel) and [`IVRSystem::FreeRenderModel`](https://github.com/ValveSoftware/openvr/wiki/IVRSystem::FreeRenderModel) for details.
+- Clarified and changed tracking prediction. The right value to pass to [`IVRSystem::GetDeviceToAbsoluteTrackingPose`](https://github.com/ValveSoftware/openvr/wiki/IVRSystem::GetDeviceToAbsoluteTrackingPose) is typically ( <frame duration> - <time since vsync> ) + <vsync to photons time>. All three of those values are available as properties on the HMD.
+- Added origin to calls that return poses. This can be Seated, Standing, or Raw. In the first two cases all returned poses will be relative to that configured origin. Raw poses are in whatever tracking system the current driver provides.
+- Renamed `IVRSystem::ZeroTracker` to [`IVRSystem::ResetSeatedZeroPose`](https://github.com/ValveSoftware/openvr/wiki/IVRSystem::ResetSeatedZeroPose). This function only applies to the seated origin and will have no effect on applications that use the standing origin.
+- Added angular velocity and velocity to the data returned with a tracked device’s pose.
+- CAPI and C# bindings for OpenVR interfaces added to headers. The accompanying json can be used to generate bindings for other languages as well.
+- Added [`IVRSystem::PollNextEvent`](https://github.com/ValveSoftware/openvr/wiki/IVRSystem::PollNextEvent) to the API. This allows applications to receive events when devices are activated, deactivated, or updated.
+- Added new interface [`IVRChaperone`](https://github.com/ValveSoftware/openvr/wiki/IVRChaperone_Overview) to query chaperone hard and soft bounds. Use this to show the user where safe areas to walk are.
+- [`IVRSystem::GetHiddenAreaMesh`](https://github.com/ValveSoftware/openvr/wiki/IVRSystem::GetHiddenAreaMesh). It returns the stencil mesh to use to minimize pixel rendering for the current HMD.
+- Removed GetIPD. Use the property Prop_UserIpdMeters_Float instead.
+- Added [`IVRCompositor`](https://github.com/ValveSoftware/openvr/wiki/IVRCompositor_Overview) interface. This interface allows an application to use the VR Compositor to perform distortion mapping and manage the HMD window.
+",https://api.github.com/users/JoeLudwig,303656,JoeLudwig,https://api.github.com/repos/ValveSoftware/openvr/releases/1237100/assets,https://api.github.com/repos/ValveSoftware/openvr/releases/1237100,master,https://api.github.com/repos/ValveSoftware/openvr/tarball/0.9.0,https://github.com/ValveSoftware/openvr/releases/tag/0.9.0,https://api.github.com/repos/ValveSoftware/openvr/zipball/0.9.0,0.9.0,False,False

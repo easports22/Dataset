@@ -1,0 +1,1135 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7777484,2017-09-16T03:58:11Z,2017-09-16T04:08:57Z,Lift Framework 3.1.1,"This is a bugfix release to [Lift 3.1.0][310] to fix a few bugs that were introduced in the 3.0.0 release and discovered only recently. The bug fixes we've shipped are described below. Please let us know if on the [Mailing List][ml] if you have any issues.
+
+[310]: https://github.com/lift/framework/releases/tag/3.1.0-release
+[ml]: https://groups.google.com/forum/#!forum/liftweb
+
+## Fixes
+
+* (#1917) **Consider `LiftRules.cometCreation` when building comets.** This `LiftRule` became ignored by accident during the great comet upgrade of the 3.0 release. We've added the line back that was missing, and plan to back-port this fix to the 3.0 and the 3.1 series.
+* (#1915) **Provide context path to session reload handler.** There was a subtle change in behavior in Lift 3.0 that caused bad things to happen when a Lift application was deployed under a context path in an application server (so, somewhere other than `/`) and that Lift application detected that the comet session had disappeared. In previous versions of Lift this would just reload the page. In Lift 3.0, we changed that behavior to take you to the root of your application. However, `/` is not always the root of the application. Now, we'll properly consider the context path when detecting what URL to send you to. This is, as always, customizable with `LiftRules.noCometSessionCmd`.",https://api.github.com/users/farmdawgnation,620189,farmdawgnation,https://api.github.com/repos/lift/framework/releases/7777484/assets,https://api.github.com/repos/lift/framework/releases/7777484,master,https://api.github.com/repos/lift/framework/tarball/3.1.1-release,https://github.com/lift/framework/releases/tag/3.1.1-release,https://api.github.com/repos/lift/framework/zipball/3.1.1-release,3.1.1-release,False,False
+7777443,2017-09-16T03:48:44Z,2017-09-16T03:52:55Z,Lift Framework 3.0.2,"This is a bugfix release to Lift 3.0.1 to fix a few bugs that were introduced in the 3.0.0 release and discovered only recently. The bug fixes we've shipped are described below. Please let us know if on the [Mailing List][ml] if you have any issues.
+
+[ml]: https://groups.google.com/forum/#!forum/liftweb
+
+## Fixes
+
+* (#1916) **Consider `LiftRules.cometCreation` when building comets.** This `LiftRule` became ignored by accident during the great comet upgrade of the 3.0 release. We've added the line back that was missing, and plan to back-port this fix to the 3.0 and the 3.1 series.
+* (#1914) **Provide context path to session reload handler.** There was a subtle change in behavior in Lift 3.0 that caused bad things to happen when a Lift application was deployed under a context path in an application server (so, somewhere other than `/`) and that Lift application detected that the comet session had disappeared. In previous versions of Lift this would just reload the page. In Lift 3.0, we changed that behavior to take you to the root of your application. However, `/` is not always the root of the application. Now, we'll properly consider the context path when detecting what URL to send you to. This is, as always, customizable with `LiftRules.noCometSessionCmd`.",https://api.github.com/users/farmdawgnation,620189,farmdawgnation,https://api.github.com/repos/lift/framework/releases/7777443/assets,https://api.github.com/repos/lift/framework/releases/7777443,master,https://api.github.com/repos/lift/framework/tarball/3.0.2-release,https://github.com/lift/framework/releases/tag/3.0.2-release,https://api.github.com/repos/lift/framework/zipball/3.0.2-release,3.0.2-release,False,False
+7776621,2017-09-15T23:13:50Z,2017-09-16T02:51:35Z,Lift Framework 3.2.0-M2,"The Lift Committers are pleased to announce the release of **Lift 3.2.0-M2** on September 15th, 2017. This release is the second of three milestone releases for Lift 3.2.0. The next milestone release is tentatively scheduled for November 15th, 2017 with plans to finalize Lift 3.2 around the end of the year. As always, you can follow along with our progress in the [GitHub Milestone View][ghmv].
+
+Please read below for the changes in this milestone.
+
+[ghmv]: https://github.com/lift/framework/milestones
+
+
+## Changes
+
+### New Features
+
+#### (#1906) Snippet Timers
+
+Page loading slowly and you're not sure what code to blame? Want to just report all snippet timings to a metrics system for monitoring? Snippet Timers are for you! Snippet Timers enable global, per-request, or per-session timing of Snippet execution throughout your Lift application. By default, we package a `LoggingSnippetTimer` that spits out these timings to the log system, but anything implementing the [`SnippetTimer` interface][stint] can be provided.
+
+To get started you'll need to invoke `LiftRules.installSnippetTimer` in `Boot` to enable the feature. For example, to enable the logging snippet timer globally, just add the following line:
+
+```scala
+LiftRules.installSnippetTimer(LoggingSnippetTimer)
+```
+
+If you're only interested in logging in certain sessions or requests, you'll still need to invoke `installSnippetTimer` at boot with the `NoOpSnippetTimer` to enable the feature. Then, to enable logging snippet timing at some point in a request invoke:
+
+```scala
+LiftRules.snippetTimer.get.map(_.request(LoggingSnippetTimer))
+```
+
+The logging snippet timer will be enabled for the duration of the request. You can also do the same for a session.
+
+```scala
+LiftRules.snippetTimer.get.map(_.session(LoggingSnippetTimer))
+```
+
+[stint]: https://github.com/lift/framework/blob/aa24c2d966d005cd21d725a8ffa7a4790b6c6983/web/webkit/src/main/scala/net/liftweb/http/SnippetTimer.scala#L11
+
+#### (#1893) ContainerVar serialization for anything Serializable
+Lift has provided `ContainerVar` for awhile for storing values in the underlying container session. (This is as opposed to the `SessionVar` that stores things in Lift's session.) However, to use a `ContainerVar` you need to provide some sort of `ContainerSerializer` for the type that you're trying to serialize. Even though Lift has provided a handful of implementations for awhile, none of them would handle something as simple as `Box[String]`.
+
+@joescii was kind enough to add a `ContainerSerializer` that works for anything extending `Serializable`. This should give Lift developers using `ContainerVar` a much more ""batteries included"" experience.
+
+#### (#1866) New Optional Mongo Fields
+@Bhashit made a number of additions to the optional mongo fields as a part of mongodb-record. Some fun additions that your code might benefit from include:
+
+* `OptionalCaseClassField`
+* `OptionalJObjectField`
+* `OptionalUUIDRefField`
+* `OptionalObjectIdField`
+
+... and more! We've also deprecated some legacy field names and parameter names (e.g. `rec` is now `owner`) so you'll probably see some deprecation warnings crop up if you're using any of those.
+
+### Documentation
+
+* (#1868) @Bhashit contributed some very nice documentation about Dependency Injection in Lift.
+* During this release cycle, we also formalized our [support policy](https://github.com/lift/framework/blob/master/SUPPORT.md).
+
+### Bug Fixes
+
+* (#1911) **Consider `LiftRules.cometCreation` when building comets.** This `LiftRule` became ignored by accident during the great comet upgrade of the 3.0 release. We've added the line back that was missing, and plan to back-port this fix to the 3.0 and the 3.1 series.
+* (#1903) **Provide context path to session reload handler.** There was a subtle change in behavior in Lift 3.0 that caused bad things to happen when a Lift application was deployed under a context path in an application server (so, somewhere other than `/`) and that Lift application detected that the comet session had disappeared. In previous versions of Lift this would just reload the page. In Lift 3.0, we changed that behavior to take you to the root of your application. However, `/` is not always the root of the application. Now, we'll properly consider the context path when detecting what URL to send you to. This is, as always, customizable with `LiftRules.noCometSessionCmd`.
+
+### Improvements
+
+* (#1918) **Logging improvements for various exceptions.** @andreak had located a few spots that weren't properly printing the exception stack trace when exceptions were hit, and delivered a Quick Fix™ to that.
+* (#1910) **Clarification of LAPinger documentation.**
+* (#1909) **Move template cache defaulting to `LiftRules`.** This change addresses some confusing behavior in how Lift creates the default template cache. Previously, if you were running in production mode and the `templateCache` was set to `Empty` we would auto-magically create an `InMemoryCache` and use that instead. Due to the way this was written, this effectively meant that turning off template caching in production was impossible. With this change we moved where the default gets calculated so it's actually possible to turn off the template cache in production mode if you would like to do that.
+* (#1907) **Addition of `onShutdown` to `buildRoundtrip`.** Previously, users of `buildRoundtrip` had no way to get notified that the underlying comet actor had been shut down. This meant that they had no way to really know if they could free resources that might be associated with that connection in their application level code. To address this, we've added an `onShutdown` argument to the `buildRoundtrip` function so developers can pass a handler when the underlying comet is actually shut down.
+* (#1895) **Make the servlet session ID configurable.** Previously, Lift's servlet session identifier was hard-coded. This worked fine for a long time. However, recently we discovered that it doesn't play nice when used in conjunction with Jetty's Mongo persisted sessions plugin because of the `$`s in it. To resolve that, we've made it configurable through `LiftRules.servletSessionIdentifier`.
+* (#1889) **Implementation of LiftRulesGuardedSetting.** This type will eventually replace everything in `LiftRules` declared as a `var`. The idea here is that we want to avoid folks from changing things in `LiftRules` at runtime. We do that in a bit of an ad-hoc way now, in the sense that some settings will blow up in your face if you attempt to do so, but moving forward the `LiftRulesGuardedSetting` is the way we're planning to standardize that behavior and make it more consistent.
+* (#1888, #1881) **Various lift-json performance improvements.**
+
+## About Lift
+
+The Lift Framework is a mature, advanced framework for the modern software engineer. There are Seven Things that set Lift apart from the other frameworks out there today: it's secure-by-default, developer-centric, scalable, capable of rich interactive behavior, modular, and designer-friendly. If you're new to Lift or interested in checking out what these things mean, we recommend checking out [Simply Lift][simply] and [The Lift Cookbook][cookbook].
+
+The [Lift Mailing List][ml] is also a good resource for anyone to ask questions or just meet other Lift users. The [Lift README][readme] is a good resource for figuring out how to use Lift in your project.
+
+[simply]: https://simply.liftweb.net/
+[cookbook]: https://cookbook.liftweb.net
+[ml]: https://groups.google.com/forum/#!forum/liftweb
+[readme]: https://github.com/lift/framework/blob/master/README.md",https://api.github.com/users/farmdawgnation,620189,farmdawgnation,https://api.github.com/repos/lift/framework/releases/7776621/assets,https://api.github.com/repos/lift/framework/releases/7776621,master,https://api.github.com/repos/lift/framework/tarball/3.2.0-M2-release,https://github.com/lift/framework/releases/tag/3.2.0-M2-release,https://api.github.com/repos/lift/framework/zipball/3.2.0-M2-release,3.2.0-M2-release,False,True
+7133208,2017-07-22T03:02:34Z,2017-07-22T16:48:07Z,Lift Framework 3.2.0-M1,"The Lift Committers are pleased to announce the release of **Lift 3.2.0-M1** on July 23rd, 2017. This release is the first of three milestone releases for Lift 3.2.0. The next milestone release is tentatively scheduled for September 15th, 2017 with plans to finalize Lift 3.2 around the end of the year. As always, you can follow along with our progress in the [GitHub Milestone View][ghmv].
+
+Please read below for the changes in this milestone.
+
+[ghmv]: https://github.com/lift/framework/milestones
+
+## Changes
+
+* (#1874) **Support for HTTP patch method in RestHelper.** This PR adds support for a `Patch` verb when using `RestHelper` to build APIs. Examples on how to use this can be found in the [Scaladocs for the new matcher][patchscaladoc]. Also, as you would expect, there are `XmlPatch` and `JsonPatch` variants as there are with `Get`, `Post`, etc.
+* (#1865) **Ensure the server/port combo of the original request is preserved.** This resolves bug #1794, wherein our snapshotting of the underlying request object during some async operations was incomplete. This periodically caused misbehavior that broke the ability to retrieve the host and path of the request being handled by the async operations.
+* (#1871) **Bumped our logback version.** This shouldn't affect applications using Lift directly, since we treat the logback dependency as something the application using Lift will provide. However, we do recommend that, if you haven't, you also upgrade to 1.2.3 or higher to resolve a security issue.
+
+[patchscaladoc]: http://static.javadoc.io/net.liftweb/lift-webkit_2.12/3.2.0-M1/net/liftweb/http/rest/RestHelper.html#Patch
+
+## About Lift
+
+The Lift Framework is a mature, advanced framework for the modern software engineer. There are Seven Things that set Lift apart from the other frameworks out there today: it's secure-by-default, developer-centric, scalable, capable of rich interactive behavior, modular, and designer-friendly. If you're new to Lift or interested in checking out what these things mean, we recommend checking out [Simply Lift][simply] and [The Lift Cookbook][cookbook].
+
+The [Lift Mailing List][ml] is also a good resource for anyone to ask questions or just meet other Lift users. The [Lift README][readme] is a good resource for figuring out how to use Lift in your project.
+
+[simply]: https://simply.liftweb.net/
+[cookbook]: https://cookbook.liftweb.net
+[ml]: https://groups.google.com/forum/#!forum/liftweb
+[readme]: https://github.com/lift/framework/blob/master/README.md
+
+",https://api.github.com/users/farmdawgnation,620189,farmdawgnation,https://api.github.com/repos/lift/framework/releases/7133208/assets,https://api.github.com/repos/lift/framework/releases/7133208,master,https://api.github.com/repos/lift/framework/tarball/3.2.0-M1-release,https://github.com/lift/framework/releases/tag/3.2.0-M1-release,https://api.github.com/repos/lift/framework/zipball/3.2.0-M1-release,3.2.0-M1-release,False,True
+6905785,2017-07-02T19:14:37Z,2017-07-02T21:50:39Z,Lift Framework 3.1.0,"The Lift Committers are pleased to announce the release of **Lift 3.1.0** on July 2nd, 2017. This release continues our [new release cadence](https://groups.google.com/d/msg/liftweb/uK10My2o1wQ/h6m7HaLZDgAJ) and marks the first final release in our new cadence. This release has **no code changes** from the 3.1.0-RC1 release.
+
+## About Lift
+
+The Lift Framework is a mature, advanced framework for the modern software engineer. There are Seven Things that set Lift apart from the other frameworks out there today: it's secure-by-default, developer-centric, scalable, capable of rich interactive behavior, modular, and designer-friendly. If you're new to Lift or interested in checking out what these things mean, we recommend checking out [Simply Lift](https://simply.liftweb.net/) and [The Lift Cookbook](https://cookbook.liftweb.net).
+
+The [Lift Mailing List](https://groups.google.com/forum/#!forum/liftweb) is also a good resource for anyone to ask questions or just meet other Lift users. The [Lift README](https://github.com/lift/framework/blob/master/README.md) is a good resource for figuring out how to use Lift in your project.
+
+## Changes
+
+This release of Lift is composed of the following component releases:
+
+* [Lift 3.1.0-M1](https://github.com/lift/framework/releases/tag/3.1.0-M1-release)
+* [Lift 3.1.0-M2](https://github.com/lift/framework/releases/tag/3.1.0-M2-release)
+* [Lift 3.1.0-M3](https://github.com/lift/framework/releases/tag/3.1.0-M3-release)
+* [Lift 3.1.0-RC1](https://github.com/lift/framework/releases/tag/3.1.0-RC1-release)
+
+Below is a list of changes since Lift 3.0 organized by the type of change and sorted by the PR number.
+
+### New Features
+
+* (#1768) **Improved handling of tuples in lift-json.** Tuples can now be serialized and deserialized as heterogenous arrays in JSON instead of as objects. This feature is disabled by default to ensure we're not changing default behavior in Lift 3.1, but can be enabled by providing a `Formats` object with `tuplesAsArrays` set to true. The one caveat with this functionality is that it doesn't consistently support Scala primitives, so if you're using tuples inside a larger, more complex structure you'll want to use the Java boxed types instead of Scala primitives where applicable (so, `java.lang.Integer` instead of `Int`). However, if the tuple contains case classes you should be able to use primitives inside those without issue: this caveat only affects primitives directly in the tuple. The [README for lift-json](https://github.com/lift/framework/blob/3.1.0-M3-release/core/json/README.md) documents all of this, and Matt Farmer [wrote a blog post](https://farmdawgnation.com/2017/05/02/tuple-array-extraction-for-lift/) demonstrating it in a more narrative style if that's more your thing.
+* (#1813, #1824) **Session-aware Lift and Scala Futures.** Especially with Lift 3's enhanced support for futures in CSS bindings and `RestHelper`, folks would find themselves firing off futures that needed to do i18n or something else that required session access, only to have that session context missing when the future actually executed. @pdyraga added a new helper, `LAFutureWithSession.withCurrentSession`, aliased as `S.sessionFuture`, which can be used to create an `LAFuture` task that has access to the session. There is a similar helper, `FutureWithSession.withCurrentSession`, that will spawn a task as a Scala `Future` with access to the session. The resulting futures can be chained and combined with other futures and will preserve their session access. This includes all APIs in Scala's `Future` in Scala 2.12, as well.
+* (#1845) **Custom rendering of special Double values.** Prior to M3, lift-json always serialized `NaN`, `PositiveInfinity`, and `NegativeInfinity` as their respective string values (`NaN`, `-Infinity`, `Infinity`). This is actually *not correct JSON*, as these are not supported JSON numeric values. Many if not most JSON parsers will choke on this output, including browser parsers. One notable exception is if anyone is `eval`ing JSON as JavaScript directly---but this is a very unsafe practice. As of M3, we default to rendering these as `null` instead, and provide a new `RenderSettings` customization that allows you to switch back to the old rendering approach, or to switch to an approach that throws an exception if these special values are found (which can be paired with `tryo` to produce a `Failure` in these cases).
+* (#1857) **Addition of the `BoxLogging` helpers.** The new `BoxLogging` helper provides functions for logging boxes and then continuing to operate on the box, allowing logging to become a fluent part of the `Box` interaction. It provides methods that can allow for logging empties and failures, or just failures. It also allows logging these to different log levels, and allows for different adapters to be applied.
+
+### Improvements
+
+* @n4to4 was kind enough to fix some broken links in our readme.
+* (#1791) **Event return normalization.** If handlers to `liftVanilla.onEvent` returned false, we'd just return that value. Now, we now check for the existence of `event.preventDefault` and trigger it and `stopPropagation` if the handler returned `false`. We also return that return that `false` value for older browsers to work with.
+* (#1812, #1815, #1823) **Full compatibility with Scala 2.12.** Lift 3.0.1 was released with Scala 2.12 support, but there were still some pieces to put in place for proper continuous integration and release building before we could consider that complete. This is now done. Thanks to @SethTisue and @farmdawgnation for putting in some contortions to get this all in order.
+* (#1817, #1822) **`lift-json` has gained significant parser performance improvements**, and is now competitive with the jawn parser in most of jawn's microbenchmarks, making it one of the fastest Scala JSON parsers across a variety of parsing scenarios.
+* (#1819) **The mongo Java driver has been updated to version 3.4.0.**
+* (#1829) **The MongoDB Record module now supports the MongoDB Async API calls.** Now, there are a handful of `*Async` methods on the MongoDB record implementation that will return `Future`s to the calling code, meaning you can now easily compose Mongo Record operations with other non-blocking code. Hat tip to @eltimn and @marekzebrowski for their work on this.
+* (#1837, #1854) **Removed `FileInputStream` and `FileOutputStream` usage.** @eltimn moved much of Lift's internal usage of `FileInputStream` and `FileOutputStream` to their more GC-friendly `java.nio` equivalents. See [this Cloudbees post](https://www.google.com/url?q=https%3A%2F%2Fwww.cloudbees.com%2Fblog%2Ffileinputstream-fileoutputstream-considered-harmful&sa=D&sntz=1&usg=AFQjCNFw3mO7nZ8ux3M95QBEdKeN7f6i_Q) for the GC impact of the old streams. *This change should have no impact on your code.* If you find yourself having to recompile your code to work with this change, please let us know on the mailing list, as this is meant to be a purely internal change.
+* (#1838) **Removed some deprecated rendering methods in lift-json.**
+* (#1839) **Closer to jQuery independence.** Lift 3.0.0 debuted a new `liftVanilla` provider of JavaScript functionality on the client with an eye towards removing the Lift jQuery dependency; unfortunately, that provider was somewhat incomplete. Amongst other things, loading it still required having jQuery loaded, or at least defined. We've removed this dependency now, and continue to work to make `liftVanilla` a fully functional replacement for the jquery-dependent functionality needed for core Lift operations.
+* (#1853) **Added Class caching for type hints in lift-json.** This change should improve performance when the same type hint is seen multiple times by caching the `Class` instance we use for a particular type hint instead of invoking a class lookup each time.
+* (#1862) **Improve error messages when we can't find a correct implicit conversion for CSS transforms.** When things went wrong while trying to resolve implicit conversions to make a working CSS transform, the compiler error generated was pretty opaque. With this change, we've improved that error message to be more friendly to people without a ton of Lift experience.
+
+### Bug Fixes
+
+* (#1832) **Fixed snippet class cache.** Resolved a bug in how we cache snippet class instances that caused a performance hit when using the same snippet multiple times.
+* (#1841) **Fixed event extraction for page fragments.** When event extraction was introduced in Lift 3, it did not take into account the possibility that a page fragment might be processed---for example, as a response to an AJAX request. As a result, in these cases, the events were extracted… But they were not re-transmitted through a separate channel. Instead, they were lost entirely. We now fix that, and page fragments with extracted events will properly reference the detached event handler code that will set those handlers up properly on the client.
+* (#1842) **Disabled event extraction for `fixHtmlFunc`.** `JsExp`s that handle HTML go through `fixHtmlFunc`, which is charged with preprocessing any embedded JS so it can be served correctly for client interpretation. Unfortunately, the interaction between this preprocessing and event extraction led to some broken and unexpected behavior. We're reasoning through a deeper fix, but in the meantime even when `LiftRules.extractInlineJavaScript` is enabled, `fixHtmlFunc` will *not* do event extraction.
+* (#1844) **Properly handle missing servlet http requests in `buildDeferredFunction`.** Sometimes `S.req` returns a `Req` without a servlet `HTTPRequest` inside. Ergo, when code would call `HttpRequest.snapshot` in `Req.snapshot`, we would get a `NullPointerException`. To fix this, we modify `currentReq` in both definitions of `buildDeferredFunction` so that they filter out null requests. Shout out to first-time contributor @arigoldx!
+* (#1852) **Always suspend Comet Requests before resuming them.** When a container supports request suspension, we were first scheduling a function to resume the request on a different thread and then suspending the request. While the function was scheduled in the future, the fact that it was scheduled before the suspend had definitively occurred meant there were thread schedulings where the resume could occur before the suspend had executed, leading to exceptions. We now suspend the request before scheduling the resume.
+* (#1861) **Add special handling for `UnavailableException` in boot.** This code adds special handling for `javax.servlet.UnavailableException`. Previously, if this exception was thrown during boot, we'd swallow it because we swallowed all exceptions during boot. However, this exception is an idiomatic way to signal a full abort to the Java Application Server running the application. From now on, we will log and re-throw this exception if we see it.
+* (#1863) **Resolve some issues with swallowing exceptions in lift-json.** In some cases extraction in lift-json would go horribly wrong and swallow exceptions that occur during class instantiation. This was due to us failing to pass on an underlying exception when we run into these errors. That has now been fixed.
+* (#1859) **Fix LAFuture.collect/collectAll when sub-futures fail.** Before, a single failed LAFuture rolled up in a `collect` or `collectAll` would cause the overall future to hang forever. We now properly fail the overall future if any contained future fails.
+* (aeeac274698164605715fec033242d6f42c41f60) Some minor liftsh changes to deal with some build problems.
+
+## Final Notes
+
+This release represents six months of hard work on behalf of the contributors. Most of the contributions made to Lift are made on the contributor's own time without any kind of payment. If you use Lift, please take the time to thank a contributor the next time you see them. They'll appreciate knowing their work is valued.
+
+Now, we look forward to the next part of the year, and begin building up to Releasing Lift 3.2.0 at the end of the year. Lift 3.2.0-M1 is currently scheduled to be released July 15, 2017. If you're interested in our progress, you can follow along from the [Milestones page](https://github.com/lift/framework/milestones).
+
+As always, please reach out to us with any questions or concerns on the [mailing list](https://groups.google.com/forum/#!forum/liftweb). We hope you enjoy Lift 3.1.0!",https://api.github.com/users/farmdawgnation,620189,farmdawgnation,https://api.github.com/repos/lift/framework/releases/6905785/assets,https://api.github.com/repos/lift/framework/releases/6905785,master,https://api.github.com/repos/lift/framework/tarball/3.1.0-release,https://github.com/lift/framework/releases/tag/3.1.0-release,https://api.github.com/repos/lift/framework/zipball/3.1.0-release,3.1.0-release,False,False
+6751146,2017-06-17T02:29:14Z,2017-06-19T00:10:19Z,Lift Framework 3.1.0-RC1,"The Lift Committers are pleased to announce the release of **Lift 3.1.0-RC1** on June 16, 2017. This release continues our [new release cadence](https://groups.google.com/d/msg/liftweb/uK10My2o1wQ/h6m7HaLZDgAJ). This will be the final pre-release 3.1.0 build unless we find regressions or need to make critical fixes to the 3.1.0 line before declaring it final.
+
+Provided we do not need to make an additional release candidate, this release will become the final 3.1.0 build at the end of June. For the latter half of the year, we'll start the release cycle over for 3.2.0. You can follow the milestone progress in the [Github milestone view](https://github.com/lift/framework/milestones).
+
+Below is a summary of the changes that have been made since 3.1.0-M3.
+
+The following new features or improvements have been made in this release:
+
+* (#1857) **Addition of the `BoxLogging` helpers.** The new `BoxLogging` helper provides functions for logging boxes and then continuing to operate on the box, allowing logging to become a fluent part of the `Box` interaction. It provides methods that can allow for logging empties and failures, or just failures. It also allows logging these to different log levels, and allows for different adapters to be applied.
+* (#1862) **Improve error messages when we can't find a correct implicit conversion for CSS transforms.** When things went wrong while trying to resolve implicit conversions to make a working CSS transform, the compiler error generated was pretty opaque. With this change, we've improved that error message to be more friendly to people without a ton of Lift experience.
+
+Additionally, the following bug fixes have been made in this release:
+
+* (#1852) **Always suspend Comet Requests before resuming them.** When a container supports request suspension, we were first scheduling a function to resume the request on a different thread and then suspending the request. While the function was scheduled in the future, the fact that it was scheduled before the suspend had definitively occurred meant there were thread schedulings where the resume could occur before the suspend had executed, leading to exceptions. We now suspend the request before scheduling the resume.
+* (#1844) **Properly handle missing servlet http requests in `buildDeferredFunction`.** Sometimes `S.req` returns a `Req` without a servlet `HTTPRequest` inside. Ergo, when code would call `HttpRequest.snapshot` in `Req.snapshot`, we would get a `NullPointerException`. To fix this, we modify `currentReq` in both definitions of `buildDeferredFunction` so that they filter out null requests. Shout out to first-time contributor @arigoldx!
+* (#1861) **Add special handling for `UnavailableException` in boot.** This code adds special handling for `javax.servlet.UnavailableException`. Previously, if this exception was thrown during boot, we'd swallow it because we swallowed all exceptions during boot. However, this exception is an idiomatic way to signal a full abort to the Java Application Server running the application. From now on, we will log and re-throw this exception if we see it.
+* (#1863) **Resolve some issues with swallowing exceptions in lift-json.** In some cases extraction in lift-json would go horribly wrong and swallow exceptions that occur during class instantiation. This was due to us failing to pass on an underlying exception when we run into these errors. That has now been fixed.
+* (#1859) **Fix LAFuture.collect/collectAll when sub-futures fail.** Before, a single failed LAFuture rolled up in a `collect` or `collectAll` would cause the overall future to hang forever. We now properly fail the overall future if any contained future fails.
+* (aeeac274698164605715fec033242d6f42c41f60) Some minor liftsh changes to deal with some build problems.
+
+This release is immediately available on Maven Central. Please let us know what you think [on the mailing list](https://groups.google.com/forum/#!forum/liftweb)!",https://api.github.com/users/farmdawgnation,620189,farmdawgnation,https://api.github.com/repos/lift/framework/releases/6751146/assets,https://api.github.com/repos/lift/framework/releases/6751146,master,https://api.github.com/repos/lift/framework/tarball/3.1.0-RC1-release,https://github.com/lift/framework/releases/tag/3.1.0-RC1-release,https://api.github.com/repos/lift/framework/zipball/3.1.0-RC1-release,3.1.0-RC1-release,False,True
+6451310,2017-05-19T03:39:41Z,2017-05-20T13:58:33Z,Lift Framework 3.1.0-M3,"The Lift Committers are pleased to announce the release of Lift 3.1.0-M3 on May 18, 2017. This release continues our [new release cadence](https://groups.google.com/d/msg/liftweb/uK10My2o1wQ/h6m7HaLZDgAJ) of bimonthly milestone builds, and is the last milestone build of the 3.1.0 series. One more pre-release build will be made, 3.1.0-RC1, around June 15th, with an eye towards a 3.1.0 final release near the end of June (depending on how the RC cycle goes). These will lead up to the final 3.1.0 milestone at the start of June. 3.1.0-RC1 is currently targeted for June 15, and the final 3.1.0 release targeted for the end of June. After that we'll start the release cycle over for 3.2.0 for the latter part of the year. You can follow the milestone progress in [the Github milestone view](https://github.com/lift/framework/milestones).
+
+With that, 3.1.0-M3 contains a few delicious nuggets:
+ - (#1845) **Custom rendering of special Double values.** Prior to M3, lift-json always serialized `NaN`, `PositiveInfinity`, and `NegativeInfinity` as their respective string values (`NaN`, `-Infinity`, `Infinity`). This is actually *not correct JSON*, as these are not supported JSON numeric values. Many if not most JSON parsers will choke on this output, including browser parsers. One notable exception is if anyone is `eval`ing JSON as JavaScript directly---but this is a very unsafe practice. As of M3, we default to rendering these as `null` instead, and provide a new `RenderSettings` customization that allows you to switch back to the old rendering approach, or to switch to an approach that throws an exception if these special values are found (which can be paired with `tryo` to produce a `Failure` in these cases).
+- (#1839) **Closer to jQuery independence.** Lift 3.0.0 debuted a new `liftVanilla` provider of JavaScript functionality on the client with an eye towards removing the Lift jQuery dependency; unfortunately, that provider was somewhat incomplete. Amongst other things, loading it still required having jQuery loaded, or at least defined. We've removed this dependency now, and continue to work to make `liftVanilla` a fully functional replacement for the jquery-dependent functionality needed for core Lift operations.
+ - (#1841) **Fixed event extraction for page fragments.** When event extraction was introduced in Lift 3, it did not take into account the possibility that a page fragment might be processed---for example, as a response to an AJAX request. As a result, in these cases, the events were extracted… But they were not re-transmitted through a separate channel. Instead, they were lost entirely. We now fix that, and page fragments with extracted events will properly reference the detached event handler code that will set those handlers up properly on the client.
+ - (#1842) **Disabled event extraction for `fixHtmlFunc`.** `JsExp`s that handle HTML go through `fixHtmlFunc`, which is charged with preprocessing any embedded JS so it can be served correctly for client interpretation. Unfortunately, the interaction between this preprocessing and event extraction led to some broken and unexpected behavior. We're reasoning through a deeper fix, but in the meantime even when `LiftRules.extractInlineJavaScript` is enabled, `fixHtmlFunc` will *not* do event extraction.
+ - (#1837, #1854) **Removed `FileInputStream` and `FileOutputStream` usage.** @eltimn moved much of Lift's internal usage of `FileInputStream` and `FileOutputStream` to their more GC-friendly `java.nio` equivalents. See [this Cloudbees post](https://www.google.com/url?q=https%3A%2F%2Fwww.cloudbees.com%2Fblog%2Ffileinputstream-fileoutputstream-considered-harmful&sa=D&sntz=1&usg=AFQjCNFw3mO7nZ8ux3M95QBEdKeN7f6i_Q) for the GC impact of the old streams. *This change should have no impact on your code.* If you find yourself having to recompile your code to work with this change, please let us know on the mailing list, as this is meant to be a purely internal change.
+- (#1832) **Fixed snippet class cache.** Resolved a bug in how we cache snippet class instances that caused a performance hit when using the same snippet multiple times.
+- (#1768) **Improved handling of tuples in lift-json.** Tuples can now be serialized and deserialized as heterogenous arrays in JSON instead of as objects. This feature is disabled by default to ensure we're not changing default behavior in Lift 3.1, but can be enabled by providing a `Formats` object with `tuplesAsArrays` set to true. The one caveat with this functionality is that it doesn't consistently support Scala primitives, so if you're using tuples inside a larger, more complex structure you'll want to use the Java boxed types instead of Scala primitives where applicable (so, `java.lang.Integer` instead of `Int`). However, if the tuple contains case classes you should be able to use primitives inside those without issue: this caveat only affects primitives directly in the tuple. The [README for lift-json](https://github.com/lift/framework/blob/3.1.0-M3-release/core/json/README.md) documents all of this, and Matt Farmer [wrote a blog post](https://farmdawgnation.com/2017/05/02/tuple-array-extraction-for-lift/) demonstrating it in a more narrative style if that's more your thing.
+- (#1791) **Event return normalization.** If handlers to `liftVanilla.onEvent` returned false, we'd just return that value. Now, we now check for the existence of `event.preventDefault` and trigger it and `stopPropagation` if the handler returned `false`. We also return that return that `false` value for older browsers to work with.
+- (#1838) **Removed some deprecated rendering methods in lift-json.**
+- (#1853) **Added Class caching for type hints in lift-json.** This change should improve performance when the same type hint is seen multiple times by caching the `Class` instance we use for a particular type hint instead of invoking a class lookup each time.
+
+The RC has a few more tidbits geared up to be included, and we're already planning for some good updates that will go into Lift 3.2 as well.
+
+This release is immediately available on Maven Central (meaning it's actually been available since Thursday...) ;) Please let us know what you think [on the mailing list](https://groups.google.com/forum/#!forum/liftweb)!",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/6451310/assets,https://api.github.com/repos/lift/framework/releases/6451310,master,https://api.github.com/repos/lift/framework/tarball/3.1.0-M3-release,https://github.com/lift/framework/releases/tag/3.1.0-M3-release,https://api.github.com/repos/lift/framework/zipball/3.1.0-M3-release,3.1.0-M3-release,False,True
+6075140,2017-04-07T04:34:44Z,2017-04-13T16:36:51Z,Lift Framework 3.1.0-M2,"The Lift Committers are pleased to announce the release of Lift 3.1.0-M2 on April 7, 2017. This release continues our [new release cadence](https://groups.google.com/d/msg/liftweb/uK10My2o1wQ/h6m7HaLZDgAJ) of bimonthly milestone builds. These will lead up to the final 3.1.0 milestone at the start of June. 3.1.0-RC1 is currently targeted for June 15, and the final 3.1.0 release targeted for the end of June. After that we'll start the release cycle over for 3.2.0 for the latter part of the year.
+
+This milestone build brings a small set of improvements:
+
+* **The MongoDB Record module now supports the MongoDB Async API calls.** (#1829) Now, there are a handful of `*Async` methods on the MongoDB record implementation that will return `Future`s to the calling code, meaning you can now easily compose Mongo Record operations with other non-blocking code. Hat tip to @eltimn and @marekzebrowski for their work on this.
+* @n4to4 was kind enough to fix some broken links in our readme.
+
+This release is immediately available on Maven Central.
+
+This was a pretty small milestone, but we were focusing on producing a stable milestone at a predictable schedule, and we successfully accomplished that goal. We've got a lot of good work queued up for M3, so be on the lookout for that.",https://api.github.com/users/farmdawgnation,620189,farmdawgnation,https://api.github.com/repos/lift/framework/releases/6075140/assets,https://api.github.com/repos/lift/framework/releases/6075140,master,https://api.github.com/repos/lift/framework/tarball/3.1.0-M2-release,https://github.com/lift/framework/releases/tag/3.1.0-M2-release,https://api.github.com/repos/lift/framework/zipball/3.1.0-M2-release,3.1.0-M2-release,False,True
+5363773,2017-02-02T05:41:19Z,2017-02-05T14:52:21Z,Lift Framework 3.1.0-M1,"Lift 3.1.0-M1 marks a new release process. Now that Lift 3 is out the door
+with most foreseeable breaking changes, Lift 3.1.0 will be developed on a
+regular cycle, per the [discussion @farmdawgnation initiated on the Lift ML](https://groups.google.com/d/msg/liftweb/uK10My2o1wQ/h6m7HaLZDgAJ)
+regarding our release cycles.
+
+3.1.0-M1 is a little late by that account as we finalized the new cycle a little
+after the planned date called for. In general, expect bimonthly milestone
+builds, with 3 milestones before a final minor release. The first RC for a final
+minor release will come about 2 weeks after the third milestone release for
+that version, with an eye to having the final release out one month after the
+last milestone, barring major bugs.
+
+With that, 3.1.0-M1 contains a few things that were pent up during the Lift
+3.0 release cycle:
+- (#1812, #1815, #1823) **Full compatibility with Scala 2.12.** Lift 3.0.1 was
+  released with Scala 2.12 support, but there were still some pieces to
+  put in place for proper continuous integration and release building before
+  we could consider that complete. This is now done. Thanks to @SethTisue 
+  and @farmdawgnation for putting in some contortions to get this all in order.
+- (#1813, #1824) **Session-aware Lift and Scala Futures.** Especially with Lift 3's
+  enhanced support for futures in CSS bindings and `RestHelper`, folks
+  would find themselves firing off futures that needed to do i18n or something
+  else that required session access, only to have that session context missing
+  when the future actually executed. @pdyraga added a new helper,
+  `LAFutureWithSession.withCurrentSession`, aliased as `S.sessionFuture`,
+  which can be used to create an `LAFuture` task that has access to the
+  session. There is a similar helper, `FutureWithSession.withCurrentSession`,
+  that will spawn a task as a Scala `Future` with access to the session. The
+  resulting futures can be chained and combined with other futures and will
+  preserve their session access. This includes all APIs in Scala's `Future` in
+  Scala 2.12, as well.
+- (#1819) **The mongo Java driver has been updated to version 3.4.0.**
+- (#1817, #1822) **`lift-json` has gained significant parser performance
+  improvements**, and is now competitive with the jawn parser in most
+  of jawn's microbenchmarks, making it one of the fastest Scala JSON
+  parsers across a variety of parsing scenarios.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/5363773/assets,https://api.github.com/repos/lift/framework/releases/5363773,master,https://api.github.com/repos/lift/framework/tarball/3.1.0-M1-release,https://github.com/lift/framework/releases/tag/3.1.0-M1-release,https://api.github.com/repos/lift/framework/zipball/3.1.0-M1-release,3.1.0-M1-release,False,True
+4911841,2016-12-13T17:44:47Z,2016-12-13T22:21:02Z,Lift Framework 3.0.1,"This is a small point release to make Lift 3 available for Scala 2.12. The
+Lift 3.0.1 release is built for both Scala 2.11.4 _and_ Scala 2.12.1. As per
+the usual Lift strategy of long-term support, we currently intend on
+supporting Scala 2.11.x for some time.
+
+Note that the bump to 3.0.1 brings with it bumps in several dependencies:
+- Compile: Scalaz from 7.2.0 to 7.2.7.
+- Test: Scalatest from 2.1.3 to **3.0.1**. Specs2 from 3.7 to **3.8.6**.
+
+Please be aware of these dependency bumps when upgrading, and let
+us know if you have any issues!
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/4911841/assets,https://api.github.com/repos/lift/framework/releases/4911841,master,https://api.github.com/repos/lift/framework/tarball/3.0.1-release,https://github.com/lift/framework/releases/tag/3.0.1-release,https://api.github.com/repos/lift/framework/zipball/3.0.1-release,3.0.1-release,False,False
+4284912,2016-10-01T00:20:05Z,2016-10-03T01:52:12Z,Lift Framework 3.0-RC4: Fourth Release Candidate,"RC3 (and previous pre-release versions of Lift 3 that do event extraction for
+content security policy purposes) had an issue where AJAX responses containing
+HTML that in turn contained embedded event handlers could in certain cases turn
+into attempts to attach events _before_ the associated HTML elements were in
+the DOM. This caused failures with existing apps.
+
+Due to the lateness in the RC cycle of this bug, we've opted to allow for
+disabling event extraction altogether, and **disabled it by default**. This
+means that apps that have been using event extraction will want to enable it
+explicitly by setting:
+
+``` scala
+LiftRules.extractInlineJavaScript = true
+```
+
+We will enable it by default in a future Lift 3 point release once we're confident
+of its correct behavior.
+
+We expect this to be the last RC before Lift 3 goes final.
+
+## Breaking Changes
+- (#1809) You must now explicitly enable event extraction (which turns `on*`-style
+  event attributes in HTML and `javascript:`-style form submission and link URLs into
+  out-of-band JavaScript that attaches event handlers, making HTML like this
+  generated by Lift compatible with restrictive content security policies) in order for
+  Lift to do this. This was done in response to noticing some issues with event extraction
+  and HTML-appending AJAX responses, which could in some cases attempt to bind
+  event handlers before the relevant nodes were in the DOM, and thus failed to bind
+  those handlers. **Users of Lift 3 before RC4 will want to explicitly enable
+  `LiftRules.extractInlineJavaScript` to preserve prior behavior.**
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/4284912/assets,https://api.github.com/repos/lift/framework/releases/4284912,master,https://api.github.com/repos/lift/framework/tarball/3.0-RC4-release,https://github.com/lift/framework/releases/tag/3.0-RC4-release,https://api.github.com/repos/lift/framework/zipball/3.0-RC4-release,3.0-RC4-release,False,True
+4284890,2016-05-04T05:34:46Z,2016-10-03T01:43:27Z,Lift Framework 3.0-RC3: Third Release Candidate,"We found an annoying situation in RC2 that made the `asJValue`
+method of `Record` and `MetaRecord` return `JValue`, which
+didn't jive with the way these were being used in certain cases.
+
+## Fixes
+- (#1787) `Record` and `MetaRecord`'s `asJValue` methods were
+  correctly converted to return `JValue`s, but in certain cases this
+  did not connect well with actual use. A new `asJObject` method
+  was added to return the JSON as a `JObject` which could then be
+  combined with other fields and objects.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/4284890/assets,https://api.github.com/repos/lift/framework/releases/4284890,master,https://api.github.com/repos/lift/framework/tarball/3.0-RC3-release,https://github.com/lift/framework/releases/tag/3.0-RC3-release,https://api.github.com/repos/lift/framework/zipball/3.0-RC3-release,3.0-RC3-release,False,True
+2947490,2016-04-04T03:59:37Z,2016-04-04T14:50:57Z,Lift Framework 3.0-RC2: Second Release Candidate,"We saw an issue in RC1 that could be worked around, but we
+felt it was easy enough to come across it without intending to
+that it was worth releasing a second RC.
+
+## Fixes
+- (#1783) `JsCmd`s that produced HTML with events and eagerly
+  evaluated that HTML content (e.g. by declaring a `val toJsCmd`
+  instead of `def toJsCmd`) would produce the event handler JS
+  even if the `JsCmd` in question was never sent down to the client.
+  We now tie the JS for event handling to the `JsCmd`'s content
+  directly, so this pitfall can't be triggered. Thanks to Riccardo Sirigu
+  for reporting this issue [on the mailing list](https://groups.google.com/d/msg/liftweb/Z4K-79iObu0/4OCRb893AgAJ).
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/2947490/assets,https://api.github.com/repos/lift/framework/releases/2947490,master,https://api.github.com/repos/lift/framework/tarball/3.0-RC2-release,https://github.com/lift/framework/releases/tag/3.0-RC2-release,https://api.github.com/repos/lift/framework/zipball/3.0-RC2-release,3.0-RC2-release,False,True
+2851751,2016-03-19T19:20:49Z,2016-03-21T03:56:45Z,Lift Framework 3.0-RC1: Release Candidate,"This release features the last tidbits before 3.0 goes out the door. These
+include some cleanup, a bunch of dependency bumps, and a couple of
+fixes to bugs discovered during use of 3.0-M8. No feature work landed in
+this release, and only bug fixes will be permitted before the next release.
+
+If we don't see any bugs in the next 2-4 weeks, we'll be releasing Lift 3.0.
+We're all super excited to be this close to a final release!
+
+## Breaking Changes
+- (#1766) lift-json's `\\` used to return a `JValue`. In cases where it matched
+  a single field directly, it would return the field's value rather than a consistent
+  container type. Matching multiple fields would return a `JObject` with the
+  matched fields in it. Now, `\\` always returns a `JObject` with the matching
+  fields in it, even if there is only one such field. This may require adapting
+  certain uses of `\\`, especially in `for` comprehensions. Code like
+  `for (JString(name) <- object \\ ""name"")` will have to be changed to
+  something more like `for (JField(_, JString(name)) <- object \\ ""name"")` to
+  work correctly. Thanks to @eallik for reporting!
+- (#1773, #1779) Lift was depending on outdated versions of many libraries.
+  We've bumped those dependencies, so we now depend on specs2 3.7 and
+  Java Servlet 3.1. All other version bumps were non-major, including
+  lift-json-scalaz now depending on Scalaz 7.2. See [the dependency file's diff](https://github.com/lift/framework/pull/1773/files#diff-0ecdbc5a001d52fb34f5eafb7cd1aaa6) for the full breakdown of dependency updates.
+
+## Improvements
+- (#1772) When `JsCmd`s including `Noop` were combined with `&`, you
+  would get a lot of empty lines, since each `Noop` would emit some empty
+  lines in those cases. Now, we ignore `Noop` when combining `JsCmd`s,
+  which should lead to reduced noise in serialized JS output. The most
+  immediate impact is that page-specific JavaScript will be much more compact
+  than it was before.
+
+## Fixes
+- (#1779) `Props.whereToLook` works correctly again. In 3.0-M8, we expanded
+  the abilities of `Props` to read from arbitrary sources. Unfortunately, in the
+  process, we broke the `whereToLook` setting that allowed you to adjust the
+  search paths for `Props` to look for named property files. This has been fixed
+  in RC1. Thanks to @serioga for reporting!
+- (#1769) Lift's JavaScript settings customization was set up such that you couldn't
+  override things provided by Lift's `liftVanilla` or `liftJQuery` objects. This is now
+  fixed, so custom JavaScript settings can build on and override those base functions.
+  Thanks to @joescii for reporting… And fixing! ;)
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/2851751/assets,https://api.github.com/repos/lift/framework/releases/2851751,master,https://api.github.com/repos/lift/framework/tarball/3.0-RC1-release,https://github.com/lift/framework/releases/tag/3.0-RC1-release,https://api.github.com/repos/lift/framework/zipball/3.0-RC1-release,3.0-RC1-release,False,True
+2525547,2016-01-31T21:26:04Z,2016-01-31T23:08:57Z,Lift Framework 3.0-M8: Security and milestone release,"This release features a dependency update to fix a security issue. See below.
+
+It also features a large number of bug fixes and targeted improvements
+based on feedback from actual use of Lift 3. It is expected to be the last Lift 3
+milestone release, with the next build expected to be RC1. We don't expect
+to land any more feature work before releasing Lift 3.0.0, and would like folks
+to start hammering this release to find any lurking bugs that haven't yet been
+caught.
+
+## Security
+
+Lift 3.0 milestones were found to be using an outdated version of Apache
+Commons FileUpload, which had an [unpatched DoS vulnerability](https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0050).
+
+Lift 3.0-M8 bumps the dependency to the latest version, 1.3.1, which fixes
+this vulnerability. Additionally, if you're using sbt, you can directly depend
+on `commons-fileupload` 1.3.1 to evict the Lift dependency without upgrading
+Lift. The versions are compatible with respect to Lift's usage.
+
+## Compatibility Notes
+
+Lift 3.0-M7 was the last Lift build built with java 7. Future builds and the
+final Lift 3.0.0 release will be built on Java 8. If you use Java 7, please
+make sure to add the `commons-fileupload` 1.3.1 dependency mentioned
+above so you are protected from the DoS vulnerability.
+
+Also, earlier builds of Lift 3.0 defaulted the `Content-Security-Policy` to
+report only in dev mode (which will produce error messages and logs, but
+not prevent anything from actually loading/running), but actually enforced
+the security policy in production. For the initial Lift 3.0.0 release, we are
+relaxing this to allow for an easier transition: the default will be report-only
+in _both_ dev mode _and_ production mode. Lift 3.1 will return to a secure
+production default.
+
+You can get the previous behavior by setting:
+
+``` scala
+LiftRules.securityRules = () => SecurityRules(enforceInOtherModes = true)
+```
+
+You can also enforce in dev mode by passing the `enforceInDevMode = true`
+parameter.
+
+## Note about M7
+
+We cut M7 a little earlier than we wanted to announce another milestone,
+so rather than announcing it we left the artifacts but made no official
+announcement. The release notes below include the changes in M7.
+
+## Improvements
+- (#1726) `LiftRules.autoIncludeAjaxCalc`, which decides whether or not to
+  include Lift's JavaScript, now makes no attempt to include the `lift.js` file if the
+  current request is stateless. Serving `lift.js` triggers session creation, so a
+  page that was stateless for performance reasons but included `lift.js` would
+  still cause session churn. The new default avoids this, though you can return
+  to the old behavior if preferred.
+- (#1710) Until now, `render` produced a `Document`, which is a now-deprecated Scala
+  intermediary type. Passing that `Document` to `pretty` or `compact` would produce
+  the desired kind of JSON output. We now drop `Document` from the pipeline,
+  with `compact(render)` and `pretty(render)` producing deprecation warnings.
+  These forms will be removed in 3.1, in favor of `compactRender` and `prettyRender`.
+  The new serialization code is also both faster and more customizable, allowing
+  rendering to any Java `Appendable` and some more customization on how
+  renderings are formatted.
+- (#1736) JSON serialization is well-specified, but when serializing for parsing
+  by a JS language parser rather than a JSON parser (e.g., in JSON-P), [escaping
+  works a little differently](http://stackoverflow.com/questions/2965293/javascript-parse-error-on-u2028-unicode-character). Lift now supports changing characters that are escaped
+  and provides JS-specific convenience configurations for serializing JSON in
+  ways that won't break for these cases.
+- (#1741) `RestHelper` will now properly handle async responses wrapped in
+  Scala `Future`s. Before, it only handled `LAFuture`. These async responses
+  are handled using the same continuation mechanism that powers Lift's comets.
+- (#1717) Deserializing JSON to a `List[Option[T]]` did not work. It now works
+  correctly, deserializing `null` to `None`.
+- (#1719) `lift-json`'s `write` function can now take primitive values to serialize (e.g.,
+  `Serialization.write(3)`). Before, it only supported object types.
+- (#1752) Lift 3.0 finds `on*` attributes and other embedded JS and separates
+  it out into actual JS that is invoked separately. This helps to enforce tighter
+  `Content-Security-Policy` restrictions. Before, in AJAX responses that included
+  HTML, we were not performing this event extraction. Now, event extraction
+  happens for both pages and AJAX responses uniformly.
+
+## Fixes
+- (#1711) `S.appendJs` could behave strangely when invoked from within
+  `JsCmd` construction, and particularly in `Wiring` and in certain comet contexts.
+  It should now behave predictably across the board.
+- (#1714) `MatchWithoutCurrentValue` did not work correctly for `Menu`s
+  that did not include a `*`. This is now fixed.
+- (#1718) Deserializing an incorrect type to an `Option[T]` would produce a
+  `None`. Now, only a `null` produces a `None`, something that can deserialize
+  to a `T` produces a `Some[T]`, and a non-`null` value that cannot deserialize
+  to a `T` produces a `MappingException`.
+- (#1721) Lift 3's default client-side `logError` implementation was broken and
+  caused a stack overflow. It is now fixed.
+- (#1733) `lift-markdown` was failing to correctly break up parsing by newline.
+  This was only on Java 8 due to a change in regex behavior in Java; it is now
+  fixed.
+- (#1734) `CssUrlPrefixer`, which prepends the context path of the application
+  to served CSS, was failing to properly parse certain URLs, particularly those
+  that included `,` and `%`. It was also always emitting URLs wrapped in single
+  quotes irrespective of the source CSS's style. All of these issues are now fixed.
+- (#1737) `Msgs` now appends any JS it needs to the page JS, rather than
+  inserting it into the page markup.
+- (#1744) Fixes for IE8 in `lift.js`. We were relying on some functionality that
+  does not exist in IE8. We now have a polyfill for this functionality.
+- (#1748) Lift's non-jQuery implementation of internal functionality now properly
+  sets `X-Requested-With` for AJAX requests, thus allowing Lift to internally
+  recognize AJAX requests (via `Req`'s `xhr_?` method).
+- (#1749) Our mongo dependencies were upgraded to the latest driver that
+  still provides support for some of our older customization strategies. The
+  older customization is now deprecated for removal in 3.1, so that we can
+  catch up to the latest mongo driver. Note that the driver we currently depend
+  on is still compatible with the latest server versions.
+- (#1750) When trying to use `Menu.item`, we were trying to identify the current
+  page using `S.request`. This failed when we were trying to build menu HTML
+  from an AJAX callback, since `S.request` no longer referred to the current page,
+  but rather the AJAX request. We now use `S.originalRequest`, which _does_ refer
+  to the current page even in an AJAX callback.
+
+## Deprecations
+- (#1710) In lift-json, `compact` and `pretty` (previously used in conjunction with
+  `render` to serialize JSON to a `String`) are now deprecated in favor of `compactRender`
+  and `prettyRender`. They will be removed in Lift 3.1.
+- (#1742) `FocusOnLoad` is now deprecated in favor of `S.appendJs(Focus(...))`
+  and/or using the HTML5 `autofocus` attribute.
+- (#1749) Our mongo dependencies were upgraded to the latest driver that
+  supports some of our older customization strategies. The older customization
+  is now deprecated for removal in 3.1. In particular, these are `defineDbAuth`
+  and `useSession` wrappers.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/2525547/assets,https://api.github.com/repos/lift/framework/releases/2525547,master,https://api.github.com/repos/lift/framework/tarball/3.0-M8-release,https://github.com/lift/framework/releases/tag/3.0-M8-release,https://api.github.com/repos/lift/framework/zipball/3.0-M8-release,3.0-M8-release,False,True
+2525498,2016-01-31T14:08:02Z,2016-01-31T23:09:08Z,Lift 2.5.4: Security Release,"Lift 2.5 was found to be using an outdated version of Apache Commons
+FileUpload, which had an [unpatched DoS vulnerability](https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0050).
+
+Lift 2.5.4 bumps the dependency to the latest version, 1.3.1, which fixes
+this vulnerability. Additionally, if you're using sbt, you can directly depend
+on `commons-fileupload` 1.3.1 to evict the Lift dependency without upgrading
+Lift. The versions are compatible with respect to Lift's usage.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/2525498/assets,https://api.github.com/repos/lift/framework/releases/2525498,master,https://api.github.com/repos/lift/framework/tarball/2.5.4-release,https://github.com/lift/framework/releases/tag/2.5.4-release,https://api.github.com/repos/lift/framework/zipball/2.5.4-release,2.5.4-release,False,False
+2525491,2016-01-31T04:38:40Z,2016-01-31T23:09:11Z,Lift 2.6.3: Security Release,"Lift 2.6 was found to be using an outdated version of Apache Commons
+FileUpload, which had an [unpatched DoS vulnerability](https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0050).
+
+Lift 2.6.3 bumps the dependency to the latest version, 1.3.1, which fixes
+this vulnerability. Additionally, if you're using sbt, you can directly depend
+on `commons-fileupload` 1.3.1 to evict the Lift dependency. The versions
+are compatible with respect to Lift's usage.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/2525491/assets,https://api.github.com/repos/lift/framework/releases/2525491,master,https://api.github.com/repos/lift/framework/tarball/2.6.3-release,https://github.com/lift/framework/releases/tag/2.6.3-release,https://api.github.com/repos/lift/framework/zipball/2.6.3-release,2.6.3-release,False,False
+1587771,2015-07-20T08:15:48Z,2015-07-26T16:12:56Z,Lift Framework 3.0-M6,"This release features a good bit of cleanup from the previous one. It's been a busy
+few months for the committers so the work is mostly in targeted improvements and
+bug fixes:
+
+## Improvements
+- (#1706) Thanks to @chriswebster, an [up to 90% performance increase](https://groups.google.com/d/msg/liftweb/PD5GJYCBmx4/khEdnHy0qMMJ) in JSON
+  serialization for `lift-json`!
+- (#1693) `ParamFailure` now behaves more correctly with `~>`. That operator, when
+  used on a `Failure`, returns a `ParamFailure` with the passed parameter, while
+  preserving the rest of the original `Failure`'s information. Before, invoking `~>` with
+  a parameter on a `ParamFailure` would replace the existing parameter with the new
+  one, thus losing the previous parameter altogether. Now, we produce a copy of the
+  `ParamFailure` with the new parameter, but we chain the previous `ParamFailure`
+  to it so that it the original parameter is still accessible.
+- (#1698) Lift 3 sessions allow an actor proxy for client code to be created via
+  `serverActorForClient`. This release includes some new setup configuration
+  when creating those actors, like providing setup and teardown functions as well
+  as ways to convert from application messages into client JS content.
+- (#1701) There is now a `LiftRules.attributeForRemovedEventAttributes`. When
+  Lift strips event-related attributes (e.g. `onclick`, `onsubmit`, etc), if this rule is
+  set to a `String`, it will tag the element whose event attributes were removed
+  with the attributes that were removed. For example, setting it to `Some(""data-lift-removed-attributes"")`
+  might result in a `data-lift-removed-attributes=""onclick onmouseover""` attribute
+  in your HTML if that element had its click and mouseover event handlers moved
+  into page-specific JS. This allows you to make styling decisions based on these
+  attributes, if you want to. See [the rule documentation](https://github.com/lift/framework/blob/master/web/webkit/src/main/scala/net/liftweb/http/LiftRules.scala#L564-620) for more.
+- (#1705) Until now, `jsonCall` would fail silently on both client and server if the
+  submitted data from the client wasn't valid JSON. Now, it will log (at an `ERROR`
+  log level) on the server if invalid JSON is sent. Whether this log info will be printed
+  or not is configurable using usual logger configuration.
+- (#1709) You can now register to find out when a function owner no longer has
+  available functions bound in a session. Function owners typically (though not always)
+  correspond to server-side functions bound or a page rendering (e.g., form fields).
+  These usually expire ~2 minutes after the user is no longer on the page, but until
+  now there was no way to find out that a given page was no longer “in scope”. In
+  certain cases, that could be interesting to clean up page-related temporary assets
+  or resource allocations. We now provide `LiftSession.onFunctionOwnersRemoved`,
+  which can be set during application startup so that any new sessions can register
+  those listeners. @andreak posted an excellent example of how they are using this
+  [on the mailing list](https://groups.google.com/d/msg/liftweb/smBAyoFVvpQ/yScJ1bMd_pgJ).
+
+## Bug Fixes
+- (#1694) When generating post-page JavaScript (mostly used by Wiring), there
+  were some cases where null pointer exceptions could be thrown. These should
+  be gone.
+- (#1692) When binding `onclick` to an element that had an `href`, the new code
+  that extracts event handlers into page-specific JS was failing to bind the click
+  handler. This is now fixed, as is a related bug where elements that didn't need
+  handlers still had a random id assigned to them.
+- (#1677) When sending messages to comet actors before they are created (via
+  `LiftSession.sendCometActorMessage`), they would arrive in reverse order.
+  This is now fixed, and the first message sent using `sendCometActorMessage`
+  arrives first.
+- (#1703) When we moved away from `bind`, the CSS bindings in `ProtoUser`
+  that checked password changes were incorrect, in that they never saw the
+  user having submitted two versions of the same password. This is now fixed,
+  and the change password stuff provided by `ProtoUser` is now correct.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/1587771/assets,https://api.github.com/repos/lift/framework/releases/1587771,master,https://api.github.com/repos/lift/framework/tarball/3.0-M6-release,https://github.com/lift/framework/releases/tag/3.0-M6-release,https://api.github.com/repos/lift/framework/zipball/3.0-M6-release,3.0-M6-release,False,True
+1186799,2015-03-20T23:24:30Z,2015-04-19T19:44:51Z,Lift 3.0-M5-1: Security Snapshot Release,"Lift 3.0-SNAPSHOT was found to be vulnerable to [XML External Entity](https://www.owasp.org/index.php/XML_External_Entity_%28XXE%29_Processing) attacks,
+which can leak private files through your application when parsing certain
+types of XML. In the process of communicating the vulnerability to Typesafe,
+they referred us to a more-restricted version of XML parsing used to prevent
+additional vulnerabilities like the [billion laughs vulnerability](http://en.wikipedia.org/wiki/Billion_laughs) and its sibling
+quadratic blowup vulnerability.
+
+Lift 3.0-M5 fixed the XXE attacks, but Lift 3.0-M5-1 was released to shore up the
+additional vulnerabilities we were made aware of. This is done by disabling
+inline DTDs altogether. We also enable secure processing, which adds restrictions
+to supporting parsers to prevent denial-of-service style attacks on XML parsing.
+Anyone who switched to use `net.liftweb.util.Helpers.secureXML` will automatically
+get these additional protections.
+
+To do this, Lift 3.0-M5-1 depends on Apache Xerces version 2.11. [Some concerns](https://groups.google.com/forum/#!topic/liftweb/QQhDsKOco-k)
+have been brought up about this additional dependency and how it may interact
+with other XML parsing that may occur in the application; please provide feedback
+on the mailing list if you run into any issues related to this new dependency.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/1186799/assets,https://api.github.com/repos/lift/framework/releases/1186799,master,https://api.github.com/repos/lift/framework/tarball/3.0-M5-1-release,https://github.com/lift/framework/releases/tag/3.0-M5-1-release,https://api.github.com/repos/lift/framework/zipball/3.0-M5-1-release,3.0-M5-1-release,False,False
+1186796,2015-03-15T08:54:42Z,2015-04-19T19:43:56Z,Lift 3.0-M5: Security Snapshot Release,"Lift 3.0-SNAPSHOT was found to be vulnerable to [XML External Entity attacks](https://www.owasp.org/index.php/XML_External_Entity_%28XXE%29_Processing),
+which can leak private files through your application when parsing certain
+types of XML.
+
+Lift 3.0-M5 introduces `net.liftweb.util.Helpers.secureXML`, an analogous object to
+Scala's `scala.xml.XML` that is secured against XXE attacks by disabling external
+entities in doctypes. If you are parsing untrusted user-provided XML using
+`scala.xml.XML`, it is recommended that you switch to `secureXML` instead.
+
+Lift 3.0-M5 was rapidly superseded by [Lift 3.0-M5-1](https://github.com/lift/framework/releases/tag/3.0-M5-1-release), which secures the `secureXML`
+object against a few additional XML-based attacks.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/1186796/assets,https://api.github.com/repos/lift/framework/releases/1186796,master,https://api.github.com/repos/lift/framework/tarball/3.0-M5-release,https://github.com/lift/framework/releases/tag/3.0-M5-release,https://api.github.com/repos/lift/framework/zipball/3.0-M5-release,3.0-M5-release,False,False
+1186790,2015-03-20T23:01:14Z,2015-04-19T19:42:51Z,Lift 3.0-M4-1: Security Milestone Release,"Lift 3.0-M3 was found to be vulnerable to [XML External Entity](https://www.owasp.org/index.php/XML_External_Entity_%28XXE%29_Processing) attacks,
+which can leak private files through your application when parsing certain
+types of XML. In the process of communicating the vulnerability to Typesafe,
+they referred us to a more-restricted version of XML parsing used to prevent
+additional vulnerabilities like the [billion laughs vulnerability](http://en.wikipedia.org/wiki/Billion_laughs) and its sibling
+quadratic blowup vulnerability.
+
+Lift 3.0-M4 fixed the XXE attacks, but Lift 3.0-M4-1 was released to shore up the
+additional vulnerabilities we were made aware of. This is done by disabling
+inline DTDs altogether. We also enable secure processing, which adds restrictions
+to supporting parsers to prevent denial-of-service style attacks on XML parsing.
+Anyone who switched to use `net.liftweb.util.Helpers.secureXML` will automatically
+get these additional protections.
+
+To do this, Lift 3.0-M4-1 depends on Apache Xerces version 2.11. [Some concerns](https://groups.google.com/forum/#!topic/liftweb/QQhDsKOco-k)
+have been brought up about this additional dependency and how it may interact
+with other XML parsing that may occur in the application; please provide feedback
+on the mailing list if you run into any issues related to this new dependency.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/1186790/assets,https://api.github.com/repos/lift/framework/releases/1186790,master,https://api.github.com/repos/lift/framework/tarball/3.0-M4-1-release,https://github.com/lift/framework/releases/tag/3.0-M4-1-release,https://api.github.com/repos/lift/framework/zipball/3.0-M4-1-release,3.0-M4-1-release,False,False
+1186788,2015-03-15T02:31:44Z,2015-04-19T19:40:30Z,Lift 3.0-M4: Security Milestone Release,"Lift 3.0-M3 was found to be vulnerable to [XML External Entity attacks](https://www.owasp.org/index.php/XML_External_Entity_%28XXE%29_Processing),
+which can leak private files through your application when parsing certain
+types of XML.
+
+Lift 3.0-M4 introduces `net.liftweb.util.Helpers.secureXML`, an analogous object to
+Scala's `scala.xml.XML` that is secured against XXE attacks by disabling external
+entities in doctypes. If you are parsing untrusted user-provided XML using
+`scala.xml.XML`, it is recommended that you switch to `secureXML` instead.
+
+Lift 3.0-M4 was rapidly superseded by [Lift 3.0-M4-1](https://github.com/lift/framework/releases/tag/3.0-M4-1-release), which secures the `secureXML`
+object against a few additional XML-based attacks.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/1186788/assets,https://api.github.com/repos/lift/framework/releases/1186788,master,https://api.github.com/repos/lift/framework/tarball/3.0-M4-release,https://github.com/lift/framework/releases/tag/3.0-M4-release,https://api.github.com/repos/lift/framework/zipball/3.0-M4-release,3.0-M4-release,False,False
+1186785,2015-03-20T21:23:55Z,2015-04-19T19:37:37Z,Lift 2.6.2: Security Release,"Lift 2.6 was found to be vulnerable to [XML External Entity](https://www.owasp.org/index.php/XML_External_Entity_%28XXE%29_Processing) attacks,
+which can leak private files through your application when parsing certain
+types of XML. In the process of communicating the vulnerability to Typesafe,
+they referred us to a more-restricted version of XML parsing used to prevent
+additional vulnerabilities like the [billion laughs vulnerability](http://en.wikipedia.org/wiki/Billion_laughs) and its sibling
+quadratic blowup vulnerability.
+
+Lift 2.6.1 fixed the XXE attacks, but Lift 2.6.2 was released to shore up the
+additional vulnerabilities we were made aware of. This is done by disabling
+inline DTDs altogether. We also enable secure processing, which adds restrictions
+to supporting parsers to prevent denial-of-service style attacks on XML parsing.
+Anyone who switched to use `net.liftweb.util.Helpers.secureXML` will automatically
+get these additional protections.
+
+To do this, Lift 2.6.2 depends on Apache Xerces version 2.11. [Some concerns](https://groups.google.com/forum/#!topic/liftweb/QQhDsKOco-k)
+have been brought up about this additional dependency and how it may interact
+with other XML parsing that may occur in the application; please provide feedback
+on the mailing list if you run into any issues related to this new dependency.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/1186785/assets,https://api.github.com/repos/lift/framework/releases/1186785,master,https://api.github.com/repos/lift/framework/tarball/2.6.2-release,https://github.com/lift/framework/releases/tag/2.6.2-release,https://api.github.com/repos/lift/framework/zipball/2.6.2-release,2.6.2-release,False,False
+1186783,2015-03-15T00:35:46Z,2015-04-19T19:36:57Z,Lift 2.6.1: Security Release,"Lift 2.6 was found to be vulnerable to [XML External Entity attacks](https://www.owasp.org/index.php/XML_External_Entity_%28XXE%29_Processing),
+which can leak private files through your application when parsing certain
+types of XML.
+
+Lift 2.6.1 introduces `net.liftweb.util.Helpers.secureXML`, an analogous object to
+Scala's `scala.xml.XML` that is secured against XXE attacks by disabling external
+entities in doctypes. If you are parsing untrusted user-provided XML using
+`scala.xml.XML`, it is recommended that you switch to `secureXML` instead.
+
+Lift 2.6.1 was rapidly superseded by [Lift 2.6.2](https://github.com/lift/framework/releases/tag/2.6.2-release), which secures the `secureXML`
+object against a few additional XML-based attacks.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/1186783/assets,https://api.github.com/repos/lift/framework/releases/1186783,master,https://api.github.com/repos/lift/framework/tarball/2.6.1-release,https://github.com/lift/framework/releases/tag/2.6.1-release,https://api.github.com/repos/lift/framework/zipball/2.6.1-release,2.6.1-release,False,False
+1186780,2015-03-21T22:40:42Z,2015-04-19T19:35:49Z,Lift 2.5.3: Security Release,"Lift 2.5.1 was found to be vulnerable to [XML External Entity](https://www.owasp.org/index.php/XML_External_Entity_%28XXE%29_Processing) attacks,
+which can leak private files through your application when parsing certain
+types of XML. In the process of communicating the vulnerability to Typesafe,
+they referred us to a more-restricted version of XML parsing used to prevent
+additional vulnerabilities like the [billion laughs vulnerability](http://en.wikipedia.org/wiki/Billion_laughs) and its sibling
+quadratic blowup vulnerability.
+
+Lift 2.5.2 fixed the XXE attacks, but Lift 2.5.3 was released to shore up the
+additional vulnerabilities we were made aware of. This is done by disabling
+inline DTDs altogether. We also enable secure processing, which adds restrictions
+to supporting parsers to prevent denial-of-service style attacks on XML parsing.
+Anyone who switched to use `net.liftweb.util.Helpers.secureXML` will automatically
+get these additional protections.
+
+To do this, Lift 2.5.3 depends on Apache Xerces version 2.11. [Some concerns](https://groups.google.com/forum/#!topic/liftweb/QQhDsKOco-k)
+have been brought up about this additional dependency and how it may interact
+with other XML parsing that may occur in the application; please provide feedback
+on the mailing list if you run into any issues related to this new dependency.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/1186780/assets,https://api.github.com/repos/lift/framework/releases/1186780,master,https://api.github.com/repos/lift/framework/tarball/2.5.3-release,https://github.com/lift/framework/releases/tag/2.5.3-release,https://api.github.com/repos/lift/framework/zipball/2.5.3-release,2.5.3-release,False,False
+1186765,2015-03-14T22:54:24Z,2015-04-19T19:25:43Z,Lift 2.5.2: Security Release,"Lift 2.5.1 was found to be vulnerable to [XML External Entity attacks](https://www.owasp.org/index.php/XML_External_Entity_%28XXE%29_Processing),
+which can leak private files through your application when parsing certain
+types of XML.
+
+Lift 2.5.2 introduces `net.liftweb.util.Helpers.secureXML`, an analogous object to
+Scala's `scala.xml.XML` that is secured against XXE attacks by disabling external
+entities in doctypes. If you are parsing untrusted user-provided XML using
+`scala.xml.XML`, it is recommended that you switch to `secureXML` instead.
+
+Lift 2.5.2 was rapidly superseded by [Lift 2.5.3](https://github.com/lift/framework/releases/tag/2.5.3-release), which secures the `secureXML`
+object against a few additional XML-based attacks.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/1186765/assets,https://api.github.com/repos/lift/framework/releases/1186765,master,https://api.github.com/repos/lift/framework/tarball/2.5.2-release,https://github.com/lift/framework/releases/tag/2.5.2-release,https://api.github.com/repos/lift/framework/zipball/2.5.2-release,2.5.2-release,False,False
+862620,2015-01-10T18:53:44Z,2015-01-18T23:03:57Z,Lift 2.6,"The final Lift 2.6 release contains all of the functionality from the previous milestone builds and release candidates:
+- [2.6-M1](https://github.com/lift/framework/releases/tag/2.6-M1-release)
+- [2.6-M2](https://github.com/lift/framework/releases/tag/2.6-M2-release)
+- [2.6-M3](https://github.com/lift/framework/releases/tag/2.6-M3-release)
+- [2.6-M4](https://github.com/lift/framework/releases/tag/2.6-M4-release)
+- [2.6-RC1](https://github.com/lift/framework/releases/tag/2.6-RC1-release)
+- [2.6-RC2](https://github.com/lift/framework/releases/tag/2.6-RC2-release)
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/862620/assets,https://api.github.com/repos/lift/framework/releases/862620,master,https://api.github.com/repos/lift/framework/tarball/2.6-release,https://github.com/lift/framework/releases/tag/2.6-release,https://api.github.com/repos/lift/framework/zipball/2.6-release,2.6-release,False,False
+862604,2015-01-18T01:59:01Z,2015-01-18T22:59:23Z,Lift Framework 3.0-M3,"This release brings quite a few changes, mostly as small improvements and bug fixes over M2. M3 is the next “stable snapshot” release, meaning that we've got some more big potentially-breaking changes in the pipeline and we're putting M3 out so that if you're on the SNAPSHOT build and those changes have negative effects, you can fall back on M3 and continue working.
+
+Without further ado, here's a list of the changes that went in between M2 and M3 (note that they are not all super well-documented; more documentation will come before the 3.0 final release, but in the meantime please ask any questions you may have on the [Lift mailing list](http://liftweb.net/forum)):
+
+# Deprecations
+- (#1668) Much of `TimeSpan`'s functionality has been deprecated. `TimeSpan` conflated several different concepts, including `DateTime`, `Duration`, and `Period`, which did not have the same semantics. As a result, there were corner cases where it could behave in very unexpected ways. In order to fix this, we've deprecated `TimeSpan` functionality for all uses that are not as a simple millisecond `Duration`. This deprecation takes effect for the final release of Lift 3.0, which means the functionality in question won't be removed until Lift 3.1 at the earliest. Big big thanks to @arkadius for spotting this issue while trying to clean up specs, and taking point on adding the various deprecations.
+
+# Improvements
+- (#1619) Added a `MessageCometActor` which is designed solely for pushing what were until now called `partialUpdate`s. This is the beginning of a reworking of the comet API into a base `MessageCometActor` that handles just the messaging facet of comets, and a `CometActor` that works like the current one does. In particular, `MessageCometActor` does not have an overridable `render` method, as it is not expected to render itself—only to push updates. If your comet actor uses `render`, make sure that a call to `render` can replace any previous rendering + any partial updates since then. That is to say, rendering at time t_0 and then sending partial updates at t_1, t_2, and t_3 should produce the same result as rendering at time t_4. This is because calling render clears the list of partial updates, so if that condition does not hold, you can lose information. In these cases, please render separately and use `MessageCometActor`. In `MessageCometActor`, you can and should use `pushMessage` instead of `partialUpdate` to send a message to the client. We'll expand further on the distinction once we've fleshed out the APIs a bit more.
+- (#1619) Rename `devMode` on `CometActor` to `alwaysReRenderOnPageLoad` to clarify what its purpose is.
+- (#1652) Lift now supports a `LiftRules.contentParsers` rule that can be used to define parsers for templates, which the template loading pipeline can then use to load templates of various types. Out of the box, we provide the existing HTML and Markdown parsers, but this can easily be used to add, e.g., asciidoc support. The Scaladocs for `LiftRules.contentParsers` and the `ContentParser` class should provide a good guide to getting started, and an example of adding `asciidoc` support can be seen in @joescii's [blog source code](https://github.com/joescii/prose-and-conz/blob/f69b50a19c48aedf8e218f9c248cc7b66f4843c4/src/main/scala/bootstrap/liftweb/Boot.scala#L63).
+- (#1609) Using `toSingleBox` on a `List[Box]` that contains `Failure`s now produces a `ParamFailure` whose chain is set up so that you can call `failureChain` to get all of those failures. You can still use the `ParamFailure`s param to get the original list of boxes.
+- (#1663) `HList`s are now covariant in their type parameters. Lift provides a lightweight `HList` in `lift-util`; this is a small improvement to it. More comprehensive (but also heavier and harder on the compiler) `HList`s are available using [shapeless](https://github.com/milessabin/shapeless), as well.
+- (#1649) Session ids are no longer emitted into page markup.
+- (#1650) The scaladocs in lift-common have seen a lot of general cleanup and improvement.
+- (#1656, #1658) More reliable specs in a few corners of the framework, thanks to @arkadius.
+
+# Bug fixes
+- (#1619) Lift 3.0 milestone builds until now had a few comet-related bugs. Amongst other things, they could unexpectedly lose partial updates and call render more than once when a page was initially rendered. Most of these issues should now be fixed.
+- (#1619) `lastListenerTime` is now accurate, where before it was never updated.
+- (#1639) When throwing a `ResponseShortcutException` during an AJAX request handler, we now correctly serve the specified response. Before, only those with a location attached were handled, by serving a JS redirect command. Now you can serve any response you want—though those that have a location associated will always result in a JS redirect command for now.
+- (#1640) The email regex in `ProtoRules` is now case insensitive and includes support for TLDs longer than 4 characters.
+- (#1646) Lift 3.0-M2 introduced the ability to serve new comet actors via AJAX; however, doing this from within an AJAX handler bound inside a comet, or using a `partialUpdate`, had a few issues that prevented it from working correctly. These are now fixed.
+- (#1646) `S.appendJs` from inside a comet's message handler could occasionally produce double execution of the JS, and other times could simply not work. `S.appendJs` should now always work and correctly execute the JS only once when used from within a comet's message handler.
+- (#1648) Fix use of `S.oneShot` and `S.callOnce` with `ajaxOnSubmit`.
+- (#1664) The `LAFuture` singleton's `collect` and `collectAll` functions, when given an empty list, now return an `LAFuture` that is immediately satisfied with an empty list. Before, these would return a future that would never be satisfied. Thanks to @arkadius.
+
+# Removals
+- (#1619) Introduced in the first milestone of Lift 3.0, `CometActor`'s `lastWhenDeltaPruner` has been removed as it could present timing issues that were difficult to fix. It may make a reappearance before Lift 3 goes final, depending on whether we figure out how to implement it more robustly.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/862604/assets,https://api.github.com/repos/lift/framework/releases/862604,master,https://api.github.com/repos/lift/framework/tarball/3.0-M3-release,https://github.com/lift/framework/releases/tag/3.0-M3-release,https://api.github.com/repos/lift/framework/zipball/3.0-M3-release,3.0-M3-release,False,True
+842105,2013-11-07T06:52:38Z,2015-01-11T19:53:11Z,Lift 2.6-M2,"## Bugfixes
+- Fix `JObject`'s `hashCode` to work with `equals` (#1499).
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/842105/assets,https://api.github.com/repos/lift/framework/releases/842105,master,https://api.github.com/repos/lift/framework/tarball/2.6-M2-release,https://github.com/lift/framework/releases/tag/2.6-M2-release,https://api.github.com/repos/lift/framework/zipball/2.6-M2-release,2.6-M2-release,False,False
+727370,2014-11-23T04:47:19Z,2014-11-23T19:53:11Z,Lift 2.6-RC2,"## Bug Fixes
+- Fix for the conflict between the private class scala.io.Position and our implementation of it. Hat tip to @fmpwizard to fixing this in #1636.
+- Fix for the incorrect manipulation of `ajaxPostTimeout` on the server, which caused threads processing an ajax request to stick around longer than they should have. Penguin tip to @fmpwizard for fixing this in #1637.
+- Added an implicit conversion from tuple to `SelectableOption` for backward compatibility niceness. Bacon tip to @fmpwizard for fixing this in #1630.
+- Removed some unnecessary synchronization for Vars. Shoe tip to @davewhittaker for making that happen in #1631.
+- Return `DefaultConnectionIdentifier.jndiName` to being a var, with an added deprecation warning. JNDI tip to @eltimn for making that happen in #1623.
+",https://api.github.com/users/farmdawgnation,620189,farmdawgnation,https://api.github.com/repos/lift/framework/releases/727370/assets,https://api.github.com/repos/lift/framework/releases/727370,master,https://api.github.com/repos/lift/framework/tarball/2.6-RC2-release,https://github.com/lift/framework/releases/tag/2.6-RC2-release,https://api.github.com/repos/lift/framework/zipball/2.6-RC2-release,2.6-RC2-release,False,False
+594551,2014-09-23T01:57:35Z,2014-09-30T22:50:28Z,Lift Framework 3.0-M2,"This is the first “clean” release of Lift 3.0. This means that we've removed all currently-deprecated items from Lift 3.0 (i.e., anything that is deprecated in Lift 2.6 is gone in Lift 3.0-M2). This release still shouldn't be considered stable per se, in that there may be some additional removals in the future, but we don't currently have any such removals planned.
+
+Additionally, a lot of additional feature work has gone into this, as many of the pull requests that were pending a milestone release of 3.0 before have now gone in. Here's a high-level breakdown of things that have gone in, though they are not yet particularly well-documented (more documentation will come before the 3.0 final release; in the meantime, please ask any questions you may have on the [Lift mailing list](http://liftweb.net/forum)).
+
+# Breaking Changes
+- JavaScript handling
+  - `liftAjax` is no longer available on the client, as it has been significantly restructured.
+  - There is now a public API for Lift's few client-side functions; it resides under the `window.lift` object. It is not yet documented, and should be considered volatile until we announce otherwise.
+  - Lift AJAX calls are now routed under `<context path>/lift/ajax`
+  - Lift comet calls are now routed under `<context path>/lift/comet`
+  - Everything under `/lift` is reserved for Lift's use. That path can be customized via
+    `LiftRules.liftContextRelativePath`. Unlike before, when you could customize AJAX and comet paths
+    separately, you can now only customize the top-level Lift path, and everything underneath
+    it is reserved for Lift's use, both present and future.
+- (#1584) `lift-json`'s `JField` stopped being a `JValue`; it is now instead a type alias for `(String, JValue)`. This is a cleaner representation, but it means that `map`, `transform`, `find`, and `filter` only operate on proper `JValue`s, and using these on fields requires using `mapField`, `transformField`, `findField`, and `filterField`.
+- (#1548) The old binding strategy based on the `bind` function is now gone. CSS selector transforms should be used instead. Several built-in snippets have been migrated away from the old bind strategy. The changed snippets are:
+  - `Paginator`
+  - `ProtoUser`
+  - `Crudify`
+  - `LiftScreen` (now behaves like `CssBoundLiftScreen`)
+  - `CssBoundLiftScreen` (now `LiftScreen`)
+  - `FormProcessor` (removed)
+  - `TableEditor`
+  - `Util` in `mapper.view`
+- (#1585) `CometActor` behavior has changed—comets with no `type` specified are no longer supported.
+
+# Improvements
+- (#1585) Sending new comets to the client in AJAX callbacks now works.
+- (#1585) Comets can now be instantiated programmatically via a well-defined `S` API.
+- (#1613) `S.request` is now empty in comet actors.
+- (#1607) The `lazy-load` snippet now works in AJAX responses (builds on the comet support above).
+- (#1607) Scala `Future` and Lift `LAFuture` can be used in a CSS selector transform and will automatically be set up for lazy loading.
+- (#1606, #1537) Lift 3 now builds exclusively on Scala 2.11, using sbt 0.13.
+- (#1522) Add the ability to force reading `RestHelper` post data as JSON or XML even if the sent `Content-Type` is incorrect.
+- (#1253) `withFilter` added to `BaseResponse` class (for testing) so that it can be used correctly in `for`comprehensions.
+- (#1574) Fix an issue where there were two very different overloads of `updateListeners` in `ListenerManager`. One of them is now named `sendListenersMessage`.
+- (#1559) JavaScript added to the page via `S.appendJs` during the initial page render is now accumulated into a file under the `<context path>/lift` path and referenced from the page. Things like `on*` event handlers and such will in the future also be placed in this file so that the generated HTML is free of inline script when using Lift's built-in behavior. This will allow a restrictive `Content-Security-Policy` for security purposes.
+
+# Fixes
+- (#1253) `withFilter` added to `BaseResponse` class (for testing) so that it can be used correctly in `for`comprehensions.
+- (#1572) Fixed an issue in 3.0-M1 where boolean values in roundtrip responses could cause issues.
+- (#1593) `BsonRecordListField` validates all elements by default on `validate`
+- (#1597) Fixed an issue in Lift 3.0-M1 where the AJAX paths did not include the context path.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/594551/assets,https://api.github.com/repos/lift/framework/releases/594551,master,https://api.github.com/repos/lift/framework/tarball/3.0-M2-release,https://github.com/lift/framework/releases/tag/3.0-M2-release,https://api.github.com/repos/lift/framework/zipball/3.0-M2-release,3.0-M2-release,False,True
+463915,2014-07-30T01:45:45Z,2014-07-31T19:59:04Z,2.6-RC1,"## Changes
+- Included option attributes in `multiSelect_*`.
+- Improved memory usage by sharing init key value for each `*Var`.
+- Added explicit parameter type when looking for snippet methods.
+- Added `Date` header when sending mail.
+- Exclude the Position.scala file in builds for Scala < 2.11.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/463915/assets,https://api.github.com/repos/lift/framework/releases/463915,master,https://api.github.com/repos/lift/framework/tarball/2.6-RC1-release,https://github.com/lift/framework/releases/tag/2.6-RC1-release,https://api.github.com/repos/lift/framework/zipball/2.6-RC1-release,2.6-RC1-release,False,False
+359967,2014-05-24T02:48:26Z,2014-06-06T03:17:59Z,Lift Framework 3.0-M1,"Quick fix over 3.0-M0, this fixes an issue where the comet-related `ListenerManager`
+trait would not notify a comet when it was first subscribed to it.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/359967/assets,https://api.github.com/repos/lift/framework/releases/359967,master,https://api.github.com/repos/lift/framework/tarball/3.0-M1-release,https://github.com/lift/framework/releases/tag/3.0-M1-release,https://api.github.com/repos/lift/framework/zipball/3.0-M1-release,3.0-M1-release,False,True
+329594,2014-05-20T01:43:28Z,2014-05-20T03:12:39Z,Lift Framework 3.0-M0,"This build includes early work on Lift 3.0 that has been available in the snapshot for
+some time, as well as some recent cleanup that has gone in. It is a stable base for
+people who have been using Lift's 3.0 snapshot, as there is likely to be continuing and
+significant churn in the mainline 3.0 snapshot over the coming months.
+
+A couple of new features include:
+- [Round-trips and streaming promises](http://blog.goodstuff.im/roundtrip_promises)
+- [Custom `data-` and element handling](http://shadowfiend.svbtle.com/lift-weekly-recap-6-speed-data-and-elementals)
+
+More to come on that front—and more to be documented as well.
+
+## Removed Deprecations
+- `JSONParser`, Lift's legacy JSON parser, along with its dependents:
+  - `MetaRecord.setFieldsFromJSON`
+  - `MetaRecord.fromJSON`
+  - `CometActor`'s `handleJson`, `jsonCall`, and `jsonInCode`
+  - `S.buildJsonFunc`
+  - `S.jsonFmapFunc` with `Any=>JsCmd`
+  - `JsonHandler`
+  - `SHtml.fjsonCall`
+  - `SHtml.jsonButton` with `Any=>JsCmd`
+  - `SHtml.jsonForm`
+- `Mapper` and `MetaMapper`'s snippet bindings that use `PartialFunction`s:
+  - `addSnippet`, `editSnippet`, `viewSnippet` (in favor of `addFormSnippet`,
+    `editFormSnippet`, and `viewTransform`, all based on CSS selector transforms)
+  - `modSnippet`, used in `addSnippet` and `editSnippet`, superseded by `formSnippet`.
+  - `add`, `edit`, and `view` snippets in HTML, in favor of `addForm`, `editForm`,
+    and `viewTransform`
+  - `fieldMapperPF`, in favor of `fieldMapperTransforms`
+  - `fieldPF`, `appendField`, and `prependField`, in favor of `fieldTransforms`,
+    `appendFieldTransform`, and `prependFieldTransform`.
+- lift-mongo's `MongoIdentifier` in favor of `ConnectionIdentifier` in lift-util
+- lift-mongo's constructors and methods dealing with db connections that aren't in
+  the form of `MongoClient` (`Mongo`, `MongoHost`, etc)
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/329594/assets,https://api.github.com/repos/lift/framework/releases/329594,master,https://api.github.com/repos/lift/framework/tarball/3.0-M0-release,https://github.com/lift/framework/releases/tag/3.0-M0-release,https://api.github.com/repos/lift/framework/zipball/3.0-M0-release,3.0-M0-release,False,True
+290623,2016-11-14T00:49:45Z,2016-11-15T03:46:49Z,Lift Framework 3.0.0,"# The Big One
+
+Lift 3 has been several years in the making, and includes a _lot_ of stuff. Going
+through it exhaustively would be very difficult, so some highlights will be listed
+and then links will be provided to other places where a lot of the finer changes
+have been announced, mentioned, and discussed.
+
+Thanks for your patience waiting for the final release, and enjoy! More to come,
+as always :)
+
+## Version Support
+
+Currently Lift 3.0.0 is built for Scala 2.11.8. Scala 2.12.0 has a compiler bug that
+prevents us from building Lift 3 for it; 2.12.1 has a fix for this bug, and we'll be
+publishing a 2.12 build shortly after that is released.
+
+## Big Improvements
+- Lift-json is a bit faster to serialize thanks to elimination of the intermediate `scala.text.Document` class,
+  and **hugely** faster thanks to an optimization in the hot path of serialization by @chriswebster .
+- Addition of `LiftRules.securityRules`, which allows configuring:
+  - `Content-Security-Policy` support (first-class support for CSP Level 1, defaults
+    to allowing only same-origin resources except for images, which are allowed from
+    all domains, and JS, which allows unsafe eval).
+  - `Strict-Transport-Security` settings (default to off).
+  - Frame restrictions (same-origin by default)
+  - Whether the above restrictions should be turned off for dev run mode vs other run modes.
+  - Whether violations of the above restrictions should be logged in dev mode vs other run modes.
+  
+  See [the API documentation for `SecurityRules`](http://liftweb.net/api/30/api/#net.liftweb.http.SecurityRules) for more.
+- Along with `SecurityRules` and supporting progressive enhancement, `LiftRules.extractInlineJavaScript` can be set to `true` to extract any `onclick`, `onmouseover`, and generally `on*` events, as well as `javascript:`-style URLs, into external event handlers. These are served on a per-page JS file and allow the CSP to be set to disallow unsafe inline JS while still permitting most classic server-side JS binding done in Lift using CSS selector transforms.
+- `Props` allows lookup of properties in places other than Lift's .props files. In particular, any `Map` can be used to find properties by passing it to `Props.appendProvider`.
+- `Props` also allows interpolation in property values, which values can be added as a `Map` using `Props.appendInterpolationValues`.
+- Improved future and async support throughout, including:
+  - Wrapping any right-hand value for a CSS selector transform in a `Future` or `LAFuture` (this will be rendered as a spinner to the client, until the future resolves at which point the content will be sent down). This is backed by the same infrastructure used for Lift's `lazy` snippet.
+  - Wrapping any `RestHelper` response in a `Future` or `LAFuture` to have it handled asynchronously using container continuations, reusing all of the extensive support that Lift's comet actors use.
+  - Including new comets in future values for CSS selector transforms or in AJAX responses or in lazy-loaded snippets without any additional plumbing or work. This also allows including lazy-loaded snippets in AJAX responses, or lazy-loaded snippets within lazy-loaded snippets (lazyception, as it were).
+- Arbitrary parsers for Lift templates can be added using `LiftRules.contentParsers`. By default, HTML and Markdown parsers are provided, but this can be straightforwardly expanded to, for example, asciidoc, or any other template that can be parsed to `NodeSeq` in Scala. See [the Scaladocs for `ContentParser`](http://liftweb.net/api/30/api/#net.liftweb.http.ContentParser) and @joescii's [blog source code](https://github.com/joescii/prose-and-conz/blob/f69b50a19c48aedf8e218f9c248cc7b66f4843c4/src/main/scala/bootstrap/liftweb/Boot.scala#L63) for more.
+- [Round-trips and streaming promises](http://blog.goodstuff.im/roundtrip_promises) for even easier async support.
+- [Custom `data-` and element handling](https://shadowfiend.svbtle.com/lift-weekly-recap-6-speed-data-and-elementals) for better domain-specific templates.
+
+In addition to these big features, following is a broader summary of changes with some duplicates.
+
+## Breaking Changes
+
+All deprecated methods in Lift 2.6 have been removed. If you have deprecation warnings
+in your 2.6 application, it _will not_ compile for Lift 3.0.0. However, there are also other
+aspects that have been changed that could not be deprecated properly in Lift 2.6.
+- `Box.get` is no longer usable.
+- JavaScript handling
+  - `liftAjax` is no longer available on the client, as it has been significantly restructured.
+  - There is now a semi-public API for Lift's few client-side functions; see [lift.js](https://github.com/lift/framework/blob/3.0-release/web/webkit/src/main/resources/toserve/lift.js). Note that this API is not yet documented and therefore not considered stable, so use it directly only with great care. That said, we also don't have any specific plans to change that API's behavior.
+- Lift URIs
+  - Lift AJAX calls are now routed under `/lift/ajax`
+  - Lift comet calls are now routed under `/lift/comet`
+  - Everything under `/lift` is reserved for Lift's use. That path can be customized via
+    `LiftRules.liftPath`. Unlike before, when you could customize AJAX and comet paths
+    separately, you can now only customize the top-level Lift path, and everything underneath
+    it is reserved for Lift's use, both present and future.
+- In #1584, `lift-json`'s `JField` stopped being a `JValue`; it is now instead a type alias for `(String, JValue)`. This is a cleaner representation, but it means that `map`, `transform`, `find`, and `filter` only operate on proper `JValue`s, and using these on fields requires using `mapField`, `transformField`, `findField`, and `filterField`.
+- In #1568, old binding strategy based on the `bind` function is now gone. CSS selector transforms should be used instead. Several built-in snippets have been migrated away from the old bind strategy; in general, elements and attributes that were prefixed by namespaces now correspond to classes without the prefixes. If you need any help migrating, please post to the Lift mailing list. The changed snippets are:
+  - `Paginator`; see the [`Paginator` binding migration guide](https://github.com/lift/framework/blob/master/docs/migration/2.6-to-3.0-paginator.adoc) for details here.
+  - `ProtoUser`
+  - `Crudify`
+  - `LiftScreen` (now behaves like `CssBoundLiftScreen`); see the [`LiftScreen` binding migration guide](https://github.com/lift/framework/blob/3.0-release/docs/migration/2.6-to-3.0-lift-screen.adoc) for details here.
+  - `CssBoundLiftScreen` (now `LiftScreen`)
+  - `FormProcessor` (removed)
+  - `TableEditor`
+  - `Util` in `mapper.view`
+- (#1585) `CometActor` behavior—comets with no `type` specified are no longer supported
+- (#1714) `LocRewrite` is now expected to return a `(RewriteResponse, Box[T])` where `T` is the type of the menu item's param. Before it was a `T` rather than a `Box[T]`.
+- (#1710) `lift-json` no longer uses `scala.text.Document` as an intermediary when rendering to a string.
+
+## Improvements
+- (#1585) Sending new comets to the client in AJAX callbacks
+- (#1619) `MessageCometActor`/`CometActor` distinction allows `partialUpdate`s with fewer bugs.
+
+## Deprecations
+- (#1668) Much of `TimeSpan`'s functionality has been deprecated. `TimeSpan` conflated
+  several different concepts, including `DateTime`, `Duration`, and `Period`, which did not
+  have the same semantics. As a result, there were corner cases where it could behave in
+  very unexpected ways. In order to fix this, we've deprecated `TimeSpan` functionality for
+  all uses that are not as a simple millisecond `Duration`. This deprecation takes effect for the
+  final release of Lift 3.0.0, which means the functionality in question won't be removed until Lift
+  3.1.0 at the earliest. Big big thanks to @arkadius for spotting this issue while trying to clean up
+  specs, and taking point on adding the various deprecations.
+- (#1710) In lift-json, `compact` and `pretty` (previously used in conjunction with
+  `render` to serialize JSON to a `String`) are now deprecated in favor of `compactRender`
+  and `prettyRender`. They will be removed in Lift 3.1.0.
+- (#1742) `FocusOnLoad` is now deprecated in favor of `S.appendJs(Focus(...))`
+  and/or using the HTML5 `autofocus` attribute.
+- (#1749) Our mongo dependencies were upgraded to the latest driver that
+  supports some of our older customization strategies. The older customization
+  is now deprecated for removal in 3.1.0. In particular, these are `defineDbAuth`
+  and `useSession` wrappers.
+
+## Prior Announcements
+
+There have been lots of posts about the new functionality in Lift 3 over the years; following
+are links to the release notes for all of the milestone and RC releases, followed by a set of
+links to the Lift Weekly/Monthly Recap series that covered a lot of the early additions.
+
+### Release Notes
+- [Lift 3.0-M0](https://github.com/lift/framework/releases/tag/3.0-M0-release)
+- [Lift 3.0-M1](https://github.com/lift/framework/releases/tag/3.0-M1-release)
+- [Lift 3.0-M2](https://github.com/lift/framework/releases/tag/3.0-M2-release)
+- [Lift 3.0-M3](https://github.com/lift/framework/releases/tag/3.0-M3-release)
+- [Lift 3.0-M4](https://github.com/lift/framework/releases/tag/3.0-M4-release)
+- [Lift 3.0-M5](https://github.com/lift/framework/releases/tag/3.0-M5-release)
+- [Lift 3.0-M6](https://github.com/lift/framework/releases/tag/3.0-M6-release)
+- [Lift 3.0-M7](https://github.com/lift/framework/releases/tag/3.0-M7-release)
+- [Lift 3.0-M8](https://github.com/lift/framework/releases/tag/3.0-M8-release)
+- [Lift 3.0-RC1](https://github.com/lift/framework/releases/tag/3.0-RC1-release)
+- [Lift 3.0-RC2](https://github.com/lift/framework/releases/tag/3.0-RC2-release)
+- [Lift 3.0-RC3](https://github.com/lift/framework/releases/tag/3.0-RC3-release)
+- [Lift 3.0-RC4](https://github.com/lift/framework/releases/tag/3.0-RC4-release)
+
+### Lift Recaps
+- [Lift Weekly Recap 1](https://groups.google.com/d/msg/liftweb/zmBbI0HREis/-I6ah0dlDVEJ)
+- [Lift Weekly Recap 2](https://groups.google.com/d/msg/liftweb/m_VFI5x_Zlc/EuMk_gVkZQYJ)
+- [Lift Weekly Recap 3](https://groups.google.com/d/msg/liftweb/DNZCLF8irbE/8kcKATKNp-MJ)
+- [Lift Weekly Recap 4](https://shadowfiend.svbtle.com/lift-weekly-recap-4)
+- [Lift Weekly Recap 5](https://shadowfiend.svbtle.com/lift-weekly-recap-5-comets-and-funcnames-oh-my)
+- [Lift Weekly Recap 6](https://shadowfiend.svbtle.com/lift-weekly-recap-6-speed-data-and-elementals)
+- [Lift Monthly Recap 1](https://shadowfiend.svbtle.com/lift-monthly-recap-1)
+- [Lift Monthly Recap 2](https://shadowfiend.svbtle.com/lift-monthly-recap-2)",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/290623/assets,https://api.github.com/repos/lift/framework/releases/290623,master,https://api.github.com/repos/lift/framework/tarball/3.0-release,https://github.com/lift/framework/releases/tag/3.0-release,https://api.github.com/repos/lift/framework/zipball/3.0-release,3.0-release,False,False
+278964,2014-06-17T05:12:00Z,2014-06-19T03:58:30Z,2.6-M4,"## Changes
+- 2.10 versions of Lift are now built for Scala 2.10.4.
+- We are now publishing Lift builds for 2.11, built with Scala 2.11.1.
+- `MongoRecord.save` now has a default `true` value for its `safe` parameter.
+- Add `saveBox`, `updateBox`, and `deleteBox_!` methods to `MongoRecord`
+  that catch exceptions and return a `Box`.
+- Moved `MongoIdentifier` to use a common `ConnectionIdentifier` shared with
+  other record types.
+- Added `RecordRules.fieldName`, a `FactoryMaker` that lets you modify a field's
+  corresponding database name based on the database connection and the field's
+  variable name. (#1505).
+- Added `RecordRules.displayName`, a `FactoryMaker` that lets you modify a field's
+  display name (the name rendered in the UI) based on the record instance being
+  handled, the current locale, and the default display name.
+- Added `MongoRules.collectionName`, an `Inject` that lets you modify the name of a `MongoRecord` class's collection based on the connection and the
+  class name.
+- Fix `MongoListField`'s `setFromJValue` to properly handle special mongo data
+  types.
+- Add `AsObjectId` extractor for pattern matching `ObjectId` `String`s.
+- Add `AsMongoRecord` extractor for pattern matching a Mongo `Record` instance
+  based on an incoming `String` id.
+- Add `JsonObjectId`, `JsonRegex`, `JsonUUID`, `JsonDate`, and `JsonDateTime`
+  extractors for `lift-mongodb`-formatted `JValue`s.
+- Added a `withFilter` method to suppress warnings when using the `BaseResponse`
+  class in Lift tests (see #1253).
+- Wrap mail parts in `multipart/related` MIME part in emails (see #1569).
+- `CometActor` now handles `ResponseShortcutException`s with redirect responses
+  by sending an appropriate `RedirectTo` command to the client. This means that
+  e.g. `S.redirectTo` will work as expected in a `CometActor`. Note that this is implemented
+  in the default `exceptionHandler` of `CometActor`, so if you've overridden it you'll
+  need to make sure that the default handler is something you eventually invoke.
+- Added the ability to get a forced version of a request body as JSON or XML,
+  regardless of whether the specified `Content-Type` of the request was correct.
+  These are `Req.forcedBodyAsJson` and `Req.forcedBodyAsXml`, respectively.
+- Return a `Failure` with descriptive error message if `bodyAsJson` or `bodyAsXml`
+  are invoked and we don't return the relevant JSON or XML due to an incorrect
+  `Content-Type` in the request.
+- Added a short note on `StackableMaker`'s `doWith` (used by `FactoryMaker`,
+  amongst other things) regarding the fact that its changes to its maker's value
+  are thread-local.
+
+## Deprecations
+- `JSONParser`, Lift's legacy JSON parser, along with its dependents:
+  - `MetaRecord.setFieldsFromJSON`
+  - `MetaRecord.fromJSON`
+  - `CometActor`'s `handleJson`, `jsonCall`, and `jsonInCode`
+  - `S.buildJsonFunc`
+  - `S.jsonFmapFunc` with `Any=>JsCmd`
+  - `JsonHandler`
+  - `SHtml.fjsonCall`
+  - `SHtml.jsonButton` with `Any=>JsCmd`
+  - `SHtml.jsonForm`
+- `Mapper` and `MetaMapper`'s snippet bindings that use `PartialFunction`s:
+  - `addSnippet`, `editSnippet`, `viewSnippet` (in favor of `addFormSnippet`,
+    `editFormSnippet`, and `viewTransform`, all based on CSS selector transforms)
+  - `modSnippet`, used in `addSnippet` and `editSnippet`, superseded by `formSnippet`.
+  - `add`, `edit`, and `view` snippets in HTML, in favor of `addForm`, `editForm`,
+    and `viewTransform`
+  - `fieldMapperPF`, in favor of `fieldMapperTransforms`
+  - `fieldPF`, `appendField`, and `prependField`, in favor of `fieldTransforms`,
+    `appendFieldTransform`, and `prependFieldTransform`.
+- `MongoAddress`, `MongoHostBase`, `MongoHost`, `MongoSet` and all functions that
+  take them as parameters. Please use the Mongo Java driver's `MongoClient` instead.
+- `MongoRecord.save` with no parameters. Please use the version with one
+  parameter, and invoke it with empty parens (`save()`) if you want a safe save. The
+  default for `save` with no parameters was an unsafe save, which can be achieved using
+  `save(false)`.
+- `MongoMeta.ensureIndex`; use `MongoMeta.createIndex instead`.
+- `ListenerManager.updateListeners(Any)`; use `ListenerManager.sendListenersMesage(Any)`
+  instead.
+",https://api.github.com/users/Shadowfiend,8245,Shadowfiend,https://api.github.com/repos/lift/framework/releases/278964/assets,https://api.github.com/repos/lift/framework/releases/278964,master,https://api.github.com/repos/lift/framework/tarball/2.6-M4-release,https://github.com/lift/framework/releases/tag/2.6-M4-release,https://api.github.com/repos/lift/framework/zipball/2.6-M4-release,2.6-M4-release,False,False
+269013,2014-04-12T12:52:50Z,2014-04-12T13:13:02Z,Lift Framework 2.6-M3,"I'm pleased to announce that Lift 2.6-M3 is out the door and should be available on Sonatype shortly.
+
+Here's the rundown.
+
+### Notable Changes
+- [Box.get is officially deprecated](https://github.com/lift/framework/pull/1523). Previously, calling `.get` on a box would trigger an implicit conversion from Box => Option. As we move towards encouraging people even more to utilize flatMap, map, etc to open boxes and to specify exceptions when they can't (a la `openOrThowException`), we're officially deprecating the use of `.get` on a box, and you will start seeing warnings in your code if you do it as of this release. In Lift 3.0, the ability to call `.get` on a box will disappear.
+
+### New Features / Enhancements
+- [Case class decomposition performance improvements.](https://github.com/lift/framework/pull/1500) By doing some clever code @chriswebster was able to bring the complexity of case class decomposition down to O(n).
+- [Memoization to prevent additional reflection during decomposition](https://github.com/lift/framework/pull/1517), also thanks to @chriswebster.
+- [Implementation of LiftRules.funcNameGenerator.](https://github.com/lift/framework/pull/1506) You can now use your own logic for generating Func names. Thanks @japgolly
+- [The Framework should be capable of compiling in Scala 2.10.1+ now](https://github.com/lift/framework/pull/1509) thanks to @pbrant.
+- [Some variable name cleanup in lift-json.](https://github.com/lift/framework/pull/1519)
+- [Implementation of toSingleBox](https://github.com/lift/framework/pull/1525) that converts a List[Box[T]] => Box[List[T]].
+
+### Bugfixes
+- [IE 11 detection is working.](https://github.com/lift/framework/pull/1503) IE changed their typical user agent signature in IE 11. The detection code has been updated to account for this change.
+- [MockHttpServletRequest correctly handles empty parameters](https://github.com/lift/framework/pull/1516) thanks to contributions by @dmclean62.
+- [Unexpected warnings related to page/instance resource IDs should no longer appear](https://github.com/lift/framework/pull/1521), a hat tip to @Shadowfiend for that one.
+- [Fixes for an issue where bad database connections wouldn't be released correctly](https://github.com/lift/framework/pull/1526). Thanks to @rofreytag for this.
+
+Once again, thank you to everyone involved in making this release possible. Have a spectacular Saturday.
+",https://api.github.com/users/farmdawgnation,620189,farmdawgnation,https://api.github.com/repos/lift/framework/releases/269013/assets,https://api.github.com/repos/lift/framework/releases/269013,master,https://api.github.com/repos/lift/framework/tarball/2.6-M3-release,https://github.com/lift/framework/releases/tag/2.6-M3-release,https://api.github.com/repos/lift/framework/zipball/2.6-M3-release,2.6-M3-release,False,False
+9342,2013-10-05T04:48:51Z,2014-01-08T15:44:58Z,2.6-M1,"# New Features & Enhancements
+
+[Markdown parser included](https://github.com/lift/framework/issues/1462): the Actuarius Markdown parser is now part of Lift. Thanks to @chenkelmann and @dpp.  There's an example in [Torsten's Lift 3 demo source](https://github.com/tuhlmann/lift-3-demo/blob/master/src/main/scala/code/snippet/Markdown.scala).
+
+[Add support for X-Frame-Options](https://github.com/lift/framework/issues/1478): Lift now sets the ""SAMEORIGIN"" [X-Frame-Options header](https://developer.mozilla.org/en-US/docs/HTTP/X-Frame-Options?redirectlocale=en-US&redirectslug=The_X-FRAME-OPTIONS_response_header).  Thanks to @dpp and @fmpwizard.
+
+[Improved LAFutures](https://github.com/lift/framework/issues/1471): The improvements to `LAFuture` in Lift 3.0 have been back-ported to 2.6.  This brings `map`, `flatMap`, `filter`, `withFilter`, `onSuccess`, `onFail`, and `onComplete`. Thanks to @dpp and @fmpwizard.
+
+[CSS Selector for first match](https://github.com/lift/framework/issues/1475): You can now use `""^ [href]""` as a CSS selector, and it will only apply a transformation to the first match on your NodeSeq.  Thanks to @dpp and @fmpwizard.
+
+[Run-mode auto-detection](https://github.com/lift/framework/pull/1466/files): when `run.mode` isn't set, you can now supply a function to determine the run mode to use by setting `Props.autDetectRuModeFn` before referencing `run.mode`. Thanks to @japgolly for this.
+
+[Make LiftRules use the html5 parser by default](https://github.com/lift/framework/pull/1457): you no longer need to set the parser in your `Boot.scala` file.  Thanks @fmpwizard. 
+
+[No more warnings in JValue in for comprehensions](https://github.com/lift/framework/pull/1472): `withFilter` has been implemented on `JValue`. Thanks @hedefalk.
+
+[Mock Lift Actor for better unit tests](https://github.com/lift/framework/pull/1467): The details and example are in the pull request. Thanks to @farmdawgnation.
+
+[Lift now defaults to the HTML5 parser](https://github.com/lift/framework/pull/1457): You don't need to specify HTML5 anymore in your `Boot.scala`. Thanks @fmpwizard.
+
+[Addition of `ajaxOnSubmit` to `SHtml`](https://github.com/lift/framework/pull/1414): Use `ajaxOnSubmit` to bind a `() => JsCmd` submit handling function to an `<input>` or `<button>`. This allows you to retain the entire element content, except for the onclick attribute, without resorting to a hidden field.  Thanks to @Shadowfiend. 
+
+[Conditional onEvent](https://github.com/lift/framework/pull/1450): A convenience for prompting the user before carrying out an action. For example: `SHtml.onEventIf(""Are you sure you want to do that?"", s => deleteUser())`. Thanks to @farmdawgnation 
+
+[Support for `form=ajax` as a snippet attribute](https://github.com/lift/framework/pull/1188): You can now invoke a snippet with a `?form=ajax` parameter and Lft will do the right thing and convert it into an Ajax form.  Prior to this, you had to enclose your form with an extra div and call `data-lift=""form.ajax""`. Thanks to @fmpwizard.
+
+[Logging not found GUIDs](https://github.com/lift/framework/pull/1427): Lift now logs POST or GET requests that contain no callback functions, but look like they should.  You can control this behaviour with `LiftRules.handleUnmappedParameter`. Thanks to @Shadowfiend and @serioga.
+
+[Easier testing and customization of Mailer](https://github.com/lift/framework/pull/1469): Mailer's inner class is now a trait, which allows any class extending the trait to accept `From()`, `To()` etc.  Thanks to @japgolly.
+
+[Custom handling of Menu Param failing to match](https://github.com/lift/framework/pull/1487): Normally a `Menu.param` 404s if the current value is `Empty`. You can now change the behaviour via `Loc.MatchWithoutCurrentValue`. There's an example of using this in [the ScalaDoc](https://github.com/lift/framework/pull/1487/files#diff-606c53226890e8146c8ac304bca152a4L739).  Thank you @farmdawgnation.
+
+[Scheme-relative URLs now supported](https://github.com/lift/framework/pull/1433): Scheme relative URLs (e.g., those starting `//`) no longer have the context path pre-pended. Thanks to @serveace.
+
+[Lifecycle callbacks added to MongoMetaRecord.update](https://github.com/lift/framework/issues/1348): there's now support for `beforeUpdate` and `afterUpdate` on Mongo records. Thanks to @eltimn.
+
+[Mongo Record creation date](https://github.com/lift/framework/issues/1349): a document creation date is now available via `createdAt`.  This uses the timestamp from Mongo's `ObjectId`. Thanks to @eltimn.
+
+[Joda Time support for Mongo Record](https://github.com/lift/framework/issues/1400): you can now use Joda's `DateTime` via `JodaTimeField`. Thanks to @eltimn.
+
+[Dirty check on Record](https://github.com/lift/framework/issues/1411): use `myrecord.dirty_?` to test if a record has been modified since being loaded. Thanks to @eltimn  
+
+[Maven archetypes updated](https://github.com/lift/framework/issues/1470): thanks to @ldeck.
+
+# Bug fixes, Compatibility and Performance Gains
+
+[Remove ActorWatcher](https://github.com/lift/framework/pull/1481): _BREAKING CHANGE_ `ActorWatcher` has been removed, as it referenced the old deprecated Scala Actor code. Thanks @fmpwizard. 
+
+[Workaround for Scala regression SI-7612](https://github.com/lift/framework/pull/1465): Annotate type of primaryKeyField in Mapper to avoid a StackOverflow (will be fixed in 2.10.3 or 2.11). Thanks to @retronym and @fmpwizard. 
+
+[LAFuture.collect IndexOutOfBoundsException fix](https://github.com/lift/framework/pull/1453): it was possible for LAFuture to throw an IndexOutOfBoundsException for futures resolved in a particular order.  This has been resolved, thanks to @tuhlmann.
+
+[Jetty 9 null safety checks](https://github.com/lift/framework/issues/1452): Under Jetty 9 it's possible for a request to say it has a header, but when you ask for the header you get null. We now protect against this, and you won't get a null header value. Thanks to @dpp.
+
+[JSON parser fix for handing  scientific notation](https://github.com/lift/framework/pull/1492): The parser was fine with e and e-, but now can handle e+ (e.g., 1.23e+1). Thank you @kluyg. 
+
+[CSS parser robustness improvements](https://github.com/lift/framework/commit/538e6944a2feccb91f8f22812ace138070cd3fb2): Including allowing the # character in URLs. Thanks @pbrant.
+
+[Menu.item swallowed surrounding Elem](https://github.com/lift/framework/pull/1479). From @dpp and @hedefalk.
+
+[`Helpers.toBoolean(""on"")` now returns `true`](https://github.com/lift/framework/pull/1157): it didn't before! Thanks @fmpwizard and Denis Nevmerzhitsky.
+
+[S.ieMode is misleading and so deprecated](https://github.com/lift/framework/pull/1477):  This flag is used for a specific XML handling issue, and is not a general IE detection check. To avoid this confusion, isMode is deprecated and will probably be removed in Lift 3.  This improvement from @farmdawgnation.
+
+[Spelling fixes for Vendor](https://github.com/lift/framework/issues/1429) and [supplimentalKidMenuItems](): there have been a number of fixes to spelling mistakes in functions. Incorrect spellings have been deprecated.  Thanks to @farmdawgnation and @nafg
+
+[ScalaDoc improvement to `ListenerManager`](https://github.com/Tmr/framework/commit/bfe464a3da12c02f3b801fe79c86f829f237d156), thanks to @Timr.
+
+[Typos in the source](https://github.com/lift/framework/commit/ee08fbd77219a6c688288c8b90ca22d5776434dc): fixed by @pbrant.
+
+[Out of date references to Can removed](https://github.com/lift/framework/pull/1488) by @Shadowfiend.
+
+# ...and thanks to everyone who contributed on the mailing list, writing code, reviewing code, supplying feedback!
+",https://api.github.com/users/d6y,102661,d6y,https://api.github.com/repos/lift/framework/releases/9342/assets,https://api.github.com/repos/lift/framework/releases/9342,master,https://api.github.com/repos/lift/framework/tarball/2.6-M1-release,https://github.com/lift/framework/releases/tag/2.6-M1-release,https://api.github.com/repos/lift/framework/zipball/2.6-M1-release,2.6-M1-release,False,False

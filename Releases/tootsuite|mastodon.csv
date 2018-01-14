@@ -1,0 +1,2816 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8165024,2017-10-18T15:13:51Z,2017-10-18T16:16:58Z,v2.0.0,"![Mastodon](https://i.imgur.com/NhZc40l.png)
+
+### Breaking changes:
+
+- All `id` attributes in the REST API responses, including attributes that end in `_id`, are now returned as strings instead of integers. This is because large integers cannot be encoded in JSON losslessly, and all IDs in Mastodon are now bigint. Some apps will not work with this release until they are updated
+- Mastodon will no longer deliver private and direct statuses to OStatus-based recipients (that means pre-1.6.0 Mastodon, too)
+- Stylesheet customizations now work differently due to the new theme feature. See upgrade notes for details.
+
+### Features:
+
+**Custom emoji** (#4988, #5243, #5258, #5002)
+
+Admins may upload 50KB PNG images and assign them shortcodes. These images act as custom emojis that can be embedded inline in statuses using those shortcodes, like `:example:`. The emojis display correctly between different instances, but users can only use their local emojis. However, it is simple enough to make a local copy of a desired emoji.
+
+Admins may disable individual remote emojis from being displayed on their instance. The domain block reject media option also works on them.
+
+**Add support for multiple themes** (#4959, #5336)
+
+Besides the old custom.scss way, admins may install additional themes. When more than one theme is installed, the option to select your preference appears in user's preferences.
+
+**Replace EmojiOne emoji pack with Twemoji** (#5046)
+
+The newer releases of EmojiOne have switched their license and availability. To get access to all the latest standard emojis, we switched packs to Twemoji, which has a more permissive license, which is used by Twitter and Discord.
+
+**Add emoji autosuggestions** (#5053)
+
+When beginning to type a shortcode, an autosuggestion appears instantly, like for usernames. Upon selection it inserts the unicode character into the text. Entering a standard emoji's shortcode and leaving it as such now is interpreted as you meaning to leave it as plain text, it will not be converted to unicode server-side to avoid garbling code and IPv6 addresses that contain syntax that is similar to shortcodes.
+
+**New emoji picker** (#5046, #5275)
+
+The emoji picker has been improved. It will display your instances's custom emojis as well as keep track of the emojis you use frequently and your selected skin tone modifier.
+
+**New error page graphic. Other error page improvements** (#5067, #5099)
+
+The 500 error page is now generated during the assets:precompile rake task, meaning that it can use the same stylesheets and assets as the rest of the application. The loading of external Google Fonts was removed from the page. Custom style adjustments will also work on it now. And there's a new elephant graphic on it.
+
+**Better primary ID generation** (#4801, #5260)
+
+The so-called Snowflake algorithm of generating primary IDs for statuses is used now. It includes timestamps in the ID, making it possible to sort items chronologically regardless of when they were actually inserted into the database, without giving up performance or the uniqueness required for keyset pagination. It also makes it harder to guess how large someone's database table truly is. When resolving old statuses from other instances, such as for boosts, search or thread resolving, this means that newly resolved old statuses will no longer appear at the top of public timelines.
+
+**Hotkeys in web UI** (#5164)
+
+The web UI can now be navigated and controlled with a variety of hotkeys.
+
+For example, `1`-`9` will focus a corresponding column (skipping the compose drawer, that is). `n` will focus the compose textarea, while `alt+n` will not only focus it but also reset it. `s` will focus the search form.
+
+When a timeline is focused, `j`/down-arrow and `k`/up-arrow move the focus down/up; `o`/enter expands the status, `p` opens the author's profile, `r` to reply, `m` to mention author, `f` to favourite, `b` to boost.
+
+In terms of general navigation, backspace is bound to navigating backward. A quick combination of `g` and certain letters will take you to a particular page: `s` to start, `h` to home, `n` to notifications, `l` to local timeline, `t` to federated timeline, `f` to your favourites, `u` to your own profile, `p` to your pinned toots, `b` to your blocked users, `m` to your muted users.
+
+**Add ability to specify alternative text for media attachments** (#5123)
+
+After uploading a media attachment but before submitting the toot, the description of the upload can be specified to allow people who use screen readers to enjoy the upload, too. Up to 420 characters can be used.
+
+**Redesign public hashtag pages** (#5237)
+
+The public hashtag pages are used almost exclusively by non-logged-in users, so they should act more like landing pages. The updated design uses the same embedded timeline component as the frontpage, meaning there are auto-updates and infinite scroll and it looks more like what you get if you sign up. It also displays login and sign-up buttons on the side, as well as a few benefits of Mastodon.
+
+**Implement dynamic e-mail blacklist for admins** (#5109)
+
+Previously the only way to prevent an e-mail domain from being used by new sign-ups was to specify an environment variable and restart Mastodon. This does not work well enough. Now this setting can be changed inside the admin UI without restarting Mastodon, instead.
+
+**Other:**
+
+- After 7 days of repeated delivery failures, give up on inbox delivery to reduce wasted effort (#5131)
+- Send streaming API delete to people mentioned in status, so they would get it even if they don't follow the author (#5103)
+- In detailed status view, display the attachment uncropped if there's only one of it (#5054)
+- When a streaming API status arrives, sort it into conversations live so you don't have to reload the conversation to see it (#5206)
+- New Material app icon for Chrome, new icons for iOS, Microsoft (#5291, #5321)
+- New API: GET /api/v1/apps/verify_credentials to confirm app works (#5112)
+- Reorganize preferences page (#5161, #4447)
+- Admins can now add moderation notes to accounts (#5240)
+- New preference for reducing animations in web UI to prevent motion sickness (#5393)
+
+### Upgrade notes:
+
+Non-Docker only:
+
+- The recommended Ruby version has been bumped to 2.4.2. However, it is only a recommendation. If you would like to stay with 2.4.1, simply overwrite the value in `.ruby-version`
+- Dependency updates: `bundle install` and `yarn install`
+
+Both Docker and non-Docker:
+
+- This release includes database migrations, that means you need to run `RAILS_ENV=production bundle exec rails db:migrate` (in Docker: `docker-compose run --rm web rails db:migrate`). **Depending on your database size, this migration may take a long while! It may also lead to some downtime. Make sure you have backups.** This is because we are upgrading a multitude of database columns from int to bigint to make sure they're future-proof.
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+Optionally:
+
+- `custom.scss` is no longer automatically loaded because the feature has been reworked into themes. Change to `default: styles/custom.scss` in `config/themes.yml` to restore old behaviour
+
+### Troubleshooting
+
+- If you have upgraded to the master branch before v2.0.0rc1 and your custom emoji now fail to load, perform this rake task: `RAILS_ENV=production bundle exec rake paperclip:refresh:thumbnails CLASS=CustomEmoji`
+
+### Fixes:
+
+- Web UI: Make sure formatted numbers don't contain insignificant zeroes (#4993)
+- Bump recommended Ruby version to 2.4.2 (#4958)
+- Fix performance on stats queries (#4996)
+- OpenGraph: Fix error when generating OpenGraph tags for images without metadata (#4995)
+- ActivityPub: Add published property to activity for reblogs (#5000)
+- Re-allow final underscore in parsed URLs (#4999)
+- Web UI: Improve scrolling performance on Chrome (#5001)
+- Remove ubuntu-toolchain-r-test dependency (#5005)
+- Fix account records being read before processing finished (#4998)
+- Web UI: Hide sensitive image by default on the public pages (#5009)
+- ActivityPub: Use OrderedCollectionPage to return followers/following list (#4949)
+- Web UI: Improve scrolling performance in general (#5011, #5152)
+- Web UI: Fix remote statuses being html_encoded in public pages (#5012)
+- Fix race condition when processing incoming OStatus messages (#5013)
+- API: Change IDs to strings rather than numbers in API JSON output (#5019)
+- Web UI: Use file extensions in addition to MIME types for file picker (#5029)
+- Disable private status federation over OStatus (#5027)
+- Web UI: Reduce wasted renders (#5021, #5036)
+- Web UI: Improve mobile style of /about/more (#5034)
+- Web UI: Make dropdowns render into portal, expand animation (#5018, #5140)
+- Document REDIS_NAMESPACE (#5038)
+- Do not filter statuses with unknown languages (#5045)
+- Web UI: Fix overflowing tabs in account__action-bar (#5056)
+- Web UI: Fix media gallery CSS (#5064)
+- Web UI: Change mobile layout breakpoint from 1024px to 630px (#5063)
+- Suppress backtrace when failed to communicate with a remote instance (#5076)
+- Thread notification e-mails for mentions by conversation (#5061)
+- Web UI: Increase max height of preview card image (#5092)
+- Stop processing of payload if it originates from a local account (#5100)
+- API: When OAuth password verification fails, return 401 instead of redirect to login (#5111)
+- Web UI: Remove now redundant warnings about OStatus privacy (#5102)
+- Improve worker performance by flushing body when performing POST requests (#5128)
+- ActivityPub: If HTTP signature is wrong and webfinger cache is stale, retry with resolve (#5129)
+- Web UI: Improve performance of modal and swipe animations (#5135)
+- Change max redirects followed to 2 (#5136)
+- When using statsd to track Mastodon performance, it will now get more useful metrics (#5118)
+- Web UI: Upgrade to React 16 (#5119)
+- Web UI: Make emoji autosuggestions immediate, usernames appear sooner (#5149)
+- Fix bug with OpenStack v2 (#5155)
+- Fix order of paginated accounts on authorized followers page (#3357)
+- Mobile: Make Chrome splash screen the same color as web UI's background color for smoother transition (#5169)
+- Web UI: Toggle contain:strict on fullscreen (#5159)
+- Append confirmation link as plain text in e-mails (#5146)
+- Web UI: When muting someone, clear web UI of their content like for blocks (#5172)
+- Web UI: Fix emoji sequence bug in substring-trie (#5191)
+- Web UI: Compress and combine emoji data (#5201, #5229)
+- Improve HTTP responses for Salmon and ActivityPub inbox processing (#5200)
+- ActivityPub: Fix possible acct URI usurpation in account discovery (#5208)
+- Use separate workers to process imports, retry failures (#5207)
+- ActivityPub: Validate id of objects (#5114)
+- Web UI: Use own, shorter relative timestamps in web UI to save space (#5171)
+- OpenGraph: Use summary_large_image card only when media attachments present (#5219)
+- Web UI: Fix remote profile being displayed as HTML on remote follow page (#5249)
+- Improve error handling in LinkCrawlWorker (#5250)
+- Web UI: Fix overflowing (#5246)
+- Web UI: Show buffering in video player (#5261)
+- Web UI: Dynamically calculate card height for embeds instead of using CSS padding trick (#5265)
+- ActivityPub: Use object URI only in Announce, instead of embedding (#5266)
+- Fix pagination in blocks API (#5285)
+- Web UI: Center error layout (#5289)
+- Fix offline-plugin warning in dev mode (#5411) 
+- Disable reblog counter for private toots (#5397)
+- Fix unreblogged toot being at wrong position in the home timeline (#5418)
+- Ensure that home feed regeneration after inactivity restores non-zero items (#5409)
+- Properly remove unreblogged toots from timelines by keeping references of all reblogs (#5419)
+- Web UI: Replace newlines in desktop notifications with spaces instead of removing them (#5361)
+- Allow unreblogging pre-ActivityPub reblogs (#5376)
+- ActivityPub: Fix remote status fetching for ActivityPub-only WEB_ACCOUNT users (#5372)
+- Web UI: Avoid confusing messaging: When unfollowing, remove toots from home in web UI immediately (#5369)
+- Web UI: Avoid confusing messaging: Do not try to guess why home timeline is empty in web UI (#5370)
+- Fix user sign in count updating on every request, optimize some queries (#5368)
+- Optimize Status#permitted_for 500x (account timeline) (#5373) 
+- Make HTTP deliveries faster by closing connection right after posting (#5390)
+- Fix some failure cases when fetching link preview cards (#5347)
+- Web UI: Reduce discrepancies between server and client-side character count (#5360)
+- Fix reblog count increasing without reason (#5363)
+- Web UI: Fix React warning about tabIndex on status with CW (#5432) 
+- Don't capture scheme-less URLs in the status (#5435)
+- When status is fetched instead of delivered, do not stream it (#5437) 
+- Web UI: Fix unwanted content warning gap in CSS (#5436)
+- OpenGraph: OpenGraph tags on sign in and sign up pages (#5308) 
+- Web UI: Only preload JS on /web pages (#5325) 
+- Web UI: In thread view, only scroll on first update, and scroll to replied-to post (#5322)
+
+### Contributors to this release:
+
+- @abcang
+- @akihikodaki
+- @Aldarone
+- @aschmitz
+- @BoFFire
+- @cacheflow
+- @contraexemplo
+- @crakaC
+- @ErikXXon
+- @gandaro
+- @Gargron
+- @hcmiya
+- @hinaloe
+- @JeanGauthier
+- @jeroenpraat
+- @JohnD28
+- @k24
+- @Kjwon15
+- @lynlynlynx
+- @m4sk1n
+- @mabkenar
+- @masarakki
+- @mathias-b
+- @MightyPork
+- @MitarashiDango
+- @monsterpit-daggertooth
+- @nolanlawson
+- @nullkal
+- @pfm-eyesightjp
+- @renatolond
+- @roikale
+- @salvadorpla
+- @sylph01
+- @Sylvhem
+- @takayamaki
+- @Technowix
+- @ThibG
+- @tkbky
+- @unarist
+- @utam0k
+- @voidsatisfaction
+- @yanakend
+- @yannicka
+- @YaQ00
+- @ykzts
+- @zunda",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/8165024/assets,https://api.github.com/repos/tootsuite/mastodon/releases/8165024,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v2.0.0,https://github.com/tootsuite/mastodon/releases/tag/v2.0.0,https://api.github.com/repos/tootsuite/mastodon/zipball/v2.0.0,v2.0.0,False,False
+8157096,2017-10-17T21:16:35Z,2017-10-17T21:58:13Z,v2.0.0rc4,"![Mastodon](https://i.imgur.com/NhZc40l.png)
+
+> **Note:** This is a release candidate. It is intended to be stable, but not guaranteed.
+
+### Fixes:
+
+- Fix React warning about tabIndex on status with CW (#5432) 
+- Don't capture scheme-less URLs in the status (#5435)
+- When status is fetched instead of delivered, do not stream it (#5437) 
+- Fix unwanted content warning gap in CSS (#5436)
+- Fix scrolling of dropdown when offscreen (#5434) 
+- When unreblog arrives over streaming API, just delete in UI (#5439) 
+- Make theme directory and rename application.scss (#5336)
+
+### Upgrade notes:
+
+Both Docker and non-Docker:
+
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/8157096/assets,https://api.github.com/repos/tootsuite/mastodon/releases/8157096,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v2.0.0rc4,https://github.com/tootsuite/mastodon/releases/tag/v2.0.0rc4,https://api.github.com/repos/tootsuite/mastodon/zipball/v2.0.0rc4,v2.0.0rc4,False,True
+8146740,2017-10-17T10:02:47Z,2017-10-17T10:14:28Z,v2.0.0rc3,"![Mastodon](https://i.imgur.com/NhZc40l.png)
+
+> **Note:** This is a release candidate. It is intended to be stable, but not guaranteed.
+
+### Fixes:
+
+- Fix some failure cases when fetching link preview cards (#5347)
+- Reduce discrepancies between server and client-side character count (#5360)
+- Fix reblog count increasing without reason (#5363)
+- Fix crash on registration validation errors (#5366) 
+- Fix remote status fetching for ActivityPub-only WEB_ACCOUNT users (#5372)
+- Avoid confusing messaging: When unfollowing, remove toots from home in web UI immediately (#5369)
+- Avoid confusing messaging: Do not try to guess why home timeline is empty in web UI (#5370)
+- Fix user sign in count updating on every request, optimize some queries (#5368)
+- Optimize Status#permitted_for 500x (account timeline) (#5373) 
+- Make HTTP deliveries faster by closing connection right after posting (#5390)
+- Redirect back to the right page after copying emoji (#5387)
+- Replace newlines in desktop notifications with spaces instead of removing them (#5361)
+- Allow unreblogging pre-ActivityPub reblogs (#5376)
+- Adjust CSS of public hashtag pages (#5357) 
+- Fix JS crash: Clear timer when unmounting RelativeTimestamp components (#5408)
+- Fix JS crash: Filter out duplicate IDs in timelines reducer (#5417) 
+- Fix offline-plugin warning in dev mode (#5411) 
+- Disable reblog counter for private toots (#5397)
+- Fix unreblogged toot being at wrong position in the home timeline (#5418)
+- Ensure that home feed regeneration after inactivity restores non-zero items (#5409)
+- Properly remove unreblogged toots from timelines by keeping references of all reblogs (#5419)
+
+### Features:
+
+- Add option to reduce motion in UI (#5393)
+
+### Upgrade notes:
+
+Non-Docker only:
+
+- Dependency updates: `bundle install` and `yarn install`
+
+Both Docker and non-Docker:
+
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/8146740/assets,https://api.github.com/repos/tootsuite/mastodon/releases/8146740,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v2.0.0rc3,https://github.com/tootsuite/mastodon/releases/tag/v2.0.0rc3,https://api.github.com/repos/tootsuite/mastodon/zipball/v2.0.0rc3,v2.0.0rc3,False,True
+8087790,2017-10-11T22:58:14Z,2017-10-11T23:21:15Z,v2.0.0rc2,"![Mastodon](https://i.imgur.com/NhZc40l.png)
+
+> **Note:** This is a release candidate. It is intended to be stable, but not guaranteed.
+
+### Fixes:
+
+- Remove prop types from external libraries to reduce JS size (#5304) 
+- Pre-fill frequently used emojis to avoid emoji picker crash (#5305)
+- OpenGraph tags on sign in and sign up pages (#5308) 
+- Fix tooltip/custom emoji/search interaction resulting in emoji picker crash (#5310)
+- Fix an error when ancestors get loaded before the status itself (#5312)
+- Fully disable hotkeys when an input element is focused (#5324) 
+- Add padding to Android icon, change Apple and MS icons (#5321) 
+- Only preload JS on /web pages (#5325) 
+- In thread view, only scroll on first update, and scroll to replied-to post (#5322)
+- Fix styles of error pages (#5335) 
+
+### Upgrade notes:
+
+Non-Docker only:
+
+- Dependency updates: `yarn install`
+
+Both Docker and non-Docker:
+
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/8087790/assets,https://api.github.com/repos/tootsuite/mastodon/releases/8087790,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v2.0.0rc2,https://github.com/tootsuite/mastodon/releases/tag/v2.0.0rc2,https://api.github.com/repos/tootsuite/mastodon/zipball/v2.0.0rc2,v2.0.0rc2,False,True
+8060768,2017-10-10T13:18:27Z,2017-10-10T13:30:46Z,v2.0.0rc1,"![Mastodon](https://i.imgur.com/NhZc40l.png)
+
+> **Note:** This is a release candidate. It is intended to be stable, but not guaranteed.
+
+### Breaking changes:
+
+- All `id` attributes in the REST API responses, including attributes that end in `_id`, are now returned as strings instead of integers. This is because large integers cannot be encoded in JSON losslessly, and all IDs in Mastodon are now bigint. Some apps will not work with this release until they are updated
+- Mastodon will no longer deliver private and direct statuses to OStatus-based recipients (that means pre-1.6.0 Mastodon, too)
+- Stylesheet customizations now work differently due to the new theme feature. See upgrade notes for details.
+
+### Fixes:
+
+- Web UI: Make sure formatted numbers don't contain insignificant zeroes (#4993)
+- Bump recommended Ruby version to 2.4.2 (#4958)
+- Fix performance on stats queries (#4996)
+- OpenGraph: Fix error when generating OpenGraph tags for images without metadata (#4995)
+- ActivityPub: Add published property to activity for reblogs (#5000)
+- Re-allow final underscore in parsed URLs (#4999)
+- Web UI: Improve scrolling performance on Chrome (#5001)
+- Remove ubuntu-toolchain-r-test dependency (#5005)
+- Fix account records being read before processing finished (#4998)
+- Web UI: Hide sensitive image by default on the public pages (#5009)
+- ActivityPub: Use OrderedCollectionPage to return followers/following list (#4949)
+- Web UI: Improve scrolling performance in general (#5011, #5152)
+- Web UI: Fix remote statuses being html_encoded in public pages (#5012)
+- Fix race condition when processing incoming OStatus messages (#5013)
+- API: Change IDs to strings rather than numbers in API JSON output (#5019)
+- Web UI: Use file extensions in addition to MIME types for file picker (#5029)
+- Disable private status federation over OStatus (#5027)
+- Web UI: Reduce wasted renders (#5021, #5036)
+- Web UI: Improve mobile style of /about/more (#5034)
+- Web UI: Make dropdowns render into portal, expand animation (#5018, #5140)
+- Document REDIS_NAMESPACE (#5038)
+- Do not filter statuses with unknown languages (#5045)
+- Web UI: Fix overflowing tabs in account__action-bar (#5056)
+- Web UI: Fix media gallery CSS (#5064)
+- Web UI: Change mobile layout breakpoint from 1024px to 630px (#5063)
+- Suppress backtrace when failed to communicate with a remote instance (#5076)
+- Thread notification e-mails for mentions by conversation (#5061)
+- Web UI: Increase max height of preview card image (#5092)
+- Stop processing of payload if it originates from a local account (#5100)
+- API: When OAuth password verification fails, return 401 instead of redirect to login (#5111)
+- Web UI: Remove now redundant warnings about OStatus privacy (#5102)
+- Improve worker performance by flushing body when performing POST requests (#5128)
+- ActivityPub: If HTTP signature is wrong and webfinger cache is stale, retry with resolve (#5129)
+- Web UI: Improve performance of modal and swipe animations (#5135)
+- Change max redirects followed to 2 (#5136)
+- When using statsd to track Mastodon performance, it will now get more useful metrics (#5118)
+- Web UI: Upgrade to React 16 (#5119)
+- Web UI: Make emoji autosuggestions immediate, usernames appear sooner (#5149)
+- Fix bug with OpenStack v2 (#5155)
+- Fix order of paginated accounts on authorized followers page (#3357)
+- Mobile: Make Chrome splash screen the same color as web UI's background color for smoother transition (#5169)
+- Web UI: Toggle contain:strict on fullscreen (#5159)
+- Append confirmation link as plain text in e-mails (#5146)
+- Web UI: When muting someone, clear web UI of their content like for blocks (#5172)
+- Web UI: Fix emoji sequence bug in substring-trie (#5191)
+- Web UI: Compress and combine emoji data (#5201, #5229)
+- Improve HTTP responses for Salmon and ActivityPub inbox processing (#5200)
+- ActivityPub: Fix possible acct URI usurpation in account discovery (#5208)
+- Use separate workers to process imports, retry failures (#5207)
+- ActivityPub: Validate id of objects (#5114)
+- Web UI: Use own, shorter relative timestamps in web UI to save space (#5171)
+- OpenGraph: Use summary_large_image card only when media attachments present (#5219)
+- Web UI: Fix remote profile being displayed as HTML on remote follow page (#5249)
+- Improve error handling in LinkCrawlWorker (#5250)
+- Web UI: Fix overflowing (#5246)
+- Web UI: Show buffering in video player (#5261)
+- Web UI: Dynamically calculate card height for embeds instead of using CSS padding trick (#5265)
+- ActivityPub: Use object URI only in Announce, instead of embedding (#5266)
+- Fix pagination in blocks API (#5285)
+- Web UI: Center error layout (#5289)
+
+### Features:
+
+**Custom emoji** (#4988, #5243, #5258, #5002)
+
+Admins may upload 50KB PNG images and assign them shortcodes. These images act as custom emojis that can be embedded inline in statuses using those shortcodes, like `:example:`. The emojis display correctly between different instances, but users can only use their local emojis. However, it is simple enough to make a local copy of a desired emoji.
+
+Admins may disable individual remote emojis from being displayed on their instance. The domain block reject media option also works on them.
+
+**Add support for multiple themes** (#4959)
+
+Besides the old custom.scss way, admins may install additional themes. When more than one theme is installed, the option to select your preference appears in user's preferences.
+
+**Replace EmojiOne emoji pack with Twemoji** (#5046)
+
+The newer releases of EmojiOne have switched their license and availability. To get access to all the latest standard emojis, we switched packs to Twemoji, which has a more permissive license, which is used by Twitter and Discord.
+
+**Add emoji autosuggestions** (#5053)
+
+When beginning to type a shortcode, an autosuggestion appears instantly, like for usernames. Upon selection it inserts the unicode character into the text. Entering a standard emoji's shortcode and leaving it as such now is interpreted as you meaning to leave it as plain text, it will not be converted to unicode server-side to avoid garbling code and IPv6 addresses that contain syntax that is similar to shortcodes.
+
+**New emoji picker** (#5046, #5275)
+
+The emoji picker has been improved. It will display your instances's custom emojis as well as keep track of the emojis you use frequently and your selected skin tone modifier.
+
+**New error page graphic. Other error page improvements** (#5067, #5099)
+
+The 500 error page is now generated during the assets:precompile rake task, meaning that it can use the same stylesheets and assets as the rest of the application. The loading of external Google Fonts was removed from the page. Custom style adjustments will also work on it now. And there's a new elephant graphic on it.
+
+**Better primary ID generation** (#4801, #5260)
+
+The so-called Snowflake algorithm of generating primary IDs for statuses is used now. It includes timestamps in the ID, making it possible to sort items chronologically regardless of when they were actually inserted into the database, without giving up performance or the uniqueness required for keyset pagination. It also makes it harder to guess how large someone's database table truly is. When resolving old statuses from other instances, such as for boosts, search or thread resolving, this means that newly resolved old statuses will no longer appear at the top of public timelines.
+
+**Hotkeys in web UI** (#5164)
+
+The web UI can now be navigated and controlled with a variety of hotkeys.
+
+For example, `1`-`9` will focus a corresponding column (skipping the compose drawer, that is). `n` will focus the compose textarea, while `alt+n` will not only focus it but also reset it. `s` will focus the search form.
+
+When a timeline is focused, `j`/down-arrow and `k`/up-arrow move the focus down/up; `o`/enter expands the status, `p` opens the author's profile, `r` to reply, `m` to mention author, `f` to favourite, `b` to boost.
+
+In terms of general navigation, backspace is bound to navigating backward. A quick combination of `g` and certain letters will take you to a particular page: `s` to start, `h` to home, `n` to notifications, `l` to local timeline, `t` to federated timeline, `f` to your favourites, `u` to your own profile, `p` to your pinned toots, `b` to your blocked users, `m` to your muted users.
+
+**Add ability to specify alternative text for media attachments** (#5123)
+
+After uploading a media attachment but before submitting the toot, the description of the upload can be specified to allow people who use screen readers to enjoy the upload, too. Up to 420 characters can be used.
+
+**Redesign public hashtag pages** (#5237)
+
+The public hashtag pages are used almost exclusively by non-logged-in users, so they should act more like landing pages. The updated design uses the same embedded timeline component as the frontpage, meaning there are auto-updates and infinite scroll and it looks more like what you get if you sign up. It also displays login and sign-up buttons on the side, as well as a few benefits of Mastodon.
+
+**Implement dynamic e-mail blacklist for admins** (#5109)
+
+Previously the only way to prevent an e-mail domain from being used by new sign-ups was to specify an environment variable and restart Mastodon. This does not work well enough. Now this setting can be changed inside the admin UI without restarting Mastodon, instead.
+
+**Other:**
+
+- After 7 days of repeated delivery failures, give up on inbox delivery to reduce wasted effort (#5131)
+- Send streaming API delete to people mentioned in status, so they would get it even if they don't follow the author (#5103)
+- In detailed status view, display the attachment uncropped if there's only one of it (#5054)
+- When a streaming API status arrives, sort it into conversations live so you don't have to reload the conversation to see it (#5206)
+- New Material app icon for Chrome (#5291)
+- New API: GET /api/v1/apps/verify_credentials to confirm app works (#5112)
+- Reorganize preferences page (#5161, #4447)
+- Admins can now add moderation notes to accounts (#5240)
+
+### Upgrade notes:
+
+Non-Docker only:
+
+- The recommended Ruby version has been bumped to 2.4.2. However, it is only a recommendation. If you would like to stay with 2.4.1, simply overwrite the value in `.ruby-version`
+- Dependency updates: `bundle install` and `yarn install`
+
+Both Docker and non-Docker:
+
+- This release includes database migrations, that means you need to run `RAILS_ENV=production bundle exec rails db:migrate` (in Docker: `docker-compose run --rm web rails db:migrate`). **Depending on your database size, this migration may take a long while! It may also lead to some downtime. Make sure you have backups.** This is because we are upgrading a multitude of database columns from int to bigint to make sure they're future-proof.
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+Optionally:
+
+- `custom.scss` is no longer automatically loaded because the feature has been reworked into themes. Change to `default: styles/custom.scss` in `config/themes.yml` to restore old behaviour
+
+### Contributors to this release:
+
+- @abcang
+- @akihikodaki
+- @Artoria2e5
+- @aschmitz
+- @bruwalfas
+- @Chronister
+- @crakaC
+- @febrezo
+- @gandaro
+- @Gargron
+- @hcmiya
+- @hinaloe
+- @JeanGauthier
+- @k24
+- @Kjwon15
+- @lynlynlynx
+- @m4sk1n
+- @mayaeh
+- @MitarashiDango
+- @monsterpit-daggertooth
+- @nolanlawson
+- @nullkal
+- @pfm-eyesightjp
+- @roikale
+- @sylph01
+- @syui
+- @ThibG
+- @TomoyaShibata
+- @unarist
+- @utam0k
+- @yanakend
+- @ykzts
+- @yukimochi
+- @zunda
+",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/8060768/assets,https://api.github.com/repos/tootsuite/mastodon/releases/8060768,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v2.0.0rc1,https://github.com/tootsuite/mastodon/releases/tag/v2.0.0rc1,https://api.github.com/repos/tootsuite/mastodon/zipball/v2.0.0rc1,v2.0.0rc1,False,True
+7776995,2017-09-17T13:23:44Z,2017-09-17T19:25:09Z,v1.6.1,"![Mastodon](https://i.imgur.com/NhZc40l.png)
+
+**Fixes:**
+
+- Reset preview image if avatar/header image selection was cancelled (#4893)
+- Fix error when following locked accounts (#4896)
+- Fix count numbers from ActivityPub not being saved (#4899)
+- Merge context hash into final JSON hash after key transform (#4898)
+- Fix nil error for old toots that don't have a conversation (#4900)
+- Clean up and improve generated OpenGraph tags (#4901)
+- Whenever a remote keypair changes, unfollow them and re-subscribe to them (#4907)
+- Specify libicu explicitly in Aptfile (#4920)
+- Fix height cache (#4909)
+- Limit pinned toots to 5 (#4923)
+- Add missing suspend checks (#4921)
+- Fix ActivityPub handling of replies with WEB_DOMAIN (#4904)
+- Fix share intent (#4926)
+- Do not keep remote file names, generate random (#4934)
+- Enable to recognize most kinds of characters as URL paths (#4941, #4968, #4975)
+- Fix race condition when receiving an ActivityPub Create multiple times (#4930)
+- Remove redundant width/height values from SVGs to fix Safari bug (#4956)
+- Fix invisible load more button (#4962)
+- Fix filterable_languages method of SettingsHelper (#4966)
+- Fix hasSize condition in secSet and sizes. (#4969)
+- Fix AP serialization error when thread is missing (#4970)
+- Fix an error in ReplyDistributionWorker when replied status was deleted (#4974)
+- Adjust landing pages 2 (#4967) 
+- Fix an error when actor json couldn't be fetched in ResolveRemoteAccountService (#4979)
+- Randomize sidekiq-scheduler cron schedule (#4980)
+- Fix cancellation of scroll to the right (#4978)
+- Raise an error on getting activity uri for remote status (#4984)
+- Validate uri presence for remote status (#4985)
+- Oauth code in input form and add description message (#4986)
+
+**Features**:
+
+- Add OpenStack Keystone V3 support (#4889)
+- Add section for protocol specific information on the admin page (#4910)
+- Admin UI: Make instance names in into links to user list in the instance (#4924)
+- Admin UI: Add instance search feature (#4925)
+- Admin UI: **Uploads for admin site settings** (#4913)  
+  You can now upload your own OpenGraph thumbnail for your instance 
+- **Redesign video player** (#4911)
+- Support OpenGraph video embeds (e.g. Twitch clips) (#4897) 
+- Include requested URL into the message on network errors (#4945)
+- Add scheduled worker to purge old user IPs (#4951)
+- When web UI URL used while logged out, redirect to corresponding static page (#4954)
+- **When accessing uncached media attachment, redownload it** (#4955)
+
+**Upgrade notes:**
+
+Non-Docker only:
+
+- Dependency updates: `bundle install`
+
+Both Docker and non-Docker:
+
+- This release includes database migrations, that means you need to run `RAILS_ENV=production bundle exec rails db:migrate` (in Docker: `docker-compose run --rm web rails db:migrate`).
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+**Contributors to this release:**
+
+@abcang
+@akihikodaki
+@Artoria2e5
+@bounshi
+@bruwalfas
+@contraexemplo
+@fvh-P
+@Gargron
+@greysteil
+@jeroenpraat
+@lynlynlynx
+@m4sk1n
+@mabkenar
+@MitarashiDango
+@nullkal
+@patf
+@Quent-in
+@sdukhovni
+@ThibG
+@unarist
+@ykzts
+@yukimochi
+@zunda
+",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/7776995/assets,https://api.github.com/repos/tootsuite/mastodon/releases/7776995,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.6.1,https://github.com/tootsuite/mastodon/releases/tag/v1.6.1,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.6.1,v1.6.1,False,False
+7697786,2017-09-10T13:10:03Z,2017-09-10T13:43:33Z,v1.6.0,"![Mastodon](https://i.imgur.com/NhZc40l.png)
+
+> **ActivityPub** is a new federated web protocol. From this release onward it is the **primary protocol of Mastodon**. We will remain compatible with OStatus for the foreseeable future, but version 2.0 of Mastodon will stop sending private toots over it. After installation, accounts in the database will slowly start upgrading. One of the immediate and obvious perks of this new protocol is more complete conversation views on every instance (presuming all participants are upgraded). For more, [see this blog post](https://www.patreon.com/posts/progress-report-14076545).
+
+
+**Fixes:**
+
+- During Docker build: Use multiple cores in bundler and make (#4544)
+- Web perf: Cache status height (#4439)
+- Fixes to the about page (#4554, #4548, #4682) 
+- Add missing content type on throttled responses (#4558)
+- Add coalesce option to avatar and header convert processor (#4552)
+- Add missing @ to the onboarding modal (#4560)
+- Add missing scroll to top to some column headers (#4563)
+- Add favourited toot to favourites column (#4562)
+- Remove toot from favorites column when unfavorited (#4597)
+- Fix emoji picker scrollbar style (#4572)
+- Extend Devise remember_me longevity to 1 year instead of 2 weeks (#4587)
+- Fix search (regression from #4589) (#4594)
+- Fix require_user! behavior when not logged in (#4604)
+- Don't send Link header when prev and next links are empty (#4633)
+- Re-add missing token authorization for /api/v1/verify_credentials (#4650)
+- Refactored streaming connections (#4645)
+- Do not try to re-subscribe to unsubscribed accounts (#4653)
+- Fix visual line-break glitch with .invisible parts of links (#4655)
+- Increase contrast in landing pages (#4567)
+- Periodically remove expired PuSH subscribers (#4654)
+- Disable babel-loader cache when in development environment (#4684)
+- Don't load Roboto webfont when system font is used in the app (#4591) 
+- Automatically authorize pending incoming follow requests after unlocking account (#4658)
+- Adjust RTL styles (#4712)
+- Do not scroll the columns area due to redirection (#4541)
+- Remove unnecessary indices (#4738)
+- Add close tag of iframe for OEmbed response (#4745)
+- Docker: Update to Alpine 3.6 (#4747)
+- Make first use less overwhelming with browser permissions: Ask for desktop notifications after 1 minute, ask to register protocol handler after 5 minutes (#4760)
+- Use system's default font (when selected) on non web UI pages too (#4553)
+- Link previews storage and fetching reworked/optimized (#4642) 
+- Fix text position of ""sensitive content"" spoiler in Safari (Mac/iPhone) (#4570)
+- Make ""unfollow"" remove pending outgoing follow requests too (#4781)
+- Validate presence of data in imports (#4782)
+- Fix short number locales (#4790)
+- Fix a problem that notification column goes to top (#4792)
+- Use correct syntax for content preloading (#4798)
+- Fix streaming url to lowercase (#4804)
+- Show pinned statuses only in the top of the profile page (#4803)
+- Fix some ActivityPub JSON bugs (#4796)
+- Add new index on notifications to make filtering faster (#4750)
+- Adjust status embeds (#4808)
+- Restore instant follow in API response when account is unlocked (#4799)
+- Fix mentions in direct statuses not being delivered via AP (#4806)
+- Do not execute the job with the same arguments as the retry job (#4814)
+- Fix text position of NSFW for video file (#4819)
+- Fix scroll position (#4821)
+- Add Smartphone screen favourite back button and adjust styles (#4813)
+- Make new statuses use the same URI format in both ActivityPub and OStatus (fixes threading issue in OStatus) (#4815)
+- Fix rake task compatibility with Ruby 2.3.x (#4832)
+- Report comment: limit to 1000 characters (#4833)
+- Enable UniqueRetryJobMiddleware even when called from sidekiq worker (#4836)
+- Fix counting of local statuses for stats (#4839)
+- Fix language filter codes (#4841)
+- Handle stream_entry URL correctly in ActivityPub (#4854)
+- Refresh timeline after toot while the timeline is disconnected (#4858)
+- When visibility missing from API call to toot, fallback to user preference (#4861)
+- Check if already follow-requested from FollowService to avoid error (#4855)
+- Scrollable tables in settings pages (#4857)
+- Add missing reject_media check before avatar download via ActivityPub (#4862)
+- Fix errors preventing UnsubscribeService from working (#4866)
+- Set fallback address when empty notification address (#4868)
+- Fix dimensions of loading component for compose drawer (#4872)
+- Hide modal loading screen for media/video/boost/confirm/actions modals (#4873)
+
+**Features**:
+
+- 🎉 🎉  **ActivityPub** 🎉 🎉 
+  - **Security**:
+    - Digest header on requests with body (#4565)
+    - Add handling of Linked Data Signatures in payloads (#4687, #4752)
+    - Support more variations of ActivityPub keyId in signature (#4630)
+  - **Plumbing**:
+    - Incoming processing (#4216, #4571, #4595, #4601, #4629, #4639, #4728, #4729, #4763, #4754, #4761)
+    - Delivery (#4566, #4703, #4704, #4739)
+    - Improvements to representation of entities (#4592, #4737, #4764, #4767, #4779)
+  - **Protocol upgrade**:
+    - Migration from OStatus (#4583, #4593, #4623, #4631, #4632, #4617, #4662, #4582, #4702, #4730, #4756, #4766)
+    - Alternate links to ActivityPub resources from HTML/HEAD variants (#4586)
+    - Hook up URL-based resource look-up to ActivityPub (#4589, #4661, #4599, #4668, #4672)
+  - **User-facing**:
+    - Update admin view for ActivityPub users (#4600, #4622)
+    - Forward ActivityPub deletes to followers of rebloggers (#4706)
+    - Forward ActivityPub replies to local statuses to followers of authors (#4709)
+    - Fetch statuses/following/followers numbers from ActivityPub (#4840)
+- Include the stats from the /about/more page in API response about instance (#4074)
+- Add **protocol handler**. Mastodon can now respond to URLs that begin with `web+mastodon://`, e.g. specially crafted ""follow me"" buttons would automatically open your correct instance from any webpage (#4511)
+  - `web+mastodon://follow?uri=alice@example.com` opens follow dialog for alice
+  - `web+mastodon://share?text=Lorem+ipsum` opens new toot dialog with preset text ""Lorem ipsum""
+- **Redesign public profiles**. Add no-replies, with-replies, only-media filters (#4608, #4711, #4713)
+- **Developer UI for OAuth applications** (#2758, #4664, #4671)
+- Add Mastodon::Source.url for forks (#4643)
+- **Pinned statuses** (#4675, #4690, #4817)
+- Update status embeds with better URLs, better design, branded follow button using protocol handler (#4742)
+- ""Embed"" modal in web UI (#4748, #4759, #4773)
+- Add script to make embedded iframes autosize (#4853)
+- OpenStack Swift support as alternative to S3 📎 (#2322, #4816)
+- ""Mute conversation"" option on all own toots, not just in notifications (#4844)
+- **Default follows for new users** (#4871)  
+  New users automatically follow certain accounts upon e-mail confirmation. Configurable with admin site setting. When nothing else set, defaults to admins.
+
+**Upgrade notes:**
+
+Non-Docker only:
+
+- Dependency updates: `bundle install` and `yarn install`
+
+Both Docker and non-Docker:
+
+- This release includes database migrations, that means you need to run `RAILS_ENV=production bundle exec rails db:migrate` (in Docker: `docker-compose run --rm web rails db:migrate`).
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+- After database migrations, clean out old preview cards thumbnails with `RAILS_ENV=production bundle exec rails mastodon:maintenance:remove_deprecated_preview_cards` (in Docker: `docker-compose run --rm web rails mastodon:maintenance:remove_deprecated_preview_cards`)
+
+**Contributors to this release:**
+
+@abcang
+@akihikodaki
+@algernon
+@andydrop
+@anneau
+@BoFFire
+@clworld
+@contraexemplo
+@cygnan
+@diomed
+@ekiru
+@eramdam
+@Gargron
+@Jehops
+@lynlynlynx
+@m4sk1n
+@mabkenar
+@masarakki
+@mayaeh
+@MightyPork
+@MitarashiDango
+@miuchan
+@muffinista
+@nightpool
+@nullkal
+@pfm-eyesightjp
+@Quent-in
+@rkarabut
+@salvadorpla
+@sorin-davidoi
+@Sylvhem
+@takayamaki
+@TheInventrix
+@ThomasLeister
+@thurloat
+@trebmuh
+@treyssatvincent
+@unarist
+@vahnj
+@voidsatisfaction
+@Wonderfall
+@ykzts
+@yoshi-pc
+@yukimochi
+@zunda",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/7697786/assets,https://api.github.com/repos/tootsuite/mastodon/releases/7697786,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.6.0,https://github.com/tootsuite/mastodon/releases/tag/v1.6.0,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.6.0,v1.6.0,False,False
+7697542,2017-09-10T08:26:51Z,2017-09-10T08:52:11Z,v1.6.0rc5,"![Mastodon](https://i.imgur.com/NhZc40l.png)
+
+**Fixes:**
+
+- Set fallback address when empty notification address (#4868)
+- Fix dimensions of loading component for compose drawer (#4872)
+- Hide modal loading screen for media/video/boost/confirm/actions modals (#4873)
+
+**Features:**
+
+- **Default follows for new users** (#4871)  
+  New users automatically follow certain accounts upon e-mail confirmation. Configurable with admin site setting. When nothing else set, defaults to admins.
+
+**Upgrade notes:**
+
+Both Docker and non-Docker:
+
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+**Contributors to this release:**
+
+@Gargron
+@Quent-in
+@ykzts",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/7697542/assets,https://api.github.com/repos/tootsuite/mastodon/releases/7697542,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.6.0rc5,https://github.com/tootsuite/mastodon/releases/tag/v1.6.0rc5,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.6.0rc5,v1.6.0rc5,False,True
+7694887,2017-09-09T15:36:27Z,2017-09-09T15:51:06Z,v1.6.0rc4,"![Mastodon](https://i.imgur.com/NhZc40l.png)
+
+**Fixes:**
+
+- Fix rake task compatibility with Ruby 2.3.x (#4832)
+- Report comment: limit to 1000 characters (#4833)
+- Enable UniqueRetryJobMiddleware even when called from sidekiq worker (#4836)
+- Fix counting of local statuses for stats (#4839)
+- Fix language filter codes (#4841)
+- Handle stream_entry URL correctly in ActivityPub (#4854)
+- Refresh timeline after toot while the timeline is disconnected (#4858)
+- When visibility missing from API call to toot, fallback to user preference (#4861)
+- Check if already follow-requested from FollowService to avoid error (#4855)
+- Scrollable tables in settings pages (#4857)
+- Add missing reject_media check before avatar download via ActivityPub (#4862)
+- Fix errors preventing UnsubscribeService from working (#4866)
+
+**Features:**
+
+- Add column for managing your pinned toots (#4817)
+- Fetch statuses/following/followers numbers from ActivityPub (#4840)
+- ""Mute conversation"" option on all own toots, not just in notifications (#4844)
+- Add script to make embedded iframes autosize (#4853)
+
+**Upgrade notes:**
+
+Non-Docker only:
+
+- Dependency updates: `bundle install` and `yarn install`
+
+Both Docker and non-Docker:
+
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+**Contributors to this release:**
+
+@abcang
+@Gargron
+@Jehops
+@lynlynlynx
+@m4sk1n
+@pfm-eyesightjp
+@Quent-in
+@trebmuh
+@unarist
+@voidsatisfaction
+@ykzts ",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/7694887/assets,https://api.github.com/repos/tootsuite/mastodon/releases/7694887,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.6.0rc4,https://github.com/tootsuite/mastodon/releases/tag/v1.6.0rc4,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.6.0rc4,v1.6.0rc4,False,True
+7658396,2017-09-06T18:57:52Z,2017-09-06T19:01:02Z,v1.6.0rc3,"> **Note:** This is a hotfix for RC2. This is technically exactly the same release as 1.6.0rc2, just with a fix to the database migrations. You wouldn't encounter problems unless your statuses table is really, really big, so if you already successfully upgraded to RC2, you don't have to do anything. It is preferable you upgrade to this version straight away though, if you haven't.",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/7658396/assets,https://api.github.com/repos/tootsuite/mastodon/releases/7658396,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.6.0rc3,https://github.com/tootsuite/mastodon/releases/tag/v1.6.0rc3,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.6.0rc3,v1.6.0rc3,False,True
+7657174,2017-09-06T17:02:03Z,2017-09-06T17:33:45Z,v1.6.0rc2,"![Mastodon](https://i.imgur.com/NhZc40l.png)
+
+**Fixes:**
+
+- Fix short number locales (#4790)
+- Fix a problem that notification column goes to top (#4792)
+- Use correct syntax for content preloading (#4798)
+- Fix streaming url to lowercase (#4804)
+- Show pinned statuses only in the top of the profile page (#4803)
+- Fix some ActivityPub JSON bugs (#4796)
+- Add new index on notifications to make filtering faster (#4750)
+- Adjust status embeds (#4808)
+- Restore instant follow in API response when account is unlocked (#4799)
+- Fix mentions in direct statuses not being delivered via AP (#4806)
+- Do not execute the job with the same arguments as the retry job (#4814)
+- Fix text position of NSFW for video file (#4819)
+- Fix scroll position (#4821)
+- Add Smartphone screen favourite back button and adjust styles (#4813)
+- Make new statuses use the same URI format in both ActivityPub and OStatus (fixes threading issue in OStatus) (#4815)
+
+**Features:**
+
+- OpenStack Swift support as alternative to S3 📎 (#2322, #4816)
+
+**Upgrade notes:**
+
+Non-Docker only:
+
+- Dependency updates: `bundle install` and `yarn install`
+
+Both Docker and non-Docker:
+
+- This release includes database migrations, that means you need to run `RAILS_ENV=production bundle exec rails db:migrate` (in Docker: `docker-compose run --rm web rails db:migrate`).
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+- After database migrations, clean out old preview cards thumbnails with `RAILS_ENV=production bundle exec rails mastodon:maintenance:remove_deprecated_preview_cards` (in Docker: `docker-compose run --rm web rails mastodon:maintenance:remove_deprecated_preview_cards`)
+
+**Contributors to this release:**
+
+@abcang
+@akihikodaki
+@andydrop
+@BoFFire
+@clworld
+@diomed
+@Gargron
+@lynlynlynx
+@mabkenar
+@nullkal
+@pfm-eyesightjp
+@Quent-in
+@takayamaki
+@thurloat
+@treyssatvincent
+@voidsatisfaction
+@ykzts",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/7657174/assets,https://api.github.com/repos/tootsuite/mastodon/releases/7657174,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.6.0rc2,https://github.com/tootsuite/mastodon/releases/tag/v1.6.0rc2,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.6.0rc2,v1.6.0rc2,False,True
+7616192,2017-09-02T23:12:05Z,2017-09-03T00:16:50Z,v1.6.0rc1,"![Mastodon](https://i.imgur.com/NhZc40l.png)
+
+> **ActivityPub** is a new federated web protocol. From this release onward it is the **primary protocol of Mastodon**. We will remain compatible with OStatus for the foreseeable future, but version 2.0 of Mastodon will stop sending private toots over it. After installation, accounts in the database will slowly start upgrading. One of the immediate and obvious perks of this new protocol is more complete conversation views on every instance (presuming all participants are upgraded). For more, [see this blog post](https://www.patreon.com/posts/progress-report-14076545).
+
+
+**Fixes:**
+
+- During Docker build: Use multiple cores in bundler and make (#4544)
+- Web perf: Cache status height (#4439)
+- Fixes to the about page (#4554, #4548, #4682) 
+- Add missing content type on throttled responses (#4558)
+- Add coalesce option to avatar and header convert processor (#4552)
+- Add missing @ to the onboarding modal (#4560)
+- Add missing scroll to top to some column headers (#4563)
+- Add favourited toot to favourites column (#4562)
+- Remove toot from favorites column when unfavorited (#4597)
+- Fix emoji picker scrollbar style (#4572)
+- Extend Devise remember_me longevity to 1 year instead of 2 weeks (#4587)
+- Fix search (regression from #4589) (#4594)
+- Fix require_user! behavior when not logged in (#4604)
+- Don't send Link header when prev and next links are empty (#4633)
+- Re-add missing token authorization for /api/v1/verify_credentials (#4650)
+- Refactored streaming connections (#4645)
+- Do not try to re-subscribe to unsubscribed accounts (#4653)
+- Fix visual line-break glitch with .invisible parts of links (#4655)
+- Increase contrast in landing pages (#4567)
+- Periodically remove expired PuSH subscribers (#4654)
+- Disable babel-loader cache when in development environment (#4684)
+- Don't load Roboto webfont when system font is used in the app (#4591) 
+- Automatically authorize pending incoming follow requests after unlocking account (#4658)
+- Adjust RTL styles (#4712)
+- Do not scroll the columns area due to redirection (#4541)
+-	Remove unnecessary indices (#4738)
+- Add close tag of iframe for OEmbed response (#4745)
+- Docker: Update to Alpine 3.6 (#4747)
+- Make first use less overwhelming with browser permissions: Ask for desktop notifications after 1 minute, ask to register protocol handler after 5 minutes (#4760)
+- Use system's default font (when selected) on non web UI pages too (#4553)
+- Link previews storage and fetching reworked/optimized (#4642) 
+- Fix text position of ""sensitive content"" spoiler in Safari (Mac/iPhone) (#4570)
+- Make ""unfollow"" remove pending outgoing follow requests too (#4781)
+- Validate presence of data in imports (#4782)
+
+**Features**:
+
+- 🎆🎇 **ActivityPub** 🎇🎆
+  - **Security**:
+    - Digest header on requests with body (#4565)
+    - Add handling of Linked Data Signatures in payloads (#4687, #4752)
+    - Support more variations of ActivityPub keyId in signature (#4630)
+  - **Plumbing**:
+    - Incoming processing (#4216, #4571, #4595, #4601, #4629, #4639, #4728, #4729, #4763, #4754, #4761)
+    - Delivery (#4566, #4703, #4704, #4739)
+    - Improvements to representation of entities (#4592, #4737, #4764, #4767, #4779)
+  - **Protocol upgrade**:
+    - Migration from OStatus (#4583, #4593, #4623, #4631, #4632, #4617, #4662, #4582, #4702, #4730, #4756, #4766)
+    - Alternate links to ActivityPub resources from HTML/HEAD variants (#4586)
+    - Hook up URL-based resource look-up to ActivityPub (#4589, #4661, #4599, #4668, #4672)
+  - **User-facing**:
+    - Update admin view for ActivityPub users (#4600, #4622)
+    - Forward ActivityPub deletes to followers of rebloggers (#4706)
+    - Forward ActivityPub replies to local statuses to followers of authors (#4709)
+- Include the stats from the /about/more page in API response about instance (#4074)
+- Add **protocol handler**. Mastodon can now respond to URLs that begin with `web+mastodon://`, e.g. specially crafted ""follow me"" buttons would automatically open your correct instance from any webpage (#4511)
+  - `web+mastodon://follow?uri=alice@example.com` opens follow dialog for alice
+  - `web+mastodon://share?text=Lorem+ipsum` opens new toot dialog with preset text ""Lorem ipsum""
+- **Redesign public profiles**. Add no-replies, with-replies, only-media filters (#4608, #4711, #4713)
+- **Developer UI for OAuth applications** (#2758, #4664, #4671)
+- Add Mastodon::Source.url for forks (#4643)
+- **Pinned statuses** (#4675, #4690)
+- Update status embeds with better URLs, better design, branded follow button using protocol handler (#4742)
+- ""Embed"" modal in web UI (#4748, #4759, #4773)
+
+**Upgrade notes:**
+
+Non-Docker only:
+
+- Dependency updates: `bundle install` and `yarn install`
+
+Both Docker and non-Docker:
+
+- This release includes database migrations, that means you need to run `RAILS_ENV=production bundle exec rails db:migrate` (in Docker: `docker-compose run --rm web rails db:migrate`).
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+**Contributors to this release:**
+
+@abcang
+@akihikodaki
+@algernon
+@anneau
+@clworld
+@contraexemplo
+@cygnan
+@ekiru
+@eramdam
+@Gargron
+@lynlynlynx
+@m4sk1n
+@masarakki
+@mayaeh
+@MightyPork
+@MitarashiDango
+@miuchan
+@muffinista
+@nightpool
+@nullkal
+@pfm-eyesightjp
+@Quent-in
+@rkarabut
+@salvadorpla
+@sorin-davidoi
+@Sylvhem
+@takayamaki
+@TheInventrix
+@ThomasLeister
+@unarist
+@vahnj
+@Wonderfall
+@ykzts
+@yukimochi
+@zunda",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/7616192/assets,https://api.github.com/repos/tootsuite/mastodon/releases/7616192,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.6.0rc1,https://github.com/tootsuite/mastodon/releases/tag/v1.6.0rc1,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.6.0rc1,v1.6.0rc1,False,True
+7298760,2017-08-06T21:53:25Z,2017-08-06T21:58:53Z,v1.5.1,"![Mastodon](https://i.imgur.com/NhZc40l.png)
+
+**Fixes**:
+
+- **Critical**: Fix WebFinger regression that some servers experience (#4527)
+- Use correct keys for keyboard navigation (#4487)
+- Fix column-back-button style for some browsers (#4484) 
+- Don't normalize invalid domain names (#4499)
+- Make number of comparison in emojify() fewer (#4500)
+- Redirect to PasswordController#new when reset_password_token is invalid (#4506)
+- Enable cache for babel-loader (#4505)
+- Docker: Use GNU libiconv in Nokogiri (#4494)
+- Scroll columns area to right when children property is changed (#4517)
+- Add ""signed in as"" header to some pages (#4523)
+
+**Upgrade notes:**
+
+Non-Docker only:
+
+- Dependency updates: `bundle install`
+
+Both Docker and non-Docker:
+
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+**Contributors to this release:**
+
+TBA",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/7298760/assets,https://api.github.com/repos/tootsuite/mastodon/releases/7298760,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.5.1,https://github.com/tootsuite/mastodon/releases/tag/v1.5.1,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.5.1,v1.5.1,False,False
+7241733,2017-08-01T13:12:07Z,2017-08-01T13:17:39Z,v1.5.0,"![Mastodon](https://i.imgur.com/NhZc40l.png)
+
+**Fixes:**
+
+- Increased threshold for triggering a swipe on mobile (#4037)
+- Faster emojify (#4049)
+- Process links in toots on update as well a mount (#4042)
+- Faster JSON generation (#4090)
+- Fix verified feed author not being enforced when processing feed (#4092)
+- Fix sessions getting forgotten too soon (#4091)
+- Lazy load less used components in web UI (#3879)
+- Change account link to admin account link on report page (#4119)
+- GIF autoplay now defaults to off (#4132) 
+- Improve PuSH resubscription scheduling (#4142)
+- Reduce webpack memory usage (#4139)
+- /api/v1/search now requires authentication (#4155)
+- Do not make HTTP roundtrip when resolving local URL (#4160)
+- Add background color for spoiler input, like toot textarea (#4181)
+- Make tag search case insensitive again (#4184)
+- Store emojis as unicode (#4189) 
+- Fix subsequent replies to unresolved status not being filtered from home timeline (#4190)
+- HTTP signatures: connect signed PuSH subscription requests to instance domain, removes the drawback of serving Mastodon from a subdomain (#4146, #4205)
+- Optimize uri normalization (#4212) 
+- Exclude self toots from regular expression filter (#4245)
+- Mutes now block notifications (#4300)
+- Change ""Content Warning"" to ""Write your warning here"" (#4313)
+- No scrollbar if not needed (#4350)
+- Exit early in load function (#4349)
+- Use passive wheel listener (#4348)
+- Update Capistrano lock version in config/deploy.rb (#4352)
+- Guard against missing ref (#4353)
+- Send short account URL to remote instance (regression from #3844) (#4355)
+- Allow longer link text on landing page (reduce padding for Mobile) (#4363)
+- Fix multiple-gif display in user page (#4364)
+- Adjust mobile landing page (#4366)
+- Added external link icons to joinmastodon navbar buttons (#4368)
+- Improve accessibility (#4369, #4377, #4405, #4408, #4417)
+- Add index favourites on account_id and id (#4360)
+- Fix padding in hero container of landing page (#4373)
+- s/PubSubHubbub/WebSub/g (#4372)
+- Fix crash when heading is undefined (#4378)
+- Guard against deleted notifications (#4379)
+- Manually set tabs style when swiping (#4320)
+- Fix infinite scroll fluidity (#4381)
+- Accept backup codes for disabling 2FA (#4382)
+- Add callback_url/acct information for Sidekiq PuSH workers Exception. (#4281)
+- Fix multipoint shortcode bug (#4387)
+- Fix an error when a user tries to search nonexistent remote user (regression from #4275) (#4400)
+- Add default settings for user (#4393)
+- [nanobox] Minor tweaks for 1.5 (#4395)
+- Fallback to site_hostname when site_title is empty (#4394)
+- Use star icon for favourite action (#4396)
+- Fix timeline height on landing page for Safari (#4392)
+- Symlink sw.js to assets/sw.js (#4357)
+- Web push notifications: Do not hard reload tab (#4380)
+- Web push notifications: Group notifications (#4388)
+- Remove hash from chunk filename when dev env (#4411)
+- Fix column header in landing page (regression from #4405) (#4416)
+- Fix protruded information board section in about/more page (#4415)
+- Unify webpackChunkName to lowercase (#4412)
+- Fix current session not being displayed in sessions list (#4424)
+- When PuSH subscribe attempts are exhausted, unsubscribe (#4422)
+- Fix guard clause in WebPushNotificationWorker (#4421)
+- Use consistent icons for web push notifications, same as web UI (#4426)
+- Fix web push notifications ""boost"" icon not being loaded (regression from #4426) (#4431)
+- Accessability fixes (#4432)
+- Allow animation to end before navigating (#4429)
+- Improve accessibility (#4435, #4457)
+- Don't add tabIndex to wrapped status (#4437)
+- Fix autocomplete option in haml files (#4438)
+- Avoid optimization for non-touch devices (#4444)
+- Use a fainted text color for `<hr>` elements in the landing page (#4443)
+- Set contact address in about/more as mailto link  (#4450)
+- Remove outline from focused toot (#4448)
+- Change to sensitive when adding content warning from web UI (#4456)
+- Disable sensitive button when with content warnings (#4460)
+- Fix button overflow on confirmation modal for mobile (#4465)
+
+**Features**:
+
+- Customize privacy policy from admin UI (#4062)
+- Setting to use native system font in web UI (#4033)
+- Nanobox: automated backups (#4023) 
+- Swipe animations on mobile web UI (#4105)
+- /api/v1/accounts/verify_credentials now returns user's chosen privacy default (#4075)
+- New preference: always mark media as sensitive (#4136)
+- Success page when remote following someone (#4129)
+- New landing page with public timeline (can be disabled by admin) (#4122)
+- Rake task to redownload avatars/headers (#4156) 
+- Improved design of admin settings (#4163)
+- Whenever content warning is preset, media sensitivity is also enforced (#4176)
+- Web Push Notifications (#3243)
+- Adjustable time period for `mastodon:media:remove_remote` (#4191)
+- Add option to opt out of search engines on public profile/status pages (#4199)
+- Pin favourites column (#4201)
+- Improve ActivityPub representations (#3844)
+- Add unfollow modal (optional) (#4246)
+- Add feature to revoke sessions (#4259)
+- Add admin button to re-subscribe to all accounts from a domain (#4285)
+- Show avatar/header on edit profile page (#4288)
+- Add rake task mastodon:feeds:build to regenerate all active users' feeds (#4303)
+- New logo (#4306)
+- Add loading indicator animation (#4316)
+- Allow domain blocks that only reject media without silencing or suspending (#4325)
+- Redesign extended information page (#4322)
+- Redesign terms page (#4338)
+- Improve remote profile disclaimer (#4342)
+- Web share button (#4365, #4402)
+- Open dropdown menu as modal on mobile (#4295)
+- Count all URLs in text as 23 characters flat, do not count domain part of usernames (#4427)
+
+**Upgrade notes:**
+
+Non-Docker only:
+
+- New system package dependencies: `libicu-dev libidn11-dev`
+- Dependency updates: `bundle install` and `yarn install`
+
+Both Docker and non-Docker:
+
+- To enable Web Push notifications, you should generate a few extra secrets and put them into your environment (usually `.env.production`). Generate the secrets/variables with: `RAILS_ENV=production bundle exec rake mastodon:webpush:generate_vapid_key` (in Docker: `docker-compose run --rm web rake mastodon:webpush:generate_vapid_key`)
+- This release includes database migrations, that means you need to run `RAILS_ENV=production bundle exec rails db:migrate` (in Docker: `docker-compose run --rm web rails db:migrate`). There are some column data updates, so the migration may take a while if your tables have many rows. If you get a lock error, you'll need to shut down the Mastodon web process during the upgrade.
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+- The file `sw.js` (service worker definition) served from the public directory should be served with no cache headers or cache headers with max-age 0 (basically, don't cache it)
+- There are no more mandatory regular cronjobs, because all important tasks have been moved to Sidekiq. Deprecated rake tasks like `mastodon:daily` now do nothing.
+
+If push notifications are not being sent and the server logs show errors like `Webpush::InvalidSubscription - 400 Unauthorized Registration` or `Request did not validate Invalid bearer token: Auth > 24 hours in the future`, most likely the server time is not accurate (you can use `ntp` to synchronize it and prevent it from drifting).
+
+If you're upgrading from a version prior to 1.4.2, you may need to run the following command to prepare for the 1.4.2 referential integrity migration: 
+
+ - `RAILS_ENV=production bundle exec rails mastodon:maintenance:prepare_for_foreign_keys` (in Docker: `docker-compose run --rm web rails mastodon:maintenance:prepare_for_foreign_keys`)
+
+**Contributors to this release:**
+
+@aaribaud
+@abcang
+@akihikodaki
+@clworld
+@cygnan
+@danhunsaker
+@eramdam
+@Gargron
+@ignisf
+@jeroenpraat
+@Komic
+@lindwurm
+@lynlynlynx
+@m4sk1n
+@mabkenar
+@masarakki
+@mayaeh
+@MightyPork
+@MitarashiDango
+@nightpool
+@nullkal
+@Quent-in
+@rkarabut
+@schas002
+@ScienJus
+@sdukhovni
+@skoji
+@sorin-davidoi
+@Sylvhem
+@ThibG
+@unarist
+@ykzts
+@yukimochi",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/7241733/assets,https://api.github.com/repos/tootsuite/mastodon/releases/7241733,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.5.0,https://github.com/tootsuite/mastodon/releases/tag/v1.5.0,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.5.0,v1.5.0,False,False
+7228327,2017-07-31T13:28:36Z,2017-07-31T13:34:45Z,v1.5.0rc3,"![Mastodon](https://i.imgur.com/NhZc40l.png)
+
+**Fixes:**
+
+- Fix web push notifications ""boost"" icon not being loaded (regression from #4426) (#4431)
+- Accessability fixes (#4432)
+- Allow animation to end before navigating (#4429)
+- Improve accessibility (#4435, #4457)
+- Don't add tabIndex to wrapped status (#4437)
+- Fix autocomplete option in haml files (#4438)
+- Avoid optimization for non-touch devices (#4444)
+- Use a fainted text color for `<hr>` elements in the landing page (#4443)
+- Set contact address in about/more as mailto link  (#4450)
+- Remove outline from focused toot (#4448)
+- Change to sensitive when adding content warning from web UI (#4456)
+- Disable sensitive button when with content warnings (#4460)
+- Fix button overflow on confirmation modal for mobile (#4465)
+
+**Features**:
+
+- Count all URLs in text as 23 characters flat, do not count domain part of usernames (#4427)
+
+**Upgrade notes:**
+
+Both Docker and non-Docker:
+
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+**Contributors to this release:**
+
+@eramdam
+@Gargron
+@jeroenpraat
+@lynlynlynx
+@m4sk1n
+@masarakki
+@MitarashiDango
+@sorin-davidoi
+@unarist
+@ykzts",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/7228327/assets,https://api.github.com/repos/tootsuite/mastodon/releases/7228327,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.5.0rc3,https://github.com/tootsuite/mastodon/releases/tag/v1.5.0rc3,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.5.0rc3,v1.5.0rc3,False,True
+7209152,2017-07-28T16:13:42Z,2017-07-28T16:14:19Z,v1.5.0rc2,"![Mastodon](https://i.imgur.com/NhZc40l.png)
+
+**Fixes:**
+
+- No scrollbar if not needed (#4350)
+- Exit early in load function (#4349)
+- Use passive wheel listener (#4348)
+- Update Capistrano lock version in config/deploy.rb (#4352)
+- Guard against missing ref (#4353)
+- Send short account URL to remote instance (regression from #3844) (#4355)
+- Allow longer link text on landing page (reduce padding for Mobile) (#4363)
+- Fix multiple-gif display in user page (#4364)
+- Adjust mobile landing page (#4366)
+- Added external link icons to joinmastodon navbar buttons (#4368)
+- Improve accessibility (#4369, #4377, #4405, #4408, #4417)
+- Add index favourites on account_id and id (#4360)
+- Fix padding in hero container of landing page (#4373)
+- s/PubSubHubbub/WebSub/g (#4372)
+- Fix crash when heading is undefined (#4378)
+- Guard against deleted notifications (#4379)
+- Manually set tabs style when swiping (#4320)
+- Fix infinite scroll fluidity (#4381)
+- Accept backup codes for disabling 2FA (#4382)
+- Add callback_url/acct information for Sidekiq PuSH workers Exception. (#4281)
+- Fix multipoint shortcode bug (#4387)
+- Fix an error when a user tries to search nonexistent remote user (regression from #4275) (#4400)
+- Add default settings for user (#4393)
+- [nanobox] Minor tweaks for 1.5 (#4395)
+- Fallback to site_hostname when site_title is empty (#4394)
+- Use star icon for favourite action (#4396)
+- Fix timeline height on landing page for Safari (#4392)
+- Symlink sw.js to assets/sw.js (#4357)
+- Web push notifications: Do not hard reload tab (#4380)
+- Web push notifications: Group notifications (#4388)
+- Remove hash from chunk filename when dev env (#4411)
+- Fix column header in landing page (regression from #4405) (#4416)
+- Fix protruded information board section in about/more page (#4415)
+- Unify webpackChunkName to lowercase (#4412)
+- Fix current session not being displayed in sessions list (#4424)
+- When PuSH subscribe attempts are exhausted, unsubscribe (#4422)
+- Fix guard clause in WebPushNotificationWorker (#4421)
+- Use consistent icons for web push notifications, same as web UI (#4426)
+
+**Features**:
+
+- Web share button (#4365, #4402)
+- Open dropdown menu as modal on mobile (#4295)
+
+**Upgrade notes:**
+
+Non-Docker only:
+
+- Dependency updates: `bundle install` and `yarn install`
+
+Both Docker and non-Docker:
+
+- This release includes database migrations, that means you need to run `RAILS_ENV=production bundle exec rails db:migrate` (in Docker: `docker-compose run --rm web rails db:migrate`)
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+**Contributors to this release:**
+
+@akihikodaki
+@clworld
+@danhunsaker
+@Gargron
+@ignisf
+@jeroenpraat
+@Komic
+@lynlynlynx
+@m4sk1n
+@mayaeh
+@MightyPork
+@nullkal
+@Quent-in
+@rkarabut
+@skoji
+@sorin-davidoi
+@unarist
+@ykzts",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/7209152/assets,https://api.github.com/repos/tootsuite/mastodon/releases/7209152,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.5.0rc2,https://github.com/tootsuite/mastodon/releases/tag/v1.5.0rc2,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.5.0rc2,v1.5.0rc2,False,True
+7148881,2017-07-24T18:05:29Z,2017-07-24T19:21:03Z,v1.5.0rc1,"![Mastodon](https://i.imgur.com/NhZc40l.png)
+
+**Fixes:**
+
+- Increased threshold for triggering a swipe on mobile (#4037)
+- Faster emojify (#4049)
+- Process links in toots on update as well a mount (#4042)
+- Faster JSON generation (#4090)
+- Fix verified feed author not being enforced when processing feed (#4092)
+- Fix sessions getting forgotten too soon (#4091)
+- Lazy load less used components in web UI (#3879)
+- Change account link to admin account link on report page (#4119)
+- GIF autoplay now defaults to off (#4132) 
+- Improve PuSH resubscription scheduling (#4142)
+- Reduce webpack memory usage (#4139)
+- /api/v1/search now requires authentication (#4155)
+- Do not make HTTP roundtrip when resolving local URL (#4160)
+- Add background color for spoiler input, like toot textarea (#4181)
+- Make tag search case insensitive again (#4184)
+- Store emojis as unicode (#4189) 
+- Fix subsequent replies to unresolved status not being filtered from home timeline (#4190)
+- HTTP signatures: connect signed PuSH subscription requests to instance domain, removes the drawback of serving Mastodon from a subdomain (#4146, #4205)
+- Optimize uri normalization (#4212) 
+- Exclude self toots from regular expression filter (#4245)
+- Mutes now block notifications (#4300)
+- Change ""Content Warning"" to ""Write your warning here"" (#4313)
+
+**Features**:
+
+- Customize privacy policy from admin UI (#4062)
+- Setting to use native system font in web UI (#4033)
+- Nanobox: automated backups (#4023) 
+- Swipe animations on mobile web UI (#4105)
+- /api/v1/accounts/verify_credentials now returns user's chosen privacy default (#4075)
+- New preference: always mark media as sensitive (#4136)
+- Success page when remote following someone (#4129)
+- New landing page with public timeline (can be disabled by admin) (#4122)
+- Rake task to redownload avatars/headers (#4156) 
+- Improved design of admin settings (#4163)
+- Whenever content warning is preset, media sensitivity is also enforced (#4176)
+- Web Push Notifications (#3243)
+- Adjustable time period for `mastodon:media:remove_remote` (#4191)
+- Add option to opt out of search engines on public profile/status pages (#4199)
+- Pin favourites column (#4201)
+- Improve ActivityPub representations (#3844)
+- Add unfollow modal (optional) (#4246)
+- Add feature to revoke sessions (#4259)
+- Add admin button to re-subscribe to all accounts from a domain (#4285)
+- Show avatar/header on edit profile page (#4288)
+- Add rake task mastodon:feeds:build to regenerate all active users' feeds (#4303)
+- New logo (#4306)
+- Add loading indicator animation (#4316)
+- Allow domain blocks that only reject media without silencing or suspending (#4325)
+- Redesign extended information page (#4322)
+- Redesign terms page (#4338)
+- Improve remote profile disclaimer (#4342)
+
+**Upgrade notes:**
+
+Non-Docker only:
+
+- New system package dependencies: `libicu-dev libidn11-dev`
+- Dependency updates: `bundle install` and `yarn install`
+
+Both Docker and non-Docker:
+
+- To enable Web Push notifications, you should generate a few extra secrets and put them into your environment (usually `.env.production`). Generate the secrets/variables with: `RAILS_ENV=production bundle exec rake mastodon:webpush:generate_vapid_key` (in Docker: `docker-compose run --rm web rake mastodon:webpush:generate_vapid_key`)
+- This release includes database migrations, that means you need to run `RAILS_ENV=production bundle exec rails db:migrate` (in Docker: `docker-compose run --rm web rails db:migrate`)
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+- The file `sw.js` (service worker definition) served from the public directory should be served with max-age 0 (no caching)
+- There are no more mandatory regular cronjobs, because all important tasks have been moved to Sidekiq. Deprecated rake tasks like `mastodon:daily` now do nothing.
+
+**Contributors to this release:**
+
+@aaribaud
+@abcang
+@akihikodaki
+@cygnan
+@danhunsaker
+@eramdam
+@ernix
+@Gargron
+@jeroenpraat
+@lindwurm
+@lynlynlynx
+@m4sk1n
+@masarakki
+@MightyPork
+@mistermantas
+@Mnkai
+@nightpool
+@nolanlawson
+@noraworld
+@nullkal
+@Quent-in
+@rkarabut
+@schas002
+@sdukhovni
+@sorin-davidoi
+@staticsafe
+@STJrInuyasha
+@Sylvhem
+@ThibG
+@unarist
+@unstabler
+@ykzts
+@yukimochi",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/7148881/assets,https://api.github.com/repos/tootsuite/mastodon/releases/7148881,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.5.0rc1,https://github.com/tootsuite/mastodon/releases/tag/v1.5.0rc1,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.5.0rc1,v1.5.0rc1,False,True
+6901430,2017-07-01T12:50:10Z,2017-07-01T12:50:33Z,v1.4.7,"**Fixes:**
+
+- Security fix: access tokens used by web UI are now session-bound instead of reused between sessions (#3940)
+- Security fix: require 2FA token to disable 2FA (#3935)
+- Fix ""favourites"" page not working in web UI (#3925)
+- Fix elephant in onboarding modal being very small on mobile (#3932)
+- Fix incorrect aspect ratio on some preview images in image modal (#3966)
+- Fix jittery timelines (#3972)
+- Fix order of processing when regenerating home feeds from scratch (#3984)
+- Optimize number of commands when trimming home feeds (#3989)
+- Optimize regenerating home feeds (#3990)
+- Optimize emoji replacements in web UI (#4019) 
+- Check external changes to textarea before submitting (Grammarly support) (#3632)
+- ""Credentials"" page renamed to ""Security"" (#3941)
+- Remove babel compilation step from streaming API server (#3950)
+- Detect more Salmon delivery failures and retry (#3960)
+
+**Features**:
+
+- Swipeable columns, media, onboarding modal on mobile (#3643, #3934)
+- Login sessions tracking (under ""Security"") (#3616, #3929)
+- Admins now receive e-mails about new reports in the system (#3949)
+- Responsive images in media gallery for higher res on high DPI devices (#3963)
+- New rake task to create a user account from the command line (`mastodon:add_user`) (#1482)
+- Report screen is now a modal instead of a column (#3965)
+
+**Upgrade notes:**
+
+Non-Docker only:
+
+- Dependency updates: `bundle install` and `yarn install`
+
+Both Docker and non-Docker:
+
+- This release includes database migrations, that means you need to run `RAILS_ENV=production bundle exec rails db:migrate` (in Docker: `docker-compose run --rm web rails db:migrate`)
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+**Contributors to this release:**
+
+@abcang
+@akihikodaki
+@Aldarone
+@amazedkoumei
+@danhunsaker
+@debanshuk
+@Gargron
+@ikuradon
+@M1dgard
+@m4sk1n
+@mjankowski
+@nolanlawson
+@pfm-eyesightjp
+@sorin-davidoi
+@ThibG
+@unarist
+@ykzts
+@yukimochi",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6901430/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6901430,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.4.7,https://github.com/tootsuite/mastodon/releases/tag/v1.4.7,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.4.7,v1.4.7,False,False
+6816888,2017-06-23T15:02:14Z,2017-06-23T15:34:36Z,v1.4.6,"**Fixes:**
+
+- Bumps the version up to 1.4.6 properly, unlike 1.4.5 which reports itself as 1.4.4
+- Setting toggles properly connected to their labels (#3907)
+
+**Upgrade notes:**
+
+Both Docker and non-Docker:
+
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+**Upgrade notes if you are upgrading straight from 1.4.3:**
+
+Non-Docker only:
+
+- Dependency updates: `bundle install` and `yarn install`
+
+Both Docker and non-Docker:
+
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+**Contributors:**
+
+@Gargron
+@ykzts",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6816888/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6816888,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.4.6,https://github.com/tootsuite/mastodon/releases/tag/v1.4.6,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.4.6,v1.4.6,False,False
+6809812,2017-06-22T21:28:58Z,2017-06-23T01:53:07Z,v1.4.5,"*Note: It is recommended to upgrade straight to 1.4.6*
+
+Fixes performance regression in 1.4.4 (#3892)
+
+**Contributors:**
+
+@akihikodaki
+@foxsan48
+@Gargron
+@nightpool
+@Quent-in
+@rkarabut
+@unarist",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6809812/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6809812,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.4.5,https://github.com/tootsuite/mastodon/releases/tag/v1.4.5,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.4.5,v1.4.5,False,False
+6778650,2017-06-20T23:37:15Z,2017-06-20T23:53:25Z,v1.4.4,"*Note: It is recommended to upgrade straight to 1.4.6*
+
+**Fixes:**
+
+- Whitelist allowed classes for federated statuses (no more spinning) (#3810)
+- Debounce autosuggestions (#3836)
+- Fix hashtag timelines not updating in real time (#3849)
+- Fix character/grapheme count stuff (#3839)
+- Account deletions can be disabled as an instance setting (#3852)
+- Set cursor: pointer only when necessary (#3857)
+- Clicking on the CW text should expand the status (#3855)
+- Fix RTL detection on Ruby side (#3867)
+- ""NSFW"" button replaced with eye icon, consistent with other UI elements for the function (#3759)
+- Filter direct statuses in Status.as_home_timeline (#3842)
+- Fix remote conversation URIs not being recorded (#3870)
+- Instead of each streaming server subscribing to all redis channels, subscribe on demand (#3828)
+
+**Upgrade notes:**
+
+Non-Docker only:
+
+- Dependency updates: `bundle install` and `yarn install`
+
+Both Docker and non-Docker:
+
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+**Contributors:**
+
+@ThibG 
+@Gargron 
+@ykzts 
+@abcang 
+@unarist 
+@akihikodaki 
+@Quent-in 
+@nightpool 
+@nolanlawson 
+@alpaca-tc 
+@marrus-sh 
+@zunda 
+@masarakki 
+@noraworld 
+@m4sk1n 
+@sorin-davidoi 
+@deflis ",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6778650/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6778650,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.4.4,https://github.com/tootsuite/mastodon/releases/tag/v1.4.4,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.4.4,v1.4.4,False,False
+6718937,2017-06-15T01:03:42Z,2017-06-15T01:17:27Z,v1.4.3,"**This is a hotfix release**
+
+Unfortunately right after v1.4.2 went out, I was informed of a regression from one of the pull requests. This wasn't noticed earlier even though it was up for testing on mastodon.social and glitch.social for a week. This is an important privacy bug (#3752) that we fixed immediately after being informed of it.
+
+**No special upgrade instructions are necessary**. This release is otherwise identical to v1.4.2. Only the code needs to be updated.",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6718937/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6718937,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.4.3,https://github.com/tootsuite/mastodon/releases/tag/v1.4.3,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.4.3,v1.4.3,False,False
+6714320,2017-06-14T21:07:06Z,2017-06-14T21:29:24Z,v1.4.2,"**Fixes:**
+
+- JS performance improvements (#3402, #3300, #3475)
+- Unauthorized websockets access returns 401 instead of closing connection (#3411)
+- Fix webpack building on Windows (#3426)
+- Fix crash in TW locale (#3459)
+- Focus submit button on boost modal (#3494)
+- Usernames and hashtags no longer have influence over language detection (#3503)
+- Update Rails from 5.0.x to 5.1.x (#3121) 
+- Add missing database indices (#3510)
+- Clicking label influences the connected toggle (#3530)
+- Only push updates to streaming API for recipients who are signed in to the streaming API (#3278)
+- Bulk pushes to sidekiq (#3536)
+- Refocus textarea after tooting (#3537)
+- Fix limits param in favourites controller (#3553)
+- No-op when following an already followed account (#3575)
+- No-op when favouriting/reblogging toot that has already been favourited/reblogged (#3641)
+- Fix embed page being broken (#3577)
+- Introduce foreign key constraints (#3562)
+- Fix failing thread resolving (#3599, #3622) 
+- Fix exact hashtag search (#3611)
+- Fix crash when searching for invalid URLs (#3613)
+- Don't show business e-mail if it's blank (#3619)
+- Allow class attribute on anchors during sanitization to preserve microformats (#3623)
+- Display error message if JS is disabled (#3634)
+- Fix race condition when resolving remote account (#3606)
+- Support multiple trusted proxies (#3639)
+- When language cannot be reliably detected, set it to nil instead of to default locale of instance (#3666) 
+- Fix RTL styles (#3669)
+- Improve RTL detection by ignoring whitespace, usernames, URLs and hashtags (#3682) 
+- Fix issue where some Node.js versions wouldn't have ""includes"" function and the streaming API would crash (#3667)
+- Fix case sensitive e-mail check (#3688)
+- Fix deletion of toot sending the original toot to mentioned addresses instead of the ""delete"" Salmon (#3672)
+- Fix incompatibility with Hubzilla Salmon slaps (#3699)
+- Fix badly positioned unread indicator in column (#3720)
+- Fix unclickable onboarding modal links (#3724)
+- Adjust quality settings of GIFs converted to MP4s to actually save space (#3723)
+- Link the project website from ""powered by"" links (#3725)
+- Fix content jumping on scroll sometimes (#3734)
+- While the home feed is being regenerated for a returning user, display live results from database instead of nothing (#3721)
+- Batch status deletes for performance and less cross-instance payloads, when suspending accounts (#3735)
+- Save column settings when they are changed rather than when the area is collapsed (#3743)
+- Suspended/deleted accounts no longer come up in search/autocomplete (#3728)
+
+**Features:**
+
+- Columns can be pinned, unpinned and moved (#3207)
+- Regex filters on local and federated timelines (#3564)
+- Preference for confirmation dialog on toot deletion (#3368)
+- Simplify stylesheets customization again (#3373)
+- Configurable reserved usernames, so people can't register e.g. ""admin"", ""support"", etc (#3566)
+- Dynamic app manifest so ""Add to homescreen"" will use configured instance name etc (#3563) 
+- Image viewer modal uses low-res preview images before full-res is loaded for immediate feedback (#3595)
+- Admin buttons to control PuSH subscription to a remote account (#3640)
+- Admin button to re-download avatar/header of remote account (#3640)
+- Account deletion (#3728)
+
+**Upgrade notes:**
+
+This release adds database-level constraints for ensure cross-referential integrity. Previously, incorrect records could have persisted due to race conditions and request timeouts in the Ruby codebase. Because Postgres cannot create the constraints if violations of the constraints already exist, I have written a rake task for cleaning up the incorrect records in the database that you should execute before the migration.
+
+If for some reason you cannot deploy the code first without running database migrations in the process (e.g. Capistrano deployments), you can simply [copypaste the code from the rake task](https://github.com/tootsuite/mastodon/blob/master/lib/tasks/mastodon.rake#L182) into the Rails console and execute it that way.
+
+Because of how Postgres executes the creation of foreign keys, if Mastodon activity is happening at the same time, the migration may fail with a ""deadlock"". In such a case I recommend disabling user access to Mastodon during the migration, which shouldn't take longer than a minute.
+
+Non-Docker only:
+
+- Dependency updates: `bundle install` and `yarn install`
+
+Both Docker and non-Docker:
+
+- Run the rake task to prepare for the database migrations: `RAILS_ENV=production bundle exec rails mastodon:maintenance:prepare_for_foreign_keys` (in Docker: `docker-compose run --rm web rails mastodon:maintenance:prepare_for_foreign_keys`)
+- This release includes database migrations, that means you need to run `RAILS_ENV=production bundle exec rails db:migrate` (in Docker: `docker-compose run --rm web rails db:migrate`)
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+- The upgrade from Rails 5.0 to 5.1 will break cached entities. Cache lives for 10 minutes, so you can either wait for it to go away after 10 minutes, or clear Rails cache with `RAILS_ENV=production bundle exec rails r Rails.cache.clear` (in Docker: `docker-compose run --rm web rails r Rails.cache.clear`)
+
+**Contributors:**
+@akihikodaki
+@alpaca-tc
+@Artoria2e5
+@caasi
+@ChristopherWMartin
+@clworld
+@danhunsaker
+@diomed
+@fvh-P
+@Gargron
+@harukasan
+@ikuradon
+@jackjennings
+@jeroenpraat
+@jumbosushi
+@lindwurm
+@m4sk1n
+@masarakki
+@mjankowski
+@Naouak
+@nolanlawson
+@nullkal
+@Quent-in
+@reneklacan
+@rkarabut
+@salvadorpla
+@sorin-davidoi
+@STJrInuyasha
+@takayamaki
+@ThibG
+@unarist
+@ykzts
+@yukimochi
+@zunda",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6714320/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6714320,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.4.2,https://github.com/tootsuite/mastodon/releases/tag/v1.4.2,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.4.2,v1.4.2,False,False
+6527264,2017-05-28T17:11:47Z,2017-05-28T17:13:09Z,v1.4rc6,"**Fixes:**
+
+- Reject revoked access_token on Streaming API. (#3367)
+- Improve streaming API cluster logging, fix streaming API hanging up (#3370)
+- Fix Webpack Bundle Analyzer output for Webpacker (#3374)
+- Simplify isIntersecting in status_list.js (#3371)
+- Fix IntersectionObserver isIntersecting in Edge (#3365)
+- Update bootsnap to 0.3.0 (fix xattr.h error) (#3390)
+- Fix video having black border on top (#3392)
+
+**Upgrade notes:**
+
+Non-Docker only:
+
+- Dependency updates: `yarn install` and `bundle install`
+
+Both Docker and non-Docker:
+
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+**Contributors:**
+
+@akihikodaki
+@clworld
+@Gargron
+@mabkenar
+@nolanlawson
+@sterbfly
+@vidarlee",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6527264/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6527264,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.4rc6,https://github.com/tootsuite/mastodon/releases/tag/v1.4rc6,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.4rc6,v1.4rc6,False,True
+6524741,2017-05-28T17:30:38Z,2017-05-28T21:55:34Z,v1.4.1,"**Fixes:**
+
+- Fix boost icon: center vertically (#2690)
+- Fix to completely hide NSFW-tagged images (#2724)
+- Fix width of .confirmation-modal on narrow screens (#2743)
+- Always respond with 200 to PuSH payloads (#2733)
+- Language improvements, replace whatlanguage with CLD (#2753, #2949)
+- Handle out-of-order deletes for statuses (#2734)
+- Replace best_in_place editor on admin settings page (#2789)
+- Performance: Delete records in smaller transaction (#2802)
+- More robust PuSH subscription refreshes (#2799)
+- Use Twitter::Extractor for creating links (#2502)
+- Performance: Optimize follower_accounts and following_accounts (#2820)
+- Performance: Fix slow query in notifications api (#2851)
+- Performance: Add asynchronous emojione-picker (code-splitting) (#2863)
+- Fix a aspect ratio for the embedded video (#2872)
+- Fix local fonts and change font-face values (#2877)
+- Add content-type in pubsubhubhub request header (#2943)
+- Disabled auto focus on toot form when search results are shown. (#2942)
+- Performance: Add `account_id DESC` to optimize PrecomputeFeedService (#2967)
+- Send HEAD request ahead of GET when fetching URL previews (#2972)
+- Fix mention regex to support unicode (#2420)
+- When avatar/header are missing, do not include the missing file into Atom (#2988)
+- Accept own ID for remote follow with and without preceding @ (#2991)
+- Delete associated notifications when a status is deleted (#2994)
+- Trim long usernames in public follower/following lists (#2993)
+- Fix not rejecting remote URIs when parsing out local IDs (#3012)
+- Prepend reblogs' wrapper content with ""RT @original_author"", (#3013)
+- Do not cancel PuSH subscriptions after encountering ""permanent"" error (#3046)
+- Do not override ctrl/cmd+click on permalinks (#3073)
+- Hide signup path unless the instance allows registration. (#3055)
+- Performance: Optimize Status#permitted_for 24x (#3069)
+- Performance: Improve Account#triadic_closures (#3079)
+- Performance: Make faster ProcessFeedService (#3080)
+- Enable to handle app immediately after closing modal (#3082)
+- Performance: Make .column-collapse animation simple (#3086)
+- Resolve preview cards for remote statuses as well as local ones (#3088)
+- Do not hardcode the exclamation in ""toot!"", wrap it in an extra locale key (#3089)
+- Performance: Avoid useless renders (#3141)
+- Performance: Improvements (#3168)
+- Run processes in Docker as non-root user (#3159)
+- Performance: Use joins for account properties (#3167)
+- Performance: Remove unnecessary div (#3172)
+- Performance: Faster boot time (#3176)
+- Replace mastodon:media:clear and mastodon:feeds:clear rake tasks with sidekiq scheduler (#3180)
+- Add boop sounds in Vorbis format (#2963)
+- Focus tab of Mastodon when clicking notification (#2989)
+- Fix regression in mutes API and similar (#3202)
+- Allow access token in URI in the EventSource streaming API (#3208)
+- Language attribute in statuses JSON (#3209)
+- Fix ""Edit profile"" on the account action bar (#3222)
+- Fix cache not being configured correctly (#3219)
+- Keep children of the column-collapsable until animation is completed (#3218)
+- Fix locale regression that made logged-out public pages crash (#3231)
+- Fix ""saved"" message in wrong locale after updating preferences (#3232)
+- Put creation of remote statuses in a transaction to prevent incomplete statuses from being returned in the API (#3233)
+- Fix more locale regressions from #3055 (#3242)
+- Focus the submit button (#3253)
+- Fix Devise destroy method being available to delete user record (#3266)
+- Fix following/followers API to return correct link headers (#3268)
+- Skip formatting for cashtag in status text (#3275)
+- Fix hovering default value for avatar component (#3290)
+- Fix settings model sometimes returning nil (#3213)
+- Add `flex: 0 0 auto` to some components to avoid bugs on iOS9 (#3313)
+- Fix ""contains"" CSS for Chromium <57 (#3317)
+- Fix style regression of buttons not inheriting document font by default (#3310)
+- Fix load more feature on the Account media gallery (#3293) 
+- Remove status context construction in the React side (#3331) 
+- Remove redundant call of recent scope in AccountsController (#3330) 
+- Introduce react-textarea-autosize instead of using style.height side effects (#3334)
+- Add ""meta"" attribute to return of POST /api/v1/media method as well (#3333)
+- Replace onboarding elephant with friendlier graphic, shorter animation (#3337)
+- Fix some nil errors (#3338)
+- Language filtering in streaming API (#3339)
+- Add missing background center on public profile headers (#3340)
+- Avoid comparing domains when looking for an exact match of a local account (#3336)
+- Fix empty flash message on the settings page (#3345)
+- Fix #2922 - Load stylesheet from ""custom.css"" entrypoint when present (#3332)
+- Reject revoked access_token on Streaming API. (#3367)
+- Improve streaming API cluster logging, fix streaming API hanging up (#3370)
+- Fix Webpack Bundle Analyzer output for Webpacker (#3374)
+- Simplify isIntersecting in status_list.js (#3371)
+- Fix IntersectionObserver isIntersecting in Edge (#3365)
+- Update bootsnap to 0.3.0 (fix xattr.h error) (#3390)
+- Fix video having black border on top (#3392)
+
+**Features:**
+
+- Filter out languages from public timelines based on preferences (#2361, #3175)
+- Admins can disable 2FA for users (#2584)
+- Webpack (#2617)
+- Show boosted user's avatar (#2518)
+- Show emoji shortname in a tooltip (#2784)
+- Decode IDN URLs in PreviewCard (#2781)
+- When streaming API is disconnected, poll home/notifications (#2776)
+- Replace ws with uws (#2807)
+- Sidekiq dashboard displays scheduled tasks (#2898)
+- Add `<ostatus:conversation />` to Atom feeds (#3016)
+- Make direct statuses stand out more (#3025)
+- Ability to mute notifications for an entire conversation (#3017)
+- Admins can filter accounts based on username/display name/e-mail/IP (#2968)
+- Ability to hide all content from a domain (#2381)
+- Media gallery view on profiles (#3120)
+- Allow alternate domains to be recognized by Webfinger, while still returning a canonical acct (#3187)
+- Only load i18n data for current language in web UI (#3130)
+- Toggle sensitive from admin page (#3261)
+- Don't notify me when my toot is faved by someone i muted (#3245)
+- Performance: Use node instead of babel-node for streaming API (#3269)
+- Fix DM being highlighted when it's inside a favourite notification (#3267)
+- Show error message to suspended user (#3281)
+- Performance: Lazy load toots using IntersectionObserver (#3191) 
+- Go to root after login in single user mode (#3289)
+
+**Upgrade notes:**
+
+Non-Docker only:
+
+- This release switches the minimum supported Node.js version from 4 to 6
+- Three additional system packages are required: `pkg-config libprotobuf-dev protobuf-compiler`
+- Dependency updates: `bundle install` and `yarn install`
+
+Docker-only:
+
+- Processes inside Docker no longer run as root. Existing installations will require you to change directory ownership of the uploads volume to a different UID/GID: something like `sudo chown -R 991:991 public/system` (the default UID/GID of the new in-Docker user is 991/991)
+
+Both Docker and non-Docker:
+
+- If you have `CDN_HOST` set, make sure it contains the protocol part (`http://` or `https://`), if it does not, adjust it before doing the next step
+- If you set a non-default `STREAMING_API_BASE_URL`, change the protocol part to `ws://` or `wss://` respectively
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+- Generated assets now live under public/packs instead of public/assets. This is mostly irrelevant but might affect some custom proxying configurations.
+- This release includes database migrations, that means you need to run `RAILS_ENV=production bundle exec rails db:migrate` (in Docker: `docker-compose run --rm web rails db:migrate`)
+
+**Contributors to this release:**
+
+@AA4ch1
+@abcang
+@akihikodaki
+@alpaca-tc
+@beatrix-bitrot
+@BoFFire
+@bzg
+@clworld
+@danhunsaker
+@esetomo
+@Gargron
+@geta6
+@happycoloredbanana
+@harukasan
+@h-izumi
+@immae
+@jackjennings
+@jeroenpraat
+@Jnsll
+@kaniini
+@knu
+@m4sk1n
+@mabkenar
+@masarakki
+@mjankowski
+@nolanlawson
+@Pangoraw
+@pfm-eyesightjp
+@Quent-in
+@rkarabut
+@salvadorpla
+@seefood
+@sorin-davidoi
+@stephenburgess8
+@sterbfly
+@tomosm
+@treby
+@unarist
+@vidarlee
+@Wonderfall
+@xqus
+@yiskah
+@ykzts
+@yookoala
+@znz
+@zunda",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6524741/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6524741,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.4.1,https://github.com/tootsuite/mastodon/releases/tag/v1.4.1,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.4.1,v1.4.1,False,False
+6523618,2017-05-27T14:56:47Z,2017-05-27T15:00:30Z,v1.4rc5,"**Fixes:**
+
+- Remove status context construction in the React side (#3331) 
+- Remove redundant call of recent scope in AccountsController (#3330) 
+- Introduce react-textarea-autosize instead of using style.height side effects (#3334)
+- Add ""meta"" attribute to return of POST /api/v1/media method as well (#3333)
+- Replace onboarding elephant with friendlier graphic, shorter animation (#3337)
+- Fix some nil errors (#3338)
+- Language filtering in streaming API (#3339)
+- Add missing background center on public profile headers (#3340)
+- Avoid comparing domains when looking for an exact match of a local account (#3336)
+- Fix empty flash message on the settings page (#3345)
+- Fix #2922 - Load stylesheet from ""custom.css"" entrypoint when present (#3332)
+
+**Upgrade notes:**
+
+Non-Docker only:
+
+- Dependency updates: `yarn install`
+
+Both Docker and non-Docker:
+
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+**Contributors:**
+
+@akihikodaki
+@Gargron
+@happycoloredbanana
+@jeroenpraat
+@m4sk1n
+@Quent-in
+@unarist",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6523618/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6523618,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.4rc5,https://github.com/tootsuite/mastodon/releases/tag/v1.4rc5,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.4rc5,v1.4rc5,False,True
+6514300,2017-05-26T12:16:04Z,2017-05-26T12:25:50Z,v1.4rc4,"**Fixes:**
+
+- Fix more locale regressions from #3055 (#3242)
+- Focus the submit button (#3253)
+- Fix Devise destroy method being available to delete user record (#3266)
+- Fix following/followers API to return correct link headers (#3268)
+- Skip formatting for cashtag in status text (#3275)
+- Fix hovering default value for avatar component (#3290)
+- Fix settings model sometimes returning nil (#3213)
+- Add `flex: 0 0 auto` to some components to avoid bugs on iOS9 (#3313)
+- Fix ""contains"" CSS for Chromium <57 (#3317)
+- Fix style regression of buttons not inheriting document font by default (#3310)
+- Fix load more feature on the Account media gallery (#3293) 
+
+**Features:**
+
+- Toggle sensitive from admin page (#3261)
+- Don't notify me when my toot is faved by someone i muted (#3245)
+- Performance: Use node instead of babel-node for streaming API (#3269)
+- Fix DM being highlighted when it's inside a favourite notification (#3267)
+- Show error message to suspended user (#3281)
+- Performance: Lazy load toots using IntersectionObserver (#3191) 
+- Go to root after login in single user mode (#3289)
+
+**Upgrade notes:**
+
+Non-Docker only:
+
+- Dependency updates: `yarn install`
+
+Both Docker and non-Docker:
+
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+**Contributors:**
+
+@abcang
+@akihikodaki
+@alpaca-tc
+@beatrix-bitrot
+@danhunsaker
+@Gargron
+@knu
+@masarakki
+@mjankowski
+@nolanlawson
+@seefood
+@sorin-davidoi
+@unarist
+@xqus
+@ykzts
+@zunda",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6514300/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6514300,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.4rc4,https://github.com/tootsuite/mastodon/releases/tag/v1.4rc4,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.4rc4,v1.4rc4,False,True
+6467573,2017-05-22T19:38:19Z,2017-05-22T19:48:43Z,v1.4rc3,"**Fixes:**
+
+- Fix regression in mutes API and similar (#3202)
+- Allow access token in URI in the EventSource streaming API (#3208)
+- Language attribute in statuses JSON (#3209)
+- Fix ""Edit profile"" on the account action bar (#3222)
+- Fix cache not being configured correctly (#3219)
+- Keep children of the column-collapsable until animation is completed (#3218)
+- Fix locale regression that made logged-out public pages crash (#3231)
+- Fix ""saved"" message in wrong locale after updating preferences (#3232)
+- Put creation of remote statuses in a transaction to prevent incomplete statuses from being returned in the API (#3233)
+
+**Features:**
+
+- Allow alternate domains to be recognized by Webfinger, while still returning a canonical acct (#3187)
+- Only load i18n data for current language in web UI (#3130)
+
+**Locales**:
+
+- Japanese (#3192)
+- Chinese (#3198)
+- Ukrainian (#3203)
+- Persian (#3206)
+- Polish (#3204)
+- Russian (#3225)
+
+**Upgrade notes:**
+
+Non-Docker only:
+
+- Dependency updates: `yarn install`
+
+Both Docker and non-Docker:
+
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+**Contributors to this release:**
+
+@Gargron
+@zunda
+@vidarlee
+@h-izumi
+@akihikodaki
+@sterbfly
+@happycoloredbanana
+@mabkenar
+@ykzts 
+@unarist
+@clworld
+@m4sk1n
+@nolanlawson
+@immae
+@rkarabut
+@tomosm
+@mjankowski",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6467573/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6467573,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.4rc3,https://github.com/tootsuite/mastodon/releases/tag/v1.4rc3,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.4rc3,v1.4rc3,False,True
+6452863,2017-05-20T21:30:20Z,2017-05-20T21:31:35Z,v1.4rc2,"Bump version identifier to 1.4.0.2
+
+Otherwise same as v1.4rc1",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6452863/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6452863,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.4rc2,https://github.com/tootsuite/mastodon/releases/tag/v1.4rc2,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.4rc2,v1.4rc2,False,True
+6452183,2017-05-20T19:06:09Z,2017-05-20T19:52:29Z,v1.4rc1,"*This is a release candidate. Upgrade at your own risk.*
+
+**Fixes:**
+
+- Fix boost icon: center vertically (#2690)
+- Fix to completely hide NSFW-tagged images (#2724)
+- Fix width of .confirmation-modal on narrow screens (#2743)
+- Always respond with 200 to PuSH payloads (#2733)
+- Language improvements, replace whatlanguage with CLD (#2753, #2949)
+- Handle out-of-order deletes for statuses (#2734)
+- Replace best_in_place editor on admin settings page (#2789)
+- Performance: Delete records in smaller transaction (#2802)
+- More robust PuSH subscription refreshes (#2799)
+- Use Twitter::Extractor for creating links (#2502)
+- Performance: Optimize follower_accounts and following_accounts (#2820)
+- Performance: Fix slow query in notifications api (#2851)
+- Performance: Add asynchronous emojione-picker (code-splitting) (#2863)
+- Fix a aspect ratio for the embedded video (#2872)
+- Fix local fonts and change font-face values (#2877)
+- Add content-type in pubsubhubhub request header (#2943)
+- Disabled auto focus on toot form when search results are shown. (#2942)
+- Performance: Add `account_id DESC` to optimize PrecomputeFeedService (#2967)
+- Send HEAD request ahead of GET when fetching URL previews (#2972)
+- Fix mention regex to support unicode (#2420)
+- When avatar/header are missing, do not include the missing file into Atom (#2988)
+- Accept own ID for remote follow with and without preceding @ (#2991)
+- Delete associated notifications when a status is deleted (#2994)
+- Trim long usernames in public follower/following lists (#2993)
+- Fix not rejecting remote URIs when parsing out local IDs (#3012)
+- Prepend reblogs' wrapper content with ""RT @original_author"", (#3013)
+- Do not cancel PuSH subscriptions after encountering ""permanent"" error (#3046)
+- Do not override ctrl/cmd+click on permalinks (#3073)
+- Hide signup path unless the instance allows registration. (#3055)
+- Performance: Optimize Status#permitted_for 24x (#3069)
+- Performance: Improve Account#triadic_closures (#3079)
+- Performance: Make faster ProcessFeedService (#3080)
+- Enable to handle app immediately after closing modal (#3082)
+- Performance: Make .column-collapse animation simple (#3086)
+- Resolve preview cards for remote statuses as well as local ones (#3088)
+- Do not hardcode the exclamation in ""toot!"", wrap it in an extra locale key (#3089)
+- Performance: Avoid useless renders (#3141)
+- Performance: Improvements (#3168)
+- Run processes in Docker as non-root user (#3159)
+- Performance: Use joins for account properties (#3167)
+- Performance: Remove unnecessary div (#3172)
+- Performance: Faster boot time (#3176)
+- Replace mastodon:media:clear and mastodon:feeds:clear rake tasks with sidekiq scheduler (#3180)
+- Add boop sounds in Vorbis format (#2963)
+- Focus tab of Mastodon when clicking notification (#2989)
+
+**Features:**
+
+- Filter out languages from public timelines based on preferences (#2361, #3175)
+- Admins can disable 2FA for users (#2584)
+- Webpack (#2617)
+- Show boosted user's avatar (#2518)
+- Show emoji shortname in a tooltip (#2784)
+- Decode IDN URLs in PreviewCard (#2781)
+- When streaming API is disconnected, poll home/notifications (#2776)
+- Replace ws with uws (#2807)
+- Sidekiq dashboard displays scheduled tasks (#2898)
+- Add `<ostatus:conversation />` to Atom feeds (#3016)
+- Make direct statuses stand out more (#3025)
+- Ability to mute notifications for an entire conversation (#3017)
+- Admins can filter accounts based on username/display name/e-mail/IP (#2968)
+- Ability to hide all content from a domain (#2381)
+- Media gallery view on profiles (#3120)
+
+**Upgrade notes:**
+
+Non-Docker only:
+
+- This release switches the minimum supported Node.js version from 4 to 6
+- Three additional system packages are required: `pkg-config libprotobuf-dev protobuf-compiler`
+- Dependency updates: `bundle install` and `yarn install`
+
+Docker-only:
+
+- Processes inside Docker no longer run as root. Existing installations will require you to change directory ownership of the uploads volume to a different UID/GID: something like `sudo chown -R 991:991 public/system` (the default UID/GID of the new in-Docker user is 991/991)
+
+Both Docker and non-Docker:
+
+- If you have `CDN_HOST` set, make sure it contains the protocol part (`http://` or `https://`), if it does not, adjust it before doing the next step
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+- Generated assets now live under public/packs instead of public/assets. This is mostly irrelevant but might affect some custom proxying configurations.
+- This release includes database migrations, that means you need to run `RAILS_ENV=production bundle exec rails db:migrate` (in Docker: `docker-compose run --rm web rails db:migrate`)
+
+**Contributors to this release:**
+
+@AA4ch1
+@abcang
+@akihikodaki
+@Aldarone
+@alpaca-tc
+@ayumin
+@beatrix-bitrot
+@BoFFire
+@bzg
+@dikky1218
+@docjkl
+@esetomo
+@Gargron
+@gentarok
+@geta6
+@haoyayoi
+@harukasan
+@h-izumi
+@jackjennings
+@jeroenpraat
+@Jnsll
+@kaniini
+@loomchild
+@m4sk1n
+@marrus-sh
+@masarakki
+@mikoim
+@mjankowski
+@nolanlawson
+@ozcanzaferayan
+@Pangoraw
+@pfm-eyesightjp
+@potato4d
+@Quent-in
+@ramlmn
+@rch850
+@rkarabut
+@rtucker
+@salvadorpla
+@seefood
+@sorin-davidoi
+@sossii
+@stephenburgess8
+@sterbfly
+@treby
+@unarist
+@Wonderfall
+@xqus
+@yhirano55
+@yiskah
+@ykzts
+@yookoala
+@znz
+@zunda",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6452183/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6452183,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.4rc1,https://github.com/tootsuite/mastodon/releases/tag/v1.4rc1,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.4rc1,v1.4rc1,False,True
+6296935,2017-05-06T11:53:43Z,2017-05-06T11:59:04Z,v1.3.3,"This is a patch release that backports a few important improvements from the upcoming v1.4 release which is still a work in progress.
+
+*PuSH subscriptions is how Mastodon instances send each other statuses of followed accounts. They have to be periodically renewed (by default they run for around 30 days). Because Scalingo does not support cronjobs, and Heroku requires a separate scheduler setup, those installations are in most dire need of this update, which moves the renewal code into the Sidekiq process instead. But everyone else will also benefit from the renewals being more efficient and failure-resistant. Previous behaviour did not have retries, so if a subscription request failed, it would only be retried when you next ran the cronjob, which meant gaps in followed people's timelines for days or longer.*
+
+**Fixes**:
+
+- PuSH subscriptions refresh now run through Sidekiq, it no longer requires cronjobs (old `mastodon:push:refresh` rake task becomes no-op), more efficient/less hard-hitting order in which subscription requests are sent, better handling of errors and retrial in case of temporary failures (#2799) 
+- Handle out-of-order delete events (e.g. when delete arrives before original status - future original status will get ignored now) (#2734)
+- Always respond with 200 to PuSH deliveries instead of 201/202, check Salmon verification synchronously to return useful error to remote server (#2733)
+
+**Upgrade notes:**
+
+- This release includes dependency updates, that means you need to run `bundle install` (not required in Docker deployments)
+
+**Contributors:**
+
+@Gargron",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6296935/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6296935,1.3-stable,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.3.3,https://github.com/tootsuite/mastodon/releases/tag/v1.3.3,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.3.3,v1.3.3,False,False
+6232223,2017-04-29T17:26:32Z,2017-04-29T17:34:53Z,v1.3.2,"Stabilized release. **Fixes:**
+
+- Fix templating error in reports (#2546) 
+- Fix templating error in remote follows (#2547) 
+- Fix templating error on public page when hashtag doesn't exist (#2563) 
+- Fix Mastodon version not being returned correctly from API (#2590) 
+- Fix incorrect attachment type being set for reject_media-blocked domains (#2599) 
+- Remove unneeded order clause on public follower/following pages (#2615) 
+- Fix more style regressions from CSS/BEM refactor (#2608)
+
+**Upgrade notes:**
+
+- This release includes dependency updates, that means you need to run `bundle install` and `yarn install` (not required in Docker deployments)
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+**Contributors:**
+
+@alpaca-tc
+@Artoria2e5
+@ashfurrow
+@BoFFire
+@Gargron
+@JoelQ
+@mjankowski
+@patf
+@rkarabut
+@stephenburgess8
+@S-YOU
+@Wonderfall
+@yiskah
+@ykzts
+@y-temp4",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6232223/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6232223,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.3.2,https://github.com/tootsuite/mastodon/releases/tag/v1.3.2,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.3.2,v1.3.2,False,False
+6215456,2017-04-27T21:37:22Z,2017-04-27T21:41:23Z,v1.3.1,Immediate hotfix for obscure formatting issue that slipped through review and testing.,https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6215456/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6215456,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.3.1,https://github.com/tootsuite/mastodon/releases/tag/v1.3.1,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.3.1,v1.3.1,False,False
+6210603,2017-04-27T20:32:38Z,2017-04-27T21:18:16Z,v1.3,"This update includes important security fixes.
+
+**Fixes:**
+
+- Textarea height reset on submission (#2236)
+- Fixed mistakes in onboarding modal (#1964)
+- Improve bio compatibility with GNU social (#2278)
+- Adjust boost icon tooltip according to visibility (#1754)
+- Support for IDN (utf8/punycode) URLs (#2363, #2370)
+- Fix e-mail whitelist rules (#2213)
+- Fix hashtags in private toots listing the toot on public hashtag pages (#2182)
+- Fix status being available in public timelines before images finished attaching (#2426)
+- Add shared status tampering verification (#2525)
+- Hide redundant links on small screens (#2175)
+- Fix mangling of ##tags (#2247)
+- Various performance improvements, bug fixes
+
+**Features:**
+
+- Version now returned in API (#2181)
+- Display remaining characters when editing profile (2219)
+- Display local time rather than UTC through JS (#2174)
+- API for single notification dismissal (#2251)
+- Emoji picker can now be localized (#2294, #2302)
+- Improve aria support (#2299, #1424, #2516)
+- Confirmation modals for deleting, blocking and muting (#2279)
+- Private toots now federate out to remote followers (#2111)
+- Improved reports admin UI (#2349)
+- Switching the context column in web UI made faster (#2271)
+- Right-to-left design for the UI (#2378)
+- API support for idempotency header to prevent duplicate toots via network failures (#2419)
+- Save media dimensions for media attachments (#2448)
+- Link preview cards now support OEmbed, e.g. YouTube, Vimeo, Flickr embeds (#2337)
+- Mastodon self-identifies when doing HTTP requests (#2073, #2253)
+
+Various improved localizations and new translations.
+
+**Upgrade notes:**
+
+- This release includes dependency updates, that means you need to run `bundle install` and `yarn install` (not required in Docker deployments)
+- This release includes database migrations, that means you need to run `RAILS_ENV=production bundle exec rails db:migrate` (in Docker: `docker-compose run --rm web rails db:migrate`)
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+**Contributors:**
+
+@178inaba
+@akihikodaki
+@Aldarone
+@alpaca-tc
+@ameliavoncat
+@anon5r
+@Artoria2e5
+@ashfurrow
+@benediktg
+@blinry
+@camponez
+@codl
+@diomed
+@DoubleMalt
+@esetomo
+@evanminto
+@expenses
+@Fiaxhs
+@Gargron
+@ik11235
+@ineffyble
+@j0k3r
+@jeroenpraat
+@JoelQ
+@jpdevries
+@kayleej
+@kodnaplakal
+@LindseyB
+@mabkenar
+@magurotabetai
+@masarakki
+@mecab
+@michaeljdeeb
+@mig5
+@mjankowski
+@mtparet
+@Naouak
+@nolanlawson
+@orzFly
+@Quent-in
+@rainyday
+@ramlmn
+@saper
+@shnjp
+@siuying
+@stephenburgess8
+@STJrInuyasha
+@suzukaze
+@tahnok
+@takp
+@ThibG
+@tsuwatch
+@unarist
+@walf443
+@Wonderfall
+@yhirano55
+@yiskah
+@ykzts
+@ymmtmdk
+@yookoala",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6210603/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6210603,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.3,https://github.com/tootsuite/mastodon/releases/tag/v1.3,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.3,v1.3,False,False
+6128239,2017-04-19T21:21:00Z,2017-04-19T21:23:54Z,1.2.2,"This release includes important security improvements and fixes.
+
+**Fixes:**
+
+- Remove unneeded query when posting toot without attachments (#1907)
+- Long statuses in boost dialog scroll again (#1710)
+- Fix unreblog/unfavourite API returning stale boolean result (#1989)
+- Fix treatment of special characters in XML (#1988)
+- Skip posting to the API if text is empty (#1962)
+- Optimized logo to look sharper (#2020)
+- Cache account IDs to be excluded from public timelines (blocked, blocking, muted accounts) for faster queries (#1858) 
+- Fix multiple load-more requests being fired on account timelines (#2066)
+- Ensure that uploaded files are saved with a file extension (#2078)
+- Remove unused fonts (#2103)
+- Language detection falls back to user's selected locale, otherwise to default locale (#2099)
+- Hide link preview if there is a content warning (#1617)
+- Fix broken URLs due to HTML escaping (#2138)
+- Use confirmed users in about/more stats instead of all (#2127)
+- Fix potential for webfinger redirect misuse (#2147)
+- Uncached attachments now have type `unknown` (instead of `image`, `video` etc) and no longer transparently hotlink to the remote URL. In the web UI, they are now displayed as a list of links, instead of preview (#2110)
+- Fix gif uploads (#2172)
+
+**Features:**
+
+- Streaming API server now can run in a cluster mode (i.e. multiple processes kickstarted by one master process) (#1970)
+- Preferred user locale assigned on sign-up (#1982)
+- When over the character limit, character counter goes red (#1980)
+- Disable toot button when over character limit (#2088)
+- Option to disable all GIF autoplay in the web UI (#1991)
+- List of known instances in admin UI (#2095)
+- Filter reports by accounts/target accounts (#2092)
+- API to retrieve status no longer requires authentication (similar to public timelines APIs) (#1919)
+- Rate limits on login attempts, sign-up attemps, and forgotten password attempts (#2079)
+- Automatically expand textarea (#2128)
+- OpenGraph tags on public followers/following pages (#2052)
+
+There are also various localization additions and improvements, as well as refactors and new test suites.
+
+**Upgrade notes:**
+
+- This release includes database migrations, that means you need to run `RAILS_ENV=production bundle exec rails db:migrate` (in Docker: `docker-compose run --rm web rails db:migrate`)
+- This release includes changes to assets, that means you need to run `RAILS_ENV=production bundle exec rails assets:precompile` (in Docker: `docker-compose run --rm web rails assets:precompile`)
+
+**Contributors to this release:**
+
+@8398a7
+@857b
+@abcang
+@alpaca-tc
+@anon5r
+@Artoria2e5
+@ashfurrow
+@blackle
+@bradurani
+@chrolis
+@cyweo
+@d6rkaiz
+@daprice
+@dar5hak
+@diomed
+@dunn
+@eramdam
+@evilny0
+@expenses
+@fsubal
+@Gargron
+@geta6
+@happycoloredbanana
+@hugogameiro
+@ian-kelling
+@iblech
+@ik11235
+@ikasoumen
+@ineffyble
+@iwaim
+@jeroenpraat
+@JoelQ
+@jpdevries
+@k0ta0uchi
+@kodnaplakal
+@kuro5hin
+@matsurai25
+@matteoaquila
+@mig5
+@mistydemeo
+@mjankowski
+@Moosh-be
+@patf
+@reedcourty
+@rkarabut
+@SansPseudoFix
+@saper
+@saturday06
+@snwh
+@tmyt
+@tomfhowe
+@tototoshi
+@trebmuh
+@tsuwatch
+@usagi-f
+@walf443
+@ykzts
+@yookoala
+@zacanger",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6128239/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6128239,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.2.2,https://github.com/tootsuite/mastodon/releases/tag/v1.2.2,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.2.2,v1.2.2,False,False
+6124539,2017-04-19T17:21:44Z,2017-04-19T18:09:52Z,1.2.1,See 1.2.2,https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6124539/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6124539,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.2.1,https://github.com/tootsuite/mastodon/releases/tag/v1.2.1,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.2.1,v1.2.1,False,False
+6093197,2017-04-16T21:15:58Z,2017-04-16T21:45:39Z,1.2,"- JS subresource integrity (#1729)
+- Title attribute on URLs (#1755)
+- List of muted users in web UI (#1799)
+- Ability to run Mastodon on a subdomain while using root domain as identifier (#1267)
+- Periodic refreshing of Webfinger-sourced data to help with cases where URLs or public keys of an account have changed (#1323)
+- Recovery codes for 2FA (#1773)
+- Deployment with single-user mode enabled gives chance for one account to register (#1820)
+- Admin function to reset someone's password (#1841)
+- Use a slightly different reply icon to indicate when a toot is part of a conversation (#1869)
+- Error message if video cannot be played (#1879)
+- Atom feeds always have valid title tags (#1875)
+- Improved compatibility with Google Cloud Storage instead of S3 (#1886)
+- Improved admin domain block UI and functionality (#1865):
+  - Ability to undo a domain block
+  - Ability to specify an option to block media caching from a domain
+  - API returns remote URL for media attachment instead of locally cached one if there is no locally cached copy (i.e. hotlinking)
+- Home column regex filter now matches against plain-text instead of HTML markup (#1845)
+- Less network requests when processing mentions from Atom (#1938)
+- Update OStatus2 dependency to fix incompatibility with Ruby 2.4.1 (#1936)
+- Web UI greets new users with a modal explaining first steps (#1883)
+- Use heuristics to detect language of toots and return it from the API (#1772)
+- You can now put down CSS (SCSS) customizations into a special file that isn't in version control and so will not be overwritten by future updates (#1368)
+- Various bug fixes and refactors, special shout out to @mjankowski 
+- Various improvements to existing localizations
+- Rake task to clear out unconfirmed user accounts older than 2 days `rake mastodon:users:clear`
+- Rake task that unites all other mandatory periodic tasks: `rake mastodon:daily`
+
+**Upgrade notes:**
+
+- This release includes dependency updates, that means you need to run `bundle install` and `yarn install` (not required in Docker deployments)
+- This release includes database migrations, that means you need to run `RAILS_ENV=production bundle exec rails db:migrate` (in Docker: `docker-compose run --rm web rails db:migrate`)
+
+**Contributors to this release:**
+
+- abcang
+- Akihiko Odaki
+- Alda Marteau-Hardi
+- Alex Dunn
+- alpaca-tc
+- Amakasu Ryoma
+- Andrew
+- Ash Furrow
+- Ben Roberts
+- Bryce Chidester
+- Chad Pytel
+- Darío Hereñú
+- Eduardo Elias
+- Effy Elden
+- Erwan Leboucher
+- Eugen Rochko
+- Fjoerfoks
+- George Hattori
+- goofy-bz
+- Henry Smith
+- Hiromi Kai
+- Ian Kelling
+- Isabelle Knott
+- Joachim Viide
+- JP DeVries
+- Kazuhiro NISHIYAMA
+- Keiji, Yoshimi
+- Koala Yeung
+- Les Orchard
+- Luc Didry
+- luigi
+- Marcin Cieślak
+- Matt Jankowski
+- maxypy
+- mshrtkch
+- Naouak
+- oliverkeeble
+- Olivier Humbert
+- Patrick Figel
+- Pierre Ozoux
+- Ratmir Karabut
+- rysiekpl
+- Setuu
+- Shel Raphen
+- Shouko Yu
+- tackeyy
+- Takayuki KUSANO
+- ThibG
+- Thor Harald Johansen
+- Valentin Lorentz
+- Wonderfall
+- Yuki Nakagawa
+- Zac Anger
+- 新都心(Neet Shin)
+- 西小倉宏信",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6093197/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6093197,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.2,https://github.com/tootsuite/mastodon/releases/tag/v1.2,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.2,v1.2,False,False
+6077403,2017-04-13T20:26:54Z,2017-04-13T21:09:56Z,1.1.2,"- Improved emoji picker (#1395, #1403, #1464)
+- Improved scrolling performance (#1415)
+- Can type while image is uploading (#1429)
+- Filtered notifications column now paginates properly (#1341)
+- Recommended Ruby version bumped to 2.4.1 (#1159)
+- GIF avatars are now hover-to-play (#1428)
+- Optional (off by default) boost confirmation dialog (Shift+Boost to skip) (#1507, #1638)
+- Default log level is now INFO instead of DEBUG (#1579)
+- Fixed wrong SMTP default breaking e-mail sending (#1563)
+- Focus textarea after image finished uploading (#1320)
+- Better microformats markup on public pages (#1063)
+- Clear spoiler text when replying to toot without spoiler text (#1662)
+- Videos can be expanded (#1688)
+- Overlay icon button style that is easier to see
+- Convert emoji shortcodes into UTF8 when posting (#1666)
+- Fix report comments being reset while typing (#1699)
+- Ensure all attachments get an extension in their filename based on content type (#1718)
+- Fix drag & drop area not appearing in Firefox (#1721)
+
+Localizations fixes, improvements or additions:
+
+- Russian
+- Finnish
+- Norwegian
+- Dutch
+- French
+- Japanese
+- Spanish
+- Italian
+- Bulgarian
+- Portuguese
+
+**Upgrade notes:**
+
+- An upgrade to Ruby 2.4.1 means having to install Ruby 2.4.1 and reinstalling the bundler gem as a minimum: `rbenv install 2.4.1; gem install bundler --no-ri` (not required in Docker deployments)
+- This release includes dependency updates, that means you need to run `bundle install` and `yarn install` (not required in Docker deployments)
+- Most importantly, the hover-to-play update for GIF avatars means static versions of GIF avatars need to be generated, or else they wouldn't show up. A rake task has been added for this one-time occasion: `rake mastodon:maintenance:add_static_avatars` (This will iterate over all accounts who have GIF avatars or headers, and re-process them to generate a static non-GIF version. Please mind that this means downloading and uploading data if your files are stored in the cloud like Amazon S3 or GCS, which could incur costs. If you don't run this task, users with GIF avatars will simply have to re-upload theirs manually)
+
+**Contributors to this release:**
+
+- Alexander Mankuta
+- Alexsander Akers
+- Alyssa Ross
+- Ash Furrow
+- Ben Roberts
+- blackle
+- Carlos A. Escobar
+- CgX
+- Chris Martin
+- Christopher Su
+- Corey Dutson
+- d0p1
+- Daijiro Wachi
+- David Libeau
+- Effy Elden
+- Eric Blade
+- Eugen Rochko
+- Gavin Mogan
+- goofy-bz
+- Henry Smith
+- Hugo Gameiro
+- INAGAKI Hiroshi
+- Isabelle Knott
+- James Moore
+- Jantso Porali
+- Jessica Stokes
+- jukper
+- Julien Deswaef
+- karlyeurl
+- Knut Erik
+- Koala Yeung
+- Komic
+- lindwurm
+- Lukas Burk
+- Manato Kameya
+- matteoaquila
+- Matteo Aquila
+- Matthias Jouan
+- Matt Jankowski
+- May Kittens Devour Your Soul
+- Musee U
+- pinfort
+- Rachel H
+- Ram Lmn
+- Ratmir Karabut
+- R Tucker
+- Ryan Freebern
+- Shel R
+- spf
+- Stephen Burgess
+- Svetlozar Todorov
+- Thomas Citharel
+- Thor Harald Johansen
+- tom
+- Valentin Ouvrard
+- Yann GUERN
+- YOSHIOKA Eiichiro
+- Yusuke Abe
+- 新都心(Neet Shin)",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6077403/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6077403,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.1.2,https://github.com/tootsuite/mastodon/releases/tag/v1.1.2,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.1.2,v1.1.2,False,False
+6026503,2017-04-09T20:21:52Z,2017-04-09T22:41:43Z,1.1.1,"- Webfinger query's canonical username/domain are used instead of initial user input, which may have wrong casing
+- Fixed regression that broke form submissions with a 422 error page
+- Fixed a situation in which a profile update job was queued with a nil account ID
+- Fixed wrongfully skipped profile update jobs
+- More Finnish localizations
+- More French localizations
+- More German localizations
+- More Portuguese localizations
+- Column header icons now have descriptive tooltips 
+- Two factor authentication now requires OTP token confirmation before being enabled
+- Public timeline APIs are now public (require no registered app/user)
+- Added API for profile updating: `PATCH /api/v1/accounts/update_credentials`
+- HTTP Accept-Language header used to determine UI language if no other preferences set by user
+- Added env variable to control which is the instance's default locale (`DEFAULT_LOCALE`)
+- Added env variable to disable usage of SQL prepared statements, e.g. when you want to use pgbouncer in transaction pooling mode (`PREPARED_STATEMENTS=false`)
+- Added env variable to change Rails log level (e.g. `RAILS_LOG_LEVEL=debug` by default)
+- Fix ""last visited"" URLs that are used to redirect back from sign-in wrongfully including API URLs
+- Fixed titles in Atom feeds being unsemantic
+
+Many documentation pages have also been updated. Also, reminder that since v1.1 there are **four** Sidekiq queue types:
+
+- **default**: local toot distribution and other local tasks
+- **push**: delivery of toots to remote servers, processing of remote toot payloads
+- **pull** (this is new since v1.1): fetching of data from remote servers, e.g. resolving threads, updating profile data like avatars
+- **mailers**: e-mail delivery
+
+**Contributors to this release:**
+
+- Aguay-val
+- Alda Marteau-Hardi
+- Amanda Visconti
+- André Lewin
+- Ash Furrow
+- ava
+- awea
+- axolotl
+- Ben Field
+- benklop
+- Blake
+- Brad Janke
+- Brian Mock
+- Chad Pytel
+- Chris Heninger
+- Christopher Gilbert
+- David Authier
+- David Celis
+- David Huerta
+- Derek Lewis
+- Ed Knutson
+- Effy Elden
+- Elizabeth Myers
+- Erwan Leboucher
+- Eugen Rochko
+- Florian Maunier
+- foxiehkins
+- Guewen FAIVRE
+- Hugo Gameiro
+- isati
+- Jack Michaud
+- James Smith
+- Jantso Porali
+- Jason Rhodes
+- Joël Quenneville
+- Jonathan Klee
+- Julien
+- kadiix
+- Kody
+- Korbinian
+- Kurtis Rainbolt-Greene
+- Lukas Fülling
+- Markus Amalthea Magnuson
+- Markus R
+- Matt Jankowski
+- Milton Mazzarri
+- Mouse Reeve
+- Nick Gerakines
+- Nicolai von Neudeck
+- Ninetailed
+- Olivier Humbert
+- Ornithologist Coder
+- Pavel Djundik
+- Rachel H
+- Ray Alez
+- rbaumert
+- R Tucker
+- Sebastian Hübner
+- seekr
+- Sergei Č
+- Shel R
+- spf
+- StefOfficiel
+- Technowix
+- Thibaut (Eychics)
+- ThibG
+- Thomas Alberola
+- Thomas Citharel
+- Toby Deshane
+- tom
+- Tristan Mahé
+- Valentin_NC
+- Valentin Ouvrard
+- VirtuBox
+- Vladimir Mincev
+- Yann GUERN
+- YDrogen
+- ZiiX",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6026503/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6026503,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.1.1,https://github.com/tootsuite/mastodon/releases/tag/v1.1.1,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.1.1,v1.1.1,False,False
+6011169,2017-04-07T11:08:51Z,2017-04-07T11:20:47Z,1.1,"Regular iterative release in a stable state.
+
+**Contributors to this release:**
+
+- Adam Thurlow
+- Aesen
+- Alexander Acevedo
+- Alex Gleason
+- Alice
+- Angristan
+- Ash Furrow
+- blackle
+- Brad Urani
+- Cédric Levieux
+- Christopher Kolstad
+- Clément D
+- Damien Erambert
+- David Baumgold
+- Drew DeVault
+- Effy Elden
+- Eugen Rochko
+- Evan Minto
+- Florian Maunier
+- Florian Piesche
+- halna_Tanaguru
+- Ian McDowell
+- Isabelle Knott
+- James Moore
+- JantsoP
+- Jantso Porali
+- Jason Snell
+- jenn kaplan
+- Jessica Stokes
+- Jo Decker
+- Jonathan Hurter
+- Jordan Guerder
+- Kazhnuz
+- Kibigo
+- Kibigo!
+- Kit Redgrave
+- Korbinian
+- Kurtis Rainbolt-Greene
+- leopku
+- Leo Wzukw
+- Lorenz Diener
+- Markus Amalthea Magnuson
+- Marvin Kopf
+- Matt Jankowski
+- Maxime BORGES
+- Michael Vieira
+- Neville Park
+- Niclas Darville
+- nicobz25
+- nicolas
+- Nope Nope
+- Olivia Mossberg
+- Padraig Fahy
+- Pete Keen
+- Pierre Ozoux
+- Rakib Hasan
+- Ryan Wade
+- Samy KACIMI
+- scriptjunkie
+- Sébastien Santoro
+- shel
+- Sina Mashek
+- TheKinrar
+- Thibaut (Eychics)
+- Tobias Merkle
+- Tom McAtee
+- Udo Kramer
+- undrskr
+- Valentin Lorentz
+- walfie
+- Wonderfall
+- wxcafé
+- Your Name",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/6011169/assets,https://api.github.com/repos/tootsuite/mastodon/releases/6011169,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.1,https://github.com/tootsuite/mastodon/releases/tag/v1.1,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.1,v1.1,False,False
+5364627,2017-02-05T18:39:00Z,2017-02-05T18:27:29Z,Nipple Tooth,"First major stable release of Mastodon! Mastodon translated literally means ""nipple tooth""
+",https://api.github.com/users/Gargron,184731,Gargron,https://api.github.com/repos/tootsuite/mastodon/releases/5364627/assets,https://api.github.com/repos/tootsuite/mastodon/releases/5364627,master,https://api.github.com/repos/tootsuite/mastodon/tarball/v1.0,https://github.com/tootsuite/mastodon/releases/tag/v1.0,https://api.github.com/repos/tootsuite/mastodon/zipball/v1.0,v1.0,False,False

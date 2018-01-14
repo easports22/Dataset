@@ -1,0 +1,723 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7334320,2017-08-09T12:41:28Z,2017-08-10T14:33:31Z,runc 1.0 Release Candidate 4,"## Features:
+
++ runc now supports v1.0.0 of the OCI runtime specification. #1527
++ Rootless containers support has been released. The current state of
+  this feature is that it only supports single-{uid,gid} mappings as an
+  unprivileged user, and cgroups are completely unsupported. Work is
+  being done to improve this. #774
++ Rather than relying on CRIU version nnumbers, actually check if the
+  system supports pre-dumping. #1371
++ Allow the PIDs cgroup limit to be updated. #1423
++ Add support for checkpoint/restore of containers with orphaned PTYs
+  (which is effectively all containers with terminal=true). #1355
++ Permit prestart hooks to modify the cgroup configuration of a
+  container. #1239
++ Add support for a wide variety of mount options. #1460
++ Expose memory.use_hierarchy in MemoryStats. #1378
+
+## Fixes:
+
+* Fix incorrect handling of systems without the freezer cgroup. #1387
+* Many, many changes to switch away from Go's ""syscall"" stdlib to
+  ""golang.org/x/sys/unix"". #1394 #1398 #1442 #1464 #1467 #1470 #1474
+  #1478 #1491 #1482 #1504 #1519 #1530
+* Set cgroup resources when restoring a container. #1399
+* Switch back to using /sbin as the installation directory. #1406
+* Remove the arbitrary container ID length restriction. #1435
+* Make container force deletion ignore non-existent containers. #1451
+* Improve handling of arbitrary cgroup mount locations when populating
+  cpuset. #1372
+* Make the SaneTerminal interface public. #1479
+* Fix cases where runc would report a container to be in a ""Running""
+  state if the init was a zombie or dead. #1489
+* Do not set supplementary groups for numeric users. #1450
+* Fix various issues with the ""owner"" field in runc-list. #1516
+* Many other miscellaneous fixes, some of which were made by first-time
+  contributors. Thanks, and welcome to the project! #1406 #1400 #1365
+  #1396 #1402 #1414 #1412 #1408 #1418 #1425 #1428 #1436 #1433 #1438
+  #1410 #1447 #1388 #1484 #1481 #1496 #1245 #1524 #1534 #1526 #1533
+
+## Removals:
+
+- Remove any semblance of non-Linux support. #1502
+- We no longer use shfmt for testing. #1510
+
+<hr>
+
+Thanks to all of the contributors that made this release possible:
+
+* Adrian Reber <areber@redhat.com>
+* Aleksa Sarai <asarai@suse.de>
+* Andrei Vagin <avagin@virtuozzo.com>
+* Antonio Murdaca <runcom@redhat.com>
+* chchliang <chen.chuanliang@zte.com.cn>
+* Christy Perez <christy@linux.vnet.ibm.com>
+* Craig Furman <cfurman@pivotal.io>
+* CuiHaozhi <cuihz@wise2c.com>
+* Daniel, Dao Quang Minh <dqminh89@gmail.com>
+* Derek Carr <decarr@redhat.com>
+* Harshal Patil <harshal.patil@in.ibm.com>
+* Jonh Wendell <jonh.wendell@redhat.com>
+* Justin Cormack <justin.cormack@docker.com>
+* Kang Liang <kangliang424@gmail.com>
+* Kenfe-Mickael Laventure <mickael.laventure@gmail.com>
+* Konstantinos Karampogias <konstantinos.karampogias@swisscom.com>
+* Ma Shimiao <mashimiao.fnst@cn.fujitsu.com>
+* Michael Crosby <crosbymichael@gmail.com>
+* Mrunal Patel <mrunalp@gmail.com>
+* Qiang Huang <h.huangqiang@huawei.com>
+* Steven Hartland <steven.hartland@multiplay.co.uk>
+* Tim Potter <tpot@hpe.com>
+* Tobias Klauser <tklauser@distanz.ch>
+* Valentin Rothberg <vrothberg@suse.com>
+* Vincent Batts <vbatts@redhat.com>
+* Wentao Zhang <zhangwentao234@huawei.com>
+* Will Martin <wmartin@pivotal.io>
+* W. Trevor King <wking@tremily.us>
+* yangshukui <yangshukui@huawei.com>
+* Zhang Wei <zhangwei555@huawei.com>
+
+Vote-Closed: [Wed Aug 9 05:28:38 UTC 2017]
+Vote-Results: [+5 -0 /2]
+",https://api.github.com/users/cyphar,2888411,cyphar,https://api.github.com/repos/opencontainers/runc/releases/7334320/assets,https://api.github.com/repos/opencontainers/runc/releases/7334320,master,https://api.github.com/repos/opencontainers/runc/tarball/v1.0.0-rc4,https://github.com/opencontainers/runc/releases/tag/v1.0.0-rc4,https://api.github.com/repos/opencontainers/runc/zipball/v1.0.0-rc4,v1.0.0-rc4,False,True
+5823278,2017-03-21T20:25:48Z,2017-03-21T20:44:03Z,runC 1.0 Release Candidate 3,"### Features:
+
++ Add slice management support to the systemd cgroup driver. Checks are
+  done to make sure that systemd supports the feature. #1084
++ Support for readonly mount labels. #1112
++ Add a tmpcopyup mount extension for tmpfs mounts that are mounted over
+  already existing directories, allowing for the contents of a volume to
+  be copied up transparently. #845
+* Switch our pivot_root usage to no longer require temporary
+  directories, improving the state of containters running in entirely
+  readonly contexts. #1125 #1148
++ Allow updating of rt_period_us and rt_runtime_us in cpuacct cgroup.
++ Reimplement console handling to use AF_UNIX sockets such that the
+  console is created inside the container's (namespaced) devpts
+  instance, solving a wide variety of historical pty bugs with runC.
+  #1018 #1356
+* Support overlayfs in mounts. #1314
++ Support creating devices with types 'p' and 'u'. #1321
++ Add --preserve-fds=N to create and run commands. #1320
++ Add pre-dump and parent-path to checkpoint. #1001
++ Update to runtime-spec v1.0.0-rc5. #1370
+
+### Fixes:
+
+* Remove check for binding to /. #1090
+* Ensure we log to logrus on command errors. #1089
+* Don't enable kmem limits if they're not specified in the config. #1095
+* Handle cases where specs.Resources.* members would cause null
+  dereferences. #1111 #1116
+* Fix bugs in the GetProcessStartTime implementation. #1136
+* Make sysctl config validation checks handle network namespaces more
+  gracefully. #1138 #1149
+* Guarantee correct namespace creation ordering. This is part of the
+  rootless container patchset, and is also required in certain SELinux
+  setups. #977
+* Stop screwing around with '\n' in console output. #1146
+* Fix cpuset.cpu_exclusive handling. #1194
+* Sync HookState with the OCI specification. #1201
+* Split remounting mountpoints and bindmounts, resolving issues with
+  mount options being dropped in certain cases. #1222
+* Fix leftover cgroup directory issue. #1196
+* Handle config.Devices and config.MaskPaths in checkpoint. #1110.
+* Don't create combined cgroup subsystem names. #1268
+* Ignore cgroupv2 mountpoints, fixing issues with systemd v232. #1266
+* Race condition when synchronising with children and grandchildren in
+  nsexec.c. #1237
+* Fix state checks to no longer depend on _LIBCONTAINER being present in
+  the environment, fixing both bugs as well as being part of the
+  rootless container patchset. #1317
+* Fix systemd-notify when using different PID namespaces, and allow
+  detach+notify socket. #1308
+* Don't fchown when inheriting stdio, which is necessary for rootless
+  containers in certain scenarios. #1354
+* Fix cpu.cfs_quota_us being changed when systemd is reloaded. #1344
+* Add devices to whitelist for LXD, to make runC under LXC/LXD work
+  better. #1327
+* Many improvements to testing. #1121 #1131 #1132 #1147
+
+### Security:
+
+* Several fixes for CVE-2016-9962. 5d93fed3d27f #1274
+
+Thanks to all of the contributors that made this release possible:
+
+* Qiang Huang <h.huangqiang@huawei.com>
+* Aleksa Sarai <asarai@suse.de>
+* Mrunal Patel <mrunalp@gmail.com>
+* Michael Crosby <crosbymichael@gmail.com>
+* Wang Long <long.wanglong@huawei.com>
+* Daniel, Dao Quang Minh <dqminh89@gmail.com>
+* rajasec <rajasec79@gmail.com>
+* Zhang Wei <zhangwei555@huawei.com>
+* Steven Hartland <steven.hartland@multiplay.co.uk>
+* Giuseppe Scrivano <gscrivan@redhat.com>
+* Shukui Yang <yangshukui@huawei.com>
+* Ma Shimiao <mashimiao.fnst@cn.fujitsu.com>
+* Daniel Dao <dqminh89@gmail.com>
+* CuiHaozhi <cuihaozhi@chinacloud.com.cn>
+* Antonio Murdaca <runcom@redhat.com>
+* Xianglin Gao <xlgao@zju.edu.cn>
+* Lei Jitang <leijitang@huawei.com>
+* Justin Cormack <justin.cormack@docker.com>
+* Dan Walsh <dwalsh@redhat.com>
+* Daniel Martí <mvdan@mvdan.cc>
+* Ce Gao <ce.gao@outlook.com>
+* allencloud <allen.sun@daocloud.io>
+* Alexander Morozov <lk4d4math@gmail.com>
+* yupeng <yu.peng36@zte.com.cn>
+* Yuanhong Peng <pengyuanhong@huawei.com>
+* Yong Tang <yong.tang.github@outlook.com>
+* xuxinkun <xuxinkun@gmail.com>
+* Xianlu Bird <xianlubird@gmail.com>
+* William Martin <wmartin@pivotal.io>
+* Wentao Zhang <zhangwentao234@huawei.com>
+* Vivek Goyal <vgoyal@redhat.com>
+* Samuel Ortiz <sameo@linux.intel.com>
+* rainrambler <wanganyu@outlook.com>
+* Mohammad Arab <boynux@gmail.com>
+* Michal Rostecki <michal@kinvolk.io>
+* Máximo Cuadros <mcuadros@gmail.com>
+* Kenfe-Mickael Laventure <mickael.laventure@gmail.com>
+* Ian Campbell <ian.campbell@docker.com>
+* Harry Zhang <harryz@hyper.sh>
+* Fengtu Wang <wangfengtu@huawei.com>
+* Eric Paris <eparis@redhat.com>
+* Derek Carr <decarr@redhat.com>
+* Deng Guangxing <dengguangxing@huawei.com>
+* CuiHaozhi <61755280@qq.com>
+* Crazykev <crazykev@zju.edu.cn>
+* Chris Aniszczyk <caniszczyk@gmail.com>
+* Casey Callendrello <c1@caseyc.net>
+* Carlton-Semple <carlton.semple@ibm.com>
+* Brian Goff <cpuguy83@gmail.com>
+* Andrew Vagin <avagin@openvz.org>",https://api.github.com/users/cyphar,2888411,cyphar,https://api.github.com/repos/opencontainers/runc/releases/5823278/assets,https://api.github.com/repos/opencontainers/runc/releases/5823278,master,https://api.github.com/repos/opencontainers/runc/tarball/v1.0.0-rc3,https://github.com/opencontainers/runc/releases/tag/v1.0.0-rc3,https://api.github.com/repos/opencontainers/runc/zipball/v1.0.0-rc3,v1.0.0-rc3,False,True
+4279628,2016-10-01T08:26:01Z,2016-10-01T08:34:55Z,runC 1.0 Release Candidate 2,"### Features
+- {create,run}: add --no-new-keyring flag so that a new session keyring
+  is not created for the container and the calling process's keyring is
+  inherited.
+- restore: add --empty-ns flag to tell CRIU to only create a network
+  namespace for a container and not populate it (allowing higher levels
+  to correctly handle re-creating the network namespace).
+- {create,start}: use a FIFO rather than signals to signal the starting
+  of a container. This removes the Go version restriction, and also
+  avoids potential issues with Go's signal handling.
+- exec: allow additional groups to be overridden.
+- delete: add --force flag.
+- exec: disable the subreaper option entirely, because the option
+  causes many issues with reparenting in the context of containers.
+  This is not a complete fix, which is intended to land for -rc3. Using
+  the removed option will be silently ignored by runC.
+- {create,run}: add support for masking directories with MaskPaths.
+- delete: allow for the deletion of multiple containers in one cmdline.
+- build: add `make release` for distributions.
+
+### Fixes
+- Major improvements and fixes to CLI handling. Now commands like
+  `runc ps` and `runc exec` will act sanely when you're trying to use
+  flags that are not meant to be parsed by runC.
+- Set the cp.rt_\* cgroup options correctly so that runC running in
+  SCHED_RR (realtime) mode can operate properly.
+- Massive improvements to kmem limit detection to ensure that we only
+  attempt to change memory.kmem.\* if it is safe to do so.
+- Part of a major cleanup of the nsenter code, with more intended to
+  land before -rc3.
+- Restored containers now have a start time, which is the time that the
+  new container was started (not when the original container was
+  started).
+- Fix the default cgroupPath behaviour, so that we actually attach to
+  subcgroups of all of the caller's current cgroups (rather than using
+  the devices cgroup path for all other cgroups)
+- Support 32bit UIDs on i386 with the setuid32(2) syscall.
+- Add /proc/timer_list to the set of default masked paths.
+- Do not create /dev/fuse by default.
+- Parse cgroupPath correctly if it contains ':'.
+- Add some more debugging information for the test suite, along with
+  fixes for race conditions and other issues. In addition, add more
+  integration tests for edge conditions.
+- Improve check-config.sh script to handle more cases.
+- Fix incorrect type when setting of net_cls classid.
+- Lots of fixes to help pages and man pages.
+- *: append -dirty to the version if the git repo is unclean.
+- Fix the JSON tags for CpuRt\* options.
+- Cleanups to the rootfs setup code.
+- Improve error messages related to SELinux.
+
+Thanks to all of the contributors that made this release possible:
+- Akihiro Suda suda.akihiro@lab.ntt.co.jp
+- Aleksa Sarai asarai@suse.de
+- Alexander Morozov lk4d4math@gmail.com
+- Andrew Vagin avagin@virtuozzo.com
+- Ben ben.gray@bskyb.com
+- Buddha Prakash buddhap@google.com
+- Carl Henrik Lunde chlunde@ifi.uio.no
+- Christian Brauner cbrauner@suse.de
+- Dam Thomason ad@mthomason.net
+- Dan Walsh dwalsh@redhat.com
+- Daniel, Dao Quang Minh dqminh89@gmail.com
+- Davanum Srinivas davanum@gmail.com
+- Euan Kemp euank@coreos.com
+- Guilherme Rezende guilhermebr@gmail.com
+- Haiyan Meng hmeng@redhat.com
+- Hushan Jia hushan.jia@gmail.com
+- Jiuyue Ma majiuyue@huawei.com
+- Johnny Bieren jbieren@redhat.com
+- Jonathan Boulle jonathanboulle@gmail.com
+- Justin Cormack justin.cormack@docker.com
+- Kenfe-Mickael Laventure mickael.laventure@gmail.com
+- Michael Crosby crosbymichael@gmail.com
+- Mike Brown brownwm@us.ibm.com
+- Mrunal Patel mrunalp@gmail.com
+- Peng Gao peng.gao.dut@gmail.com
+- Petar Petrov pppepito86@gmail.com
+- Phil Estes estesp@linux.vnet.ibm.com
+- Qiang Huang h.huangqiang@huawei.com
+- Serge Hallyn serge@hallyn.com
+- Seth Jennings sjenning@redhat.com
+- Shukui Yang yangshukui@huawei.com
+- Tristan Cacqueray tdecacqu@redhat.com
+- Vishnu kannan vishnuk@google.com
+- Wang Long long.wanglong@huawei.com
+- Yang Hongyang imhy.yang@gmail.com
+- Yen-Lin Chen hencrice@gmail.com
+- Yuanhong Peng pengyuanhong@huawei.com
+- Zhang Wei zhangwei555@huawei.com
+- Zhao Lei zhaolei@cn.fujitsu.com
+- rajasec rajasec79@gmail.com
+- xiekeyang xiekeyang@huawei.com
+",https://api.github.com/users/cyphar,2888411,cyphar,https://api.github.com/repos/opencontainers/runc/releases/4279628/assets,https://api.github.com/repos/opencontainers/runc/releases/4279628,master,https://api.github.com/repos/opencontainers/runc/tarball/v1.0.0-rc2,https://github.com/opencontainers/runc/releases/tag/v1.0.0-rc2,https://api.github.com/repos/opencontainers/runc/zipball/v1.0.0-rc2,v1.0.0-rc2,False,True
+3371902,2016-06-03T22:25:47Z,2016-06-03T23:08:55Z,runc 1.0 Release Candidate 1,"# runc 1.0 Release Candidate 1
+
+This is the first of the release candidates for OCI's runtime specification and runc version 1.0.  Runc is now using the [runtime-spec](https://github.com/opencontainers/runtime-spec/tree/v1.0.0-rc1) 1.0.0-rc1 release.  
+
+### Breaking Changes
+
+The large breaking change from the previous versions of runc to 1.0 is the create and start command changes.  The previous start command functionality has been moved to the run command.  `runc run mycontainer`.  `runc start` does not perform the operations that it did before this release.
+
+#### Create -> Start -> Delete
+
+By splitting the create and start phase for a container it allows higher level systems to modify the container before the user defined process is started.
+
+A simple example of using this new workflow would look something like this from the command line:
+
+``` bash
+# create the container with the specified configuration 
+runc create mycontainer
+
+# at the point that create returns the container's environment is fully setup but the user's specified process has not run
+
+# you can place network interfaces inside the container 
+# you can exec into the container
+# you can modify the mount namespaces
+runc exec mycontainer ps aux
+
+# after your setup is complete you can start the user defined process
+runc start mycontainer
+
+# after start returns the user defied process inside your OCI config is running
+
+# whenever the container exits you must delete the container removing any existing resources it still has
+runc delete mycontainer
+```
+
+If you want the previous functionality where runc did this for you, use the `runc run` command.
+
+#### Container State
+
+You can get the container state and status by using the `runc state` command:
+
+`runc state mycontainer`
+
+``` json
+{
+  ""ociVersion"": ""1.0.0-rc1"",
+  ""id"": ""mycontainer"",
+  ""pid"": 18917,
+  ""bundlePath"": ""/containers/mycontainer"",
+  ""rootfsPath"": ""/containers/mycontainer/rootfs"",
+  ""status"": ""running"",
+  ""created"": ""2016-06-03T21:23:42.401668933Z"",
+  ""annotations"": {
+    ""something"": ""else""
+  }
+}
+```
+
+#### ps command
+
+A `ps` command was added to show the processes inside the container:
+
+``` bash
+runc ps influxdb
+UID        PID  PPID  C STIME TTY          TIME CMD
+1000  18936 18917  0 14:23 ?        00:00:06 influxd -config /home/influxdb/influxdb.conf
+```
+
+#### Other Updates
+- Added seccomp support for more architectures 
+- Stable stats output 
+- Added `update` command for dynamically updating container resources
+- bash completion and man pages
+
+Please help in testing and please report any issues to the issue tracker on github.  Thanks!
+- OCI Maintainers 
+
+### Usage
+
+``` bash
+NAME:
+   runc - Open Container Initiative runtime
+
+runc is a command line client for running applications packaged according to
+the Open Container Initiative (OCI) format and is a compliant implementation of the
+Open Container Initiative specification.
+
+runc integrates well with existing process supervisors to provide a production
+container runtime environment for applications. It can be used with your
+existing process monitoring tools and the container will be spawned as a
+direct child of the process supervisor.
+
+Containers are configured using bundles. A bundle for a container is a directory
+that includes a specification file named ""config.json"" and a root filesystem.
+The root filesystem contains the contents of the container.
+
+To start a new instance of a container:
+
+    # runc start [ -b bundle ] <container-id>
+
+Where ""<container-id>"" is your name for the instance of the container that you
+are starting. The name you provide for the container instance must be unique on
+your host. Providing the bundle directory using ""-b"" is optional. The default
+value for ""bundle"" is the current directory.
+
+USAGE:
+   runc [global options] command [command options] [arguments...]
+
+VERSION:
+   1.0.0-rc1
+commit: 04f275d4601ca7e5ff9460cec7f65e8dd15443ec
+spec: 1.0.0-rc1
+
+COMMANDS:
+     checkpoint checkpoint a running container
+     create create a container
+     delete delete any resources held by the container often used with detached containers
+     events display container events such as OOM notifications, cpu, memory, and IO usage statistics
+     exec   execute new process inside the container
+     init   initialize the namespaces and launch the process (do not call it outside of runc)
+     kill   kill sends the specified signal (default: SIGTERM) to the container's init process
+     list   lists containers started by runc with the given root
+     pause  pause suspends all processes inside the container
+     ps     ps displays the processes running inside a container
+     restore    restore a container from a previous checkpoint
+     resume resumes all processes that have been previously paused
+     run    create and run a container
+     spec   create a new specification file
+     start  start signals a created container to execute the user defined process
+     state  output the state of a container
+     update update container resource constraints
+
+GLOBAL OPTIONS:
+   --debug      enable debug output for logging
+   --log value      set the log file path where internal debug information is written (default: ""/dev/null"")
+   --log-format value   set the format used by logs ('text' (default), or 'json') (default: ""text"")
+   --root value     root directory for storage of container state (this should be located in tmpfs) (default: ""/run/runc"")
+   --criu value     path to the criu binary used for checkpoint and restore (default: ""criu"")
+   --systemd-cgroup enable systemd cgroup support, expects cgroupsPath to be of form ""slice:prefix:name"" for e.g. ""system.slice:runc:434234""
+   --help, -h       show help
+   --version, -v    print the version
+
+```
+",https://api.github.com/users/crosbymichael,749551,crosbymichael,https://api.github.com/repos/opencontainers/runc/releases/3371902/assets,https://api.github.com/repos/opencontainers/runc/releases/3371902,master,https://api.github.com/repos/opencontainers/runc/tarball/v1.0.0-rc1,https://github.com/opencontainers/runc/releases/tag/v1.0.0-rc1,https://api.github.com/repos/opencontainers/runc/zipball/v1.0.0-rc1,v1.0.0-rc1,False,True
+3095534,2016-04-25T21:18:35Z,2016-04-25T23:27:51Z,runc 0.1.1,"# runc 0.1.1
+
+This release includes a bug fix for adding the selinux mount label in the specification.
+",https://api.github.com/users/crosbymichael,749551,crosbymichael,https://api.github.com/repos/opencontainers/runc/releases/3095534/assets,https://api.github.com/repos/opencontainers/runc/releases/3095534,master,https://api.github.com/repos/opencontainers/runc/tarball/v0.1.1,https://github.com/opencontainers/runc/releases/tag/v0.1.1,https://api.github.com/repos/opencontainers/runc/zipball/v0.1.1,v0.1.1,False,False
+3006168,2016-04-12T21:12:08Z,2016-04-12T21:48:04Z,Runc v0.1.0,"This release updates runc to the OCI runtime specification v0.5.0 and includes various fixes and features.
+
+## Features:
+- cgroups: pid limits and stats
+- cgroups: kmem stats
+- systemd cgroup support
+- libcontainer specconv package
+- no pivot root option
+- numeric ids are treated as uid/gid
+- hook improvements
+
+## Bug Fixes:
+- log flushing
+- atomic pid file creation
+- init error recovery
+- seccomp logging removed
+- delete container on aborted start
+- /dev bind mount handling 
+",https://api.github.com/users/crosbymichael,749551,crosbymichael,https://api.github.com/repos/opencontainers/runc/releases/3006168/assets,https://api.github.com/repos/opencontainers/runc/releases/3006168,master,https://api.github.com/repos/opencontainers/runc/tarball/v0.1.0,https://github.com/opencontainers/runc/releases/tag/v0.1.0,https://api.github.com/repos/opencontainers/runc/zipball/v0.1.0,v0.1.0,False,False
+2789377,2016-03-10T22:35:57Z,2016-03-11T01:02:52Z,runc 0.0.9 and specification 0.4.0,"## runc 0.0.9
+
+This new release of runc includes the specification v0.4 changes.  The backwards incompatible changes includes moving process specific settings like capabilities, rlimits, apparmor, and selinux process label from the container configuration to the process configuration.  Be sure to update your `config.json` files for these changes or they will not be applied to the container.  You can always use the `runc spec` command to generate a compatible `config.json` based on the specification version that runc is currently using.  
+
+### Updates:
+- In this release runc has better support for errors and logging for use with the `--log` flag.  
+- Improved namespace sharing for joining PID namespaces.
+- Allow all mount types inside the container's mount namespace.
+- Updated masked and readonly paths for container's /proc.
+- Better IO handling for container's STDIO.
+- Unique session keyring support for containers.
+- Container label support.
+- No new privileges support.
+- Various bug fixes and performance improvements. 
+
+```
+NAME:
+   runc - Open Container Initiative runtime
+
+runc is a command line client for running applications packaged according to
+the Open Container Format (OCF) and is a compliant implementation of the
+Open Container Initiative specification.
+
+runc integrates well with existing process supervisors to provide a production
+container runtime environment for applications. It can be used with your
+existing process monitoring tools and the container will be spawned as a
+direct child of the process supervisor.
+
+Containers are configured using bundles. A bundle for a container is a directory
+that includes a specification file named ""config.json"" and a root filesystem.
+The root filesystem contains the contents of the container. 
+
+To start a new instance of a container:
+
+    # runc start [ -b bundle ] <container-id>
+
+Where ""<container-id>"" is your name for the instance of the container that you
+are starting. The name you provide for the container instance must be unique on
+your host. Providing the bundle directory using ""-b"" is optional. The default
+value for ""bundle"" is the current directory.
+
+USAGE:
+   runc [global options] command [command options] [arguments...]
+
+VERSION:
+   0.0.9
+spec version 0.4.0
+
+COMMANDS:
+   checkpoint   checkpoint a running container
+   delete   delete any resources held by the container often used with detached containers
+   events   display container events such as OOM notifications, cpu, memory, IO and network stats
+   exec     execute new process inside the container
+   init     init is used to initialize the containers namespaces and launch the users process.
+    This command should not be called outside of runc.
+
+   kill     kill sends the specified signal (default: SIGTERM) to the container's init process
+   list     lists containers started by runc with the given root
+   pause    pause suspends all processes inside the container
+   restore  restore a container from a previous checkpoint
+   resume   resumes all processes that have been previously paused
+   spec     create a new specification file
+   start    create and run a container
+   state    output the state of a container
+   help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --debug      enable debug output for logging
+   --log ""/dev/null""    set the log file path where internal debug information is written
+   --log-format ""text""  set the format used by logs ('text' (default), or 'json')
+   --root ""/run/runc""   root directory for storage of container state (this should be located in tmpfs)
+   --criu ""criu""    path to the criu binary used for checkpoint and restore
+   --help, -h       show help
+   --version, -v    print the version
+
+```
+",https://api.github.com/users/crosbymichael,749551,crosbymichael,https://api.github.com/repos/opencontainers/runc/releases/2789377/assets,https://api.github.com/repos/opencontainers/runc/releases/2789377,master,https://api.github.com/repos/opencontainers/runc/tarball/v0.0.9,https://github.com/opencontainers/runc/releases/tag/v0.0.9,https://api.github.com/repos/opencontainers/runc/zipball/v0.0.9,v0.0.9,False,False
+2590473,2016-02-10T22:11:47Z,2016-02-10T22:31:14Z,Release 0.0.8 for runc and specification 0.3.0,"# runc 0.0.8
+
+This new release of runc supports the OCI runtime specification version 0.3.0.  It includes changes such as the unified configuration file, separation of device creation and access, and many other usability updates.  
+
+## New features
+
+### Detach
+
+The detach flag allows runc to exit after it spawns the container and reparents the process to system init.  You no longer have a long running runc process as the parent of the container.
+
+``` bash
+runc start -d test
+```
+
+### Pid file
+
+The `pid-file` flag allows runc to write the pid of the process run inside the container to a file so that existing init systems can wait on it and allows runc to exit.
+
+``` bash
+runc start -d --pid-file test.pid test
+```
+
+### Delete command
+
+The delete command allows runc to delete the container's state after it has exited for use with the detach flag.
+
+``` bash
+runc delete test
+```
+
+### List command
+
+The list command will list all containers running on a system that were spawned by runc.
+
+``` bash
+> runc list
+ID          PID         STATUS      CREATED
+test        15278       running     2016-02-10T22:21:09.415768192Z
+```
+
+### Exec command updates
+
+The exec command now allows you to use a json file for the process configuration or pass the arguments and settings via flags and args.
+
+``` bash
+> runc exec --tty --env TEST=1 -- test ps aux
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  0.0  0.0   4476   900 ?        Ss+  22:23   0:00 sh
+root        13  0.0  0.0  15600  2116 ?        Rs+  22:23   0:00 ps aux
+```
+
+### Container ids
+
+Container ids are required for every command in runc.  You pass the container id as argument 1 to the commands to specify which container you want to interact with.  This was always the case before in runc but hidden behind a `--id` flag.  
+
+``` bash
+> runc start test
+> runc events test
+> runc kill test
+```
+
+## Update to spec 0.3.0
+
+Be sure to use the `runc spec` command to generate a new base template for your containers based on the specification and the unified configuration file.  
+
+```
+NAME:
+   runc - Open Container Initiative runtime
+
+runc is a command line client for running applications packaged according to
+the Open Container Format (OCF) and is a compliant implementation of the
+Open Container Initiative specification.
+
+runc integrates well with existing process supervisors to provide a production
+container runtime environment for applications. It can be used with your
+existing process monitoring tools and the container will be spawned as a
+direct child of the process supervisor.
+
+After creating config files for your root filesystem with runc, you can execute 
+a container in your shell by running:
+
+    # cd /mycontainer
+    # runc start [ -b bundle ] <container-id>
+
+If not specified, the default value for the 'bundle' is the current directory.
+'Bundle' is the directory where 'config.json' must be located.
+
+USAGE:
+   runc [global options] command [command options] [arguments...]
+
+VERSION:
+   0.0.8
+spec version 0.3.0
+
+COMMANDS:
+   checkpoint   checkpoint a running container
+   delete       delete any resources held by the container often used with detached containers
+   events       display container events such as OOM notifications, cpu, memory, IO and network stats
+   exec         execute new process inside the container
+   kill         kill sends the specified signal (default: SIGTERM) to the container's init process
+   list         lists containers started by runc with the given root
+   pause        pause suspends all processes inside the container
+   restore      restore a container from a previous checkpoint
+   resume       resumes all processes that have been previously paused
+   spec         create a new specification file
+   start        create and run a container
+   help, h      Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --debug                                      enable debug output for logging
+   --log                                        set the log file path where internal debug information is written
+   --log-format ""text""                          set the format used by logs ('text' (default), or 'json')
+   --root ""/run/opencontainer/containers""       root directory for storage of container state (this should be located in tmpfs)
+   --criu ""criu""                                path to the criu binary used for checkpoint and restore
+   --help, -h                                   show help
+   --version, -v                                print the version
+```
+
+MD5 hases for the downloadable runc binaries in this release are:
+- runc-amd64: 966cf271c2923b64d2d7ad0be9ffdc6e
+",https://api.github.com/users/crosbymichael,749551,crosbymichael,https://api.github.com/repos/opencontainers/runc/releases/2590473/assets,https://api.github.com/repos/opencontainers/runc/releases/2590473,master,https://api.github.com/repos/opencontainers/runc/tarball/v0.0.8,https://github.com/opencontainers/runc/releases/tag/v0.0.8,https://api.github.com/repos/opencontainers/runc/zipball/v0.0.8,v0.0.8,False,False
+2489504,2016-01-26T22:45:16Z,2016-01-26T22:50:24Z,Release v0.0.7,"This release includes the following changes:
+- Do not use stream encoders
+- Update github.com/opencontainers/specs to a7b50925d8996923d99e1c50750131e20b743067
+- cgroup: systemd: properly expand systemd slice names
+- Remove the nullState
+- Revert ""update date in README""
+- Add build status badge
+- Allow switch to anything from nullState
+- Fix various state bugs for pause and destroy
+- cgroups: set memory cgroups in Set
+- Only set cwd when not empty
+- Fix comment of swap limit
+- Add support for just joining in apply using cgroup paths
+- Remove some hard coded strings
+- Handle seccomp proc parsing errors
+- Embed Resources for backward compatibility
+- add seccomp.IsEnabled() function
+- cleanup old hack dir
+- Check that cwd is absolute
+- update go version to 1.5.3 in dockerfile and cleanup
+- Make cwd required
+- Update README of libcontainer
+- Only validate post-hyphen field length on cgroup mounts
+- libcontainer: set cgroup config late
+- libcontainer: cgroups: loudly fail with Set
+- libcontainer: cgroups: don't Set in Apply
+- libcontainer: cgroups: add pids controller support
+- cgroups: fs: fix cgroup.Parent path sanitisation
+- Do not create devices when in user namespace
+- Revert to non-recursive GetPids, add recursive GetAllPids
+- selinux: add SelinuxSetEnforceMode implementation
+- update date in README
+- Add --console to specify path to use from runc
+- Do not allow access to /dev/tty{0,1}
+- Add white list for bind mount check
+- Fix typo word in SPEC.md
+- libcontainer: Add support for memcg pressure notifications
+- Cleanup Godeps
+- Revert ""cgroups: add pids controller support""
+- libcontainer: set cgroup config late
+- libcontainer: cgroups: loudly fail with Set
+- libcontainer: cgroups: don't Set in Apply
+- libcontainer: cgroups: add pids controller support
+- Caclulate NLA_HDRLEN as gccgo workaround
+- Add state pattern for container state transition
+- Move the cgroups setting into a Resources struct
+- Move linux only Process.InitializeIO behind the linux build flag.
+- Replace docker units package with new docker/go-units.
+- Move STDIO initialization to libcontainer.Process
+- Fixing TestSetFilecon in selinux test step
+- Adding selinux label
+- make localtest failure with selinux enabled
+- Add spec version to runC version cli
+",https://api.github.com/users/LK4D4,101445,LK4D4,https://api.github.com/repos/opencontainers/runc/releases/2489504/assets,https://api.github.com/repos/opencontainers/runc/releases/2489504,master,https://api.github.com/repos/opencontainers/runc/tarball/v0.0.7,https://github.com/opencontainers/runc/releases/tag/v0.0.7,https://api.github.com/repos/opencontainers/runc/zipball/v0.0.7,v0.0.7,False,True
+2274838,2015-12-11T18:13:47Z,2015-12-11T19:07:02Z,Release v0.0.6,"This release includes the following changes:
+- fix minor typo
+- Remove the timeframe for v1 spec
+- Export console New func
+- setns: replace env with netlink for bootstrap data
+- systemd: support cgroup parent with specified slice
+- libcontainer: network_linux.go: fix go vet
+- Fixing xattr test step issue
+- libcontainer: configs: create cgroup_unsupported.go in order to build on darwin as well
+- Fixing minor typo in usage
+- setns: add bootstrap data
+- Adding error conditions when apparmor disabled
+- README.md: clarify OCI JSON files
+",https://api.github.com/users/mrunalp,53798,mrunalp,https://api.github.com/repos/opencontainers/runc/releases/2274838/assets,https://api.github.com/repos/opencontainers/runc/releases/2274838,master,https://api.github.com/repos/opencontainers/runc/tarball/v0.0.6,https://github.com/opencontainers/runc/releases/tag/v0.0.6,https://api.github.com/repos/opencontainers/runc/zipball/v0.0.6,v0.0.6,False,False

@@ -1,0 +1,325 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7956023,2017-10-01T15:28:57Z,2017-10-01T15:30:17Z,1.0.15," - The default password hashing algorithm is now Argon2id. The `pwhash_str_verify()` function can still verify Argon2i hashes without any changes, and `pwhash()` can still compute Argon2i hashes as well.
+ - The aes128ctr primitive was removed. It was slow, non-standard, not authenticated, and didn't seem to be used by any opensource project.
+ - Argon2id required at least 3 passes like Argon2i, despite a minimum of `1` as defined by the `OPSLIMIT_MIN` constant. This has been fixed.
+ - The secretstream construction was slightly changed to be consistent with forthcoming variants.
+ - The Javascript and Webassembly versions have been merged, and the module now returns a `.ready` promise that will resolve after the Webassembly code is loaded and compiled.
+ - Note that due to these incompatible changes, the library version major was bumped up.",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/7956023/assets,https://api.github.com/repos/jedisct1/libsodium/releases/7956023,master,https://api.github.com/repos/jedisct1/libsodium/tarball/1.0.15,https://github.com/jedisct1/libsodium/releases/tag/1.0.15,https://api.github.com/repos/jedisct1/libsodium/zipball/1.0.15,1.0.15,False,False
+7847909,2017-09-21T22:59:16Z,2017-09-21T23:21:36Z,1.0.14," - iOS binaries should now be compatible with WatchOS and TVOS.
+ - WebAssembly is now officially supported. Special thanks to @facekapow and @pepyakin who helped to make it happen.
+ - Internal consistency checks failing and primitives used with dangerous/out-of-bounds/invalid parameters used to call abort(3). Now, a custom handler *that doesn't return* can be set with the `set_sodium_misuse()` function. It still aborts by default or if the handler ever returns. This is not a replacement for non-fatal, expected runtime errors. This handler will be only called in unexpected situations due to potential bugs in the library or in language bindings.
+ - `*_MESSAGEBYTES_MAX` macros (and the corresponding `_messagebytes_max()` symbols) have been added to represent the maximum message size that can be safely handled by a primitive. Language bindings are encouraged to check user inputs against these maximum lengths.
+ - The test suite has been extended to cover more edge cases.
+ - `crypto_sign_ed25519_pk_to_curve25519()` now rejects points that are not on the curve, or not in the main subgroup.
+ - Further changes have been made to ensure that smart compilers will not optimize out code that we don't want to be optimized.
+ - Visual Studio solutions are now included in distribution tarballs.
+ - The `sodium_runtime_has_*` symbols for CPU features detection are now defined as weak symbols, i.e. they can be replaced with an application-defined implementation. This can be useful to disable AVX* when temperature/power consumption is a concern.
+ - `crypto_kx_*()` now aborts if called with no non-NULL pointers to store keys to.
+ - SSE2 implementations of `crypto_verify_*()` have been added.
+ - Passwords can be hashed using a specific algorithm with the new `crypto_pwhash_str_alg()` function.
+ - Due to popular demand, base64 encoding (`sodium_bin2base64()`) and decoding (`sodium_base642bin()`) have been implemented.
+ - A new `crypto_secretstream_*()` API was added to safely encrypt files and multi-part messages.
+ - The `sodium_pad()` and `sodium_unpad()` helper functions have been added in order to add & remove padding.
+ - An AVX512 optimized implementation of Argon2 has been added (written by Ondrej Mosnáček, thanks!)
+ - The `crypto_pwhash_str_needs_rehash()` function was added to check if a password hash string matches the given parameters, or if it needs an update.
+ - The library can now be compiled with recent versions of emscripten/binaryen that don't allow multiple variables declarations using a single `var` statement.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/7847909/assets,https://api.github.com/repos/jedisct1/libsodium/releases/7847909,master,https://api.github.com/repos/jedisct1/libsodium/tarball/1.0.14,https://github.com/jedisct1/libsodium/releases/tag/1.0.14,https://api.github.com/repos/jedisct1/libsodium/zipball/1.0.14,1.0.14,False,False
+7053299,2017-07-15T15:45:37Z,2017-07-15T18:26:18Z,1.0.13,"- Javascript: the sumo builds now include all symbols. They were previously limited to symbols defined in minimal builds.
+- The public `crypto_pwhash_argon2i_MEMLIMIT_MAX` constant was incorrectly defined on 32-bit platforms. This has been fixed.
+- Version 1.0.12 didn't compile on OpenBSD/i386 using the base gcc compiler. This has been fixed.
+- The Android compilation scripts have been updated for NDK r14b.
+- armv7s-optimized code was re-added to iOS builds.
+- An AVX2 optimized implementation of the Argon2 round function was added.
+- The Argon2id variant of Argon2 has been implemented. The high-level `crypto_pwhash_str_verify()` function automatically detects the algorithm and can verify both Argon2i and Argon2id hashed passwords.
+The default algorithm for newly hashed passwords remains Argon2i in this version to avoid breaking compatibility with verifiers running libsodium <= 1.0.12.
+- A `crypto_box_curve25519xchacha20poly1305_seal*()` function set was implemented.
+- scrypt was removed from minimal builds.
+- libsodium is now available on NuGet.",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/7053299/assets,https://api.github.com/repos/jedisct1/libsodium/releases/7053299,master,https://api.github.com/repos/jedisct1/libsodium/tarball/1.0.13,https://github.com/jedisct1/libsodium/releases/tag/1.0.13,https://api.github.com/repos/jedisct1/libsodium/zipball/1.0.13,1.0.13,False,False
+5720540,2017-03-13T08:26:00Z,2017-03-13T08:27:54Z,1.0.12," - Ed25519ph was implemented, adding a multi-part signature API (`crypto_sign_init()`, `crypto_sign_update()`, `crypto_sign_final_*()`).
+ - New constants and related accessors have been added for Scrypt and Argon2.
+ - XChaCha20 has been implemented. Like XSalsa20, this construction extends the ChaCha20 cipher to accept a 192-bit nonce. This makes it safe to use ChaCha20 with random nonces.
+ - `crypto_secretbox`, `crypto_box` and `crypto_aead` now offer variants leveraging XChaCha20.
+ - SHA-2 is about 20% faster, which also gives a speed boost to signature and signature verification.
+ - AVX2 implementations of Salsa20 and ChaCha20 have been added. They are twice as fast as the SSE2 implementations. The speed gain is even more significant on Windows, that previously didn't use vectorized implementations.
+ - New high-level API: `crypto_kdf`, to easily derive one or more subkeys from a master key.
+ - Siphash with a 128-bit output has been implemented, and is available as `crypto_shorthash_siphashx_*`.
+ - New `*_keygen()` helpers functions have been added to create secret keys for all constructions. This improves code clarity and can prevent keys from being partially initialized.
+ - A new `randombytes_buf_deterministic()` function was added to deterministically fill a memory region with pseudorandom data. This function can especially be useful to write reproducible tests.
+ - A `crypto_kx_*()` API was added to compute shared session keys.
+ - AVX2 detection is more reliable.
+ - The pthreads library is not required any more when using MingW.
+ - `contrib/Findsodium.cmake` was added as an example to include libsodium in a project using cmake.
+ - Compatibility with gcc 2.x has been restored.
+ - Minimal builds can be checked using `sodium_library_minimal()`.
+ - The `--enable-opt` compilation switch has become compatible with more platforms.
+ - Android builds are now using clang on platforms where it is available.
+
+![Pie from PIE](https://download.libsodium.org/libsodium/awesome/pie.jpg)",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/5720540/assets,https://api.github.com/repos/jedisct1/libsodium/releases/5720540,master,https://api.github.com/repos/jedisct1/libsodium/tarball/1.0.12,https://github.com/jedisct1/libsodium/releases/tag/1.0.12,https://api.github.com/repos/jedisct1/libsodium/zipball/1.0.12,1.0.12,False,False
+3779150,2016-07-31T16:11:24Z,2016-07-31T16:13:08Z,1.0.11,"- `sodium_init()` is now thread-safe, and can be safely called multiple times.
+- Android binaries now properly support 64-bit Android, targeting platform 24, but without breaking compatibility with platforms 16 and 21.
+- Better support for old gcc versions.
+- On FreeBSD, core dumps are disabled on regions allocated with sodium allocation functions.
+- AVX2 detection was fixed, resulting in faster BLAKE2b hashing on platforms where it was not properly  detected.
+- The Sandy2x Curve25519 implementation was not as fast as expected on some platforms. This has been fixed.
+- The NativeClient target was improved. Most notably, it now supports optimized implementations, and uses `pepper_49` by default.
+- The library can be compiled with recent Emscripten versions. Changes have been made to produce smaller code, and the default heap size was reduced in the standard version.
+- The code can now be compiled on SLES11 service pack 4.
+- Decryption functions can now accept a NULL pointer for the output. This checks the MAC without writing the decrypted message.
+- `crypto_generichash_final()` now returns `-1` if called twice.
+- Support for Visual Studio 2008 was improved.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/3779150/assets,https://api.github.com/repos/jedisct1/libsodium/releases/3779150,master,https://api.github.com/repos/jedisct1/libsodium/tarball/1.0.11,https://github.com/jedisct1/libsodium/releases/tag/1.0.11,https://api.github.com/repos/jedisct1/libsodium/zipball/1.0.11,1.0.11,False,False
+2949952,2016-04-04T19:55:44Z,2016-04-04T20:01:34Z,1.0.10,"- This release only fixes a compilation issue reported with some older gcc versions. There are no functional changes over the previous release.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/2949952/assets,https://api.github.com/repos/jedisct1/libsodium/releases/2949952,master,https://api.github.com/repos/jedisct1/libsodium/tarball/1.0.10,https://github.com/jedisct1/libsodium/releases/tag/1.0.10,https://api.github.com/repos/jedisct1/libsodium/zipball/1.0.10,1.0.10,False,False
+2939563,2016-04-02T15:10:47Z,2016-04-02T15:14:19Z,1.0.9,"- The Javascript target now includes a `--sumo` option to include all the symbols of the original C library.
+- A detached API was added to the ChaCha20-Poly1305 and AES256-GCM implementations.
+- The Argon2i password hashing function was added, and is accessible directly and through a new, high-level `crypto_pwhash` API. The scrypt function remains available as well.
+- A speed-record AVX2 implementation of BLAKE2b was added (thanks to Samuel Neves).
+- The library can now be compiled using C++Builder (thanks to @jcolli44)
+- Countermeasures for Ed25519 signatures malleability have been added to match the irtf-cfrg-eddsa draft (note that malleability is irrelevant to the standard definition of signature security). Signatures with a small-order `R` point are now also rejected.
+- Some implementations are now slightly faster when using the Clang compiler.
+- The HChaCha20 core function was implemented (`crypto_core_hchacha20()`).
+- No-op stubs were added for all AES256-GCM public functions even when compiled on non-Intel platforms.
+- `crypt_generichash_blake2b_statebytes()` was added.
+- New macros were added for the IETF variant of the ChaCha20-Poly1305 construction.
+- The library can now be compiled on Minix.
+- HEASLR is now enabled on MinGW builds.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/2939563/assets,https://api.github.com/repos/jedisct1/libsodium/releases/2939563,master,https://api.github.com/repos/jedisct1/libsodium/tarball/1.0.9,https://github.com/jedisct1/libsodium/releases/tag/1.0.9,https://api.github.com/repos/jedisct1/libsodium/zipball/1.0.9,1.0.9,False,False
+2340203,2015-12-25T14:59:24Z,2015-12-25T15:04:38Z,1.0.8,"```
+
+           *             ,
+                       _/^\_
+                      <     >
+     *                 /.-.\         *
+              *        `/&\`                   *
+                      ,@.*;@,
+                     /_o.I %_\    *
+        *           (`'--:o(_@;
+                   /`;--.,__ `')             *
+                  ;@`o % O,*`'`&\ 
+            *    (`'--)_@ ;o %'()\      *
+                 /`;--._`''--._O'@;
+                /&*,()~o`;-.,_ `""""`)
+     *          /`,@ ;+& () o*`;-';\
+               (`""""--.,_0 +% @' &()\
+               /-.,_    ``''--....-'`)  *
+          *    /@%;o`:;'--,.__   __.'\
+              ;*,&(); @ % &^;~`""`o;@();         *
+              /(); o^~; & ().o@*&`;&%O\
+              `""=""==""""==,,,.,=""==""===""`
+           __.----.(\-''#####---...___...-----._
+         '`         \)_`""""""""""`
+                 .--' ')
+               o(  )_-\
+                 `""""""` `
+```
+- Handle the case where the CPU supports AVX, but we are running on an hypervisor with AVX disabled/not supported.
+- Faster (2x) `scalarmult_base()` when using the ref10 implementation.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/2340203/assets,https://api.github.com/repos/jedisct1/libsodium/releases/2340203,master,https://api.github.com/repos/jedisct1/libsodium/tarball/1.0.8,https://github.com/jedisct1/libsodium/releases/tag/1.0.8,https://api.github.com/repos/jedisct1/libsodium/zipball/1.0.8,1.0.8,False,False
+2252623,2015-12-08T15:58:35Z,2015-12-08T16:07:52Z,1.0.7,"- More functions whose return value should be checked have been tagged with `__attribute__ ((warn_unused_result))`: `crypto_box_easy()`, `crypto_box_detached()`, `crypto_box_beforenm()`, `crypto_box()`, and `crypto_scalarmult()`.
+- Sandy2x, the fastest Curve25519 implementation ever, has been merged in, and is automatically used on CPUs supporting the AVX instructions set.
+- An SSE2 optimized implementation of Poly1305 was added, and is twice as fast as the portable one.
+- An SSSE3 optimized implementation of ChaCha20 was added, and is twice as fast as the portable one.
+- Faster `sodium_increment()` for common nonce sizes.
+- New helper functions have been added: `sodium_is_zero()` and  `sodium_add()`.
+- `sodium_runtime_has_aesni()` now properly detects the CPU flag when  compiled using Visual Studio.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/2252623/assets,https://api.github.com/repos/jedisct1/libsodium/releases/2252623,master,https://api.github.com/repos/jedisct1/libsodium/tarball/1.0.7,https://github.com/jedisct1/libsodium/releases/tag/1.0.7,https://api.github.com/repos/jedisct1/libsodium/zipball/1.0.7,1.0.7,False,False
+2054259,2015-11-01T22:42:50Z,2015-11-01T22:50:09Z,1.0.6,"- Optimized implementations of Blake2 have been added for modern Intel platforms. crypto_generichash() is now faster than MD5 and SHA1 implementations while being far more secure.
+- Functions for which the return value should be checked have been tagged with `__attribute__ ((warn_unused_result))`. This will intentionally break code compiled with `-Werror` that didn't bother checking critical return values.
+- The `crypto_sign_edwards25519sha512batch_*()` functions have been tagged as deprecated.
+- Undocumented symbols that were exported, but were only useful for internal purposes have been removed or made private:
+  `sodium_runtime_get_cpu_features()`, the implementation-specific `crypto_onetimeauth_poly1305_donna()` symbols, `crypto_onetimeauth_poly1305_set_implementation()`, `crypto_onetimeauth_poly1305_implementation_name()` and `crypto_onetimeauth_pick_best_implementation()`.
+- `sodium_compare()` now works as documented, and compares numbers in little-endian format instead of behaving like `memcmp()`.
+- The previous changes should not break actual applications, but to be safe, the library version major was incremented.
+- `sodium_runtime_has_ssse3()` and `sodium_runtime_has_sse41()` have been added.
+- The library can now be compiled with the CompCert compiler.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/2054259/assets,https://api.github.com/repos/jedisct1/libsodium/releases/2054259,master,https://api.github.com/repos/jedisct1/libsodium/tarball/1.0.6,https://github.com/jedisct1/libsodium/releases/tag/1.0.6,https://api.github.com/repos/jedisct1/libsodium/zipball/1.0.6,1.0.6,False,False
+2013881,2015-10-24T20:58:33Z,2015-10-24T20:59:59Z,1.0.5,"This release only fixes compilation issues on some platforms.
+
+If 1.0.4 compiled and installed fine on your system, upgrading to this version is not required.
+There are no functional changes.
+- Compilation issues on some platforms were fixed: missing alignment directives were added (required at least on RHEL-6/i386), a workaround for a VRP bug on gcc/armv7 was added, and the library can now be compiled with the SunPro compiler.
+- Javascript target: io.js is not supported any more. Use nodejs.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/2013881/assets,https://api.github.com/repos/jedisct1/libsodium/releases/2013881,master,https://api.github.com/repos/jedisct1/libsodium/tarball/1.0.5,https://github.com/jedisct1/libsodium/releases/tag/1.0.5,https://api.github.com/repos/jedisct1/libsodium/zipball/1.0.5,1.0.5,False,False
+1978380,2015-10-18T13:30:47Z,2015-10-18T14:25:23Z,1.0.4,"- Support for AES256-GCM has been added. This requires a CPU with the aesni and pclmul extensions, and is accessible via the `crypto_aead_aes256gcm_*()` functions.
+- The Javascript target doesn't use `eval()` any more, so that the library can be used in Chrome packaged applications.
+- QNX and CloudABI are now supported.
+- Support for NaCl has finally been added.
+- ChaCha20 with an extended (96 bit) nonce and a 32-bit counter has been implemented as `crypto_stream_chacha20_ietf()`, `crypto_stream_chacha20_ietf_xor()` and `crypto_stream_chacha20_ietf_xor_ic()`. An IETF-compatible version of ChaCha20Poly1305 is available as `crypto_aead_chacha20poly1305_ietf_npubbytes()`, `crypto_aead_chacha20poly1305_ietf_encrypt()` and `crypto_aead_chacha20poly1305_ietf_decrypt()`.
+- The `sodium_increment()` helper function has been added, to increment an arbitrary large number (such as a nonce).
+- The `sodium_compare()` helper function has been added, to compare arbitrary large numbers (such as nonces, in order to prevent replay attacks).
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/1978380/assets,https://api.github.com/repos/jedisct1/libsodium/releases/1978380,master,https://api.github.com/repos/jedisct1/libsodium/tarball/1.0.4,https://github.com/jedisct1/libsodium/releases/tag/1.0.4,https://api.github.com/repos/jedisct1/libsodium/zipball/1.0.4,1.0.4,False,False
+1278048,2015-06-13T01:26:47Z,2015-05-09T14:13:53Z,1.0.3,"- In addition to `sodium_bin2hex()`, `sodium_hex2bin()` is now a
+  constant-time function.
+- `crypto_stream_xsalsa20_ic()` has been added.
+- `crypto_generichash_statebytes()`, `crypto_auth_*_statebytes()` and `crypto_hash_*_statebytes()` have been added in order to retrieve the size of structures keeping states from foreign languages.
+- The JavaScript target doesn't require `/dev/urandom` or an external `randombytes()` implementation any more. Other minor Emscripten-related improvements have been made in order to support libsodium.js
+- Custom `randombytes` implementations do not need to provide their own implementation of `randombytes_uniform()` any more. `randombytes_stir()` and `randombytes_close()` can also be `NULL` pointers if they are not required.
+- On Linux, `getrandom(2)` is being used instead of directly accessing `/dev/urandom`, if the kernel supports this system call.
+- `crypto_box_seal()` and `crypto_box_seal_open()` have been added.
+- A solutions for Visual Studio 2015 was added.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/1278048/assets,https://api.github.com/repos/jedisct1/libsodium/releases/1278048,master,https://api.github.com/repos/jedisct1/libsodium/tarball/1.0.3,https://github.com/jedisct1/libsodium/releases/tag/1.0.3,https://api.github.com/repos/jedisct1/libsodium/zipball/1.0.3,1.0.3,False,False
+722439,2014-11-20T22:01:35Z,2014-11-21T04:54:51Z,1.0.1,"- DLL_EXPORT was renamed SODIUM_DLL_EXPORT in order to avoid
+  collisions with similar macros defined by other libraries.
+- sodium_bin2hex() is now constant-time.
+- crypto_secretbox_detached() now supports overlapping input and output
+  regions.
+- NaCl's donna_c64 implementation of curve25519 was reading an extra byte
+  past the end of the buffer containing the base point. This has been
+  fixed.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/722439/assets,https://api.github.com/repos/jedisct1/libsodium/releases/722439,master,https://api.github.com/repos/jedisct1/libsodium/tarball/1.0.1,https://github.com/jedisct1/libsodium/releases/tag/1.0.1,https://api.github.com/repos/jedisct1/libsodium/zipball/1.0.1,1.0.1,False,False
+580268,2014-09-30T18:35:31Z,2014-09-24T17:06:48Z,1.0.0,"- The API and ABI are now stable. New features will be added, but backward-compatibility is guaranteed through all the 1.x.y releases.
+- crypto_sign() properly works with overlapping regions again. Thanks to @pysiak for reporting this regression introduced in version 0.6.1.
+- The test suite has been extended.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/580268/assets,https://api.github.com/repos/jedisct1/libsodium/releases/580268,master,https://api.github.com/repos/jedisct1/libsodium/tarball/1.0.0,https://github.com/jedisct1/libsodium/releases/tag/1.0.0,https://api.github.com/repos/jedisct1/libsodium/zipball/1.0.0,1.0.0,False,False
+570460,2014-09-19T06:46:57Z,2014-09-19T21:04:37Z,0.7.1 (1.0 RC2),"This is the second release candidate of Sodium 1.0.
+
+Minor compilation, readability and portability changes have been made and the test suite was improved, but the API is the same as the previous release candidate.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/570460/assets,https://api.github.com/repos/jedisct1/libsodium/releases/570460,master,https://api.github.com/repos/jedisct1/libsodium/tarball/0.7.1,https://github.com/jedisct1/libsodium/releases/tag/0.7.1,https://api.github.com/repos/jedisct1/libsodium/zipball/0.7.1,0.7.1,False,False
+511011,2014-08-21T04:00:09Z,2014-08-24T06:55:59Z,0.7.0 (1.0 RC1),"- Allocating memory to store sensitive data can now be done using
+  sodium_malloc() and sodium_allocarray(). These functions add guard
+  pages around the protected data to make it less likely to be
+  accessible in a heartbleed-like scenario. In addition, the protection
+  for memory regions allocated that way can be changed using
+  sodium_mprotect_noaccess(), sodium_mprotect_readonly() and
+  sodium_mprotect_readwrite().
+- ed25519 keys can be converted to curve25519 keys with
+  crypto_sign_ed25519_pk_to_curve25519() and
+  crypto_sign_ed25519_sk_to_curve25519(). This allows using the same
+  keys for signature and encryption.
+- The seed and the public key can be extracted from an ed25519 key
+  using crypto_sign_ed25519_sk_to_seed() and crypto_sign_ed25519_sk_to_pk().
+- aes256 was removed. A timing-attack resistant implementation might
+  be added later, but not before version 1.0 is tagged.
+- The crypto_pwhash_scryptxsalsa208sha256_\* compatibility layer was
+  removed. Use crypto_pwhash_scryptsalsa208sha256_*.
+- The compatibility layer for implementation-specific functions was
+  removed.
+- Compilation issues with Mingw64 on MSYS (not MSYS2) were fixed.
+- crypto_pwhash_scryptsalsa208sha256_STRPREFIX was added: it contains
+  the prefix produced by crypto_pwhash_scryptsalsa208sha256_str()
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/511011/assets,https://api.github.com/repos/jedisct1/libsodium/releases/511011,master,https://api.github.com/repos/jedisct1/libsodium/tarball/0.7.0,https://github.com/jedisct1/libsodium/releases/tag/0.7.0,https://api.github.com/repos/jedisct1/libsodium/zipball/0.7.0,0.7.0,False,False
+431497,2014-07-15T21:19:37Z,2014-07-15T21:18:13Z,0.6.1,"- Important bug fix: when crypto_sign_open() was given a signed
+  message too short to even contain a signature, it was putting an
+  unlimited amount of zeros into the target buffer instead of
+  immediately returning -1. The bug was introduced in version 0.5.0.
+- New API: crypto_sign_detached() and crypto_sign_verify_detached()
+  to produce and verify ed25519 signatures without having to duplicate
+  the message.
+- New ./configure switch: --enable-minimal, to create a smaller
+  library, with only the functions required for the high-level API.
+  Mainly useful for the JavaScript target and embedded systems.
+- All the symbols are now exported by the Emscripten build script.
+- The pkg-config .pc file is now always installed even if the
+  pkg-config tool is not available during the installation.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/431497/assets,https://api.github.com/repos/jedisct1/libsodium/releases/431497,master,https://api.github.com/repos/jedisct1/libsodium/tarball/0.6.1,https://github.com/jedisct1/libsodium/releases/tag/0.6.1,https://api.github.com/repos/jedisct1/libsodium/zipball/0.6.1,0.6.1,False,False
+406296,2014-07-01T23:35:45Z,2014-07-01T23:58:57Z,0.6.0,"- The ChaCha20 stream cipher has been added, as crypto_stream_chacha20_*
+- The ChaCha20Poly1305 AEAD construction has been implemented, as
+  crypto_aead_chacha20poly1305_*
+- The _easy API does not require any heap allocations any more and
+  does not have any overhead over the NaCl API. With the password
+  hashing function being an obvious exception, the library doesn't
+  allocate and will not allocate heap memory ever.
+- crypto_box and crypto_secretbox have a new _detached API to store
+  the authentication tag and the encrypted message separately.
+- crypto_pwhash_scryptxsalsa208sha256_() functions have been renamed
+  crypto_pwhash_scryptsalsa208sha256_().
+- The low-level crypto_pwhash_scryptsalsa208sha256_ll() function
+  allows setting individual parameters of the scrypt function.
+- New macros and functions for recommended crypto_pwhash_\* parameters
+  have been added.
+- Similarly to crypto_sign_seed_keypair(), crypto_box_seed_keypair()
+  has been introduced to deterministically generate a key pair from a seed.
+- crypto_onetimeauth() now provides a streaming interface.
+- crypto_stream_chacha20_xor_ic() and crypto_stream_salsa20_xor_ic()
+  have been added to use a non-zero initial block counter.
+- On Windows, CryptGenRandom() was replaced by RtlGenRandom(), which
+  doesn't require the Crypt API.
+- The high bit in curve25519 is masked instead of processing the key as
+  a 256-bit value.
+- The curve25519 ref implementation was replaced by the latest ref10
+  implementation from Supercop.
+- sodium_mlock() now prevents memory from being included in coredumps
+  on Linux 3.4+
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/406296/assets,https://api.github.com/repos/jedisct1/libsodium/releases/406296,master,https://api.github.com/repos/jedisct1/libsodium/tarball/0.6.0,https://github.com/jedisct1/libsodium/releases/tag/0.6.0,https://api.github.com/repos/jedisct1/libsodium/zipball/0.6.0,0.6.0,False,False
+321157,2014-05-13T20:47:13Z,2014-05-15T00:48:23Z,0.5.0,"- sodium_mlock()/sodium_munlock() have been introduced to lock pages
+  in memory before storing sensitive data, and to zero them before
+  unlocking them.
+- High-level wrappers for crypto_box and crypto_secretbox
+  (crypto_box_easy and crypto_secretbox_easy) can be used to avoid
+  dealing with the specific memory layout regular functions depend on.
+- crypto_pwhash_scryptxsalsa208sha256\* functions have been added
+  to derive a key from a password, and for password storage.
+- Salsa20 and ed25519 implementations now support overlapping
+  inputs/keys/outputs (changes imported from supercop-20140505).
+- New build scripts for Visual Studio, Emscripten, different Android
+  architectures and msys2 are available.
+- The poly1305-53 implementation has been replaced with Floodyberry's
+  poly1305-donna32 and poly1305-donna64 implementations.
+- sodium_hex2bin() has been added to complement sodium_bin2hex().
+- On OpenBSD and Bitrig, arc4random() is used instead of reading
+  /dev/urandom.
+- crypto_auth_hmac_sha512() has been implemented.
+- sha256 and sha512 now have a streaming interface.
+- hmacsha256, hmacsha512 and hmacsha512256 now support keys of
+  arbitrary length, and have a streaming interface.
+- crypto_verify_64() has been implemented.
+- first-class Visual Studio build system, thanks to @evoskuil
+- CPU features are now detected at runtime.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/321157/assets,https://api.github.com/repos/jedisct1/libsodium/releases/321157,master,https://api.github.com/repos/jedisct1/libsodium/tarball/0.5.0,https://github.com/jedisct1/libsodium/releases/tag/0.5.0,https://api.github.com/repos/jedisct1/libsodium/zipball/0.5.0,0.5.0,False,False
+72963,2013-10-22T13:12:19Z,2013-10-22T10:06:34Z,0.4.5,"- Restore compatibility with OSX <= 10.6
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/72963/assets,https://api.github.com/repos/jedisct1/libsodium/releases/72963,master,https://api.github.com/repos/jedisct1/libsodium/tarball/0.4.5,https://github.com/jedisct1/libsodium/releases/tag/0.4.5,https://api.github.com/repos/jedisct1/libsodium/zipball/0.4.5,0.4.5,False,False
+72804,2013-10-22T05:03:37Z,2013-10-22T05:18:17Z,0.4.4,"- Visual Studio is officially supported (VC 2010 & VC 2013)
+- mingw64 is now supported
+- big-endian architectures are now supported as well
+- The donna_c64 implementation of curve25519_donna_c64 now handles non-canonical points like the ref implementation
+- Missing scalarmult_curve25519 and stream_salsa20 constants are now exported
+- A crypto_onetimeauth_poly1305_ref() wrapper has been added
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/72804/assets,https://api.github.com/repos/jedisct1/libsodium/releases/72804,master,https://api.github.com/repos/jedisct1/libsodium/tarball/0.4.4,https://github.com/jedisct1/libsodium/releases/tag/0.4.4,https://api.github.com/repos/jedisct1/libsodium/zipball/0.4.4,0.4.4,False,False
+41321,2013-09-09T18:51:25Z,2013-09-09T19:01:38Z,0.4.3,"- crypto_sign_seedbytes() and crypto_sign_SEEDBYTES were added.
+- crypto_onetimeauth_poly1305_implementation_name() was added.
+- poly1305-ref has been replaced by a faster implementation,
+  Floodyberry's poly1305-donna-unrolled.
+- Stackmarkings have been added to assembly code, for Hardened Gentoo.
+- pkg-config can now be used in order to retrieve compilations flags for
+  using libsodium.
+- crypto_stream_aes256estream_*() can now deal with unaligned input
+  on platforms that require word alignment.
+- portability improvements.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/41321/assets,https://api.github.com/repos/jedisct1/libsodium/releases/41321,master,https://api.github.com/repos/jedisct1/libsodium/tarball/0.4.3,https://github.com/jedisct1/libsodium/releases/tag/0.4.3,https://api.github.com/repos/jedisct1/libsodium/zipball/0.4.3,0.4.3,False,False
+6303,2013-01-22T05:33:39Z,2013-07-08T20:31:48Z,0.1,"- Initial release.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/6303/assets,https://api.github.com/repos/jedisct1/libsodium/releases/6303,master,https://api.github.com/repos/jedisct1/libsodium/tarball/0.1,https://github.com/jedisct1/libsodium/releases/tag/0.1,https://api.github.com/repos/jedisct1/libsodium/zipball/0.1,0.1,False,False
+6302,2013-01-29T05:46:51Z,2013-07-08T20:31:17Z,0.2,"- crypto_sign_seed_keypair() has been added
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/6302/assets,https://api.github.com/repos/jedisct1/libsodium/releases/6302,master,https://api.github.com/repos/jedisct1/libsodium/tarball/0.2,https://github.com/jedisct1/libsodium/releases/tag/0.2,https://api.github.com/repos/jedisct1/libsodium/zipball/0.2,0.2,False,False
+6301,2013-02-23T23:22:53Z,2013-07-08T20:31:05Z,0.3,"- The crypto_shorthash operation has been added, implemented using
+  SipHash-2-4.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/6301/assets,https://api.github.com/repos/jedisct1/libsodium/releases/6301,master,https://api.github.com/repos/jedisct1/libsodium/tarball/0.3,https://github.com/jedisct1/libsodium/releases/tag/0.3,https://api.github.com/repos/jedisct1/libsodium/zipball/0.3,0.3,False,False
+6300,2013-04-24T20:08:25Z,2013-07-08T20:30:49Z,0.4,"- Most constants and operations are now available as actual functions
+  instead of macros, making it easier to use from other languages.
+- New operation: crypto_generichash, featuring a variable key size, a
+  variable output size, and a streaming API. Currently implemented using
+  Blake2b.
+- The package can be compiled in a separate directory.
+- aes128ctr functions are exported.
+- Optimized versions of curve25519 (curve25519_donna_c64), poly1305
+  (poly1305_53) and ed25519 (ed25519_ref10) are available. Optionally calling
+  sodium_init() once before using the library makes it pick the fastest
+  implementation.
+- New convenience function: sodium_memzero() in order to securely
+  wipe a memory area.
+- A whole bunch of cleanups and portability enhancements.
+- On Windows, a .REF file is generated along with the shared library,
+  for use with Visual Studio. The installation path for these has become
+  $prefix/bin as expected by MingW.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/6300/assets,https://api.github.com/repos/jedisct1/libsodium/releases/6300,master,https://api.github.com/repos/jedisct1/libsodium/tarball/0.4,https://github.com/jedisct1/libsodium/releases/tag/0.4,https://api.github.com/repos/jedisct1/libsodium/zipball/0.4,0.4,False,False
+6299,2013-07-08T06:56:53Z,2013-07-08T20:29:16Z,0.4.2,"- All NaCl constants are now also exposed as functions.
+- The Android and iOS cross-compilation script have been improved.
+- libsodium can now be cross-compiled to Windows from Linux.
+- libsodium can now be compiled with emscripten.
+- New convenience function (prototyped in utils.h): sodium_bin2hex().
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/6299/assets,https://api.github.com/repos/jedisct1/libsodium/releases/6299,master,https://api.github.com/repos/jedisct1/libsodium/tarball/0.4.2,https://github.com/jedisct1/libsodium/releases/tag/0.4.2,https://api.github.com/repos/jedisct1/libsodium/zipball/0.4.2,0.4.2,False,False
+3994,2013-04-27T23:42:37Z,2013-07-04T18:31:57Z,0.4.1,"- sodium_version_*() functions were not exported in version 0.4. They
+  are now visible as intended.
+- sodium_init() now calls randombytes_stir().
+- optimized assembly version of salsa20 is now used on amd64.
+- further cleanups and enhanced compatibility with non-C99 compilers.
+",https://api.github.com/users/jedisct1,124872,jedisct1,https://api.github.com/repos/jedisct1/libsodium/releases/3994/assets,https://api.github.com/repos/jedisct1/libsodium/releases/3994,master,https://api.github.com/repos/jedisct1/libsodium/tarball/0.4.1,https://github.com/jedisct1/libsodium/releases/tag/0.4.1,https://api.github.com/repos/jedisct1/libsodium/zipball/0.4.1,0.4.1,False,False

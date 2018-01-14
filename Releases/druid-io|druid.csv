@@ -1,0 +1,1674 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7487564,2017-08-22T22:27:07Z,2017-08-23T03:31:29Z,,"Druid 0.10.1 contains hundreds of performance improvements, stability improvements, and bug fixes from over 40 contributors. Major new features include:
+- Large performance improvements and additional query metrics for TopN queries
+- The ability to push down limit clauses for GroupBy queries
+- More accurate query timeout handling
+- Hadoop indexing support for the Amazon S3A filesystem
+- Support for ingesting Protobuf data
+- A new Firehose that can read input via HTTP
+- Improved disk space management when indexing from cloud stores
+- Various improvements to coordinator lookups management
+- A new Kafka metrics emitter
+- A new dimension comparison filter
+- Various improvements to Druid SQL
+
+If you are upgrading from a previous version of Druid, please see ""Updating from 0.10.0 and earlier"" below for upgrade notes, including some backwards incompatible changes.
+
+The full list of changes is here: https://github.com/druid-io/druid/pulls?utf8=%E2%9C%93&q=is%3Apr%20is%3Aclosed%20milestone%3A0.10.1
+
+Documentation for this release is at: http://druid.io/docs/0.10.1/
+
+## Highlights
+
+### TopN performance improvements
+Processing for TopN queries with 1-2 aggregators on historical nodes is now 2-4 times faster. This is accomplished with new runtime inspection logic that generates monomorphic implementations of query processing classes, reducing polymorphism in the TopN query execution path.
+
+Added in a series of PRs described here by @leventov: https://github.com/druid-io/druid/issues/3798.
+
+### Limit clause push down for GroupBy
+Druid can now optimize limit clauses in GroupBy queries by distributing the limit application to historical/realtime nodes, applying the limit to partial result sets before they are sent to the broker for merging. This reduces network traffic within the cluster and reduces the merging workload on broker nodes. Please refer to http://druid.io/docs/0.10.1/querying/groupbyquery.html#query-context for more information.
+
+Added in https://github.com/druid-io/druid/pull/3873 by @jon-wei.
+
+### Hadoop indexing support for Amazon S3A
+Amazon's S3A filesystem is now supported for deep storage and as an input source for batch ingestion tasks. Please refer to <> for documentation.
+
+Added in https://github.com/druid-io/druid/pull/4116 by @b-slim.
+
+### Protobuf 3.0 support and other enhancements
+Support for ingesting Protobuf 3.0 data has been added, along with other enhancements such as reading Protobuf descriptors from a URL. Protobuf-supporting code has been moved into its own core extension as well. See http://druid.io/docs/0.10.1/development/extensions-core/protobuf.html for documentation.
+
+Added in https://github.com/druid-io/druid/pull/4039 by @knoguchi.
+
+### HTTP Firehose
+A new Firehose for realtime ingestion that reads data from a list of URLs via HTTP has been added. Please see http://druid.io/docs/latest/ingestion/firehose.html#httpfirehose for documentation.
+
+Added in https://github.com/druid-io/druid/pull/4297 by @jihoonson.
+
+### Improved disk space management for realtime indexing from cloud stores
+The Firehose implementations for Microsoft Azure, Rackspace Cloud Files, Google Cloud Storage, and Amazon S3 now support caching and prefetching of data. These firehoses can now operate on portions of the input data and pull new data as needed, instead of having to fully read the firehose's input to disk.
+
+Please refer to the following links for documentation:
+http://druid.io/docs/0.10.1/development/extensions-contrib/azure.html
+http://druid.io/docs/0.10.1/development/extensions-contrib/cloudfiles.html
+http://druid.io/docs/0.10.1/development/extensions-contrib/google.html
+http://druid.io/docs/0.10.1/development/extensions-core/s3.html
+
+Added in https://github.com/druid-io/druid/pull/4193 by @jihoonson.
+
+### Improvements to coordinator lookups management
+Several enhancements have been made to the state management/synchronization logic for query-time lookups, including versioning of lookup specs. Please see http://druid.io/docs/0.10.1/querying/lookups.html for documentation.
+
+Added in https://github.com/druid-io/druid/pull/3855 by @himanshug.
+
+### Kafka metrics emitter
+A new metrics emitter that sends metrics data to Kafka in JSON format has been added. See http://druid.io/docs/0.10.1/development/extensions-contrib/kafka-emitter.html
+
+Added in https://github.com/druid-io/druid/pull/3860 by @dkhwangbo.
+
+### Column comparison filter
+A new column comparison filter has been added. This filter allows the user to compare values across columns within a row, like a ""WHERE columnA = columnB"" clause in SQL. See http://druid.io/docs/0.10.1/querying/filters.html#column-comparison-filter for documentation.
+
+Added in https://github.com/druid-io/druid/pull/3928 by @erikdubbelboer.
+
+### Druid SQL improvements
+Druid 0.10.1 has a number of enhancements to Druid SQL, such as support for lookups (PRs by @gianm):
+
+https://github.com/druid-io/druid/pull/4368 - More forgiving Avatica server
+https://github.com/druid-io/druid/pull/4109 - Support for another form of filtered aggregator
+https://github.com/druid-io/druid/pull/4085 - Rule to collapse sort chains
+https://github.com/druid-io/druid/pull/4055 - Add SQL REGEXP_EXTRACT function
+https://github.com/druid-io/druid/pull/3991 - Make row extractions extensible and add one for lookups
+https://github.com/druid-io/druid/pull/4028 - Support for coercing to DECIMAL
+https://github.com/druid-io/druid/pull/3999 - Ability to generate exact distinct count queries
+
+### Other performance improvements
+Druid 0.10.1 has a number of other performance improvements, including:
+
+https://github.com/druid-io/druid/pull/4364 - Uncompress streams without having to download to tmp first, by @niketh
+https://github.com/druid-io/druid/pull/4315 - Server selector improvement, by @dgolitsyn
+https://github.com/druid-io/druid/pull/4110 - Remove ""granularity"" from IngestSegmentFirehose, by @gianm
+https://github.com/druid-io/druid/pull/4038 - serialize DateTime As Long to improve json serde performance, by @kaijianding
+
+### And much more!
+The full list of changes is here: https://github.com/druid-io/druid/pulls?utf8=%E2%9C%93&q=is%3Apr%20is%3Aclosed%20milestone%3A0.10.1
+
+## Updating from 0.10.0 and earlier
+Please see below for changes between 0.10.0 and 0.10.1 that you should be aware of before upgrading. If you're updating from an earlier version than 0.10.0, please see release notes of the relevant intermediate versions for additional notes.
+
+### Deprecation of support for Hadoop versions < 2.6.0
+To add support for Amazon's S3A filesystem, Druid is now built against Hadoop 2.7.3 libraries, and we are deprecating support for Hadoop versions older than 2.6.0.
+
+For users running a Hadoop version older than 2.6.0, it is possible to continue running Druid 0.10.1 with the older Hadoop version using a workaround.
+
+The user would need to downgrade `hadoop.compile.version` in the main Druid pom.xml, remove the `hadoop-aws` dependency from pom.xml in the `druid-hdfs-storage` core extension, and then rebuild Druid.
+
+Users are strongly encouraged to upgrade their Hadoop clusters to a 2.6.0+ version as of this release, as support for Hadoop <2.6.0 may be dropped completely in future releases.
+
+If users wish to use Hadoop 2.7.3 as default for ingestion tasks, users should double check any existing `druid.indexer.task.defaultHadoopCoordinates` configurations.
+
+### Kafka Broker Changes
+Due to changes from https://github.com/druid-io/druid/pull/4115, the Kafka indexing service is no longer compatible with version 0.9.x Kafka brokers. Users will need to upgrade their Kafka brokers to an 0.10.x version.
+
+### Coordinator Lookup Management Changes
+https://github.com/druid-io/druid/pull/3855 introduces various improvements to coordinator lookup propagation behavior. Please see http://druid.io/docs/0.10.1/querying/lookups.html for details. Note the changes to coordinator HTTP API regarding lookups management.
+
+If Lookups are being used in prior deployment, then as part of upgrade to 0.10.1, All coordinators should be stopped, upgraded, and then started with version 0.10.1 at one time rather than upgrading them one at a time. There should never be a situation where one coordinator is running 0.10.0 while other coordinator is running 0.10.1 at the same time.
+
+During the course of the cluster upgrade, lookup query nodes will report an error starting with `got notice to load lookup [LookupExtractorFactoryContainer{version='null'`. This is not actually an error and is a side effect of the update. See https://github.com/druid-io/druid/issues/4603 for details.
+
+### Off-heap query-time lookup cache
+Please note that the off-heap query-time lookup cache is broken at this time because of an excessive memory use issue, and must not be used:
+https://github.com/druid-io/druid/issues/3663
+
+### Default worker select strategy
+Please note that the default worker select strategy has changed from `fillCapacity` to `equalDistribution`.
+
+### Rolling updates
+The standard Druid update process described by http://druid.io/docs/0.10.1/operations/rolling-updates.html should be followed for rolling updates.
+
+## Credits
+
+Thanks to everyone who contributed to this release!
+
+@akashdw
+@amarjayr
+@asdf2014
+@asrayousuf
+@b-slim
+@cesure
+@cxmcc
+@dclim
+@dgolitsyn
+@dkhwangbo
+@drcrallen
+@elloooooo
+@erikdubbelboer
+@fanjieqi
+@Fokko
+@freakyzoidberg
+@fuji-151a
+@gianm
+@gkc2104
+@himanshug
+@hzy001
+@JackyWoo
+@Jdban
+@jeffhartley
+@jerchung
+@jihoonson
+@jon-wei
+@kaijianding
+@KenjiTakahashi
+@knoguchi
+@leventov
+@licl2014
+@logarithm
+@niketh
+@nishantmonu51
+@pjain1
+@praveev
+@ramiyer
+@sascha-coenen
+@satishbhor
+@sixtus
+@sjvs
+@skyler-tao
+@xanec
+@zhihuij
+@zwang180
+",https://api.github.com/users/jon-wei,8729063,jon-wei,https://api.github.com/repos/druid-io/druid/releases/7487564/assets,https://api.github.com/repos/druid-io/druid/releases/7487564,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.10.1,https://github.com/druid-io/druid/releases/tag/druid-0.10.1,https://api.github.com/repos/druid-io/druid/zipball/druid-0.10.1,druid-0.10.1,False,False
+6114509,2017-04-18T18:03:54Z,2017-04-18T20:34:19Z,,"Druid 0.10.0 contains hundreds of performance improvements, stability improvements, and bug fixes from over 40 contributors. Major new features include a built-in SQL layer, numeric dimensions, Kerberos authentication support, a revamp of the ""index"" task, a new ""like"" filter, large columns, ability to run the coordinator and overlord as a single service, better performing defaults, and eight new extensions.
+
+If you are upgrading from a previous version of Druid, please see ""Updating from 0.9.2 and earlier"" below for upgrade notes, including some backwards incompatible changes.
+
+The full list of changes is here: https://github.com/druid-io/druid/pulls?utf8=%E2%9C%93&q=is%3Apr%20is%3Aclosed%20milestone%3A0.10.0
+
+Documentation for this release is at: http://druid.io/docs/0.10.0/
+
+## Highlights
+
+### Built-in SQL
+
+Druid now includes a built-in SQL server powered by [Apache Calcite](https://calcite.apache.org/). Druid provides two SQL APIs: HTTP POST and JDBC. This provides an alternative to Druid's native JSON API which is more familiar to new developers, and which makes it easier to integrate pre-existing applications that natively speak SQL. Not all Druid and SQL features are supported by the SQL layer in this initial release, but we intend to expand both in future releases.
+
+SQL support can be enabled by setting `druid.sql.enable=true` in your configuration. See http://druid.io/docs/0.10.0/querying/sql.html for details and documentation.
+
+Added in #3682 by @gianm.
+
+### Numeric dimensions
+
+Druid now supports numeric dimensions at ingestion and query time. Users can ingest long and float columns as dimensions (i.e., treating the numeric columns as part of the ingestion-time grouping key instead of as aggregators, if rollup is enabled). Additionally, Druid queries can now accept any long or float column as a dimension for grouping or for filtering.
+
+There are performance tradeoffs between string and numeric columns. Numeric columns are generally faster to group on than string columns. Numeric columns don't have indexes, so they are generally slower to filter on than string columns.
+
+See http://druid.io/docs/0.10.0/ingestion/schema-design.html#numeric-dimensions for ingestion documentation and http://druid.io/docs/0.10.0/querying/dimensionspecs.html for query documentation.
+
+Added in #3838, #3966, and other patches by @jon-wei.
+
+### Kerberos authentication support
+Added a new extension named 'druid-kerberos' which adds support for User Authentication for Druid Nodes using Kerberos. It uses the simple and protected GSSAPI negotiation mechanism, SPNEGO(https://en.wikipedia.org/wiki/SPNEGO) for authentication via HTTP.
+
+See http://druid.io/docs/0.10.0/development/extensions-core/druid-kerberos.html for documentation on how to configure kerberos authentication. 
+
+Added in #3853 by @nishantmonu51.
+
+### Index task revamp
+
+The indexing task was re-written to improve performance, particularly for jobs spanning multiple intervals that generated many shards. The segmentGranularity `intervals` can now be automatically determined and no longer needs to be specified, but ingestion time can be reduced if both `intervals` and `numShards` are provided.
+
+Additionally, the indexing task now supports an `appendToExisting` flag which causes the data to be indexed as an additional shard of the current version rather than as a new version overshadowing the previous version. 
+
+See http://druid.io/docs/0.10.0/ingestion/tasks.html#index-task for documentation.
+
+Added in #3611 by @dclim.
+
+### Like filter
+
+Druid now includes a ""like"" filter that enables SQL LIKE-style filtering, such as `foo LIKE 'bar%'`. The implementation is generally faster than regex filters, and is encouraged over regex filters when possible. In particular, like filters on prefixes such as `bar%` are significantly faster than equivalent regex filters such as `^bar.*`.
+
+See http://druid.io/docs/0.10.0/querying/filters.html#like-filter for documentation.
+
+Added in #3642 by @gianm.
+
+### Large columns
+
+Druid now supports individual columns larger than 2GB. This feature is not typically required, since general guidance is that segments should generally be 500MB–1GB in size, but is useful in situations where one column is much larger than all the others (for example, large sketches).
+
+This functionality is available to all Druid users and no special configuration is necessary when using the built-in column types. If you have developed a custom metric column type as a Druid extension, you can enable large column support by overriding `getSerializer` in your `ComplexMetricsSerde`.
+
+Added in #3743 by @akashdw.
+
+### Coordinator/Overlord combination option
+
+Druid deployments can now be simplified by combining the Coordinator and Overlord functions into the Coordinator process. To do this, set `druid.coordinator.asOverlord.enabled` and `druid.coordinator.asOverlord.overlordService` appropriately on your Coordinators and then stop your Overlords.
+Overlord console would be available on `http://coordinator-host:port/console.html`.
+
+This is currently an experimental feature and is off by default. We intend to consider making this the default in a future version of Druid.
+
+See http://druid.io/docs/0.10.0/configuration/coordinator.html for documentation on this feature and configuration options.
+
+Added in #3711 by @himanshug.
+
+### Better performing defaults
+
+This release changes two default settings to improve out-of-the-box performance:
+
+- The buildV9Directly option introduced in Druid 0.9.0 is now enabled by default. This option improves performance of indexing by creating the v9 data format directly rather than creating v8 first and then converting to v9. If necessary, you can roll back to the old code by setting ""buildV9Directly"" to false in your indexing tasks.
+
+- The v2 groupBy engine introduced in Druid 0.9.2 is now enabled by default. This new groupBy engine was rewritten from the ground up for better performance and memory management. If necessary, you can roll back to the old engine by setting either ""druid.groupBy.query.defaultStrategy"" in your runtime.properties, or ""groupByStrategy"" in your query context, to ""v1"". See http://druid.io/docs/0.10.0/querying/groupbyquery.html for details on the differences between groupBy v1 and v2.
+
+### Other performance improvements
+
+In addition to better performing defaults, Druid 0.10.0 has a number of other performance improvements, including:
+
+- Concise bitset union, intersection, and iteration optimization (#3883) by @leventov 
+- DimensionSelector-based value matching optimization (#3858) by @leventov 
+- Search query strategy for choosing index-based vs. cursor-based execution (#3792) by @jihoonson 
+- Bitset iteration optimization (#3753) by @leventov 
+- GroupBy optimization for granularity ""all"" (#3740) by @gianm
+- Disable flush after every DefaultObjectMapper write (#3748) by @jon-wei 
+- Short-circuiting AND filter (#3676) by @gianm
+- Improved performance of IndexMergerV9 (#3440) by @leventov 
+
+### New extensions
+
+- ambari-metrics-emitter (#3767) by @nishantmonu51 
+- druid-kerberos (#3853) by @nishantmonu51 
+- google-extensions (#2458) by @erikdubbelboer 
+- scan-query (#3307) by @kaijianding 
+- sqlserver-metadata-storage (#3421) by @mark1900 
+- thrift-extensions (#3418) by @du00cs 
+- time-min-max (#3299) by @sirpkt 
+- virtual-columns (#2511) by @navis 
+
+### And much more!
+
+The full list of changes is here: https://github.com/druid-io/druid/pulls?utf8=%E2%9C%93&q=is%3Apr%20is%3Aclosed%20milestone%3A0.10.0
+
+## Updating from 0.9.2 and earlier
+
+Please see below for changes between 0.9.2 and 0.10.0 that you should be aware of before upgrading. If you're updating from an earlier version than 0.9.2, please see release notes of the relevant intermediate versions for additional notes.
+
+### Rolling updates
+
+The standard Druid update process described by http://druid.io/docs/0.10.0/operations/rolling-updates.html should be followed for rolling updates.
+
+### Query API changes 
+
+Please note the following backwards-incompatible query API changes when updating. Some queries may need to be adjusted to continue to behave as expected.
+
+- JavaScript query features are now disabled by default for security reasons (#3818). If you use these features, you can re-enable them by setting `druid.javascript.enabled=true` in your runtime properties. See http://druid.io/docs/0.10.0/development/javascript.html for details, including security considerations.
+
+- GroupBy queries no longer allow `__time` as the output name of a dimension, aggregator, or post-aggregator (#3967).
+
+- Select query pagingSpecs now default to `fromNext: true` behavior when `fromNext` is not specified (#3986). Behavior is unchanged for Select queries that did have `fromNext` specified. If you prefer the old default, then you can change this through the `druid.query.select.enableFromNextDefault` runtime property.  See http://druid.io/docs/0.10.0/querying/select-query.html for details.
+
+- SegmentMetadata queries no longer include ""size"" analysis by default (#3773). You can still request ""size"" analysis by adding ""size"" to ""analysisTypes"" at query time.
+
+### Deployment and configuration changes
+
+Please note the following deployment-related changes when updating.
+
+- Druid now requires Java 8 to run (#3914). If you are currently running on Java 7, we suggest upgrading Java first and then Druid.
+
+- Druid now defaults to the ""v2"" engine for groupBy rather than the legacy ""v1"" engine. **As part of this, memory usage limits have changed from row-based to byte-based limits, so it is possible that some queries which met resource limits before will now exceed them and fail.** You can avoid this by tuning the new groupBy engine appropriately. If necessary, you can roll back to the old engine by setting either ""druid.groupBy.query.defaultStrategy"" in your runtime.properties, or ""groupByStrategy"" in your query context, to ""v1"". See http://druid.io/docs/0.10.0/querying/groupbyquery.html for more details on the differences between groupBy v1 and v2.<p>This new groupBy engine was rewritten from the ground up for better performance and memory management. The query API and results are compatible between the two engines; however, there are some differences from a cluster configuration perspective: (1) groupBy v2 uses primarily off-heap memory instead of on-heap memory; (2) it requires one merge buffer for each concurrent query; (3) if you've configured caching for groupBy, it must be on historicals; and (4) it doesn't support chunkPeriod.
+
+- Druid now has a non-zero default value for `druid.processing.numMergeBuffers` (#3953). This will increase the amount of direct memory used in its default configuration. This change was made in connection with changing the default groupBy engine, since the new ""v2"" engine requires merge buffers. If you were formerly using groupBy v1, you should be able to offset this by reducing your JVM heap, since groupBy v2 uses off-heap memory rather than on-heap memory.
+
+- Druid query-related processes (broker, historical, indexing tasks) now eagerly allocate `druid.processing.numThreads` number of DirectByteBuffer instances of size `druid.processing.buffer.sizeBytes` for query processing at startup (#3628). This allocation was lazy in earlier versions of Druid. This change does not affect memory use of a long-running Druid cluster, but it means that memory for processing buffers must be available when Druid starts up.
+
+- When running in non-UTC timezones, behavior of predefined segmentGranularity constants such as ""day"" will change when upgrading. Formerly, this would generate segments using local days. In Druid 0.10.0, this will generate segments using UTC days. If you were running Druid in the UTC timezone, this change has no effect. Please note that running Druid in a non-UTC timezone is not officially supported (see http://druid.io/docs/0.10.0/configuration/index.html) and we recommend always running all processes in UTC timezones. To create local-day segments using Druid 0.10.0, you can use a local-time segmentGranularity such as:
+```json
+""segmentGranularity"" : {
+     ""type"" : ""period"",
+     ""period"" : ""P1D"",
+     ""timeZone"" : ""America/Los_Angeles""
+}
+```
+
+### Extension changes
+
+- AggregatorFactory, BufferAggregator, and PostAggregator interfaces have changed (#3894, #3899, #3957, #4071). If you have deployed a custom extension that includes an AggregatorFactory or PostAggregator, it will need to be recompiled. Druid's built-in extensions have all been updated for this change.
+
+- Extensions targeting Druid 0.10.x must be compiled with JDK 8.
+
+## Credits
+
+Thanks to everyone who contributed to this release!
+
+@akashdw
+@Aveplatter
+@b-slim
+@baruchz
+@cheddar
+@clintropolis
+@DaimonPl
+@dclim
+@dpenas
+@drcrallen
+@du00cs
+@erikdubbelboer
+@Fokko
+@freakyzoidberg
+@gabrielpage
+@gianm
+@gvsmirnov
+@himanshug
+@hland
+@hzy001
+@jaehc
+@jihoonson
+@jisookim0513
+@jkukul
+@joanvr
+@jon-wei
+@kaijianding
+@leventov
+@mark1900
+@michaelschiff
+@navis
+@ncolomer
+@niketh
+@nishantmonu51
+@pjain1
+@praveev
+@sirpkt
+@tranv94
+@xiaoyao1991
+@yuusaku-t
+@zhxiaogg",https://api.github.com/users/gianm,1214075,gianm,https://api.github.com/repos/druid-io/druid/releases/6114509/assets,https://api.github.com/repos/druid-io/druid/releases/6114509,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.10.0,https://github.com/druid-io/druid/releases/tag/druid-0.10.0,https://api.github.com/repos/druid-io/druid/zipball/druid-0.10.0,druid-0.10.0,False,False
+4810774,2016-12-01T20:13:42Z,2016-12-01T21:43:54Z,,"Druid 0.9.2 contains hundreds of performance improvements, stability improvements, and bug fixes from over 30 contributors. Major new features include a new groupBy engine, ability to disable rollup at ingestion time, ability to filter on longs, new encoding options for long-typed columns, performance improvements for HyperUnique and DataSketches, a query cache implementation based on [Caffeine](https://github.com/ben-manes/caffeine), a new lookup extension exposing fine grained caching strategies, support for reading ORC files, and new aggregators for variance and standard deviation.
+
+The full list of changes is here: https://github.com/druid-io/druid/pulls?utf8=%E2%9C%93&q=is%3Apr%20is%3Aclosed%20milestone%3A0.9.2
+
+Documentation for this release is here: http://druid.io/docs/0.9.2/
+
+## Highlights
+
+### New groupBy engine
+
+Druid now includes a new groupBy engine, rewritten from the ground up for better performance and memory management. Benchmarks show a 2–5x performance boost on our test datasets. The new engine also supports strict limits on memory usage and the option to spill to disk when memory is exhausted, avoiding result row count limitations and potential OOMEs generated by the previous engine.
+
+The new engine is off by default, but you can enable it through configuration or query context parameters. We intend to enable it by default in a future version of Druid.
+
+See ""implementation details"" on http://druid.io/docs/0.9.2/querying/groupbyquery.html#implementation-details for documentation and configuration.
+
+Added in #2998 by @gianm.
+
+### Ability to disable rollup
+
+Since its inception, Druid has had a concept of ""dimensions"" and ""metrics"" that applied both at ingestion time and at query time. Druid is unique in that it is one of the only databases that supports aggregation at data loading time, which we call ""rollup"". But, for some use cases, ingestion-time rollup is not desired, and it's better to load the original data as-is. With rollup disabled, one row in Druid will be created for each input row.
+
+Query-time aggregation is, of course, still supported through the groupBy, topN, and timeseries queries.
+
+See the ""rollup"" flag on http://druid.io/docs/0.9.2/ingestion/index.html for documentation. By default, rollup remains enabled.
+
+Added in #3020 by @kaijianding.
+
+### Ability to filter on longs
+
+Druid now supports sophisticated filtering on integer-typed columns, including long metrics and the special __time column. This opens up a number of new capabilities:
+- Filtered aggregations on time, useful for time comparison queries using two filtered aggregators and a post-aggregator. This can also be used for retention analysis with theta sketches. Examples here: http://druid.io/docs/0.9.2/development/extensions-core/datasketches-aggregators.html#retention-analysis-example
+- Filtering on integer-typed columns, which is especially useful when rollup is disabled using the new rollup-disabling flag.
+
+Druid does not yet support grouping on longs. We intend to add this capability in a future release.
+
+Added in #3180 by @jon-wei.
+
+### New long encodings
+
+Until now, all integer-typed columns in Druid, including long metrics and the special __time column, were stored as 64-bit longs optionally compressed in blocks with LZ4. Druid 0.9.2 adds new encoding options which, in many cases, can reduce file sizes and improve performance:
+- Long encoding option ""auto"", which potentially uses table or delta encoding to use fewer than 64 bits per row. The ""longs"" encoding option is the default behavior, which always uses 64 bits.
+- Compression option ""none"", which is like the old ""uncompressed"" option, except it offers a speedup by bypassing block copying.
+
+The default remains ""longs"" encoding + ""lz4"" compression. In our testing, two options that often yield useful benefits are ""auto"" + ""lz4"" (generally smaller than longs + lz4) and ""auto"" + ""none"" (generally faster than longs + lz4, file size impact varies). See the PR for full test results.
+
+See ""metricCompression"" and ""longEncoding"" on http://druid.io/docs/0.9.2/ingestion/batch-ingestion.html for documentation.
+
+Added in #3148 by @acslk.
+
+### Sketch performance improvements
+- DataSketches speedups of up to 80% from #3471.
+- HyperUnique speedups of 19–30% from #3314, used for ""hyperUnique"" and ""cardinality"" aggregators.
+
+### New extensions
+- [druid-caffeine-cache](http://druid.io/docs/0.9.2/development/extensions-core/caffeine-cache.html) from #3028 by @drcrallen.
+- [druid-lookups-cached-single](http://druid.io/docs/0.9.2/development/extensions-core/druid-lookups.html) from #2819 by @b-slim.
+- [druid-orc-extensions](http://druid.io/docs/0.9.2/development/extensions-contrib/orc.html) from #3019 by @sirpkt.
+- [druid-stats](http://druid.io/docs/0.9.2/development/extensions-core/stats.html) from #2525 by @navis.
+
+### And much more!
+
+The full list of changes is here: https://github.com/druid-io/druid/pulls?utf8=%E2%9C%93&q=is%3Apr%20is%3Aclosed%20milestone%3A0.9.2
+
+## Updating from 0.9.1.1
+
+### Rolling updates
+
+The standard Druid update process described by http://druid.io/docs/0.9.2/operations/rolling-updates.html should be followed for rolling updates.
+
+### Query time lookups
+
+The druid-namespace-lookup extension, which was deprecated in 0.9.1 in favor of [druid-lookups-cached-global](http://druid.io/docs/0.9.2/development/extensions-core/lookups-cached-global.html), has been removed in 0.9.2. If you are using druid-namespace-lookup, migrate to druid-lookups-cached-global before upgrading to 0.9.2. See our migration guide for details: http://druid.io/docs/0.9.1.1/development/extensions-core/namespaced-lookup.html#transitioning-to-lookups-cached-global
+
+### Other notes
+
+Please note the following changes:
+- Druid now ships Guice 4.1.0 rather than 4.0-beta (#3222). This conflicts with the version shipped in some Hadoop distributions, so for Hadoop indexing you may need to adjust your `mapreduce.job.classloader` or `mapreduce.job.user.classpath.first` options. In testing we have found this to be an effective workaround. See http://druid.io/docs/0.9.2/operations/other-hadoop.html for details.
+- If you are using Roaring bitmaps, note that compressRunOnSerialization now defaults to true. As a result, segments written will not be readable by Druid 0.8.1 or earlier. If you need segments written by Druid 0.9.2 to be readable by 0.8.1, and you are using Roaring bitmaps, you must set compressRunOnSerialization = false. By default, bitmaps are Concise, not Roaring, so this point will not apply to you unless you overrode that. See #3228 for details.
+- If you use the new long encoding or compression options, segments written by Druid will not be readable by any version older than 0.9.2. If you don't use the new options, segments will remain backwards compatible.
+- If you are using the experimental Kafka indexing service, there is a known issue that may cause task supervision to hang when it tries to stop all running tasks simultaneously during the upgrade process. To prevent this from happening, you can shutdown all supervisors and wait for the indexing tasks to complete before updating your overlord. Alternatively, you can set `chatThreads` in the supervisor tuning configuration to a value greater than the number of running tasks as a workaround.
+
+## Credits
+
+Thanks to everyone who contributed to this release!
+
+@acslk
+@AlexanderSaydakov
+@ashishawasthi
+@b-slim
+@chtefi
+@dclim
+@drcrallen
+@du00cs
+@ecesena
+@erikdubbelboer
+@fjy
+@Fokko
+@gianm
+@giaosudau
+@guobingkun
+@gvsmirnov
+@hamlet-lee
+@himanshug
+@HyukjinKwon
+@jaehc
+@jianran
+@jon-wei
+@kaijianding
+@leventov
+@linbojin
+@michaelschiff
+@navis
+@nishantmonu51
+@pjain1
+@rajk-tetration
+@SainathB
+@sirpkt
+@vogievetsky
+@xvrl
+@yuppie-flu
+",https://api.github.com/users/gianm,1214075,gianm,https://api.github.com/repos/druid-io/druid/releases/4810774/assets,https://api.github.com/repos/druid-io/druid/releases/4810774,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.9.2,https://github.com/druid-io/druid/releases/tag/druid-0.9.2,https://api.github.com/repos/druid-io/druid/zipball/druid-0.9.2,druid-0.9.2,False,False
+3552747,2016-06-29T17:15:14Z,2016-06-29T18:58:51Z,,"Druid 0.9.1.1 contains only one change since Druid 0.9.1, #3204, which addresses a bug with the Coordinator web console. The full list of changes for the Druid 0.9.1 line is here: https://github.com/druid-io/druid/issues?q=milestone%3A0.9.1+is%3Aclosed
+
+## Updating from 0.9.0
+
+### Query time lookups
+
+Query time lookup (QTL) functionality has been substantially reworked in this release. Most users will need to update their configurations and queries.
+
+The [druid-namespace-lookup extension](http://druid.io/docs/0.9.1.1/development/extensions-core/namespaced-lookup.html) is now deprecated, and will be removed in a future version of Druid. Users should migrate to the new [druid-lookups-cached-global extension](http://druid.io/docs/0.9.1.1/development/extensions-core/lookups-cached-global.html). Both extensions can be loaded simultaneously to simplify migration. For details about migrating, see [Transitioning to lookups-cached-global](http://druid.io/docs/0.9.1.1/development/extensions-core/namespaced-lookup.html#transitioning-to-lookups-cached-global) in the documentation.
+
+### Other notes
+
+Aside from the QTL changes, please note the following changes:
+- The default value for maxRowsInMemory has been set to 75,000 across the board for all forms of ingestion. This is in line with previous defaults for Hadoop tasks and Tranquility-based ingestion. If you were creating realtime index tasks directly (without Tranquility) then this is lower than the previous default of 500,000.
+- The `/druid/coordinator/v1/datasources/{dataSourceName}?kill=true&interval={myISO8601Interval}` REST endpoint is now deprecated. The new `/druid/coordinator/v1/datasources/{dataSourceName}/intervals/{interval}?kill=true` REST endpoint can be used instead.
+- The druid.indexer.runner.separateIngestionEndpoint property is now deprecated. If you were using this functionality to isolate event-push requests and query serving requests for realtime tasks, you can accomplish something similar with druid.indexer.server.maxChatRequests.
+- For developers of Druid extensions, note that the QueryGranularity constants (ALL, NONE, etc) have been moved to io.druid.granularity.QueryGranularities in #2980. Query syntax is not affected.
+
+### Rolling updates
+
+The standard Druid update process described by http://druid.io/docs/0.9.1.1/operations/rolling-updates.html should be followed for rolling updates.
+
+## Kafka Supervisor
+
+Druid 0.9.1 is the first version to include the experimental Kafka indexing service, utilizing a new Kafka-type indexing task and a supervisor that runs within the Druid overlord. The Kafka indexing service provides an exactly-once ingestion guarantee and does not have the restriction of events requiring timestamps which fall within a window period. More details about this feature are available in the documentation: http://druid.io/docs/0.9.1.1/development/extensions-core/kafka-ingestion.html.
+
+**Note:** The Kafka indexing service uses the Java Kafka consumer that was introduced in Kafka 0.9. As there were protocol changes made in this version, Kafka 0.9 consumers are not compatible with older brokers and you will need to ensure that your Kafka brokers are version 0.9 or better. Details on upgrading to the latest version of Kafka can be found here: [http://kafka.apache.org/documentation.html#upgrade](http://kafka.apache.org/documentation.html#upgrade)
+
+## New Features
+
+#2656 Supervisor for KafkaIndexTask
+#2602 implement special distinctcount
+#2220 Appenderators, DataSource metadata, KafkaIndexTask
+#2424 Enabling datasource level authorization in Druid
+#2410 statsd-emitter
+#1576 [QTL] Query time lookup cluster wide config
+
+Full list: https://github.com/druid-io/druid/issues?q=milestone%3A0.9.1+is%3Aclosed+label%3AFeature
+
+## Improvements
+
+#2972 Improved Segment Distrubution (new cost function)
+#2931 Optimize filter for timeseries, search, and select queries
+#2753 More consistent empty-set filtering behavior on multi-value columns
+#2727 BoundFilter optimizations, and related interface changes. 
+#2711 All Filters should work with FilteredAggregators
+#2690 Allow filters to use extraction functions
+#2577 Implement native in filter
+
+Full list: https://github.com/druid-io/druid/issues?q=milestone%3A0.9.1+is%3Aclosed+label%3AImprovement
+
+## Bug Fixes
+
+Full list: https://github.com/druid-io/druid/issues?q=milestone%3A0.9.1+is%3Aclosed+label%3ABug
+
+## Documentation
+
+Full list: https://github.com/druid-io/druid/issues?q=milestone%3A0.9.1+is%3Aclosed+label%3ADocumentation
+
+Thanks to everyone who contributed to this release!
+@acslk 
+@b-slim 
+@binlijin 
+@bjozet 
+@dclim 
+@drcrallen 
+@du00cs 
+@erikdubbelboer 
+@fjy
+@gaodayue
+@gianm
+@guobingkun 
+@harshjain2 
+@himanshug 
+@jaehc 
+@javasoze 
+@jisookim0513 
+@jon-wei 
+@JonStrabala
+@kilida 
+@lizhanhui 
+@michaelschiff 
+@mrijke 
+@navis 
+@nishantmonu51 
+@pdeva 
+@pjain1 
+@rasahner 
+@sascha-coenen
+@se7entyse7en 
+@shekhargulati 
+@sirpkt 
+@skilledmonster
+@spektom
+@xvrl 
+@yuppie-flu 
+",https://api.github.com/users/gianm,1214075,gianm,https://api.github.com/repos/druid-io/druid/releases/3552747/assets,https://api.github.com/repos/druid-io/druid/releases/3552747,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.9.1.1,https://github.com/druid-io/druid/releases/tag/druid-0.9.1.1,https://api.github.com/repos/druid-io/druid/zipball/druid-0.9.1.1,druid-0.9.1.1,False,False
+3544936,2016-06-28T23:20:59Z,2016-06-28T23:23:07Z,,"Druid 0.9.1 contains hundreds of performance improvements, stability improvements, and bug fixes from over 30 contributors. Major new features include an experimental Kafka Supervisor to support exactly-once consumption from Apache Kafka, support for cluster-wide query-time lookups (QTL), and an improved segment balancing algorithm.
+
+The full list of changes is here: https://github.com/druid-io/druid/issues?q=milestone%3A0.9.1+is%3Aclosed
+
+## Updating from 0.9.0
+
+### Query time lookups
+
+Query time lookup (QTL) functionality has been substantially reworked in this release. Most users will need to update their configurations and queries.
+
+The [druid-namespace-lookup extension](http://druid.io/docs/0.9.1/development/extensions-core/namespaced-lookup.html) is now deprecated, and will be removed in a future version of Druid. Users should migrate to the new [druid-lookups-cached-global extension](http://druid.io/docs/0.9.1/development/extensions-core/lookups-cached-global.html). Both extensions can be loaded simultaneously to simplify migration. For details about migrating, see [Transitioning to lookups-cached-global](http://druid.io/docs/0.9.1/development/extensions-core/namespaced-lookup.html#transitioning-to-lookups-cached-global) in the documentation.
+
+### Other notes
+
+Aside from the QTL changes, please note the following changes:
+- The default value for maxRowsInMemory has been set to 75,000 across the board for all forms of ingestion. This is in line with previous defaults for Hadoop tasks and Tranquility-based ingestion. If you were creating realtime index tasks directly (without Tranquility) then this is lower than the previous default of 500,000.
+- The `/druid/coordinator/v1/datasources/{dataSourceName}?kill=true&interval={myISO8601Interval}` REST endpoint is now deprecated. The new `/druid/coordinator/v1/datasources/{dataSourceName}/intervals/{interval}?kill=true` REST endpoint can be used instead.
+- The druid.indexer.runner.separateIngestionEndpoint property is now deprecated. If you were using this functionality to isolate event-push requests and query serving requests for realtime tasks, you can accomplish something similar with druid.indexer.server.maxChatRequests.
+- For developers of Druid extensions, note that the QueryGranularity constants (ALL, NONE, etc) have been moved to io.druid.granularity.QueryGranularities in #2980. Query syntax is not affected.
+
+### Rolling updates
+
+The standard Druid update process described by http://druid.io/docs/0.9.1/operations/rolling-updates.html should be followed for rolling updates.
+
+## Kafka Supervisor
+
+Druid 0.9.1 is the first version to include the experimental Kafka indexing service, utilizing a new Kafka-type indexing task and a supervisor that runs within the Druid overlord. The Kafka indexing service provides an exactly-once ingestion guarantee and does not have the restriction of events requiring timestamps which fall within a window period. More details about this feature are available in the documentation: http://druid.io/docs/0.9.1/development/extensions-core/kafka-ingestion.html.
+
+**Note:** The Kafka indexing service uses the Java Kafka consumer that was introduced in Kafka 0.9. As there were protocol changes made in this version, Kafka 0.9 consumers are not compatible with older brokers and you will need to ensure that your Kafka brokers are version 0.9 or better. Details on upgrading to the latest version of Kafka can be found here: [http://kafka.apache.org/documentation.html#upgrade](http://kafka.apache.org/documentation.html#upgrade)
+
+## New Features
+
+#2656 Supervisor for KafkaIndexTask
+#2602 implement special distinctcount
+#2220 Appenderators, DataSource metadata, KafkaIndexTask
+#2424 Enabling datasource level authorization in Druid
+#2410 statsd-emitter
+#1576 [QTL] Query time lookup cluster wide config
+
+Full list: https://github.com/druid-io/druid/issues?q=milestone%3A0.9.1+is%3Aclosed+label%3AFeature
+
+## Improvements
+
+#2972 Improved Segment Distrubution (new cost function)
+#2931 Optimize filter for timeseries, search, and select queries
+#2753 More consistent empty-set filtering behavior on multi-value columns
+#2727 BoundFilter optimizations, and related interface changes. 
+#2711 All Filters should work with FilteredAggregators
+#2690 Allow filters to use extraction functions
+#2577 Implement native in filter
+
+Full list: https://github.com/druid-io/druid/issues?q=milestone%3A0.9.1+is%3Aclosed+label%3AImprovement
+
+## Bug Fixes
+
+Full list: https://github.com/druid-io/druid/issues?q=milestone%3A0.9.1+is%3Aclosed+label%3ABug
+
+## Documentation
+
+Full list: https://github.com/druid-io/druid/issues?q=milestone%3A0.9.1+is%3Aclosed+label%3ADocumentation
+
+Thanks to everyone who contributed to this release!
+@acslk 
+@b-slim 
+@binlijin 
+@bjozet 
+@dclim 
+@drcrallen 
+@du00cs 
+@erikdubbelboer 
+@fjy
+@gaodayue
+@gianm
+@guobingkun 
+@harshjain2 
+@himanshug 
+@jaehc 
+@javasoze 
+@jisookim0513 
+@jon-wei 
+@JonStrabala
+@kilida 
+@lizhanhui 
+@michaelschiff 
+@mrijke 
+@navis 
+@nishantmonu51 
+@pdeva 
+@pjain1 
+@rasahner 
+@sascha-coenen
+@se7entyse7en 
+@shekhargulati 
+@sirpkt 
+@skilledmonster
+@spektom
+@xvrl 
+@yuppie-flu 
+",https://api.github.com/users/gianm,1214075,gianm,https://api.github.com/repos/druid-io/druid/releases/3544936/assets,https://api.github.com/repos/druid-io/druid/releases/3544936,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.9.1,https://github.com/druid-io/druid/releases/tag/druid-0.9.1,https://api.github.com/repos/druid-io/druid/zipball/druid-0.9.1,druid-0.9.1,False,False
+3013735,2016-04-12T21:00:05Z,2016-04-13T18:58:39Z,Druid 0.9.0,"Druid 0.9.0 introduces an update to the extension system that requires configuration changes. There were additionally over 400 pull requests from 0.8.3 to 0.9.0. Below we highlight the more important changes in this patch.
+
+Full list of changes is here: https://github.com/druid-io/druid/issues?q=milestone%3A0.9.0+is%3Aclosed
+
+## Updating from 0.8.x
+
+### Extensions
+
+In Druid 0.9, we have refactored the extension loading mechanism. The main reason behind this change is to make Druid load extensions from the local file system without having to download stuff from the internet at runtime.
+
+To learn all about the new extension loading mechanism, see [Include extensions](https://github.com/druid-io/druid/blob/master/docs/content/operations/including-extensions.md) and [Include Hadoop Dependencies](https://github.com/druid-io/druid/blob/master/docs/content/operations/other-hadoop.md). If you are impatient, here is the summary.
+
+The following properties have been deprecated:
+`druid.extensions.coordinates`
+`druid.extensions.remoteRepositories`
+`druid.extensions.localRepository`
+`druid.extensions.defaultVersion`
+
+Instead, specify **druid.extensions.loadList**, **druid.extensions.directory** and **druid.extensions.hadoopDependenciesDir**.
+
+**druid.extensions.loadList** specifies the list of extensions that will be loaded by Druid at runtime. An example would be `druid.extensions.loadList=[""druid-datasketches"", ""mysql-metadata-storage""]`.
+
+**druid.extensions.directory** specifies the directory where all the extensions live. An example would be `druid.extensions.directory=/xxx/extensions`.
+
+**Note** that mysql-metadata-storage extension is not packaged in druid distribution due to license issue. You will have to manually download it from [druid.io](http://static.druid.io/artifacts/releases/mysql-metadata-storage-0.9.0.tar.gz), decompress and then put in the extensions directory specified.
+
+**druid.extensions.hadoopDependenciesDir** specifies the directory where all the Hadoop dependencies live. An example would be `druid.extensions.hadoopDependenciesDir=/xxx/hadoop-dependencies`. Note: We didn't change the way of specifying which Hadoop version to use. So you just need to make sure the Hadoop you want to use exists underneath `/xxx/hadoop-dependencies`.
+
+You might now wonder if you have to manually put extensions inside `/xxx/extensions` and `/xxx/hadoop-dependencies`. The answer is no, we already have created them for you. Download the latest Druid tarball at http://druid.io/downloads.html. Unpack it and you will see `extensions` and `hadoop-dependencies` folders there. Simply copy them to `/xxx/extensions` and `/xxx/hadoop-dependencies` respectively, now you are all set!
+
+If the extension or the Hadoop dependency you want to load is not included in the core extension, you can use [pull-deps](https://github.com/druid-io/druid/blob/master/docs/content/operations/pull-deps.md) to download it to your extension directory.
+
+If you want to load your own extension, you can first do mvn install to install it into local repository, and then use [pull-deps](https://github.com/druid-io/druid/blob/master/docs/content/operations/pull-deps.md) to download it to your extension directory.
+
+Please feel free to leave any questions regarding the migration.
+
+Extensions have now also been refactored in core and contrib extensions. Core extensions will be maintained by Druid committers and are packaged as part of the download tarball. Contrib extensions are community maintained and can be installed as needed. For more information, please see [here](https://github.com/druid-io/druid/blob/master/docs/content/development/extensions.md).
+
+### Ordering of Dimensions
+
+Until Druid 0.8.x the order of dimensions given at indexing time did not affect the way data gets indexed. Rows would be ordered first by timestamp, then by dimension values, in lexicographical order of dimension names.
+
+As of Druid 0.9.0, Druid respects the given dimension order given and will order rows first by timestamp, then by dimension values, in the given dimension order.
+
+This means segments may now vary in size depending on the order in which dimensions are given. Specifying a dimension with many unique values first, may result in worse compression than specifying dimensions with repeating values first.
+
+### Min/Max Aggregators no longer supported, use doubleMin/doubleMax instead
+
+As indicated in the 0.8.3 release notes, min/max aggregators have been removed in favor of doubleMin, doubleMax, longMin, and longMax aggregators.
+
+If you have any issues starting up because of this, please see https://github.com/druid-io/druid/issues/2749
+
+### Configuration changes
+
+`druid.indexer.task.baseDir` and `druid.indexer.task.baseTaskDir` now default to using the standard Java temporary directory specified by `java.io.tmpdir` system property, instead of `/tmp`,
+
+Other issues to be aware of: https://github.com/druid-io/druid/issues?q=milestone%3A0.9.0+is%3Aclosed+label%3A%22Release+Notes%22
+
+and 
+
+https://github.com/druid-io/druid/issues?q=milestone%3A0.9.0+is%3Aclosed+label%3AIncompatible
+
+## New Features
+
+Full list: https://github.com/druid-io/druid/issues?q=milestone%3A0.9.0+is%3Aclosed+label%3AFeature
+
+#1719 Add Rackspace Cloud Files Deep Storage Extension
+#1858 Support avro ingestion for realtime & hadoop batch indexing 
+#1873 add ability to express CONCAT as an extractionFn
+#1921 Add docs and benchmark for JSON flattening parser
+#1936 adding Upper/Lower Bound Filter 
+#1978 Graphite emitter 
+#1986 Preserve dimension order across indexes during ingestion 
+#2008 Regex search query
+#2014 Support descending time ordering for time series query
+#2043 Add dimension selector support for groupby/having filter
+#2076 adding lower and upper extraction fn
+#2209 support cascade execution of extraction filters in extraction dimension spec 
+#2221 Allow change minTopNThreshold per topN query 
+#2264 Adding custom mapper for json processing exception
+#2271 time-descending result of select queries
+#2258 acl for zookeeper is added
+
+## Improvements
+
+Full list: https://github.com/druid-io/druid/issues?q=milestone%3A0.9.0+is%3Aclosed+label%3AImprovement
+
+#984 Use thread priorities. (aka set `nice` values for background-like tasks)
+#1638 Remove Maven client at runtime + Provide a way to load Druid extensions through local file system
+#1728 Store AggregatorFactory[] in segment metadata
+#1988 support multiple intervals in dataSource inputSpec
+#2006 Preserve dimension order across indexes during ingestion 
+#2047 optimize InputRowSerde 
+#2075 Configurable value replacement on match failure for RegexExtractionFn
+#2079 reduce bytearray copy to minimal optimize VSizeIndexedWriter
+#2084 minor optimize IndexMerger's MMappedIndexRowIterable 
+#2094 Simplifying dimension merging 
+#2107 More efficient SegmentMetadataQuery
+#2111 optimize create inverted indexes 
+#2138 build v9 directly 
+#2228 Improve heap usage for IncrementalIndex 
+#2261 Prioritize loading of segments based on segment interval
+#2306 More specific null/empty str handling in IndexMerger 
+
+## Bug Fixes
+
+Full list: https://github.com/druid-io/druid/issues?q=milestone%3A0.9.0+is%3Aclosed+label%3ABug
+
+## Documentation
+
+Full list: https://github.com/druid-io/druid/issues?q=milestone%3A0.9.0+is%3Aclosed+label%3ADocumentation
+
+#2100 doc update to make it easy to find how to do re-indexing or delta ingestion
+#2186 Add intro developer docs
+#2279 Some more multitenancy docs
+#2364 Add more docs around timezone handling
+#2216 Completely rework the Druid getting started process
+
+Thanks to everyone who contributed to this patch!
+@fjy
+@xvrl 
+@drcrallen 
+@pjain1 
+@chtefi 
+@liubin 
+@salsakran 
+@jaebinyo
+@erikdubbelboer 
+@gianm 
+@bjozet 
+@navis 
+@AlexanderSaydakov 
+@himanshug 
+@guobingkun 
+@abbondanza 
+@binlijin 
+@rasahner 
+@jon-wei 
+@CHOIJAEHONG1 
+@loganlinn 
+@michaelschiff 
+@himank
+@nishantmonu51 
+@sirpkt 
+@duilio 
+@pdeva 
+@KurtYoung 
+@mangesh-pardeshi 
+@dclim 
+@desaianuj 
+@stevemns
+@b-slim 
+@cheddar 
+@jkukul 
+@AdrieanKhisbe 
+@liuqiyun
+@codingwhatever
+@clintropolis 
+@zhxiaogg 
+@rohitkochar 
+@itsmee 
+@Angelmmiguel 
+@noddi 
+@se7entyse7en 
+@zhaown 
+@genevien
+",https://api.github.com/users/gianm,1214075,gianm,https://api.github.com/repos/druid-io/druid/releases/3013735/assets,https://api.github.com/repos/druid-io/druid/releases/3013735,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.9.0,https://github.com/druid-io/druid/releases/tag/druid-0.9.0,https://api.github.com/repos/druid-io/druid/zipball/druid-0.9.0,druid-0.9.0,False,False
+2497730,2016-01-26T23:02:18Z,2016-01-26T23:51:06Z,Druid 0.8.3 - Stable,"## Updating from 0.8.x
+- You must set `druid.selectors.coordinator.serviceName` to your Coordinator's `druid.service` value (defaults to `druid/coordinator`) in common.runtime.properties of all nodes. Realtime handoff will only work if this config is properly set. (See #2015)
+- Instead of the normal rolling update procedure, for this release you should update your Coordinator nodes before updating the overlord. (See #2015)
+- Min/max aggregators are now deprecated and will be removed in Druid 0.9.0. Please use longMin, longMax, doubleMin, or doubleMax aggregators as appropriate.
+
+## New Features
+- #1881 Restorable indexing tasks
+- #1897, #1991 complex aggregator based on http://datasketches.github.io
+- #1943 Enable caching on intermediate realtime persists
+- #1957 Ability to skip Incremental Index during query using query context
+
+## Improvements
+- #1770 Add segment merge time as a metric
+- #1791 EventReceiverFirehoseMonitor
+- #1824 Add hashCode and equals to UniformGranularitySpec
+- #1889 update server metrics and emitter version
+- #1920 Update curator to 2.9.1
+- #1929 separate ingestion and query thread pool
+- #1960 optimize index merge
+- #1967 Add datasource and taskId to metrics emitted by peons
+- #1973 CacheMonitor - make cache injection optional
+- #2015 Remove ServerView from RealtimeIndexTasks and use coordinator http endpoint for handoffs
+- #2045 Update mmx emitter to 0.3.6
+- #2145 druid.indexer.task.restoreTasksOnRestart configuration
+
+## Bug Fixes
+- #1387 Add special handler to allow logger messages during shutdown
+- #1799 Support multiple outer aggregators of same type
+- #1815 Fix Race in jar upload during hadoop indexing
+- #1842 Do not pass `druid.indexer.runner.javaOpts` to Peon as a property
+- #1867 fixing hadoop test scope dependencies in indexing-hadoop
+- #1888 forward cancellation request to all brokers, fixes #1802
+- #1917 RemoteTaskActionClient: Fix statusCode check.
+- #1932 DataSchema: Exclude metric names from dimension list.
+- #1935 ForkingTaskRunner: Log without buffering.
+- #1940 Move Jackson Guice adapters into io.druid
+- #1954 EC2 autoscaler: avoid hitting aws filter limits
+- #1985 Change LookupExtractionFn cache key to be unique
+- #2036 Disable javadoc linting
+- #1973 Make cache injection optional
+- #2141 Fix some problems with restoring
+- #2227 Update bytebuffer-collections to 0.2.4 (upstream bugfixes in roaring bitmaps)
+- #2240 Fix loadRule when one of the tiers had no available servers
+- #2207 Fix bug for thetaSketch metric not working with select queries
+- #2266 Fix loss in segment announcements when segments do not fit in zNode
+- #2189 add ChatHandlerServerModule to realtime example
+- #2338 Fix tutorial so indexing service can start up
+
+## Documentation
+- #1832 add examples for duration and period granularities
+- #1843 ""druid.manager.segment"" should be ""druid.manager.segments
+- #1854 Fix documentation about lookup
+- #1900 fix doc - correct default value for maxRowsInMemory
+
+Thanks to all the contributors to this release!
+
+@b-slim
+@binlijin
+@dclim
+@drcrallen
+@fjy 
+@gianm
+@guobingkun
+@himanshug
+@nishantmonu51
+@pjain1
+@xvrl 
+",https://api.github.com/users/xvrl,815147,xvrl,https://api.github.com/repos/druid-io/druid/releases/2497730/assets,https://api.github.com/repos/druid-io/druid/releases/2497730,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.8.3,https://github.com/druid-io/druid/releases/tag/druid-0.8.3,https://api.github.com/repos/druid-io/druid/zipball/druid-0.8.3,druid-0.8.3,False,False
+1957243,2015-11-17T21:41:44Z,2015-11-18T17:17:57Z,Druid 0.8.2 - Stable,"## Updating from 0.8.1
+
+If you are using [union queries](http://druid.io/docs/latest/querying/datasource.html#union-data-source), please make sure to update broker nodes prior to updating any historical nodes, realtime nodes, or indexing service.
+
+Otherwise, you can follow standard rolling update procedures.
+
+## New Features
+- [#1744](https://github.com/druid-io/druid/pull/1744) Memcached connection pooling
+- [#1753](https://github.com/druid-io/druid/pull/1753) Allow SegmentMetadataQuery to skip cardinality and size calculations
+- [#1609](https://github.com/druid-io/druid/pull/1609) Experimental kafa simple consumer based firehose
+- [#1800](https://github.com/druid-io/druid/pull/1800) Experimental Hybrid L1/L2 cache
+
+## Improvements
+- [#1821](https://github.com/druid-io/druid/pull/1821) cache max data timestamp in QueryableIndexStorageAdapter
+- [#1765](https://github.com/druid-io/druid/pull/1765) Add CPUTimeMetricQueryRunner to ClientQuerySegmentWalker
+- [#1776](https://github.com/druid-io/druid/pull/1776) Modified the Twitter firehose to process more properties
+- [#1748](https://github.com/druid-io/druid/pull/1748) Allow ForkingTaskRunner javaOpts to have quoted arguments which contain spaces
+- [#1759](https://github.com/druid-io/druid/pull/1759) better faster smaller roaring bitmaps
+- [#1755](https://github.com/druid-io/druid/pull/1755) update druid-api for timestamp parsing speedup
+- [#1756](https://github.com/druid-io/druid/pull/1756) improving msging when indexing service is not found
+- [#1739](https://github.com/druid-io/druid/pull/1739) Allow SegmentAnalyzer to read columns from StorageAdapter, allow SegmentMetadataQuery to query IncrementalIndexSegments on realtime node
+- [#1732](https://github.com/druid-io/druid/pull/1732) Add support for a configurable default segment history period for segmentMetadata queries and GET /datasources/<datasourceName> lookups
+- [#1695](https://github.com/druid-io/druid/pull/1695) Allow writing InputRowParser extensions that use hadoop/any libraries
+- [#1688](https://github.com/druid-io/druid/pull/1688) More memcached metrics
+- [#1712](https://github.com/druid-io/druid/pull/1712) Add dimension extraction functionality to SearchQuery
+- [#1696](https://github.com/druid-io/druid/pull/1696) Add CPU time to metrics for segment scanning.
+- [#1718](https://github.com/druid-io/druid/pull/1718) Adds task duration to indexer console for completed tasks.
+- [#1725](https://github.com/druid-io/druid/pull/1725) Don't check for sortedness if we already know GenericIndexedWriter isn't sorted
+- [#1699](https://github.com/druid-io/druid/pull/1699) composing emitter module to use multiple emitters together
+- [#1639](https://github.com/druid-io/druid/pull/1639) New plumber
+- [#1604](https://github.com/druid-io/druid/pull/1604) Allow task to override ForkingTaskRunner tunings and jvm settings
+- [#1542](https://github.com/druid-io/druid/pull/1542) add endpoint to fetch rule history for all datasources
+- [#1682](https://github.com/druid-io/druid/pull/1682) Support parsing of BytesWritable strings in HadoopDruidIndexerMapper
+- [#1622](https://github.com/druid-io/druid/pull/1622) Support for JSON Smile format for EventReceiverFirehoseFactory
+- [#1654](https://github.com/druid-io/druid/pull/1654) Add ability to provide taskResource for IndexTask.
+
+## Bug Fixes
+- [#1868](https://github.com/druid-io/druid/pull/1868) Removing parent paths causes watchers of the ""announcements"" path to get stuck
+- [#1855](https://github.com/druid-io/druid/pull/1855) fix [GreaterThan,LessThan,Equals] HavingSpecs
+- [#1862](https://github.com/druid-io/druid/pull/1862) Add timeout to shutdown request to middle manager for indexing service
+- [#1822](https://github.com/druid-io/druid/pull/1822) support multiple non-consecutive intervals in outer query of nested group-by
+- [#1811](https://github.com/druid-io/druid/pull/1811) Server discovery selector ipv6 friendly
+- [#1823](https://github.com/druid-io/druid/pull/1823) For dataSource inputSpec in hadoop batch ingestion, use configured query granularity for reading existing segments instead of NONE
+- [#1818](https://github.com/druid-io/druid/pull/1818) Add hashCode and equals to stock lookups
+- [#1812](https://github.com/druid-io/druid/pull/1812) Bump server-metrics to 0.2.5 to catch a few fixes.
+- [#1806](https://github.com/druid-io/druid/pull/1806) Fix index exceeded msg to give maxRowCount as well
+- [#1801](https://github.com/druid-io/druid/pull/1801) Fix ClientInfoResource
+- [#1795](https://github.com/druid-io/druid/pull/1795) Try and make AnnouncerTest a bit more predictable
+- [#1797](https://github.com/druid-io/druid/pull/1797) ingest segment firehose ut
+- [#1798](https://github.com/druid-io/druid/pull/1798) Update httpcomponents and aws-sdk
+- [#1792](https://github.com/druid-io/druid/pull/1792) GroupByQueryRunnerTest for hyperUnique finalizing post aggregators
+- [#1781](https://github.com/druid-io/druid/pull/1781) Fix failure in nested groupBy with multiple aggregators with same fie…
+- [#1790](https://github.com/druid-io/druid/pull/1790) Cleanup kafka-extraction-namespace
+- [#1782](https://github.com/druid-io/druid/pull/1782) Add analysisTypes to SegmentMetadataQuery cache key
+- [#1730](https://github.com/druid-io/druid/pull/1730) fix #1727 - Union bySegment queries fix
+- [#1783](https://github.com/druid-io/druid/pull/1783) Separate ListColumnIncluderator cache key parts with nul bytes
+- [#1740](https://github.com/druid-io/druid/pull/1740) fix #1715 - Zombie tasks able to acquire locks after failure
+- [#1778](https://github.com/druid-io/druid/pull/1778) Redirect fixes
+- [#1777](https://github.com/druid-io/druid/pull/1777) fail task if finishjob throws any exception
+- [#1775](https://github.com/druid-io/druid/pull/1775) SQLMetadataConnector: Retry table creation, in case something goes wrong.
+- [#1772](https://github.com/druid-io/druid/pull/1772) RemoteTaskRunner: Fix for starting an overlord before any workers ever existed.
+- [#1764](https://github.com/druid-io/druid/pull/1764) Enable logging for memcached in factory
+- [#1760](https://github.com/druid-io/druid/pull/1760) Update memcached client for better concurrency in metrics.
+- [#1761](https://github.com/druid-io/druid/pull/1761) LocalDataSegmentPusher: Fix for Hadoop + relative paths.
+- [#1763](https://github.com/druid-io/druid/pull/1763) fix NPE and duplicate metric keys
+- [#1758](https://github.com/druid-io/druid/pull/1758) Fix memcached cache provider injection and add test
+- [#1747](https://github.com/druid-io/druid/pull/1747) Account for potential gaps in hydrants in sink initialization, hydrant swapping (e.g. h0, h1, h4)
+- [#1751](https://github.com/druid-io/druid/pull/1751) Soften concurrency requirements on IncrementalIndexTest
+- [#1736](https://github.com/druid-io/druid/pull/1736) IngestSegmentFirehostFactoryTimelineTest for overshadowing of the middle of a segment.
+- [#1741](https://github.com/druid-io/druid/pull/1741) Add better concurrency testing to IncrementalIndexTest
+- [#1743](https://github.com/druid-io/druid/pull/1743) Disable metadata publishing attempt in example script
+- [#1697](https://github.com/druid-io/druid/pull/1697) Better logging of URIExtractionNamespace failures due to missing files
+- [#1702](https://github.com/druid-io/druid/pull/1702) do not have dataSource twice in path to segment storage on hdfs
+- [#1710](https://github.com/druid-io/druid/pull/1710) Add some basic latching to concurrency testing in IncrementalIndexTest
+- [#1734](https://github.com/druid-io/druid/pull/1734) fix broken integration-test
+- [#1731](https://github.com/druid-io/druid/pull/1731) fix NPE with regex extraction function
+- [#1700](https://github.com/druid-io/druid/pull/1700) update indexing in the helper to use multiple persists and merge
+- [#1721](https://github.com/druid-io/druid/pull/1721) fix for ""java.io.IOException: No FileSystem for scheme: hdfs"" error
+- [#1694](https://github.com/druid-io/druid/pull/1694) Better timing and locking in NamespaceExtractionCacheManagerExecutorsTest
+- [#1703](https://github.com/druid-io/druid/pull/1703) add null check for task context.
+- [#1637](https://github.com/druid-io/druid/pull/1637) Make jetty scheduler threads daemon thread
+- [#1658](https://github.com/druid-io/druid/pull/1658) Hopefully add better timeouts and ordering to JDBCExtractionNamespaceTest
+- [#1620](https://github.com/druid-io/druid/pull/1620) Allow long values in the key or value fields for URIExtractionNamespace
+- [#1578](https://github.com/druid-io/druid/pull/1578) Fix UT and documentation to the extraction filter
+- [#1687](https://github.com/druid-io/druid/pull/1687) do not let user override hadoop job settings explicitly provided by druid code
+- [#1689](https://github.com/druid-io/druid/pull/1689) Update LZ4Transcoder to match Compressed strategy factory type.
+- [#1685](https://github.com/druid-io/druid/pull/1685) Close output streams and channels loudly when creating segments.
+- [#1686](https://github.com/druid-io/druid/pull/1686) Replace funky imports with standard ones.
+- [#1683](https://github.com/druid-io/druid/pull/1683) Remove unused Indexer interface.
+- [#1632](https://github.com/druid-io/druid/pull/1632) Inner Query should build on sub query
+- [#1676](https://github.com/druid-io/druid/pull/1676) fix convert segment task
+- [#1672](https://github.com/druid-io/druid/pull/1672) Migrate TestDerbyConnector to a JUnit @Rule
+- [#1675](https://github.com/druid-io/druid/pull/1675) update druid-api for jackson 2.4.6
+- [#1632](https://github.com/druid-io/druid/pull/1632) Inner Query should build on sub query
+- [#1668](https://github.com/druid-io/druid/pull/1668) Code cleanup for CachingClusteredClientTest
+- [#1669](https://github.com/druid-io/druid/pull/1669) Upgrade dependencies
+- [#1663](https://github.com/druid-io/druid/pull/1663) TaskActionToolbox: Remove allowOlderVersions, lift interval constraint
+- [#1619](https://github.com/druid-io/druid/pull/1619) update server metrics
+- [#1661](https://github.com/druid-io/druid/pull/1661) Poll rules immediately after change
+- [#1665](https://github.com/druid-io/druid/pull/1665) Consolidate SQL retrying by moving logic into the connectors.
+- [#1648](https://github.com/druid-io/druid/pull/1648) handle commas in the path before calling MultipleInputs.addInputPaths
+- [#1647](https://github.com/druid-io/druid/pull/1647) Approx histogram ""integration"" unit test
+
+## Documentation
+- [#1814](https://github.com/druid-io/druid/pull/1814) Adjust realtime constraints in the docs.
+- [#1794](https://github.com/druid-io/druid/pull/1794) update R / Python clients
+- [#1784](https://github.com/druid-io/druid/pull/1784) Minor documentation fixes for CONTRIBUTING.md
+- [#1774](https://github.com/druid-io/druid/pull/1774) update doc about aggregation field in merge task and a null check
+- [#1742](https://github.com/druid-io/druid/pull/1742) add docs for search filter
+- [#1737](https://github.com/druid-io/druid/pull/1737) Docs: Suggest hadoopyString parser for Hadoop.
+- [#1735](https://github.com/druid-io/druid/pull/1735) add pivot as a UI
+- [#1723](https://github.com/druid-io/druid/pull/1723) fix typo in segments.md
+- [#1720](https://github.com/druid-io/druid/pull/1720) update ingestion faq to mention dataSource inputSpec
+- [#1717](https://github.com/druid-io/druid/pull/1717) in configuration/index.md s/instantialize/initialize
+- [#1698](https://github.com/druid-io/druid/pull/1698) Timeseries skipEmptyBucket docs.
+- [#1662](https://github.com/druid-io/druid/pull/1662) Add documentation for pathFormat in batch ingestion
+- [#1673](https://github.com/druid-io/druid/pull/1673) Fix batch ingestion doc
+- [#1670](https://github.com/druid-io/druid/pull/1670) fix formatting
+- [#1656](https://github.com/druid-io/druid/pull/1656) more docs for common questions
+- [#1664](https://github.com/druid-io/druid/pull/1664) add documentation about TimedShutoff firehose
+- [#1633](https://github.com/druid-io/druid/pull/1633) swap description and dimension column for some JVM metrics
+- [#1793](https://github.com/druid-io/druid/pull/1793) fixing the link to chunkPeriod doc
+
+Thanks to all the contributors to this release!
+
+@anwenxu
+@cheddar
+@dclim
+@drcrallen
+@fjy
+@gianm
+@guobingkun
+@Hailei
+@himanshug
+@jon-wei
+@nishantmonu51
+@pjain1
+@potto007
+@qix
+@rasahner
+@xvrl
+",https://api.github.com/users/xvrl,815147,xvrl,https://api.github.com/repos/druid-io/druid/releases/1957243/assets,https://api.github.com/repos/druid-io/druid/releases/1957243,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.8.2,https://github.com/druid-io/druid/releases/tag/druid-0.8.2,https://api.github.com/repos/druid-io/druid/zipball/druid-0.8.2,druid-0.8.2,False,False
+1819670,2015-09-16T05:47:00Z,2015-09-16T05:49:59Z,Druid 0.8.1 - Stable,"## Updating from 0.8.0
+
+There should be no update concerns and standard updating procedures can be followed for rolling updates
+
+## New Features
+- [#1259](https://github.com/druid-io/druid/pull/1259) **Experimental** Query Time Lookups (QTL) -– Ability to do limited joins at query time.
+  Simple example use case is Country Code to Country Name.
+- [#1374](https://github.com/druid-io/druid/pull/1374) **Experimental** Hadoop batch re-indexing and Delta ingestion.
+  Re-Indexing allows you to ingest existing druid segments using a new schema with certain columns removed, changed granularity etc. ""Delta"" Ingestion allows appending data to existing interval in a datasource. See the new [dataSource inputSpec](http://druid.io/docs/latest/ingestion/batch-ingestion.html#datasource) and [multi inputSpec](http://druid.io/docs/latest/ingestion/batch-ingestion.html#multi) for more information.
+
+## Improvements
+- [#1465](https://github.com/druid-io/druid/pull/1465) Read Hadoop configuration file from HDFS
+- [#1472](https://github.com/druid-io/druid/pull/1472) Support using combiner for Hadoop ingestion
+- [#1506](https://github.com/druid-io/druid/pull/1506) Better support for null input rows during ingestion
+- [#1518](https://github.com/druid-io/druid/pull/1518) More support added for Azure deep store
+- [#1550](https://github.com/druid-io/druid/pull/1550) Add configuration option to print all HTTP requests to log
+- [#1563](https://github.com/druid-io/druid/pull/1563) [#1602](https://github.com/druid-io/druid/pull/1602) Improved merging performance on Broker
+- [#1567](https://github.com/druid-io/druid/pull/1567) [#1568](https://github.com/druid-io/druid/pull/1568) Improved error logging for segment activities
+- [#1596](https://github.com/druid-io/druid/pull/1596) Improved coordinator console, now a separate maven dependency instead of giant code dump
+- [#1601](https://github.com/druid-io/druid/pull/1601) Reduced lock contention during segment scan
+- [#1603](https://github.com/druid-io/druid/pull/1603) Improved performance of Lexicographic TopNs
+- [#1643](https://github.com/druid-io/druid/pull/1643) helpful cause explaining why SegmentDescriptorInfo did not exist
+
+Improved test coverage for indexing service, ingestion, and coordinator endpoints
+
+## Bug Fixes
+- [#1406](https://github.com/druid-io/druid/pull/1406) Fix groupBy breaking when exceeding max intermediate rows
+- [#1441](https://github.com/druid-io/druid/pull/1441) Fix flush errors being suppressed when closing output streams
+- [#1469](https://github.com/druid-io/druid/pull/1469) Fix inconsistent property names for druid.metadata.\* properties
+- [#1484](https://github.com/druid-io/druid/pull/1484) JobHelper.ensurePaths will set properties from config properly
+- [#1499](https://github.com/druid-io/druid/pull/1499) Fix groupBy caching with renamed aggregators
+- [#1503](https://github.com/druid-io/druid/pull/1503) Fix leaking indexing service status nodes in ZK
+- [#1534](https://github.com/druid-io/druid/pull/1534) Fix caching for approximate histograms
+- [#1616](https://github.com/druid-io/druid/pull/1616) Fix dependency error in local index task 
+- [#1627](https://github.com/druid-io/druid/pull/1627) Fix realtime tasks getting stuck on shutdown even after status being shown as SUCCESS
+- [#1634](https://github.com/druid-io/druid/pull/1634) Allow IrcFirehoseFactory to shutdown cleanly
+- [#1640](https://github.com/druid-io/druid/pull/1640) Package extensions in release tarball + script to run druid servers
+- [#1653](https://github.com/druid-io/druid/pull/1653) Fix success flag emitted in router query metrics 
+- [#1659](https://github.com/druid-io/druid/pull/1659) on kill segment, don't leave version, interval and dataSource dir behind on HDFS
+- [#1681](https://github.com/druid-io/druid/pull/1681) Fix overlapping segments not working for ingest segment firehose
+
+## Documentation
+- New documentation for firehoses, evaluating Druid, and plenty of fixes.
+- Improved documentation for working with CDH
+- Added instructions for PostgreSQL metadata store
+- More documentation on how to use ApproximateHistograms
+
+The full list of changes can be found [here](https://github.com/druid-io/druid/compare/0.8.0...0.8.1)
+
+## Thanks
+
+Special thanks to everyone that contributed (code, docs, etc.) to this release!
+
+@drcrallen
+@davideanastasia
+@guobingkun
+@himanshug
+@michaelschiff
+@fjy
+@krismolendyke
+@nishantmonu51
+@rasahner
+@xvrl
+@gianm
+@pjain1
+@samjhecht
+@solimant
+@sherry-q
+@ubercow
+@zhaown
+@mvfast
+@mistercrunch
+@pdeva
+@KurtYoung
+@onlychoice
+@b-slim
+@cheddar
+@MarConSchneid
+",https://api.github.com/users/xvrl,815147,xvrl,https://api.github.com/repos/druid-io/druid/releases/1819670/assets,https://api.github.com/repos/druid-io/druid/releases/1819670,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.8.1,https://github.com/druid-io/druid/releases/tag/druid-0.8.1,https://api.github.com/repos/druid-io/druid/zipball/druid-0.8.1,druid-0.8.1,False,False
+1541978,2015-07-15T16:58:24Z,2015-07-15T17:37:09Z,Druid 0.8.0 - Stable,"We recently introduced a backwards incompatible change to the schema Druid uses when it emits metrics. If you are not emitting Druid metrics to an http endpoint, the update procedure should be straightforward.
+
+# Updating from 0.7.x
+- If you are emitting Druid metrics to an http endpoint, please consult https://github.com/druid-io/druid/blob/master/docs/content/operations/metrics.md for the new schema used for Druid metrics
+- `io.druid.server.metrics.ServerMonitor` has been renamed to `io.druid.server.metrics.HistoricalMetricsMonitor`. You will need to update any configs that contain this change.
+- Correction to one of db index keys requires migration steps described in https://github.com/druid-io/druid/pull/1322 
+
+# Updating from 0.6.x
+- Please see the update guide from 0.6.x to 0.7.x: https://github.com/druid-io/druid/releases/tag/druid-0.7.0
+- After updating to 0.7.x, follow the previous instructions to update to 0.8.x
+
+# New Features
+- Redo Druid metrics to use an understandable metrics schema
+- Support compression for multi-value columns
+- Added longMax/longMin aggregators in addition to previous min/max [double] aggregators which have been renamed to appropriate doubleMax/doubleMin
+- Added a hadoop_convert_segment task for the indexer to allow large scale batch re-compression of old data as an indexer task.
+
+# Improvements
+- Index task now ignores invalid rows (#1264)
+- Improved segment filtering for dataSourceMetadataQuery (#1299)
+- Numerous additional unit tests
+
+# Bug Fixes
+- Fixed deprecated warnings in Hadoop batch indexing (#1275). Thanks @infynyxx!
+- Fix groupBys applying limitSpecs to historicals on post aggregations (#1292). Thanks @guobingkun!
+- Fix incorrectly typed values in metadata sql queries (#1295). THanks @anubhgup!
+- Fix timeBoundary cache serde problems (#1303)
+- Fix serde issue with pulling timestamps from cache (#1304)
+- Fixed concatenated gzip files with static s3 firehose (#1311)
+- Fix audit table config serde problems (#1322)
+- Fix IRC firehose serde (#1331)
+- Fix Arithmetic exceptions on the broker (#1336)
+- Fix an error where the Convert Segment Task would leave zombie tasks if the task failed (#1363) 
+- Fixed #1365 to return actual complex metric name in segment metadata query response
+- Fix groupBy caching to work with renamed aggregators (#1499)
+
+# Documentation
+- Numerous typo fixes. Thanks to @textractor, @rasahner, & @bobrik.
+",https://api.github.com/users/drcrallen,8213081,drcrallen,https://api.github.com/repos/druid-io/druid/releases/1541978/assets,https://api.github.com/repos/druid-io/druid/releases/1541978,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.8.0,https://github.com/druid-io/druid/releases/tag/druid-0.8.0,https://api.github.com/repos/druid-io/druid/zipball/druid-0.8.0,druid-0.8.0,False,False
+1344794,2015-05-27T18:57:30Z,2015-05-27T20:23:25Z,Druid 0.7.3 - Stable,"This release is mainly to get out dimension compression and rework the druid documentation. There are no update concerns with this version of Druid.
+
+# New Features
+- Added support for Dimension compression of segment columns, enabled by default. Compression is applied to the column storing the dimension value indices, but not to the dimension values themselves. This change only applies to single value dimensions, multi-value dimensions are left uncompressed. With real-world data we have seen segments sizes reduced by 50% for some datasources, but actual compression ratios will vary based on the data. Sparse and repetitive columns will benefit the most, whereas more random and higher cardinality columns will benefit less. Old segments can be converted using the updated VersionConverterTask.
+- Initial support for Microsoft Azure as a deep storage option has been added. Thanks @davrodpin!
+
+# Improvements
+- Improved VersionConverterTask to allow for an IndexSpec and forced updates. This enables the ability to convert old segments to use dimension compression,
+- Improved how the datasource metadata query filters on segments to scan.
+
+# Bug Fixes
+- Ignore rows with invalid interval for index task (#1264)
+- always re-upload snapshot self-contained jars to hdfs (#1261)
+- Skip raising false alert when the coordinator loses leadership (#1224)
+- Fix an issue that after broker forwards GroupByQuery to historical, havingSpec is still applied (#1292). Thanks @guobingkun!
+- Fix type incorrect types for update sql statement for metadata storage (#1295). Thanks @anubhgup!
+- fix serde issue when pulling timestamps from cache (#1304)
+
+# Documentation
+- Reworked the Druid documentation such that it can be consumed in order.
+- Many documentation fixes and improvements thanks to @bobrik, @infynyxx, @rasahner, @b-slim, @textractor, @truenorth, @gknapp, and others we may have missed!
+",https://api.github.com/users/fjy,428325,fjy,https://api.github.com/repos/druid-io/druid/releases/1344794/assets,https://api.github.com/repos/druid-io/druid/releases/1344794,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.7.3,https://github.com/druid-io/druid/releases/tag/druid-0.7.3,https://api.github.com/repos/druid-io/druid/zipball/druid-0.7.3,druid-0.7.3,False,False
+1146913,2015-04-09T21:50:23Z,2015-04-09T23:01:43Z,Druid 0.7.1.1 - Stable,"## New Features
+- **Group results by day of week, hour of day, etc.**
+  
+  We added support for time extraction functions where you can group by results based on anything DateTimeFormatter supports. For more details, see http://druid.io/docs/latest/DimensionSpecs.html#time-format-extraction-function .
+- **Audit rule and dynamic configuration changes**
+  
+  Druid now provides support for remembering why a rule or configuration change was made, and who made the change. Note that you must provide the author and comment fields yourself. The IP which issued the configuration change will be recorded by default. For more details, see headers ""X-Druid-Author"" and ""X-Druid-Comment"" on http://druid.io/docs/latest/Coordinator.html
+- **Provide support for a password provider for the metadata store**
+  
+  This enables people to write a module extension which implements the logic for getting a password to the metadata store.
+- **Enable servlet filters on Druid nodes**
+  
+  This enables people to write authentication filters for Druid requests.
+
+## Improvements
+- **Query parallelization on the broker for long interval queries**
+  
+  We’ve added the ability to break up a long interval query into multiple shorter interval queries that can be run in parallel. This should improve the performance of more expensive `groupBy`s. For more details, see ""chunkPeriod"" on http://druid.io/docs/latest/Querying.html#query-context 
+- **Better schema exploration**
+  
+  The broker can now return the dimensions and metrics for a datasource broken down by interval.
+- **Improved code coverage**
+  
+  We’ve added numerous unit tests to improve code coverage and will be tracking coverage in the future with [Coveralls](https://coveralls.io/).
+- **Additional ingestion metrics**
+  
+  Added additional metrics for failed persists and failed handoffs.
+- **Configurable InputFormat for batch ingestion** (#1177)
+
+## Bug Fixes
+- Fixed a bug where sometimes the broker and coordinator would miss announcements of segments, leading to null pointer exceptions. (#1161)
+- Fixed a bug where groupBy queries would fail when aggregators and post-aggregators were named the same (#1044)
+- Fixed a bug where not including a `pagingSpec` in a select query generates a obscure NPE (#1165). Thanks to friedhardware!
+- ""bySegment"" groupBy queries should now work (#1180)
+- Honor `ignoreInvalidRows` in reducer for Hadoop indexing
+- Download dependencies from Maven Central over https
+- Updated MySQL connector to fix issues with recent MySQL versions
+- Fix `timeBoundary` query on union datasources (#1243)
+- Fix Guice injections for `DruidSecondaryModule` (#1245)
+- Fix log4j version dependencies (#1239)
+- Fix NPE when partition number 0 does not exist (#1190)
+- Fix arbitrary granularity spec (#1214) and ignore rows with invalid interval for index task (#1264)
+- Fix thread starvation in AsyncQueryForwardingServletTest (#1233)
+- More useful ZooKeeper log messages
+- Various new unit tests for things
+- Updated MapDB to 1.0.7 for bugfixes
+- Fix re-uploading of self-containted SNAPSHOT jars when developing on hadoop (#1261)
+
+## Documentation
+- Reworked the flow of Druid documentation and fixed numerous errors along the way.
+- Thanks to @infynxx for fixing many of our broken links!
+- Thanks to @mrijke for many fixes with metrics and emitter configuration.
+- Thanks to @b-slim, @bobrik and @andrewserff for documentation and example fixes
+
+## Misc
+- Improved startup scripts thanks to @housejester.
+",https://api.github.com/users/xvrl,815147,xvrl,https://api.github.com/repos/druid-io/druid/releases/1146913/assets,https://api.github.com/repos/druid-io/druid/releases/1146913,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.7.1.1,https://github.com/druid-io/druid/releases/tag/druid-0.7.1.1,https://api.github.com/repos/druid-io/druid/zipball/druid-0.7.1.1,druid-0.7.1.1,False,False
+980651,2015-01-29T22:30:40Z,2015-02-24T00:32:12Z,Druid 0.6.172 - Stable,"Druid 0.6.172 fixes a few bugs to make the upgrade path towards Druid 0.7.0 seamless:
+- Fixes ingestion schema forward-compatibility with 0.7.0
+- Fixes dynamic worker configuration and worker affinity settings for the indexing service
+
+## Updating
+
+If you are not already running 0.6.171, please see the [0.6.171 release notes](https://github.com/druid-io/druid/releases/tag/druid-0.6.171) for important notes on the upgrade procedure.
+",https://api.github.com/users/xvrl,815147,xvrl,https://api.github.com/repos/druid-io/druid/releases/980651/assets,https://api.github.com/repos/druid-io/druid/releases/980651,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.6.172,https://github.com/druid-io/druid/releases/tag/druid-0.6.172,https://api.github.com/repos/druid-io/druid/zipball/druid-0.6.172,druid-0.6.172,False,False
+980529,2015-02-23T22:28:02Z,2015-02-24T17:37:32Z,Druid 0.7.0 - Stable,"## Updating to Druid 0.7.0 – Things to be Aware
+- **New ingestion spec**
+  
+  Druid 0.7.0 requires a new ingestion spec format. Druid 0.6.172 supports both the old and new formats of ingestion and has scripts to convert from the old to the new format. This script can be run with 'tools convertSpec' using the same Main used to run Druid nodes. You can update your Druid cluster to 0.6.172, update your ingestion specs to the new format, and then update to Druid 0.7.0. If you update your cluster to Druid 0.7.0 directly, make sure your real-time ingestion pipeline understands the new spec.
+- **MySQL is no longer the default metadata storage**
+  
+  Druid now defaults to embedding Apache Derby, which was chosen mainly for testability purposes. However, **we do not recommend using Derby in production**. For anything other than testing, please use MySQL or PostgreSQL metadata storage.
+  
+  [Configuration parameters for metadata storage](http://druid.io/docs/0.7.0/Configuration.html#metadata-storage) were renamed from `druid.db` to `druid.metadata.storage` and an additional `druid.metadata.storage.type=<mysql|postgresql>` is required to use anything other than Derby.
+  
+  The `convertProps` tool can assis you in convertng all 0.6.x properties to 0.7 properties.
+- **Druid is now case-sensitive**
+  
+  Druid column names are now case-sensitive. We previously tried to be case-insensitive for queries and case-preserving for data, but we decided to make this change as there were numerous bugs related to various casing problems.
+  
+  If you are upgrading from version 0.6.x:
+  1. Please make sure the column casing in your queries matches the casing of your column names in your data and update your queries accordingly.
+  2. One very important thing to note is that 0.6 internally lower-cased all column names at ingestion time and query time. In 0.7, this is no longer the case, however, we still strongly recommend that you use lowercase column names in 0.7 for simplicity.
+  3. If you are currently ingesting data with mixed case column names as part of your data or ingestion schema:
+     - for TSV or CSV data, simply lower-case your column names in your schema when you update to 0.7.0.
+     - for JSON data with mixed case fields and if you were not specifying the names of the columns, you can use the [`jsonLowerCase` parseSpec](http://druid.io/docs/0.7.0/Ingestion.html#json-lowercase-parsespec) to lower-case the data for you at ingestion time and maintain backwards compatibility.
+  
+  For all other parse specs, you will need to lower-case the
+  
+  metric/aggregator names if you were using mixed case before.
+- **Batch segment announcement is now the default**
+  
+  Druid now uses batch segment announcement by default for all nodes. If you are already using [batch segment announcement](http://druid.io/docs/0.7.0-rc3/Configuration.html#data-segment-announcer), you should be all set.
+  
+  If you have not yet updated to using batch segments announcement, please read [this guide in the forum](https://groups.google.com/forum/#!searchin/druid-development/eric$200.5$20batch$20segment/druid-development/vKV8pTAd0Gg/VgC8ee6XWZ0J) on how to update your current 0.6.x cluster to use batch announcement first.
+- **Kafka 0.7.x removed in favor of Kafka 0.8.x**
+  
+  If you are using Kafka 0.7, you will have to build the `kafka-seven` extension manually. It is commented out in the build, because Kafka 0.7 is not available in Maven Central. The Kafka 0.8 (`kafka-eight`) extension is unaffected.
+- **Coordinator endpoint changes**
+  
+  Numerous coordinator endpoints have changed. Please refer to the [coordinator documentation](http://druid.io/docs/0.7.0-rc3/Coordinator.html#http-endpoints) for what they are.
+  
+  In particular:
+  1. `/info` on the coordinator has been removed.
+  2. `/health` on historical nodes has been removed
+- **Separate jar required for `com.metamx.metrics.SysMonitor`**
+  
+  If you currenly have `com.metamx.metrics.SysMonitor` as part of your `druid.monitoring.monitors` configuration and would like to keep it, you will have to add the [SIGAR library jar](https://repository.jboss.org/nexus/content/repositories/thirdparty-uploads/org/hyperic/sigar/1.6.5.132/sigar-1.6.5.132.jar) to your classpath.
+  
+  Alternatively, you can simply remove `com.metamx.metrics.SysMonitor` if you do not rely on the `sys/.*` metrics.
+  
+  We had to remove the direct dependency on SIGAR in order to move Druid artifacts to Maven Central, since SIGAR is currently not available there.
+- **Update Procedure**
+  
+  If you are running a version of Druid older than 0.6.172, please upgrade to 0.6.172 first. See the [0.6.172 release notes](https://github.com/druid-io/druid/releases/tag/druid-0.6.172) for instructions.
+  
+  In order to ensure a smooth rolling upgrade without downtime, nodes must be updated in the following order:
+  1. historical nodes
+  2. indexing service/real-time nodes
+  3. router nodes (if you have any),
+  4. broker nodes
+  5. coordinator nodes
+
+## New Features
+- **Long metric column support**
+  
+  Until now Druid stored all metrics as single precision floating point values, which could introduce rounding errors and unexpected results with queries using `longSum` aggregators, especially for groupBy queries.
+- **Pluggable metadata storage**
+  
+  MySQL, PostgreSQL, and Derby (for testing) are now supported out of the box.  Derby only supports single master or should not be used for high availability production, use MySQL or PostgreSQL failover for that.
+- **Simplified data ingestion API**
+  
+  completely redo Druid’s data ingestion API.
+- **Switch compression for metric colums from LZF to LZ4**
+  
+  Initial performance tests show it may be between 15% and 25% faster, and results in segments about 3-5% smaller on typical data sets.
+- **Configurable inverted bitmap indexes**
+  
+  Druid now supports Roaring Bitmaps in addition to the default Concise Bitmaps. Initial performance tests show Roaring may be up to 20% faster for certain types of queries, at the expense of segments being 20% larger on average.
+- **Integration tests**
+  
+  We have added a set of integration tests that use Docker to spin up a Druid cluster to run a series of indexing and query tests.
+- **New Druid Coordinator console**
+  
+  We introduced a new Druid console that should hopefully provide a better overview of the status of your cluster and be a bit more scalable if you have hundreds of thousands of segments. We plan to expand this console to provide more information about the current state of a Druid cluster.
+- **Query Result Context**
+  
+  Result contexts can report errors during queries in the query headers. We are currently using this feature for internal retries, but hope to expand it to report more information back to clients.
+
+## Improvements
+- **Faster query speeds**
+  
+  Lots of speed improvements thanks to faster compression format, small optimizations in column structure, and optimizations of queries with multiple aggregations, as well as numerous groupBy query performance improvements.  Overall, some queries can be up to twice as fast using the new index format. 
+- **Druid artifacts in Maven Central**
+  
+  Druid artifacts are now [available in Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cio.druid) to make your own builds and deployments easier.
+- **Common Configuration File**
+  
+  Druid now has a common.runtime.properties where you can declare all global properties as well as all of your external dependencies. This avoids repeated configuration across multiple nodes and will hopefully make setting up a Druid cluster a little less painful.
+- **Default host names, port and service names**
+  
+  Default host names, ports, and service names for all nodes means a lot less configuration is required upfront if you are happy with the defaults. It also means you can run all node types on a single machine without fiddling with port conflicts.
+- **Druid column names are now case sensitive**
+  
+  Death to casing bugs. Be aware of the dangers of updating to 0.7.0 if you have mixed case columns and are using 0.6.x. See above for more details.
+- **Query Retries**
+  
+  Druid will now automatically retry queries for certain classes of failures.
+- **Background caching**
+  
+  For certain types of queries, especially those that involve distinct (hyperloglog) counts, this can improve performance up over 20%.  Background caching is disabled by default.
+- **Reduced coordinator memory usage**
+  
+  Reduced coordinator memory usage (by up to 50%). This fixes a problem where a coordinator would sometimes lose leadership due to frequent GCs.
+- **Metrics can now be emitted to SSL endpoints**
+- **Additional AWS credentials support**, Thanks @gnethercutt
+- **Additional persist and throttle metrics for real-time ingestion**
+  
+  This should help diagnose when real-time ingestion is being throttled and how long persists are taking. These metrics provide a good indication of when it is time to scale up real-time ingestion.
+- **Broker initialization endpoint**
+  
+  Brokers now provides a status endpoint at /druid/broker/v1/loadstatus to indicate whether they are ready to be queried, making rolling upgrades / restarts easier. 
+
+## Bug Fixes
+- Support multiple shards of the same datasource on the same realtime node. Thanks @zhaown
+- HDFS task logs should now work as expected. Thanks @flowbehappy.
+- Possible deadlock condition fixed in the Broker.
+- Various fixes for GZIP compression in returning results.
+- `druid.host` should now support IPv6 addresses as well.
+
+## Documentation
+- New tutorials.
+- New ingestion documentation.
+- New configuration documentation.
+- Improvements to rule documentation. Thanks @mrijke
+
+## Known issues
+- Merging segments with different types of bitmap indices is currently not possible, so if you have both types of indices in your cluster, you must set `druid.coordinator.merge.on` to false. ‘false’ is the default value of the config.
+- https://github.com/druid-io/druid/issues/1045 Issue with GoupBy queries with complex aggregations and post-aggregations using the same name
+- https://github.com/druid-io/druid-api/pull/38 If you are using longSum in your ingestion spec, having floating point data may throw exceptions. 
+",https://api.github.com/users/xvrl,815147,xvrl,https://api.github.com/repos/druid-io/druid/releases/980529/assets,https://api.github.com/repos/druid-io/druid/releases/980529,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.7.0,https://github.com/druid-io/druid/releases/tag/druid-0.7.0,https://api.github.com/repos/druid-io/druid/zipball/druid-0.7.0,druid-0.7.0,False,False
+872606,2015-01-21T00:29:43Z,2015-01-21T21:36:06Z,Druid 0.6.171 - Stable,"Druid 0.6.171 is a bug fix stable mainly meant to enable a less painful update to Druid 0.7.0. Going forward, we will be backporting fixes to 0.6.x as required for the community and continuing to develop major features on 0.7.x.
+
+## Download
+
+http://static.druid.io/artifacts/releases/druid-services-0.6.171-bin.tar.gz
+
+## Updating, Things to be Aware
+
+Both this version and 0.7.0-RC1 provide much better out of the box support for PostgreSQL as a metadata store. In order to provide this functionality, we had to make some small changes to the way data is stored in metadata storage for MySQL setups.
+
+Before updating to 0.6.171, please make sure that:
+All Druid MySQL metadata tables are using UTF-8 encoding for all string/text columns, 
+The default character set for the Druid MySQL database has been changed to UTF-8. 
+Druid Coordinator and Overlord will refuse to start if the database default character set is not UTF-8.
+
+To check column character encoding, use
+`SHOW CREATE TABLE <table>;`.
+If the default table encoding is not UTF-8 or if any columns are encoded using anything other than UTF-8 you will need to convert those tables.
+
+To check the database default encoding, use
+`SHOW VARIABLES LIKE 'character_set_database';`
+
+If you are not already using UTF-8 encoding for your columns, you can convert your tables and change the database default using the following commands. Please keep in mind that table conversion can take a while (order of minutes) and segment loading / handoff will be interrupted for the duration of the upgrade.
+
+Make a backup of your database before performing the upgrade!
+
+``` sql
+ALTER TABLE druid_config    CONVERT TO CHARSET utf8;
+ALTER TABLE druid_rules     CONVERT TO CHARSET utf8;
+ALTER TABLE druid_segments  CONVERT TO CHARSET utf8;
+ALTER TABLE druid_tasks     CONVERT TO CHARSET utf8;
+ALTER TABLE druid_tasklogs  CONVERT TO CHARSET utf8;
+ALTER TABLE druid_tasklocks CONVERT TO CHARSET utf8;
+
+-- replace druid with your Druid database name here 
+ALTER DATABASE druid DEFAULT CHARACTER SET utf8;
+```
+
+## Improvements
+
+We introduced several query optimizations, mainly for topNs and HLLs
+The overlord can now optionally choose what worker to send tasks to #904
+Improved retry logic for realtime plumbers when handoffs fail during the final merge step
+
+## Bug Fixes
+- Fixed searching with same value in multiple columns
+- Fixed jetty defaults to increase number of threads and prevent lockups
+- Fixed query/wait metrics being emitted twice
+- Fixed default dimension exclusions for timestamp and aggregators in ingestion schema 
+- Fixed missing origin in cache key for period granularities
+- Fixed default FilteredServerView to actually be filtered
+- Fixed files not cleaning up correctly in segment cache directory
+- Fixed results sometimes coming in out of order
+- Fixed bySegment TopN queries not returning at the broker level
+- Fixed a few bugs related to filtered aggregators
+- Fixed crazy amounts of logging when coordinator loses leadership
+- Updated jetty and spymemcached libraries for various fixes
+- Fixed cardinality aggregator caching schema problem
+- Fixed Coordinator and overlord '/status' page should not be redirected to the leader instances
+- Made postgres actually work out of the box in 0.6.x
+",https://api.github.com/users/fjy,428325,fjy,https://api.github.com/repos/druid-io/druid/releases/872606/assets,https://api.github.com/repos/druid-io/druid/releases/872606,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.6.171,https://github.com/druid-io/druid/releases/tag/druid-0.6.171,https://api.github.com/repos/druid-io/druid/zipball/druid-0.6.171,druid-0.6.171,False,False
+677986,2014-10-22T23:25:30Z,2014-11-04T19:29:10Z,Druid 0.6.160 - Stable,"## Improvements
+- Broker nodes now only start up after reading all information about segments in Zookeeper
+- Nested groupBy queries should now work with post aggregations.
+- Nested groupBy queries should now work with complex metrics.
+- The overlord in the indexing service can now assign tasks to workers based on strategies.
+- Local firehose can now find all files under a directory.
+- Timestamp and metrics are now automatically added to dimension exclusions.
+- Improved failure handling during real-time hand-offs.
+- Parallel downloading of segments. Multiple threads can now be used to download segments from deep storage.
+- Segments can be announced and queried as a node is initially loading up.
+- Native filtered aggregators for selector type filters
+- Custom Broker selection strategy for Router can now be written in JavaScript
+
+## Documentation
+- Example Hadoop Configuration now available
+- Best Practices and Recommendations now updated
+- Experimental Router node is now documented (druid.io/docs/latest/Router.html).
+- Local firehose is now documented (http://druid.io/docs/latest/Firehose.html).
+- Numerous improvements to FAQS, segment metadata docs improved, ingest firehose docs improved, full - cluster view explained. Thanks @pdeva!
+- Updates to Cassandra documentation. Thanks @lexicalunit!
+
+## Bug Fixes
+- Added a workaround for a jetty half open connection issue that appears when client connections terminate a long running query. The symptoms when this bug appears are that the cluster appears stuck and unresponsive. Another workaround for this issue is to simply use query context timeouts.
+- Fixed merging results from partitions with time gaps, which could cause out of order unmerged results (#796).
+- HDFS should now work for non-default filesystems. Thanks @flowbehappy!
+- Multiple spatial dimensions can now be ingested.
+- Fixed a bug with approximate histograms not working with groupBy queries.
+- Fixed last 8kb not working for non-s3 task logs.
+- Fixed dynamic configuration not working for replication throttling.
+- Fix search queries throwing exceptions if querying for non-existing dimensions
+- Fix ingest firehose breaking for non-present dimensions.
+- Select queries now work if you specify non-existing dimensions (#778)
+- groupBy cache now works with complex metrics
+- Fixed some serde problems that existed with RabbitMQ (#794)
+",https://api.github.com/users/fjy,428325,fjy,https://api.github.com/repos/druid-io/druid/releases/677986/assets,https://api.github.com/repos/druid-io/druid/releases/677986,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.6.160,https://github.com/druid-io/druid/releases/tag/druid-0.6.160,https://api.github.com/repos/druid-io/druid/zipball/druid-0.6.160,druid-0.6.160,False,False
+506993,2014-08-21T19:50:31Z,2014-08-21T20:02:04Z,Druid 0.6.146 - Stable,"## New features
+- Reschema capabilities added. You can now ingest an existing Druid segment and change the name, dimensions, metrics, rollup, etc. of the segment. (More info: http://druid.io/docs/0.6.146/Ingestion-FAQ.html)
+- Approximate histograms and quantiles. We’ve open sourced a new module, druid-histogram that includes a new aggregator to build approximate distributions and can be used for quantiles. Depending on the accuracy of the desired results, this aggregator can be slower than the other Druid aggregators. This features is still somewhat experimental, but we would really love to work with the community to make it more production stable.
+  (More info: http://druid.io/docs/0.6.146/ApproxHisto.html)
+- Query timeout and cancellation. You can now specify an optional “timeout” key and a long value in the Druid query context to cancel queries that have been running for too long. You can also issue explicit query cancellation.
+  (More info: http://druid.io/docs/0.6.146/Querying.html)
+- groupBy and select query caching (disabled by default). Select and groupBy queries do not cache by default. This is to prevent large result sets from these queries overflowing the cache. However, if your workload generates groupBy results of reasonable size and you’d like to enable the cache for these queries, you can override the default values for druid.*.cache.unCacheable (http://druid.io/docs/0.6.146/Broker-Config.html).
+- Middle-managers can now be blacklisted. This allows for rolling updates of middleManagers. See new docs on rolling Druid updates. (http://druid.io/docs/0.6.146/Rolling-Updates.html)
+- S3 credentials can now be read from file. Thanks @metacret!
+- HDFS task logs for the indexing service now supported. Thanks @realfun!
+- Index tasks now support manual specification of shardSpecs and the ability to skip the determine partitions step.
+- TimeBoundary queries can now return just the max or min time.
+  http://druid.io/docs/0.6.146/TimeBoundaryQuery.html
+
+## Improvements
+- Nested groupBy queries now support post aggregators and all functionality of normal groupBy queries.
+- groupBy queries now support cardinality aggregators.
+- Port finding strategies for peons are smarter and can now reuse ports.
+- Existing complete sinks will now try to be handed off much sooner after real-time updates or restarts.
+- More flexible userData for indexing service autoscaling on EC2 that is no longer tied to our deployment environment.
+- The async logic in the Druid router was improved significantly.
+- Routers now support optional routing strategy overrides.
+- Druid 0.6.x deployments now work with Apache Whirr. We are going to create a way of deploying Druid with docker soon as well.
+- Cleaned up some redundant configs in the indexing service.
+- A whole bunch of query and caching unit tests were added.
+- Explicit job properties can now be added for Hadoop ingestion tasks.
+
+## Docs
+- There are now docs about how to do rolling Druid updates and restarts.
+  http://druid.io/docs/0.6.146/Rolling-Updates.html
+- New docs for configuring logging in Druid.
+  http://druid.io/docs/0.6.146/Logging.html
+- Kafka 8 docs now added. Thanks @r4j4h
+  http://druid.io/docs/0.6.146/Kafka-Eight.html
+- Added docs for inverted topNs
+  http://druid.io/docs/0.6.146/TopNMetricSpec.html#inverted-topnmetricspec
+- Updated Cassandra documentation. Thanks @lexicalunit 
+  https://github.com/metamx/druid/pull/680
+
+## Misc
+- Curator version bumped to 2.6.0
+- Jetty version bumped to 9.2.2
+- Guava version bumped to 16.0.1
+- Logging for coordinator and historical nodes is now less verbose
+",https://api.github.com/users/fjy,428325,fjy,https://api.github.com/repos/druid-io/druid/releases/506993/assets,https://api.github.com/repos/druid-io/druid/releases/506993,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.6.146,https://github.com/druid-io/druid/releases/tag/druid-0.6.146,https://api.github.com/repos/druid-io/druid/zipball/druid-0.6.146,druid-0.6.146,False,False
+431189,2014-06-05T03:22:19Z,2014-07-15T18:52:24Z,,,https://api.github.com/users/xvrl,815147,xvrl,https://api.github.com/repos/druid-io/druid/releases/431189/assets,https://api.github.com/repos/druid-io/druid/releases/431189,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.6.120,https://github.com/druid-io/druid/releases/tag/druid-0.6.120,https://api.github.com/repos/druid-io/druid/zipball/druid-0.6.120,druid-0.6.120,False,False
+382285,2014-01-17T23:53:52Z,2014-06-18T20:40:21Z,Druid 0.6.52 - Stable,,https://api.github.com/users/fjy,428325,fjy,https://api.github.com/repos/druid-io/druid/releases/382285/assets,https://api.github.com/repos/druid-io/druid/releases/382285,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.6.52,https://github.com/druid-io/druid/releases/tag/druid-0.6.52,https://api.github.com/repos/druid-io/druid/zipball/druid-0.6.52,druid-0.6.52,False,False
+382281,2014-03-21T18:07:38Z,2014-06-18T20:37:06Z,Druid 0.6.73 - Stable,"We are pleased to announce a new Druid stable, version 0.6.73. New features include:
+
+A production tested dimension cardinality estimation module
+
+We recently open sourced our HyperLogLog module described in bit.ly/1fIEpjM  and //bit.ly/1ebLnNI . Documentation has been added on how to use this module as an aggregator and as part of post aggregators.
+
+Hash-based partitioning
+
+We recently introduced a new sharding format for batch indexing. We use the HyperLogLog module to estimate the size of a data set and create partitions based on this size. In our tests, partitioning via this hash based method is both faster and leads to more evenly partitioned segments.
+
+Cross-tier replication
+
+We can now replicate segments across different tiers. This means that you can create a “hot” tier that loads a single copy of the data on more powerful hardware and a “cold” tier that loads another copy of the data on less powerful hardware. This can lead to significant reductions in infrastructure costs.
+
+Nested GroupBy Queries
+
+Thanks to an awesome contribution from Yuval Oren et. al, we can do multi-level aggregation with groupBys. More info here: https://groups.google.com/forum/#!topic/druid-development/8oL28iuC4Gw
+
+GroupBy memory improvements
+
+We’ve made improvements as to how multi-threaded groupBy queries utilize memory. This should help reduce memory pressure on nodes with concurrent, expensive groupBy queries.
+
+Real-time ingestion stability improvements
+
+We’ve seen some stability issues with real-time ingestion with a high number of concurrent persists and have added smarter throttling to handle this type of workload.
+
+Additional features
+- multi-data center distribution (experimental)
+- request tracing
+- restore tasks (to restore archived segments)
+- memcached stability improvements
+- indexing service stability improvements
+- smarter autoscaling in the indexing service
+- numerous bug fixes
+- new documentation for production configurations
+
+Things on our plate
+- Reducing CPU usage on the broker nodes when interacting with the cache (we are seeing query bottlenecks when merging too many results from memcached)
+- Having historical nodes populate memcached (so bySegment results are no longer returned and historical nodes can do their own local merging)
+- Consolidating batch and real-time ingestion schemas so we can move towards a simpler data ingestion model
+- Scaling groupBys with off-heap result merging
+- Improving real-time ingestion stability and performance by moving to more off-heap data structures
+- Autoscaling and sharding the real-time ingestion pipeline
+- Evaluating append only style updates for streaming data (https://github.com/metamx/druid/issues/418)
+",https://api.github.com/users/fjy,428325,fjy,https://api.github.com/repos/druid-io/druid/releases/382281/assets,https://api.github.com/repos/druid-io/druid/releases/382281,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.6.73,https://github.com/druid-io/druid/releases/tag/druid-0.6.73,https://api.github.com/repos/druid-io/druid/zipball/druid-0.6.73,druid-0.6.73,False,False
+364852,2014-06-05T17:03:29Z,2014-06-09T20:25:06Z,Druid 0.6.121 - Stable,"This is a small release with mainly stability and performance updates.
+
+## Updating
+- If updating from 0.6.105, no particular steps need to be taken.
+- If updating from an older release, see the [notes for Druid 0.6.105](https://github.com/metamx/druid/releases/tag/druid-0.6.105)
+
+## Release Notes
+
+### New features
+- new cardinality estimation aggregator: uses hyperUnique (the optimized HyperLogLog aggregator) to estimate the cardinality of a dimension
+- we have completely redone the ingestion schemas to consolidate batch and real-time ingestion. Everything is backwards compatible for the time being, and we hope to have new examples and tutorials that show how to use the new schema. It should hopefully simplify ingestion.
+- alphanumeric sorted topNs
+- a new union query (right now this only works if there are commonly named columns and metrics among your datasources)
+- allow config-based overriding of Hadoop job properties for batch ingestion
+- multi-threaded the coordinator cost balancing algorithm for faster load balancing decisions (the number of threads to use is dynamically configurable, it is 1 by default)
+- added a context parameter to force a 2-pass topN optimization algorithm (previously this was done a heuristic that was rarely used)
+- additional coordinator endpoints to return more info about cluster state
+
+### Improvements
+- improved real-time ingestion memory usage. Depending on the number of total segments in your cluster, much less memory can now be used for real-time ingestion.
+- faster batch ingestion when there are numerous individual raw data files. Thanks @deepujain.
+- more resilient rabbitMQ firehoses. Thanks @tucksaun.
+- JavaScript aggregator now supports multi-valued dimensions.
+- inverted topN now works with lexicographic sorting
+- lexicographic topN now supports dimension extraction functions
+
+### Bug Fixes
+- several fixes for hyperUnique aggregator where large errors in estimates could be reported in certain edge cases
+- fixed an edge case race condition in the coordinator where it could load/drop segments incorrectly when disconnecting/reconnecting from Zookeeper
+- fixed an edge condition with real-time ingestion where a bad sink can be created with delayed events
+- updated jetty to 9.1.5 for a fix of a half-open connection problem that occurs occasionally (it’s been extremely difficult for us to reproduce this -- but when it occurs nodes appear to have their jetty threads stalled while writing to a channel that is already closed)
+- fixed a bug where cached results would get combined in arbitrary order
+- fixed additional casing bugs
+- Druid now passes tests with Java 8
+
+### Documentation
+- new documentation about possible hardware for production nodes and configuration for them. Look for more improvements to configuration coming soon.
+- Fixed several broken links in docs. Thanks @jcollum.
+",https://api.github.com/users/xvrl,815147,xvrl,https://api.github.com/repos/druid-io/druid/releases/364852/assets,https://api.github.com/repos/druid-io/druid/releases/364852,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.6.121,https://github.com/druid-io/druid/releases/tag/druid-0.6.121,https://api.github.com/repos/druid-io/druid/zipball/druid-0.6.121,druid-0.6.121,False,False
+362067,2014-05-01T22:08:59Z,2014-06-07T04:58:56Z,Druid 0.6.105 - Stable,"## Updating
+
+When updating Druid with no downtime, we highly recommend updating historical nodes and real-time nodes before updating the broker layer. Changes in queries are typically compatible with an old broker version and a new historical node version, but not vice versa. Our recommended rolling update process is:
+1. indexing service/real-time nodes
+2. historical nodes (with a wait in between each node, the wait time corresponds to how long it takes for a historical node to restart and load all locally cached segments)
+3. broker nodes
+4. coordinator nodes
+
+## Release Notes
+- Historical nodes can now use and maintain a local cache (disabled by default). This cache can either be heap based or memcached. This allows historical nodes to merge results locally and reduces much of the memory pressure seen on brokers while pulling a large number of results from the cache. Populating the cache is also now done in an asynchronous manner.
+- Experimental router node. We’ve been experimenting with a fully asynchronous router node that can route queries to different brokers depending on the actual query. Currently, the router node makes decisions about which broker to talk to based on rules from the coordinator node. It is our goal to at some point merge the router and broker logic and move towards hierarchical brokers.
+- Post aggregation optimization. We’ve optimized calculations of post aggregations (previously post aggs were being calculated more than necessary). In some initial benchmarks, this can lead to 20%-30% improvement in queries that involve post aggregations.
+- Support hyperUnique in groupBys. We’ve fixed a reported problem where groupBys would report incorrect results when using complex metrics (especially hyperUnique).
+- Support dimension extraction functions in groupBy
+- Persist and persist-n-merge threads now no longer block each other during real-time ingestion. We added a parameter for throttling real-time ingestion a few months ago, and what we’ve seen is that very high ingestion rates that lead to a high number of intermediate persists can be blocked while waiting for a hand-off operation to complete. This behavior has now been improved. You are also now able to set maxPendingPersists in the plumber.
+- hyperUnique performance optimizations: ~30-50% faster aggregations
+
+## Miscellaneous other things
+- Fix integer overflow in hash based partitions
+- Support for arbitrary JSON objects in query context
+- Request logs now include query timing statistics
+- Hadoop 2.3 support by default
+- Update to Jetty 9
+- Do not require valid database connections for testing
+- Gracefully handle NaN / Infinity returned by compute nodes 
+- better error reporting for cases where the ChainedExecutionQueryRunner throws NPEs
+
+## Extensions:
+- HDFS Storage should now work better with Cloudera CDH4
+- S3 Storage: object ACLs now consistently default to ""bucket owner full control""
+",https://api.github.com/users/xvrl,815147,xvrl,https://api.github.com/repos/druid-io/druid/releases/362067/assets,https://api.github.com/repos/druid-io/druid/releases/362067,master,https://api.github.com/repos/druid-io/druid/tarball/druid-0.6.105,https://github.com/druid-io/druid/releases/tag/druid-0.6.105,https://api.github.com/repos/druid-io/druid/zipball/druid-0.6.105,druid-0.6.105,False,False

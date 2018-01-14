@@ -1,0 +1,576 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8158707,2017-10-18T01:15:05Z,2017-10-18T01:27:47Z,,"**Fixes:**
+
+- Improved typescript definitions for new functional API (#1395)
+- Improved flow types for Record `setIn()`/`getIn()` key-paths. (#1399) 
+- Improved flow types for functional `merge()` definitions. (#1400)",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/8158707/assets,https://api.github.com/repos/facebook/immutable-js/releases/8158707,master,https://api.github.com/repos/facebook/immutable-js/tarball/v4.0.0-rc.9,https://github.com/facebook/immutable-js/releases/tag/v4.0.0-rc.9,https://api.github.com/repos/facebook/immutable-js/zipball/v4.0.0-rc.9,v4.0.0-rc.9,False,True
+8143469,2017-10-17T04:34:20Z,2017-10-17T04:52:53Z,,"**BREAKING:**
+
+- `list.concat()` now has a slightly more efficient implementation and `map.concat()` is an alias for `map.merge()`. (#1373)
+
+  In rare cases, this may affect use of `map.concat()` which expected slightly different behavior from `map.merge()`.
+
+- `isImmutable()` now returns true for collections currently within a `withMutations()` call. (#1374)
+
+  Previously, `isImmutable()` did double-duty of both determining if a value was a Collection or Record from this library as well as if it was outside a `withMutations()` call. This latter case caused confusion and was rarely used.
+
+- Plain Objects and Arrays are no longer considered opaque values (#1369)
+
+  This changes the behavior of a few common methods with respect to plain Objects and Arrays where these were previously considered opaque to `merge()` and `setIn()`, they now are treated as collections and can be merged into and updated (persistently). This offers an exciting alternative to small Lists and Records.
+
+- No longer use value-equality within `merge()` (#1391)
+
+  This rectifies an inconsistent behavior between x.merge(y) and x.mergeDeep(y) where merge would use === on leaf values to determine return-self optimizations, while mergeDeep would use `is()`. This improves consistency across the library and avoids a possible performance pitfall.
+
+**New:**
+
+- Dramatically better Flow types for `getIn()`, `setIn()`, `updateIn()` which understand key paths (#1366, #1377)
+- Functional API for `get()`, `set()`, and more which support both Immutable.js collections and plain Objects and Arrays (#1369)
+
+**Fixed:**
+
+- `getIn()` no longer throws when encountering a missing path (#1361)
+- Flow string enums can now be used as Map keys or Record fields (#1376)
+- Flow now allows `record.get()` to provide a not-set-value (#1378)
+- Fixed Flow return type for `Seq.Set()` (3e671a2b6dc76ab3dd141c65659bce55ffd64f44)",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/8143469/assets,https://api.github.com/repos/facebook/immutable-js/releases/8143469,master,https://api.github.com/repos/facebook/immutable-js/tarball/v4.0.0-rc.8,https://github.com/facebook/immutable-js/releases/tag/v4.0.0-rc.8,https://api.github.com/repos/facebook/immutable-js/zipball/v4.0.0-rc.8,v4.0.0-rc.8,False,True
+8012993,2017-10-05T16:51:48Z,2017-10-05T16:54:36Z,,"**Fixes:**
+
+* Fixed syntax error in typescript definitions which limited some checking (#1354)",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/8012993/assets,https://api.github.com/repos/facebook/immutable-js/releases/8012993,master,https://api.github.com/repos/facebook/immutable-js/tarball/v4.0.0-rc.7,https://github.com/facebook/immutable-js/releases/tag/v4.0.0-rc.7,https://api.github.com/repos/facebook/immutable-js/zipball/v4.0.0-rc.7,v4.0.0-rc.7,False,True
+8007477,2017-10-05T10:48:51Z,2017-10-05T10:50:24Z,,"**Fixes:**
+
+* Flow types now understand `list.filter(Boolean)` will remove null values (#1352)
+* Added missing flow types for `Record.hasIn` and `Record.getIn` (#1350)",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/8007477/assets,https://api.github.com/repos/facebook/immutable-js/releases/8007477,master,https://api.github.com/repos/facebook/immutable-js/tarball/v4.0.0-rc.6,https://github.com/facebook/immutable-js/releases/tag/v4.0.0-rc.6,https://api.github.com/repos/facebook/immutable-js/zipball/v4.0.0-rc.6,v4.0.0-rc.6,False,True
+8004773,2017-10-05T06:37:24Z,2017-10-05T07:00:32Z,,"**BREAKING:**
+
+* Concat Lists when merging deeply (#1344)
+
+  Previously, calling `map.mergeDeep()` with a value containing a `List` would replace the values in the original List. This has always been confusing, and does not properly treat `List` as a monoid. Now, `List.merge` is simply an alias for `List.concat`, and `map.mergeDeep()` will concatenate lists instead of replacing them.
+
+* No longer deeply coerce argument to merge() (#1339)
+
+  Previously, the argument provided to `merge()` was deeply converted to Immutable collections via `fromJS()`. This was the only function in the library which calls `fromJS()` indirectly directly, and it was surprising and made it difficult to understand what the result of `merge()` would be. Now, the value provided to `merge()` is only shallowly converted to an Immutable collection, similar to related methods in the library. This may change the behavior of your calls to `merge()`.
+
+* KeyedCollection.toArray() returns array of tuples. (#1340)
+
+  Previously, calling `toArray()` on a keyed collection (incl `Map` and `OrderedMap`) would discard keys and return an Array of values. This has always been confusing, and differs from `Array.from()`. Now, calling `toArray()` on a keyed collection will return an Array of `[key, value]` tuples, matching the behavior of `Array.from()`.
+
+**New:**
+
+* Much better documentation for Records (http://facebook.github.io/immutable-js/docs/#/Record) (#1349)
+* Include version in build (#1345)
+* Flow types `RecordOf<T>` and `RecordFactory<T>` dramatically improve the Flow types for Records (#1343, #1330)
+
+**Fixed:**
+
+* zipAll type should predict undefined values (#1322)
+* Do not throw when printing value that cannot be coerced to primitive (#1334)
+* Ensure set.subtract() accepts any iterable. (#1338) 
+* Fix TypeScript definitions for merge functions (#1336) 
+* Ensure when OrderedSet becomes empty, that it remains OrderedSet (#1335)
+* Fix slow iterator for Set (#1333)
+* Add proper typescript type for `map.flip()` (#1332)
+* Set wasAltered() to false after List.asImmutable() (#1331) 
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/8004773/assets,https://api.github.com/repos/facebook/immutable-js/releases/8004773,master,https://api.github.com/repos/facebook/immutable-js/tarball/v4.0.0-rc.5,https://github.com/facebook/immutable-js/releases/tag/v4.0.0-rc.5,https://api.github.com/repos/facebook/immutable-js/zipball/v4.0.0-rc.5,v4.0.0-rc.5,False,True
+8004685,2017-10-02T22:39:38Z,2017-10-05T06:49:25Z,,"**Fixes:**
+
+* Fixed a regression from rc.3 where value hashing was not working (#1325, #1328)
+* Stop the iteration of an exhausted, unknown-sized sequence when slicing (#1324)
+* Flow type the prototype chain of ""plain object"" inputs (#1328) ",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/8004685/assets,https://api.github.com/repos/facebook/immutable-js/releases/8004685,master,https://api.github.com/repos/facebook/immutable-js/tarball/v4.0.0-rc.4,https://github.com/facebook/immutable-js/releases/tag/v4.0.0-rc.4,https://api.github.com/repos/facebook/immutable-js/zipball/v4.0.0-rc.4,v4.0.0-rc.4,False,True
+8004167,2017-10-03T18:26:45Z,2017-10-05T05:08:28Z,,"This patch release relicenses with the MIT license, but includes no other changes. Intended for those who have not yet been able to update to the 4.x builds, but have a legal need for the change in license.",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/8004167/assets,https://api.github.com/repos/facebook/immutable-js/releases/8004167,master,https://api.github.com/repos/facebook/immutable-js/tarball/v3.8.2,https://github.com/facebook/immutable-js/releases/tag/v3.8.2,https://api.github.com/repos/facebook/immutable-js/zipball/v3.8.2,v3.8.2,False,False
+7949937,2017-09-30T03:35:16Z,2017-09-30T03:38:26Z,,"This RC is now relicensed as MIT (#1320) 
+
+**BREAKING:**
+
+* Remove Seq.of() (#1311, #1310 )
+
+  This method has been removed since it cannot be correctly typed. It's recommended to convert `Seq.of(1, 2, 3)` to `Seq([1, 2, 3])`.
+
+**New:**
+
+* Support for Transducers! (ee9c68f1d43da426498ee009ecea37aa2ef77cb8)
+* A new method, `zipAll()` (#1195)
+* Considerably improved Record typing (#1193, #1276)
+* Bundle and distribute an ""es module"" so Webpack and Rollup can use tree-shaking for smaller builds (#1204) 
+* Warn instead of throw when `getIn()` has a bad path (668f2236642c97bd4e7d8dfbf62311f497a6ac18)
+* Improved TypeScript types for `zip()`. (#1258)
+* Improved TypeScript types for `has()`. (#1232)
+* Support typescript strictNullChecks (#1168) 
+
+**Fixed:**
+
+* Updated Flow types to work with 0.55 and higher (#1312)
+* Updated TypeScript types to work with v2.4 and higher (#1285)
+* Do not throw from hasIn (#1319)
+* Long hash codes no longer cause an infinite loop (#1175)
+* `slice()` which should return an empty set could return a full set or vice versa (#1245, #1287)
+* Ensure empty slices do not throw when iterated (#1220)
+* Error during equals check on Record with undefined or null (#1208)
+* Fixes missing size property in flow types. (#1173) 
+* Fix size of count() after filtering or flattening (#1171)
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/7949937/assets,https://api.github.com/repos/facebook/immutable-js/releases/7949937,master,https://api.github.com/repos/facebook/immutable-js/tarball/v4.0.0-rc.3,https://github.com/facebook/immutable-js/releases/tag/v4.0.0-rc.3,https://api.github.com/repos/facebook/immutable-js/zipball/v4.0.0-rc.3,v4.0.0-rc.3,False,True
+5718689,2017-03-13T02:49:14Z,2017-03-13T02:51:55Z,,"**Changes Since v4.0.0-rc.1:**
+
+* Type definition improvements for `filter()`, `reduce()` and `concat()` (#1155, #1156, #1153)
+* More specific TypeScript type definitions (#1149)
+* Added back `delete()` and `clear()` to Record instances (#1157)
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/5718689/assets,https://api.github.com/repos/facebook/immutable-js/releases/5718689,master,https://api.github.com/repos/facebook/immutable-js/tarball/v4.0.0-rc.2,https://github.com/facebook/immutable-js/releases/tag/v4.0.0-rc.2,https://api.github.com/repos/facebook/immutable-js/zipball/v4.0.0-rc.2,v4.0.0-rc.2,False,True
+5710037,2017-03-11T03:09:11Z,2017-03-11T03:13:48Z,,"This is a **pre-release** version of Immutable.js. Please try it at your own risk and report any issues you encounter so an official release can be shipped with great confidence.
+
+As a pre-release, this changelog doesn't contain everything that has changed. Take a look at the [commit log](https://github.com/facebook/immutable-js/commits/master) for a complete view, and expect a more thorough changelog for the official release.
+
+# Breaking Changes
+
+* The `Iterable` class has been renamed to `Collection`, and `isIterable()` has been renamed to `isCollection()`. Aliases with the existing names exist to make transitioning code easier.
+
+* The ""predicate"" functions, `isCollection`, `isKeyed`, `isIndexed`, `isAssociative` have been moved from `Iterable.` to the top level exports.
+  
+* Record is no longer an Immutable Collection type. 
+  * Now `isCollection(myRecord)` returns `false` instead of `true`.
+  * The sequence API (such as `map`, `filter`, `forEach`) no longer exist on Records.
+  * `delete()` and `clear()` no longer exist on Records.
+
+* The `toJSON()` method is now a shallow conversion (previously it was an alias for `toJS()`, which remains a deep conversion).
+
+* Some minor implementation details have changed, which may require updates to libraries which deeply integrate with Immutable.js's private APIs.
+
+* The Cursor API is officially deprecated. Use [immutable-cursor](https://github.com/redbadger/immutable-cursor) instead.
+
+# New Stuff!
+
+* A new predicate function `isValueObject()` helps to detect objects which implement `equals()` and `hashCode()`, and type definitions now define the interface `ValueObject` which you can implement in your own code to create objects which behave as values and can be keys in Maps or entries in Sets.
+
+* The Flowtype and TypeScript type definitions have been completely rewritten with much higher quality and accuracy, taking advantage of the latest features from both amazing tools.
+
+* Using `fromJS()` with a ""reviver"" function now provides access to the key path to each translated value. (#1118)
+
+# Bug fixes
+
+* Numerous bug fixes have gone into this release. 
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/5710037/assets,https://api.github.com/repos/facebook/immutable-js/releases/5710037,master,https://api.github.com/repos/facebook/immutable-js/tarball/v4.0.0-rc.1,https://github.com/facebook/immutable-js/releases/tag/v4.0.0-rc.1,https://api.github.com/repos/facebook/immutable-js/zipball/v4.0.0-rc.1,v4.0.0-rc.1,False,True
+3046116,2016-04-18T22:03:22Z,2016-04-18T22:04:01Z,,"Minor touch ups discovered after the last release, plus a few more bug fixes! Plus, you can now contribute to immutable-js using the latest version of node.
+
+**New:**
+- The methods `keyOf`, `findKey`, `lastKeyOf`, and `findLastKey` were moved from KeyedIterable to Iterable, so they may be also used on Lists and Sets. (#740)
+
+**Fixes:**
+- Some issues with the flow definitions have been polished out thanks to @marudor. (#840, #841, #845)
+- Collections which contain `Symbol` keys or values can now be stringified. (#620)
+- Negative indexing into the keySeq of an IndexedIterable returns correct results. (#811)
+- Can use the value `Infinity` as a key in a Collection without crashing. (#797)
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/3046116/assets,https://api.github.com/repos/facebook/immutable-js/releases/3046116,master,https://api.github.com/repos/facebook/immutable-js/tarball/v3.8.1,https://github.com/facebook/immutable-js/releases/tag/v3.8.1,https://api.github.com/repos/facebook/immutable-js/zipball/v3.8.1,v3.8.1,False,False
+3032535,2016-04-16T00:18:26Z,2016-04-16T00:32:34Z,,"Whoa, a new version of Immutable! The big news is that we now export types for both Flow and TypeScript in the npm module! Also that pesky `length` warning has finally been fully removed. There are also a good amount of small bug fixes and performance improvements. Finally, the API docs have been improved greatly! Check it out http://facebook.github.io/immutable-js/docs/.
+
+A huge huge thanks to everyone in the community for contributing these improvements. The large majority of work cited below is community contributions.
+
+**New:**
+- Now exports Flow types (#805)
+- Now exports `typings` for TypeScript use. (#808)
+- Cursor TypeScript definitions (#765)
+- No longer warns when accessing `length` property of a collection. (88f880fc02a377eb36dc1b9f3d6c86c2d1c287dd)
+- `Map.of()` takes key, value interleaved pairs (#727)
+- `findEntry` and `findLastEntry` now respect `notSetValue` argument (#822)
+
+**Fixes:**
+- `Iterable::take(Infinity)` takes infinitely instead of 0 (#834)
+- Proper `toOrderedMap` and `toOrderedSet` method definitions (#761)
+- Records return themselves for no-op `Record#set` calls for better performance (#795)
+- `Range#toString` propertly reports step (#759)
+- Add missing `Set#contains` (96b09465f95a4f9f5229b4183a06faca39235fec)
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/3032535/assets,https://api.github.com/repos/facebook/immutable-js/releases/3032535,master,https://api.github.com/repos/facebook/immutable-js/tarball/v3.8.0,https://github.com/facebook/immutable-js/releases/tag/v3.8.0,https://api.github.com/repos/facebook/immutable-js/zipball/v3.8.0,v3.8.0,False,False
+2295640,2015-12-16T05:57:20Z,2015-12-16T06:03:11Z,,"A few minor bug fixes:
+- Fixed issue where `lastIndexOf` did not always return the correct value #703 
+- `mergeDeep` now has more opportunities to for the ""return self"" optimization, saving memory #690 
+- The TypeScript .d.ts file now aligns with the outputted file for the variations of Immutable Iterables. #647 
+- Ensure behavior for `slice(0, NaN)` is equivalent to that of JS Array #623
+- Ensure ES6 Symbol can be properly hashed #579
+
+And a new API method:
+- `myList.insert()` #402 
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/2295640/assets,https://api.github.com/repos/facebook/immutable-js/releases/2295640,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.7.6,https://github.com/facebook/immutable-js/releases/tag/3.7.6,https://api.github.com/repos/facebook/immutable-js/zipball/3.7.6,3.7.6,False,False
+1759797,2015-09-02T19:34:49Z,2015-09-02T22:41:34Z,,"Many stability improvements thanks to excellent community submitted fixes.
+
+New:
+- Cursor can now `set(value)` #516 to replace the value at the cursor.
+
+Fixes:
+- Ensure all tests pass in node v0.12
+- All operations that accept indicies now use ECMA's algorithm for converting input to integers when possible. #545 #598
+- Fix issue where slice/splice with non-number arguments could result in infinite recursion. #511
+- Clearer documentation regarding creating Map from JS Obj #589
+- Immutable now exported as a TypeScript module #567
+- Trailing commas causing issues in IE8 #510
+- Fix memory leak from setSize() and slice() #540
+- Union and Merge of Map or Set always favors the type of the left hand side #515 
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/1759797/assets,https://api.github.com/repos/facebook/immutable-js/releases/1759797,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.7.5,https://github.com/facebook/immutable-js/releases/tag/3.7.5,https://api.github.com/repos/facebook/immutable-js/zipball/3.7.5,3.7.5,False,False
+1429750,2015-06-17T21:18:36Z,2015-06-17T21:20:58Z,,"Fixes:
+- isSuperset can be called with an array of values.
+
+New: 
+- contrib/Cursor has proper support for Record
+- tsc will pick up type definitions from node modules
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/1429750/assets,https://api.github.com/repos/facebook/immutable-js/releases/1429750,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.7.4,https://github.com/facebook/immutable-js/releases/tag/3.7.4,https://api.github.com/repos/facebook/immutable-js/zipball/3.7.4,3.7.4,False,False
+1315700,2015-05-20T02:33:57Z,2015-05-20T02:40:46Z,,"Fixes:
+- Improvements to documentation around equality, `hasIn` and `withMutations`
+- Iterating over empty slice no longer throws.
+- Merge deep methods no longer throw if deep position is not mergeable.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/1315700/assets,https://api.github.com/repos/facebook/immutable-js/releases/1315700,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.7.3,https://github.com/facebook/immutable-js/releases/tag/3.7.3,https://api.github.com/repos/facebook/immutable-js/zipball/3.7.3,3.7.3,False,False
+1150923,2015-04-10T19:20:15Z,2015-04-10T19:21:13Z,,"- Updated PATENTS to [v2](https://code.facebook.com/posts/1639473982937255/updating-our-open-source-patent-grant/).
+- Minor improvements to docs and Readme
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/1150923/assets,https://api.github.com/repos/facebook/immutable-js/releases/1150923,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.7.2,https://github.com/facebook/immutable-js/releases/tag/3.7.2,https://api.github.com/repos/facebook/immutable-js/zipball/3.7.2,3.7.2,False,False
+1103526,2015-03-29T20:26:25Z,2015-03-29T20:29:12Z,,"New:
+- `contains()` is now called `includes()` to match the ES6 specification. `contains()` still exists as an alias.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/1103526/assets,https://api.github.com/repos/facebook/immutable-js/releases/1103526,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.7.1,https://github.com/facebook/immutable-js/releases/tag/3.7.1,https://api.github.com/repos/facebook/immutable-js/zipball/3.7.1,3.7.1,False,False
+1096908,2015-03-27T05:28:34Z,2015-03-27T05:29:06Z,,"New:
+- `merge()` family of functions now get the currently merging key as a 3rd argument, in case merge strategy should alter based on key.
+- `IndexedCursor` now has `push()`, `pop()`, `unshift()` and `shift()` to more closely mirror `List`.
+- Records initialize lazily. Creating a new Record type with `Record({foo:""bar""})` involves a small bit of work. For applications with a large amount of Records, lazy initialization should help startup times.
+- Maps can now be constructed by a List of Lists instead of only a List of Arrays.
+- toString() prints Map string keys in quotes.
+
+Fixes:
+- `is()` allows usage of valueOf to return primitives without recursing or encountering a reference error.
+- `merge()`/`union()` work inside withMutations when initial collection is empty. #405
+- Producing subcursors using cursor.cursor() now returns a proper typed cursor. #381
+- When a Record is passed to the same Record creation function, it's now returned directly.
+- Ensure Records toString() correctly. #383
+- Iterating over a sliced Seq can no longer cause an infinite recursion. #394
+- Ensure we don't throw when hashing non-extensible object in a modern environment.
+- Fix issue where non-existent function could be called if a collection doesn't have a size.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/1096908/assets,https://api.github.com/repos/facebook/immutable-js/releases/1096908,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.7.0,https://github.com/facebook/immutable-js/releases/tag/3.7.0,https://api.github.com/repos/facebook/immutable-js/zipball/3.7.0,3.7.0,False,False
+1026667,2015-03-08T01:01:36Z,2015-03-08T01:02:52Z,,"Fixes:
+- 3.6.3 was a broken npm release.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/1026667/assets,https://api.github.com/repos/facebook/immutable-js/releases/1026667,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.6.4,https://github.com/facebook/immutable-js/releases/tag/3.6.4,https://api.github.com/repos/facebook/immutable-js/zipball/3.6.4,3.6.4,False,False
+1026525,2015-03-07T22:18:48Z,2015-03-07T22:24:44Z,,"Fixes:
+- Improve test coverage of Stack, fixing #332 and #353 
+- Numerous typo fixings. Me spel gud.
+- Fix collection `toString()` when an ES6 `Symbol` is a value in the collection.
+- Consider a prototype-free object a ""plain object"". Fixes #302
+- No long enumerates extra key in `canDefineProperty` in rare cases in some versions of Chrome
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/1026525/assets,https://api.github.com/repos/facebook/immutable-js/releases/1026525,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.6.3,https://github.com/facebook/immutable-js/releases/tag/3.6.3,https://api.github.com/repos/facebook/immutable-js/zipball/3.6.3,3.6.3,False,False
+845744,2015-01-12T23:01:01Z,2015-01-12T23:05:12Z,,"Fixes:
+- Improves performance of creating Cursors.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/845744/assets,https://api.github.com/repos/facebook/immutable-js/releases/845744,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.6.2,https://github.com/facebook/immutable-js/releases/tag/3.6.2,https://api.github.com/repos/facebook/immutable-js/zipball/3.6.2,3.6.2,False,False
+845319,2015-01-12T21:10:45Z,2015-01-12T21:11:59Z,,"Fixes:
+- Iterating over a Cursor to a List could result in an infinite loop.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/845319/assets,https://api.github.com/repos/facebook/immutable-js/releases/845319,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.6.1,https://github.com/facebook/immutable-js/releases/tag/3.6.1,https://api.github.com/repos/facebook/immutable-js/zipball/3.6.1,3.6.1,False,False
+844509,2015-01-12T17:21:50Z,2015-01-12T17:27:37Z,,"New:
+- `findEntry()` and `findLastEntry()` will return `[key, value]` tuples of the first value to pass a predicate. Related to `find()` and `findLast()` which only return `value`.
+- `contrib/Cursor` now has the wider suite of methods found on `List` and `Map` including:
+  - `updateIn()`
+  - `setIn()`
+  - `deleteIn()`
+  - `merge()`
+  - `mergeWith()`
+  - `mergeIn()`
+  - `mergeDeep()`
+  - `mergeDeepWith()`
+  - `mergeDeepIn()`
+
+Fixes:
+- UMD module wrapper safer to use with CommonJS -> AMD bundlers.
+- Clarified some examples in documentation
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/844509/assets,https://api.github.com/repos/facebook/immutable-js/releases/844509,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.6.0,https://github.com/facebook/immutable-js/releases/tag/3.6.0,https://api.github.com/repos/facebook/immutable-js/zipball/3.6.0,3.6.0,False,False
+829968,2015-01-07T03:24:51Z,2015-01-07T03:31:30Z,,"New:
+- `zip()`, `zipWith()` and `interleave()` for combining multiple collections are new methods on indexed collections.
+- `isEmpty()` is safer than comparing `count()` or `size` to `0`.
+- `groupBy()` now returns OrderedMap when called on an ordered collection.
+- `hashCode()` included in public API 
+
+Fixes:
+- Custom `toJSON()` methods on values in a collection respected when provided to `JSON.stringify()`.
+- Fixed issue with browserify including `Cursor`.
+- Throws TypeError if `getIn`/`updateIn`/`hasIn`/etc. are not provided valid key paths.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/829968/assets,https://api.github.com/repos/facebook/immutable-js/releases/829968,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.5.0,https://github.com/facebook/immutable-js/releases/tag/3.5.0,https://api.github.com/repos/facebook/immutable-js/zipball/3.5.0,3.5.0,False,False
+796138,2014-12-18T22:28:06Z,2014-12-18T22:29:20Z,,"Fixes:
+- `deleteIn` alias now exists for all types (was missing from Map).
+- Improve min/max to be order-independent when handling null/undefined/NaN
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/796138/assets,https://api.github.com/repos/facebook/immutable-js/releases/796138,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.4.1,https://github.com/facebook/immutable-js/releases/tag/3.4.1,https://api.github.com/repos/facebook/immutable-js/zipball/3.4.1,3.4.1,False,False
+789090,2014-12-16T23:15:50Z,2014-12-16T23:25:12Z,,"New:
+- Improved documentation in Immutable.d.ts, resulting in better [generated documentation](http://facebook.github.io/immutable-js/docs/).
+- `remove` and `removeIn` are now alises for the methods `delete` and `deleteIn`. No effect on execution (but `deleteIn` is new).
+- Added `deleteIn` on `Record`.
+- Added `hasIn` - deeply query for value existence.
+- `Cursor` `onChange` function can now intercept the new value and return an override (3598f8c71f54cddba8e09647226e77dce69f6b1e).
+- +0 and -0 are treated as the same value in `Immutable.is` (key equality and Set existence).
+- `valueOf()` is now used when determining value equality between two objects. This allows `Date` to be used as `Map` key, and provides a more straight-forward way to implement value equality for custom types.
+
+Fixes:
+- Mapping over infinite `Seq` no longer throws error about Infinite iteration. (Improve accuracy of infinite iteration warning overall).
+- Ensure `setIn` can set `undefined` as a value.
+- `List` iterators no longer return invalid values if the `List` was the result of a `slice` or `shift`.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/789090/assets,https://api.github.com/repos/facebook/immutable-js/releases/789090,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.4.0,https://github.com/facebook/immutable-js/releases/tag/3.4.0,https://api.github.com/repos/facebook/immutable-js/zipball/3.4.0,3.4.0,False,False
+727852,2014-11-24T02:59:22Z,2014-11-24T02:59:47Z,,"New:
+- `setIn` added to `Record`
+- Added `mergeIn` and `deepMergeIn` to `Map` and `List`.
+- `updateIn`, and all `*In` methods accept any Iterable as key path, not just Array.
+- Optimization for `concat`, `merge` and `union`. If `this` is empty, and a single non-empty argument is provided, then attempt to return the argument unmodified. 
+
+Fixes:
+- Documentation improvements
+- Tests to ensure equality symmetry and hash equality
+- Performance improvements to collection hashing
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/727852/assets,https://api.github.com/repos/facebook/immutable-js/releases/727852,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.3.0,https://github.com/facebook/immutable-js/releases/tag/3.3.0,https://api.github.com/repos/facebook/immutable-js/zipball/3.3.0,3.3.0,False,False
+706590,2014-11-15T07:17:48Z,2014-11-15T07:18:29Z,,"Fixes
+- Ensure equality symmetry
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/706590/assets,https://api.github.com/repos/facebook/immutable-js/releases/706590,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.2.1,https://github.com/facebook/immutable-js/releases/tag/3.2.1,https://api.github.com/repos/facebook/immutable-js/zipball/3.2.1,3.2.1,False,False
+706285,2014-11-15T00:10:46Z,2014-11-15T00:13:56Z,,"New:
+- `Immutable.isOrdered` describes if an iterable has a defined iteration order.
+- `Immutable.is` and `iterable#equals` now respect ordered-ness to evaluate equality.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/706285/assets,https://api.github.com/repos/facebook/immutable-js/releases/706285,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.2.0,https://github.com/facebook/immutable-js/releases/tag/3.2.0,https://api.github.com/repos/facebook/immutable-js/zipball/3.2.0,3.2.0,False,False
+699061,2014-11-12T18:43:26Z,2014-11-12T18:50:54Z,,"New:
+- Performance enhancement to Maps and Sets with 8 or fewer entries.
+- `OrderedSet` introduced.
+- Map and Set can now be `sort`ed, returning an OrderedMap or OrderedSet, respectively.
+- Improved `sortBy`, `maxBy` and `minBy` performance
+
+Fixed:
+- `Map#set` or `Set#add` now return themselves for a no-op involving a hash collision.
+- Accessing an Indexed Iterable (such as `List`) with strings are now coerced to number when possible, mirroring the behavior of native Array.
+- `List`, `Stack` and `Set` constructors documentation now matches behavior.
+- Records now ignore unknown keys provided to constructors.
+- OrderedMap no longer leaks memory when keys are removed.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/699061/assets,https://api.github.com/repos/facebook/immutable-js/releases/699061,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.1.0,https://github.com/facebook/immutable-js/releases/tag/3.1.0,https://api.github.com/repos/facebook/immutable-js/zipball/3.1.0,3.1.0,False,False
+681609,2014-11-05T22:04:20Z,2014-11-05T22:16:29Z,,"A number of issues with v3.0.0 spotted and fixed by the growing Immutable.js community.
+
+Fixes:
+- Indexed and Set constructors no longer accept Objects, an unintended edge case which led to easy to make mistakes.
+- Indexed and Set constructors accept Keyed Iterables as lists of [K,V] entries rather than dropping the keys, better mirroring ES6 Map and Set behavior.
+- Collection constructors no longer throw when provided null/undefined and instead return empty collections. Better mirroring the behavior of ES6 Map/Set.
+- concat accepts arguments of similar type as it's `this`'s constructor. Ensures objects passed to concat are not exploded into an array of fields which is almost never intended.
+- Record equality works as advertised
+- Record iteration now includes default fields
+- Map iteration no longer incorrectly yield values on ES6 browsers (Chrome canary)
+- Implicit `any` removed from TypeScript files
+- OrderedMap no longer breaks when keys are removed.
+- Cursor iterators now reference proper `this`.
+- Improvements to example code and Readme.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/681609/assets,https://api.github.com/repos/facebook/immutable-js/releases/681609,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.0.3,https://github.com/facebook/immutable-js/releases/tag/3.0.3,https://api.github.com/repos/facebook/immutable-js/zipball/3.0.3,3.0.3,False,False
+670249,2014-11-01T02:42:59Z,2014-11-01T02:56:15Z,,"- mergeDeep is smarter about when to merge nested values vs replacing existing values.
+- Mention `Record` in README
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/670249/assets,https://api.github.com/repos/facebook/immutable-js/releases/670249,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.0.2,https://github.com/facebook/immutable-js/releases/tag/3.0.2,https://api.github.com/repos/facebook/immutable-js/zipball/3.0.2,3.0.2,False,False
+663188,2014-10-29T17:48:57Z,2014-10-29T17:52:35Z,,"Fixes:
+- Cursors in contrib now work in any ES5 environment
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/663188/assets,https://api.github.com/repos/facebook/immutable-js/releases/663188,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.0.1,https://github.com/facebook/immutable-js/releases/tag/3.0.1,https://api.github.com/repos/facebook/immutable-js/zipball/3.0.1,3.0.1,False,False
+661412,2014-10-29T03:14:44Z,2014-10-29T03:21:46Z,3.0.0,"v3.0.0 brings the Immutable collection API closer to ES6 Map and Set, introduces opt-in lazy operations, clarifies the differences between keyed and non-keyed collections and more.
+
+A lot has changed, please check out the [upgrade guide](https://github.com/facebook/immutable-js/wiki/Upgrading-to-Immutable-v3) for more details and help for upgrading your code to work with this new version of the library.
+
+New:
+- Collection methods (`map`, `filter`, etc) are now eager by default.
+- `Seq` and `toSeq` for explicit lazy operations.
+- Renamed `Sequence` to `Iterable`
+- Renamed `Vector` to `List`
+- Renamed `length` to `size`
+- Constructors now always accept Iterable.
+  - `empty()` and `from()` removed
+  - `of(...values)` on indexed and set collections
+- `contrib/` directory
+  - `Cursor` now moved to contrib.
+- ""is type"" predicates exist on all major Iterable types, such as `Map.isMap()`.
+- `groupBy()` and `countBy()` return concrete `Map`.
+- Added: `keyOf()` and `lastKeyOf()` on KeyedIterable are similar to `indexOf()` and `lastIndexOf()` on IndexedIterable.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/661412/assets,https://api.github.com/repos/facebook/immutable-js/releases/661412,master,https://api.github.com/repos/facebook/immutable-js/tarball/3.0.0,https://github.com/facebook/immutable-js/releases/tag/3.0.0,https://api.github.com/repos/facebook/immutable-js/zipball/3.0.0,3.0.0,False,False
+660029,2014-10-28T17:29:50Z,2014-10-28T17:32:16Z,2.6.2,"Fixes:
+- Vector slicing along N^2-1 bound could result in exception.
+- Negative slice could result in a sized collection.
+- Many link and url fixes to README.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/660029/assets,https://api.github.com/repos/facebook/immutable-js/releases/660029,master,https://api.github.com/repos/facebook/immutable-js/tarball/2.6.2,https://github.com/facebook/immutable-js/releases/tag/2.6.2,https://api.github.com/repos/facebook/immutable-js/zipball/2.6.2,2.6.2,False,False
+652060,2014-10-24T17:53:34Z,2014-10-24T17:56:19Z,,"Fix filename issue on case-sensitive file systems
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/652060/assets,https://api.github.com/repos/facebook/immutable-js/releases/652060,master,https://api.github.com/repos/facebook/immutable-js/tarball/2.6.1,https://github.com/facebook/immutable-js/releases/tag/2.6.1,https://api.github.com/repos/facebook/immutable-js/zipball/2.6.1,2.6.1,False,False
+650117,2014-10-24T00:35:29Z,2014-10-24T00:40:10Z,2.6.0,"New:
+- `max`, `maxBy`, `min`, `minBy` - find the largest or smallest item in any sequence.
+- `filterNot` - filters by the complement of the predicate, e.g. where the filter function returns false, the values will be kept.
+- `setIn` and `removeIn` for altering deep immutable structures.
+
+Fixes:
+- Object Hash will no longer be overridden if shared between multiple global contexts.
+- Immutable sequences from different requires in the same environment interact correctly for `toJS` and `equals`.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/650117/assets,https://api.github.com/repos/facebook/immutable-js/releases/650117,master,https://api.github.com/repos/facebook/immutable-js/tarball/2.6.0,https://github.com/facebook/immutable-js/releases/tag/2.6.0,https://api.github.com/repos/facebook/immutable-js/zipball/2.6.0,2.6.0,False,False
+644063,2014-10-21T22:53:25Z,2014-10-22T00:10:14Z,2.5.1,"Fixes:
+- `updateIn` could fail to set a value if it matched the default value, or if it looked like an empty collection.
+- base Sequences no longer have unsafe specialized `toArray` and `toObject` functions which could cause accidental mutation of the immutable Sequences.
+- hashing uses WeakMap if available, resulting in a best possible case of not touching JS objects used as keys.
+- Distribution files are now lowercase.js, matching the package name to aleviate any confusion or case-sensitive file system woes.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/644063/assets,https://api.github.com/repos/facebook/immutable-js/releases/644063,master,https://api.github.com/repos/facebook/immutable-js/tarball/2.5.1,https://github.com/facebook/immutable-js/releases/tag/2.5.1,https://api.github.com/repos/facebook/immutable-js/zipball/2.5.1,2.5.1,False,False
+635661,2014-10-17T23:58:52Z,2014-10-17T23:59:14Z,2.5.0,"New:
+- `seq.toStack()` as alias for `Stack(seq)`
+- `flatten` now accepts a `depth` number or `shallow` boolean to describe how deep it should flatten, by default it now flattens deeply.
+
+Fixed:
+- Cursors can now represent Indexed sequences #97
+- Readme updates: explain CDN, update examples.
+- `record.clear()` no longer mysteriously vanishes.
+- Unsafe `get` and `has` optimizations removed from ValuesSeq.
+- `last` on a sequence with unknown length no longer returns undefined #141
+- `seq.reverse().get(i)` no longer returns incorrect values for indexed sequences.
+- `seq.filter().get(i)` no longer returns incorrect values for indexed sequences.
+- `flatten` no longer flattens sequencible values (string, array, object), but only Sequence instances, leading to more predictable flattening.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/635661/assets,https://api.github.com/repos/facebook/immutable-js/releases/635661,master,https://api.github.com/repos/facebook/immutable-js/tarball/2.5.0,https://github.com/facebook/immutable-js/releases/tag/2.5.0,https://api.github.com/repos/facebook/immutable-js/zipball/2.5.0,2.5.0,False,False
+623812,2014-10-13T22:22:02Z,2014-10-13T22:22:22Z,2.3.2,"New:
+- `Stack`! a linked-list style structure with efficient addition and removal from the front of the list.
+
+Fixes:
+- `indexedSeq.skip(n).get(i)` now returns the correct value.
+- `skip(n).get(-i)` and `take(n).get(-i)` return correct values for negative indices.
+- IE8 issue with Record
+- Throw when trying to set an invalid key on Record.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/623812/assets,https://api.github.com/repos/facebook/immutable-js/releases/623812,master,https://api.github.com/repos/facebook/immutable-js/tarball/2.3.2,https://github.com/facebook/immutable-js/releases/tag/2.3.2,https://api.github.com/repos/facebook/immutable-js/zipball/2.3.2,2.3.2,False,False
+620456,2014-10-12T06:59:30Z,2014-10-12T07:09:47Z,2.3.0,"## Iterators!
+
+All Sequences, including both concrete collections (Map, Vector, Set) and lazy Sequences (mapped, filtered) can be iterated. 
+
+API:
+
+`values()` returns an iterator object where each call to `next()` provides the next value.
+
+`keys()` returns an iterator object where each call to `next()` provides the next key.
+
+`entries()` returns an iterator object where each call to `next()` provides the next entry as a [key, value] tuple.
+
+Example:
+
+```
+var myMap = Immutable.Map([['A', 1], ['B', 2], ['C', 3]]);
+var entries = myMap.entries();
+entries.next() // { value: ['A', 1], done: false }
+entries.next() // { value: ['B', 2], done: false }
+entries.next() // { value: ['C', 3], done: false }
+entries.next() // { value: undefined, done: true }
+```
+
+All Sequences also support iteration via the `@@iterator` and `Symbol.iterator` methods, so they can be used in ES6 for-of comprehensions. 
+
+## New
+- `interpose()`
+- Sequence documentation is easier to follow now that methods are categorized and alphabetized.
+- A number of lazy sequence optimizations. For example, `seq.flip().reverse().flip()` becomes `seq.reverse()`.
+- Optimizations that allow `get()` and `has()` to be O(1) on lazy sequences.
+
+## Bugs
+- Equality checking via `Immutable.is` or `seq.equals()` could throw or incorrectly return false.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/620456/assets,https://api.github.com/repos/facebook/immutable-js/releases/620456,master,https://api.github.com/repos/facebook/immutable-js/tarball/2.3.0,https://github.com/facebook/immutable-js/releases/tag/2.3.0,https://api.github.com/repos/facebook/immutable-js/zipball/2.3.0,2.3.0,False,False
+619539,2014-10-11T07:55:07Z,2014-10-11T08:01:01Z,2.2.3,"Fixed: Immutable.is() could throw for some Sequences
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/619539/assets,https://api.github.com/repos/facebook/immutable-js/releases/619539,2.2.3,https://api.github.com/repos/facebook/immutable-js/tarball/2.2.3,https://github.com/facebook/immutable-js/releases/tag/2.2.3,https://api.github.com/repos/facebook/immutable-js/zipball/2.2.3,2.2.3,False,False
+619186,2014-10-10T23:23:15Z,2014-10-10T23:23:39Z,2.2.2,"- Improved using arbitrary Objects as keys or as members of a Set for IE8.
+- Fixed: collections did not always return correct length iterated from forEach()
+- Sequences (and Maps, Vectors, and Sets) can now be constructed from Iterables and Iterators. This enables Map and Set construction similar to ES6 spec.
+
+```
+var m = new Map([['A', 1], ['B', 2], ['C', 3]]);
+// Map {""A"" => 1, ""B"" => 2, ""C"" => 3}
+var im = Immutable.Map(m);
+// Map { A: 1, B: 2, C: 3 }
+m = new Map(im);
+// Map {""A"" => 1, ""B"" => 2, ""C"" => 3}
+```
+- Fixed: some Sequences did not properly provide themselves as the 3rd argument in iteration.
+- Fixed: `take()` could iterate one step too far.
+- Fixed: `getIn()` could throw if one of the intermediate keys does not exist.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/619186/assets,https://api.github.com/repos/facebook/immutable-js/releases/619186,master,https://api.github.com/repos/facebook/immutable-js/tarball/2.2.2,https://github.com/facebook/immutable-js/releases/tag/2.2.2,https://api.github.com/repos/facebook/immutable-js/zipball/2.2.2,2.2.2,False,False
+613011,2014-10-08T19:47:36Z,2014-10-08T19:48:58Z,,"New:
+- `groupBy` and `countBy` now return `Sequence` instead of `Map`.
+
+Bugs:
+- Fix issue where `seq.flip().reverse()` can result in incorrect value.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/613011/assets,https://api.github.com/repos/facebook/immutable-js/releases/613011,master,https://api.github.com/repos/facebook/immutable-js/tarball/2.2.1,https://github.com/facebook/immutable-js/releases/tag/2.2.1,https://api.github.com/repos/facebook/immutable-js/zipball/2.2.1,2.2.1,False,False
+612872,2014-10-08T18:55:19Z,2014-10-08T19:12:11Z,2.2.0,"**New**
+
+`mapEntries()` works like `map` and `mapKeys`, but accepts and returns [key, value] tuples, enabling mapping both keys and values simultaniously.
+
+`toKeyedSeq()` converts an IndexedSequence into a Sequence where the indices are treated as keys. This is a lazy operation.
+
+The whole IndexedSequence API has been reworked to remove the third `maintainIndices` argument from many methods. Using `maintainIndices` resulted in a sparse IndexedSequence, which no longer made sense in the context of dense IndexedSequences.
+
+Example:
+
+```
+// Old: [0,,2,,4,,6,,8,,]
+Range(0,10).filter(isEven, null, true) 
+
+// New: { 0: 0, 2: 2, 4: 4, 6: 6, 8: 8 }
+Range(0,10).toKeyedSeq().filter(isEven)
+```
+
+If you were using this argument, you will need to use `toKeyedSeq()` first to achieve similar behavior. This change warrants the minor-version bump.
+
+Bugs:
+- Returning false from forEach() often resulted in an incorrect length iterated. Clarified the documentation describing this behavior and corrected any bad behavior.
+- Fixed some documentation which referenced sparse behavior.
+- Fixed some issues when using reverse() and take() or skip() in concert that resulted in incorrect indices.
+- Fixed incorrect behavior when take() or skip() are given negative values.
+- Fixed issue where iteration of valueSeq() didn't provide the correct collection as a third argument.
+- Fixed issue where flatten() and concat() behavior diverged.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/612872/assets,https://api.github.com/repos/facebook/immutable-js/releases/612872,master,https://api.github.com/repos/facebook/immutable-js/tarball/2.2.0,https://github.com/facebook/immutable-js/releases/tag/2.2.0,https://api.github.com/repos/facebook/immutable-js/zipball/2.2.0,2.2.0,False,False
+607112,2014-10-06T19:43:19Z,2014-10-06T19:56:24Z,2.1.0,"New:
+- Indexed Sequences are now always treated densely, including Vector and ArraySequence. This means iterators, forEach, and Sequence methods visit unset indices, and `has` returns true for unset indicies within length. This warrants a minor-version bump.
+- `flatten` turns a Sequence of Sequences into a single Sequence.
+- `flatMap` maps over a Sequence, flattening the result. The alias `chain` is provided to begin to adhere to the Fantasy Land spec.
+- Indexed Sequences can now be accessed by negative indicies, which index from the end of the Sequence.
+
+Bugs:
+- ensure 3rd argument in sequence functions is always parent sequence.
+- `reduce` behavior matches Array#reduce.
+- `join` behavior matches Array#join
+- Fix type definition error for `mergeDeep`
+- Fix equality checking for Sets.
+- Fix issue where Safari/JSC incorrectly JITs hash creation, resulting in ""missing values"" or exceptions.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/607112/assets,https://api.github.com/repos/facebook/immutable-js/releases/607112,master,https://api.github.com/repos/facebook/immutable-js/tarball/2.1.0,https://github.com/facebook/immutable-js/releases/tag/2.1.0,https://api.github.com/repos/facebook/immutable-js/zipball/2.1.0,2.1.0,False,False
+530818,2014-09-02T20:02:47Z,2014-09-02T20:09:20Z,2.0.17,"New new new!
+- Cursor now has `withMutations`
+- We're available on Bower!
+
+Bugs Fixed:
+- `take` and `skip` now return immutable sequences.
+- `splice` behavior now matches `Array.prototype.splice`
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/530818/assets,https://api.github.com/repos/facebook/immutable-js/releases/530818,master,https://api.github.com/repos/facebook/immutable-js/tarball/2.0.17,https://github.com/facebook/immutable-js/releases/tag/2.0.17,https://api.github.com/repos/facebook/immutable-js/zipball/2.0.17,2.0.17,False,False
+516570,2014-08-26T20:43:43Z,2014-08-26T20:43:43Z,2.0.16,"Breaking Changes:
+- Sequence's `keys`, `values`, `entries` and `fromEntries` renamed to `keySeq`, `valueSeq`, `entrySeq` and `fromEntrySeq` respectively.
+
+Features Added:
+- Sets can now contain Collections and JS Objects
+- Maps can now use Collections and JS Objects as keys
+- ES6 Iteration methods, `keys`, `values` and `entries`, added to all concrete collections.
+- concrete collections can be used directly in ES6 for-of loops
+- Vector iterator follows ES6 spec: dense iteration but adds an optional param to get sparse iteration.
+- Improved performance of Vector iteration and folding.
+
+Bugs Fixed:
+- IE8 no longer complains about ""delete"" used as a method
+- Cursor access and sequence methods now always return Cursors.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/516570/assets,https://api.github.com/repos/facebook/immutable-js/releases/516570,master,https://api.github.com/repos/facebook/immutable-js/tarball/2.0.16,https://github.com/facebook/immutable-js/releases/tag/2.0.16,https://api.github.com/repos/facebook/immutable-js/zipball/2.0.16,2.0.16,False,False
+509999,2014-08-23T05:58:38Z,2014-08-23T06:01:19Z,2.0.15,"- Source used by node is now not-minified
+- `withMutations` and all complex mutation methods implemented with it (such as `merge`), now return `this` when they result in a no-op.
+- Fixed bug where a Map key could be incorrectly dropped.
+- Cursors now behave as Sequences and share more of the Map API
+- Clarify API of `update` and `updateIn`
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/509999/assets,https://api.github.com/repos/facebook/immutable-js/releases/509999,master,https://api.github.com/repos/facebook/immutable-js/tarball/2.0.15,https://github.com/facebook/immutable-js/releases/tag/2.0.15,https://api.github.com/repos/facebook/immutable-js/zipball/2.0.15,2.0.15,False,False
+499556,2014-08-19T04:11:44Z,2014-08-19T04:13:08Z,2.0.12,"- Fix warnings with node v0.10
+- Fix issue with case-sensitive file systems
+- Significant performance improvements to Map
+- Bug fixes:
+  - Deleting key from map can result in incorrect result
+  - Deleting key from map can result in thrown error
+  - Map iteration was returning incorrect value 
+  - Map key comparison was incorrect for complex keys (e.g. `NaN`)
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/499556/assets,https://api.github.com/repos/facebook/immutable-js/releases/499556,master,https://api.github.com/repos/facebook/immutable-js/tarball/2.0.12,https://github.com/facebook/immutable-js/releases/tag/2.0.12,https://api.github.com/repos/facebook/immutable-js/zipball/2.0.12,2.0.12,False,False
+495055,2014-08-16T01:04:59Z,2014-08-16T01:05:28Z,2.0.11,"- Bugs:
+  - TypeScript resolution was occasionally incorrect
+  - `pop()` of 33-element Vector returned incorrect result.
+- Additions:
+  - Cursor API expanded
+  - `Map()` constructor now mirrors ES6 spec.
+  - Vector's Iterator now adheres to ES6 spec.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/495055/assets,https://api.github.com/repos/facebook/immutable-js/releases/495055,master,https://api.github.com/repos/facebook/immutable-js/tarball/2.0.11,https://github.com/facebook/immutable-js/releases/tag/2.0.11,https://api.github.com/repos/facebook/immutable-js/zipball/2.0.11,2.0.11,False,False
+493028,2014-08-15T06:14:15Z,2014-08-15T06:15:38Z,2.0.10,"- Cursors - Alpha support. Please provide feedback!
+- `rest` and `butLast` methods.
+- Jasmine-check tests - Yay robust!
+- API Changes:
+  - updateIn now creates empty Maps for missing keys, previously it simply performed no update.
+- Fixed bugs:
+  - Map inserts with colliding hashes was causing a stack overflow.
+  - Unshift >32 elements caused structural failure.
+  - Slicing a Range could result in incorrect return value.
+  - updateIn and getIn with empty array would throw, now it correctly applys the change to the root element.
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/493028/assets,https://api.github.com/repos/facebook/immutable-js/releases/493028,master,https://api.github.com/repos/facebook/immutable-js/tarball/2.0.10,https://github.com/facebook/immutable-js/releases/tag/2.0.10,https://api.github.com/repos/facebook/immutable-js/zipball/2.0.10,2.0.10,False,False
+487131,2014-08-12T20:11:28Z,2014-08-12T20:18:25Z,mapKeys,"Adds `mapKeys`
+",https://api.github.com/users/leebyron,50130,leebyron,https://api.github.com/repos/facebook/immutable-js/releases/487131/assets,https://api.github.com/repos/facebook/immutable-js/releases/487131,master,https://api.github.com/repos/facebook/immutable-js/tarball/2.0.8,https://github.com/facebook/immutable-js/releases/tag/2.0.8,https://api.github.com/repos/facebook/immutable-js/zipball/2.0.8,2.0.8,False,False

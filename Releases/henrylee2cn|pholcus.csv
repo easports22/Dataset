@@ -1,0 +1,350 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+4223411,2016-09-25T07:18:14Z,2016-09-25T09:30:17Z,Version 1.2.0,"Pholcus发布1.2版本，占用资源更少，运行更稳定
+
+一、输出功能升级
+
+添加kafka数据库输出
+基本重新了mysql输出模块，提升输出稳定性与输出效率
+增加输出文件目录的配置项
+大量优化结果收集模块，提升I/O性能与状态控制性
+4. 移除文件输出目录的日期后缀
+调整文件名哈希临界长度为>8
+移除数据输出通道容量的配置项DATA_CHAN_CAP，由分批输出用户设置项直接决定
+
+二、下载功能升级
+
+增强自动转码功能
+当响应头未指定编码类型时，从请求头读取
+都未指定编码类型或编码类型为utf8时，不做转码，节约内存
+增加支持自动解压缩deflate和zlib编码的响应流
+升级surfer下载器，修复POST提交时下载内核中Content-Type被覆盖的bug，修复Request.GetHeader()==nil时panic的bug
+修复输出图片等文件时，下载补全的bug
+Context.text字段类型由string改为[]byte
+将HTTP状态码大于等于400的请求自动标记为下载失败
+
+三、采集规则模块升级
+
+更新_Request.GetTemp(key string, defaultValue interface{}) interface{}，defaultValue不再作为结果接收容器，当键值对不存在时，返回值为参数defaultValue。
+Spider.Register()方法改为接受Spider类型（之前为_Spider），推荐使用 ""func init(){Spider{}.Register()}"" 的方式进行声明
+优化任务停止条件，Spider.Root退出之前，任务不可终止
+修复动态规则解析bug
+同名采集规则的名称自动添加加""(2)""形式的序号后缀
+优化crawl采集引擎的随机停顿逻辑
+添加 Context.Log() 日志打印接口
+
+四、其他优化
+
+修复某些情况下在非win系统中log日志引发的panic
+修复web版启动时偶然性打不开页面的bug
+web版实时日志在超过2000条时自定清除前1000条
+优化scheduler调度器
+调整分布式模块字面量命名
+修复CUP占用高的问题，采集过程的最低使用率从 20% 降低到 1%
+加快任务的主动终止，基本已将延时控制在秒级
+通过数据输出速率来抑制采集下载速率，从而降低不必要的内存占用
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/4223411/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/4223411,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v1.2.0,https://github.com/henrylee2cn/pholcus/releases/tag/v1.2.0,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v1.2.0,v1.2.0,False,False
+3456049,2016-06-16T06:18:49Z,2016-06-17T03:31:24Z,Version 1.0.0,"一、输出模块
+1. 支持规则中设置Spider.NotDefaultField=true来禁止输出系统默认添加的字段 Url、ParentUrl 和 DownloadTime；
+2. 减少mysql的表创建操作；
+3. 修复mysql表名和字段内容在某些情况下会出现乱码的现象；
+4. 修复Linux下，文件创建权限问题；
+5. 修复输出文件的路径以""\""分割时，目录创建失效的bug；
+6. 修复Output()方法指定ruleName无效的bug；
+7. 直接下载文件时，在日志中打印文件大小。
+
+二、内存优化
+1. DateCell、FileCell、Context均增加Pool，减少对象创建；
+2. 每2分钟检查一次可重用内存，若大于50M，则手动释放一次内存；
+3. 简化结果数据转储流程，一定程度降低内存消耗。
+
+三、动态规则
+1. 修复解析多个动态规则时的闭包问题；
+2. 修复动态规则中设置Header无效的bug。
+
+四、日志模块
+在配置文件中增加[log]段落参数：
+1. level -> 全局日志打印级别（亦是日志文件输出级别）；
+2. consolelevel -> 日志在控制台的显示级别；
+3. feedbacklevel -> 客户端反馈至服务端的日志级别；
+4. lineinfo -> 日志是否打印行信息；
+5. save -> 是否保存所有日志到本地文件。
+
+五、配置模块
+1. 配置文件中段落与配置项分别按字母排序；
+2. 配置文件中 mysqlmaxallowedpacket -> mysqlmaxallowedpacketmb，单位为MB；
+3. mysql增加max_allowed_packet的配置；
+4. 增加conngcsecond配置，支持自主设定mgo连接池GC时间。
+
+六、操作界面
+1. cmd版的服务端模式支持连续添加任务‘
+2. 修复web版长时间运行，因意外丢失cookie而可能引发panic的问题‘
+3. 修复web版大量日志输出时“send on closed channel“的bug。
+
+七、其他
+1. 增加对支持gzip的页面进行自动解码的功能；
+2. 修复CrawlPool.Use()与CrawlPool.Free()的写竞争；
+3. 调整运行依赖目录；
+4. 升级surfer下载器。
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/3456049/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/3456049,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v1.0.0,https://github.com/henrylee2cn/pholcus/releases/tag/v1.0.0,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v1.0.0,v1.0.0,False,False
+2868557,2016-03-23T01:22:39Z,2016-03-23T01:24:04Z,Version 0.8.5,"一、命令行相关功能升级
+1. cmd界面版增加对服务端与客户端模式的支持；
+2. 新增丰富的命令行参数，且优先级高于配置文件。
+
+二、配置文件更新
+1. 增加更多可配置项；
+2. 重新规范代码，配置参数为优先级最低的默认信息。
+
+三、Spider结构体调整
+1. Keyword改为Keyin，相应操作界面中“自定义输入”改为“自定义配置”（多任务时应分别多包裹一层“<>”）；
+2. MaxPage字段改为Limit，相应操作界面中“最大页数”改为“采集上限”（默认限制url请求数）；
+3. 添加subName，用于区分多任务并发的情况；
+4. 允许在规则的Root()中进行阻塞；
+5. 优化动态规则加载的错误处理。
+
+四、调度器与历史记录模块升级
+1. 增强历史记录功能，历史记录与Spider实例一一对应，且与输出操作保持同步更新；
+2. 修复调度器在32位系统下panic的bug。
+
+五、输出模块优化
+1. 修改mysql输出模块，支持多行批量插入，修改默认连接池容量为2048，提升输出速率与稳定性；
+2. mgo的insert方法更新，内部增加分批插入控制，默认为5000条，提升写入数据库的稳定性；
+3. 修复连接池捕获panic的bug。
+
+六、其他
+1. 解决某些规则的代码片段在手动终止任务后依旧默默运行的问题，减少资源消耗；
+2. 解决大量任务长时间运行后手动终止操作耗时太长的问题，加快终止操作响应速度；
+3. 调整运行时目录文件；
+4. 将大部分依赖包合并到项目中；
+5. 修复一些bug。
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/2868557/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/2868557,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.8.5,https://github.com/henrylee2cn/pholcus/releases/tag/v0.8.5,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.8.5,v0.8.5,False,False
+2735142,2016-03-03T11:52:47Z,2016-03-03T11:55:02Z,Version 0.8.2,"1. 移除Response；
+2. 重构Context，同时增加Context.GetCookie()方法；
+3. 重构mgo与mysql输出模块，优化连接池，增加异常重连函数，提高输出性能与稳定性；
+4. 优化调度器中sdl.Push()方法，降低内存占用；
+5. 修复不支持freebsd系统的bug；
+6. 规范全局代码；
+7. 规范日志打印格式；
+8. 兼容 go1.6 版本；
+9. 本版本通过大量代码重构与优化，减少约30%的堆栈数量。
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/2735142/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/2735142,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.8.2,https://github.com/henrylee2cn/pholcus/releases/tag/v0.8.2,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.8.2,v0.8.2,False,False
+2454073,2016-01-19T16:49:22Z,2016-01-19T16:51:51Z,Version 0.8.0,"一、初步支持HTML风格的动态规则
+
+二、添加配置文件，便于修改数据库配置等信息
+
+三、重新规划软件依赖文件目录
+
+├─pholcus 软件
+│
+├─pholcus 依赖文件目录
+│  ├─pholcus.ini 配置文件
+│  │
+│  ├─proxy.lib 代理IP列表库
+│  │
+│  ├─spider.lib 动态规则目录
+│  │  └─xxx.pholcus.html 动态规则文件
+│  │
+│  ├─logs 日志目录
+│  │  
+│  ├─history 历史记录目录
+│  │  
+└─└─cache 临时缓存目录
+
+四、增强代理IP功能
+
+五、增强状态控制功能
+
+六、为Spider结构体添加定时器
+
+七、增强Request结构体序列化与反序列化的可靠性
+
+八、Web界面的外部资源文件全部打包进软件
+
+九、更新下载器Surfer至0.9版本，性能更佳
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/2454073/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/2454073,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.8.0,https://github.com/henrylee2cn/pholcus/releases/tag/v0.8.0,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.8.0,v0.8.0,False,False
+2304657,2015-12-17T13:04:55Z,2015-12-17T13:07:19Z,Version 0.7.6,"一、新增全局代理IP模块：
+1. 通过操作界面设置更换IP的频率，实现代理IP轮询；
+2. 每次更换代理IP前，会通过ping测速，选取最佳IP；
+3. 支持自动跳过ping失败的ip；
+4. 代理IP列表文件的路径可在config中设置。
+
+二、新增历史记录模块：
+1. 在原来的去重模块基础上进行改造升级；
+2. 成功记录充当原来的去重模块的功能；
+3. 失败记录用于记录下载失败的请求，下次执行该Spider规则时将会自动追加至调度器的失败列表，从而实现重新抓取；
+4. 根据输出方式的设置，从对应位置读取并写入记录。
+
+三、调度器更新：
+1. 重构调度器，提高稳定性与响应速率；
+2. 添加失败请求自动添加至队列的功能；
+3. 添加为每个请求设置代理IP的功能；
+4. 添加控制每类Spider最大请求数的功能。
+
+四、规则模块更新：
+1. 大量更新上下文Context，提升运行效率；
+2. 完美支持Request的复用，节约内存且简化代码；
+3. Spider添加Namespace、SubNamespace、ReqMatrix三个字段，移除proxy字段，Pausetime字段改为int64类型；
+4. 支持在输出前自定义“当前链接”和“上级链接”两个字段；
+5. 最大页数MaxPage默认为该类规则的最大请求数；但当其定义初始值设置为MAXPAGE，可在规则中自定义该字段的作用，如设置列表页数等；
+6. 添加获取文章页正文的通用方法；
+7. 其他一系列的方法变动。
+
+五、Request结构体更新：
+1. 为更好地支持Request序列化，将Temp字段改为Temp类型，内部采用JSON字符串格式存储；
+2. GetTemp()interface{}改为GetTemp(key string, receive ...interface{})interface{}，其中第二个参数receive在value值不为string类型时不可省略，且receive为指针或引用类型时，可从receive中直接获取value；
+3. 添加Copy()方法，返回Request副本。
+
+六、Response结构体更新：
+1. 移除Response的temp字段。
+
+七、日志打印模块更新：
+1. 美化日志的打印格式；
+2. 耗时统计改用类似”1h2m3s“的格式；
+3. 错误日志添加当前URL信息。
+
+八、下载器更新：
+1. 全面优化Surfer下载器，并合并入项目主目录；
+2. 解决下载失败后panic的bug。
+
+九、输出模块：
+1. 文件输出支持自定义子目录。
+
+十、操作界面更新：
+1. 将两个暂停时长的设置合并为”暂停时长参考“；
+2. 添加“代理IP更换频率”设置；
+3. 移除去重相关的设置，并添加“继承并保存成功记录”和“继承并保存失败记录”设置；
+4. 支持运行时设置 -a_ui 参数指定操作界面。
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/2304657/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/2304657,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.7.6,https://github.com/henrylee2cn/pholcus/releases/tag/v0.7.6,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.7.6,v0.7.6,False,False
+2219016,2015-12-02T10:23:23Z,2015-12-02T10:24:58Z,Version 0.7.5,"大量功能优化：
+一、规则模块更新：
+1. 封装Spider与Response为上下文Context，大大简化规则语法；
+2. 支持从Context获取上一次Request，并可在修改后作为新请求加入队列，从而节约内存（如有依赖Request的Temp值的Output操作，则应先Output再修改Request）；
+3. 自动为每条未设置Referer的请求补填Referer；
+4. Keyword作为命名空间时，如过长则取其hash值；
+4. 更新公共方法集。
+
+二、调度器更新：
+1. 去除SrcManager接口，降低内部消耗；
+2. 为每个队列增加读写锁，消除并发隐患；
+4. 增加RegSpider方法，提升调度效率。
+
+三、输出模块更新：
+1. 优化加强mysql操作，并解决一个字段长度的bug；
+2. 优化mongodb操作，降低内存消耗；
+3. 修复数据库链接失败后panic的bug。
+
+四、去重功能更新：
+1. 样本的保存位置与输出方式保持一致（file/mongodb/mysql）；
+2. 每次采集时，若改变是否继承历史去重的状态，则更新去重样本；
+3. 优化读写方法，提升性能。
+
+五、Surfer下载器更新：
+1. 修复surf下载内核Header赋值的bug，完美支持模拟登录、随机User-Agent等；
+2. phantom下载内核，在返回的响应流中添加请求信息。
+(更新方法：go get -u github.com/henrylee2cn/surfer)
+
+六、其他更新：
+1. 提高暂停/停止功能在大批量任务并发情况下的灵敏性；
+2. 修复运行模式热切换的小bug，并优化了切换速度；
+3. Crwal接口的内部资源计数改用原子操作，提高并发安全性；
+4. 操作界面的规则列表，实现按首字母排序。
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/2219016/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/2219016,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.7.5,https://github.com/henrylee2cn/pholcus/releases/tag/v0.7.5,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.7.5,v0.7.5,False,False
+2096212,2015-11-09T17:12:19Z,2015-11-09T17:17:40Z,Version 0.7.4,"1. Spider中添加Namespace func(*Spider) string与SubNamespace func(self *Spider, dataCell map[string]interface{}) string两个字段，实现自定义数据库、表单及文件的名称
+2. 简化数据库配置信息
+3. mongodb输出中，将采集结果字段直接作为数据存储字段，便于检索
+4. 更新计时器等spider中公用方法
+5. 可通过DownloaderID指定下载器，其中phantomjs下载支持请求中定义js，用法Request.Temp[""**JS**""]=js编码（请更新surfer下载器）
+6. AddOutFeild(key)返回索引位置
+7. 增加输出统计报告的打印
+8. 提高被取消的请求删除去重记录的精确度
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/2096212/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/2096212,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.7.4,https://github.com/henrylee2cn/pholcus/releases/tag/v0.7.4,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.7.4,v0.7.4,False,False
+1990046,2015-10-20T16:10:58Z,2015-10-20T16:16:28Z,Version 0.7.3,"全面升级
+一、界面升级：
+1. Windows下编译时自动添加图标
+2. web及cmd版的命令行窗口添加软件名称
+
+二、下载器相关升级：
+1. 初步增加PhantomJS下载器，实现双下载引擎，可在请求中指定
+2. 下载控制转移至Request中，从而下载更灵活
+3. Request增加重定向跳转次数控制功能
+4. Request可以支持无限重载
+5. Request增加序列化方法
+6. 下载器实例改为全局唯一
+
+三、规则语法升级：
+1. 文本结果输出方法改为Output(ruleName string, resp _context.Response, item interface{})
+2. 文件输出方法建议用FileOutput(resp *context.Response, name ...string)
+3. 更改解析函数Parse(resp *context.Response, ruleName ...string)，ruleName为空时调用Root函数
+4. OutFeild()方法改为IndexOutFeild()
+5. Spider结构体新增CreatItem(ruleName string, item map[int]interface{}) map[string]interface{}，将map索引自动转换为OutFeild字段
+6. Spider结构体新增代理服务器列表
+6. AddQueue()接收_Request参数，UseCookie改为EnableCookie
+7. 规则方法库中升级timer计时器
+
+四、数据库操作升级：
+1. 优化更新mongodb操作方法库
+2. 数据库连接池增加空闲连接定时回收
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/1990046/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/1990046,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.7.3,https://github.com/henrylee2cn/pholcus/releases/tag/v0.7.3,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.7.3,v0.7.3,False,False
+1940115,2015-10-10T07:44:14Z,2015-10-10T07:45:39Z,Version 0.7.2,"1. web版支持多用户之间联动控制、状态实时同步；
+2. 升级去重功能，支持file和mongodb两种样本存储方式，支持是否继承历史去重样本；
+3. 规则中添加请求时支持通过设置“Duplicatable”为true，来允许重复下载该页面；
+4. 美化客户端模式下的GUI界面；
+5. 彻底解决规则库加载为空的问题；
+6. 增加下载超时设置，支持规则及请求两个级别的控制；
+7. 简化main包，更改一个参数即可指定目标编译界面；
+8. 其他一些代码优化。
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/1940115/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/1940115,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.7.2,https://github.com/henrylee2cn/pholcus/releases/tag/v0.7.2,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.7.2,v0.7.2,False,False
+1877179,2015-09-28T13:49:39Z,2015-09-28T13:51:10Z,Version 0.7.1,"1. 优化并增强App核心接口，更好地支持状态查询与控制；
+2. web版支持前端读取状态与后台执行相分离；
+3. 对mongodb与mysql数据库操作功能进行封装；
+4. 修复下载失败后重复报错的bug。
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/1877179/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/1877179,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.7.1,https://github.com/henrylee2cn/pholcus/releases/tag/v0.7.1,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.7.1,v0.7.1,False,False
+1838989,2015-09-19T20:13:39Z,2015-09-19T20:24:16Z,Version 0.7.0,"1. 更换日志模块为beelogs并增加debug功能，beelogs是beego中logs模块的升级加强版，新增状态控制、信息截获、指定输出终端等功能；
+2. 更换队列优先级、输出方式的排序方法，提升排序速度；
+3. 升级Teleport下载模块，支持debug功能；
+4. 其他一些小的性能优化。
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/1838989/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/1838989,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.7.0,https://github.com/henrylee2cn/pholcus/releases/tag/v0.7.0,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.7.0,v0.7.0,False,False
+1724604,2015-08-26T11:13:03Z,2015-08-26T11:17:04Z,Version 0.6.2,"1. 调整软件架构，更新流程图，结构更清晰明了；
+2. 升级Teleport socket API包，提升性能；
+3. 优化web界面，解决一些小bug；
+4. 修复随机暂停功能；
+5. Spider.Keyword可用标记由常量CAN_ADD改为USE；
+6. spider_lib包中规则示例精简冗余代码，令规则书写更加简约。
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/1724604/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/1724604,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.6.2,https://github.com/henrylee2cn/pholcus/releases/tag/v0.6.2,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.6.2,v0.6.2,False,False
+1692263,2015-08-19T08:44:41Z,2015-08-19T08:51:41Z,Version 0.6.1,"1. 调整spider结构体，规范命名，精简方法；
+2. 拓展Teleport Socket API；
+3. 新增大量采集规则实例；
+4. 解放规则库，用户可以自由指定规则库；
+5. 不再直接提供main包，用户可以创建自己的项目。
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/1692263/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/1692263,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.6.1,https://github.com/henrylee2cn/pholcus/releases/tag/v0.6.1,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.6.1,v0.6.1,False,True
+1649817,2015-08-10T09:50:39Z,2015-08-10T09:57:57Z,Version 0.6.0,"1. 新增web操作界面（已支持web/gui/command三种界面）；
+2. 支持运行模式热切换。
+3. 下载器支持固定UserAgent，自动保存cookie模式；
+4. 下载器支持随机大量常用UserAgent，禁用cookie模式；
+5. 下载器添加url自动转码功能；
+6. 优化app等模块，接口对接更加灵活简单。
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/1649817/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/1649817,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.6.0,https://github.com/henrylee2cn/pholcus/releases/tag/v0.6.0,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.6.0,v0.6.0,False,False
+1632766,2015-08-05T17:28:53Z,2015-08-05T17:30:32Z,Version 0.5.2,"1. spider模块更加灵活，支持动态Rule及动态OutFeild；
+2. 优化mysql输出；
+3. 优化下载模块；
+4. 优化百度及淘宝搜索规则；
+5. 优化去重功能。
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/1632766/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/1632766,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.5.2,https://github.com/henrylee2cn/pholcus/releases/tag/v0.5.2,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.5.2,v0.5.2,False,False
+1590232,2015-07-27T11:54:29Z,2015-07-27T11:59:05Z,Version 0.5.1,"1. 添加mysql输出；
+2. 简化添加输出方式的步骤；
+3. 优化json字符串输出；
+4. 改进调度器，提升纵向抓取效率；
+5. 修复因第三方包walk的更新导致单机模式无法启动的问题；
+6. 添加简单的单机模式命令行操作；
+7. 其他一些小的改进。
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/1590232/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/1590232,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.5.1,https://github.com/henrylee2cn/pholcus/releases/tag/v0.5.1,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.5.1,v0.5.1,False,False
+1559481,2015-07-20T12:17:05Z,2015-07-20T12:21:41Z,Version 0.5.0,"1. 添加支持图片、视频等文件下载功能；
+2. 添加暂停功能；
+3. 精简优化业务逻辑App接口；
+4. 修复因walk包升级导致单机模式无法打开的BUG。
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/1559481/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/1559481,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.5.0,https://github.com/henrylee2cn/pholcus/releases/tag/v0.5.0,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.5.0,v0.5.0,False,False
+1528687,2015-07-13T09:18:32Z,2015-07-13T10:29:53Z,Version 0.4.8,"添加页码下载成功数与失败数监控。
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/1528687/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/1528687,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.4.8,https://github.com/henrylee2cn/pholcus/releases/tag/v0.4.8,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.4.8,v0.4.8,False,False
+1514745,2015-07-09T10:12:06Z,2015-07-09T10:16:42Z,Version 0.4.7,"优化信息打印与GUI界面，升级Teleport（socketAPI）至 v0.3.2
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/1514745/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/1514745,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.4.7,https://github.com/henrylee2cn/pholcus/releases/tag/v0.4.7,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.4.7,v0.4.7,False,False
+1493845,2015-07-03T15:49:31Z,2015-07-03T16:03:30Z,Version 0.4.6,"修复1个客户端模式的小bug…
+",https://api.github.com/users/henrylee2cn,10174178,henrylee2cn,https://api.github.com/repos/henrylee2cn/pholcus/releases/1493845/assets,https://api.github.com/repos/henrylee2cn/pholcus/releases/1493845,master,https://api.github.com/repos/henrylee2cn/pholcus/tarball/v0.4.6,https://github.com/henrylee2cn/pholcus/releases/tag/v0.4.6,https://api.github.com/repos/henrylee2cn/pholcus/zipball/v0.4.6,v0.4.6,False,False

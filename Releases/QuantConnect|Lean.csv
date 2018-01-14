@@ -1,0 +1,161 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7324495,2017-08-08T20:48:29Z,2017-08-08T20:57:57Z,"R-Support, Visual Studio Integration, Python Updates","This release adds R-support to LEAN; allowing you to run R-code from your LEAN C# algorithms. This makes the R statistics libraries available for use in QuantConnect. Additionally a community member contributed a plugin for Visual Studio which uses the QuantConnect API to perform file editing tasks and deploy backtests. Additionally this release extends Python support with many new libraries, charting, history request support, Quandl support and many example algorithms. Quantity decimalization was implemented as the first step towards crypto-currency support. In addition there were numerous bug fixes, notably forIB connection handling and Python support.
+
+*Features*
+
+* Added support for R.Net and R-base from C#
+* Added Plug-in for Visual Studio Integration
+* Added charting support for Python
+* Added Arnaud Legoux Moving Average (ALMA) indicator
+* Added Python packages sklearn, keras, tensorflow, copulalib, theano, xgboost, TA-Lib and many more
+* Added Python basic template algorithms for options and futures
+* Added calculation of futures expiry dates
+* Added AlgorithmSettings and IAlgorithm.Settings property
+* Order quantity and position sizes are now decimals to support crypto-currency assets.
+* Added Python History Requests returning pandas.DataFrame
+* Added new LeanManagement interface
+* Added Quandl support for Python
+
+*Updates*
+
+* Updated example algorithms written in Python
+* Improved ZipDataCacheProvider exception handling and logging
+* Restored default accountId for OandaDownloader
+* Updated OandaDownloader to save QuoteBars instead of TradeBars
+* Improved compression in futures and options data writers
+* Update Reader error log messages for QuoteBar and TradeBar
+* Added symbol to QuoteBar.Reader error logging
+* Added Resolution to QuoteBar.Reader error logging
+* Performance improvements to ZipDataCacheProvider
+* Updated and added new sample data files
+* Added rate limiting to 50 msg/second for Interactive Brokerssubscribe/unsubscribe
+* Added Easter holidays in market-hours-database
+* Updated Python framework to support Python datetime
+* Time-based removal of option contracts from universe in live mode
+* Updated OandaSymbolMapper to support delisted symbols
+* Updated Forex/CFD default fee model to ConstantFeeModel(0)
+* Added Holidays for CFDs in market-hours-database
+* Updated YahooDownloader to new Yahoo API
+* Updated example Python algorithms
+* Added DataNormalization mode validation for Options
+* Updated HistoryDataCacheProvider to use ZipDataCacheProvider within Engine
+* Updated all LEAN threads to be Background threads
+* Increased speed in option data conversion
+* Upgraded all projects to target .NET Framework 4.5.2
+* Upgraded all projects to use C# 6.0 compiler
+* Upgraded all third-party libraries
+* Updated ToDecimal extension method to allow negative numbers
+* Added OANDA-Agent HTTP Header to API requests
+
+*Bug Fixes*
+
+* Removed redundant properties in HistoryRequest class
+* Added HasCustomData flag to SubscriptionManager (for Python)
+* Updated IB brokerage to restart when receiving reconnect (1102) message
+* Removed lock from AddData method
+* Added check for custom data existence after security removal
+* Fixed FSharp reference error
+* Fixed Warmup/History requests for canonical symbols
+* Added parameter validation in FutureMarginModel.GetInitialMarginRequirement
+* Fixed OANDA v20 history requests for more than 5000 bars
+* Fixed ParallelRunner error during application exit
+* Fixed zero-value open interest bug in IB brokerage
+* Fixed compiler build warnings
+* Fixed errors with Futures or Options existing holdings
+* Fixed existing brokerage holdings in Futures universe selection filters
+* Fixed bugs and performance issues in Python integration
+* Fixed bug in option filtering by range of strikes
+* Fixed counting bug in SubscriptionLimiter with Options/Futures
+* Fixed IB reset sequence in CheckIbGateway
+* Fixed SetBrokerageModel resetting leverage when called after AddSecurity
+* Added missing enumerator disposal when symbol removed from universe
+* Fixed price adjusting on split dates with hourly resolution
+* Fixed issues with IB reconnect and nightly reset logic
+* Fixed AddConsolidator to support all input data types available
+* Removed unnecessary subscriptions in FineFundamental universe selection
+* Fixed error handling for OANDA connection failure
+* Fixed file naming bug in daily or hourly resolution market data for futures
+* Fixed OANDA v20 GetOpenOrders with unsupported order types
+* Fixed formatting bug in StatisticsBuilder.GetSummary
+* Fixed bug in LiveTradingDataFeed.Run exception handler
+* Fixed OANDA API v1 error handling
+* Fixed error handling in FileSystemDataFeed
+* Fixed IB bug causing error ""Already Connected""
+* Fixed concurrency issue in RuntimeStatistics
+* Fixed invalid order status when receiving IB errors for operations not allowed
+* Fixed DirectoryNotFoundException when using custom data with FileFormat.Collection
+* Fixed RenkoConsolidator not accepting Tick data
+
+*Notes*
+
+Thank you to the community contributors in this release:
+@AnshulYADAV007, @jameschch, @Jay-Jay-D, @LiXiang618, @mushketyk, @smartquant, @tomhunter-gh",https://api.github.com/users/StefanoRaggi,7236689,StefanoRaggi,https://api.github.com/repos/QuantConnect/Lean/releases/7324495/assets,https://api.github.com/repos/QuantConnect/Lean/releases/7324495,master,https://api.github.com/repos/QuantConnect/Lean/tarball/v2.4.0.1,https://github.com/QuantConnect/Lean/releases/tag/v2.4.0.1,https://api.github.com/repos/QuantConnect/Lean/zipball/v2.4.0.1,v2.4.0.1,False,False
+6237696,2017-05-01T01:41:56Z,2017-05-01T01:48:26Z,Python Library Support,"*Python Library Support – LEAN Release Notes v2.4.0.0*
+
+This release adds full python support to enable using common python libraries in your algorithm.It is implemented using the PythonNet library which allows importing C# classes into python and vice versa. The new python algorithms are fully supported in local and cloud trading. There are some minor API adjustments to use the new library but the majority of existing python algorithms should work with no changes. In addition there were numerous bug fixes to make IB re-connection more resilient, and OANDA Brokerage was updated to support v2 accounts.
+
+*Features*
+
+-Full native python library support.
+-Add support for OANDA v2 accounts.
+-Added OrderType Exercise to OrderJsonConverter.
+-Added NLogHandler for additional logging capabilities.
+-Fix bugs in IEX Data Queue Handler.
+-Add SetTradeBuilder to QCAlgorithm API so users can set their own trade builder for statistics.
+-Added Volume Share Slippage Model.
+-Extend LeanData class to generate forex and cfd QuoteBars.
+-Liquidated positions show up tagged with “Liquidated”.
+-When backtests drop below $0 equity they are halted.
+-Added Hull Moving Average indicator.
+-Fetch option chains from the OCC website to speed up launching algorithms.
+
+*Bug Fixes*
+
+-Update FXCM Brokerage to return QuoteBars in GetHistory request.
+-Fix OANDA Brokerage to return GetHistory requests in the exchange timezone.
+-Fix IB timezone issues in GetHistory and Data Queue Handler.
+-Prevent setting real-time price when the exchange is closed.
+-Fixed bug updating consolidators with tick data.
+-Fix futures to use quotes for the universe instead of trades.
+-Fix issues with ZB and SGSD30 in market hours database.
+-Adjusted RAM limit calculations to be less sensitive to short term spikes.
+-Restart IBGateway each night on IB server disconnection.
+-Allow field selectors to be used with QuoteBars.
+-Removed underlying asset from futures assets.
+-Fix issue calculating holdings in CalculateOrderQuantity.
+-Added NSE data converter to backtest on data from National Stock Exchange of India.
+-Futures expiry date calculated dynamically with date rules.
+
+
+*Notes*
+Updated to IB API Version 9.73
+
+Thank you to the community contributors in this release Oswaldo, Ray Bohac,Jay-Jay-D, Anshul and Ed Rouwendaal!",https://api.github.com/users/jaredbroad,2243225,jaredbroad,https://api.github.com/repos/QuantConnect/Lean/releases/6237696/assets,https://api.github.com/repos/QuantConnect/Lean/releases/6237696,master,https://api.github.com/repos/QuantConnect/Lean/tarball/v2.4.0.0,https://github.com/QuantConnect/Lean/releases/tag/v2.4.0.0,https://api.github.com/repos/QuantConnect/Lean/zipball/v2.4.0.0,v2.4.0.0,False,False
+5774155,2017-03-16T21:08:47Z,2017-03-16T21:10:05Z,Free Streaming Live Data with IEX,"This release adds the IEXDataQueueHandler allowing LEAN users to stream free US equity trades to their strategy; along with numerous bug fixes to the OANDA and FXCM brokerage implementations. 
+
+Additional regression algorithms were added to automate testing of daily data algorithms. 
+
+The Interactive Brokers connection logic was also made more intelligent to fail quickly when there is an existing TWS connection open. 
+
+There were no breaking changes in regression tests or the API of LEAN.",https://api.github.com/users/jaredbroad,2243225,jaredbroad,https://api.github.com/repos/QuantConnect/Lean/releases/5774155/assets,https://api.github.com/repos/QuantConnect/Lean/releases/5774155,master,https://api.github.com/repos/QuantConnect/Lean/tarball/v2.3.0.3,https://github.com/QuantConnect/Lean/releases/tag/v2.3.0.3,https://api.github.com/repos/QuantConnect/Lean/zipball/v2.3.0.3,v2.3.0.3,False,False
+5594459,2017-02-28T12:39:46Z,2017-02-28T14:09:33Z,Data Caching and Data Providing Abstraction,"The key update from this release was a re-write of the bottom of the LEAN enumerator stack to abstract the fetching and caching of data. This is now plugin powered. This allows easily sourcing data from different locations and intelligently caching the streams in memory.
+
+There were also numerous bug fixes, stability enhancements and changes to make backtesting and live trading more consistent. For full release notes see: https://www.quantconnect.com/blog/release-notes-v2-3-0-2
+",https://api.github.com/users/jaredbroad,2243225,jaredbroad,https://api.github.com/repos/QuantConnect/Lean/releases/5594459/assets,https://api.github.com/repos/QuantConnect/Lean/releases/5594459,master,https://api.github.com/repos/QuantConnect/Lean/tarball/v2.3.0.2,https://github.com/QuantConnect/Lean/releases/tag/v2.3.0.2,https://api.github.com/repos/QuantConnect/Lean/zipball/v2.3.0.2,v2.3.0.2,False,False
+5333408,2017-02-01T21:16:40Z,2017-02-01T22:14:47Z,"Options, Futures and Fundamental Analysis","This release marks the integration of options and futures trading support in LEAN. Options and futures contracts are selected by using a filter universe. It is a substantial revision and improvement of the LEAN Engine.
+
+The new asset classes are supported in live trading. They should be considered bleeding edge and could potentially have unknown bugs. Please report any issues found to the Issues page.
+
+Fundamental analysis based on MorningStar data is now also fully supported in live and backtesting modes. This has been burnt in for 8 months and should be stable enough for production purposes. It can be used in conjunction with Coarse Fundamental data. This allows selecting a universe of symbols based on price and volume, then narrowing down the search based on corporate information.
+
+There have been hundreds of bug fixes since the previous version which are _cough_ [poorly] documented in the commit history but we will strive to start keeping better release notes in the future. 
+
+Release notes for this version are documented here: 
+https://www.quantconnect.com/blog/release-notes-lean-v2-3-0-0/
+",https://api.github.com/users/jaredbroad,2243225,jaredbroad,https://api.github.com/repos/QuantConnect/Lean/releases/5333408/assets,https://api.github.com/repos/QuantConnect/Lean/releases/5333408,master,https://api.github.com/repos/QuantConnect/Lean/tarball/v2.3.0.0,https://github.com/QuantConnect/Lean/releases/tag/v2.3.0.0,https://api.github.com/repos/QuantConnect/Lean/zipball/v2.3.0.0,v2.3.0.0,False,False
+2268032,2015-12-10T18:57:42Z,2015-12-10T19:02:19Z,Universe Selection,"LEAN Algorithm Trading Engine now supports universe selection.
+",https://api.github.com/users/mchandschuh,531416,mchandschuh,https://api.github.com/repos/QuantConnect/Lean/releases/2268032/assets,https://api.github.com/repos/QuantConnect/Lean/releases/2268032,master,https://api.github.com/repos/QuantConnect/Lean/tarball/v2.1.6.0,https://github.com/QuantConnect/Lean/releases/tag/v2.1.6.0,https://api.github.com/repos/QuantConnect/Lean/zipball/v2.1.6.0,v2.1.6.0,False,False
+1474054,2015-06-29T16:52:08Z,2015-06-29T16:54:38Z,Multi-Language Support,"Lean Algorithmic Trading Engine and Web IDE and now support multiple languages (C#, F#, VB) with Java support to soon follow.
+",https://api.github.com/users/jaredbroad,2243225,jaredbroad,https://api.github.com/repos/QuantConnect/Lean/releases/1474054/assets,https://api.github.com/repos/QuantConnect/Lean/releases/1474054,master,https://api.github.com/repos/QuantConnect/Lean/tarball/v2.1.2,https://github.com/QuantConnect/Lean/releases/tag/v2.1.2,https://api.github.com/repos/QuantConnect/Lean/zipball/v2.1.2,v2.1.2,False,False
+844735,2015-01-12T17:36:12Z,2015-01-12T18:36:17Z,QuantConnect Open Source Debut,"First release of the Lean - an open source .NET Algorithmic Trading Engine. Lean is an event driven, multi-threaded, cloud-desktop hybrid application for backtesting and executing algorithmic trading strategies.
+",https://api.github.com/users/jaredbroad,2243225,jaredbroad,https://api.github.com/repos/QuantConnect/Lean/releases/844735/assets,https://api.github.com/repos/QuantConnect/Lean/releases/844735,master,https://api.github.com/repos/QuantConnect/Lean/tarball/v2.1.1,https://github.com/QuantConnect/Lean/releases/tag/v2.1.1,https://api.github.com/repos/QuantConnect/Lean/zipball/v2.1.1,v2.1.1,False,False

@@ -1,0 +1,463 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7054571,2017-07-16T04:42:50Z,2017-07-16T04:51:38Z,修复synccheck中的错误,"修复synccheck中BadStatusLine及503导致的错误。
+
+synccheck会返回一些例如这样的值：
+
+```bash
+6f:00:0a:14:d0:9e:f7:90:f3:8d:32:ac:c2:81:aa:c8:d3:aa:bb:0a:14:d0:9e:f7:90:f3:8d:32:ac:c2:81:aa:c8:d3
+6f:00:8a:9c:09:74:e4:d8:e0:14:bf:96:3a:56:a0:64:1b:cc:dd:8a:9c:09:74:e4:d8:e0:14:bf:96:3a:56:a0:64:1b
+```
+
+涵义还没有头绪。",https://api.github.com/users/littlecodersh,13028340,littlecodersh,https://api.github.com/repos/littlecodersh/ItChat/releases/7054571/assets,https://api.github.com/repos/littlecodersh/ItChat/releases/7054571,master,https://api.github.com/repos/littlecodersh/ItChat/tarball/v1.3.9,https://github.com/littlecodersh/ItChat/releases/tag/v1.3.9,https://api.github.com/repos/littlecodersh/ItChat/zipball/v1.3.9,v1.3.9,False,False
+6529337,2017-05-29T02:23:18Z,2017-05-29T02:25:26Z,,"增加了消息撤回方法，示例如下：
+
+```python
+import itchat
+
+itchat.auto_login(True)
+
+user = itchat.search_friends(nickName='LittleCoder')[0]
+r = user.send('hi')
+msgId = r['MsgID']
+r = itchat.revoke(msgId, user.userName)
+
+itchat.run()
+```",https://api.github.com/users/littlecodersh,13028340,littlecodersh,https://api.github.com/repos/littlecodersh/ItChat/releases/6529337/assets,https://api.github.com/repos/littlecodersh/ItChat/releases/6529337,master,https://api.github.com/repos/littlecodersh/ItChat/tarball/v1.3.7,https://github.com/littlecodersh/ItChat/releases/tag/v1.3.7,https://api.github.com/repos/littlecodersh/ItChat/zipball/v1.3.7,v1.3.7,False,False
+5931671,2017-03-31T04:31:34Z,2017-03-31T04:39:21Z,修复循环引用,"如果两个类互相引用将导致无法被正常回收，所以采取这种形式：
+
+```python
+from weakref import ref
+
+class D(object):
+    def __init__(self, name):
+        self.name = name
+    def __del__(self):
+        print('[deleted]: %s' % self.name)
+
+class T(D):
+    @property
+    def pointer(self):
+        return getattr(self, '_pointer', lambda: None)()
+    @pointer.setter
+    def pointer(self, value):
+        self._pointer = ref(value)
+
+def fn():
+    t, d = T('t'), D('d')
+    t.pointer, d.pointer = d, t
+
+if __name__ == '__main__':
+    fn()
+    print('end')
+```
+
+在itchat中主要解决这样两个问题：
+
+你需要对照该版本和前版本的结果比较差别。
+
+```python
+from weakref import ref
+
+from itchat.storage import templates
+
+def fn():
+    chatroom = templates.Chatroom()
+    chatroom.memberList.append({})
+    m = chatroom.memberList[0]
+    return ref(m), ref(chatroom)
+
+if __name__ == '__main__':
+    a, b = fn()
+    print(a(), b())
+```
+
+```python
+from weakref import ref
+
+from itchat import Core
+
+def fn():
+    r = Core()
+    return ref(r)
+
+r = fn()
+print(r())
+```
+
+",https://api.github.com/users/littlecodersh,13028340,littlecodersh,https://api.github.com/repos/littlecodersh/ItChat/releases/5931671/assets,https://api.github.com/repos/littlecodersh/ItChat/releases/5931671,master,https://api.github.com/repos/littlecodersh/ItChat/tarball/v1.3.5,https://github.com/littlecodersh/ItChat/releases/tag/v1.3.5,https://api.github.com/repos/littlecodersh/ItChat/zipball/v1.3.5,v1.3.5,False,False
+5866154,2017-03-23T05:18:15Z,2017-03-25T05:27:11Z,1.3.0版本更新,"## 主要更改
+* 更新用户、群、公众号的oop操作
+* 在注册方法的返回值中增加User键值，存放发送者的类
+* 将注册方法的返回值改为可以通过__getattr__访问
+* 另，所有新操作不影响旧的字典的使用方式
+
+## oop操作
+
+```python
+import itchat
+
+user = itchat.get_friends()[0]
+user.send('hi')
+```
+
+同样，群和公众号也是这样访问。
+
+## 注册方法返回值增加User
+
+```python
+import itchat
+
+@itchat.msg_register(itchat.content.TEXT)
+def _(msg):
+    msg['User'].send('hi')
+
+itchat.auto_login(True)
+itchat.run()
+```
+
+## 返回值通过__getattr__访问
+
+```python
+import itchat
+
+@itchat.msg_register(itchat.content.TEXT)
+def _(msg):
+    msg.user.send('hi')
+
+itchat.auto_login(True)
+itchat.run()
+```
+
+## 发送文件类
+
+```python
+import itchat
+
+itchat.auto_login(True)
+
+with open('t.pdf', 'rb') as f:
+    r = itchat.send_file('test.pdf', 'filehelper', file_=f)
+# equals to:
+# r = itchat.send_file('t.pdf', 'filehelper')
+print(r)
+
+with open('t.png', 'rb') as f:
+    r = itchat.send_image(f, 'filehelper')
+# equals to:
+# r = itchat.send_image('t.png', 'filehelper')
+print(r)
+
+with open('t.mp4', 'rb') as f:
+    r = itchat.send_video(f, 'filehelper')
+# equals to:
+# r = itchat.send_video('t.mp4', 'filehelper')
+print(r)
+
+itchat.run()
+```",https://api.github.com/users/littlecodersh,13028340,littlecodersh,https://api.github.com/repos/littlecodersh/ItChat/releases/5866154/assets,https://api.github.com/repos/littlecodersh/ItChat/releases/5866154,master,https://api.github.com/repos/littlecodersh/ItChat/tarball/v1.3.1,https://github.com/littlecodersh/ItChat/releases/tag/v1.3.1,https://api.github.com/repos/littlecodersh/ItChat/zipball/v1.3.1,v1.3.1,False,False
+5776380,2017-03-17T02:33:41Z,2017-03-17T02:36:27Z,增加了图片后缀自动判断,"获取用户头像：
+```python
+import itchat, shutil
+
+itchat.auto_login(True)
+
+r = itchat.get_head_img(picDir='tmp.unknown')
+print(r)
+if 'PostFix' in r:
+    shutil.move('tmp.unknown', 'tmp.%s' % r['PostFix'])
+```
+
+获取聊天图片：
+```python
+import itchat, shutil
+
+itchat.auto_login(True)
+
+@itchat.msg_register(itchat.content.PICTURE)
+def download(msg):
+    r = msg['Text']('tmp.unknown')
+    print(r)
+    if 'PostFix' in r:
+        shutil.move('tmp.unknown', 'tmp.%s' % r['PostFix'])
+
+itchat.run()
+```",https://api.github.com/users/littlecodersh,13028340,littlecodersh,https://api.github.com/repos/littlecodersh/ItChat/releases/5776380/assets,https://api.github.com/repos/littlecodersh/ItChat/releases/5776380,master,https://api.github.com/repos/littlecodersh/ItChat/tarball/v1.2.31,https://github.com/littlecodersh/ItChat/releases/tag/v1.2.31,https://api.github.com/repos/littlecodersh/ItChat/zipball/v1.2.31,v1.2.31,False,False
+5671823,2017-03-08T02:41:55Z,2017-03-08T02:47:49Z,增加了qrCallback中的终止登陆功能,"```python
+import itchat
+
+def qrCallback(uuid, status, qrcode):
+    if status == '400':
+        itchat.logout()
+
+itchat.auto_login(True, qrCallback=qrCallback)
+
+if itchat.originInstance.alive:
+    itchat.run()
+else:
+    print('qrcode timeout and exit')
+```",https://api.github.com/users/littlecodersh,13028340,littlecodersh,https://api.github.com/repos/littlecodersh/ItChat/releases/5671823/assets,https://api.github.com/repos/littlecodersh/ItChat/releases/5671823,master,https://api.github.com/repos/littlecodersh/ItChat/tarball/v1.2.29,https://github.com/littlecodersh/ItChat/releases/tag/v1.2.29,https://api.github.com/repos/littlecodersh/ItChat/zipball/v1.2.29,v1.2.29,False,False
+5629390,2017-03-03T09:31:35Z,2017-03-03T09:39:17Z,Login without scanning qrcode,"你可以这样测试：
+
+首先成功登陆一次：
+
+```python
+import itchat
+itchat.auto_login(True)
+```
+
+之后在手机上将该登录状态登出。（模拟各类登出）
+
+之后重新运行登陆，你将不需要扫码直接在手机上获得登陆推送。
+
+```python
+import itchat
+itchat.auto_login(True)
+itchat.send('Login without qrcode!', 'filehelper')
+```
+
+在上次登陆后没有通过其他途径登陆该微信的情况下，再次登录将不再需要扫码，直接收到登陆推送。",https://api.github.com/users/littlecodersh,13028340,littlecodersh,https://api.github.com/repos/littlecodersh/ItChat/releases/5629390/assets,https://api.github.com/repos/littlecodersh/ItChat/releases/5629390,master,https://api.github.com/repos/littlecodersh/ItChat/tarball/v1.2.28,https://github.com/littlecodersh/ItChat/releases/tag/v1.2.28,https://api.github.com/repos/littlecodersh/ItChat/zipball/v1.2.28,v1.2.28,False,False
+5392473,2017-02-08T08:43:27Z,2017-02-08T08:56:10Z,Clear useless loggings,"Exceptions in registered functions will now be shown in warning level.
+When wechat domain is not available, exceptions will also be shown in warning level.
+",https://api.github.com/users/littlecodersh,13028340,littlecodersh,https://api.github.com/repos/littlecodersh/ItChat/releases/5392473/assets,https://api.github.com/repos/littlecodersh/ItChat/releases/5392473,master,https://api.github.com/repos/littlecodersh/ItChat/tarball/v1.2.22,https://github.com/littlecodersh/ItChat/releases/tag/v1.2.22,https://api.github.com/repos/littlecodersh/ItChat/zipball/v1.2.22,v1.2.22,False,False
+4989552,2016-12-22T11:15:08Z,2016-12-22T11:19:18Z,群聊用户删除后不更新本地群聊存储修复,"这个问题简而言之就是退了一个用户，之后本地不会删除该用户。
+
+这里给出一个群聊人数监控的示例：
+
+``` python
+#coding=utf8
+import logging
+
+import itchat
+from itchat.content import *
+
+logger = logging.getLogger('itchat')
+groupName = u'萝卜群'
+groupMemberCount = -1
+groupUserName = None
+
+itchat.auto_login(True)
+
+group = itchat.search_chatrooms(name=groupName)[0]
+if not group['MemberList']:
+    logger.info('no member list detected')
+    group = itchat.update_chatroom(group['UserName'])
+groupMemberCount = len(group['MemberList'])
+groupUserName = group['UserName']
+logger.info('%s: %s' % (groupName, groupMemberCount))
+
+@itchat.msg_register(SYSTEM)
+def detect_member(msg):
+    global groupMemberCount
+    if msg['SystemInfo'] != 'chatrooms':
+        logger.info(msg['SystemInfo'])
+    elif groupUserName not in msg['Text']:
+        logger.info(msg['Text'])
+    else:
+        newGroup = itchat.search_chatrooms(userName=groupUserName)
+        logger.info('%s member updated: %s -> %s' %(
+            groupName, groupMemberCount, len(newGroup['MemberList'])))
+        groupMemberCount = len(newGroup['MemberList'])
+
+itchat.run(True)
+```
+",https://api.github.com/users/littlecodersh,13028340,littlecodersh,https://api.github.com/repos/littlecodersh/ItChat/releases/4989552/assets,https://api.github.com/repos/littlecodersh/ItChat/releases/4989552,master,https://api.github.com/repos/littlecodersh/ItChat/tarball/v1.2.16,https://github.com/littlecodersh/ItChat/releases/tag/v1.2.16,https://api.github.com/repos/littlecodersh/ItChat/zipball/v1.2.16,v1.2.16,False,False
+4854702,2016-12-07T12:04:30Z,2016-12-07T12:07:41Z,,"## 更新了大文件的上传
+
+这个不用多说了吧，你试试大文件就好了
+
+## 更新了新的发送协议
+
+微信更新了附件的发送协议，所以我也更新了一下
+",https://api.github.com/users/littlecodersh,13028340,littlecodersh,https://api.github.com/repos/littlecodersh/ItChat/releases/4854702/assets,https://api.github.com/repos/littlecodersh/ItChat/releases/4854702,master,https://api.github.com/repos/littlecodersh/ItChat/tarball/v1.2.12,https://github.com/littlecodersh/ItChat/releases/tag/v1.2.12,https://api.github.com/repos/littlecodersh/ItChat/zipball/v1.2.12,v1.2.12,False,False
+4826160,2016-12-04T05:51:20Z,2016-12-04T06:03:26Z,,"## 增强了pkl的版本兼容
+
+这样在itchat更新的时候就不需要手动删除pkl了，我也不用因为修改pkl的内容导致bug而被吐槽。
+
+## 增加了qrCallback
+
+好像很久以前就有说需要增加二维码的回调，但以前都是建议不使用auto_login，自定义登录过程。
+现在auto_login里面的功能多了之后，还是给加上qrCallback吧。
+需要注意的是，如果使用了qrCallback，系统默认不会再存储二维码并显示，这些内容全都交给qrCallback。
+
+可以通过如下程序测试：
+
+``` python
+import logging
+
+import itchat
+
+itchat.set_logging(loggingLevel=logging.DEBUG)
+
+def qrCallback(uuid, status, qrcode):
+    if status == '0':
+        with open('qr.jpg', 'wb') as f:
+            f.write(qrcode)
+        itchat.utils.print_qr('qr.jpg')
+    print('** qr callback **')
+    print('%s: %s' % (uuid, status))
+    print('qr size: %s' % len(qrcode))
+    print('*****************')
+
+itchat.auto_login(True, qrCallback=qrCallback)
+
+itchat.run(debug=True)
+```
+
+qrCallback必须接受三个参数，uuid status qrcode。
+uuid和qrcode分别对应qrcode的uuid以及二进制图片。
+status有0, 200, 201, 400, 408（都是字符串形式），对应为：
+- 0 - 获取到图片
+- 200 - 登陆成功
+- 201 - 需要在手机端确认登录
+- 400 - 二维码失效
+- 408 - 二维码尚未被扫描也未失效
+
+这里给出一个使用这个功能通过网页显示二维码的示例：[源码](https://gist.github.com/littlecodersh/da5ad98728627c25963da67b0180453d)
+
+## 修复了因为群聊没有self键导致群聊消息遗漏的问题
+
+好像也没什么好说的，之后如果发现一些奇怪的问题，记得这样调试：
+
+``` python
+itchat.run(debug=True)
+```
+",https://api.github.com/users/littlecodersh,13028340,littlecodersh,https://api.github.com/repos/littlecodersh/ItChat/releases/4826160/assets,https://api.github.com/repos/littlecodersh/ItChat/releases/4826160,master,https://api.github.com/repos/littlecodersh/ItChat/tarball/v1.2.10,https://github.com/littlecodersh/ItChat/releases/tag/v1.2.10,https://api.github.com/repos/littlecodersh/ItChat/zipball/v1.2.10,v1.2.10,False,False
+4805927,2016-12-02T13:41:08Z,2016-12-01T13:49:40Z,,"## 修复了通讯录混乱问题
+
+本来由于对于webwxsync（`itchat.get_msg()`）返回的用户信息全部默认为群聊，导致了该问题。
+
+目前已经修复，使用如下代码测试，记得删一下itchat.pkl之后测试：
+
+``` python
+import logging, sys
+
+import itchat
+from itchat.content import *
+
+itchat.set_logging(loggingLevel=logging.DEBUG)
+
+itchat.auto_login(True)
+
+@itchat.msg_register(FRIENDS)
+def add_friend(msg):
+    itchat.add_friend(**msg['Text'])
+
+@itchat.msg_register(TEXT)
+def check_contact(msg):
+    print('** Contact check begin **')
+    for member in itchat.get_friends():
+        if '@@' in member['UserName']:
+            print('Fake member: %s' % member['NickName'])
+    for chatroom in itchat.get_chatrooms():
+        if '@@' not in chatroom['UserName']:
+            print('Fake chatroom: %s' % member['NickName'])
+    print('** Contact check finish **')
+
+itchat.run()
+```
+
+## 为每个发送消息增加了logging信息
+
+为了方便之后的调试与交流，每个发送操作都会产生带参数的logging信息。
+
+可以通过如下代码测试：
+
+``` python
+import itchat
+from itchat.content import *
+
+itchat.auto_login(True)
+
+@itchat.msg_register([PICTURE, RECORDING, ATTACHMENT, VIDEO])
+def download_files(msg):
+    msg['Text'](msg['FileName'])
+    return '@%s@%s' % ({'Picture': 'img', 'Video': 'vid'}.get(
+        msg['Type'], 'fil'), msg['FileName'])
+
+itchat.run(debug=True)
+```
+
+## 修复了好友列表首位非自己的问题
+
+这就是我手滑，原谅我，同样记得删除itchat.pkl之后测试。
+",https://api.github.com/users/littlecodersh,13028340,littlecodersh,https://api.github.com/repos/littlecodersh/ItChat/releases/4805927/assets,https://api.github.com/repos/littlecodersh/ItChat/releases/4805927,master,https://api.github.com/repos/littlecodersh/ItChat/tarball/v1.2.8,https://github.com/littlecodersh/ItChat/releases/tag/v1.2.8,https://api.github.com/repos/littlecodersh/ItChat/zipball/v1.2.8,v1.2.8,False,False
+4756797,2016-11-16T06:35:33Z,2016-11-25T08:31:35Z,,"为了方便之后对代码的修改和调整，与itchatmp的适配，实现一些一直累计的需求。
+
+在1.2.0版本中作如下更改：
+
+## 主要更改
+- 加入日志
+- 更改返回值内容
+- 完善多实例及退出
+- 更新构架
+
+## 加入日志
+
+使用logging记录日志。
+
+新增接口，设定日志输出位置（文件、控制台），类似这样操作：
+
+``` python
+itchat.set_logging(showOnCmd=True, loggingFile=None, loggingLevel=10)
+```
+
+## 更改返回值内容
+
+使用能够记录更多信息的返回值，类似这样操作：
+
+``` python
+# r.json() -> {'BaseResponse': {'Ret': 0 }}
+r = ReturnValue(r.json())
+
+if r:
+    print('True')
+else:
+    print('False')
+
+print(r['BaseResponse'])
+# {'Ret': 0}
+```
+
+## 完善多实例及退出
+
+增加新实例接口与退出接口
+
+``` python
+itchat.new_instance()
+itchat.logout()
+```
+
+## 更新构架
+
+将本处于**init**.py中的方法也加入client
+
+将client以初始化时加载形式组织
+
+定义时方法仅作占位及注释作用
+
+``` python
+# core.py 即原client.py
+from .messages import load_messages_components
+
+class Core(object):
+    def __init__(self):
+        self.__load_components()
+    def load_components(self):
+        load_messages_components(self)
+    def produce_msg(self, msg):
+        ''' place for docs
+         * will be initialized in messages
+        '''
+        raise NotImplementedError()
+```
+
+``` python
+# messages.py
+
+def load_components(core):
+    core.produce_msg = produce_msg
+
+def produce_msg(self, msg):
+    pass
+```
+",https://api.github.com/users/littlecodersh,13028340,littlecodersh,https://api.github.com/repos/littlecodersh/ItChat/releases/4756797/assets,https://api.github.com/repos/littlecodersh/ItChat/releases/4756797,master,https://api.github.com/repos/littlecodersh/ItChat/tarball/v1.2.0,https://github.com/littlecodersh/ItChat/releases/tag/v1.2.0,https://api.github.com/repos/littlecodersh/ItChat/zipball/v1.2.0,v1.2.0,False,False

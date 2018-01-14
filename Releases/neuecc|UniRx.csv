@@ -1,0 +1,399 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+4269498,2016-09-30T01:14:33Z,2016-09-30T01:22:29Z,ver 5.5.0,"This release is available in AssetStore on 2016-10-04
+
+New Experimental support for Unity .NET 4.6 async/await
+
+Add: ObserveEveryValueChanged(bool fastDestroyCheck) overload
+Add: Observable.Sample(intervalSourcea) overload, thanks @svermeulen
+Fix: UWP Platform compile error
+Breaking Changes: Remove workaround for Unity WWW dispose freeze bug
+
+---
+
+Unity 5.5.0xMono-Runtime-Upgrade-1-b4 Support details
+
+use System.IObservable<T>, IObserver<T> instead of UniRx.IObservable<T>, IObserver<T>
+use System.Tuple instad of UniRx.Tuple (but lost ValueType tuple, should we create other tuple?)
+use System.IProgress<T> instead of UniRx.Progress
+use System.Threading.CancellationToken instead of UniRx.CancellationToken
+add GetAwaiter to UniRx for supports async/await for IObservable
+create UniRxSynchronizationContext to support async/await completly
+add ToObservable to Task
+supplemental Unity coroutine support async/await
+",https://api.github.com/users/neuecc,46207,neuecc,https://api.github.com/repos/neuecc/UniRx/releases/4269498/assets,https://api.github.com/repos/neuecc/UniRx/releases/4269498,master,https://api.github.com/repos/neuecc/UniRx/tarball/5.5.0,https://github.com/neuecc/UniRx/releases/tag/5.5.0,https://api.github.com/repos/neuecc/UniRx/zipball/5.5.0,5.5.0,False,False
+4047479,2016-09-04T13:15:12Z,2016-09-04T13:15:56Z,ver 5.4.1,"This release is available in AssetStore on 2016-09-08
+https://www.assetstore.unity3d.com/jp/#!/content/17276
+
+Improvement: Support Unity 5.5 Beta
+Fix: ThrottleFirstFrame throws NullReferenceException when stream sends OnNext immediately. #160, thanks @hsanno
+Fix: Error on LogEntry.cs #164, thanks @kimsama
+Fix: ToReadOnlyReactiveProperty should be distinct publishing #161
+Fix: To(ReadOnly)ReactiveProperty cause strange result when source observable returns OnCompleted or OnError
+(Breaking) Changes: PresenterBase was obsoleted(but it only commented, not marked [Obsolete])
+Breaking Changes: Sample14 was removed
+Breaking Changes: Removed ObservableMonoBehaviour, TypedMonoBehaviour in UNITY 5.5 or newer
+",https://api.github.com/users/neuecc,46207,neuecc,https://api.github.com/repos/neuecc/UniRx/releases/4047479/assets,https://api.github.com/repos/neuecc/UniRx/releases/4047479,master,https://api.github.com/repos/neuecc/UniRx/tarball/5.4.1,https://github.com/neuecc/UniRx/releases/tag/5.4.1,https://api.github.com/repos/neuecc/UniRx/zipball/5.4.1,5.4.1,False,False
+3753057,2016-07-26T14:52:08Z,2016-07-27T17:15:12Z,ver 5.4.0,"This release is available in AssetStore on  2016-08-01
+https://www.assetstore.unity3d.com/jp/#!/content/17276
+
+Add: Observable.FrameInterval
+Add: Observable.FrameTimeInterval
+Add: Observable.BatchFrame
+Add: Observable.Debug(under UniRx.Diagnostics namespace)
+Add: ObservableParticleTrigger and OnParticleCollisionAsObservable, OnParticleTriggerAsObservabl(after Unity 5.4) extension methods
+Add: UniRx.AsyncReactiveCommand
+Add: ReactiveCommand.BindToOnClick, `IObservable<bool>.BindToButtonOnClick`
+Add: UniRx.Toolkit.ObjectPool, AsyncObjectPool
+Add: UniRx.AsyncMessageBroker, asynchronous variation of MessageBroker
+Add: ObserveEveryValueChanged(IEqualityComparer) overload
+Add: `Observable.FromCoroutine(Func<CancellationToken, IEnumerator>)` overload
+Add: ObservableYieldInstruction.IsDone property
+Add: IPresenter.ForceInitialize(object argument)
+Improvement: Where().Select(), Select().Where() peformance was optimized that combine funcs at internal
+Improvement: MicroCoroutine performance was optimized that prevent refresh spike
+Improvement: Observable.Return performance was optimized that reduced memory cost
+Improvement: Observable.Return(bool) was optimzied perofmrance that allocate zero memory
+Improvement: Observable.ReturnUnit was optimzied perofmrance that allocate zero memory
+Improvement: Observable.Empty was optimzied perofmrance that allocate zero memory
+Improvement: Observable.Never was optimzied perofmrance that allocate zero memory
+Improvement: Observable.DelayFrame performance was optimized
+Improvement: UnityEqualityComparer.GetDefault peformance was optimized
+Improvement: AddTo(gameObject) dispose when ObservableTrigger is not activated
+Improvement: AddTo(gameObject/component) performance was optimized by use inner CompositeDisposable of ObservableDestroyTrigger
+Improvement: `FromCoroutine<T>(Func<IObserver<T>, IEnumerator>)` stops coroutine when subscription was disposed
+Improvement: ReactiveCollection, ReactiveDictionary implements dispose pattern
+Fix: ToYieldInstruction throws exception on MoveNext when reThrowOnError and has error 
+Fix: ObserveEveryValueChanged publish value immediately(this is degraded from UniRx 5.3)
+Fix: Prevent warning on Unity 5.4 at ObservableMonoBehaviour/TypedMonoBehaviour.OnLevelWasLoaded
+Fix: Remove indexer.set of IReadOnlyReactiveDictionary
+Breaking Changes: Does not guaranty MicroCoroutine action on same frame
+Breaking Changes: UniRx.Diagnostics.LogEntry was changed from class to struct for performance improvement
+",https://api.github.com/users/neuecc,46207,neuecc,https://api.github.com/repos/neuecc/UniRx/releases/3753057/assets,https://api.github.com/repos/neuecc/UniRx/releases/3753057,master,https://api.github.com/repos/neuecc/UniRx/tarball/5.4.0,https://github.com/neuecc/UniRx/releases/tag/5.4.0,https://api.github.com/repos/neuecc/UniRx/zipball/5.4.0,5.4.0,False,False
+3198596,2016-05-11T01:07:58Z,2016-05-11T01:09:33Z,ver 5.3.0,"This release is available in AssetStore on May13th 2016.
+https://www.assetstore.unity3d.com/jp/#!/content/17276
+
+This release introduce MicroCoroutine, it is memory efficient and 10x faster than standard coroutine at run many coroutines.
+Some coroutine based operators has been changed to use MicroCoroutine.
+
+Add : ReactiveCommand
+Add : MainThreadDispatcher.StartUpdateMicroCoroutine, StartFixedUpdateMicroCoroutine, StartEndOfFrameMicroCoroutine
+Add : Scheduler.MainThreadFixedUpdate, MainThreadEndOfFrame
+Add : ToYieldInstruction(cancellationToken)
+Add : Observer.Create(onNext/onNext, onError/onNext, onCompleted) overload
+Add : IReadOnlyReactiveProperty.SkipLatestValueOnSubscribe
+Add : Observable.WhenAll overload (IObservable<Unit>(params IObservable<Unit>[] sources), this becomes breaking changes)
+Add : Observable.FromMicroCoroutine
+Add : Observable.AsSingleUnitObservable
+Add : Observable.SubscribeWithState
+Add : Observable.CreateWithState
+Add : Disposable.CreateWithState
+Improvement : Use MicroCoroutine on `ObserveEveryValueChanged`, `EveryUpdate`, `EveryFixedUpdate`, `EveryEndOfFrame`, `NextFrame`, `TimerFrame`, `IntervalFrame`, `DelayFrame`, `SampleFrame`, `ThrottleFrame`, `ThrottleFirstFrame`, `TimeoutFrame`
+Improvement : Performance improvement for Observable.Range, Repeat when scheduler is Scheduler.Immediate
+Improvement : Use Time.unscaledDeltaTime in IgnoreTimeScaleMainThreadScheduler
+Fix : ReadOnlyReactiveProperty(source, initialValue) does not publish initial value on subscribe
+Fix : IReadOnlyCollection has set indexer
+Fix : Ambigious property of IReactiveCollection.Count, Indexer
+Fix : Throw invalid error when ObservableWWW.LoadFromCacheOrDownload failed.
+Breaking Changes : Added IReadOnlyReactiveProperty.HasValue
+Breaking Changes : AsyncConvertsion scheduler to Scheduler.MainThread on WebGL build(WebGL doesn't support ThreadPool)
+Other : Update UniRxAnalyzer 1.4.0.1 https://www.nuget.org/packages/UniRxAnalyzer
+",https://api.github.com/users/neuecc,46207,neuecc,https://api.github.com/repos/neuecc/UniRx/releases/3198596/assets,https://api.github.com/repos/neuecc/UniRx/releases/3198596,master,https://api.github.com/repos/neuecc/UniRx/tarball/5.3.0,https://github.com/neuecc/UniRx/releases/tag/5.3.0,https://api.github.com/repos/neuecc/UniRx/zipball/5.3.0,5.3.0,False,False
+2612088,2016-02-14T14:45:38Z,2016-02-14T14:47:01Z,ver 5.2.0,"This release is available in AssetStore on Feb 18th 2016.
+https://www.assetstore.unity3d.com/jp/#!/content/17276
+
+This release has been changed root directory under `Plugins`.
+
+Add : Observable.Pairwise overload(returns Pair[T])
+Add : Observable.ContinueWith
+Add : Observable.Share
+Add : Observable.ZipLatest
+Add : Observable.WithLatestFrom
+Add : Observable.TakeLast
+Add : Observable.GroupBy
+Add : IObserver.Synchronize
+Add : ISubject.Synchronize
+Add : RangeReactivePropertyAttribute
+Fix : Subscribe() throw exception on OnError (this is degraded from UniRx 5.0)
+Fix : ToAwaitableEnumerator is called callback when canceled
+Fix : Wait complete of WWW when called dispose before completed, it's workaround for freeze bug of Android
+Breaking Changes : Buffer(windowBoundaries), Buffer(timeSpan, count) should publish value when buffer is empty.
+Breaking Changes : UniRx has been moved under Plugins directory for avoid uNET Weaver Error
+Breaking Changes : Obsolete Observable.EveryAfterUpdate
+Breaking Changes : Obsolete MainThreadDispatchType.AfterUpdate
+",https://api.github.com/users/neuecc,46207,neuecc,https://api.github.com/repos/neuecc/UniRx/releases/2612088/assets,https://api.github.com/repos/neuecc/UniRx/releases/2612088,master,https://api.github.com/repos/neuecc/UniRx/tarball/5.2.0,https://github.com/neuecc/UniRx/releases/tag/5.2.0,https://api.github.com/repos/neuecc/UniRx/zipball/5.2.0,5.2.0,False,False
+2342161,2015-12-26T11:18:07Z,2015-12-26T11:32:55Z,ver 5.1.0,"This release is available in AssetStore on Jan 5th 2016.
+https://www.assetstore.unity3d.com/jp/#!/content/17276
+
+This release eliminates boxing for performance improvement.
+
+Add : Observable.EveryLateUpdate
+Add : Observable.EveryAfterUpdate in Unity 5.3
+Add : Observable.EveryGameObjectUpdate
+Add : Observable.ObserveOnMainThread(MainThreadDispatchType.Update/FixedUpdate/EndOfFrame/GameObjectUpdate/LateUpdate/AfterUpdate)
+Add : UnityEqualityComparer.Vector2/Vector3/Vector4/Color/Rect/Bounds/Quaternion and GetDefault[T] for avoid boxing
+Improvement : Support Unity 4.7
+Improvement : ReactiveProperty.SetValue avoids boxing
+Improvement : UniRx.Tuple implements IEquatable[T] for avoid boxing
+Improvement : Observable.Distinct/DistinctUntilChanged/ObserveEveryValueChanged use UnityEqualityComparer for avoid boxing
+Improvement : ReactiveCollection implements IReadOnlyReactiveCollection
+Improvement : ReactiveDictionary implements IReadOnlyReactiveDictionary
+Improvement : MainThreadDispatcher doesn't use Array.Clear
+",https://api.github.com/users/neuecc,46207,neuecc,https://api.github.com/repos/neuecc/UniRx/releases/2342161/assets,https://api.github.com/repos/neuecc/UniRx/releases/2342161,master,https://api.github.com/repos/neuecc/UniRx/tarball/5.1.0,https://github.com/neuecc/UniRx/releases/tag/5.1.0,https://api.github.com/repos/neuecc/UniRx/zipball/5.1.0,5.1.0,False,False
+2292520,2015-12-15T17:56:53Z,2015-12-15T18:04:04Z,ver 5.0.0,"This release is available in AssetStore on Dec 19th 2015.
+https://www.assetstore.unity3d.com/jp/#!/content/17276
+
+This release contains biggest changes.
+Many codes are refactored, achieved 3x~10x performance, clean stacktrace, less gc garbage.
+
+Breaking Changes:
+iOS/AOT support is dropped. Now supports only IL2CPP on iOS.
+Unit/Tuple/CancellationToken/TimeInterval/Timestamped changed class to struct.
+MainThreadDispatcher.Post needs T state.
+ObservableMonoBehaviour/TypedMonoBehaviour marked Obsolete.
+Remove AotSafe Extensions(WrapValueToClass).
+InputField.OnValueChangeAsObservable renamed to OnValueChangedAsObservable in Unity 5.3.
+Operator's chain acquired unhandled exception durability in Subscribe in Subscribe.
+
+Add:
+Observable.ForEachAsync
+Observable.Take(duration)
+Observable.Aggregate
+Observable.Zip(T3~T7)
+Observable.CombineLatest(T3~T7)
+Observable.Start(function, timeSpan)
+Observable.ToYieldInstruction in Unity 5.3
+Observable.DoOnError
+Observable.DoOnCompleted
+Observable.DoOnTerminate
+Observable.DoOnSubscribe
+Observable.DoOnCancel
+Observable.CreateSafe
+Progress
+StableCompositeDisposable
+MultilineReactivePropertyAttribute
+
+Fix:
+Observable.First call onNext many times, thanks @TORISOUP
+Fix ScheduledDisposable will never call disposable's dispose, thanks @yaegaki
+Fix explicitly is UniRx.Diagnostics.Logger, thanks @enpel
+ReplaySubject does not use target scheduler.Now, thanks @CoderMin
+EveryEndOfFrameCore was using WaitForFixedUpdate, thanks @mavriel
+ObservableWWW.Post cause runtime error when externalheaders conflicts, thanks @huminado
+WWWErrorException.ToString can't show string when WWW was disposed
+AsyncSubject, ReplaySubject didn't implement IDisposable
+
+Improvement:
+Made Parent available to children within PresenterBase, thanks @JimW
+Removed redundant onCompleted on AsyncSubject, thanks @j6lim
+Implement IDisposable for ReactiveDictionary, thanks @lostfictions
+Implement IDisposable for ReactiveCollection
+Cached WaitForFixedUpdate/WaitForEndOfFrame YieldInstrtuction, thanks @qiankanglai
+FromCoroutine in Editor Support Unity 5.3 CustomYieldInstruction
+Optimize yield sequnece if reportProgess == null on AsyncOperation.AsObservable and ObservableWWW
+Add WWWErrorException.Text property
+ThreadPoolScheduler and MainThreadScheduler are reduced garbage in some time-based operations(Timer/Interval/Sample/etc...) by ISchedulerPeriodic
+ObserveOn(MainThreadScheduler) is reduced garbage by ISchedulerQueueing
+",https://api.github.com/users/neuecc,46207,neuecc,https://api.github.com/repos/neuecc/UniRx/releases/2292520/assets,https://api.github.com/repos/neuecc/UniRx/releases/2292520,master,https://api.github.com/repos/neuecc/UniRx/tarball/5.0.0,https://github.com/neuecc/UniRx/releases/tag/5.0.0,https://api.github.com/repos/neuecc/UniRx/zipball/5.0.0,5.0.0,False,False
+1465067,2015-06-26T11:38:59Z,2015-06-26T11:43:32Z,ver 4.8.2,"This release is available in AssetStore on Jun 29th 2015.
+https://www.assetstore.unity3d.com/jp/#!/content/17276
+
+Add : PresenterBase.ForceInitialize
+Improvement : PresenterBase can initialize when inactive in hierarchy
+Improvement : Seperate event triggers into individual classes, thanks @orenro
+Improvement : Separate sources which depend on UnityEngine.dll to UniRx.Library, UniRx.Library.Unity with #UniRxLibrary symbol, thanks @ppcuni 
+Fix : WWWErrorException StatusCode for iOS IL2CPP, thanks @DenizPiri
+Fix : ToReactiveProperty doesn't publish value when initial time and value same as defaultValue
+Fix : MainThreadDispatcher thread safety, thanks @pokehanai
+Fix : InspectorDisplayDrawer handles array in object and array of ReactiveProperty
+Breaking Change : Disable ObservableStateMachineBehaviour.OnStateMove, thanks @cruwel
+",https://api.github.com/users/neuecc,46207,neuecc,https://api.github.com/repos/neuecc/UniRx/releases/1465067/assets,https://api.github.com/repos/neuecc/UniRx/releases/1465067,master,https://api.github.com/repos/neuecc/UniRx/tarball/4.8.2,https://github.com/neuecc/UniRx/releases/tag/4.8.2,https://api.github.com/repos/neuecc/UniRx/zipball/4.8.2,4.8.2,False,False
+1336361,2015-05-26T07:50:55Z,2015-05-26T07:51:56Z,ver 4.8.1,"This release is available in AssetStore on May 28th 2015.
+
+Add : PresenterBase
+Add : MessageBroker
+Add : ThrottleFirst, ThrottleFirstFrame, thanks @torisoup
+Add : UIBehaviour.ObservableEventTrigger extensions
+Add : ReactiveCollection.ObserveCountChanged(notifyCurrentCount)
+Add : Append IReactiveCollection/IReactiveDictionary interfafces to ReactiveCollection/ReactiveDictionary
+Improvement : Make DisposableExtensions.AddTo method-chainable, thanks @shiwano
+Improvement : Make LifetimeDisposableExtensions.AddTo method-chainable
+Improvement : documentation grammer, thanks @orenro
+Improvement : Moved IScheduler interface to separate file, thanks @Qbit86
+Improvement : ReactiveProperty.Dispose as virtual
+Fix : XmlDoc warning was removed
+Fix : MainThraedDispatcher cause ""Some objects were not cleaned up when closing the scene find target"" error
+Fix : Nested ReactiveProperty can't show on editor inspector
+Fix : StartWith throws OnError passing non array IEnumerable, thanks @torisoup
+Fix : Observable.EveryUpdate　calls OnNext　immediately, thanks @torisoup
+Fix : check cancellationToken after yield at Observable.EveryUpdate/EveryFixedUpdate/EveryEndOfFrame
+Fix : Windows Phone 8.1 build error, thanks @Xianor
+Fix : Windows Phone 8.1 runtime error, thanks @Xianor
+Breaking Change : initialized from source's ReactiveProperty doesn't publish value on subscribe when value didn't set
+Breaking Change : HttpWebRequest.GetResponseObservableAsync was renamed to GetResponseAsObservable
+",https://api.github.com/users/neuecc,46207,neuecc,https://api.github.com/repos/neuecc/UniRx/releases/1336361/assets,https://api.github.com/repos/neuecc/UniRx/releases/1336361,master,https://api.github.com/repos/neuecc/UniRx/tarball/4.8.1,https://github.com/neuecc/UniRx/releases/tag/4.8.1,https://api.github.com/repos/neuecc/UniRx/zipball/4.8.1,4.8.1,False,False
+1145851,2015-04-09T18:13:43Z,2015-04-09T18:15:00Z,ver 4.8.0,"This release is available in AssetStore on April 11th 2015.
+
+Add : ReactiveDictionary
+Add : BoolReactiveProperty
+Add : More Specialized ReactiveProperty(Vector2/Vector3/Vector4/Color/Rect/AnimationCurve/Bounds/Quaternion)
+Add : ReactiveProperty.SetValue virtual method
+Add : ObservableTriggers in UniRx.Triggers namespace(`ObservableAnimatorTrigger`, `ObservableCollision2DTrigger`, `ObservableCollisionTrigger`, `ObservableDestroyTrigger`, `ObservableEnableTrigger`, `ObservableFixedUpdateTrigger`, `ObservableUpdateTrigger`, `ObservableLastUpdateTrigger`, `ObservableMouseTrigger`, `ObservableTrigger2DTrigger`, `ObservableTriggerTrigger`, `ObservableVisibleTrigger`, `ObservableTransformChangedTrigger`, `ObservableRectTransformTrigger`, `ObservableCanvasGroupChangedTrigger`, `ObservableStateMachineTrigger`, `ObservableEventTrigger`)
+Add : ObservableTriggerExtensions
+Add : Observable.StartWith(valueFactory)
+Add : Observable.TakeUntilDestroy
+Add : Observable.TakeUntilDisable
+Add : Observable.RepeatSafe
+Add : Observable.RepeatUntil
+Add : Observable.RepeatUntilDestroy
+Add : Observable.RepeatUntilDisable
+Add : Observable.EveryValueChanged(frameCountType)
+Add : Observable.FromAsyncPattern
+Add : WebRequest.GetResponseAsObservable/GetRequestStreamAsObservable
+Add : IDisposable.AddTo(GameObject/Component)
+Add : Logger.Raw
+Improvement : ReactiveProperty.ToString
+Improvement : ReactiveCollectionEvent.ToString
+Improvement : InspectorDisplayDrawer notify property changed on Inspector
+Improvement : InspectorDisplayDrawer auto detect known specialized ReactiveProperty
+Improvement : UnityEvent.AsObservable makes AOT safe
+Improvement : ObserveEveryValueChanged automaticaly detect object is destroy/GC and publish OnCompleted
+Fix : Compiler error on target platform as Windows Universal App
+Fix : Observable.SampleFrame doesn't call OnCompleted
+Fix : Observable.ThrottleFrame leaks internal timer.
+Fix : Observable.Timeout sometimes doesn't trigger, thanks @zhaoyk
+Breaking Change : IReactiveProperty.IDisposable moved to ReactiveProeprty.IDisposable
+Breaking Change : UniRx.UI namespace is disappeared
+Breaking Change : ObservableStateMachineBehaviour renamed to ObservableStateMachineTrigger(namespace moved to UniRx.Triggers)
+Breaking Change : TypedMonoBehaviour/ObservableMonoBehaviour is not recommended(use UniRx.Triggers instead)
+",https://api.github.com/users/neuecc,46207,neuecc,https://api.github.com/repos/neuecc/UniRx/releases/1145851/assets,https://api.github.com/repos/neuecc/UniRx/releases/1145851,master,https://api.github.com/repos/neuecc/UniRx/tarball/4.8.0,https://github.com/neuecc/UniRx/releases/tag/4.8.0,https://api.github.com/repos/neuecc/UniRx/zipball/4.8.0,4.8.0,False,False
+1071387,2015-03-20T02:59:32Z,2015-03-20T03:09:43Z,ver 4.7.2,"This release is available in AssetStore on March 27th 2015.
+
+Add : ObservableLogger.DebugFormat/LogFormat/WarningFormat/ErrorFormat
+Fix : ReactiveProperty when value is null set value throws null reference exception
+Fix : ReactiveCollection can't compile when build target is Web Player, thanks @FodderMK
+Improvement : InspectorDisplayAttribute better handling on error
+Breaking Change : Remove ObservableUIComponents(ObservableButton/Image/InputField/etc...)
+Breaking Change : ObservableEventTriggerSlim rename to ObservableEventTrigger
+",https://api.github.com/users/neuecc,46207,neuecc,https://api.github.com/repos/neuecc/UniRx/releases/1071387/assets,https://api.github.com/repos/neuecc/UniRx/releases/1071387,master,https://api.github.com/repos/neuecc/UniRx/tarball/4.7.2,https://github.com/neuecc/UniRx/releases/tag/4.7.2,https://api.github.com/repos/neuecc/UniRx/zipball/4.7.2,4.7.2,False,False
+1045954,2015-03-13T08:23:39Z,2015-03-13T08:47:55Z,ver 4.7.1,"This release is available in AssetStore on March 17th 2015.
+
+Add : ReadOnlyReactiveProperty
+Add : ReactiveProperty.SetValueAndForceNotify
+Add : Observable.Pairwise
+Add : Observable.SelectMany(IEnumerator)
+Add : ObservableEventTriggerSlim
+Add : IEnumerable[IObservable[bool]].CombineLatestValuesAreAllTrue/CombineLatestValuesAreAllFalse
+Fix : Compiler error on Unity 4.6 at Examples
+Fix : Observable.NextFrame should complete after the frame was rendered, thanks @Useurmind
+Fix : Observable.TimerFrame should complete after the frame was rendered
+Fix : 'newValue' is not used in CollectionReplaceEvent[T], thanks @Grabacr07
+Fix : When UniRx is dll or in plugin folder and use SelectMany and resultSelector returns AnonymousType, can't compile. (It's Unity's compiler bug)
+Breaking Change : ReactiveProperty changed to doesn't notify equality value
+Breaking Change : When ReactiveProperty is called Dispose, notify OnCompleted to all subscribers
+Breaking Change : ObservableMonoBehaviour.Awake, Start, Destroy notify OnCompleted
+Improvement : Add Model-View-(Reactive)Presenter Pattern section to ReadMe
+",https://api.github.com/users/neuecc,46207,neuecc,https://api.github.com/repos/neuecc/UniRx/releases/1045954/assets,https://api.github.com/repos/neuecc/UniRx/releases/1045954,master,https://api.github.com/repos/neuecc/UniRx/tarball/4.7.1,https://github.com/neuecc/UniRx/releases/tag/4.7.1,https://api.github.com/repos/neuecc/UniRx/zipball/4.7.1,4.7.1,False,False
+1031115,2015-03-09T18:43:42Z,2015-03-09T18:56:03Z,ver 4.7,"This release is available in AssetStore on March 11th 2015.
+
+Add : ReactiveProperty
+Add : ReactiveCollection
+Add : InspectorDisplayAttribute(for ReactiveProperty)
+Add : Observable.WhenAll(this IEnumerable[IObservable[T]])
+Add : Observable.AsUnitObservable
+Add : AsyncOperation.AsAsyncOperationObservable
+Add : Observable.NextFrame
+Add : Observable.IntervalFrame
+Add : Observable.TimerFrame
+Add : Observable.SampleFrame
+Add : Observable.ThrottleFrame
+Add : Observable.TimeoutFrame
+Add : Observable.DelayFrameSubscription
+Add : Observable.DelayFrame(FrameCountType)
+Add : Observable.SubscribeToText(for uGUI)
+Add : Observable.SubscribeToInteractable(for uGUI)
+Add : Button.OnClickAsObservable, Toggle/Scrollbar/ScrollRect/Slider.OnValueChangedAsObservable, InputField.OnEndEditAsObservable, InputField.OnValueChangeAsObservable
+Add : ObservableStateMachineBehaviour
+Add : ObservableUIBehaviours(ObservableButton, ObservableEventTrigger, ObservableImage, ObservableInputField, ObservableSelectable, ObservableSlider, ObservableText, ObservableToggle, ObservableUIBehaviour)
+Add : Graphic.DirtyLayoutCallbackAsObservable, Graphic.DirtyMaterialCallbackAsObservable, Graphic.DirtyVerticesCallbackAsObservable
+Fix : Prevent warning when Android build, thanks @mikanbako
+Fix : ObservableWWW progress not reporting 1 when done, thanks @etic
+Fix : Some methods runs once after disposed, thanks @TigerHix
+Improvement : Add class constraints to ObserveEveryValueChanged
+Improvement : Add Examples, Sample12_ReactiveProperty and Sample13_ToDoApp
+Improvement : ReadMe is added UI section
+Breaking Change : Observable.WhenAll if sequence is empty, return empty array
+",https://api.github.com/users/neuecc,46207,neuecc,https://api.github.com/repos/neuecc/UniRx/releases/1031115/assets,https://api.github.com/repos/neuecc/UniRx/releases/1031115,master,https://api.github.com/repos/neuecc/UniRx/tarball/4.7,https://github.com/neuecc/UniRx/releases/tag/4.7,https://api.github.com/repos/neuecc/UniRx/zipball/4.7,4.7,False,False
+872236,2015-01-21T19:34:25Z,2015-01-21T19:38:54Z,ver 4.6,"This release is available in AssetStore on January 27th 2015.
+
+Improvement : Add support Unity5
+Improvement : Run coroutine on UnityEditor in MainThreadDispatcher, thanks @movajr
+Add : Observable.FromCoroutineValue
+Add : Observable.Amb
+Add : ObservableWWW.LoadFromCacheOrDownload
+Add : Observable.Merge overloads
+Add : AsyncSubject[T].Value
+Add : AsyncOperation.AsObservable(Extension Method)
+Fix : ObservableWWW allows same hash key, thanks @badoet
+Fix : Observable.FromCoroutine makes thread-safe
+Fix : Makes Observable.Zip iOS AOT Safety
+Fix Bug : Observable.DistinctUntilChanged throws exception when sequence contains null
+Fix Bug : Logger throws exception when message is null
+Fix Bug : Logger throws exception when use same logger name
+Performance Improvement : AnonymousObserver(it is used Subscribe implicitly)
+Performance Improvement : BehaviorSubject[T]
+Performance Improvement : ReplaySubject[T]
+Breaking Change : in NETFX_CORE, use System.IObservable/IObserver/IProgress/Tuple instead of UniRx.IObservable, etc.
+",https://api.github.com/users/neuecc,46207,neuecc,https://api.github.com/repos/neuecc/UniRx/releases/872236/assets,https://api.github.com/repos/neuecc/UniRx/releases/872236,master,https://api.github.com/repos/neuecc/UniRx/tarball/4.6,https://github.com/neuecc/UniRx/releases/tag/4.6,https://api.github.com/repos/neuecc/UniRx/zipball/4.6,4.6,False,False
+501823,2014-08-19T22:45:22Z,2014-08-19T22:47:31Z,ver 4.5,"This release is available in AssetStore on August 26th 2014.
+
+Add : ObservableWWW Overload(byte[] postData)
+Add : Observable.Buffer Overload(windowBoundaries)
+Add : LazyTask - yieldable value container like Task
+Add : Observable.StartWith
+Add : Observable.Distinct
+Add : Observable.DelaySubscription
+Add : UnityEvent.AsObservable - only for Unity 4.6 uGUI
+Add : UniRx.UI.ObserveEveryValueChanged(Extension Method)
+Add : RefCountDisposable
+Add : Scheduler.MainThreadIgnoreTimeScale - difference with MainThreadScheduler, not follow Unity Timescale
+Add : Scheduler.DefaultSchedulers - can configure default scheduler for any operation
+Fix : DistinctUntilChanged iOS AOT issue.
+Fix : Remove IObservable/IObserver/ISubject's covariance/contravariance(Unity is not support)
+Fix : UnityDebugSink throws exception when called from other thread
+Fix : Remove compiler error for Windows Phone 8/Windows Store App
+Breaking Change : MainThreadSchduler follow Unity Timescale
+Breaking Change : All Timebased operator's default scheduler changed to MainThreadScheduler
+Breaking Change : Remove TypedMonoBehaviour.OnGUI for performance improvment
+Performance Improvment : AsyncSubject[T]
+Performance Improvment : CurrentThreadScheduler
+Performance Improvment : MainThreadScheduler
+",https://api.github.com/users/neuecc,46207,neuecc,https://api.github.com/repos/neuecc/UniRx/releases/501823/assets,https://api.github.com/repos/neuecc/UniRx/releases/501823,master,https://api.github.com/repos/neuecc/UniRx/tarball/4.5,https://github.com/neuecc/UniRx/releases/tag/4.5,https://api.github.com/repos/neuecc/UniRx/zipball/4.5,4.5,False,False
+454019,2014-07-27T22:38:46Z,2014-07-27T22:41:05Z,ver 4.4,"This release is available in AssetStore on July 30th 2014.
+
+Add : Observable.FromEvent
+Add : Observable.Merge Overload(params IObservable[TSource][] / IEnumerable[IObserable[TSource]])
+Add : Observable.Buffer Overload(timeSpan, timeShift)
+Add : IDisposable.AddTo
+Add : ObservableLogger(UniRx.Diagnostics)
+Add : Observable.StartAsCoroutine
+Add : MainThreadDispatcher.RegisterUnhandledExceptionCallback
+Add : Examples/Sample08, Sample09, Sample10, Sample11
+Performance Improvment : Subject[T], OnNext avoids copy and lock
+Performance Improvment : MainThreadDispatcher, avoids copy on every update
+Change : Observable.ToCoroutine -> ToAwaitableEnumerator
+Fix : ObservableMonoBehaviour's OnTriggerStay2D doesn't pass Collider2D (thanks @zecl)
+",https://api.github.com/users/neuecc,46207,neuecc,https://api.github.com/repos/neuecc/UniRx/releases/454019/assets,https://api.github.com/repos/neuecc/UniRx/releases/454019,master,https://api.github.com/repos/neuecc/UniRx/tarball/4.4,https://github.com/neuecc/UniRx/releases/tag/4.4,https://api.github.com/repos/neuecc/UniRx/zipball/4.4,4.4,False,False
+405742,2014-06-23T01:45:25Z,2014-07-01T18:48:25Z,ver 4.2,"Warning disabled for Unity4.5.
+Observable.FromCoroutine improved suports for observer less IEnumerator
+Add Observable.GetWWW/PostWWW(returns IObservable[WWW] for detailed control)
+",https://api.github.com/users/neuecc,46207,neuecc,https://api.github.com/repos/neuecc/UniRx/releases/405742/assets,https://api.github.com/repos/neuecc/UniRx/releases/405742,master,https://api.github.com/repos/neuecc/UniRx/tarball/4.2,https://github.com/neuecc/UniRx/releases/tag/4.2,https://api.github.com/repos/neuecc/UniRx/zipball/4.2,4.2,False,False
+405740,2014-07-01T18:46:21Z,2014-07-01T18:47:27Z,ver 4.3,"Fix iOS AOT Safe totally
+MainThreadSchedule's schedule(dueTime) acquired time accuracy
+MainThreadDispatcher avoid deadlock at recursive call
+Add Observable.Buffer(count, skip)
+Change OfType, Cast definition
+Change IScheduler definition
+Add AotSafe Utilities(AsSafeEnumerable, WrapValueToClass)
+Change Unit, TimeInterval and Timestamped to class(for iOS AOT)
+Add Examples/Sample7_OrchestratIEnumerator.cs
+",https://api.github.com/users/neuecc,46207,neuecc,https://api.github.com/repos/neuecc/UniRx/releases/405740/assets,https://api.github.com/repos/neuecc/UniRx/releases/405740,master,https://api.github.com/repos/neuecc/UniRx/tarball/4.3,https://github.com/neuecc/UniRx/releases/tag/4.3,https://api.github.com/repos/neuecc/UniRx/zipball/4.3,4.3,False,False

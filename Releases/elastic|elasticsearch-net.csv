@@ -1,0 +1,2033 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7119273,2017-07-21T07:21:35Z,2017-07-21T07:22:34Z,,"## Features & Enhancements
+- #2775 Add `remove_index` operation to Alias operations.
+- #2795 Add missing fields on `simple_query_string` query.
+- #2807 Add XPack security `role_mapping` API to map roles to users, and a token based access API.
+- #2807 The `matrix_stats`, `sig_terms` and `sampler_agg` have additional properties.
+- #2807 Update tests.default.yaml ES version to 5.5.0
+- #2789 Add a `StickySniffingConnectionPool` - a new connection pool that combines the capabilities of the `StickyConnectionPool` and `SniffingConnectionPool`s, and allowing for the sorting of the Node collection to be defined externally.
+- #2781 Improved exception message when backpressure does not leave room for the producer to call `MoveNext()`. 
+- #2781 Throw an exception when `Reindex()` produces just enough documents for a single bulk but leaves no slots to call `MoveNext()` which would free up an awaiting task (fixes #2771).
+- #2779 Can now parse exponential notation for milliseconds time units.
+
+## Breaking Changes
+- #2807 `GetAlias` now return a 404 if you submit a query for e.g `a`,`b`,`c` and only alias `a` was found (as per: elastic/elasticsearch#25043).
+
+## Bug Fixes
+- #2791 Use serializer when deserializing `LazyDocument` to `T`.
+- #2776 Ensure `CancellationTokenRegistration` is disposed of correctly.
+- #2780 Move `EnterReadLock()` outside of `try` block for `SniffingConnectionPool`.
+- #2785 Several fixes related to HttpClient + .NET Core + Linux
+
+## Deprecations
+- #2807 `RefreshRequest` fields `force` and `operation_threading` have been removed from ES 5.x (as per: elastic/elasticsearch#25234) so have been patched in as noop to preserve binary compatibility. Will be removed in 6.0.
+
+### [View the full list of issues and PRs](https://github.com/elastic/elasticsearch-net/issues?utf8=%E2%9C%93&q=label%3Av5.5.0%20)",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/7119273/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/7119273,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/5.5.0,https://github.com/elastic/elasticsearch-net/releases/tag/5.5.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/5.5.0,5.5.0,False,False
+6367744,2017-05-12T14:50:46Z,2017-05-12T14:58:04Z,,"This marks our first release completely integration tested against [Elasticsearch 6.0.0-alpha1](https://www.elastic.co/blog/elasticsearch-6-0-0-alpha1-released). 
+
+
+No big changes from 5.4.0 with the notable exception of 
+
+* `WatcherStatsResponse` which has been reworked in `Elasticsearch 6.0.0`.
+* Support for the `mapper-attachment` plugin is gone (as its also removed from `Elasticsearch 6.0.0`)
+
+
+If you have multiple types in a single index you'll need to move to a 1 type per index solution. If you can not do that straight away you can opt in to multiple types for the time being by using `mapping.single_type` index settings. For instance `alpha1` does not come yet with an updated story for parent/child documents `mandatory` having to live in the same index.
+
+
+```csharp
+new IndexSettings(new Dictionary<string, object> {
+	{ ""mapping.single_type"", ""false"" }
+})
+{
+	NumberOfShards = 2,
+	NumberOfReplicas = 0,
+};
+
+```
+
+
+
+",https://api.github.com/users/Mpdreamz,245275,Mpdreamz,https://api.github.com/repos/elastic/elasticsearch-net/releases/6367744/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/6367744,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/6.0.0-alpha1,https://github.com/elastic/elasticsearch-net/releases/tag/6.0.0-alpha1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/6.0.0-alpha1,6.0.0-alpha1,False,False
+6337401,2017-05-10T11:14:35Z,2017-05-10T11:16:46Z,2.5.5,"Highlights: We are now rolling with the new new csproj files for our builds.
+
+## Features & Enhancements
+
+  - #2717 Moved to the new new csproj file. Which means we are now on VS2017 and up (or Rider of course!).  There's a ton of infrastructure cleanup work behind this ticket. 
+  - #2659 Add `fields` support to top hits aggregations (ty @V1tOr !)
+
+## Bug Fixes
+
+  - #2753 Timeouts on .NET core did not surface the same way they did as on full framework.
+  - #2735 Do a double read for elasticsearch server errors for requests that can return a valid response for invalid http status codes (_reindex/_update_by_query)
+  - #2720 Dateformat.epoch_millis serialized a mispelled variant (ty @JefStat !)
+  - #2759 Fix HttpClient when used on `CentOS`, does not allow maxconnections to be set.
+  - #2761 adjacent scripted metric aggregation responses failed to parse properly (ty @konbur) ",https://api.github.com/users/Mpdreamz,245275,Mpdreamz,https://api.github.com/repos/elastic/elasticsearch-net/releases/6337401/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/6337401,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.5.5,https://github.com/elastic/elasticsearch-net/releases/tag/2.5.5,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.5.5,2.5.5,False,False
+6337204,2017-05-10T10:35:00Z,2017-05-10T10:56:19Z,5.4.0,"Highlights: Elasticsearch 5.4 feature parity, we are now rolling with the new new csproj files for our builds.
+
+## Features & Enhancements
+
+  - #2717 Moved to the new new csproj file. Which means we are now on VS2017 and up (or Rider of course!).  There's a ton of infrastructure cleanup work behind this ticket. 
+  - #2659 Add `stored_fields` support to top hits aggregations (ty @V1tOr !)
+  - #2702 Add support for `time_zone` in the date range aggregations (ty @adam-mccoy !)
+  - #2746 Add support for missing highlight options as well as new options that have been introduced in 5.4
+  - #2743 Add support for the new remote info API
+  - #2745 Add support for the xpack info AND usage API
+  - #2748 Expose `num_reduce_phases` on search (see elastic/elasticsearch#23288)
+  - #2747 Expose word delimiter graph token filter
+  - #2744 Add support for the source exists API
+  - #2742 Add support for the field caps API
+
+## Bug Fixes
+
+  - #2753 Timeouts on .NET core did not surface the same way they did as on full framework.
+  - #2735 Do a double read for elasticsearch server errors for requests that can return a valid response for invalid http status codes (_reindex/_update_by_query)
+  - #2740 reintroduce `show_term_document_count_error` which went blatently missing in `5.x` 
+  - #2720 Dateformat.epoch_millis serialized a mispelled variant (ty @JefStat !)
+  - #2721 Make sure we can handle fielddata in the old format when mappings are migrated from 2.x to 5.x
+  - #2759 Fix HttpClient when used on `CentOS`, does not allow maxconnections to be set.
+  - #2761 adjacent scripted metric aggregation responses failed to parse properly (ty @konbur) 
+
+For 6.0 we will rely on a new feauture in elasticsearch called typed_keys which will return aggregation names prefixed with type# which will completely replace the current heuristics based parser which should make parsing bugs less likely to creep in. (Although the current one has held up OK since 2.x).",https://api.github.com/users/Mpdreamz,245275,Mpdreamz,https://api.github.com/repos/elastic/elasticsearch-net/releases/6337204/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/6337204,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/5.4.0,https://github.com/elastic/elasticsearch-net/releases/tag/5.4.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/5.4.0,5.4.0,False,False
+6044998,2017-04-11T12:21:39Z,2017-04-11T12:24:25Z,,"Bump from `Newtonsoft.Json` `9.0.1` to `10.0.1` (Nuget bound to 10.0.x and up)
+
+https://github.com/elastic/elasticsearch-net/pull/2715",https://api.github.com/users/Mpdreamz,245275,Mpdreamz,https://api.github.com/repos/elastic/elasticsearch-net/releases/6044998/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/6044998,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/5.3.1,https://github.com/elastic/elasticsearch-net/releases/tag/5.3.1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/5.3.1,5.3.1,False,False
+6044625,2017-04-11T11:43:21Z,2017-04-11T11:48:54Z,,"Bump from `Newtonsoft.Json` `9.0.1` to `10.0.1` (Nuget bound to 10.0.x and up)
+
+https://github.com/elastic/elasticsearch-net/pull/2715",https://api.github.com/users/Mpdreamz,245275,Mpdreamz,https://api.github.com/repos/elastic/elasticsearch-net/releases/6044625/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/6044625,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.5.4,https://github.com/elastic/elasticsearch-net/releases/tag/2.5.4,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.5.4,2.5.4,False,False
+5937640,2017-03-31T14:36:24Z,2017-03-31T14:59:06Z,,"## Features & Enhancements
+
+  - #2557 Analysis: Added support for the `kuromoji` analysis plugin
+  - #2558 Analysis: `analysis_icu` plugin is now supported out of the box
+  - #2544 Added constants for all supported date formats
+  - #2632 `AutoMap()` will now map overridden/hidden properties
+  
+## Bug Fixes
+
+  - #2540 Fix `_count` with no body sending a POST instead of GET 🔢
+  - #2531 Using reserved aggregation tokens as keys now throws an exception
+  - #2548 Multiple serialization fixes to suggesters, and added missing smoothing models to phrase suggester
+  - #2556 `AutoMap()` now correctly respects ignored and renamed properties on `ConnectionSettings`
+  - #2581 Fix `MissingMethodException` when setting `ConnectionLimit` on Xamarin.Droid
+  - #2586, #2582 More resilient error parsing
+  - #2643 Fixed a date parsing issue when using covariant search
+  - #2644 Fixed memory leak when using `BulkAll` (TY @sergii-sakharov !)
+  - #2665 Add missing scripted upserts to bulk requests
+  - #2690 NRE in IndexSettingsConverter when merge policy isn't set
+  - #2688 Added workaround for specifying a size with multi term query rewrite
+  - #2682, #2676 Fix issues around the `include` and `exclude` options of the `terms` and `significant_terms` aggregations
+  - #2685 Introduce EndOffset property on `AnalyzeToken` and deprecate misspelt `EndPostion`
+  
+## Deprecations
+
+  - #2678 Mark `IsValid` obsolete for Get and Delete responses to warn users about the behavioural change in #2637",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/5937640/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/5937640,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.5.3,https://github.com/elastic/elasticsearch-net/releases/tag/2.5.3,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.5.3,2.5.3,False,False
+5917849,2017-03-30T04:22:53Z,2017-03-30T04:53:36Z,,"## Features & Enhancements
+ 
+ - #2647 Major improvements for working with server and client certificates!
+ - #2619 Added ability to filter nodes from sniffing via `NodePredicate` on `IConnectionPool`
+ - #2632 `AutoMap()` will now map overridden/hidden properties
+ - #2602 Index Settings: support for partitioning with custom routing
+ - #2604 Analyze API: support for `position_length`
+ - #2621 Aggregations: support for adjacency matrix aggregation
+ - #2596 Search: support for field collapsing
+ - #2592 Search: support for unified highlighter (5.3.0+)
+
+## Bug Fixes
+
+ - #2624 Multiple fixes to the query profiler API
+ - #2643 Fixed a date parsing issue when using covariant search
+ - #2644 Fixed memory leak when using `BulkAll` (TY @sergii-sakharov !)
+ - #2688 Added workaround for specifying a size with multi term rewrite
+ - #2682, #2676 Fix issues around the `include` and `exclude` options of the `terms` and `significant_terms aggregations`
+ - #2665 Add missing scripted upserts to bulk requests
+ - #2690 NRE in IndexSettingsConverter when merge policy isn't set
+ - #2685 Introduce EndOffset property on `AnalyzeToken` and deprecate misspelt `EndPostion`
+ 
+## Deprecations
+
+ - #2611 Deprecated `include_in_all` mapping property",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/5917849/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/5917849,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/5.3.0,https://github.com/elastic/elasticsearch-net/releases/tag/5.3.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/5.3.0,5.3.0,False,False
+5468114,2017-02-15T17:53:56Z,2017-02-15T17:58:10Z,,"## Features & Enhancements
+- #2591 Watcher: Added support for `NotExecutedAlreadyQueued` in `ActionExecutionState`
+- #2573 Added support for the new cluster allocation explain API response
+- #2580 Return warning HTTP headers as deprecations on response
+- #2579 Ingest: Added support for the `json` processor
+- #2577 Ingest: Added support for `ignore_missing` on the `user_agent`, `geo_ip`, and `attachment` processors
+- #2559 Ingest: Added support for the `user_agent` processor plugin
+- #2567 Analysis: Added support for the `synonym_graph` token filter
+- #2567 Analysis: Added support for normalizers in the analysis chain
+- #2558 Analysis: `analysis_icu` plugin is now supported out of the box
+- #2557 Analysis: Added support for the `kuromoji` analysis plugin
+- #2572 Mappings: Added support the new range types
+- #2575 Aggregations: Added support for terms aggregation partitioning
+- #2550 Added additional `Fields` convenience overloads
+- #2544 Added constants for all supported date formats
+
+### Improved debugging
+- #2425 Added the [DebuggerDisplay](https://msdn.microsoft.com/en-us/library/x810d419.aspx) attribute for all special types and mapping properties 🐛 
+- #2538 Added `EnableDebugMode()` to `ConnectionSettings` as a quick way to disable direct streaming and pretty print JSON responses to the debug output window.  It also accepts an optional callback to perform when the request completes.
+
+## Bug Fixes
+- #2581 Fix `MissingMethodException` when setting `ConnectionLimit` on Xamarin.Droid
+- #2564 Several xmldoc fixes; netstandard will now also ship with xmldocs 📄 
+- #2586, #2582 More resilient error parsing
+- #2561 Fix `Missing` option on terms aggregation so that it can correctly be serialized to its field type
+- #2556 `AutoMap()` now correctly respects ignored and renamed properties on `ConnectionSettings`
+- #2497 `Time` did not support microseconds and nanoseconds properly
+- #2531 Using reserved aggregation tokens as keys now throws an exception
+- #2546 `ReindexOnServer()` was missing the `remote` option
+- #2548 Multiple serialization fixes to suggesters, and added missing smoothing models to phrase suggester
+- #2540 Fix `_count` with no body sending a POST instead of GET 🔢 
+- Fixed caching of mapping properties when running on Core CLR
+- Core CLR http connection is now more defensive in how it queries the header collection
+
+## Deprecations
+- #2562 Dedicated `Suggest()` is now deprecated in favor of suggest through `_search`
+- #2573 Old cluster allocation explain properties are marked obsolete in favor of the new ones added in Elasticsearch 5.2
+
+### [View the full list of issues and PRs](https://github.com/elastic/elasticsearch-net/issues?utf8=%E2%9C%93&q=label%3Av5.2.0%20)
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/5468114/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/5468114,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/5.2.0,https://github.com/elastic/elasticsearch-net/releases/tag/5.2.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/5.2.0,5.2.0,False,False
+5147912,2017-01-13T02:11:58Z,2017-01-13T02:20:50Z,,"## Enhancements
+- #2536 Enable `.DisableDirectStreaming()` on a per-request basis. This is useful when wishing to ad-hoc capture requests and responses.
+- #2387 Support `geometrycollection` for `geo_shape` types and queries 🌐 
+- #2521 Improve DebugInformation with a string representation of `CausedBy` (ty @kirilyuro )
+- #2510 Avoid unnecessary `DateTime` allocations (ty @niemyjski )
+
+## Bug fixes
+- #2525 Fix spelling mistake in German Snowball Analyzer
+- #2503 Implement deserialization for `TermsIncludeExclude` to allow search requests that include it to be deserialized
+
+## Deprecations
+- #2506 Mark type level analyzers as obsolete. Will be removed in Elasticsearch 6.0.
+
+## Misc
+- 18aa4dc149c48b5f72ffa14943b08797d104ceaa Limit version compatibility of NEST 2.x to 2.x versions of Elasticsearch.Net
+
+### [View the full list of issues and PRs](https://github.com/elastic/elasticsearch-net/issues?utf8=%E2%9C%93&q=label%3Av2.5.2%20is%3Aclosed%20)
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/5147912/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/5147912,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.5.2,https://github.com/elastic/elasticsearch-net/releases/tag/2.5.2,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.5.2,2.5.2,False,False
+5141206,2017-01-12T14:12:41Z,2017-01-12T14:26:43Z,,"## Enhancements
+- #2532 Support `geometrycollection` for `geo_shape` types and queries 🌐 
+- #2521 Improve DebugInformation with a string representation of `CausedBy` (ty @kirilyuro )
+- #2510 Avoid unnecessary `DateTime` allocations (ty @niemyjski )
+
+## Bug fixes
+- #2525 Fix spelling mistake in German Snowball Analyzer
+- #2516 Allow uppercase letters where index names are passed. **Aliases still allow uppercase letters**
+- #2513 Expose  `TermVector` for `TextProperty`
+- #2503 Implement deserialization for `TermsIncludeExclude` to allow search requests that include it to be deserialized
+
+## Deprecations
+- #2506 Mark type level analyzers as obsolete. Will be removed in next major version of Elasticsearch.
+
+### [View the full list of issues and PRs](https://github.com/elastic/elasticsearch-net/issues?utf8=%E2%9C%93&q=label%3Av5.0.1%20is%3Aclosed%20)
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/5141206/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/5141206,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/5.0.1,https://github.com/elastic/elasticsearch-net/releases/tag/5.0.1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/5.0.1,5.0.1,False,False
+5140044,2017-01-12T12:28:04Z,2017-01-12T12:30:27Z,,"## Bug fixes
+- #2529 Allow scipting in metrics aggregations with script files and inline scripts
+- #2530 Support indexing of Json.NET `JObject` types
+
+### [View the full list of issues and PRs](https://github.com/elastic/elasticsearch-net/issues?utf8=%E2%9C%93&q=label%3Av1.9.2%20is%3Aclosed%20)
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/5140044/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/5140044,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.9.2,https://github.com/elastic/elasticsearch-net/releases/tag/1.9.2,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.9.2,1.9.2,False,False
+4975310,2016-12-21T01:15:49Z,2016-12-21T01:46:29Z,,"## Enhancements
+- #2484  Limit the number of concurrent connections on .NET Core, similar to Desktop CLR.
+- #2451 Small Performance improvements
+  
+  Introduce a `BufferSize` property on `JsonNetSerializer` with a default size of 1024 to use when writing json to the request stream. Performance tests as part of #1899 indicate this to be a good compromise buffer size for performance throughput and bytes allocated.
+- #2495 Add important admonition (end of [Simple Automapping section](https://www.elastic.co/guide/en/elasticsearch/client/net-api/2.x/auto-map.html#_simple_automapping)) to the documentation about the use of `System.Decimal` types as C# POCO properties
+
+## Bug fixes
+- #2479 Deserialize `""value_as_string""` for metric aggregations that return it
+- #2466 Deserialize attachment title when deserializing an `Attachment` type from `_source` or field data
+- #2464 Add the `StringEnumConverter` to `StringFielddataFormat` to always serialize as string. Introduce coding standard unit test to assert the converter is applied to all NEST enums
+- #2487 Fix the virality of `&=` in the `bool` query DSL
+- #2496 Allow `SourceFiltering.Disable` to be set to `false`. This is synonymous with the default, which is to return `_source` in the response.
+
+## Misc
+- #2488Tidy up TODOs and make the usage of `NotSupportedException` consistent across all internal `JsonConverter` types.
+- #2486 Generate asciidoc files as part of the build
+
+### [View the full list of issues and PRs](https://github.com/elastic/elasticsearch-net/issues?utf8=%E2%9C%93&q=label%3Av2.5.1%20is%3Aclosed%20)
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/4975310/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/4975310,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.5.1,https://github.com/elastic/elasticsearch-net/releases/tag/2.5.1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.5.1,2.5.1,False,False
+4901549,2016-12-13T02:10:31Z,2016-12-13T02:34:47Z,,"# GA release of NEST and Elasticsearch.Net 5.0 🎉
+
+**A huge thank you to the [community](https://github.com/elastic/elasticsearch-net/graphs/contributors)** who kicked the tires on the 5.0 prereleases that we've been putting out since April and provided us with invaluable feedback 🖖 
+
+Check out the [blog post on the NEST 5.0 release](https://www.elastic.co/blog/nest-5-0-released) that highlights some of the main features as well as take a look at the 2.x -> 5.x [**Breaking Changes for NEST**](https://github.com/elastic/elasticsearch-net/blob/master/docs/5.0-breaking-changes/nest-breaking-changes.md) and [**Breaking Changes for Elasticsearch.Net**](https://github.com/elastic/elasticsearch-net/blob/master/docs/5.0-breaking-changes/elasticsearch-net-breaking-changes.md). 
+
+## Features
+- #2454 Add Support for `CreateRequest<T>`. This can be used to create a document of a given type in a given index with a given id, with optimistic concurrency control. See https://www.elastic.co/guide/en/elasticsearch/reference/master/docs-index_.html#operation-type for more details
+- #2443 Add `ScrollAll()` helper method
+
+## Enhancements
+- #2473 Limit the number of concurrent connections on .NET Core, similar to Desktop CLR.
+- #2457 Use `IndexName` and `TypeName` types for Bulk*Many requests
+- #2459 Add type to set index auto expand replica setting
+- #2450 Add metadata for Security roles
+- #2462 `ReindexAll()` improvements
+  
+  `ReindexAll()` is now composed over the `IObservable`s from `ScrollAll()` and `BulkAll()`, taking advantage of the concurrency models in each.
+  
+  Since the rate at which the scrolls produces far exceeds the rate at which we can consume them through bulks `ReindexAll()` also implements a producer/consumer rate limiter. This is controlled by a `backPressureFactor` which controls the max amplification factor of running scrolls with the safe guard of:
+
+```
+  searchSize * maxConcurrency * backPressureFactor >= bulkSize
+```
+- #2451 Small Performance improvements
+  
+  Introduce a `BufferSize` property on `JsonNetSerializer` with a default size of 1024 to use when writing json to the request stream. Performance tests as part of #1899 indicate this to be a good compromise buffer size for performance throughput and bytes allocated.
+- #2480 Allow target document type to be different from source document type when performing reindex
+
+## Bug fixes
+- #2479 Deserialize `""value_as_string""` for metric aggregations that return it
+- #2466 Deserialize attachment title when deserializing an `Attachment` type from `_source` or field data
+- #2464 Add the `StringEnumConverter` to `StringFielddataFormat` to always serialize as string. Introduce coding standard unit test to assert the converter is applied to all NEST enums
+- #2468 Favour `publish_address` when sniffing cluster state
+- #2467 Fix the virality of `&=` in the `bool` query DSL
+
+## Misc
+- #2456 Tidy up TODOs and #2460 make the usage of `NotSupportedException` consistent across all internal `JsonConverter` types.
+- #2470 Add test collection filtering when running tests from the command line.
+
+### [View the full list of issues and PRs](https://github.com/elastic/elasticsearch-net/issues?utf8=%E2%9C%93&q=label%3Av5.0.0%20is%3Aclosed%20)
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/4901549/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/4901549,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/5.0.0,https://github.com/elastic/elasticsearch-net/releases/tag/5.0.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/5.0.0,5.0.0,False,False
+4802360,2016-12-01T01:36:15Z,2016-12-01T05:39:56Z,,"## Features
+- #2164 Allow `Reindex()` helper to reindex into an existing index
+- #2436 Add support for [Sliced Scrolls](https://www.elastic.co/guide/en/elasticsearch/reference/master/search-request-scroll.html#sliced-scroll)
+
+## Enhancements
+- #2430 Do not instantiate `QueryContainerDescriptor<T>` unneccessarily
+- #2389 Add support for `UpdateMany()` in the bulk API
+- #2418 Faster `enum` to `string` resolution
+- #2166 Allow `DisableDirectStreaming()` on a per request basis
+- #2336 Allow the key of a bucket aggregation to be read as any type; previously, it was always deserialized to `string`.
+
+## Bug Fixes
+- #2431 Add `include_in_all` onto `TypeMapping`
+- #2420 Fix the way in which `HttpClient` are created when using the `HttpConnection` on .NET Core. A `HttpClient` was created based on a hashcode of `RequestData` that included a regression bug that caused multiple instances of `HttpClient` to be created. Now, for `RequestData` where
+  - RequestTimeout
+  - HttpCompression
+  - ProxyAddress
+  - ProxyUsername
+  - ProxyPassword
+  - DisableAutomaticProxyDetection
+  
+  do not change, the same `HttpClient` instance will be used
+- #2428 Add specific type for term vectors in `MutliTermVectorsResponse` instead of reusing `TermVectorsResponse`
+- #2422 Use `ScriptProcessorDescriptor` in the fluent API of ingest node
+- #2440 Ensure that each part of the async pipeline for Desktop CLR `HttpConnection` can be cancelled correctly
+
+## Deprecations and Removals
+- #1958 Allow exceptions late in the pipeline to bubble out as `UnexpectedElasticsearchClientException` e.g. `ResolveException` that can happen within the transport when serializing to json.
+
+### [View the full list of issues and PRs](https://github.com/elastic/elasticsearch-net/issues?utf8=%E2%9C%93&q=label%3Av5.0.0-rc4%20is%3Aclosed%20)
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/4802360/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/4802360,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/5.0.0-rc4,https://github.com/elastic/elasticsearch-net/releases/tag/5.0.0-rc4,https://api.github.com/repos/elastic/elasticsearch-net/zipball/5.0.0-rc4,5.0.0-rc4,False,True
+4802312,2016-12-01T01:25:23Z,2016-12-01T05:24:13Z,,"## Features
+- #2164 Allow `Reindex()` helper to reindex into an existing index
+- #2413 [Implement Watcher APIs](https://www.elastic.co/guide/en/watcher/2.4/index.html) 👀 
+
+## Enhancements
+- #2430 Do not instantiate `QueryContainerDescriptor<T>` unneccessarily
+- #2389 Add support for `UpdateMany()` in the bulk API
+- #2418 Faster `enum` to `string` resolution
+- #2414 Add `Min` `NestedScoreMode` 
+
+## Bug Fixes
+- #2431 Add `include_in_all` onto `TypeMapping`
+- #2420 Fix the way in which `HttpClient` are created when using the `HttpConnection` on .NET Core. A `HttpClient` was created based on a hashcode of `RequestData` that included a regression bug that caused multiple instances of `HttpClient` to be created. Now, for `RequestData` where
+  - RequestTimeout
+  - HttpCompression
+  - ProxyAddress
+  - ProxyUsername
+  - ProxyPassword
+  - DisableAutomaticProxyDetection
+  
+  do not change, the same `HttpClient` instance will be used
+- #2142 Set the `ApiCall` details on each `TermVectorsResponse` in the collection of responses in a `MultiTermVectorsResponse`
+- #2440 Ensure that each part of the async pipeline for Desktop CLR `HttpConnection` can be cancelled correctly
+
+### [View the full list of issues and PRs](https://github.com/elastic/elasticsearch-net/issues?utf8=%E2%9C%93&q=label%3Av2.5.0%20is%3Aclosed%20)
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/4802312/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/4802312,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.5.0,https://github.com/elastic/elasticsearch-net/releases/tag/2.5.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.5.0,2.5.0,False,False
+4748469,2016-11-24T07:29:55Z,2016-11-24T07:35:24Z,,"## Bug Fixes
+- #2412 Fix a number of dictionary serialization issues
+
+A recent change did not handle a number of dictionary serialization cases including
+- types that implement `IReadOnlyDictionary<TKey,TValue>`
+  
+  e.g. `public class MyReadOnlyDictionary<TKey,TValue> : IReadOnlyDictionary<TKey,TValue>`
+- types that implement `IDictionary<TKey, TValue>`
+  
+  e.g. `public class MyDictionary<TKey,TValue> : IDictionary<TKey,TValue>`
+- non-generic types that inherit a closed generic dictionary type
+  
+  e.g. `public class MyDictionary : Dictionary<string,object>`
+- types that implement `IDictionary` that are not generic
+  
+  e.g. `public class MyNonGenericDictionary : IDictionary`
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/4748469/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/4748469,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/5.0.0-rc3,https://github.com/elastic/elasticsearch-net/releases/tag/5.0.0-rc3,https://api.github.com/repos/elastic/elasticsearch-net/zipball/5.0.0-rc3,5.0.0-rc3,False,True
+4738263,2016-11-23T07:28:41Z,2016-11-23T08:00:47Z,,"## Behavioural Breaking Change
+- #2367 404s on `Get<T>()` and `Delete<T>()` (and async variants) now return `.IsValid` as `true` and deserialize the response, setting `.Found`. This aligns the behaviour of 2.x with 1.x and 5.x. The implications of this are:
+
+1. when issuing a delete, if the delete actually deletes a document or the document to delete does not exist, `.IsValid` is `true`
+2. when issuing a get where `.IsValid` is true, `.Found` should also be checked to determine if the document existed
+
+## Features
+- #2220 Backport `BulkAll` from #2162  and allow per document index operations on `BulkAll`.
+
+`BulkAll` is designed to parallelize bulk requests to Elasticsearch by iterating a lazily constructed collection of POCO types and partitioning into multiple concurrent bulk requests. It includes simple logic for automatic backoff of requests when documents failed to be indexed due to HTTP 429 response errors and retrying in a configurable number of times in such cases.
+
+## Enhancements
+- #2371 / #2323 Include the nested identity when performing `inner_hits` on a `nested` type
+- #2370 Infer the index name and type name from `T` with `Suggest<T>()`
+- #2309 / #2310 When a `ReindexOnServerResponse` comes back as 400 status code, deserialize the response so that Failures is populated with more details for why things failed.
+
+## Bug Fixes
+- #2362 Add `max_boundary_scan` to highlight fields
+- #2373 Fix script serialization when performing bulk updates
+- #2357 Correct Script serialization on bulk update operation
+- #2331 Fix `SuffixExpressionVisitor` to allow multiple calls of `.AppendSuffix()` 
+- #2319 / #2321 Fix issue where field expressions were incorrectly cached when a dynamic value and a suffix expression were used
+- #2308 the `Took` field was incorrectly mapped as an `int` value on some responses, instead of `long`. Since the type cannot be changed (it would break binary compatibility), another field has been introduced, `TookAsLong`, that will hold the value returned from Elasticsearch; `Took` will also contain the value and for values greater than `int`, `Took` will be `int.MaxValue`. `Took` is marked with `Obsolete` attribute to highlight this to client consumers and `Took` is mapped as `long` in NEST 5.x. thanks @maeserichar 👍 
+
+## Deprecations and Removals
+- #2346 Mark properties removed in 5.0 with `ObsoleteAttribute` 
+- #2297 Mark `MissingQuery` with `ObsoleteAttribute` as removed in 5.0
+- #2293 Mark `IndexName` on property mappings with `ObsoleteAttribute` as removed in 5.0
+
+### [View the full list of issues and PRs](https://github.com/elastic/elasticsearch-net/issues?utf8=%E2%9C%93&q=label%3Av2.4.7%20is%3Aclosed%20)
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/4738263/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/4738263,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.4.7,https://github.com/elastic/elasticsearch-net/releases/tag/2.4.7,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.4.7,2.4.7,False,False
+4737724,2016-11-23T05:20:59Z,2016-11-23T05:55:29Z,,"This is the 2nd release candidate compatible with Elasticsearch 5.0. Many features and fixes went into this release, including support for all the Watcher APIs.
+
+We will be finalizing the client ready for a GA release.
+
+## Features
+- #2347 [**Support for the Watcher/Alerting API**](https://www.elastic.co/products/x-pack/alerting)
+- #2220 Allow per document index operations on `BulkAll`
+- #2326 Add support for [`search_after`](https://www.elastic.co/guide/en/elasticsearch/reference/5.0/search-request-search-after.html)
+- #2327 Add support for [matrix stats aggregation](https://www.elastic.co/guide/en/elasticsearch/reference/5.0/search-aggregations-matrix-stats-aggregation.html)
+- #2334 Add support for [Script](https://www.elastic.co/guide/en/elasticsearch/reference/5.0/script-processor.html) and [DotExpander](https://www.elastic.co/guide/en/elasticsearch/reference/5.0/dot-expand-processor.html) ingest pipeline processors
+- #2335 Infer the index name and type name from `T` in `Suggest<T>()`
+- #2407 All collections on response types are either `IReadOnlyCollection<T>` and `IReadOnlyDictionary<TKey, TValue>`. Additionally, all collections should be initialized.
+- #2349 inferred mapping on CLR string properties now sets `ignore_above` to 256 on the `keyword` sub field, in line with dynamic mapping in Elasticsearch
+
+## Bug Fixes
+- #2331 Fix `SuffixExpressionVisitor` to allow multiple calls of `.AppendSuffix()` 
+- #2340 Correct time taken calculation in Audit trail to be non-negative
+- #2350 SniffResponse now correctly matches on IPv6 addresses
+- #2357 Correct Script serialization on bulk update operation
+- #2362 Add `max_boundary_scan` to highlight fields
+- #2344 Add back default value on `.Dynamic()` mapping
+- #2366 404s on `Get<T>()` and `Delete<T>()` (and async variants) now return `.IsValid` as `true` and deserialize the response, setting `.Found`.
+- #2365 `.Score` is nullable on `Hit<T>`
+
+## Removal / deprecations
+- #2342 Remove `Language` on `UpdateRequest` and rename to `Lang`, and correct script serialization
+- #2399 Remove `IDictionary` from `IIsADictionary<TKey,TValue>` interface definition. This was confusing and needed only for one purpose in the codebase. This has been refactored to perform better.
+
+### [View the full list of issues and PRs](https://github.com/elastic/elasticsearch-net/issues?utf8=%E2%9C%93&q=label%3Av5.0.0-rc2%20is%3Aclosed%20)
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/4737724/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/4737724,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/5.0.0-rc2,https://github.com/elastic/elasticsearch-net/releases/tag/5.0.0-rc2,https://api.github.com/repos/elastic/elasticsearch-net/zipball/5.0.0-rc2,5.0.0-rc2,False,True
+4482702,2016-10-25T21:00:29Z,2016-10-25T21:21:04Z,,"This is the Elasticsearch 5.0.0-rc1 compatible release.
+
+## Features
+
+#2322 `Mappings`: Added support for `half_float` and `scaled_float` numeric datatypes
+#2337 Updated datatype properties to align with ES 5.0 across the board
+#2320 Added ability to supply local metadata to mapping properties TY @ejsmith 
+#2292 Allow implicit conversion from `string[]` to `Types` and `Indices`
+
+## Bug Fixes
+
+#2209 Several improvements in some Query DSL edge cases
+#2339 `SniffingConnectionPool`: Fixed response parsing of `_nodes` when sniffing cluster state
+#2319 Fixed caching of field expressions that contained both variables and constants
+#2310 `ReindexOnServer`: Correctly handle `400` responses
+#2308 Fixed deserialization of responses that contain `took`, which was incorrectly typed to `int`.  TY @maeserichar !
+#2295 XML doc fix.  TY @niemyjski !
+#2242 #2269 Enhancements to serialization of `DateTime`
+#2195 `Query` on `PhraseSuggestCollate` is now correctly typed to `ITemplateQuery`
+
+## Removal / deprecations
+
+#2297 Removed deprecated `MissingQuery`
+#2293 Removed deprecated `IndexName`
+
+### [View the full list of issues and PRs](https://github.com/elastic/elasticsearch-net/issues?utf8=%E2%9C%93&q=label%3Av5.0.0-rc1%20is%3Aclosed%20)
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/4482702/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/4482702,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/5.0.0-rc1,https://github.com/elastic/elasticsearch-net/releases/tag/5.0.0-rc1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/5.0.0-rc1,5.0.0-rc1,False,True
+4243549,2016-09-27T17:35:42Z,2016-09-27T18:10:22Z,,"This is the Elasticsearch 5.0.0-beta1 compatible release.
+
+## Features
+
+#2233 Support for get task API
+#2228 Support for multi search template API
+#2228 Support for shrink index API
+#2226 Support for rollover index API
+#2246 Support for disable/enable user APIs of the X-Pack security plugin
+#2241 Support for `field_masking_span` query (TY @yevhen!)
+#2198 `HttpClientHandler` can now be modified in a custom `HttpConnection` when running on .NET Core. This makes it possible to validate HTTPS certs by setting `ServerCertificateValidationCallback`.
+#2197 & #2247 Introduced an improved approach to `ModifyJsonSerializerSettings` for overriding Json.Net serialization settings using `ISerializerFactory` instead (TY @jonyadamit !)
+
+## Bug Fixes & Enhancements
+
+#2274 Fix `NRE` when deserializing a mutli-bucket aggregate with an empty buckets object
+#2261 Add missing `routing` option to `FieldLookup`
+#2209 & #2209 Several improvements in some edgecase query DSL scenarios
+#2221 Fixed issue with using a sniffing connection pool where a thread could potentially become blocked resulting in a timeout exception (TY @lostllama)
+#2219 Add missing `conflicts` option to reindex API
+#2215 Add missing term vector filters
+#2215 add missing metadata on `IGetResponse<T>` and `IMultiHit<T>`
+#2169 Move analyze query string parameters to request body
+#2194 Removed deprecated `Alias` on `GetAliasRequest` (use `Name` instead) and added back the `GetAliasesPointingToIndex()` helper method.
+#2193 Add missing `collate_match` option to `geo_shape` queries  (TY @HarveyWilliams  !)
+#2187 Add `relation` to `geo_shape` queries  and `contains` to `geo_shape` relations
+#2178 Add ability to specify a custom similarity using both the fluent and object iniitalizer syntax
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/4243549/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/4243549,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/5.0.0-beta1,https://github.com/elastic/elasticsearch-net/releases/tag/5.0.0-beta1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/5.0.0-beta1,5.0.0-beta1,False,True
+4210240,2016-09-23T02:42:56Z,2016-09-23T03:25:08Z,,"## Features
+- #2112 Support [`ReindexRethrottle`](https://www.elastic.co/guide/en/elasticsearch/reference/2.4/docs-reindex.html#docs-reindex-rethrottle) when running against Elasticsearch 2.4.0, to allow throttling of longer running tasks such as [Reindex](https://www.elastic.co/guide/en/elasticsearch/reference/2.3/docs-reindex.html) and [UpdateByQuery](https://www.elastic.co/guide/en/elasticsearch/reference/2.3/docs-update-by-query.html) APIs.
+- #2231 [Support `field_masking_span` queries](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-span-field-masking-query.html). Mapped to `SpanFieldMaskingQuery` to align with names of other span queries.
+
+## Enhancements
+- #2279 Support overloaded `UpdateByQuery()` fluent methods that infer Indices and Types from generic parameter type `T`
+- #2247 Enable conveniently overriding `JsonSerializerSettings` without the need to implement a custom serializer. Thanks for the PR @jonyadamit 👍 
+
+## Bug Fixes
+- #2261 `FieldLookup` now includes a `Routing` property. ty @seanwm 
+- #2178 Fix support for custom similarities using `CustomSimilarity` object or `.Custom()` fluent method on `SimilaritiesDescriptor`
+- #2170 Resolve to the smallest whole time unit when working with `DateMath` as it does not support fractional values. For example, `TimeSpan.FromHours(25)` will serialize to `25h` as opposed to round to `1d` or fractional value `1.04d`. ty @emmekappa
+- #2209 Improve boolean combinatorial logic when dealing with bool queries with many clauses
+- #2168 Mark `.Highlights` on `SearchResponse<T>` as obsolete, to be removed in 5.x. It's a leaky abstraction when searching over multiple types that contain the same document id for different types - this will throw an exception. Highlights can be enumerated using
+
+``` c#
+foreach (var hit in searchResponse.HitsMetaData.Hits)
+{
+    foreach (var highlight in hit.Highlights)
+    {
+        // do something with highlightHit
+        var highlightHit = highlight.Value;
+    }
+}
+```
+- #2125 Allow use of custom highlighters (expert level option). `HighlightField` now contains a `CustomType` string property that can be used to specify a custom highlighter. Core highlighters can still be specified using `Type` property.
+- #2119 Allow use of per field custom similarity (expert level option). `ElasticsearchPropertyAttributeBase` and associated mapping methods allow the use of a custom similiarity through a `CustomSimilarity` string property (on attributes and mapping objects) and through the `.Similairy(string)` fluent mapping method. Core similarities can still be specified.
+- #2274 Fix `NullReferenceException` when deserializing a multi-bucket aggregation that contains an empty bucket.
+- #2263 Do not use `IsoDateTimeConverter` to handle `DateTimeOffset`. Take a look at #2268 for how `DateTime` and `DateTimeOffset` are serialized within NEST.
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/4210240/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/4210240,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.4.6,https://github.com/elastic/elasticsearch-net/releases/tag/2.4.6,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.4.6,2.4.6,False,False
+4188245,2016-09-21T03:32:47Z,2016-09-21T03:51:29Z,,"## Features
+- #2231 [Support `field_masking_span` queries](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-span-field-masking-query.html). Mapped to `SpanFieldMaskingQuery` to align with names of other span queries. Thanks for the PR @yevhen :+1: 
+
+## Bug Fixes
+- #2229 Allow `filter_keys` string array to be specified on call to `ClearCache()`. The rest api json schema spec incorrectly identified this type as `bool`
+- #2208 Use the specified `Format` when serializing dates within `RangeFilter`
+- #2191 Correctly deserialize both json representations (string or array of strings) of stop words on analyzers 
+- #2188 Correctly deserialize templates that contain alias definitions
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/4188245/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/4188245,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.9.1,https://github.com/elastic/elasticsearch-net/releases/tag/1.9.1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.9.1,1.9.1,False,False
+4056714,2016-09-06T03:26:18Z,2016-09-06T03:39:31Z,,"## Features
+- https://github.com/elastic/elasticsearch-net/commit/383623e4faab226f193e1e96dc00a2f24d0b529a Large performance improvements to MultiGet and MultiSearch calls:
+  - Cache JsonContracts per ConnectionSettings. **It is recommended to share a single instance of `ConnectionSettings` within your application for this reason**.
+  - Cache Delegates per ConnectionSettings for constructing items in a MultiGetResponse
+  - Cache Delegates per ConnectionSettings for constructing items in a MultiSearchResponse
+  - Reuse Inferrer instance on ConnectionSettings to take advantage of cached data.
+  - Reduce complexity in `IUrlParameter.GetString()` for `IndexName` and `TypeName`
+
+Thanks to @antonyfrancis for raising this :+1: 
+
+## Bug Fixes
+- https://github.com/elastic/elasticsearch-net/commit/fced23c2a92a15e69967809d1bc3f1b7f8407c71 Fix description for `refresh` on Index operation
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/4056714/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/4056714,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.4.5,https://github.com/elastic/elasticsearch-net/releases/tag/2.4.5,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.4.5,2.4.5,False,False
+3963930,2016-08-24T15:38:24Z,2016-08-24T16:05:21Z,,"### Bug Fixes
+- #2197 Fixed instances where modified serialization settings or custom serializers were not being respected by introducing `ISerializerFactory`.  The old func based factory set on `ConnectionSettings` is now obsolete.  (TY @tsliang and @mitchknife)
+- #2198 `HttpClientHandler` can now be modified in a custom `HttpConnection` when running on .NET Core.  This makes it possible to validate HTTPS certs by setting `ServerCertificateValidationCallback`.
+- #2169 Analyze API parameters have been moved to the request body
+- #2217 Added missing filter options to `ITermVectorFilter`
+- #2213 Added missing meta fields to `IGetResponse<T>` and `IMultiHit<T>`
+- #2219 Added missing `conflicts` option to `ReindexOnServer`
+- #2221 Fixed issue with using a sniffing connection pool where a thread could potentially become blocked resulting in a timeout exception (TY @lostllama)
+- #2223 Disabling `_source` now properly serializes as `false` rather than `exclude: [""*""]` (TY @pathikdevani)
+- #2194 Deprecate Alias on `GetAlias()` in favour of `Name`
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/3963930/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/3963930,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.4.4,https://github.com/elastic/elasticsearch-net/releases/tag/2.4.4,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.4.4,2.4.4,False,False
+3825063,2016-08-05T18:47:00Z,2016-08-05T18:57:21Z,,"### Bug Fixes
+- #2193 Add `collate_match` option to the phrase suggester response (TY @HarveyWilliams !)
+- #2187 Add `relation` and `contains` to `geo_shape` queries
+- #2181 Add `os.cpu_precent` to node stats response (TY @TheFireCookie !)
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/3825063/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/3825063,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.4.3,https://github.com/elastic/elasticsearch-net/releases/tag/2.4.3,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.4.3,2.4.3,False,False
+3761620,2016-07-28T14:53:02Z,2016-07-28T15:06:13Z,,"### Bug Fixes
+
+#2173 Fixed `UpdateByQuery` from incorrectly reporting successful responses
+#2159 Deprecated misnamed `Field()` method on `SuggestContextDescriptor` in favor of `Path()`
+#2150 Fixed gzip compression when running on .NET Core
+#2152 `ServerError` on response now properly deserializes recursive error details
+#2052 Fixed exception handling issues within `SimpleJson`
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/3761620/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/3761620,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.4.2,https://github.com/elastic/elasticsearch-net/releases/tag/2.4.2,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.4.2,2.4.2,False,False
+3641060,2016-07-12T18:04:14Z,2016-07-12T18:09:32Z,,"Updated Json.NET dependency to 9.0.1
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/3641060/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/3641060,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.9.0,https://github.com/elastic/elasticsearch-net/releases/tag/1.9.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.9.0,1.9.0,False,False
+3604217,2016-07-07T07:15:27Z,2016-07-07T07:18:38Z,,"# .NET Core 1.0 compatible release
+
+This is the first 5.x release that uses the new .NET Core 1.0 RTM release in conjunction with the latest `dotnet` tooling (1.0.0-preview2-003121). Included frameworks
+- .NET 4.5 (`net45`)
+- .NET 4.6 (`net46`)
+- .NET Standard 1.3 (`netstandard1.3`) 
+
+The dependency on Json.NET in NEST has also been updated to major version `9.0.0`
+
+Massive thanks to @phenixdotnet for [the initial PR](https://github.com/elastic/elasticsearch-net/pull/2149) to move the projects over from using `dnx` and .NET Core RC 1 dependencies :+1: 
+
+**This release is targeted at Elasticsearch 5.0.0-alpha3**
+
+## Bug Fixes
+- #2145 Add `size` to source when using the ReIndex API
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/3604217/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/3604217,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/5.0.0-alpha3,https://github.com/elastic/elasticsearch-net/releases/tag/5.0.0-alpha3,https://api.github.com/repos/elastic/elasticsearch-net/zipball/5.0.0-alpha3,5.0.0-alpha3,False,True
+3604189,2016-07-07T07:11:16Z,2016-07-07T07:13:57Z,,"# .NET Core 1.0 compatible release
+
+This is the second 2.x release (first available on nuget :smile:) that uses the new .NET Core 1.0 RTM release in conjunction with the latest `dotnet` tooling (1.0.0-preview2-003121). Included frameworks
+- .NET 4.5 (`net45`)
+- .NET 4.6 (`net46`)
+- .NET Standard 1.3 (`netstandard1.3`) 
+
+The dependency on Json.NET in NEST has also been updated to major version `9.0.0`
+
+Massive thanks to @phenixdotnet for [the initial PR](https://github.com/elastic/elasticsearch-net/pull/2149) to move the projects over from using `dnx` and .NET Core RC 1 dependencies :+1: 
+
+## Bug Fixes
+- Remove unneccessary dependencies from nuget packages
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/3604189/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/3604189,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.4.1,https://github.com/elastic/elasticsearch-net/releases/tag/2.4.1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.4.1,2.4.1,False,False
+3603843,2016-07-07T05:36:38Z,2016-07-07T05:56:56Z,,"# .NET Core 1.0 compatible release
+
+This is the first 2.x release that uses the new .NET Core 1.0 RTM release in conjunction with the latest `dotnet` tooling (1.0.0-preview2-003121). Included frameworks
+- .NET 4.5 (`net45`)
+- .NET 4.6 (`net46`)
+- .NET Standard 1.3 (`netstandard1.3`) 
+
+The dependency on Json.NET in NEST has also been updated to major version `9.0.0`
+
+Massive thanks to @phenixdotnet for [the initial PR](https://github.com/elastic/elasticsearch-net/pull/2149) to move the projects over from using `dnx` and .NET Core RC 1 dependencies :+1: 
+
+## Bug Fixes
+- #2145 Add `size` to source when using the ReIndex API
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/3603843/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/3603843,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.4.0,https://github.com/elastic/elasticsearch-net/releases/tag/2.4.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.4.0,2.4.0,False,False
+3541919,2016-06-28T16:49:26Z,2016-06-28T16:58:15Z,1.8.3,"### Bug Fixes
+
+#2140 Added `Serializable` attribute to all exceptions
+",https://api.github.com/users/Mpdreamz,245275,Mpdreamz,https://api.github.com/repos/elastic/elasticsearch-net/releases/3541919/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/3541919,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.8.3,https://github.com/elastic/elasticsearch-net/releases/tag/1.8.3,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.8.3,1.8.3,False,False
+3464165,2016-06-17T01:14:41Z,2016-06-17T01:46:55Z,,"This is the second alpha release of Elasticsearch.Net and NEST 5.x, compatible with [**Elasticsearch 5.0.0-alpha3 release**](https://www.elastic.co/downloads/elasticsearch)
+
+## Breaking Changes
+- #2124 Remove factor property from DateHistogramAggregation (thanks @jonyadamit!)
+- #2047 rename FileField on `attachment` mapping to ContentField
+- #2116 Analyze API : Rename filters/token_filters/char_filter
+- #2116 Streamline field names on `rename`, `date`, `geoip` and `attachment` processors
+- #2117 row centric output for CatFieldData
+- #2117 Remove TopLevelInnerHits in favour of inner hits defined in the query DSL using descending HasChild queries
+- #2117 Remove DeleteByQuery plugin from 5.0.0-alpha3. Update DeleteByQuery NEST API to use new DeleteByQuery API based on tasks API
+- #2117 Refactor Profile API to make way for other profile implementations
+
+## Deprecations
+- #2116 Deprecate `RegisterPercolator`, `UnregisterPercolator`, `Percolate`, `MultiPercolate` and `PercolateCount` in favour of the `percolate` query
+- #2116 Deprecate `indices` query
+- #2116 Deprecate `mlt` query shortcut name in favour of `more_like_this`
+- #2117 Deprecate coerce and ignore_malformed on GeoPolygonQuery, GeoDistanceRangeQuery, GeoDistanceQuery and GeoBoundingBoxQuery in favour of validation method
+
+## Features
+- #2085 Introduce `Attachment` type for attachment mapping with the mapper-attachments and ingest-attachment plugins
+- #2118 Add GeoCentroid Aggregation
+- #1986 Add support for reindex rethrottle
+- #2116 Add fingerprint token filter and fingerprint analyzer
+- #2116 Add `_cat/tasks` API
+- #2116 Allow the query cache to be disabled with index settings upon index creation
+- #2116 Add IgnoreUnmapped option to geo queries
+- #2116 Add IgnoreUnmapped option to Nested and Paret/Child queries
+- #2116 Add ParentId query
+- #2116 Add MatchNone query
+- #2116 Add Ingest GeoIpProcessor
+- #2116 Add Ingest AttachmentProcessor
+- #2116 Add points stats to SegmentStats
+- #2116 Show configured and remaining delay information to unassigned shard on ClusterAllocationExplain
+- #2117 Add Ingest Sort Processor
+- #2117 Add Ingest DateIndexName Processor
+- #2117 FieldStats now includes information on whether each field is searchable and aggregatable
+- #2117 Add the shard's store status to the Explain API
+- #2117 Add node name to CatRecovery
+- #2117 Add support for documented byte/size units in Cat API
+- #2117 Add documentation to indicate that Fuzziness is not allowed on a MultiMatch query of type `cross_fields`, `phrase` or `phrase_prefix`
+
+## Bug fixes
+- #2093 Infer index and type from `T` on `GetMany<T>()` when not specified
+- #1908 `GeoShapeBase` implement `IGeoShape` so that `Type` property is serialized correctly when default field name inference is changed
+- #2108 Allow means to modify http headers when running on .NET core 
+- #2088 Allow multiple rescore queries
+- #2087 Allow setting of pipeline id on individual bulk commands
+- #2048 Fix memory leak in the caching of field expressions
+- #1957 fix issue with SniffingConnectionPool and non-http nodes
+- #2066 Allow generic mapping of properties on dynamic templates
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/3464165/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/3464165,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/5.0.0-alpha2,https://github.com/elastic/elasticsearch-net/releases/tag/5.0.0-alpha2,https://api.github.com/repos/elastic/elasticsearch-net/zipball/5.0.0-alpha2,5.0.0-alpha2,False,True
+3455660,2016-06-16T04:00:47Z,2016-06-16T04:18:21Z,,"## Bug Fixes
+- #2114 Fix Fuzziness spelling on QueryString query (thank you @MiniGab!)
+- #2093 Infer index and type from `T` on `GetMany<T>()` when not specified
+- af468f9648d076b0d700d98d7ebde5ca400b919d  return `default(K)` when requesting a single value from Hits fields that contains no values for field
+- #1908 `GeoShapeBase` implement `IGeoShape` so that `Type` property is serialized correctly when default field name inference is changed
+
+## Features
+- #2085 Introduce `Attachment` type for attachment mapping with the mapper-attachments plugin
+- #2118 Add GeoCentroid Aggregation
+
+## Deprecations
+- #2124 Deprecate `factor` on DateHistogramAggregation (thank you @jonyadamit!) 
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/3455660/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/3455660,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.3.3,https://github.com/elastic/elasticsearch-net/releases/tag/2.3.3,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.3.3,2.3.3,False,False
+3354720,2016-06-02T01:47:00Z,2016-06-02T02:20:04Z,,"## Bug Fixes
+- #1908 Always serialize `Type` property of a `GeoShape` as `type`, irrespective of inference. `GeoShape` now implements `IGeoShape`. **Many thanks to @ganjatealq for reporting** :+1: 
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/3354720/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/3354720,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.8.2,https://github.com/elastic/elasticsearch-net/releases/tag/1.8.2,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.8.2,1.8.2,False,False
+3345958,2016-06-01T03:14:31Z,2016-06-01T03:50:57Z,,"## Bug fixes
+- #1905 Correct documentation for `HasParent<K>` query and filter
+
+## Deprecation
+- #2045 Deprecate Fuzziness ratio
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/3345958/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/3345958,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.8.1,https://github.com/elastic/elasticsearch-net/releases/tag/1.8.1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.8.1,1.8.1,False,False
+3314886,2016-05-26T17:52:14Z,2016-05-26T17:56:42Z,,"## Bug Fixes
+- #1957 Skip http disabled nodes when sniffing
+- #2086 Fix conditionless logic for compound queries
+- #2088 Allow rescore to accept multiple rescore queries
+- #2101 Fix double evaluation of `IEnumerable`s
+- #2108 `HttpConnection` methods can now be overridden when running on .NET Core
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/3314886/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/3314886,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.3.2,https://github.com/elastic/elasticsearch-net/releases/tag/2.3.2,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.3.2,2.3.2,False,False
+3154781,2016-05-04T09:22:14Z,2016-05-04T09:29:00Z,,"**It is recommended that you update any previous version of NEST 2.x to 2.3.1 that addresses a memory leak that affects those previous versions**. 
+
+Please [see this blog post for more details.](https://www.elastic.co/blog/nest-2-3-1-released)
+
+## Bug Fixes
+- #2048 Fix memory leak in FieldResolver when caching expressions
+
+Big thanks to @alwag85 for initially reporting and to @rasmus, @tabro and @krjensen voting :+1: 
+- #2066 Add `Generic()` mapping to allow targeting fields of different types in dynamic templates
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/3154781/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/3154781,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.3.1,https://github.com/elastic/elasticsearch-net/releases/tag/2.3.1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.3.1,2.3.1,False,False
+3126407,2016-04-29T10:24:43Z,2016-04-29T10:48:11Z,,"This is the first alpha release of Elasticsearch.Net and NEST 5.x, compatible with [Elasticsearch 5.0.0-alpha1 release](https://www.elastic.co/downloads/elasticsearch)
+
+## Breaking Changes
+- #2044 Change to `HasParentQuery` scoring
+- #2025 NonStringIndexOption changed from `enum` to `bool`
+- #2013 New Completion Suggester API
+- #2012 Cat API changes
+- #2011 Update `ClusterStatsResponse`
+- #2010 Allocation Changes
+- #2009 Indices settings changes
+- #2008 Update CPU and Suggest stats on cluster and node stats
+- #2007 Deprecated percolate API in favour of percolator type
+- #2006 Remove `IMappingTransform`. Use Ingest node instead.
+- #2005 Remove NumericFielddataFormat.DocValues
+- #2004 Norms now take a boolean instead of an `INorms` type
+- #2003 Default Number type is now `float` and not `double` (inference will still do the right thing for CLR numeric types).
+- #2001 Align top level hits with new format
+- #2000 Remove Deprecated APIs
+- #1999 Remove `search_type=count`
+- #1998 Index property now only accepts `true/false`
+- #1997 Changes to queries
+- #1996 Remove Deprecated queries
+
+## Features
+- #2007 New `percolator` type
+- #2002 New `text` and `keyword` types - replace `string` type, which is deprecated.
+- #1985 Update by query support
+- #1927 Add support for Task cancel API
+- #1926 Add support for Task list API
+- #1925 Add support for Reindex API
+- #1924 Add support for Render Search Template
+- #1923 Add support for Indices Shard Stores
+- #1922 Add support for force merge
+- #1921 Add support for cat snapshots
+- #1920 Add support for cat repositories
+- #1919 Add support for cat segments
+- #2053 Add support for shield APIs
+- #2034 Add support for license APIs
+- #2031 Add support for Graph API
+- #2021 Verbatim and Strict queries
+- #1935 Add support for Profile API
+- #2065 Add support for Ingest Pipeline API
+
+## Bug fixes
+- #2054 Don't allow posting `null` for bulk api
+- #2027 position_offset_gap renamed to position_increment_gap
+- #2022 `ToTimeUnit()` should not convert to years from `TimeSpan`
+- #1945 fix serialization issue with script query mapping
+- #1870 MultiMatch Fields needs Fields(Fields fields) overload
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/3126407/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/3126407,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/5.0.0-alpha1,https://github.com/elastic/elasticsearch-net/releases/tag/5.0.0-alpha1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/5.0.0-alpha1,5.0.0-alpha1,False,True
+3081179,2016-04-22T20:44:33Z,2016-04-22T20:53:50Z,,"## Features
+- #2031 Added support for the graph API
+- #2034 Added support for the license related API's
+- #2053 Added support for the shield related API's
+
+## Bug Fixes
+- #2054 Do not allow passing a null selector to `Bulk()` and fixed a `NRE` in `DebugInformation`
+- #2021 Multiple fixes around setting `Verbatim` and `Strict` on queries
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/3081179/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/3081179,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.3.0,https://github.com/elastic/elasticsearch-net/releases/tag/2.3.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.3.0,2.3.0,False,False
+3005505,2016-04-12T19:56:09Z,2016-04-12T20:21:44Z,,"## Features
+- #1985 Added support for the update by query API
+- #1927 Added support for the tasks cancel API
+- #1926 Added support for the tasks list API
+- #1925 Added support for the reindex API
+
+## Bug Fixes
+- #1980 Specifying a null required route value is now a noop
+- #1979 Mappings: `.Index(NonStringIndexOption)` now defaults to `not_analyzed`
+- #2029 Mappings: Mark PositionOffsetGap as obsolete in favor of PositionIncrementGap
+- #2014 Aggregations: Exposed the `BucketsPath` property on `SingleBucketsPath` (ty @jonyadamit)
+- #2022 `.ToTimeUnit()` will no longer serialize to year units in the low-level client
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/3005505/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/3005505,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.2.0,https://github.com/elastic/elasticsearch-net/releases/tag/2.2.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.2.0,2.2.0,False,False
+2952031,2016-04-05T02:00:59Z,2016-04-05T02:51:40Z,2.1.1,"## Features
+- #1965 Add Missing Pipeline Aggregations: `StatsBucket`, `ExtendedStatsBucket` and `PercentilesBucket`. Many thanks to @jonyadamit for the PR :+1: 
+- #1981 Ensure `AggregationVisitor` is able to visit all types of Aggregation
+
+## Bug Fixes
+- #1983 Correct combining of two `bool` should queries when wrapped in a `bool` must query
+- #1982 Sigma should be a nullable double on `ExtendedStatsBucket` aggregation
+- #1964 Set the `ComparisonValue` when instantiating a `Field` using the constructor.
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/2952031/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/2952031,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.1.1,https://github.com/elastic/elasticsearch-net/releases/tag/2.1.1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.1.1,2.1.1,False,False
+2912190,2016-03-30T01:06:33Z,2016-03-30T02:24:38Z,,"## Features
+
+[**Documentation for Elasticsearch.Net and NEST 2.x**](https://www.elastic.co/guide/en/elasticsearch/client/net-api/2.x/index.html)
+- #1935 Add support for the Profile API
+- #1924 Add support for render search template
+- #1923 Add support for indices shard stores
+- #1922 Add support for force merge
+- #1921 Add support for cat snapshots
+- #1920 Add support for cat repositories
+- #1919 Add support for cat segments
+
+## Bugs/Fixes
+- #1863 Sort failing due to serialization error
+- #1929 Handle null `_score` inside `ConcreteTypeConverter`
+- #1928 and #1952 Capture the Response bytes and HTTP status code when a BadAuth Response occurs and do not throw a serialization exception when attempting to deserialize (the response may not be json e.g. could be using a proxy for auth)
+- #1947 Remove `RethrowKeepingStackTrace` in favour of simply `throw`ing the exception; the former was an artifact of the older TPL-based async implementation which is unnecessary with the async/await async implementation
+- #1931 Fix bug in Filter Aggregation with script
+- #1930 Fix bug in `TermsQueryDescriptor` where passing an `IEnumerable<T>` to `Terms<T>()` without specifying `T`, results in the `params T[]` overload being called
+- #1917 Fix bug in `FieldStats` when less than or equal to comparison used on Index constraint
+- #1870 allow `.Fields(Fields)` everywhere
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/2912190/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/2912190,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.1.0,https://github.com/elastic/elasticsearch-net/releases/tag/2.1.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.1.0,2.1.0,False,False
+2816435,2016-03-15T15:39:35Z,2016-03-15T16:26:09Z,,"#1856 Fix `DisableDirectStreaming` not taking on error responses
+#1860 Fix deserialization exception on `GetIndex()` when refresh_interval == -1
+#1868 Add support for term filtering on `_termvector` and `_mtermvector`
+#1880 Fix handling of the month/year intervals and serialization fixes for the `Time` class
+#1887 Fix handling of return types when using the low-level client (ty @rossbrower)
+#1901 Fix deserialization of known errors even if the response isn't valid JSON
+#1904 Fix `OnRequestCompleted` not invoked when an exception is thrown
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/2816435/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/2816435,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.0.5,https://github.com/elastic/elasticsearch-net/releases/tag/2.0.5,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.0.5,2.0.5,False,False
+2763173,2016-03-07T22:30:29Z,2016-03-07T22:35:56Z,,"Upgraded to Json.NET 8
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/2763173/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/2763173,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.8.0,https://github.com/elastic/elasticsearch-net/releases/tag/1.8.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.8.0,1.8.0,False,False
+2761438,2016-03-07T18:14:23Z,2016-03-07T18:23:22Z,,"#1861 Limit NEST dependency to Elasticsearch.Net < 2.0.0
+#1781 Raise upper limit on Newtonsoft.Json dependency
+#1734 DynamicTemplates: Unable to specify FieldIndexOption.NotAnalyzed (generic mapping descriptor missing enum overload for index())
+#1682 Add ability to specify type selector on scroll (ty @bytenik)
+#1680 Raw query serialization fixes
+#1634 Fix NRE in `SniffingConnectionPool` when running on Mono
+#1626 DateHistogram aggregation: parse dates using DateTimeKind.Utc 
+#1614 Add ability to pass a `TextWriter` to `EnableTrace` (ty @ammachado)
+#1609 Fix serialization when indexing a `JObject` (don't treat it as an `IEnumerable<object>`)
+#1600 Mark `MultiField` property descriptor obsolete (ty @TheFireCookie)
+#1595 `SuggestOption` missing `Highlighted` field
+#1591 Fix missing search and index routing from _cat aliases response (ty @robertlyson)
+#1589 Fix premature disposal of request state when using async
+#1587 Add support for `detect_noop` to the update API (ty @robertlyson)
+#1570 #1655 Fix serialization of `PercolateDescriptor` and add missing `_score` to `PercolateResponse` (ty @mikelazell)
+#1568 Fix minor type in xmldocs (ty @SeanKillen)
+#1566 Filter aggregation did not support raw JSON
+#1563 Fix serialization of `protected_words_path` in the word delimitor token filter (ty @robertlyson)
+#1599 Add missing `RandomScore` to `FunctionScoreFunctionsDescriptor`
+#1553 Add `HighlightQuery` to `HighlightFieldDescriptor` (ty @Settler)
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/2761438/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/2761438,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.7.2,https://github.com/elastic/elasticsearch-net/releases/tag/1.7.2,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.7.2,1.7.2,False,False
+2728742,2016-03-02T15:54:57Z,2016-03-02T16:34:33Z,,"#1869 Improvements to `DebugInformation` and NRE fix when dispatch failed
+#1867 Fixed meta data serialization of register percolator
+#1866 Add missing values to multi term vectors response
+#1845 Fixed missing information (`CausedBy`) from `ElasticsearchClientException`
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/2728742/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/2728742,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.0.4,https://github.com/elastic/elasticsearch-net/releases/tag/2.0.4,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.0.4,2.0.4,False,False
+2721578,2016-03-01T18:47:06Z,2016-03-01T19:32:53Z,,"#1852 Overriding auto mapped properties caused duplicates and ensure AutoMap is an idempotent operation
+#1836 GeoUnit and DistanceType ignored when sorting
+#1826 Fix NullReferenceException in attachment mapping
+#1819 Boost factor on fields wasn't being serialized
+#1857 #1858 Enum cache should be concurrent and cache all code paths
+#1814 `GeoLocation` implicit conversion fixes (ty @niemyjski)
+#1810 `StickyConnectionPool` implementation (ty @Romanx)
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/2721578/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/2721578,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.0.3,https://github.com/elastic/elasticsearch-net/releases/tag/2.0.3,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.0.3,2.0.3,False,False
+2596073,2016-02-11T16:30:24Z,2016-02-11T16:42:04Z,,"### Bug Fixes
+
+#1817 Do not serialize null or conditionless queries within collections
+#1820 Fix NullReferenceException that occurred when serializing a conditionless BoolQuery
+#1821 Max recursion depth was ignored when using AutoMap() from the put mapping API
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/2596073/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/2596073,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.0.2,https://github.com/elastic/elasticsearch-net/releases/tag/2.0.2,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.0.2,2.0.2,False,False
+2578477,2016-02-09T11:18:16Z,2016-02-09T11:22:39Z,,"Patch release to fix a sniffer parsing bug (#1811 as reported by @joelse) 
+",https://api.github.com/users/Mpdreamz,245275,Mpdreamz,https://api.github.com/repos/elastic/elasticsearch-net/releases/2578477/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/2578477,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.0.1,https://github.com/elastic/elasticsearch-net/releases/tag/2.0.1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.0.1,2.0.1,False,False
+2576977,2016-02-09T03:37:58Z,2016-02-09T04:43:32Z,GA Release 2.0.0,"This marks the first GA release of our 2.0 client with well over a 1000 commits since 1.7.1 (the currently last released NEST version in the `1.x` range).
+
+### Improvements
+- #1788 Rename `IElasticsearchClient` to `IElasticLowLevelClient` to better specify intent
+- #1795 Add `SuffixExpressionVisitor` for appending suffixes to lambda expressions
+- #1801 `.ConfigureAwait(false)` all async/await methods
+- #1794 add `DebugInformation` to responses and exceptions to aid in understanding problems with client calls 
+
+### Bug Fixes
+- #1789 Move `highlight_query` to `HighlightField` 
+- #1787 Fix generated XML comment documentation
+- #1786 Move `detect_noop` back to the request body for an update request
+- #1784 When specifying a `format` and `extended_bounds` on a date histogram aggregation, include the `date_optional_time` format to allow Elasticsearch to deserialize the bounds
+
+## Back to the drawing board
+
+We took some time to go back to the drawing board. NEST is quite old (started in 2010) and not all of the choices that have accumulated in the code base make sense anymore.
+So we stepped back to properly formalize how we see the lifetime of a call and worked off of that. Armed with the following diagram, we completely rewrote NEST's internals; The old [Task Parallel Library (TPL)](https://msdn.microsoft.com/en-us/library/dd460717.aspx) based code is now replaced with [async/await](https://msdn.microsoft.com/en-us/library/hh191443.aspx), we have a much saner approach to exceptions and errors, and we expose enough information as an audit trail so you don't ever have to guess what went down during a call.
+
+![pipeline](https://raw.githubusercontent.com/elastic/elasticsearch-net/1653341d61c7a6f9ab4a7988c8d18308c54c6b23/src/Tests/ClientConcepts/LowLevel/pipeline.png)
+
+Our internals now also reflect this:
+- `IElasticClient` exposes all the Elasticsearch API endpoints e.g `client.Search` this calls into `ITransport`'s 2 methods `Request` and `RequestAsync` 
+- the default `ITransport` uses the passed in `IRequestPipelineFactory` to create an `RequestPipeline` which implements `IPipeline`.
+
+This pipeline now handles all of the failover/sniffing/pinging logic and directly reflects the flow diagram.
+
+We also simplified `IConnection` down just 2 methods. This means the outer edges are clean (`ITransport` and `IConnection`) and implementing your own should be really really simple. All of these (and also `IMemoryStreamProvider` and `IDateTimeProvider`) can be injected on the constructor of the client.
+
+## Test Framework
+
+Another huge endeavour is the rework of our test framework. NEST 1.x was always well tested but used 5 different test projects and 5 years worth of changing our minds as how best to write tests and assertions, thus becoming a big hodgepodge of [nunit assertions](http://www.nunit.org/), [fluent assertions](http://www.fluentassertions.com/), [FakeItEasy](https://fakeiteasy.github.io/), [Moq](http://www.moqthis.com/) combined with several different ways to compare json with object graphs and vice-versa. Trying to write a new test quickly became [an exercise in yak shaving](http://www.hanselman.com/blog/YakShavingDefinedIllGetThatDoneAsSoonAsIShaveThisYak.aspx) because there was no clear cut way on how best to write said test.
+
+So the first thing we did as part of our 2.0 branch was to completely delete all of our tests. This _act of insanity_ gave us carte blanche during our rewrite.
+
+As of `2.0` we have one test project `Tests` and all of the tests are written in such a way that they can be run in unit test mode and integration test mode. Write once, run differently.
+All of the API endpoint tests test all 4 request variations - two DSL's (fluent and object initializer) with both synchronous and asynchronous variations. We also test all of the moving parts of the Elasticsearch DSL (Aggregations, Sorting, IndexSettings, etc...) in the same way.
+
+In addition to the more formal unit and integration tests, we also implemented a thing we dubbed _Literate Testing_ to allow us to write tests in a more story telling form, with multi-line comments serving as the narrative for our asciidoc documentation while using the [Roslyn compiler](https://github.com/dotnet/roslyn/wiki/Roslyn%20Overview) to pick out the interesting bits of code. This gives us the benefit of always compiling our documentation in addition to having only one place where we document, test and assert how a piece of code is supposed to work.
+
+Another huge component of our testing framework is the _Virtual Cluster_ that allows us to write tests for any situation and how we expect the client to behave.
+
+``` csharp
+/** we set up a 10 node cluster with a global request time out of 20 seconds.
+* Each call on a node takes 10 seconds. So we can only try this call on 2 nodes
+* before the max request time out kills the client call.
+*/
+var audit = new Auditor(() => Framework.Cluster
+  .Nodes(10)
+  .ClientCalls(r => r.FailAlways().Takes(TimeSpan.FromSeconds(10)))
+  .ClientCalls(r => r.OnPort(9209).SucceedAlways())
+  .StaticConnectionPool()
+  .Settings(s => s.DisablePing().RequestTimeout(TimeSpan.FromSeconds(20)))
+);
+
+audit = await audit.TraceCalls(
+  new ClientCall {
+    { BadResponse, 9200 }, //10 seconds
+    { BadResponse, 9201 }, //20 seconds
+    { MaxTimeoutReached }
+  },
+  /**
+  * On the second client call we specify a request timeout override to 80 seconds
+  * We should now see more nodes being tried.
+  */
+  new ClientCall(r => r.RequestTimeout(TimeSpan.FromSeconds(80)))
+  {
+    { BadResponse, 9203 }, //10 seconds
+    { BadResponse, 9204 }, //20 seconds
+    { BadResponse, 9205 }, //30 seconds
+    { BadResponse, 9206 }, //40 seconds
+    { BadResponse, 9207 }, //50 seconds
+    { BadResponse, 9208 }, //60 seconds
+    { HealthyResponse, 9209 },
+  }
+);
+```
+
+This showcases the _Virtual Cluster_ tests combined with _Literate Tests_ and the extensive audit trail information available on each response (or exception).
+
+I'm pleased to say we are back at a decent coverage rate (60%) and will continue to iterate and improve this.
+
+## Exception handling
+
+Another big change in NEST 2.0 is how we deal with exceptions.
+
+In NEST 1.x, the client threw a multitude of exceptions: `MaxRetryException`, `ElasticsearchAuthException`, `ElasticsearchServerException`, `DslException`, etc.. This made it challenging for users to handle exceptions and invalid responses, and understand the root cause of errors. On top of that, the types of exceptions thrown depended on what kind of `IConnectionPool` was injected, in order to maintain maximum backwards compatibility with NEST 0.x.
+
+In NEST 2.x, exceptions are much more deterministic.  The former `ThrowOnElasticsearchServerExceptions()` setting has been replaced with the more succinct `ThrowExceptions()`, which determines whether the client should ever throw an exception or not (client side and server exceptions). Furthermore, the types of exceptions have been reduced and simplified down to three types of exceptions:
+
+**ElasticsearchClientException:** These are **known** exceptions, either an exception that occurred in the request pipeline(such as max retries or timeout reached, bad authentication, etc...) or Elasticsearch itself returned an error (could not parse the request, bad query, missing field, etc...). If it is an Elasticsearch error, the `ServerError` property on the response will contain the the actual error that was returned.  The inner exception will always contain the root causing exception.
+
+**UnexpectedElasticsearchClientException:**  These are **unknown** exceptions, for instance a response from Elasticsearch not properly deserialized.  These are usually bugs in the client and [we encourage you to report them](https://github.com/elastic/elasticsearch-net/issues).  This exception also inherits from `ElasticsearchClientException` so an additional catch block isn't necessary to handle but can be helpful in distinguishing between the two.
+
+**Runtime exceptions:** These are CLR exceptions like `ArgumentException`, `NullArgumentException` etc. that are thrown when an API in the client is misused.
+
+# Breaking Changes
+
+Even though a lot of work went into the interior, the exterior did not escape unscathed! On top of the many breaking changes that Elasticsearch 2.0 introduces, there are more then a few NEST 2.0 introduces.
+We revalidated all the request and response domain objects against Elasticsearch 2.0.
+
+A pretty complete list of breaking changes are available:
+- [Low level client changes, Elasticsearch.NET](https://github.com/elastic/elasticsearch-net/blob/master/docs/2.0-breaking-changes/elasticsearch-net-breaking-changes.md)
+- [high level client changes, NEST](https://github.com/elastic/elasticsearch-net/blob/master/docs/2.0-breaking-changes/nest-breaking-changes.md)
+
+## Elasticsearch 2.x support
+
+NEST 2.0 supports all the new features in Elasticsearch 2.0 including pipeline aggregations. New features from Elasticsearch `2.2` have not yet been mapped.
+
+Here we'll just highlight a couple features that are reflected in the NEST changes to whet your appetite!
+
+## Filters are **Gone Gone Gone**
+
+In `Elasticsearch 2.0`, query and filter constructs have merged into one concept called queries and NEST 2.0 reflects this. So if you were previously using the `AndFilter`, this is now called the `AndQuery`; beware that some of these filters have been obsoleted and chances are high [you were using them wrong!](https://www.elastic.co/blog/all-about-elasticsearch-filter-bitsets).
+
+## Isolated descriptors
+
+In NEST 1.x we took pride in being a 1 to 1 mapping with the Elasticsearch API. In some cases however, this _purity_ hid the real depth of parameters. As an example, 
+
+in NEST 1.x you could add sorts on `Search()` using:
+
+``` csharp
+client.Search<Project>(s=>s
+  .SortAscending(...)
+  .SortScript(...)
+)
+```
+
+in NEST 2.0 you have to stoop down a level first in order to access the same functionality
+
+``` csharp
+client.Search<Project>(s=>s
+  .Sort(ss=>ss
+    .Field()
+    .Script()
+    .Ascending()
+    .GeoDistance()
+  )
+)
+```
+
+This encapsulates all of the sort options properly and adheres stricter to the 1 to 1 mapping. NEST 1.x did also contain this full descriptor however the mix and matching
+of the convenience methods of the parent meant that some fluent methods were additive whilst others overwrote what was previously set. With NEST 2.0, this discrepancy is gone!
+
+This happens in more places e.g index settings and mappings.
+
+## Filtered query deprecation
+
+With the removal of filters, NEST has added a special construct in its Query DSL to easily create a **bool** query with a filter clause
+
+``` csharp
+.Query(q=> +q.Term(p=>p.Name, ""NEST""))
+```
+
+the `+` will wrap the term query inside a bool query's `filter` clause
+
+You can even combine `+` with `!`
+
+``` csharp
+.Query(q=> !+q.Term(p=>p.Name, ""NEST""))
+```
+
+This will wrap the term query inside a `bool filter` and subsequently inside a `bool must_not`. This approach also works with the object initializer syntax (OIS)
+
+``` csharp
+!+new TermQuery {}
+```
+
+## Attribute based mapping
+
+The single `ElasticPropertyAttribute` has been broken up into individual attributes per property type.
+
+For instance, the following:
+
+``` csharp
+[ElasticType(Name = ""othername"", IdProperty = ""MyId"")]
+public class Foo
+{
+  [ElasticProperty(Type = FieldType.String)]
+  public Guid MyId { get; set; }
+
+  [ElasticProperty(Type = FieldType.String)]
+  public string Name { get; set; }
+
+  [ElasticProperty(Type = FieldType.String, Analyzer = ""myanalyzer"", TermVector = TermVectorOption.WithOffsets)]
+  public string Description { get; set; }
+
+  [ElasticProperty(Type = FieldType.Date, Format = ""mmmddyyyy"")]
+  public DateTime Date { get; set; }
+
+  [ElasticProperty(Type = FieldType.Integer, Coerce = true)]
+  public int Number { get; set; }
+
+  [ElasticProperty(Type = FieldType.Nested, IncludeInParent = true)]
+  public List<Bar> Bars { get; set; }
+}
+```
+
+becomes
+
+``` csharp
+[ElasticsearchType(Name = ""othername"", IdProperty = ""MyId"")]
+public class Foo
+{
+  [String]
+  public Guid MyId { get; set; }
+
+  [String]
+  public string Name { get; set; }
+
+  [String(Analyzer = ""myanalyzer"", TermVector = TermVectorOption.WithOffsets)]
+  public string Description { get; set; }
+
+  [Date(Format = ""mmddyyyy"")]
+  public DateTime Date { get; set; }
+
+  [Number(NumberType.Integer, Coerce = true, DocValues = true)]
+  public int Number { get; set; }
+
+  [Nested(IncludeInParent = true)]
+  public List<Bar> Bars { get; set; }
+}
+```
+
+Aside from a simpler and cleaner API, this allows each attribute to only reflect the options that are available for the particular type instead of exposing options that may not be relevant (as `ElasticPropertyAttribute` did).
+
+## Inferred types
+
+Many places that only took a string or primitive type now take a more strongly typed object such as `Id`, `Field`, `Fields`, `Index`, `Indices`, `Type`, `Types`, `DocumentPath<T>`, etc. It's good to know that in most cases you can still pass a string or primitive type and it will be implicitly converted to the type where it makes sense.
+
+If you are using `C# 6` you can also staticly import the `Infer` static class using `using static Nest.Infer`, allowing to write 
+- `Field<Project>(p => p.Name)` any where that takes a `Field`
+- `Field<Project>(p => p.Name).And(p=>p.Description).And(""field"")` anywhere that takes `Fields`
+- `Index<Project>()` for `Index`
+
+so on and so forth. If you are using the fluent API using these infer methods is not required since the fluent API is strongly typed through lambda expressions, but they are another tool at your disposal nonetheless.
+
+## C# 6 support
+
+NEST's codebase has been largely rewritten to take advantage of all the cool new c# features making almost all the fluent code one liners
+
+``` csharp
+using static Nest.Infer;
+
+//later..
+
+Field<Project>(p => p.Name);
+Index<Project>();
+Indices<Project>().And<Developer>();
+```
+
+## DNX Support
+
+The 2.0 release has been released with a `dotnet5.1` version on nuget that can be used on both the Desktop and Core CLR runtimes of DNX rc1. We are actively tracking [rc2](https://github.com/aspnet/Home/wiki/Roadmap), the [.NET Commandline interface (dotnet-cli)](https://github.com/dotnet/cli) and the new `netstandard` NuGet target framework, with a plan to release compatible packages once these hit the scene.
+
+## Feedback
+
+We'd like to thank everyone who took the alpha and rc releases out for a spin and provided invaluable input while we incubated the 2.0 release. A special shoutout to [Blake Niemyjski](https://github.com/niemyjski) for sharing his screen with us so we could see firsthand where the pain points were during an upgrade from 1.x to 2.0.
+
+As always we very much welcome all feedback on [our github issues page](https://github.com/elastic/elasticsearch-net/issues)
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/2576977/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/2576977,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.0.0,https://github.com/elastic/elasticsearch-net/releases/tag/2.0.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.0.0,2.0.0,False,False
+2535860,2016-02-02T09:50:00Z,2016-02-02T10:16:35Z,2.0.0-rc1,"## Release Candidate
+
+This is the release candidate for NEST 2.x! Many improvements and fixes went into this release, including providing support for two new target frameworks, `dotnet5.1` (.NETPlatform5.1) and `net46` (.NETFramework4.6). As always, [your feedback on this release are very welcome!](https://github.com/elastic/elasticsearch-net/issues)
+
+### Improvements
+- #1697 **SUPPORT .NET CORE WITH DNX TOOLING**
+- #1089 Refactor to use `System.Linq.Expressions.ExpressionVisitor`
+- #1686 Support `other_bucket` and `other_bucket_key` in filters aggregations
+- #1705 AutoMap/Infer `TimeSpan` properties as long ticks
+- #1742 Support looping of named aggregation buckets
+- #1755 Add .NET 4.6 as a target framework
+
+### Bug Fixes
+- #985 Reindex supports `_parent` and `_routing`
+- #1433 Reindex supports reindexing one/many/all types within the from index
+- #1490 Update now supports fields and is not generic
+- #1612 Unify the methods and overloads available on `Query<T>`
+- #1634 Ensure consistent _purified_ Uris across all supported platforms
+- #1708 Property Name should resolve to the last token
+- #1729 Add Aggregation Metadata
+- #1731 Use custom `JsonConverters` when supplied on derive `JsonNetSerializer`
+- #1763 Add `_timestamp` to `IHit<T>`
+- #1763 Add `_ttl` to `IHit<T>`
+- #1766 when passed an a `null` reference for string, return `null` reference for `DateMath`
+- #1767 `Fields` should not be null on response when specified on request
+- #1772 Fix deficiencies in the dnx tooling for supporting dependency version ranges
+- #1778 Align request/response type names
+- #1776 Rename types in line with Naming Conventions
+- #1773 Make `ConnectionSettings` protected on `JsonNetSerializer`
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/2535860/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/2535860,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.0.0-rc1,https://github.com/elastic/elasticsearch-net/releases/tag/2.0.0-rc1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.0.0-rc1,2.0.0-rc1,False,True
+2456504,2016-01-19T23:16:58Z,2016-01-19T23:41:29Z,2.0.0-alpha2,"### Bug Fixes
+- #1694 Add support for Newtosoft.Json 8
+- #1706 Separate types for histogram and date histogram items
+- #1709 Boolean and ""conditionless"" queries
+- #1712 Rename ConnectionStatusHandler to OnRequestCompleted and add back functionality
+- #1713 High level methods now take `Time` instead of `TimeSpan`
+- #1720 `SniffingConnectionPool` now implements `IDisposable` (ty @garymcleanhall)
+- #1726 Improved Norms implementation
+- #1728 Add support for range queries on string fields
+- #1736 Fix choosing the correct HTTP method when indexing an object with no Id
+- #1741 Fix snowball analyzer language case sensitivity
+",https://api.github.com/users/russcam,208231,russcam,https://api.github.com/repos/elastic/elasticsearch-net/releases/2456504/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/2456504,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.0.0-alpha2,https://github.com/elastic/elasticsearch-net/releases/tag/2.0.0-alpha2,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.0.0-alpha2,2.0.0-alpha2,False,True
+2384393,2016-01-06T23:07:22Z,2016-01-06T23:18:00Z,,"This marks the first release of our 2.0 branch (now master) with well over a 1000 commits since 1.7.1 (the currently last released NEST version in the `1.x` range).
+
+We are releasing it as alpha because we currently only support .NET 4.5 and up. For us to go from alpha to beta we ideally still have to finish
+- PCL/.NET CORE are in the works but not part of our build and CI infrastructure.
+- Finish our new documentation
+
+Please note that even though this is an alpha, we have fully tested this against Elasticsearch 2.0 up to 2.1 (the current latest version).
+
+## Back to the drawing board
+
+We took sometime to go back to the drawing board. NEST is quite old (started in 2010) and not all of the choices that have accumulated in the code base make sense anymore.
+So we stepped back, formulized properly how we see the lifetime of a call, and worked off of that. Armed with the below diagram, we completely rewrote NEST's internals. The old TPL based code base is now replaced with async/await, we have a much saner approach to exceptions and errors, and we expose enough information as an audit trail so you do not have to ever guess what went down during a call.
+
+![pipeline](https://raw.githubusercontent.com/elastic/elasticsearch-net/1653341d61c7a6f9ab4a7988c8d18308c54c6b23/src/Tests/ClientConcepts/LowLevel/pipeline.png)
+
+Our internals now also reflect this:
+
+IElasticClient exposes all the Elasticsearch API endpoints e.g `client.Search` this calls into `ITransport`'s 2 methods `Request` and `RequestAsync` the default `ITransport` then uses the passed in `IRequestPipelineFactory` to create an `RequestPipeline` which implements `IPipeline`.
+
+This pipeline now handles all of the failover/sniffing/pinging logic and directly reflects the flow diagram.
+
+We also simplified `IConnection` down just 2 methods. This means the outer edges are clean (`ITransport` and `IConnection`) and implementing your own should be really really simple. All of these (and also `IMemoryStreamProvider` and `IDateTimeProvider`) can be injected on the constructor of the client.
+
+## Test Framework
+
+Another huge endeavour is the rework of our test framework. NEST 1.x was always well tested but used 5 different test projects and 5 years worth of changing our minds as to how best to write tests and assertions.
+Thus becoming a big hodgepodge of nunit assertions, fluent assertions, FakeItEasy, Moq combined with several different ways to compare json with object graphs and vice-versa. Trying to write a new test quickly became cumbersome because there was no clear cut way how best to write said test.
+
+So the first thing we did as part of our 2.0 branch was to completely delete all of our tests. This act of insanity gave us carte blanche during our rewrite.
+
+As of `2.0` we have one test project `Tests` and all of the tests are written in such a way that they can be run in unit test mode and integration test mode. Write once, run differently.
+All the API endpoint tests test all 4 variations, 2 DSL's (fluent and object initializer) + sync and async. We also test all of the moving parts of Elasticsearch DSL (Aggregations, Sorting, IndexSettings, etc...) in the same way.
+
+We also introduced a thing we dubbed `Literate Testing` to allow us to write tests in a more story telling form with the comments serving as the asciidoc for our documentation while using the Roslyn compiler to pick the interesting bits of code.
+This gives us the benefit of always compiling our documentation but also having one place where we document, test and assert how a piece of code is supposed to work.
+
+Another huge component of our testing framework is the `Virtual Cluster` that allows us to write tests for any situation and how we expect the client to behave.
+
+``` csharp
+/** we set up a 10 node cluster with a global request time out of 20 seconds.
+* Each call on a node takes 10 seconds. So we can only try this call on 2 nodes
+* before the max request time out kills the client call.
+*/
+var audit = new Auditor(() => Framework.Cluster
+  .Nodes(10)
+  .ClientCalls(r => r.FailAlways().Takes(TimeSpan.FromSeconds(10)))
+  .ClientCalls(r => r.OnPort(9209).SucceedAlways())
+  .StaticConnectionPool()
+  .Settings(s => s.DisablePing().RequestTimeout(TimeSpan.FromSeconds(20)))
+);
+
+audit = await audit.TraceCalls(
+  new ClientCall {
+    { BadResponse, 9200 }, //10 seconds
+    { BadResponse, 9201 }, //20 seconds
+    { MaxTimeoutReached }
+  },
+  /**
+  * On the second client call we specify a request timeout override to 80 seconds
+  * We should now see more nodes being tried.
+  */
+  new ClientCall(r => r.RequestTimeout(TimeSpan.FromSeconds(80)))
+  {
+    { BadResponse, 9203 }, //10 seconds
+    { BadResponse, 9204 }, //20 seconds
+    { BadResponse, 9205 }, //30 seconds
+    { BadResponse, 9206 }, //40 seconds
+    { BadResponse, 9207 }, //50 seconds
+    { BadResponse, 9208 }, //60 seconds
+    { HealthyResponse, 9209 },
+  }
+);
+```
+
+This showcases the `Virtual Cluster` tests combined with `Literate Tests` and the extensive audit trail information available on each response (or exception).
+
+I'm pleased to say we are back at a decent coverage rate (60%) and we'll continue to bump that.
+
+## Exception handling
+
+Another big change in NEST 2.0 is how we deal with exceptions.
+
+In NEST 1.x, the client threw a multitude of exceptions: MaxRetryException, ElasticsearchAuthException, ElasticsearchServerException, DslException, etc.. This made it challenging for users to handle exceptions/invalid responses, and understand the root cause of errors. On top of that, it depended on what kind of `IConnectionPool` was injected to contain maximum backwards compaitibility with `NEST 0.x`
+
+In NEST 2.x, exceptions are much more deterministic.  The former `ThrowOnElasticsearchServerExceptions()` setting has been replaced with simply `ThrowExceptions()`, which determinse whether the client should ever throw an exception or not (client side and server exceptions). Furthermore, the types of exceptions have been reduced and simplified-the client will now only throw three types of exceptions:
+
+**ElasticsearchClientException:** These are known exceptions, either an exception that occurred in the request pipeline(such as max retries or timeout reached, bad authentication, etc...) or Elasticsearch itself returned an error (could not parse the request, bad query, missing field, etc...). If it is an Elasticsearch error, the `ServerError` property on the response will contain the the actual error that was returned.  The inner exception will always contain the root causing exception.
+
+**UnexpectedElasticsearchClientException:**  These are unknown exceptions, for instance a response from Elasticsearch not properly deserialized.  These are usually bugs and should be reported.  This exception also inherits from `ElasticsearchClientException` so an additional catch block isn't necessary, but can be helpful in distinguishing between the two.
+
+**Development time exceptions:** These are CLR exceptions like `ArgumentException`, `NullArgumentException` etc., that are thrown when an API in the client is misused.  These should not be handled as you want to know about them during development.
+
+# Breaking Changes
+
+Even though a lot of work went into the interior, the exterior did not escape unscathed! On top of the many breaking changes that Elasticsearch 2.0 introduces, there are more then a few NEST 2.0 introduces.
+We revalidated all the request and response domain objects against Elasticsearch 2.0.
+
+We will do our best to compile a list when NEST 2.0 GA hits. If we moved your cheese to a spot you can no longer find it then please open an issue and we'll be more then happy to help locate it.
+
+# Elasticsearch 2.x support
+
+NEST 2.0 supports all the new features from Elasticsearch 2.0 including pipeline aggregations. Here we'll just highlight a couple features that are reflected in NEST changes
+
+## Removal of filters
+
+NEST 2.0 reflects Elasticsearch 2.0 move of filters and no longer has filter constructs in its code base
+
+## Filtered query deprecation
+
+With the removal of filters NEST has added a special construct in its Query DSL to easily create a bool query with a filter clause
+
+``` csharp
+.Query(q=> +q.Term(p=>p.Name, ""NEST""))
+```
+
+Note the `+` this will wrap the term query inside a bool query's `filter` clause
+
+You can even combine this with `!`
+
+``` csharp
+.Query(q=> !+q.Term(p=>p.Name, ""NEST""))
+```
+
+This will wrap the term query inside a `bool filter` and that bool inside a `bool must_not`, obviously this also works for the object initializer syntax
+
+``` csharp
+!+new TermQuery {}
+```
+
+## Attribute based mapping
+
+The single `ElasticPropertyAttribute` has been broken up into individual attributes per property type.
+
+For instance, the following:
+
+``` csharp
+[ElasticType(Name = ""othername"", IdProperty = ""MyId"")]
+public class Foo
+{
+  [ElasticProperty(Type = FieldType.String)]
+  public Guid MyId { get; set; }
+
+  [ElasticProperty(Type = FieldType.String)]
+  public string Name { get; set; }
+
+  [ElasticProperty(Type = FieldType.String, Analyzer = ""myanalyzer"", TermVector = TermVectorOption.WithOffsets)]
+  public string Description { get; set; }
+
+  [ElasticProperty(Type = FieldType.Date, Format = ""mmmddyyyy"")]
+  public DateTime Date { get; set; }
+
+  [ElasticProperty(Type = FieldType.Integer, Coerce = true)]
+  public int Number { get; set; }
+
+  [ElasticProperty(Type = FieldType.Nested, IncludeInParent = true)]
+  public List<Bar> Bars { get; set; }
+}
+```
+
+becomes
+
+``` csharp
+[ElasticsearchType(Name = ""othername"", IdProperty = ""MyId"")]
+public class Foo
+{
+  [String]
+  public Guid MyId { get; set; }
+
+  [String]
+  public string Name { get; set; }
+
+  [String(Analyzer = ""myanalyzer"", TermVector = TermVectorOption.WithOffsets)]
+  public string Description { get; set; }
+
+  [Date(Format = ""mmddyyyy"")]
+  public DateTime Date { get; set; }
+
+  [Number(NumberType.Integer, Coerce = true, DocValues = true)]
+  public int Number { get; set; }
+
+  [Nested(IncludeInParent = true)]
+  public List<Bar> Bars { get; set; }
+}
+```
+
+Aside from the more simple and cleaner API, this allows each attribute to only reflect the options that are available for the particular type, instead of exposing options that may not be relevant (as `ElasticPropertyAttribute` currently does).
+
+For more details, see https://github.com/elastic/elasticsearch-net/pull/1520.
+
+# C# 6 support
+
+NEST's codebase has been largely rewritten to take advantage of all the cool new c# features making almost all the fluent code one liners.
+We also expose the static Infer class which makes a great static using target.
+
+``` csharp
+using static Nest.Infer;
+
+//later..
+
+Field<Project>(p=>p.Name);
+Index<Project>();
+Indices<Project>().And<Developer>();
+```
+
+# Feedback
+
+Please let us know if you hit into a snag using these new bits, nothings to big or to small. We are looking to move fast to a NEST 2.0 GA and would hate to miss anything.
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/2384393/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/2384393,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/2.0.0-alpha1,https://github.com/elastic/elasticsearch-net/releases/tag/2.0.0-alpha1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/2.0.0-alpha1,2.0.0-alpha1,False,True
+1737685,2015-08-28T16:48:50Z,2015-08-28T16:56:43Z,,"### Bug Fixes
+- #1533 Added missing `store` option to `_timestamp` field (ty @KodrAus !)
+- #1525 Added missing `offset` option to `date_histogram` aggregation
+- #1514 Added missing `filter` option to `has_parent` filter
+- #1505 Added missing `min` and `max` options to `has_child` filter
+- #1497 Fixed serialization of `fields` on `UpdateDescriptor` when using expressions
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/1737685/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/1737685,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.7.1,https://github.com/elastic/elasticsearch-net/releases/tag/1.7.1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.7.1,1.7.1,False,False
+1552450,2015-07-17T17:11:59Z,2015-07-17T17:47:43Z,,"This release contains full feature parity with Elasticsearch 1.7.
+
+### New Features
+- #1381 `MapFromAttributes()` now defaults `Guid`s to `string`s
+- #1454 Add `Query(IQueryContainer)` to `CountDescriptor`
+- #1479 `byte` and `short` types are now mapped to their respective Elasticsearch types when using MapFromAttributes()
+- #1485 Add support for version to snapshot info
+- #1487 Add `shard_size` to `TermStats` face (TY @qbast)
+
+### Bug Fixes
+- #1296 `UpdateReponse` was missing `Fields`
+- #1440 Better syntax for `ReIndex`
+- #1474 `GeoBounds` aggregation not read to completion
+- #1478 Fixed serialization of `LanguageAnalyzer`s `stem_exclusion` property
+- #1484 Document metadata missing on `TermVectorResponse`
+- #1496 Force invariant culture on all dates
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/1552450/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/1552450,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.7.0,https://github.com/elastic/elasticsearch-net/releases/tag/1.7.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.7.0,1.7.0,False,False
+1461585,2015-06-25T16:58:20Z,2015-06-25T17:10:41Z,,"- NEST upgraded to Json.NET 7.x
+- #1463 Fix `ScriptFile` and `ScriptId` not being serialized on bulk update requests
+- e3447958e35e36a9cfb5d1b913ae631627d0ce8c Fix `boost` option missing from several queries
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/1461585/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/1461585,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.6.1,https://github.com/elastic/elasticsearch-net/releases/tag/1.6.1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.6.1,1.6.1,False,False
+1445895,2015-06-22T14:57:53Z,2015-06-22T15:00:04Z,,"This release contains full feature parity with Elasticsearch 1.6.
+
+### New Features
+- #1446 Support for field stats API
+- #1445 Support for synced flush API
+- #1444 Support for response filtering on all APIs
+- #1441 Support for murmur3 Field Type
+- #1430 Support for include/exclude on `TermsAggregation`
+- #1451 Added node id to _cat API responses 
+- #1450 Added `default` option to FieldValueFactor
+- #1449 Added `numeric_resolution` to date mapping
+- #1447 Added `explanation` to validate API response
+- $1448 Added `SortMulti()` to allow for easy sorting across multiple fields (TY @mgoodfellow !)
+
+### Bug Fixes
+- #1459, #1456 Add support for script, script id, and script file where they were missing on all update descriptors
+- #1457 Fixed `NullReferenceException` in `GetIndex()` when a custom analyzer had no type defined
+- #1438 `GeoPoint` mapping was missing `precision`
+- #1429 `DateMapping`, `GeoPointMapping`, and `BooleanMapping` were missing `doc_values`
+- #1409 Raw filters were not written to request when used on filtered aliases
+- #1452 Fixed serialization of `KeepWordsPath` property on `KeepWordsTokenFilter` (TY @davidtme !)
+- #1431 `MoreLikeThis` query should accept documents or ids (TY @robertlyson !)
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/1445895/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/1445895,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.6.0,https://github.com/elastic/elasticsearch-net/releases/tag/1.6.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.6.0,1.6.0,False,False
+1353321,2015-05-29T14:55:44Z,2015-05-29T15:11:28Z,,"### Bug Fixes
+- #1310 `Suggest<T>` doesn't infer index name from `T`(TY @gmoskovicz)
+- #1323 `MultiPercolate` now has support for `PercolateMany` (TY @gmoskovicz)
+- #1401 Keep exceptions stack trace in async calls (TY @vbfox)
+- #1403 Multiple Extended Stats aggregations are not parsed correctly in `ISearchResponse`
+- #1407 Support `distance_type` for `SortGeoDistance`
+- #1410 Added overload to DismaxQueryDescriptor's Queries method to take QueryContainer[](TY @xueye)
+- #1412 `RangeFilterJsonConverter` doesn't correctly serialize `gt` and `lt` (TY @aochsner)
+- #1416 IMultiGetOperation can now be deserialized (TY @abibell)
+- #1418 `function_score` query doesn't have filter property (TY @gmoskovicz)
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/1353321/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/1353321,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.5.1,https://github.com/elastic/elasticsearch-net/releases/tag/1.5.1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.5.1,1.5.1,False,False
+1275439,2015-05-08T15:17:35Z,2015-05-08T15:38:17Z,,"This is the 1.5 release! This release contains full feature parity with Elasticsearch 1.5. As always, thank you to everyone who contributed!
+
+Also, checkout [our new tutorial repository](https://github.com/elastic/elasticsearch-net-example) that will guide you through building a search interface for NuGet packages. It's a great way to get started with NEST and Elasticsearch.
+
+### New Features
+- #1369 INNER HITS SUPPORT !
+- We now support lazy deserialization of documents using `IDocument` (side-effect of implementing inner hits)
+- Low-level client now up to date with 1.5 rest spec
+- #998 You can now use variables in `.Suffix()` in property path `Expressions`
+- #1387 Fielddata fields support on `Search()`
+- #1316 Added `UsePrettyRequests()` and `PrettyJson()` to `Connectionsettings`
+- #1295 Added `script_file` to transform mapping (ty @markuslindberg!)
+- #1300 Added an internal elasticsearch timespan string parser (ty @aochsner!)
+- #1305 Special `.ConditionlessWhen(true_expression)` to functionscore queries to control its conditionless nature separately
+- #1325 Included index property for Indices Filter ty @abibell!
+- #1307 IncludeInParent support in attribute based mappings ty @robertlyson!
+- #1333 Missing `fuzzy_transpositions` support in MatchQuery ty @robertlyson!
+- #1368 Added percentage and scripted heuristics to significant terms 
+- #1362 Support for supplying index settings on restore ty @robertlyson!
+- #1376 Added status and total memory to cat indices response 
+- #1341 MLT query: Support for artificial documents 
+- #1354 MLT query: Support for `minimum_should_match` parameter 
+- #1109 MLT query: Support for `per_field_analyzer`
+- #1373 Support for `min_score` parameter on function score query ty @robertlyson!
+- #1342 Added `timezone` to `query_string`
+- #1343 Added `format` to range filter and query
+- #1374 Support for cat segments API
+- #1356 Support for `minimum_should_match` option on `query_string_query` ty @robertlyson! 
+- #1388 Has child/top children: support for `min` score type and `min/max_children`
+- #1105 Added `default` and `ignore_missing` to timestamp mappings
+- #1350 Added new columns in the cat nodes API
+- #1352 Added support for `_field_names` mapping
+- #1357 Added support for `analyze_wildcard` on `simeple_query_string`
+- #1358 Added `max_determinized_states` to `regexp` filter and query and query string query
+- #1363 Added more translog stats on recovery api and cat recovery
+- #1364 Added pending tasks to cluster health and cat health API
+
+### Bug Fixes
+- #1347 Fix bad nuspec output path for .NET 4.0 nuget packages ty @cstlaurent!!
+- #1336 Fix id property lookup methods configured on connection settings not being cached
+- #1292 Allow `sort()` on fluent search descriptor no longer throws when passed `null`
+- Script sort should not be conditionless when only file is set
+- #1297 Conditonless queries inside `dismax_query` wre serialized as `{}` ty @danielsilva!
+- #1306 Fixed some several typo's in links in the documentation ty @romansp!
+- #1317 Fieldvalue helpers on response should not throw if field is missing
+- #993 and #992 Better documented some of the breaking changes from NEST `0.*` to `1.*`
+- Fixed typo in `SnapshotBytesPerSecondMaximum()` reported by @shanekenney 7a52b89
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/1275439/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/1275439,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.5.0,https://github.com/elastic/elasticsearch-net/releases/tag/1.5.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.5.0,1.5.0,False,False
+1098904,2015-03-27T16:05:43Z,2015-03-27T16:40:43Z,,"This 1.4.3 release is compatible with **all** Elasticsearch 1.x releases.
+The previous 1.4.2 release is compatible up to (but not including) Elasticsearch 1.5.
+
+### Bug Fixes
+- #1291 Fix broken aggregations on Elasticsearch 1.5 due to elastic/elasticsearch#10284
+- #901 Fix enums from being skipped when calling MapFromAttributes().  They are now mapped as integers by default.
+- #1254 Fixed exception occurring when using Thrift and opening many simultaneous async connections (Ty @lukapor !)
+- #1281 Added support for standard deviation bounds to the extended stats aggregation response
+- #1279 Fixed an ArgumentNullException that occurred when using the MultiSearch object initializer syntax
+- #1275 `Aliases` was missing from cluster state response
+
+### Enhancements
+- #1267 Improved tracing: requests are now traced when they begin and end
+- #1280 Added a convenience extension method for passing a template name directly to `TemplateExists()` rather than using descriptors
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/1098904/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/1098904,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.4.3,https://github.com/elastic/elasticsearch-net/releases/tag/1.4.3,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.4.3,1.4.3,False,False
+987726,2015-02-25T16:42:45Z,2015-02-25T17:18:39Z,,"- #1241 Added `lenient` support to multi match query. (ty @jekstrom)
+- #1243 Added `execution` support to range filter. (ty @robertlyson)
+- #1244 Added shard query cache setting to index settings. (ty @Tasteful)
+- #1247 Added `precision` and `orientation` to `geo_shape` mapping.
+- #1249 Added `file` option to sort descriptor. (ty @nickelbob)
+- #1251 Improved type inference for `TypeExists`.
+- #1260 Exposed the ability to specify TcpKeepAlive at the request level via `ConnectionSettings` rather than setting it globally via the static `ServicePointManager` .NET class.
+
+## Bug Fixes
+- #1253 Terms filter did not allow passing an `IEnumerable<T>` field.
+- #1255 `Host` wasn't being populated in the response from node stats.
+- #1263 `SniffOnStartup()` was causing the client to sniff every time an `ElasticClient` was instantiated.
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/987726/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/987726,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.4.2,https://github.com/elastic/elasticsearch-net/releases/tag/1.4.2,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.4.2,1.4.2,False,False
+927322,2015-02-06T17:45:34Z,2015-02-06T18:11:15Z,,"## Bug Fixes
+- #1236 Aggregation response wasn't being read to completion if it contained a metric result with a null value.
+- #1223 `FunctionScoreQuery` was missing the [Weight function](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html#_weight).
+- #1222 Added the ability to specifiy predefined language-specific stopwords. (ty @danielsilva)
+- #1239 Added missing language analyzers: Irish, Latvian, and Sorani. (ty @coreycoto)
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/927322/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/927322,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.4.1,https://github.com/elastic/elasticsearch-net/releases/tag/1.4.1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.4.1,1.4.1,False,False
+893784,2015-01-28T16:39:17Z,2015-01-28T17:31:57Z,,"## Transport Fixes
+- #1093 Do not retry when timeout is hit
+- #1157 Support for TCompactProtocol when using thrift (ty @robertlyson)
+- #1176 Inner Exception not available in MaxRetryException in a couple of scenarios 
+- #1159 Thrift connection now listens to connect timeout (ty @eddyzanda)
+- When not using connection pooling, NEST 1.3 ignored the MaxRetries() setting when set explicitly
+- #1203 @aochsner spotted an instance where we were if checking on connect timeout but returning request timeout
+- #1189 Thrift did not work with SniffingConnectionPool at all!
+  - Thift IConnection now opens connections as needed as suppose to once in the constructor
+
+We also extended our Shield support:
+
+We now know when you are running a cluster using SSL nodes in this case our default connect timeout is now 2 seconds.  We also increased the default connect timeout from 200ms to 1s. From feedback we realized 200ms was a little to stringent in the cloud!
+When sniffing whilst using SSL enabled nodes we make sure all the newly discovered nodes are https as well.
+
+## Aggregations
+- #1094 support `extended_bounds` on Histogram (ty @ftoft)
+- #1108 support `pre_offset` and `post_offset` on histogram aggregation
+- #1064 filters aggregation support added
+- #1063 scripted metric aggregation support added
+- #1132 children aggregation support added
+- #1168 top hits aggragation did not fully expose all options
+- #1169 Fix parsing of the top hits aggregation response
+- #1180 added missing execution hint options to terms aggregation
+- #1178 add `background_filter` support on `significant_terms` aggregation
+- #1206 Made the internal constructor that initializes aggregate responses public (ty @mausch)
+- #994 keys that looked like dates were translated to `DateTime` first and then tostring'ed
+- #1127 `Lang` was blatently missing on `metric` aggregations
+- #1111 Added google normalized distance and chi square to `significant_terms` agg.
+- #1079 Fix parsing inner aggregations of histograms when they represent ints.
+- #1106 Add pre_offset and post_offset params to histogram aggregation
+- #955 Default date histogram aggregation format to date_optional_time
+
+## Endpoint
+- #1115 Coordinated back and restore endpoint (ty @robertlyson)
+- #983 Search exists API
+- #496 Cluster reroute
+- #1098 Repository validation
+- #1084 Snapshot validation
+- #1040 Updrade API
+- #1083 Get Index API
+- #1212 Cat endpoints were missing from `IElasticClient` 
+- #1146 `DeleteByQuery` responses contained a `.Found` property from `Delete` responses that does not exist causing confusion
+
+## New Features
+- #1100 Throttling related properties returned under indexing stats
+- #1113 Fluent DSL was missing highlight options on percolate and mpercolate
+- #1103 KeepTypes token filter fix 
+- #1104 Support multiple geo points while sorting 
+- #407 Configure id property of types in code
+- #1164 NodeInfo now also lists plugins (ty @ptming)
+- #1217 Add `matched_queries` to search response, NEST only supports named filters for the moment though.
+- #1102 Update API: Add support for scripted upserts
+- #1101 Term Vectors: add support for scripted upserts
+- #1216 FunctionScoreQuery now accepts a collection of functions
+
+## Query DSL
+- #1090 relation added to geoshape filter
+- #1099 add support for pre/post/dist to `span_not` query
+- #1218 Support for has child filters (ty @BuriakovNick!)
+- #1190 indices filter/query now supports `all` and `none` as shortcuts to actual filters on `no_match_filter` 
+- #1158 add `time_zone` parameter to range query and filer
+
+## Bug Fixes
+- #1148 Sort information did not survive serialize => deserialize roundtrip
+- #1172 Fix wrong property mapping in SearchShard (ty @UdiBen)
+- #1174 Fix typo in json property name for execution hint
+- #629 Fix exception when deserializing relative `Uri`'s
+- #1214 Function score only accepted weights as long and not as double.
+- #1160 When no default index is set we now default to `_all` explictly
+- #1154 `GetSnapshot()` did not parse errors correctly
+- #1209 Also gzip content when sent to Elasticsearch if compression is enabled
+
+## Build
+- #1188 Now support gitlink for automatic downloading of source locations straight from github!
+- #1149 We now continuously build on mono as well courtesy of travis!
+- #1207 Refactored build into logical modules
+- #1136 We now build separate .NET 4.5 dlls this to explicitly support dot net core when targeting 
+  the desktop clr.
+- #1207 We moved to paket since it resolves packages at build time and makes multi targeting that much easier.  we might move back to nuget 3.0 once its on future parity with paket. This only affects how we consume nuget packages, we still publish to nuget!
+
+## Special Mentions
+- #1181 @amironoff tested filters aggregation on our bleeding edge builds and spotted a very particular parsing error and gave us one of the [most detailed reproduce ever](https://github.com/amironoff/es-aggregation-bug)!
+- @dpen2000 fixed some casing issues on hour homepage
+- @anshudatta fixed our `QueryRaw` example in our documentation.
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/893784/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/893784,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.4.0,https://github.com/elastic/elasticsearch-net/releases/tag/1.4.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.4.0,1.4.0,False,False
+769360,2014-12-09T21:05:38Z,2014-12-09T21:30:15Z,,"## Bug Fixes
+- Added `MaxRetryTimeout` to safeguard against retrying timed out queries on other nodes. (#1093)
+- Added missing `Relation` option to GeoShape filters. (#1090)
+- Basic _authentication_ mistakenly referred to as basic _authorization_.  Marked all references to `BasicAuthorization` as obsolete in favor of `BasicAuthentication`. (#1117)
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/769360/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/769360,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.3.1,https://github.com/elastic/elasticsearch-net/releases/tag/1.3.1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.3.1,1.3.1,False,False
+736584,2014-11-26T19:30:45Z,2014-11-26T19:45:22Z,,"## New Features
+- Improved basic authorization API. (#1035)
+- Improved connection pool `401` (Unauthorized) request handling. (#1060)
+- Added a new connection setting for enabling/disabling HTTP pipelining. (#1032)
+- Added a new API for configuring property name mappings on `ConnectionSettings`. (#1062)
+- `FunctionScoreQuery`: added support for `weight`. (#1071)
+- `PhraseSuggester`: added support for `highlight`. (#1007)
+- Highlighting: added support for [highlight_query](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-request-highlighting.html#_highlight_query) and [matched_fields](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-request-highlighting.html#matched-fields). (#1076)
+- Span queries: added support for `boost`. (#1030) Ty @wbsimms!
+- Added support for [indexed scripts](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-scripting.html#_indexed_scripts). (#979) Ty @robertlyson!
+- Added support for the [geohash cell filter](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-geohash-cell-filter.html#query-dsl-geohash-cell-filter). (#1033) Ty again @robertlyson!
+- Added `TimedOut` to search responses. (#944) Ty @thegreymatter!
+
+## Bug Fixes
+- `SniffingConnectionPool`: Increased ping before sniff default timeout to 200 ms (previously 50 ms). (#1058)
+- `Elasticsearch.Net.JsonNet`: downgraded target framework to 4.0 to align with `Elasticsearch.Net`. (#1053)
+- Fixed `GetMapping()` so that multiple mappings can be retrieved. (#1066)
+- Typo fix in `DeleteTemplateAsync` method name. (#1070) Ty @ilivewithian!
+- Fixed a mapping issue with generic types that had multiple type arguments (#1044). Ty @radiosterne!
+- Fixed `NullReferenceException` in `MappingWalker` (#1068)
+
+## Internal
+-  Refactored the `Elasticsearch.Net` internals unit tests into more logical units and amended it with unit tests for the way we handle streams internally for all code paths. This gave us enough confidence to refactor our transport layer, giving it less responsibilities. (#1060)
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/736584/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/736584,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.3.0,https://github.com/elastic/elasticsearch-net/releases/tag/1.3.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.3.0,1.3.0,False,False
+695313,2014-11-11T15:19:40Z,2014-11-11T15:43:42Z,,"This release addresses a compatibility issue with aggregations between NEST and Elasticsearch 1.4.  See #1041, #1042, and #1051 for details.
+
+## Bug Fixes
+- Fixed `NullReferenceException` in `AggregationsHelper` when a bucket aggregation is not found.  (#1048) Thank you @mausch.
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/695313/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/695313,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.2.3,https://github.com/elastic/elasticsearch-net/releases/tag/1.2.3,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.2.3,1.2.3,False,False
+669391,2014-10-31T17:21:47Z,2014-10-31T18:15:52Z,,"## Bug Fixes
+- Fixed aggregation parsing error when running Elasticsearch 1.4.0.Beta1. (#1025)
+- Fixed `Get<T>`from treating a `404` (document doesn't exist) as an invalid response. (#1026)
+- Fixed `CommonTermsQuery` incorrectly serializing to `common_terms` instead of `common`. (#1027)
+- Fixed hash collision issue due to incorrect `Equals` logic in marker classes. (#1029)
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/669391/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/669391,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.2.2,https://github.com/elastic/elasticsearch-net/releases/tag/1.2.2,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.2.2,1.2.2,False,False
+646873,2014-10-22T22:14:16Z,2014-10-22T22:38:30Z,,"## Bug Fixes
+- Fixed `NullReferenceException` in `TransportRequestState` when `Metrics` was disabled. (#1009)
+- Fixed null dictionary values from being ignored when serialized even with setting `NullValueHandling` to `Include`. (#1004)
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/646873/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/646873,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.2.1,https://github.com/elastic/elasticsearch-net/releases/tag/1.2.1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.2.1,1.2.1,False,False
+640310,2014-10-20T18:50:49Z,2014-10-20T19:32:35Z,,"## New Features
+- Added support for the template query and all search template endpoints. (#959)
+- Added context suggester support. (#927)
+- Added support for the `Collate` option on the phrase suggester. (#824)
+- Get and MultiGet now support `_source` at the document level. (#945)
+- Improved consistency across OIS constructors. (#950)
+- Exposed the `Raw` method on `FilterDescriptor`. (#999) Thank you @aochsner!
+- Added a `FluentDictionary` overload on `MultiMatchQuery` for specifying `OnFieldsWithBoost`. (#964) Thank you @edwinf!
+
+## Bug Fixes
+- GeoBoundingBox Filter: fixed incorrect order of lat and lon coordinates. (#1002)
+- DateHistogram Aggregation: fixed `OrderDescending()` resulting in ascending order. (#996)
+- Fixed `NullReferenceException` when mapping date multi fields. (#990)
+- Fixed `StackOverflowException` and improved performance when using bitwise operators to build bool queries. (#974)
+- Fixed `ConstantScoreQuery` mistakenly inherting from `ICustomScoreQuery`. (#987) Thank you @sstranz!
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/640310/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/640310,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.2.0,https://github.com/elastic/elasticsearch-net/releases/tag/1.2.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.2.0,1.2.0,False,False
+607277,2014-10-06T20:25:35Z,2014-10-06T20:52:40Z,,"## Bug Fixes
+- Fixed condition-less logic in `FilteredQuery` that caused a query parsing exception in ES.  #971 
+- Fixed issue where the `ignore_unavailable` option wasn't being added to `_msearch` requests.  #969 
+- Fixed NullReferenceException when using `HttpClient`. #953 
+- Removed NetReflector dependency from the `Elasticsearch.Net.Connection.Thrift` package. #952
+- NEST no longer throws an exception when using the `_analyzed` endpoint on an empty string. #962 
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/607277/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/607277,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.1.2,https://github.com/elastic/elasticsearch-net/releases/tag/1.1.2,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.1.2,1.1.2,False,False
+561283,2014-09-16T15:16:58Z,2014-09-16T15:39:08Z,,"This release fixes a NRE in the [Elasticsearch.Net.Connection.HttpClient](https://www.nuget.org/packages/Elasticsearch.Net.Connection.HttpClient/) package. 
+
+The default `IConnection` interface for NEST was working fine but using the alternative `IConnection` based on `HttpClient` would throw a NRE.
+",https://api.github.com/users/Mpdreamz,245275,Mpdreamz,https://api.github.com/repos/elastic/elasticsearch-net/releases/561283/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/561283,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.1.1,https://github.com/elastic/elasticsearch-net/releases/tag/1.1.1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.1.1,1.1.1,False,False
+561264,2014-09-16T13:55:00Z,2014-09-16T15:35:36Z,,"# New Features
+
+### Endpoints
+- Added support for the [multi percolate API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-percolate.html#_multi_percolate_api)
+- Added support for [alias exist API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-aliases.html)
+- Added support for [type exist API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-types-exists.html#indices-types-exists)
+- Added support for the [explain API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-explain.html#search-explain)
+- Added support for the [snapshot status API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-snapshots.html#_snapshot_status)
+- Added support for the [indices recovery API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-recovery.html#indices-recovery)
+- Added support for the [cluster pending tasks API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-pending.html#cluster-pending)
+- Added support for the [cluster stats API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-stats.html#cluster-stats)
+- Added support for the [node shutdown API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-nodes-shutdown.html#cluster-nodes-shutdown)
+- Added support for the Ping API 
+- Added missing PutAlias and DeleteAlias() endpoints #933, technically both of these were possible through the `_aliases` API  already but we added them in for completion sake
+- Added support for the [template exist API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-templates.html)
+- Added support for the [nodes hot_threads API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-nodes-hot-threads.html#cluster-nodes-hot-threads)
+- Added support for the [search shards API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-shards.html#search-shards)
+- Added support for the [get repository API](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-snapshots.html#_repositories)
+- Exposed `DoRequest()` on the NEST and Elasticsearch.NET clients so that you can hit any url while still taking advantage of the cluster failover and built in response handling #934
+- NEST now also support ALL the [_cat APIs](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cat.html)
+
+### Aggregations
+- [percentile_ranks aggregation](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-aggregations-metrics-percentile-rank-aggregation.html#search-aggregations-metrics-percentile-rank-aggregation) support #821
+- [geo_bounds aggregation](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-aggregations-metrics-geobounds-aggregation.html) support  #822
+- [top_hits aggregation](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-aggregations-metrics-top-hits-aggregation.html#search-aggregations-metrics-top-hits-aggregation) support #930
+- [reverse nested aggregation](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-aggregations-bucket-reverse-nested-aggregation.html) support #939
+
+### Updated APIs
+- Added support for [mapping field data formats for fields](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/fielddata-formats.html)
+- Added support for [transform mapping](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/mapping-transform.html#mapping-transform)
+- Added a MappingVisitor class [to walk over any  elasticsearch mapping](https://github.com/elasticsearch/elasticsearch-net/blob/develop/src/Tests/Nest.Tests.Integration/Mapping/MappingVisitorTests.cs) 
+- MoreLikeThisQuery() now supports `ids` and `docs` [properties](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-mlt-query.html#query-dsl-mlt-query) #894
+- Added support for [span_multi_term](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-span-multi-term-query.html) query #896
+
+# Bug Fixes
+- Fixed an issue with parsing percentiles aggregation that prevented adjacent aggregations not to be parsed correctly #931
+- HttpClientConnection (an HttpConnection alternative) now supports compressed responses and basic AUTH #947 
+- DateExpressionRange was missing the `key` property ty @taschmidt! #938
+- Term filters did not serialize enums but only wrote there values reported on reopened #535
+- Shard failures on responses did not include the `reason` property #930 
+- Fix occasions where `Dictionary<valuetype, something>` could not be mapped as object #926
+- Elasticsearch.NET client is now generated from the 1.3.2 spec
+- IndexOptions enum was missing `Offsets` option, ty @tbrooks007 ! #891
+- In the IndicesStats API TypeNameMarker in the querystring were not resolved properly ty @Tasteful #908
+- Fix #907 `new SearchRequest()` defaulted to all indices while `new SearchRequest<T>()` defaulted to the configured default index, the latter is now always the default behaviour for any OIS class.
+- Count() now defaults to GET if no query is specified
+- NEST now plays nicely with clusters that have the `rest.action.multi.alow_explicit_index: false` set for the various bulk endpoints (_bulk, _mget, _msearch et  all). ty @Tasteful! #870
+- Disable proxy detection now defaults to false, this means that NEST plays nicely with Fiddler out of the box. Either defaulting to true or false can cause an initial delay while .NET figures out whether a proxy is configured or not depending on your system, defaulting to false atleast has the added benefit of playing nice with fiddler see #866 for more background.
+- A nested filter that only contained filters was marked as conditionless ty @Philo! #881
+- NEST still used a special notation for multifield mapping, which meant that while generating the correct json it was hard to parse the mapping json back into C# objects. @Tasteful did an amazing job refactoring the mapping API in a backwards compatible manner so that you can branch off into multi_field mapping from any property mapping. see #885. Amazing work from @Tasteful!
+- NEST 1.0 broke the ability to send a verbatim match query #876
+- Some unit tests were missing invariant culure ty @Tasteful
+- Various query string params were generated with an incorrect key see #858 for more background. ty @lakario for reporting this bug!
+- Removed NetReflector as nuget dependency for `Elasticsearch.Net.Connection.Thrift` package
+- Passing numeric collection to Terms filter and query resulted in a conditionless query #843
+- Validated nuget package restore works correctly using all the new nuget goodness in Xamarin 5.3+
+- @gmarz went over a great deal of the documentation and updated it to be correct following NEST 1.0. He also included a ton of examples using the object initializer syntax.
+- @andersosthus added an advanced aggregation section to the documentation
+",https://api.github.com/users/Mpdreamz,245275,Mpdreamz,https://api.github.com/repos/elastic/elasticsearch-net/releases/561264/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/561264,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.1.0,https://github.com/elastic/elasticsearch-net/releases/tag/1.1.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.1.0,1.1.0,False,False
+483822,2014-08-11T14:13:04Z,2014-08-11T14:55:19Z,,"### Bug Fixes
+- Fixed `GetMany()` from nullifying the `_index` and `_type` properties in the request body.  #860 
+- Fixed `term filter` producing empty JSON on numeric term values.  #843
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/483822/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/483822,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.0.2,https://github.com/elastic/elasticsearch-net/releases/tag/1.0.2,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.0.2,1.0.2,False,False
+465471,2014-07-31T21:17:42Z,2014-08-01T13:17:40Z,,"### Bug Fixes
+- Fixed SerializationException being thrown when retrieving mappings. TY @johndaniels [#829](https://github.com/elasticsearch/elasticsearch-net/pull/829)
+- Fixed ArgumentNullException being thrown when specifying an id property using the `ElasticType` attribute. [#806](https://github.com/elasticsearch/elasticsearch-net/issues/806)
+- Disable HTTP pipelining since it isn't supported by Elasticsearch. [#830](https://github.com/elasticsearch/elasticsearch-net/issues/830)
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/465471/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/465471,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.0.1,https://github.com/elastic/elasticsearch-net/releases/tag/1.0.1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.0.1,1.0.1,False,False
+438697,2014-07-18T18:29:03Z,2014-07-18T21:22:39Z,,"This is the 1.0.0 GA release!  We've made some major improvements since the RC, read more about them [here](http://www.elasticsearch.org/blog/nest-elasticsearch-1-0-ga).  Thank you to everyone who contributed!
+
+### Changelog
+- Streamlined the Update APIs, improving consistency between the Update API and Bulk Update API and better alignment with the Elasticsearch DSL. [#795](https://github.com/elasticsearch/elasticsearch-net/pull/795)
+- Improved handling of hard exceptions inside async routines, which caused connection failover issues. [#803](https://github.com/elasticsearch/elasticsearch-net/pull/803)
+- Improved support / bug fixes for the `geo_shape` query and filter [#788](https://github.com/elasticsearch/elasticsearch-net/pull/788)
+- Added attribute mapping support for the `geo_shape` type. [72057a8](https://github.com/elasticsearch/elasticsearch-net/commit/72057a862f78bf9ee3beb1445513159932dacb2f)
+- Fixed `function score` queries so that filters can be applied to all function types. [#799](https://github.com/elasticsearch/elasticsearch-net/commit/ff3d3d7e6be03c002fca60219b1d27580c49e33e)
+- Added `score_mode` option to `Rescore`. [79acfeb](https://github.com/elasticsearch/elasticsearch-net/commit/72057a862f78bf9ee3beb1445513159932dacb2f)
+- Fixed invariant culture issue with percentile aggregations. Thank you [andersosthus](https://github.com/andersosthus) [#793](https://github.com/elasticsearch/elasticsearch-net/pull/793)
+- Serialize `sorts` as array instead of dictionary according to the ES REST Spec. [#804](https://github.com/elasticsearch/elasticsearch-net/issues/804)
+- Added support for `sort_mode` to all sort types. [#770](https://github.com/elasticsearch/elasticsearch-net/issues/770)
+- Fixed bug when mapping `store` via the `ElasticProperty` attribute. [fc512db](https://github.com/elasticsearch/elasticsearch-net/commit/fc512db65b4cbefbe66c1e12ecbfb5d8f4f1c782)
+- Fixed async exceptions not bubbling up appropriately. [dbdafae](https://github.com/elasticsearch/elasticsearch-net/commit/dbdafae66588f652b03be69d5b6c8468d47cfce0)
+- Exposed the option to enable/disable automatic proxy detection [9797369](https://github.com/elasticsearch/elasticsearch-net/commit/9797369adae372aa0acaa9ba3bc9071b53d1e1e2)
+- Replace confusing `ToggleSort()` method with `Order()` on sort descriptors [#764](https://github.com/elasticsearch/elasticsearch-net/pull/764)
+- Fixed deserialization of `GeoBoundingFilter` not using invariant culture.  We now also force invariant culture on all strings formatted with the `.F()` extension method.
+- File contents were switched in GeoPointMappingDescriptor and GeoShapeMappingDescriptor. Thank you [andersosthus](https://github.com/andersosthus) [#774](https://github.com/elasticsearch/elasticsearch-net/pull/774)
+- Removed unused usings. Thank you [tkirill](https://github.com/tkirill) [#758](https://github.com/elasticsearch/elasticsearch-net/pull/758)
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/438697/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/438697,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.0.0,https://github.com/elastic/elasticsearch-net/releases/tag/1.0.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.0.0,1.0.0,False,False
+421892,2014-07-10T14:17:28Z,2014-07-10T14:27:17Z,,"This is the 1.0.0-RC1 release!  Read all about the major features and fixes in the blog post <a href=""http://www.elasticsearch.org/blog/elasticsearch-net-nest-2-0-release-candidate-now-available/"">here</a>.
+
+### Changelog
+
+As always the level of community feedback never ceases to amaze us, this changelog only lists those that resulted in fixes or new features but the influx of general questions on [github](https://www.github.com/elasticsearch/elasticsearch-net) and [stackoverflow questions tagged with 'nest'](http://stackoverflow.com/questions/tagged/nest) is wonderful to see.
+- Really removed all the OK properties on responses [#576](https://github.com/elasticsearch/elasticsearch-net/issues/576)
+- UaxEmailUrlTokenizer reported a type with a space in it ty [Jesse Slicer](https://github.com/jslicer) [#584](https://github.com/elasticsearch/elasticsearch-net/pull/584)
+- If you enabled TRACE output requests were logging `byte[]`. ty [@sporty81](https://github.com/sporty81) [#589](https://github.com/elasticsearch/elasticsearch-net/pull/589)
+- When using `AddMapping<T>` inside `CreateIndex()` allow type to be overriden ty [Mattias Nordberg](https://github.com/nordbergm) [#595](https://github.com/elasticsearch/elasticsearch-net/pull/595)
+- When using attribute mapping `DateFormat` was not send to elasticsearch. ty [Dorian Dechant](https://github.com/ddechant) [#596](https://github.com/elasticsearch/elasticsearch-net/pull/596)
+- Added API reference URL to ScrollAsync, Changed API reference URL for Suggest and SuggestAsync to point to Suggest doc, Added subsection to some API references, Improve fuzziness support on suggests. ty [Anders Østhus](https://github.com/andersosthus) [#598](https://github.com/elasticsearch/elasticsearch-net/pull/598)
+- Added `TermVector()` support [#610](https://github.com/elasticsearch/elasticsearch-net/pull/610)
+- Fix conditionless queries inside function scores [#477](https://github.com/elasticsearch/elasticsearch-net/issues/477)
+- `Analyze` now always uses POST [#527](https://github.com/elasticsearch/elasticsearch-net/issues/527)
+- Fixed `ArgumentException` when using regex flags on terms aggregation include [#592](https://github.com/elasticsearch/elasticsearch-net/issues/592)
+- Improved API around getting individual bulk errors [#616](https://github.com/elasticsearch/elasticsearch-net/issues/616)
+- Connection pooling while using the thrift plugin did not properly failover [#599](https://github.com/elasticsearch/elasticsearch/compare) (thanks for reporting [Maxim Pashuk](https://github.com/maximpashuk))
+- Added `MultiTermVector()` support [#507](https://github.com/elasticsearch/elasticsearch-net/issues/507)
+- Make sure thrift connection is also closed on `TTransportException`'s ty [@danp60](https://github.com/danp60) [#624](https://github.com/elasticsearch/elasticsearch-net/pull/624)
+- Dashes were removed from alias names in the GetAlias calls [#628](https://github.com/elasticsearch/elasticsearch-net/issues/628) ty [Paige Cook](https://github.com/paigecook) with helping to reproduce it.
+- Support doc_values attributes on numeric and string mappings and in ElasticProperty attributes ty [@danp60](https://github.com/danp60) [#644](https://github.com/elasticsearch/elasticsearch-net/pull/644)
+- BulkUpdateDescriptor should have a Lang parameter since it has a Script parameter [#627](https://github.com/elasticsearch/elasticsearch-net/issues/627)
+- BulkUpdate missed doc as upsert setting [#638](https://github.com/elasticsearch/elasticsearch-net/issues/638)
+- Elasticsearch.NET is now fully CLSCompliant [#623](https://github.com/elasticsearch/elasticsearch-net/issues/623)
+- Replaced every occurance of `.ToLower()` with `.ToLowerInvariant()` [#634](https://github.com/elasticsearch/elasticsearch-net/issues/634)
+- When using NEST response types with Elasticsearch.NET methods `.ConnectionStatus` would be null [#645](https://github.com/elasticsearch/elasticsearch-net/issues/645)
+- Terms aggregation on numeric field does not return the Key in response [#643](https://github.com/elasticsearch/elasticsearch-net/issues/643)
+- Removed `NumericRangeQuery` (removed since 0.90.8)
+- Range queries now only take `GreaterThan()` `GreaterThanOrEqual()` `LowerThan()` `LowerThanOrEqualTo()` this to resemble to the only documented parameters on the range queries/filters since elasticsearch 1.0.
+- Mapped various missing/new tokenfilters, support language on `LowercaseTokenFilter()` ty [Roman Pavlov](https://github.com/romansp) [#652](https://github.com/elasticsearch/elasticsearch-net/pull/652)
+- Improved `Delete()` convenience extension methods [#651](https://github.com/elasticsearch/elasticsearch-net/issues/651)
+- Minor error message fix ty [Micah Weaver](https://github.com/micah-bloomerang) [#642](https://github.com/elasticsearch/elasticsearch-net/pull/642)
+- Async methods did not always behave correctly when receiving error status codes [#654](https://github.com/elasticsearch/elasticsearch-net/issues/654) many thanks for catching this one during the beta [@Aaronaught](https://github.com/Aaronaught)!
+- Updated several outdated examples in the documentation [#650](https://github.com/elasticsearch/elasticsearch-net/pull/650) ty [@vovikdrg](https://github.com/vovikdrg)
+- Changed index size stats to longs [#660](https://github.com/elasticsearch/elasticsearch-net/pull/660)
+- Map field_value_factor for function score [#682](https://github.com/elasticsearch/elasticsearch-net/pull/682) ty [@UdiBen](https://github.com/UdiBen)
+- Fix typo in CardinalityAggregationDescriptor ty [@UdiBen](https://github.com/UdiBen)
+- Post nuget installation page keeps coming up every time I open Visual Studio ty [Micah Weaver](https://github.com/micah-bloomerang) [#639](https://github.com/elasticsearch/elasticsearch-net/issues/639)
+- Add DelimitedPayloadTokenFilter ty [@danp60](https://github.com/danp60) [#680](https://github.com/elasticsearch/elasticsearch-net/pull/680)
+- Implemented an IConnection implementation that uses HttpClient internally. ty [Tom Anderson](https://github.com/RenEvo) !
+- Added AutomaticProxyDetection to Connectionconfiguration. ty [Christiaan baes](https://github.com/chrissie1) [#666](https://github.com/elasticsearch/elasticsearch-net/pull/666)
+- Add support for 'no_match_size' to HighlightFieldDescriptor ty [Yves Reynhout](https://github.com/yreynhout) [#678](https://github.com/elasticsearch/elasticsearch-net/pull/678)
+- use DefaultPropertyNameInferrer from settings when resolving property [#698](https://github.com/elasticsearch/elasticsearch-net/pull/698)
+- Cannot replace ContractResolver, even with a passthrough [#701](https://github.com/elasticsearch/elasticsearch-net/issues/701) ty [David Pfeffer](https://github.com/bytenik) for the elegant solution [#705](https://github.com/elasticsearch/elasticsearch-net/pull/705)
+- Generate number from the `rest-api-spec` as longs and not ints [#702](https://github.com/elasticsearch/elasticsearch-net/issues/702)
+- Circular Reference in JSON Serialization of `SearchSourceDescriptor<T>`[#706](https://github.com/elasticsearch/elasticsearch-net/issues/706)
+- Support extend_bounds on date_histogram [#699](https://github.com/elasticsearch/elasticsearch-net/pull/699) ty [Patrick McEvoy](https://github.com/firegrass)
+- added copy to field mapping support for appropriate types [#720](https://github.com/elasticsearch/elasticsearch-net/pull/720)
+- Added missing Similarity method to StringMappingDescriptor [#724](https://github.com/elasticsearch/elasticsearch-net/pull/724)
+- Added Alias collection to CustomAnalyzer[#727](https://github.com/elasticsearch/elasticsearch-net/pull/727)
+- Fixed stack overflow when mapping recursive collections [#731](https://github.com/elasticsearch/elasticsearch-net/pull/731)
+- Fixed template mapping: type name wasn't properly inferred [#735](https://github.com/elasticsearch/elasticsearch-net/pull/735)
+- Added support for `GetClusterSettings()` [#493](https://github.com/elasticsearch/elasticsearch-net/issues/493)
+- Added support for `ClusterSettings()` (PUT) [#737](https://github.com/elasticsearch/elasticsearch-net/pull/737)
+- fixed documentation links pointing to localhost ty [Roman Pavlov](https://github.com/romansp) [#746](https://github.com/elasticsearch/elasticsearch-net/pull/746)
+- added missing settings to compound token filter ty [Roman Pavlov](https://github.com/romansp) [#747](https://github.com/elasticsearch/elasticsearch-net/pull/747)\
+- Fluent support for configuring similarity modules [#748](https://github.com/elasticsearch/elasticsearch-net/pull/748)
+- Terms Filter not applying Execution on all overloads ty [Gareth Thomas](https://github.com/TruffleMuffin) [#753](https://github.com/elasticsearch/elasticsearch-net/issues/753)
+- Add support for percolate by id
+- MInor Doc Updates ty [Eric Berens](https://github.com/ericberens) [#749](https://github.com/elasticsearch/elasticsearch-net/pull/749)
+- Added ""Second"" facet date interval and support for custom date intervals ty [Stefano Castriotta](https://github.com/stefanocastriotta) [#715](https://github.com/elasticsearch/elasticsearch-net/pull/715)
+- Match queries were missing minimum_should_match [#741](https://github.com/elasticsearch/elasticsearch-net/issues/741)
+- Add support for ignore_above in string mappings [#762](https://github.com/elasticsearch/elasticsearch-net/issues/762)
+- added support for coerce on numeric mappings
+- added missing store, doc_values, compress and compress_threshold properties for binary mapping
+- Replace confusing ToggleSort(bool) with Order(SortOrder) [#764](https://github.com/elasticsearch/elasticsearch-net/pull/764)
+- Can now map unknown types (i.e from plugins) [#729](https://github.com/elasticsearch/elasticsearch-net/issues/729)
+- Aggregations with integers as key returns null on keyfield in Nest.KeyItem [#730](https://github.com/elasticsearch/elasticsearch-net/issues/730)
+- Completely remove scope from filters and facets and implement join on nested filter [#428](https://github.com/elasticsearch/elasticsearch-net/issues/428)
+- Source returns instance when an ElasticSearch returns an error [#723](https://github.com/elasticsearch/elasticsearch-net/issues/723)
+- Can now instruct the client to accept gzipped responses from elasticsearch [#768](https://github.com/elasticsearch/elasticsearch-net/pull/768)
+",https://api.github.com/users/gmarz,1594777,gmarz,https://api.github.com/repos/elastic/elasticsearch-net/releases/421892/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/421892,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.0.0-rc1,https://github.com/elastic/elasticsearch-net/releases/tag/1.0.0-rc1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.0.0-rc1,1.0.0-rc1,False,True
+268291,2014-04-10T12:30:26Z,2014-04-11T19:11:30Z,1.0.0-beta1,"http://www.elasticsearch.org/blog/introducing-elasticsearch-net-nest-1-0-0-beta1/
+",https://api.github.com/users/Mpdreamz,245275,Mpdreamz,https://api.github.com/repos/elastic/elasticsearch-net/releases/268291/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/268291,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/1.0.0-beta1,https://github.com/elastic/elasticsearch-net/releases/tag/1.0.0-beta1,https://api.github.com/repos/elastic/elasticsearch-net/zipball/1.0.0-beta1,1.0.0-beta1,False,True
+110053,2013-12-02T20:42:26Z,2013-12-02T21:45:02Z,,"It's been a little over a month since the last release but a new release is already long overdue and I have the community to thank for that. A special shoutout to @andreabalducci for single handedly implementing support for `function_score` queries, @gmarz and @freshmaker74 went and added complete support for all the new suggest features (even the expirimental completion suggest). 
+
+I'm **very happy** to announce that I'll be joining Elasticsearch on the 1st of February to up the ante on writing proper documentation and stabilising the API.
+
+I also like to take this space to thank my current employer Q42 (http://www.q42.nl) who have been nothing but supportive to me and NEST. Q42 gracefully sponsored a day of my time a week to work on NEST.
+
+As always all the 0.12.0 packages are on nuget:
+
+| Package | Url |
+| --- | --- |
+| NEST | http://www.nuget.org/packages/NEST/ |
+| NEST.Signed | http://www.nuget.org/packages/NEST.Signed/ |
+| NEST.Connection.Thrift | http://www.nuget.org/packages/NEST.Connection.Thrift/ |
+| NEST.Connection.Thrift.SIgned | http://www.nuget.org/packages/NEST.Connection.Thrift.Signed/ |
+
+# NDC_London
+
+If you are going to NDC London this week and you are (not) using NEST or Elasticsearch shout at me on twitter (@Mpdreamz) I would love to meet.
+
+Again thank you @Q42 for still letting me go. 
+
+# New Features
+- @andreabalducci committed support for the new `function_score` queries http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html 
+- @gmarz, @freshmaker74 implemented Term, TextPhrase, Completion suggestions on the `_search` endpoint (Search() in NEST) direct support for the `_suggest` endpoint is still pending though see #397 and http://www.elasticsearch.org/blog/you-complete-me/
+- @bytenik implemented an async version of the `Bulk()` call and fixed a bug where custom serialization settings were not applied correctly see #382 
+- @jjherbst added some convenience methods for the various search preference options.
+- added new TokenChars field to NGramTokenizers see #375 
+- IElasticRawClient is now conforming to commit 394e3e45e8 of the elasticsearch client rest spec (https://github.com/elasticsearch/elasticsearch-rest-api-spec)
+- Regexp filter and query support.
+- Added geoshape filter.
+- Added support for terms lookup queries (http://www.elasticsearch.org/blog/terms-filter-lookup/)
+
+# Bug Fixes
+- @Tasteful fixed a bug in one of the overloads of `DeleteByQuery()` that did not translate types correctly see #399, also fixed analysis information not deserializing properly in the `GetSettings()` call.
+- @nickcanz fixed some documentation links. 
+- `Term(lambda, value)` no longer requires value to be of type string see #347 
+- MatchQuery was a throwing argumentnull exceptions which is not what you want if you use Conditionless queries see #262 
+- Fixed monodevelop/xamarin build error and warnings
+- Caught an edgecase in the bool rewriting of queries. See this StackOverflow question for details http://stackoverflow.com/a/20004283/47020 <- also a great read if you want to know how NEST helps you write boolean queries.
+- fixed a bug where using bitwise operators on two filters with different cache settings would apply the same cache settings to both.
+- fixed signed packages being delay signed instead of full #377 (ty @maximpashuk for slap on the wrist).
+- the dynamic property when mapping objects can by true/false or ""strict"" now see #379 
+- When mapping a generic object (using Generic(), a mechanism to map unknown types i.e that plugins expose) a `name` property was always generated. This can now be turned off see #384 
+- refresh and consistency were part of the bulk body but should have been part of the querystring see #394 
+- _percolate was available for all bulk actions while it only really applies for index bulk actions.
+- When using `IndexMany(BulkParameters<T>)` you can now also override the id of the individual objects (Bulk() already allowed for this)
+- fix #402 TermsExecution Enum was missing some members 
+- OnFieldsWithBoost on the querystring query now has an overload for specifying strings only.
+- fix min_similarity missing from the FuzzyLikeThis query. see #411
+",https://api.github.com/users/Mpdreamz,245275,Mpdreamz,https://api.github.com/repos/elastic/elasticsearch-net/releases/110053/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/110053,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/0.12.0.0,https://github.com/elastic/elasticsearch-net/releases/tag/0.12.0.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/0.12.0.0,0.12.0.0,False,False
+81675,2013-10-31T21:49:31Z,2013-10-31T22:15:38Z,,"This release should fix some of the performance problems that were introduced in 0.11.6.0. 
+
+I'd like to take this space to send many thanks to Red Gate and their opensource support programs which allowed me to obtain an OSS license to ANTS Performance and Memory profiler which were very helpful getting this release ready. If you are doing opensource do checkout ossperks.com to see what you are missing out on. Red Gate has for a long time already generously supplied me with a resharper license. Thank you Red Gate :+1: 
+
+# RawClient
+
+This is now generated from the official low level client specification: 
+
+https://github.com/elasticsearch/elasticsearch-rest-api-spec
+
+This allows you to go very low level with Elasticsearch if needs must:
+
+post strings:
+
+```
+var jsonAsString = ""{ \""json_as_a_string\"" : true}"";
+var result = this._client.Raw.BulkPost(jsonAsString, qs => qs
+    .Replication(ReplicationOptions.Async)
+    .Refresh(true)
+);
+StringAssert.EndsWith("":9200/_bulk?replication=async&refresh=true"", result.RequestUrl);
+Assert.AreEqual(jsonAsString, result.Request);
+```
+
+or anonymous C# objects:
+
+```
+var jsonAsString = ""{\r\n  \""json_as_a_string\"": true\r\n}"";
+var result = this._client.Raw.BulkPost(
+    new { json_as_a_string = true }
+    , qs => qs
+        .Replication(ReplicationOptions.Async)
+        .Refresh(true)
+);
+```
+
+This is just a small sampling check the IRawElasticClient for all the methods it exposes:
+https://github.com/Mpdreamz/NEST/blob/master/src/Nest/IRawElasticClient.Generated.cs
+
+**Oh and each method has an Async variant!**
+
+To be fully low-level client compliant NEST will have to offer some sort of baked in failover support which is high on the backlog for the next release.
+
+# Separate signed packages.
+
+For all of you who have enterprise mandates that stipulate only signed assemblies may be used NEST now also has two separate signed packages up on nuget.org for you to use.
+
+http://www.nuget.org/packages/NEST.Signed/
+http://www.nuget.org/packages/Nest.Connection.Thrift.Signed/
+
+of course http://www.nuget.org/packages/NEST/ and http://www.nuget.org/packages/Nest.Connection.Thrift/ are also still available.
+
+# No more factory dsl nuget pacakge.
+
+The factory dsl was a port of the Java DSL generously donated by @stephenpope, however neither he nor I have had the time to maintain it and NEST itself comes with a great Query DSL already. 
+
+For the sake of maintainability and simplicity I've decided to remove support for this package completely.
+
+## Bug fixes
+- Some overloads of Alias were not generating the correct JSON.
+- Correction of the the unit option for the GeoDistance filter (changed from 'distance_unit' to 'unit') TY @gmarz!
+- fix #372 if you specify default indices for types to routine that determines won't unnecessarily check and throw and exception if the DefaultIndex is empty.
+
+Please send any bugs/issues/questions to the github issues page! 
+
+For those who want the nitty gritty update check the commits starting from the previous release:
+https://github.com/Mpdreamz/NEST/compare/0.11.5.0...0.11.7.0
+",https://api.github.com/users/Mpdreamz,245275,Mpdreamz,https://api.github.com/repos/elastic/elasticsearch-net/releases/81675/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/81675,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/0.11.7.0,https://github.com/elastic/elasticsearch-net/releases/tag/0.11.7.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/0.11.7.0,0.11.7.0,False,False
+63570,2013-10-10T08:59:30Z,2013-10-10T09:24:29Z,,"- NEST now supports the [term/phrase suggest](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-suggesters.html) thanks to the hard work of @freshmaker74 and special shout out to @MaxHorstmann for committing unit/integration tests for the,.
+- @NickCraver fixed the `NodeStats()` related calls since the elasticsearch response changed somewhere this year to be now one listing per node, not one per index per node.
+- Multisearch did not translate `Type`'s to strings properly (ty @freshmaker74 again!)
+- NEST now comes with an `IRawElasticClient` which is generated by scanning the java rest source code, this allows us to have a string/object in string/object out (wrapped in a ConnectionStatus object) client. You can `new` one or get to an instance of this raw client from your `IElasticClient` i.e:
+
+```
+var connectionStatus = this._client.Raw.SearchPost(index, typeName, json, queryStringParams);
+return connectionStatus.Deserialize<QueryResponse<T>>();
+```
+
+**Note** the `json` parameter in the previous example can be a string or a plain anonymous C# object.
+- Many underwater fixes related to serializations read more here: #349 
+- NEST by default camelCase's propertyNames you can now easily modify this behaviour by calling `SetDefaultPropertyNameInferrer()` on `IConnectionSettings` i.e
+
+```
+//Do not do anything to properties
+.SetDefaultPropertyNameInferrer(a=>a)
+```
+
+### BREAKING CHANGE
+
+Removed `IsValid` and `TryConnect()`
+
+The first 2 features of `ElasticClient` I wrote nearly three years ago which seemed like a good idea at the time. `TryConnect()` and `.IsValid()` are two confusing ways to check if your node is up, `RootNodeInfo()` now returns a mapped response of the info elasticsearch returns when you hit a node at the root (version, lucene_version etc), or you can call `client.Raw.MainGet()` or perhaps even better `client.Raw.MainHead()` or even `client.Connection.HeadSync(""/"")`.
+
+You catch my drift: with so many ways of querying the root `.IsValid` and `TryConnect()` is just fluff that only introduces confusion.
+
+### NEXT RELEASE
+
+I will ""pull an elasticsearch"" for the next release and jump to version `0.90.*.*` this next release will focus on stabilising the `IElasticClient` interface and making sure that every method as an `*Async` variant.
+
+Full list of commits that make up this release:
+https://github.com/Mpdreamz/NEST/compare/0.11.4.0...0.11.5.0
+",https://api.github.com/users/Mpdreamz,245275,Mpdreamz,https://api.github.com/repos/elastic/elasticsearch-net/releases/63570/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/63570,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/0.11.5.0,https://github.com/elastic/elasticsearch-net/releases/tag/0.11.5.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/0.11.5.0,0.11.5.0,False,False
+41814,2013-09-10T12:22:05Z,2013-09-10T12:46:38Z,0.11.4.0,"Mostly only a bug fix release but of a couple that are very noteworthy
+- Fix reliance on patching Uri to set an internal flag to **NOT** forcefully escape /'s. If you use '/' by default NEST will double escape these to `%252F` if you are able to set the following config value[see code sample 1] you can disable this double escaping by calling `.SetDontDoubleEscapeDotsAndSlashes()` on the `ConnectionSettings` to have the '/' slashes properly encoded as `%2F`. The patching code taken from http://mikehadlow.blogspot.nl/2011/08/how-to-stop-systemuri-un-escaping.html does not work reliably on Mono, please note that the linked config tweak does not seem to work on mono either so getting '/' properly encoded as '%2F' seems impossible on Mono the default of double escaping them works fine though. The one time reflection hack (from the linked article) sometimes failed on some Mono versions, this should now be fixed.
+- The default Connection **always** wrapped the async in a thread which is not necessary at all. Nest will now only wrap the async stuff in threads if `.SetMaximumAsyncConnections()` is set to anything greater then 0. There is now a `NoTasksHttpConnection` as well which replaces the async routine to one which does't use tasks at all. Both implementations use IO completion ports but the overhead of tasks and yield means that in my first tests the NoTasksHttpConnection is around 1% faster. Many thanks to @henkish for filing #337 and submitting the taskless based async routine !
+- Fix ClusterState API to have Mappings also. ty @ashwinsa
+- Added Boost method to RangeQueryDescriptor ty @freshmaker74
+- added missing used_in_bytes property on NodeStats (ty @NickCraver for pinging me on twitter)
+
+**_Code sample 1**_
+
+```
+<uri>
+    <schemeSettings>
+         <add name=""http"" genericUriParserOptions=""DontUnescapePathDotsAndSlashes"" />
+    </schemeSettings>
+</uri>
+```
+",https://api.github.com/users/Mpdreamz,245275,Mpdreamz,https://api.github.com/repos/elastic/elasticsearch-net/releases/41814/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/41814,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/0.11.4.0,https://github.com/elastic/elasticsearch-net/releases/tag/0.11.4.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/0.11.4.0,0.11.4.0,False,False
+24681,2013-08-11T19:16:41Z,2013-08-11T19:32:38Z,,"- Fix #326 Scroll uses POST since 0.11.2.0 and was incorrectly uriencoding the scroll id
+- #330 added `TitleField()` to the attachment mapper and `MetadaField()` to map any metadata string property under attachment fields.
+- #329 `CustomScore()` was missing a way to specify `lang` ty @Moran007
+- #327 the Factory DSL (Nest.Dsl.Factory assembly) was missing nested_filter on sort ty @lukapor
+
+## Reindex
+
+A popular method on elasticsearch clients in other languages is an easy way to reindex from one index to another using scan, scroll and bulk. NEST now also has support for this:
+
+https://github.com/Mpdreamz/NEST/blob/master/src/Nest.Tests.Integration/Index/ReindexTests.cs
+
+See #328 for more information.
+",https://api.github.com/users/Mpdreamz,245275,Mpdreamz,https://api.github.com/repos/elastic/elasticsearch-net/releases/24681/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/24681,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/0.11.3.0,https://github.com/elastic/elasticsearch-net/releases/tag/0.11.3.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/0.11.3.0,0.11.3.0,False,False
+16174,2013-07-26T12:53:22Z,2013-07-26T13:09:44Z,0.11.2.0,"This is mainly a bug fix release before I head off on a 2 week holiday :+1: 
+- #307 adding mean and reverse_mean to terms stat facet order type (thank you @UdiBen)
+- #301 PhoneticTokenFilter.cs - Added replace and encoder JSON properties (thank you @salyh)
+- #313 fixed broken querystring construction on Update call (thank you @PicnicBasket)
+- TypeFilter did not mark itself conditionless properly.
+- added ignore_unmapped support to SortDescriptor
+- Improved Highlights API, you can now use `results.Highlights[docId][highlightField]` or `results.DocumentsWithMetadata[N].Highlights`
+- Fix #319 nullref when calling CreateIndex with a mapping that manually newed IElasticType objects.
+- Fix #318 Scroll URL length limit 
+- Fix #316 bulk update response items were null
+- Fix #303 IndexMany() result in an 411 if IEnumerable<T> is empty
+- Fix #297 Missing Scroll() on IElasticClient
+- Fix #300 Missing MultiGet() on IElasticClient
+- Fix #288 UsePrettyResponses() did not append pretty=true to all the request anymore.
+- Fix #289 MultiSearch did not map errors properly for individual search requests part of the multisearch request.
+
+Thanks to all who committed, fixed and/or reported issues!
+",https://api.github.com/users/Mpdreamz,245275,Mpdreamz,https://api.github.com/repos/elastic/elasticsearch-net/releases/16174/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/16174,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/0.11.2.0,https://github.com/elastic/elasticsearch-net/releases/tag/0.11.2.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/0.11.2.0,0.11.2.0,False,False
+3832,2013-07-04T13:20:49Z,2013-07-04T13:51:31Z,,"- #298 Add support to MultiGet to just have ids and indexName as params (ty @jakobra)
+- #296 don't add port for urls with https scheme (ty @alhardy)
+- #293 Add error handling to GetIndicesPointingToAlias ty (@MaxHorstmann)
+- #290 Sort - Added nested filter and path (Added in 0.90.0.Beta1). (ty @thelalle)
+- #292 Support for /_cluster/state APIs (ty @nickcraver)
+- #284 Added Tokenizer and Filters querystring param to Analyze request (ty @michielpost)
+- Added has_parent query and added score_type to has_child query (ty @q42jaap) (eb997c802a3)
+- #270 added multi_match support  (I actually did something this release ! :))
+",https://api.github.com/users/Mpdreamz,245275,Mpdreamz,https://api.github.com/repos/elastic/elasticsearch-net/releases/3832/assets,https://api.github.com/repos/elastic/elasticsearch-net/releases/3832,master,https://api.github.com/repos/elastic/elasticsearch-net/tarball/0.11.1.0,https://github.com/elastic/elasticsearch-net/releases/tag/0.11.1.0,https://api.github.com/repos/elastic/elasticsearch-net/zipball/0.11.1.0,0.11.1.0,False,False

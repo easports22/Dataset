@@ -1,0 +1,306 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+6978544,2017-07-09T21:56:34Z,2017-07-09T22:01:42Z,gperftools-2.6.1,"gperftools 2.6.1 is out! This is mostly bug-fixes release.
+
+* issue #901: build issue on OSX introduced in last-time commit in 2.6 was fixed (contributed by Francis Ricci).
+
+* tcmalloc_minimal now works on 32-bit ABI of mips64. This is issue #845. Much thanks to Adhemerval Zanella and github user mtone.
+
+* Romain Geissler contributed build fix for -std=c++17. This is pull request #897.
+
+* As part of fixing issue #904, tcmalloc atfork handler is now installed early. This should fix slight chance of hitting deadlocks at fork in some cases.
+",https://api.github.com/users/alk,14850,alk,https://api.github.com/repos/gperftools/gperftools/releases/6978544/assets,https://api.github.com/repos/gperftools/gperftools/releases/6978544,master,https://api.github.com/repos/gperftools/gperftools/tarball/gperftools-2.6.1,https://github.com/gperftools/gperftools/releases/tag/gperftools-2.6.1,https://api.github.com/repos/gperftools/gperftools/zipball/gperftools-2.6.1,gperftools-2.6.1,False,False
+6931532,2017-07-05T03:48:01Z,2017-07-05T03:50:53Z,gperftools-2.6,"gperftools 2.6 is out! See NEWS entries of pre-releases for major new features.
+
+* Kim Gräsman contributed documentation update for HEAPPROFILESIGNAL environment variable
+
+* KernelMaker contributed fix for population of min_object_size field returned by MallocExtension::GetFreeListSizes
+
+* commit 8c3dc52fcfe0 ""issue-654: [pprof] handle split text segments"" was reverted. Some OSX users reported issues with this commit. Given our pprof implementation is strongly deprecated, it is best to drop recently introduced features rather than breaking it badly.
+
+* Francis Ricci contributed improvement for interaction with leak sanitizer",https://api.github.com/users/alk,14850,alk,https://api.github.com/repos/gperftools/gperftools/releases/6931532/assets,https://api.github.com/repos/gperftools/gperftools/releases/6931532,master,https://api.github.com/repos/gperftools/gperftools/tarball/gperftools-2.6,https://github.com/gperftools/gperftools/releases/tag/gperftools-2.6,https://api.github.com/repos/gperftools/gperftools/zipball/gperftools-2.6,gperftools-2.6,False,False
+6470337,2017-05-23T02:25:11Z,2017-05-23T02:26:24Z,gperftools-2.5.93,"gperftools 2.6rc4 is out!
+
+Dynamic sized delete is disabled by default again. There is no hope of
+it working with eager dynamic symbols resolution (-z now linker
+flag). More details in
+https://bugzilla.redhat.com/show_bug.cgi?id=1452813
+",https://api.github.com/users/alk,14850,alk,https://api.github.com/repos/gperftools/gperftools/releases/6470337/assets,https://api.github.com/repos/gperftools/gperftools/releases/6470337,master,https://api.github.com/repos/gperftools/gperftools/tarball/gperftools-2.5.93,https://github.com/gperftools/gperftools/releases/tag/gperftools-2.5.93,https://api.github.com/repos/gperftools/gperftools/zipball/gperftools-2.5.93,gperftools-2.5.93,False,True
+6461215,2017-05-22T10:39:25Z,2017-05-22T10:46:00Z,gperftools-2.5.92,"gperftools 2.6rc3 is out!
+
+gperftools compilation on older systems (e.g. rhel 5) was fixed. This
+was originally reported in github issue #888.
+",https://api.github.com/users/alk,14850,alk,https://api.github.com/repos/gperftools/gperftools/releases/6461215/assets,https://api.github.com/repos/gperftools/gperftools/releases/6461215,master,https://api.github.com/repos/gperftools/gperftools/tarball/gperftools-2.5.92,https://github.com/gperftools/gperftools/releases/tag/gperftools-2.5.92,https://api.github.com/repos/gperftools/gperftools/zipball/gperftools-2.5.92,gperftools-2.5.92,False,True
+6383688,2017-05-15T07:02:53Z,2017-05-15T07:06:24Z,gperftools-2.5.91,"Just 2 small fixes on top of 2.6rc. Particularly, Rajalakshmi
+Srinivasaraghavan contributed build fix for ppc32.
+",https://api.github.com/users/alk,14850,alk,https://api.github.com/repos/gperftools/gperftools/releases/6383688/assets,https://api.github.com/repos/gperftools/gperftools/releases/6383688,master,https://api.github.com/repos/gperftools/gperftools/tarball/gperftools-2.5.91,https://github.com/gperftools/gperftools/releases/tag/gperftools-2.5.91,https://api.github.com/repos/gperftools/gperftools/zipball/gperftools-2.5.91,gperftools-2.5.91,False,True
+6383199,2017-05-15T06:00:29Z,2017-05-15T06:06:57Z,gperftools-2.5.90,"gperftools 2.6rc is out!
+
+Highlights of this release are performance work on malloc fast-path
+and support for more modern visual studio runtimes, and deprecation of
+bundled pprof. Another significant performance-affecting changes are
+reverting central free list transfer batch size back to 32 and
+disabling of aggressive decommit mode by default.
+
+Note, while we still ship perl implementation of pprof, everyone is
+strongly advised to use golang reimplementation of pprof from
+https://github.com/google/pprof.
+
+Here are notable changes in more details (and see ChangeLog for full
+details):
+
+* a bunch of performance tweaks to tcmalloc fast-path were
+  merged. This speeds up critical path of tcmalloc by few tens of
+  %. Well tuned and allocation-heavy programs should see substantial
+  performance boost (should apply to all modern elf platforms). This
+  is based on Google-internal tcmalloc changes for fast-path (with
+  obvious exception of lacking per-cpu mode, of course). Original
+  changes were made by Aliaksei Kandratsenka. And Andrew Hunter,
+  Dmitry Vyukov and Sanjay Ghemawat contributed with reviews and
+  discussions.
+
+* Architectures with 48 bits address space (x86-64 and aarch64) now
+  use faster 2 level page map. This was ported from Google-internal
+  change by Sanjay Ghemawat.
+
+* Default value of TCMALLOC_TRANSFER_NUM_OBJ was returned back to
+  32. Larger values have been found to hurt certain programs (but help
+  some other benchmarks). Value can still be tweaked at run time via
+  environment variable.
+
+* tcmalloc aggressive decommit mode is now disabled by default
+  again. It was found to degrade performance of certain tensorflow
+  benchmarks. Users who prefer smaller heap over small performance win
+  can still set environment variable TCMALLOC_AGGRESSIVE_DECOMMIT=t.
+
+* runtime switchable sized delete support has be fixed and re-enabled
+  (on GNU/Linux). Programs that use C++ 14 or later that use sized
+  delete can again be sped up by setting environment variable
+  TCMALLOC_ENABLE_SIZED_DELETE=t. Support for enabling sized
+  deallication support at compile-time is still present, of course.
+
+* tcmalloc now explicitly avoids use of MADV_FREE on Linux, unless
+  TCMALLOC_USE_MADV_FREE is defined at compile time. This is because
+  performance impact of MADV_FREE is not well known. Original issue
+  #780 raised by Mathias Stearn.
+
+* issue #786 with occasional deadlocks in stack trace capturing via
+  libunwind was fixed. It was originally reported as Ceph issue:
+  http://tracker.ceph.com/issues/13522
+
+* ChangeLog is now automatically generated from git log. Old ChangeLog
+  is now ChangeLog.old.
+
+* tcmalloc now provides implementation of nallocx. Function was
+  originally introduced by jemalloc and can be used to return real
+  allocation size given allocation request size. This is ported from
+  Google-internal tcmalloc change contributed by Dmitry Vyukov.
+
+* issue #843 which made tcmalloc crash when used with erlang runtime
+  was fixed.
+
+* issue #839 which caused tcmalloc's aggressive decommit mode to
+  degrade performance in some corner cases was fixed.
+
+* Bryan Chan contributed support for 31-bit s390.
+
+* Brian Silverman contributed compilation fix for 32-bit ARMs
+
+* Issue #817 that was causing tcmalloc to fail on windows 10 and
+  later, as well as on recent msvc was fixed. We now patch _free_base
+  as well.
+
+* a bunch of minor documentaion/typos fixes by: Mike Gaffney
+  <mike@uberu.com>, iivlev <iivlev@productengine.com>, savefromgoogle
+  <savefromgoogle@users.noreply.github.com>, John McDole
+  <jtmcdole@gmail.com>, zmertens <zmertens@asu.edu>, Kirill Müller
+  <krlmlr@mailbox.org>, Eugene <n.eugene536@gmail.com>, Ola Olsson
+  <ola1olsson@gmail.com>, Mostyn Bramley-Moore <mostynb@opera.com>
+
+* Tulio Magno Quites Machado Filho has contributed removal of
+  deprecated glibc malloc hooks.
+
+* Issue #827 that caused intercepting malloc on osx 10.12 to fail was
+  fixed, by copying fix made by Mike Hommey to jemalloc. Much thanks
+  to Koichi Shiraishi and David Ribeiro Alves for reporting it and
+  testing fix.
+
+* Aman Gupta and Kenton Varda contributed minor fixes to pprof (but
+  note again that pprof is deprecated)
+
+* Ryan Macnak contributed compilation fix for aarch64
+
+* Francis Ricci has fixed unaligned memory access in debug allocator
+
+* TCMALLOC_PAGE_FENCE_NEVER_RECLAIM now actually works thanks to
+  contribution by Andrew Morrow.
+",https://api.github.com/users/alk,14850,alk,https://api.github.com/repos/gperftools/gperftools/releases/6383199/assets,https://api.github.com/repos/gperftools/gperftools/releases/6383199,master,https://api.github.com/repos/gperftools/gperftools/tarball/gperftools-2.5.90,https://github.com/gperftools/gperftools/releases/tag/gperftools-2.5.90,https://api.github.com/repos/gperftools/gperftools/zipball/gperftools-2.5.90,gperftools-2.5.90,False,True
+2799640,2016-03-12T20:06:34Z,2016-03-12T20:18:22Z,gperftools-2.5,"gperftools 2.5 is out!
+
+Just single bugfix was merged after rc2. Which was fix for issue #777.
+",https://api.github.com/users/alk,14850,alk,https://api.github.com/repos/gperftools/gperftools/releases/2799640/assets,https://api.github.com/repos/gperftools/gperftools/releases/2799640,master,https://api.github.com/repos/gperftools/gperftools/tarball/gperftools-2.5,https://github.com/gperftools/gperftools/releases/tag/gperftools-2.5,https://api.github.com/repos/gperftools/gperftools/zipball/gperftools-2.5,gperftools-2.5,False,False
+2752689,2016-03-06T02:26:35Z,2016-03-06T02:30:43Z,gperftools-2.4.91,"gperftools 2.5rc2 is out!
+
+New release contains just few commits on top of first release candidate. One of them is build fix for Visual Studio. Another significant change is that dynamic sized delete is now disabled by default. It turned out that IFUNC relocations are not supporting our advanced use case on all platforms and in all cases.
+",https://api.github.com/users/alk,14850,alk,https://api.github.com/repos/gperftools/gperftools/releases/2752689/assets,https://api.github.com/repos/gperftools/gperftools/releases/2752689,master,https://api.github.com/repos/gperftools/gperftools/tarball/gperftools-2.4.91,https://github.com/gperftools/gperftools/releases/tag/gperftools-2.4.91,https://api.github.com/repos/gperftools/gperftools/zipball/gperftools-2.4.91,gperftools-2.4.91,False,True
+2660115,2016-02-22T07:11:27Z,2016-02-22T07:14:59Z,gperftools-2.4.90,"gperftools 2.5rc is out!
+
+Here are major changes since 2.4:
+- we've moved to github!
+- Bryan Chan has contributed s390x support
+- stacktrace capturing via libgcc's _Unwind_Backtrace was implemented
+  (for architectures with missing or broken libunwind).
+- ""emergency malloc"" was implemented. Which unbreaks recursive calls
+  to malloc/free from stacktrace capturing functions (such as glib'c
+  backtrace() or libunwind on arm). It is enabled by
+  --enable-emergency-malloc configure flag or by default on arm when
+  --enable-stacktrace-via-backtrace is given. It is another fix for a
+  number common issues people had on platforms with missing or broken
+  libunwind.
+- C++14 sized-deallocation is now supported (on gcc 5 and recent
+  clangs). It is off by default and can be enabled at configure time
+  via --enable-sized-delete. On GNU/Linux it can also be enabled at
+  run-time by either TCMALLOC_ENABLE_SIZED_DELETE environment variable
+  or by defining tcmalloc_sized_delete_enabled function which should
+  return 1 to enable it.
+- we've lowered default value of transfer batch size to 512. Previous
+  value (bumped up in 2.1) was too high and caused performance
+  regression for some users. 512 should still give us performance
+  boost for workloads that need higher transfer batch size while not
+  penalizing other workloads too much.
+- Brian Silverman's patch finally stopped arming profiling timer
+  unless profiling is started.
+- Andrew Morrow has contributed support for obtaining cache size of the
+  current thread and softer idling (for use in MongoDB).
+- we've implemented few minor performance improvements, particularly
+  on malloc fast-path.
+
+A number of smaller fixes were made. Many of them were contributed:
+- issue that caused spurious profiler_unittest.sh failures was fixed.
+- Jonathan Lambrechts contributed improved callgrind format support to
+  pprof.
+- Matt Cross contributed better support for debug symbols in separate
+  files to pprof.
+- Matt Cross contributed support for printing collapsed stack frame
+  from pprof aimed at producing flame graphs.
+- Angus Gratton has contributed documentation fix mentioning that on
+  windows only tcmalloc_minimal is supported.
+- Anton Samokhvalov has made tcmalloc use mi_force_{un,}lock on OSX
+  instead of pthread_atfork. Which apparently fixes forking
+  issues tcmalloc had on OSX.
+- Milton Chiang has contributed support for building 32-bit gperftools
+  on arm8.
+- Patrick LoPresti has contributed support for specifying alternative
+  profiling signal via CPUPROFILE_TIMER_SIGNAL environment variable.
+- Paolo Bonzini has contributed support configuring filename for
+  sending malloc tracing output via TCMALLOC_TRACE_FILE environment
+  variable.
+- user spotrh has enabled use of futex on arm.
+- user mitchblank has contributed better declaration for arg-less
+  profiler functions.
+- Tom Conerly contributed proper freeing of memory allocated in
+  HeapProfileTable::FillOrderedProfile on error paths.
+- user fdeweerdt has contributed curl arguments handling fix in pprof
+- Frederik Mellbin fixed tcmalloc's idea of mangled new and delete
+  symbols on windows x64
+- Dair Grant has contributed cacheline alignment for ThreadCache
+  objects
+- Fredrik Mellbin has contributed updated windows/config.h for Visual
+  Studio 2015 and other windows fixes.
+- we're not linking libpthread to libtcmalloc_minimal anymore. Instead
+  libtcmalloc_minimal links to pthread symbols weakly. As a result
+  single-threaded programs remain single-threaded when linking to or
+  preloading libtcmalloc_minimal.so.
+- Boris Sazonov has contributed mips compilation fix and printf misue
+  in pprof.
+- Adhemerval Zanella has contributed alignment fixes for statically
+  allocated variables.
+- Jens Rosenboom has contributed fixes for heap-profiler_unittest.sh
+- gshirishfree has contributed better description for GetStats method.
+- cyshi has contributed spinlock pause fix.
+- Chris Mayo has contributed --docdir argument support for configure.
+- Duncan Sands has contributed fix for function aliases.
+- Simon Que contributed better include for malloc_hook_c.h
+- user wmamrak contributed struct timespec fix for Visual Studio 2015.
+- user ssubotin contributed typo in PrintAvailability code.
+",https://api.github.com/users/alk,14850,alk,https://api.github.com/repos/gperftools/gperftools/releases/2660115/assets,https://api.github.com/repos/gperftools/gperftools/releases/2660115,master,https://api.github.com/repos/gperftools/gperftools/tarball/gperftools-2.4.90,https://github.com/gperftools/gperftools/releases/tag/gperftools-2.4.90,https://api.github.com/repos/gperftools/gperftools/zipball/gperftools-2.4.90,gperftools-2.4.90,False,True
+1677692,2014-04-19T20:16:02Z,2015-08-15T21:22:14Z,,"gperftools 2.2rc is out!
+
+Here are notable changes since 2.1:
+- a number of fixes for a number compilers and platforms. Notably Visual Studio 2013, recent mingw with c++ threads and some OSX fixes.
+- we now have mips and mips64 support! (courtesy of Jovan Zelincevic, Jean Lee, user xiaoyur347 and others)
+- we now have aarch64 (aka arm64) support! (contributed by Riku Voipio)
+- there's now support for ppc64-le (by Raphael Moreira Zinsly and Adhemerval Zanella)
+- there's now some support of uclibc (contributed by user xiaoyur347)
+- google/ headers will now give you deprecation warning. They are deprecated since 2.0
+- there's now new api: tc_malloc_skip_new_handler (ported from chromium fork)
+- issue 557 : added support for dumping heap profile via signal (by Jean Lee)
+- issue 567 : Petr Hosek contributed SysAllocator support for windows
+- Joonsoo Kim contributed several speedups for central freelist code
+- TCMALLOC_MAX_TOTAL_THREAD_CACHE_BYTES environment variable now works
+- configure scripts are now using AM_MAINTAINER_MODE. It'll only affect folks who modify source from .tar.gz and want automake to automatically rebuild Makefile-s. See automake documentation for that.
+- issue 586 : detect main executable even if PIE is active (based on patch by user themastermind1). Notably, it fixes profiler use with ruby.
+- there is now support for switching backtrace capturing method at runtime (via TCMALLOC_STACKTRACE_METHOD and TCMALLOC_STACKTRACE_METHOD_VERBOSE environment variables)
+- there is new backtrace capturing method using -finstrument-functions prologues contributed by user xiaoyur347
+- few cases of crashes/deadlocks in profiler were addressed. See (famous) issue-66,  issue 547  and  issue 579 .
+- issue 464 (memory corruption in debugalloc's realloc after memallign) is now fixed
+- tcmalloc is now able to release memory back to OS on windows ( issue 489 ). The code was ported from chromium fork (by a number of authors).
+- Together with issue 489 we ported chromium's ""aggressive decommit"" mode. In this mode (settable via malloc extension and via environment variable TCMALLOC_AGGRESSIVE_DECOMMIT), free pages are returned back to OS immediately.
+- MallocExtension::instance() is now faster (based on patch by Adhemerval Zanella)
+- issue 610  (hangs on windows in multibyte locales) is now fixed
+
+The following people helped with ideas or patches (based on git log, some contributions purely in bugtracker might be missing): Andrew C. Morrow, yurivict, Wang YanQing, Thomas Klausner, davide.italiano@10gen.com, Dai MIKURUBE, Joon-Sung Um, Jovan Zelincevic, Jean Lee, Petr Hosek, Ben Avison, drussel, Joonsoo Kim, Hannes Weisbach, xiaoyur347, Riku Voipio, Adhemerval Zanella, Raphael Moreira Zinsly
+",https://api.github.com/users/alk,14850,alk,https://api.github.com/repos/gperftools/gperftools/releases/1677692/assets,https://api.github.com/repos/gperftools/gperftools/releases/1677692,master,https://api.github.com/repos/gperftools/gperftools/tarball/gperftools-2.1.90,https://github.com/gperftools/gperftools/releases/tag/gperftools-2.1.90,https://api.github.com/repos/gperftools/gperftools/zipball/gperftools-2.1.90,gperftools-2.1.90,False,True
+1677690,2014-06-21T22:45:44Z,2015-08-15T21:19:12Z,,"gperftools 2.2.1 is out!
+
+Here's list of fixes:
+- issue 626  was closed. Which fixes initialization of statically linked tcmalloc.
+- issue 628  was closed. It adds missing header file into source tarball. This fixes for compilation on PPC Linux.
+",https://api.github.com/users/alk,14850,alk,https://api.github.com/repos/gperftools/gperftools/releases/1677690/assets,https://api.github.com/repos/gperftools/gperftools/releases/1677690,master,https://api.github.com/repos/gperftools/gperftools/tarball/gperftools-2.2.1,https://github.com/gperftools/gperftools/releases/tag/gperftools-2.2.1,https://api.github.com/repos/gperftools/gperftools/zipball/gperftools-2.2.1,gperftools-2.2.1,False,False
+1677633,2013-07-30T09:15:52Z,2015-08-15T20:46:15Z,,"This is gperftools 2.1. See NEWS file for release notes.
+",https://api.github.com/users/alk,14850,alk,https://api.github.com/repos/gperftools/gperftools/releases/1677633/assets,https://api.github.com/repos/gperftools/gperftools/releases/1677633,master,https://api.github.com/repos/gperftools/gperftools/tarball/gperftools-2.1,https://github.com/gperftools/gperftools/releases/tag/gperftools-2.1,https://api.github.com/repos/gperftools/gperftools/zipball/gperftools-2.1,gperftools-2.1,False,False
+1677619,2014-05-04T01:11:42Z,2015-08-15T20:37:28Z,,"gperftools 2.2 is out!
+
+Here are notable changes since 2.2rc:
+- issue 620  (crash on windows when c runtime dll is reloaded) was fixed
+",https://api.github.com/users/alk,14850,alk,https://api.github.com/repos/gperftools/gperftools/releases/1677619/assets,https://api.github.com/repos/gperftools/gperftools/releases/1677619,master,https://api.github.com/repos/gperftools/gperftools/tarball/gperftools-2.2,https://github.com/gperftools/gperftools/releases/tag/gperftools-2.2,https://api.github.com/repos/gperftools/gperftools/zipball/gperftools-2.2,gperftools-2.2,False,False
+1677615,2014-12-07T20:41:42Z,2015-08-15T20:35:41Z,,"gperftools 2.3rc is out!
+
+Most small improvements in this release were made to pprof tool.
+
+New experimental Linux-only (for now) cpu profiling mode is a notable big improvement.
+
+Here are notable changes since 2.2.1:
+- ( issue 631 ) fixed debugallocation miscompilation on mmap-less platforms (courtesy of user iamxujian)
+- ( issue 630 ) reference to wrong PROFILE (vs. correct CPUPROFILE) environment variable was fixed (courtesy of WenSheng He)
+- pprof now has option to display stack traces in output for heap checker (courtesy of Michael Pasieka)
+- ( issue 636 ) pprof web command now works on mingw
+- ( issue 635 ) pprof now handles library paths that contain spaces (courtesy of user mich...@sebesbefut.com)
+- ( issue 637 ) pprof now has an option to not strip template arguments (patch by jiakai)
+- ( issue 644 ) possible out-of-bounds access in GetenvBeforeMain was fixed (thanks to user abyss.7)
+- ( issue 641 ) pprof now has an option --show_addresses (thanks to user yurivict). New option prints instruction address in addition to function name in stack traces
+- ( issue 646 ) pprof now works around some issues of addr2line reportedly when DWARF v4 format is used (patch by Adam McNeeney)
+- ( issue 645 ) heap profiler exit message now includes remaining memory allocated info (patch by user yurivict)
+  pprof code that finds location of /proc/pid/maps in cpu profile files is now fixed (patch by Ricardo M. Correia)
+- (issue 654) pprof now handles ""split text segments"" feature of Chromium for Android (patch by simonb)
+- ( issue 655 ) potential deadlock on windows caused by early call to getenv in malloc initialization code was fixed (bug reported and fix proposed by user zndmitry)
+- incorrect detection of arm 6zk instruction set support (-mcpu=arm1176jzf-s) was fixed. (Reported by pedronavf on old issue-493)
+- new cpu profiling mode on Linux is now implemented. It sets up separate profiling timers for separate threads. Which improves accuracy of profiling on Linux a lot. It is off by default. And is enabled if both librt.f is loaded and CPUPROFILE_PER_THREAD_TIMERS environment variable is set. But note that all threads need to be registered via ProfilerRegisterThread.
+",https://api.github.com/users/alk,14850,alk,https://api.github.com/repos/gperftools/gperftools/releases/1677615/assets,https://api.github.com/repos/gperftools/gperftools/releases/1677615,master,https://api.github.com/repos/gperftools/gperftools/tarball/gperftools-2.2.90,https://github.com/gperftools/gperftools/releases/tag/gperftools-2.2.90,https://api.github.com/repos/gperftools/gperftools/zipball/gperftools-2.2.90,gperftools-2.2.90,False,True
+1677609,2014-12-08T01:45:24Z,2015-08-15T20:31:32Z,,"gperftools 2.3 is out!
+
+Here are changes since 2.3rc:
+- ( issue 658 ) correctly close socketpair fds on failure (patch by glider)
+- libunwind integration can be disabled at configure time (patch by Raphael Moreira Zinsly)
+- libunwind integration is disabled by default for ppc64 (patch by Raphael Moreira Zinsly)
+- libunwind integration is force-disabled for OSX. It was not used by default anyways. Fixes compilation issue I saw.
+",https://api.github.com/users/alk,14850,alk,https://api.github.com/repos/gperftools/gperftools/releases/1677609/assets,https://api.github.com/repos/gperftools/gperftools/releases/1677609,master,https://api.github.com/repos/gperftools/gperftools/tarball/gperftools-2.3,https://github.com/gperftools/gperftools/releases/tag/gperftools-2.3,https://api.github.com/repos/gperftools/gperftools/zipball/gperftools-2.3,gperftools-2.3,False,False
+1677602,2015-01-10T20:28:25Z,2015-08-15T20:28:37Z,,"gperftools 2.4rc is out!
+
+Here are changes since 2.3:
+- enabled aggressive decommit option by default. It was found to significantly improve memory fragmentation with negligible impact on performance. (Thanks to investigation work performed by Adhemerval Zanella)
+- added ./configure flags for tcmalloc pagesize and tcmalloc allocation alignment. Larger page sizes have been reported to improve performance occasionally. (Patch by Raphael Moreira Zinsly)
+- sped-up hot-path of malloc/free. By about 5% on static library and about 10% on shared library. Mainly due to more efficient checking of malloc hooks.
+- improved accuracy of stacktrace capturing in cpu profiler (due to issue found by Arun Sharma). As part of that issue pprof's handling of cpu profiles was also improved.
+",https://api.github.com/users/alk,14850,alk,https://api.github.com/repos/gperftools/gperftools/releases/1677602/assets,https://api.github.com/repos/gperftools/gperftools/releases/1677602,master,https://api.github.com/repos/gperftools/gperftools/tarball/gperftools-2.3.90,https://github.com/gperftools/gperftools/releases/tag/gperftools-2.3.90,https://api.github.com/repos/gperftools/gperftools/zipball/gperftools-2.3.90,gperftools-2.3.90,False,True
+1677597,2015-01-10T20:28:52Z,2015-08-15T20:24:32Z,,"gperftools 2.4 is out! The code is exactly same as 2.4rc.
+",https://api.github.com/users/alk,14850,alk,https://api.github.com/repos/gperftools/gperftools/releases/1677597/assets,https://api.github.com/repos/gperftools/gperftools/releases/1677597,master,https://api.github.com/repos/gperftools/gperftools/tarball/gperftools-2.4,https://github.com/gperftools/gperftools/releases/tag/gperftools-2.4,https://api.github.com/repos/gperftools/gperftools/zipball/gperftools-2.4,gperftools-2.4,False,False

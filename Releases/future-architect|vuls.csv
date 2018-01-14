@@ -1,0 +1,145 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8176203,2017-10-19T05:31:35Z,2017-10-19T05:34:24Z,v0.4.1,"## Changelog
+
+473096d Fix .goreleaser.yml
+0eae26e Merge branch 'master' of https://github.com/future-architect/vuls
+a32845f Fix a bug of making channels when fill oval information via HTTP (#514)
+15a0f7e Merge branch 'master' of https://github.com/future-architect/vuls
+5a0a6ab Fix OVAL detection on Debian and Ubuntu (#509)
+032b8d9 Merge branch 'master' of https://github.com/future-architect/vuls
+5798e3a Add filter options to tui subcommand (#508)
+8e15b9c Add filter options to tui subcommand (#508)
+7a1f132 Add -ignore-unfixed option to report subcommand #485 (#507)
+a8483b2 Add goreleaser to distribute binaries (#460)
+83bbbd0 Add goreportcard to README
+132432d Support SUSE Enterprise Linux (#487)
+e5eb8e4 Debian: Use --showformat flag to get status of packages and ignore n(not-inst… (#484)
+1095ebe fix vulsrepo dockerfile (#496)
+1541a60 Update README.ja.md (#498)
+03a141c Fix typos (#499)
+5f2183f Check repoquery with sudo nopasswd in deep scan mode on RedHat (#492)
+820831f Fix sort order of servers on TUI (#481)
+6d2d767 Fix a arg of report subcommand (#479)
+e0c3a72 Fix ping option of discover subcommand #471 (#472)
+ec92f77 add windows type (#470)
+0ba490c Merge pull request #469 from usiusi360/use_vulsrepo-server
+cfd668e use_vulsrepo-server
+
+
+---
+Automated with [GoReleaser](https://github.com/goreleaser)
+Built with go version go1.8 linux/amd64
+",https://api.github.com/users/kotakanbe,534611,kotakanbe,https://api.github.com/repos/future-architect/vuls/releases/8176203/assets,https://api.github.com/repos/future-architect/vuls/releases/8176203,master,https://api.github.com/repos/future-architect/vuls/tarball/v0.4.1,https://github.com/future-architect/vuls/releases/tag/v0.4.1,https://api.github.com/repos/future-architect/vuls/zipball/v0.4.1,v0.4.1,False,False
+7518565,2017-08-25T03:21:31Z,2017-08-25T03:32:06Z,v0.4.0 (No Backward Compatibility),"# v0.4.0
+
+We are pleased to announce the new Version, v0.4.0.
+This version is not backward compatible.
+But many new functions have been added.
+
+## How to install newly
+- https://github.com/future-architect/vuls#tutorial-local-scan-mode
+
+## How to update to the latest verison
+- https://github.com/future-architect/vuls#how-to-update-to-the-latest-version
+
+##  Fast nosudo scan mode and Deep scan mode
+
+###  Fast nosudo scan mode (Default)
+- https://github.com/future-architect/vuls#fast-scan
+- This mode scans 
+  - Ultra high speed
+  - **Without** root privilege
+  - Not consume so much resources on the servers to be scanned.
+  - Scanning is possible in an environment **without** Internet connection
+    - Some OS needs internet connection ... Amazon, FreeBSD, Raspbian
+
+- Scan Method
+  - RHEL, CentOS, Debian, Ubuntu, Oracle
+    - Only collect  information of the packages installed
+  - Amazon
+    - yum-plugin-security
+  - FreeBSD
+    - pkg-audit
+
+- Report
+  - Compare package version to detect CVE-IDs using local OVAL DB.
+  - Use vulnerability information such as NVD, JVN, OVAL
+
+### Deep scan mode
+- https://github.com/future-architect/vuls#deep-scan
+This mode may consume resources on the server to be scanned and some commands may need root privilege. However, deep scan mode is more accurate vulnerability detection and more detailed information than fast scan mode.
+
+- Scan Method
+  - Ubuntu, Debian
+    - parse changelog to detect CVE-IDs
+    - need sudo(apt-get update) 
+  - CentOS
+    - parse changelog to detect CVE-IDs
+    - no sudo
+  - RHEL
+    - collect changelogs (no parse)
+    - collect information of yum-plugin-seucrity
+    - need sudo
+  - Amazon Linux
+    - collect changelogs (no parse)
+    - collect information of yum-plugin-seucrity
+    - no sudo
+
+- Report
+  - Compare package version to detect CVE-IDs using local OVAL DB.
+  - Use vulnerability information such as NVD, JVN, OVAL
+
+## Improvement of vulnerabilities detection accuracy
+  - OVAL Support (CentOS, RHEL, Debian, Ubuntu, OracleLinux)
+    - https://github.com/kotakanbe/goval-dictionary
+  - Use vulnerability information of OVAL when reporting.
+  - Use version comparison when parsing change log (CentOS, Ubuntu, Debian)
+
+## Detect the vulnerability that is not yet fixed 
+  - CentOS 
+    - There are many packages that has been fixed in RedHat, but not been fixed in CentOS. 
+  - Ubuntu, Debian
+    - OVAL has this information
+
+## Notify Reboot Required
+Vuls warns when the scan target server was updated the kernel etc. but not restarting it.
+
+## Change the structure of models
+The structure of the model has changed.
+This version is not backward compatible.
+
+## Obtain changelog
+- Use `yum changelog` in yum-utils instead of `yum update --changelog` in yum-plugin-changelog to fetch changelogs **without** root privilege.
+  - https://github.com/future-architect/vuls/pull/449/commits/a0bafbd29f7936ab488102babf0303c7cc20522c
+- Use version comparison logic when parsing change log (Ubuntu, Debian)
+  - https://github.com/future-architect/vuls/pull/449/commits/c9cab1b190a8fa1470408a6bc67b38ea0d05520d
+
+## Display the information of yum plugin-security on TUI
+- for RHEL, Amazon, Oracle
+- Changelogs will be fetched with --deep flag of scan subcommand.
+![1____applications__tmux_](https://user-images.githubusercontent.com/534611/28582043-07e4dde6-719f-11e7-9c03-874d67ffb120.png)
+
+# Changelog
+- https://github.com/future-architect/vuls/blob/master/CHANGELOG.md#v040-2017-08-25
+
+# These fine people have contributed
+- [Yasunari Momoi](https://twitter.com/sbg)
+",https://api.github.com/users/kotakanbe,534611,kotakanbe,https://api.github.com/repos/future-architect/vuls/releases/7518565/assets,https://api.github.com/repos/future-architect/vuls/releases/7518565,master,https://api.github.com/repos/future-architect/vuls/tarball/v0.4.0,https://github.com/future-architect/vuls/releases/tag/v0.4.0,https://api.github.com/repos/future-architect/vuls/zipball/v0.4.0,v0.4.0,False,False
+5854852,2017-03-24T05:55:28Z,2017-03-24T06:01:09Z,v0.3.0,see https://github.com/future-architect/vuls/blob/master/CHANGELOG.md,https://api.github.com/users/kotakanbe,534611,kotakanbe,https://api.github.com/repos/future-architect/vuls/releases/5854852/assets,https://api.github.com/repos/future-architect/vuls/releases/5854852,master,https://api.github.com/repos/future-architect/vuls/tarball/v0.3.0,https://github.com/future-architect/vuls/releases/tag/v0.3.0,https://api.github.com/repos/future-architect/vuls/zipball/v0.3.0,v0.3.0,False,False
+5112900,2017-01-10T07:15:01Z,2017-01-10T07:28:12Z,Add Report Subcommand,"see https://github.com/future-architect/vuls/blob/master/CHANGELOG.md
+
+The main pull request is below
+https://github.com/future-architect/vuls/pull/270
+",https://api.github.com/users/kotakanbe,534611,kotakanbe,https://api.github.com/repos/future-architect/vuls/releases/5112900/assets,https://api.github.com/repos/future-architect/vuls/releases/5112900,master,https://api.github.com/repos/future-architect/vuls/tarball/v0.2.0,https://github.com/future-architect/vuls/releases/tag/v0.2.0,https://api.github.com/repos/future-architect/vuls/zipball/v0.2.0,v0.2.0,False,False
+4601859,2016-11-08T12:15:57Z,2016-11-08T12:24:55Z,,"see https://github.com/future-architect/vuls/blob/master/CHANGELOG.md
+",https://api.github.com/users/kotakanbe,534611,kotakanbe,https://api.github.com/repos/future-architect/vuls/releases/4601859/assets,https://api.github.com/repos/future-architect/vuls/releases/4601859,master,https://api.github.com/repos/future-architect/vuls/tarball/v0.1.7,https://github.com/future-architect/vuls/releases/tag/v0.1.7,https://api.github.com/repos/future-architect/vuls/zipball/v0.1.7,v0.1.7,False,False
+4104972,2016-09-12T13:03:49Z,2016-09-12T13:09:20Z,v0.1.6,"see https://github.com/future-architect/vuls/blob/master/CHANGELOG.md
+",https://api.github.com/users/kotakanbe,534611,kotakanbe,https://api.github.com/repos/future-architect/vuls/releases/4104972/assets,https://api.github.com/repos/future-architect/vuls/releases/4104972,master,https://api.github.com/repos/future-architect/vuls/tarball/v0.1.6,https://github.com/future-architect/vuls/releases/tag/v0.1.6,https://api.github.com/repos/future-architect/vuls/zipball/v0.1.6,v0.1.6,False,False
+3902977,2016-08-16T11:24:33Z,2016-08-17T02:32:32Z,,"see https://github.com/future-architect/vuls/blob/master/CHANGELOG.md
+",https://api.github.com/users/kotakanbe,534611,kotakanbe,https://api.github.com/repos/future-architect/vuls/releases/3902977/assets,https://api.github.com/repos/future-architect/vuls/releases/3902977,master,https://api.github.com/repos/future-architect/vuls/tarball/v0.1.5,https://github.com/future-architect/vuls/releases/tag/v0.1.5,https://api.github.com/repos/future-architect/vuls/zipball/v0.1.5,v0.1.5,False,False
+3298372,2016-05-24T23:30:24Z,2016-05-24T23:33:55Z,,"**Caution**
+To upgrade to this release, you have to use a new SQLite3 data file because ERD is changed.
+https://github.com/future-architect/vuls/pull/67
+
+For details, see https://github.com/future-architect/vuls/blob/master/CHANGELOG.md
+",https://api.github.com/users/kotakanbe,534611,kotakanbe,https://api.github.com/repos/future-architect/vuls/releases/3298372/assets,https://api.github.com/repos/future-architect/vuls/releases/3298372,master,https://api.github.com/repos/future-architect/vuls/tarball/v0.1.4,https://github.com/future-architect/vuls/releases/tag/v0.1.4,https://api.github.com/repos/future-architect/vuls/zipball/v0.1.4,v0.1.4,False,False

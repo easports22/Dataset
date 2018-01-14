@@ -1,0 +1,573 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+5812323,2017-03-21T03:02:55Z,2017-03-21T03:12:16Z,19.7.1,"# == 19.7.1  == 
+
+- fix: continue if SO_REUSEPORT seems to be available but fails (#1480)
+- fix: support non-decimal values for the umask command line option (#1325)",https://api.github.com/users/tilgovi,20818,tilgovi,https://api.github.com/repos/benoitc/gunicorn/releases/5812323/assets,https://api.github.com/repos/benoitc/gunicorn/releases/5812323,master,https://api.github.com/repos/benoitc/gunicorn/tarball/19.7.1,https://github.com/benoitc/gunicorn/releases/tag/19.7.1,https://api.github.com/repos/benoitc/gunicorn/zipball/19.7.1,19.7.1,False,False
+5639614,2017-03-04T09:31:44Z,2017-03-04T10:35:34Z,19.7.0,"# == 19.7.0  == 
+
+- The previously deprecated ``gunicorn_django`` command has been removed.
+  Use the [](http://docs.gunicorn.org/en/stable/run.html#gunicorn-cmd) command-line interface instead.
+- The previously deprecated ``django_settings`` setting has been removed.
+  Use the [raw-env](http://docs.gunicorn.org/en/stable/settings.html#raw-env) setting instead.
+- The default value of [ssl-version](http://docs.gunicorn.org/en/stable/settings.html#ssl-version) has been changed from ``ssl.PROTOCOL_TLSv1`` to ``ssl.PROTOCOL_SSLv23``.
+- fix: initialize the group access list when initgroups is set (#1297)
+- add environment variables to gunicorn access log format (#1291)
+- add --paste-global-conf option (#1304)
+- fix: print access logs to STDOUT (#1184)
+- remove upper limit on max header size config (#1313)
+- fix: print original exception on AppImportError (#1334)
+- use SO_REUSEPORT if available (#1344)
+- [fix leak](https://github.com/benoitc/gunicorn/commit/b4c41481e2d5ef127199a4601417a6819053c3fd) of duplicate file descriptor for bound sockets.
+- add --reload-engine option, support inotify and other backends (#1368, #1459)
+- fix: reject request with invalid HTTP versions
+- add ``child_exit`` callback (#1394)
+- add support for eventlets _AlreadyHandled object (#1406)
+- format boot tracebacks properly with reloader (#1408)
+- refactor socket activation and fd inheritance for better support of SystemD (#1310)
+- fix: o fds are given by default in gunicorn (#1423)
+- add ability to pass settings to GUNICORN_CMD_ARGS environnement variable which helps in container world (#1385)
+- fix:  catch access denied to pid file (#1091)
+-  many additions and improvements to the documentation
+
+## Breaking Change
+
+- **Python 2.6.0** is the last supported version",https://api.github.com/users/benoitc,14498,benoitc,https://api.github.com/repos/benoitc/gunicorn/releases/5639614/assets,https://api.github.com/repos/benoitc/gunicorn/releases/5639614,master,https://api.github.com/repos/benoitc/gunicorn/tarball/19.7.0,https://github.com/benoitc/gunicorn/releases/tag/19.7.0,https://api.github.com/repos/benoitc/gunicorn/zipball/19.7.0,19.7.0,False,False
+3285171,2016-05-21T09:21:53Z,2016-05-23T15:29:33Z,19.6.0,"## == 19.6.0 ==
+
+### Core
+- improvement of the binary upgrade behaviour using USR2: remove file lockin (#1270)
+- add the `--capture-output` setting to capture stdout/stderr tot the log file (#1271)
+- Allow disabling `sendfile()` via the SENDFILE` environment variable (#1252)
+- fix reload under pycharm (#1129)
+
+### Workers
+- fix: make sure to remove the signal from the worker pipe (#1269)
+- fix: **gthread** worker, handle removed socket in the select loop (#1258)
+",https://api.github.com/users/benoitc,14498,benoitc,https://api.github.com/repos/benoitc/gunicorn/releases/3285171/assets,https://api.github.com/repos/benoitc/gunicorn/releases/3285171,master,https://api.github.com/repos/benoitc/gunicorn/tarball/19.6.0,https://github.com/benoitc/gunicorn/releases/tag/19.6.0,https://api.github.com/repos/benoitc/gunicorn/zipball/19.6.0,19.6.0,False,False
+3205679,2016-05-10T19:43:06Z,2016-05-11T19:51:40Z,19.5.0,"== 19.5.0 ==
+
+=== Core === 
+- fix: Ensure response to HEAD request won't have message body  
+- fix: lock domain socket and remove on last arbiter exit (#1220)
+- improvement: use EnvironmentError instead of socket.error (#939)
+- add: new $FORWARDDED_ALLOW_IPS environment variable (#1205)
+- fix: infinite recursion when destroying sockets (#1219)
+- fix: close sockets on shutdown (#922)
+- fix: clean up sys.exc_info calls to drop circular refs (#1228)
+- fix: do post_worker_init after load_wsgi (#1248)
+
+=== Workers ===
+- fix access logging in gaiohttp worker (#1193)
+- eventlet: handle QUIT in a new coroutine (#1217)
+- gevent: remove obsolete exception clauses in run (#1218)
+- tornado: fix extra ""Server"" response header (#1246)
+- fix: unblock the wait loop under python 3.5 in sync worker (#1256)
+
+=== Logging ===
+- fix: log message for listener reloading (#1181)
+- Let logging module handle traceback printing (#1201)
+- improvement:  Allow configuring logger_class with statsd_host (#1188)
+- fix: traceback formatting (#1235)
+- fix: print error logs on stderr and access logs on stdout (#1184)
+
+=== Documentation ===
+- Simplify installation instructions in gunicorn.org (#1072)
+- Fix URL and default worker type in example_config (#1209)
+- update django doc url to 1.8 lts (#1213)
+- fix: miscellaneous wording corrections (#1216)
+- Add PSF License Agreement of selectors.py to NOTICE (:issue: #1226)
+- document LOGGING overriding (#1051)
+- put a note that error logs are only errors from Gunicorn (#1124)
+- add a note about the requirements of the threads workers under python 2.x (#1200)
+- add access_log_format to config example (#1251)
+
+=== Tests ===
+- Use more pytest.raises() in test_http.py
+",https://api.github.com/users/benoitc,14498,benoitc,https://api.github.com/repos/benoitc/gunicorn/releases/3205679/assets,https://api.github.com/repos/benoitc/gunicorn/releases/3205679,master,https://api.github.com/repos/benoitc/gunicorn/tarball/19.5.0,https://github.com/benoitc/gunicorn/releases/tag/19.5.0,https://api.github.com/repos/benoitc/gunicorn/zipball/19.5.0,19.5.0,False,False
+2371854,2016-01-05T00:10:38Z,2016-01-05T00:15:19Z,19.4.5,"== 19.4.5 ==
+- fix: NameError fileno in gunicorn.http.wsgi (#1178)
+",https://api.github.com/users/benoitc,14498,benoitc,https://api.github.com/repos/benoitc/gunicorn/releases/2371854/assets,https://api.github.com/repos/benoitc/gunicorn/releases/2371854,master,https://api.github.com/repos/benoitc/gunicorn/tarball/19.4.5,https://github.com/benoitc/gunicorn/releases/tag/19.4.5,https://api.github.com/repos/benoitc/gunicorn/zipball/19.4.5,19.4.5,False,False
+2367450,2016-01-04T09:46:23Z,2016-01-04T09:47:44Z,19.4.4,"== 19.4.4 == 
+- fix: check if a fileobject can be used with sendfile(2) (#1174)
+- doc: be more descriptive in errorlog option (#1173)
+",https://api.github.com/users/benoitc,14498,benoitc,https://api.github.com/repos/benoitc/gunicorn/releases/2367450/assets,https://api.github.com/repos/benoitc/gunicorn/releases/2367450,master,https://api.github.com/repos/benoitc/gunicorn/tarball/19.4.4,https://github.com/benoitc/gunicorn/releases/tag/19.4.4,https://api.github.com/repos/benoitc/gunicorn/zipball/19.4.4,19.4.4,False,False
+2350647,2015-12-29T14:18:13Z,2015-12-29T14:37:30Z,19.4.3,"== 19.4.3 ==
+- fix: don't check if a file is writable using os.stat with SELINUX (#1171)
+",https://api.github.com/users/benoitc,14498,benoitc,https://api.github.com/repos/benoitc/gunicorn/releases/2350647/assets,https://api.github.com/repos/benoitc/gunicorn/releases/2350647,master,https://api.github.com/repos/benoitc/gunicorn/tarball/19.4.3,https://github.com/benoitc/gunicorn/releases/tag/19.4.3,https://api.github.com/repos/benoitc/gunicorn/zipball/19.4.3,19.4.3,False,False
+2349684,2015-12-29T00:35:27Z,2015-12-29T09:49:17Z,19.4.2,"== 19.4.2 ==
+
+=== Core ===
+- improvement: handle HaltServer in manage_workers (#1095)
+- fix: Do not rely on sendfile sending requested count (#1155)
+- fix: claridy --no-sendfile default (#1156)
+- fix: LoggingCatch sendfile failure from no file descriptor (#1160)
+
+=== Logging ===
+- fix: Always send access log to syslog if syslog is on
+- fix: check auth before trying to own a file (#1157)
+
+=== Documentation ===
+- fix: Fix Slowloris broken link. (#1142)
+- Tweak markup in faq.rst
+
+=== Testing ===
+- fix: gaiohttp test (#1164)
+",https://api.github.com/users/benoitc,14498,benoitc,https://api.github.com/repos/benoitc/gunicorn/releases/2349684/assets,https://api.github.com/repos/benoitc/gunicorn/releases/2349684,master,https://api.github.com/repos/benoitc/gunicorn/tarball/19.4.2,https://github.com/benoitc/gunicorn/releases/tag/19.4.2,https://api.github.com/repos/benoitc/gunicorn/zipball/19.4.2,19.4.2,False,False
+2185257,2015-11-25T15:59:37Z,2015-11-25T16:09:11Z,,"== 19.4.1 ==
+- fix tornado worker (#1154)
+",https://api.github.com/users/benoitc,14498,benoitc,https://api.github.com/repos/benoitc/gunicorn/releases/2185257/assets,https://api.github.com/repos/benoitc/gunicorn/releases/2185257,master,https://api.github.com/repos/benoitc/gunicorn/tarball/19.4.1,https://github.com/benoitc/gunicorn/releases/tag/19.4.1,https://api.github.com/repos/benoitc/gunicorn/zipball/19.4.1,19.4.1,False,False
+2184919,2015-11-25T13:11:54Z,2015-11-25T15:24:08Z,Gunicorn 19.4 has been released,"Gunicorn 19.4 has been released. This is a new version with some new features and fixes.
+
+## Changes
+
+### Core
+- fix: make sure that a user is able to access to the logs after dropping a
+  privilege (#1116)
+- improvement: inherit the `Exception` class where it needs to be (#997)
+- fix: make sure headers are always encodedas latin1 RFC 2616 (#1102)
+- improvement: reduce arbiter noise (#1078)
+- fix: don't close the unix socket when the worker exit (#1088)
+- improvement: Make last logged worker count an explicit instance var (#1078)
+- improvement: prefix config file with its type (#836)
+- improvement: pidfile handing (#1042)
+- fix: catch OSError as well as ValueError on race condition (#1052)
+- improve support of ipv6 by backporting urlparse.urlsplit from Python 2.7 to
+  Python 2.6.
+- fix: raise InvalidRequestLine when the line contains maliscious data
+  (#1023)
+- fix: fix argument to disable sendfile
+- fix: add gthread to the list of supported workers (#1011)
+- improvement: retry socket binding up to five times upon EADDRNOTAVAIL
+  (#1004)
+- **breaking change**: only honor headers that can be encoded in ascii to comply to
+  the RFC 7230 (See #1151).
+
+### Logging
+- add new parameters to access log (#1132)
+- fix: make sure that files handles are correctly reopenebd on HUP
+  (#627)
+- include request URL in error message (#1071)
+- get username in access logs (#1069)
+- fix statsd logging support on Python 3 (#1010)
+
+### Testing
+- use last version of mock.
+- many fixes in Travis CI support
+- miscellaneous improvements in tests
+
+### Thread worker
+- fix: Fix self.nr usage in ThreadedWorker so that auto restart works as
+  expected (#1031)
+
+### Gevent worker
+- fix quit signal handling (#1128)
+- add support for Python 3 (#1066)
+- fix: make graceful shutdown thread-safe (#1032)
+
+### Tornado worker
+- fix ssl options (#1146, #1135)
+- don't check timeout when stopping gracefully (#1106)
+
+### AIOHttp worker
+- add SSL support (#1105)
+
+#### Documentation
+- fix link to proc name setting (#1144)
+- fix worker class documentation (#1141, #1104)
+- clarify graceful timeout documentation (#1137)
+- don't duplicate NGINX config files examples (#1050, #1048)
+- add `web.py` framework example (#1117)
+- update Debian/Ubuntu installations instructions (#1112)
+- clarify `pythonpath` setting description (#1080)
+- tweak some example for python3
+- clarify `sendfile` documentation
+- miscellaneous typos in source code comments (thanks!)
+- clarify why REMOTE_ADD may not be the user's IP address (#1037)
+
+### Misc
+- fix: reloader should survive SyntaxError (#994)
+- fix: expose the reloader class to the worker.
+
+Full changelog is available here: https://github.com/benoitc/gunicorn/compare/19.3...19.4
+
+## More
+
+You can find the documentation here: 
+http://docs.gunicorn.org/en/19.4/
+
+Latest version is also available on Pypi: 
+https://pypi.python.org/pypi/gunicorn/19.4.0
+",https://api.github.com/users/benoitc,14498,benoitc,https://api.github.com/repos/benoitc/gunicorn/releases/2184919/assets,https://api.github.com/repos/benoitc/gunicorn/releases/2184919,master,https://api.github.com/repos/benoitc/gunicorn/tarball/19.4,https://github.com/benoitc/gunicorn/releases/tag/19.4,https://api.github.com/repos/benoitc/gunicorn/zipball/19.4,19.4,False,False
+1022330,2015-03-06T10:09:05Z,2015-03-06T10:18:26Z,Gunicorn 19.3 has been released,"Gunicorn 19.3 has been released. This is a new version with some new features and fixes.
+
+## Changes:
+
+### Core
+- fix:#978 make sure a listener is inheritable
+- add `check_config` class method to workers
+- fix select timeout in sync worker with multiple connections  (#983)
+- allows workers to access to the reloader. close #984
+- raise TypeError instead of AssertionError
+
+### Logging
+- make Logger.loglevel a class attribute
+
+### Documentation
+- fix  fix syntax errors in `examples/gunicorn_rc` (#988)
+
+Full changelog is available here: 
+
+[https://github.com/benoitc/gunicorn/compare/19.2.1...19.3](https://github.com/benoitc/gunicorn/compare/19.2.1...19.3)
+
+## More
+
+You can find the documentation here:
+
+http://docs.gunicorn.org/en/19.3/
+
+Latest version is also available on Pypi:
+
+https://pypi.python.org/pypi/gunicorn/19.3.0
+",https://api.github.com/users/benoitc,14498,benoitc,https://api.github.com/repos/benoitc/gunicorn/releases/1022330/assets,https://api.github.com/repos/benoitc/gunicorn/releases/1022330,master,https://api.github.com/repos/benoitc/gunicorn/tarball/19.3,https://github.com/benoitc/gunicorn/releases/tag/19.3,https://api.github.com/repos/benoitc/gunicorn/zipball/19.3,19.3,False,False
+916149,2015-02-04T13:43:57Z,2015-02-04T13:53:56Z,Gunicorn 19.2.1 has been released,"Gunicorn 19.2.1 is a patch release with fixes.
+
+## Changes:
+
+### Logging
+- expose loglevel in the Logger class
+
+### AsyncIO worker (gaiohttp)
+- fix #977 fix initial crash
+
+### Documentation
+- document security mailing-list in the contributing page.
+
+Full changelog is available here: 
+
+[https://github.com/benoitc/gunicorn/compare/19.2...19.2.1](https://github.com/benoitc/gunicorn/compare/19.2...19.2.1)
+
+## More
+
+You can find the documentation here:
+
+http://docs.gunicorn.org/en/19.2.1/
+
+Latest version is also available on Pypi:
+
+https://pypi.python.org/pypi/gunicorn/19.2.1
+",https://api.github.com/users/benoitc,14498,benoitc,https://api.github.com/repos/benoitc/gunicorn/releases/916149/assets,https://api.github.com/repos/benoitc/gunicorn/releases/916149,master,https://api.github.com/repos/benoitc/gunicorn/tarball/19.2.1,https://github.com/benoitc/gunicorn/releases/tag/19.2.1,https://api.github.com/repos/benoitc/gunicorn/zipball/19.2.1,19.2.1,False,False
+900812,2015-01-30T14:23:10Z,2015-01-30T14:31:38Z,Gunicorn 19.2 has been released,"Gunicorn 19.2 is a major release with many improvements and fixes.
+
+## Changes:
+
+### Core
+- optimize the sync workers when listening on a single interface
+- add `--sendfile` settings to enable/disable sendfile. fix #856 .
+- add the selectors module to the code base. #886
+- fix #862 add `--max-requests-jitter` setting to set the maximum jitter to add to the
+  max-requests setting.
+- fix #899 propagate proxy_protocol_info to keep-alive requests
+- fix #863 worker timeout: dynamic timeout has been removed, fix a race
+  condition error
+- fix: Avoid world writable file
+- fix #917: the deprecated `--debug` option has been removed.
+
+### Logging
+- fix #941  set logconfig default to paster more trivially
+- add statsd-prefix config setting: set the prefix to use when emitting statsd
+  metrics
+- fix #832 log to console by default
+- fix #845 set the gunicorn loggers from the paste config
+
+### Thread Worker
+- fix #908 make sure the worker can continue to accept requests
+
+### Eventlet Worker
+- fix #867 , Fix eventlet shutdown to actively shut down the workers.
+
+### Documentation
+
+Many improvements and fixes have been done, see the detailled changelog for
+more informations.
+
+Full changelog is available here:
+
+[https://github.com/benoitc/gunicorn/compare/19.1.1...19.2](https://github.com/benoitc/gunicorn/compare/19.1.1...19.2)
+
+## More
+
+You can find the documentation here:
+
+http://docs.gunicorn.org/en/19.2/
+
+Latest version is also available on Pypi:
+
+https://pypi.python.org/pypi/gunicorn/19.2.0
+",https://api.github.com/users/benoitc,14498,benoitc,https://api.github.com/repos/benoitc/gunicorn/releases/900812/assets,https://api.github.com/repos/benoitc/gunicorn/releases/900812,master,https://api.github.com/repos/benoitc/gunicorn/tarball/19.2,https://github.com/benoitc/gunicorn/releases/tag/19.2,https://api.github.com/repos/benoitc/gunicorn/zipball/19.2,19.2,False,False
+495433,2014-08-16T11:36:44Z,2014-08-16T12:54:26Z,Gunicorn 19.1.1 has been released,"Gunicorn 19.1.1 is a minor release with some fixes.
+
+## Changes:
+
+### Core
+- fix  #835: display correct pid of already running instance
+- fix : fix `PyTest` class in setup.py.
+
+### Logging
+- fix  #838 : statsd logger, send statsd timing metrics in milliseconds
+- fix #839 : statsd logger,  allows for empty log message while pushing metrics and restore worker number in DEBUG logs
+- fix  #850: add timezone info to logging
+- fix #853: Respect logger_class setting unless statsd is on
+
+### AioHttp worker
+- fix #830 make sure gaiohttp worker is shipped with gunicorn.
+
+Full changelog is available here:
+
+[https://github.com/benoitc/gunicorn/compare/19.1...19.1.1](https://github.com/benoitc/gunicorn/compare/19.1...19.1.1)
+
+## More
+
+You can find the documentation here:
+
+http://docs.gunicorn.org/en/19.1.1/
+
+Latest version is also available on Pypi:
+
+https://pypi.python.org/pypi/gunicorn/19.1.1
+",https://api.github.com/users/benoitc,14498,benoitc,https://api.github.com/repos/benoitc/gunicorn/releases/495433/assets,https://api.github.com/repos/benoitc/gunicorn/releases/495433,master,https://api.github.com/repos/benoitc/gunicorn/tarball/19.1.1,https://github.com/benoitc/gunicorn/releases/tag/19.1.1,https://api.github.com/repos/benoitc/gunicorn/zipball/19.1.1,19.1.1,False,False
+452676,2014-07-26T13:04:31Z,2014-07-26T12:20:22Z,Gunicorn 19.1 has been released,"Gunicorn 19.1 is a major release with new features and fixes.
+
+## Changes:
+
+### Core
+- fix #785: handle binary type address given to a client socket address
+- fix graceful shutdown. make sure QUIT and TERMS signals are switched
+  everywhere.
+- support loading config from module (#799)
+- fix check for file-like objects (#805)
+- fix #815 args validation in WSGIApplication.init
+- fix #787 check if we load a pyc file or not.
+
+### Tornado worker
+- fix #771: support tornado 4.0
+- fix #783: x_headers error. The x-forwarded-headers option has been removed [c4873681299212d6082cd9902740eef18c2f14f1](https://github.com/benoitc/gunicorn/commit/c4873681299212d6082cd9902740eef18c2f14f1). The discussion is
+  available on #633.
+
+### AioHttp worker
+- fix: fetch all body in input. fix #803
+- fix: don't install the worker if python < 3.3
+- fix  #822: Support UNIX sockets in gaiohttp worker
+
+### Async worker
+- fix #790 StopIteration shouldn't be catched at this level.
+
+### Logging
+- add statsd logging handler fix #748
+
+### Paster
+- fix #809 Set global logging configuration from a Paste config.
+
+### Extra
+- fix RuntimeError in gunicorn.reloader (#807)
+
+### Documentation
+- [update faq:](http://docs.gunicorn.org/en/latest/faq.html#why-i-don-t-see-any-logs-in-the-console) put a note on how `watch logs in the console since many people asked for it.
+
+Full changelog is available here:
+
+[https://github.com/benoitc/gunicorn/compare/19.0...19.1](https://github.com/benoitc/gunicorn/compare/19.0...19.1)
+
+## More
+
+You can find the documentation here:
+
+http://docs.gunicorn.org/en/19.1/
+
+Latest version is also available on Pypi:
+
+https://pypi.python.org/pypi/gunicorn/19.1.0
+",https://api.github.com/users/benoitc,14498,benoitc,https://api.github.com/repos/benoitc/gunicorn/releases/452676/assets,https://api.github.com/repos/benoitc/gunicorn/releases/452676,master,https://api.github.com/repos/benoitc/gunicorn/tarball/19.1,https://github.com/benoitc/gunicorn/releases/tag/19.1,https://api.github.com/repos/benoitc/gunicorn/zipball/19.1,19.1,False,False
+371004,2014-06-12T14:45:44Z,2014-06-12T15:02:44Z,Gunicorn 19.0 has been released,"Gunicorn 19.0 is a major release with new features and fixes. This version improve a lot the usage of Gunicorn with python 3 by adding [two new workers](http://docs.gunicorn.org/en/19.0/design.html#asyncio-workers) to it: `gthread` a fully threaded async worker using futures and `gaiohttp` a worker using asyncio.
+
+## Breaking Changes
+
+### Switch QUIT and TERM signals
+
+With this change, when gunicorn receives a QUIT all the workers are
+killed immediately and exit and TERM is used for the graceful shutdown.
+
+Note: the old behaviour was based on the NGINX but the new one is more
+correct according the following doc:
+
+https://www.gnu.org/software/libc/manual/html_node/Termination-Signals.html
+
+also it is complying with the way the signals are sent by heroku:
+
+https://devcenter.heroku.com/articles/python-faq#what-constraints-exist-when-developing-applications-on-heroku
+
+### Deprecations
+
+`run_gunicorn`, `gunicorn_django` and `gunicorn_paster` are now completely deprecated and will be removed in the next release. Use the `gunicorn` command instead.
+
+## Changes:
+
+### core
+- add aiohttp worker named `gaiohttp` using asyncio. Full async worker
+  on python 3.
+- fix HTTP-violating excess whitespace in write_error output
+- fix: try to log what happened in the worker after a timeout, add a
+  `worker_abort` hook on SIGABRT signal.
+- fix: save listener socket name in workers so we can handle buffered
+  keep-alive requests after the listener has closed.
+- add on_exit hook called just before exiting gunicorn.
+- add support for python 3.4
+- fix: do not swallow unexpected errors when reaping 
+- fix: remove incompatible SSL option with python 2.6
+- add new async gthread worker and `--threads` options allows to set multiple
+  threads to listen on connection
+- deprecate `gunicorn_django` and `gunicorn_paster`
+- switch QUIT and TERM signal
+- reap workers in SIGCHLD handler
+- add universal wheel support
+- use `email.utils.formatdate` in gunicorn.util.http_date
+- deprecate the `--debug` option
+- fix: log exceptions that occur after response start … 
+- allows loading of applications from `.pyc` files (#693)
+- fix: issue #691, raw_env config file parsing
+- use a dynamic timeout to wait for the optimal time. (Reduce power
+  usage)
+- fix python3 support when notifying the arbiter
+- add: honor $WEB_CONCURRENCY environment variable. Useful for heroku
+  setups.
+- add: include tz offset in access log
+- add: include access logs in the syslog handler.
+- add --reload option for code reloading
+- add the capability to load `gunicorn.base.Application` without the loading of the arguments of the command line. It allows you to [embed gunicorn in your own application](http://docs.gunicorn.org/en/latest/custom.html).
+- improve: set wsgi.multithread to True for async workers
+- fix logging: make sure to redirect wsgi.errors when needed
+- add: syslog logging can now be done to a unix socket
+- fix logging: don't try to redirect stdout/stderr to the logfile.
+- fix logging: don't propagate log
+- improve logging: file option can be overriden by the gunicorn options `--error-logfile` and `--access-logfile` if they are given.
+- fix: dont' override SERVER_\* by the Host header 
+- fix: handle_error
+- add more option to configure SSL
+- fix: sendfile with SSL
+- add: worker_int callback (to react on SIGTERM)
+- fix: don't depend on entry point for internal classes, now absolute
+  modules path can be given.
+- fix: Error messages are now encoded in latin1
+- fix: request line length check
+- improvement: proxy_allow_ips: Allow proxy protocol if ""*"" specified
+- fix: run worker's `setup` method  before setting num_workers 
+- fix: FileWrapper inherit from `object` now
+- fix: Error messages are now encoded in latin1
+- fix: don't spam the console on SIGWINCH.
+- fix: logging -don't stringify T and D logging atoms (#621)
+- add support for the latest django version
+- deprecate `run_gunicorn` django option
+- fix: sys imported twice
+
+### gevent worker
+- fix: make sure to stop all listeners
+- fix: monkey patching is now done in the worker 
+- fix: ""global name 'hub' is not defined""
+- fix: reinit `hub` on old versions of gevent
+- support gevent 1.0
+- fix: add subprocess in monket patching
+- fix: add support for multiple listener
+
+### eventlet worker
+- fix: merge duplicate EventletWorker.init_process method (fixes #657)
+- fix: missing errno import for eventlet sendfile patch
+- fix: add support for multiple listener
+
+### tornado worker
+- add gracefull stop support
+
+Full changelog is available here:
+
+https://github.com/benoitc/gunicorn/compare/18.0...19.0
+
+## More
+
+You can find the documentation here:
+
+http://docs.gunicorn.org/en/19.0/
+
+Latest version is also available on Pypi:
+
+https://pypi.python.org/pypi/gunicorn/19.0.0
+",https://api.github.com/users/benoitc,14498,benoitc,https://api.github.com/repos/benoitc/gunicorn/releases/371004/assets,https://api.github.com/repos/benoitc/gunicorn/releases/371004,master,https://api.github.com/repos/benoitc/gunicorn/tarball/19.0,https://github.com/benoitc/gunicorn/releases/tag/19.0,https://api.github.com/repos/benoitc/gunicorn/zipball/19.0,19.0,False,False
+34085,2013-08-27T22:40:48Z,2013-08-27T22:45:13Z,Gunicorn 18.0 has been released,"Gunicorn 18.0 is a major release with new features and fixes. With this release **the commands `gunicorn_django` and `gunicorn_paster` are now deprecated**. They will be removed in the next major release R19. You can now easily launch your django or paster applications by only using the `gunicorn` command line. See the documentation and the following changes for more more information.
+
+## Changes
+- new: add `-e/--env` command line argument to pass an environment variables to
+  gunicorn
+- new: add `--chdir` command line argument to specified directory
+  before apps loading. 
+- new: add wsgi.file_wrapper support in async workers
+- new: add `--paste` command line argument to set the paster config file
+- deprecated: the command `gunicorn_django` is now deprecated. You should now
+  run your application with the WSGI interface installed with your project (see
+  https://docs.djangoproject.com/en/1.4/howto/deployment/wsgi/gunicorn/) for
+  more infos.
+- deprecated:  the command `gunicorn_paste` is deprecated. You now should use
+  the new `--paste` argument to set the configuration file of your paster
+  application.
+- fix: Removes unmatched leading quote from the beginning of the default access
+  log format string
+- fix: null timeout
+- fix: gevent worker
+- fix: don't reload the paster app when using pserve
+- fix: after closing for error do not keep alive the connection
+- fix: responses 1xx, 204 and 304 should not force the connection to be closed
+
+Full changelog is available here:
+
+https://github.com/benoitc/gunicorn/compare/17.5...18.0
+
+## More
+
+You can find the documentation here:
+
+http://docs.gunicorn.org/en/18.0/
+
+Latest version is also available on Pypi:
+
+https://pypi.python.org/pypi/gunicorn/18.0
+",https://api.github.com/users/benoitc,14498,benoitc,https://api.github.com/repos/benoitc/gunicorn/releases/34085/assets,https://api.github.com/repos/benoitc/gunicorn/releases/34085,master,https://api.github.com/repos/benoitc/gunicorn/tarball/18.0,https://github.com/benoitc/gunicorn/releases/tag/18.0,https://api.github.com/repos/benoitc/gunicorn/zipball/18.0,18.0,False,False
+2108,2013-07-03T08:10:30Z,2013-07-03T09:16:33Z,Gunicorn 17.5 has been released,"Gunicorn 17.5 is a service release with mostly a number of small corrections and user contributions. But there are some new functions worth mentioning as well: 
+- new: add signals documentation
+- new: add post_worker_init hook for workers
+- new: try to use gunicorn.conf.py in current folder as the default
+  config file.
+- fix graceful timeout with the Eventlet worker
+- fix: don't raise an error when closing the socket if already closed
+- fix: fix --settings parameter for django application and try to find
+  the django settings when using the `gunicorn` command.
+- fix: give the initial global_conf to paster application
+- fix: fix 'Expect: 100-continue' support on Python 3
+
+Full changelog is available here:
+
+https://github.com/benoitc/gunicorn/compare/0.17.4...17.5
+
+You can find the documentation here: 
+
+http://docs.gunicorn.org/en/17.5/
+
+Latest version is also available on Pypi: 
+
+https://pypi.python.org/pypi/gunicorn/17.5
+
+## Notes:
+
+### New versioning:
+
+With this release, the versioning of Gunicorn is changing. Gunicorn is stable since a long time and there is no point to release a ""1.0"" now.  It should have been done since a long time. 0.17 really meant it was the 17th stable version. From the beginning we have only 2 kind of releases:
+- major release: releases with major changes or huge features added
+- services releases: fixes and minor features added
+
+So from now we will apply the following versioning `<major>.<service>`. For example `17.5` is a service release.
+",https://api.github.com/users/benoitc,14498,benoitc,https://api.github.com/repos/benoitc/gunicorn/releases/2108/assets,https://api.github.com/repos/benoitc/gunicorn/releases/2108,master,https://api.github.com/repos/benoitc/gunicorn/tarball/17.5,https://github.com/benoitc/gunicorn/releases/tag/17.5,https://api.github.com/repos/benoitc/gunicorn/zipball/17.5,17.5,False,False

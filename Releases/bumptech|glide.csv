@@ -1,0 +1,548 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7979864,2017-10-03T14:38:38Z,2017-10-03T16:13:34Z,Glide 4.2.0,"This is the September release of Glide.
+
+## Features
+* Added support for replacing Glide's default ``Encoders`` (03f5bd4098489d3c76644ebc014f81bab371dd54, #2349, thanks to @MistaGreen)
+* Added a more advanced way to control how/when requests are restarted when they have the same cache keys (b667cab8d3e384ab6f127aef83eafe631d210fd0, thanks to @Tolriq). 
+* Repackaged Glide's annotation processor dependencies to avoid build errors with the generated API caused by dependency conflicts (a0e388e234919cb4c94ea391811b5314ac5a9654, #2059, thanks to @TWiStErRob)
+* Added a bucketing system when registering custom components to make choosing the order in which the components are called easier and more intuitive (da90633b91e817603bb25589b6589654926caea7, thanks to asuszek@).
+* Pass ``Options`` to ``ResourceTranscoders`` to allow customizing behavior (134870e51e362f1648a607348ebb7cb9c51d0a8a, #2417).
+* Added an interface to allow reporting or uncaught exceptions on Glide's thread pools (a1cd3afcc41da72885f4da385b53d71601d0d407, thanks to @stephanenicolas)
+
+## Bug fixes
+* Fixed incorrect Bitmap pool sizes on some versions of Android (fe5289d23c39fc6a4d48b092ad3fc71f84cc81f9, #2334, thanks to @SUPERCILEX)
+* Fixed a resource leak when following redirects in Glide's default Http library (7f625977e740e0278224a96e6b962c2afd286b38, 73a8054f2bc4833598426ba5b09c243b21f752f3, #2352)
+* Fixed a racy resource leak where ``DataFetchers`` were sometimes never closed (d482b8ed2b4551a35ba5edca16bc439f6242abf7)
+* Fixed load failures due to a simultaneous put exception in Glide's default disk cache (01f5a3d3dc0e78cc83b9e390b331a65dd5c1a9f3)
+* Fixed Http load failures caused by unexpected characters in the user agent of some devices (3cd06858313ebe28b4a14384fd087eddcece68ab)
+* Worked around an O specific ClassCastException in the OkHttp support library (a4af922db56c928a56bcb8bfc7651e32fe10fd10)
+* Fixed logic in ``RequestFutureTarget`` to better match the ``Future`` documentation (f033e9b45192a8a9521eca8160edbea2bb741f63) 
+* Fixed a few rounding issues when downsampling and transforming images to eliminate hardware bitmap errors and wasteful allocations when decoded Bitmaps from ``Downsampler`` are ~1 pixel off of the size required by ``Transformations`` (f5ba3740fc7d4ad4918a88d84ab55921173543bf, b1b024ebced1e6aef74062cfd04f67d1ca4aa8f5, 4b5ccaa84ad6f7d1e3ab63e6c678ab2d857aaf5d)
+* Fix ``get(View)`` failing to find non-support ``Fragments`` (a0c5af1af736a06bdeee78f13de9bd7a072dc3b5)
+* Add better null handling to ``ListPreloader`` (c3479c43461404de36c0fd07a5f324573443e193, #2379)
+* Fixed assertions when generated ``GlideRequests`` were used to load a model and then modified after the load was started (d56e08cc020269360452c7caabc35565723986f8). 
+* Fixed load failures on some devices where UUIDs initialization is broken (d67ce32fcdac66a219eb03838a8d75ffd890cd28, #1510) 
+* Improved performance loading video frames slightly be avoiding duplicate ``setDataSource`` calls (a84deb3f6a0bff59b967cf1f2eb8d8c80d805ac2). 
+* Handle all types of exceptions thrown by ``ResourceDecoders`` to allow other registered ``ResourceDecoders`` to run even if one decoder fails or behaves unexpectedly (6cffaabcf7e67f59801cc4238a38ec1a88720767). 
+* Fixed an exception using ``HARDWARE`` Bitmaps with images where Glide is unable to determine the original dimensions (f9757a5a51c253d4732cea657e968f9918fbed64). 
+* Fixed an issue where sometimes the MediaStore thumbnail would be returned when ``Target.SIZE_ORIGINAL`` was used (45013968bf451ac3219febd6f0794321916e62c0, thanks to asuszek@). 
+
+## Documentation
+* Added links to a Simplified Chinese translation of Glide's documentation page (ee557b62a6aed1b365a21e33acbe2e9c0e0580c4, thanks to @Muyangmin)
+* Added Google's maven repo for support libraries to the setup example in the readme (3bf2d36175cce7f11bc579c94e99dde113b85144, thanks to @rocboronat)
+
+## Behavior changes
+* Calling ``into()`` or ``clear()`` in a ``RequestListener`` or ``Target`` implementation will now always crash with an assertion. Previously it would sometimes crash depending on how the request was configured. To avoid the exception, you can use [``Handler#post``][1] to post your ``into()`` or ``clear()`` call to the main thread instead of calling it directly (6fb87b357803b1ca5b34ac046ac01e0fdb88ab16, #2413)
+* Glide's interpretation of View sizes has changed substantially, see #2431 for more details.
+* Changed the default downsample strategy to ``CENTER_OUTSIDE`` on KitKat+ for cases where neither a strategy nor a transformation that uses a strategy is applied to a load (8a90f542145f82f51fb8b7718f2a5c3fd9ce1bb9, thanks to asuszek@). 
+
+[1]: https://developer.android.com/reference/android/os/Handler.html#post(java.lang.Runnable)
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/7979864/assets,https://api.github.com/repos/bumptech/glide/releases/7979864,master,https://api.github.com/repos/bumptech/glide/tarball/v4.2.0,https://github.com/bumptech/glide/releases/tag/v4.2.0,https://api.github.com/repos/bumptech/glide/zipball/v4.2.0,v4.2.0,False,False
+7638609,2017-09-05T14:11:35Z,2017-09-05T14:50:38Z,Glide 4.1.1,"This is a bugfix release of Glide 4.1.
+
+## Bugfixes
+* Fix  ``com.android.dex.DexException: Multiple dex files define Landroid/support/compat/R$drawable`` (#2322, 1325d87d37693214c0cde86f5de0380c396772b0)
+* Fix ``WARNING: Module 'com.github.bumptech.glide:glide:4.1.0' depends on one or more Android Libraries but is a jar`` (#2318, 789161a6ce07289885ef9daa4a4626e83c1b2480)
+
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/7638609/assets,https://api.github.com/repos/bumptech/glide/releases/7638609,master,https://api.github.com/repos/bumptech/glide/tarball/v4.1.1,https://github.com/bumptech/glide/releases/tag/v4.1.1,https://api.github.com/repos/bumptech/glide/zipball/v4.1.1,v4.1.1,False,False
+7606574,2017-09-01T14:06:22Z,2017-09-01T15:07:35Z,Glide 4.1.0,"This is the August release of Glide.
+
+## Bug fixes
+* Fixed a bug where options applied in [``GlideExtensions``][1] could be ignored if the extension option was applied to a [``RequestOptions``][2] object that had [``autoClone()``][3] enabled (b39a9dbfd6d45782380d8d8c8e4db0863db5f32b)
+* Fixed an issue default options set in [``RequestManager``][4] could be ignored if [``autoClone()``][3] was enabled (d717e83ea8a64cff268cae302acb35889ee73ab3)
+* Fixed double logging parts of GlideExceptions (9d7b8d9757b0f296d280af4ae8c96b311b15855e) 
+* Fixed a bug where [``DiskCacheStrategy.ALL``][5] and [``DiskCachceStrategy.RESOURCE``][6] when used while loading a GIF might lead to a partial or invalid cache file (1594655d9c256e52f7ac829bba5fafb926d001c0)
+* Fixed a concurrent modification exception in ``ViewTarget`` (cac71928447b964fc1d9aac300e5ffcb503496b6)
+* Fixed an error attempting to load files more than ``Integer.MAX_VALUE`` in length (#2240, 8fac1236423cec5f46bff2d904a0803070a14c4b)
+* Fixed an issue with using cross fades in RecyclerView (06aced3fd95a6339f30a8d611be81fbb2169b0d1). 
+* Clarified nullability of properties in ``DataFetcher`` (#2203, thanks to @Tolriq)
+
+## Features
+* Removed the BitmapPool by default from low ram devices on O+ and decreased the default BitmapPool size on O+ (bb5c391a8b418f8ac2296d4d2c2ca24110e83984)
+* Added support for [``Bitmap.Config.HARDWARE``][7] in Android O+.
+ See note below for behavior changes. (d83de421024882311c0aa4d835c8fce6a0550f8a)
+* Expose the entry count to subclasses of [``LruCache``][8] (a2a695f11e0a486337c8d0010a997ad536f6a565, thanks to @loran)
+* Target Android API 26 (cea1cce41649602e4d3d3490303ea132c75f0332) 
+* Added support for loading a contact thumbnail by phone number (#2233, thanks to @dstefanox)
+* Added a method to [``GlideBuilder``][9] so users can set default [``Transitions``][10] (#2182, 0b99260f2f99b4b3c0ea5f4d7b309bc5a36d8d1c) 
+* Added a method to set network timeouts for Glide's default networking library (3e5527ebc8110c017037592aedc788f1d66f783f) 
+* Automatically register Glide for [``ComponentCallbacks``][11] and [``ComponentCallbacks2``][12] so applications no longer have to do so manually (6b137c2b1d4b2ab187ea2aa56834dea039daa090) 
+* Avoid restarting in progress or completed requests if the new request is identical to the old one (9d10097e7bd298cc5b393364663fa0cf08711e8e, 73a8e0116a7826b631775f42f9a04aad374f3bb8, 0a44cf60135e67e64bc4027ebe70f9acac6f7962, thanks to @Tolriq)
+* Added a [new shortcut method][13] for applying multiple transformations (#2138, thanks to @realdeadfish)
+
+## Build changes
+* Updated to Gradle 4.1 (0310656a6686ea1988c10dad3a9b14d24c4356da, thanks to @jaredsburrows)
+
+## API/Behavior changes:
+1. After 9d10097e7bd298cc5b393364663fa0cf08711e8e, if you attempt to start a request that is exactly the same as the request already in progress for a given ``View`` or [``Target``][14], your new request will be ignored and the old request will be allowed to complete. If you need to override this behavior, you can do so by manually calling [``clear()``][15] on the ``View`` or [``Target``][14] before starting your new load. Consider filing an issue if you encounter a problem with this feature.
+2. After 06aced3fd95a6339f30a8d611be81fbb2169b0d1, Glide will always use a [``TransitionDrawable``][16] to run the cross fade transition. Previously cross fade would use a ``ViewAnimation`` for the first image in a request to complete and only use [``TransitionDrawables``][16] for animating from thumbnails to full images. RecyclerView does not handle [``ViewAnimations``][17] run outside of its item animator so we've removed the use of [``ViewAnimation``][17]. As a result, if you use views like ``CircularImageView`` that can't handle animated ``Drawables``, you may see a change in behavior. Consider using a [``ViewAnimation`` based ``Transition``][18] instead of a cross fade if you're not loading in a ``RecyclerView`` or file a new issue if you encounter a situation where neither cross fade nor a [``ViewAnimation``][18] will work.
+3. After d83de421024882311c0aa4d835c8fce6a0550f8a, setting [``DecodeFormat.ARGB_8888``][19] or [``DecodeFormat.RGB_565``][20] will cause Glide to attempt to decode Bitmaps using [``Bitmap.Config.HARDWARE``][7]. Hardware Bitmaps are more memory efficient, but can't be drawn in software and don't expose their pixels so methods like [``getPixel()``][21] will throw an exception, as will attempting to draw a hardware bitmap to a [``Canvas``][22]. You can avoid using Hardware Bitmaps for an individual request by calling [``RequestOptions#disallowHardwareConfig``][23]. You can also disallow hardware configurations for your entire application by passing in [``RequestOptions`` into ``GlideBuilder`` in your ``AppGlideModule``][24]. 
+
+[1]: http://bumptech.github.io/glide/doc/generatedapi.html#glideextension
+[2]: http://bumptech.github.io/glide/javadocs/410/com/bumptech/glide/request/RequestOptions.html
+[3]: http://bumptech.github.io/glide/javadocs/410/com/bumptech/glide/request/RequestOptions.html#autoClone--
+[4]: http://bumptech.github.io/glide/javadocs/410/com/bumptech/glide/RequestManager.html
+[5]: http://bumptech.github.io/glide/javadocs/410/com/bumptech/glide/load/engine/DiskCacheStrategy.html#ALL
+[6]: http://bumptech.github.io/glide/javadocs/410/com/bumptech/glide/load/engine/DiskCacheStrategy.html#RESOURCE
+[7]: https://developer.android.com/reference/android/graphics/Bitmap.Config.html#HARDWARE
+[8]: http://bumptech.github.io/glide/javadocs/410/com/bumptech/glide/util/LruCache.html
+[9]: http://bumptech.github.io/glide/javadocs/410/com/bumptech/glide/GlideBuilder.html
+[10]: http://bumptech.github.io/glide/javadocs/410/com/bumptech/glide/request/transition/Transition.html
+[11]: https://developer.android.com/reference/android/content/ComponentCallbacks.html
+[12]: https://developer.android.com/reference/android/content/ComponentCallbacks2.html
+[13]: http://bumptech.github.io/glide/doc/transformations.html#multiple-transformations
+[14]: http://bumptech.github.io/glide/javadocs/410/com/bumptech/glide/request/target/Target.html
+[15]: http://bumptech.github.io/glide/javadocs/410/com/bumptech/glide/RequestManager.html#clear-com.bumptech.glide.request.target.Target-
+[16]: https://developer.android.com/reference/android/graphics/drawable/TransitionDrawable.html
+[17]: https://developer.android.com/guide/topics/graphics/view-animation.html
+[18]: http://bumptech.github.io/glide/javadocs/410/com/bumptech/glide/TransitionOptions.html#transition-int-
+[19]: http://bumptech.github.io/glide/javadocs/410/com/bumptech/glide/load/DecodeFormat.html#PREFER_ARGB_8888
+[20]: http://bumptech.github.io/glide/javadocs/410/com/bumptech/glide/load/DecodeFormat.html#PREFER_RGB_565
+[21]: https://developer.android.com/reference/android/graphics/Bitmap.html#getPixel(int,%20int)
+[22]: https://developer.android.com/reference/android/graphics/Canvas.html
+[23]: http://bumptech.github.io/glide/javadocs/410/com/bumptech/glide/request/RequestOptions.html#disallowHardwareConfig--
+[24]: http://bumptech.github.io/glide/doc/configuration.html#default-request-options",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/7606574/assets,https://api.github.com/repos/bumptech/glide/releases/7606574,master,https://api.github.com/repos/bumptech/glide/tarball/v4.1.0,https://github.com/bumptech/glide/releases/tag/v4.1.0,https://api.github.com/repos/bumptech/glide/zipball/v4.1.0,v4.1.0,False,False
+7244153,2017-08-01T15:31:33Z,2017-08-01T16:11:21Z,Glide 4.0.0,"This is the July release of Glide.
+
+We're calling this release 4.0.0, which means it's the first stable release of Glide v4. 
+
+## Bug fixes
+* Fixed an error initializing the Glide singleton allowing callers in some cases to obtain a partially initialized object (6c56e3831a47f923aeb634d78d5660af2da07bf5, thanks to @Codeintheory for fixing this in the v3 branch in #2061).
+* Fixed an issue where requesting only identity encodings from some image backends caused those image backends to return compressed streams that were not transparently decoded by HttpUrlConnection, resulting in decoding failures (#2132)
+* Updated some old documentation in ``DataFetcher`` (#2153, thanks to @Teovald)
+* Fixed an issue causing Glide to wait forever to obtain View sizes for Views that we're re-attached to windows without requiring a size change (#1981)
+* Fixed a few typos in the Readme (#2191, thanks to @rmtheis)
+* Fixed a crash in ``DefaultConnectivityMonitorFactory`` when Glide was called via an IPC from an application that had the ACCESS_NETWORK_STATE permission but in an application that did not have the ACCESS_NETWORK_STATE permission (#2121).",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/7244153/assets,https://api.github.com/repos/bumptech/glide/releases/7244153,master,https://api.github.com/repos/bumptech/glide/tarball/v4.0.0,https://github.com/bumptech/glide/releases/tag/v4.0.0,https://api.github.com/repos/bumptech/glide/zipball/v4.0.0,v4.0.0,False,False
+6788108,2017-06-21T14:16:03Z,2017-06-21T15:19:03Z,Glide 4.0.0 RC1,"This is the June release of Glide.
+
+Glide 4.0.0 RC1 is an incremental pre-release version of Glide 4.
+
+## Features
+* Added support for VectorDrawables to the placeholder methods (#1946, thanks to @Teovald)
+* Minimal support for additional Bitmap configurations in Android O (853c68744fb62d95763c1a10d662643106e5d050, better support will be coming in the future)
+
+## Bug fixes
+* Fixed a duplicate field error when using GlideExtensions (#1971)
+* Fixed VisibleForTesting lint errors in Glide's generated code (#1977)
+* Fixed a bug preventing us from falling back to the error Drawable for null models when the fallback drawable isn't specified (#1985)
+* Fixed an NPE when obtaining a RequestManager for a View (``Glide.with(view)``, #1991)
+* Propagate HTTP exceptions from the OkHttp library so that they're accessible when requests fail (#1967)
+* Fixed a race condition causing resource leaks (#1996)
+* Fixed an NPE in MultiModelLoader (#2028)
+* Fixed a broken null check (48d1f14400977ad75d80add82336426fb63303d8, thanks mattq@)
+* Fixed a bug preventing the placeholder Drawable from being shown for null models when both the fallback and the error Drawables are unspecified (41cc06c32d3f3ffc71c8ff10a4084d68ef395d0a, thnaks to angelorhoit@)
+* Fixed an IllegalStateException when pending requests were cancelled and restarted (243c28c836d7729c7f582240d5b732d17d17603f) 
+
+ ## Packaging
+* Exclude R$ files from jars compiled from integration libraries (#1972, ee8a8eda15cf4961cda152817dfce5350ce59620)
+* Populate javadoc jar files for all maven artifcats (#1972, bfe14423bffb0890d9b78f9baffc9e604a82afc7)
+* Removed an aar dependency in the recyclerview integration jar artifact (#2053)
+
+
+
+
+
+
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/6788108/assets,https://api.github.com/repos/bumptech/glide/releases/6788108,master,https://api.github.com/repos/bumptech/glide/tarball/v4.0.0-RC1,https://github.com/bumptech/glide/releases/tag/v4.0.0-RC1,https://api.github.com/repos/bumptech/glide/zipball/v4.0.0-RC1,v4.0.0-RC1,False,True
+6419274,2017-05-17T14:42:52Z,2017-05-17T18:07:50Z,Glide 4.0.0 RC0,"## Changes
+There are too many changes to list individually, but here's a few highlights:
+
+* New [documentation][1] that users can contribute to by submitting pull requests to Glide's gh-pages branch.
+* A new [extensible generated API][2] that allows you to easily customize Glide's fluent API by adding new types or custom option sets.
+* Substantially simplified types for individual requests that ensure that options are consistently available and easy to use even if you're loading different types of resources.
+* A variety of performance improvements, including a substantial reduction in garbage when downsampling images, a more intelligent default disk cache strategy, and improved performance when loading GIFs. 
+* Improved handling of View sizes and layouts, especially in RecyclerView.
+
+## Status
+Glide 4.0 is used internally by a variety of teams at Google and the library is considered stable internally. I expect that there will be more external users who may uncover issues that haven't come up internally. As a result I'm releasing this as an RC. If we don't uncover significant issues with stability or in the API, I expect a non-RC release shortly.
+
+## Release schedule.
+Glide has had a rather haphazard approach to releases in the past, largely because I maintain Glide mostly in my free time. Going forward we're going to try to provide regular releases:
+
+* Releases will go out once a month, around the 15th (the exact date may vary a bit)
+* Releases will be skipped only if no changes have been since the previous release.
+* Releases may include breaking API changes without a major version change.
+
+The third bullet point will help bridge the gap between how Glide is maintained inside and outside of Google and enable more regular releases.
+
+[1]: http://sjudd.github.io/glide/
+[2]: http://sjudd.github.io/glide/doc/generatedapi.html",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/6419274/assets,https://api.github.com/repos/bumptech/glide/releases/6419274,master,https://api.github.com/repos/bumptech/glide/tarball/v4.0.0-RC0,https://github.com/bumptech/glide/releases/tag/v4.0.0-RC0,https://api.github.com/repos/bumptech/glide/zipball/v4.0.0-RC0,v4.0.0-RC0,False,True
+6266331,2017-05-03T14:01:41Z,2017-05-03T14:35:47Z,Glide 3.8.0,"Glide 3.8.0 is a minor feature/bugfix release.
+
+## Features
+- Added ``getTotalLoopCount`` to GIFs (#1836, thanks to @toyama-sumio)
+- Added a method to turn off manifest parsing for applications that do not use integration libraries (#1754, thanks to @joshzana)
+- Added support for contact Uris (#394, thanks to  @R4md4c)
+- Better handling of OOMs (#1057, thanks to @dmapr and @ihenchi)
+
+## Notable Bugfixes
+- Fixed a variety of issues with GIF handling and decoding (thanks @TWiStErRob, @toyama-sumio, @osama and @kojilin)
+
+For a complete list of changes, see https://github.com/bumptech/glide/compare/v3.7.0...v3.8.0
+
+
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/6266331/assets,https://api.github.com/repos/bumptech/glide/releases/6266331,3.0,https://api.github.com/repos/bumptech/glide/tarball/v3.8.0,https://github.com/bumptech/glide/releases/tag/v3.8.0,https://api.github.com/repos/bumptech/glide/zipball/v3.8.0,v3.8.0,False,False
+2483174,2016-01-24T20:58:37Z,2016-01-24T21:44:29Z,Glide 3.7.0,"Glide 3.7.0 is a minor feature/bugfix release.
+
+## Features
+- Add integration library for okhttp3 (#856, #887, #917)
+- Cancel pending requests in the okhttp3 library (#257)
+
+## Bugfixes
+- Fixed a memory leak loading GIFs (#690, #892)
+- Release all memory when clearMemory() is called (#687, #717)
+- Fix NoSuchMethodError on certain devices (#578)
+- Replace default user agent rather than appending default user agent when addHeader is called (#546)
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/2483174/assets,https://api.github.com/repos/bumptech/glide/releases/2483174,master,https://api.github.com/repos/bumptech/glide/tarball/v3.7.0,https://github.com/bumptech/glide/releases/tag/v3.7.0,https://api.github.com/repos/bumptech/glide/zipball/v3.7.0,v3.7.0,False,False
+1470837,2015-06-28T20:48:14Z,2015-06-28T21:37:59Z,Glide 3.6.1,"Glide 3.6.1 is a minor bugfix release of the open source image loading library for Android focused on smooth scrolling.
+
+## Bugfixes
+- Apply Bitmap transformations to GIFs (#507)
+- Improve handling of webp images on certain platforms by adding default content encoding and user agent headers (#470)
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/1470837/assets,https://api.github.com/repos/bumptech/glide/releases/1470837,master,https://api.github.com/repos/bumptech/glide/tarball/v3.6.1,https://github.com/bumptech/glide/releases/tag/v3.6.1,https://api.github.com/repos/bumptech/glide/zipball/v3.6.1,v3.6.1,False,False
+1244647,2015-05-01T17:34:52Z,2015-05-01T20:24:11Z,Glide 3.6.0,"Glide 3.6.0 is a bugfix and minor feature release of the open source image loading library for Android focused on smooth scrolling. 
+
+## Features
+- Add a `clearDiskCache()` method (#352, thanks to @nemphys)
+
+``` java
+Glide.get(context).clearDiskCache()
+```
+- Add simpler DiskCacheFactory implementation (#430, thanks to @Tolriq)
+
+``` java
+glideBuilder.setDiskCache(new InternalDiskCacheFactory(context, 10 * 1024 * 1024));
+// or:
+glideBuilder.setDiskCache(new ExternalDiskCacheFactory(context, ""cache_dir"", 10 * 1024 * 1024));
+```
+- Add a fallback drawable to display for null models (#268)
+
+``` java
+    Glide.with(context)
+        .load(maybeNull)
+        .placeholder(R.drawable.loading)
+        .error(R.drawable.failed)
+        .fallback(R.drawable.empty)
+        .into(imageView)
+```
+- Add a method to `ViewTarget` to globally set an id to use with `setTag` 
+
+``` java
+public class FlickrGlideModule implements GlideModule {
+    @Override
+    public void applyOptions(Context context, GlideBuilder builder) {
+        // Warning: This may cause memory leaks on versions of Android less than 4.0
+        ViewTarget.setTagId(R.id.glide_tag_id);
+    }
+    ...
+}
+
+```
+- Allow requests to be paused/resumed recursively for Activities and/or Fragments and their child fragments (https://github.com/bumptech/glide/commit/5210ba8d3390af9f0cc9bde422aa63601f6e4134, thanks to Paul)
+
+``` java
+Glide.with(getActivity()).pauseRequestsRecursive();
+// And later:
+Glide.with(getActivity()).resumeRequestsRecursive();
+```
+- Add support for http headers to GlideUrl (https://github.com/bumptech/glide/commit/fee6ed6b9f5d60b1e4b299088445401a898dbcc3, thanks to Ozzie)
+
+``` java
+// In your ModelLoader:
+GlideUrl glideUrl = new GlideUrl(""url"", new LazyHeaders.Builder()
+    .addHeader(""key1"", ""value"")
+    .addHeader(""key2"", new LazyHeaderFactory() {
+        @Override
+        public String buildHeader() {
+            String expensiveAuthHeader = computeExpensiveAuthHeader();
+            return expensiveAuthHeader;
+        }
+    })
+    .build())
+```
+- Add somewhat more robust handling of uncaught exceptions (#435)
+- Add a custom request factory for the Volley integration library (https://github.com/bumptech/glide/commit/3dcad684f08ae6bf051cd6c55a0261d96ab22234, thanks to Jason)
+
+## Build/Infrastructure
+- Get Glide building on Windows (#312, thanks to @TWiStErRob)
+- Cleanup more warning (#445, thanks to @TWiStErRob)
+
+## Bugs
+- Check the response code in OkHttp integration library (#315)
+- Fix a crash mutating SquaringDrawable (#349)
+- Removed an unnecessary anti alias flag in the paint used for default transformations (#366)
+- Fix an NPE when the disk cache directory could not be created (#374)
+- Fix a concurrent modification starting requests when other requests complete/fail (#375)
+- Ensure preload targets are always cleared (#385)
+- Handle reading/skipping less than expected data in ImageHeaderParser (#387)
+- Work around a framework bug decoding webp images from InputStreams by basing available() on the content length (#392)
+- Always obey custom cross fade duration (#398)
+- Work around a framework issue where media store thumbs are not rotated (#400)
+- Fix an NPE in `RequestFutureTarget` (#401, thanks to @Tolriq)
+- Avoid throwing exceptions when provided invalid resource ids (#413)
+- Improve the error message when asked to load the empty string (#415)
+- Fix a race in DecodeJob's cancel method (#424)
+- Fix a race where downloading the same url twice with difference keys using `SOURCE` or `ALL` could cause the load to fail (#427)
+- Fix a calculation error in `Downsampler.AT_MOST` (#434)
+- Make sure code style in OkHttp library is consistent (#397, thanks to @floating-cat)
+- Fix a bitmap re-use bug during cross fades (https://github.com/bumptech/glide/commit/a9f80ea1a5a5c3576feb3b58e38240b597cc586f)
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/1244647/assets,https://api.github.com/repos/bumptech/glide/releases/1244647,master,https://api.github.com/repos/bumptech/glide/tarball/v3.6.0,https://github.com/bumptech/glide/releases/tag/v3.6.0,https://api.github.com/repos/bumptech/glide/zipball/v3.6.0,v3.6.0,False,False
+976130,2015-02-22T17:29:36Z,2015-02-22T19:08:25Z,Glide 3.5.2,"Glide 3.5.2 is a minor bug fix release.
+
+## Bugfixes
+- Fix a NPE on ComponentCallbacks (#329)
+- Fix an NPE caused by clearing the BitmapPool (#331)
+- Ensure requests started before the corresponding Fragment or Activity is started always run (#346)
+- Obey Target.ORIGINAL_SIZE when set via `override()` (#333)
+- Correctly parse JPEG image headers (#334)
+- Add an assertion when using a request builder as a thumbnail for itself (#330)
+
+## Performance
+- Avoid an unnecessary Bitmap allocation and reference when decoding most GIFs (e85cf305eb8e030cbfc3a7c73f438085ee0fb025)
+- Increase the BitmapPool hit rate on KitKat and Lollipop when using multiple types of Bitmaps (#335)
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/976130/assets,https://api.github.com/repos/bumptech/glide/releases/976130,master,https://api.github.com/repos/bumptech/glide/tarball/v3.5.2,https://github.com/bumptech/glide/releases/tag/v3.5.2,https://api.github.com/repos/bumptech/glide/zipball/v3.5.2,v3.5.2,False,False
+900997,2015-01-30T02:39:20Z,2015-01-30T16:19:11Z,Glide 3.5.1,"Glide 3.5.1 is a bug fix release to fix a critical issue on 2.3 devices.
+
+## Bugfixes
+- Fix a crash on every request in Android 2.3 (#320)
+- Fix a race condition causing a crash (#322)
+- Fix a logged ClassCastException on the first request (#314)
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/900997/assets,https://api.github.com/repos/bumptech/glide/releases/900997,master,https://api.github.com/repos/bumptech/glide/tarball/v3.5.1,https://github.com/bumptech/glide/releases/tag/v3.5.1,https://api.github.com/repos/bumptech/glide/zipball/v3.5.1,v3.5.1,False,False
+877022,2015-01-25T21:56:14Z,2015-01-25T22:46:06Z,Glide 3.5.0,"Glide 3.5 is an incremental release containing a small number of new features and some significant bug fixes.
+
+You can see a complete list of issues in the corresponding [milestone](https://github.com/bumptech/glide/issues?q=milestone%3A3.5+is%3Aclosed).
+
+## Features
+- Add GlideModules for simple lazy configuration (#311).
+- Support for an original size (#274):
+
+``` java
+// You can override a view's size to request the original image:
+Glide.with(context)
+    .load(myUrl)
+    .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+    .into(myImageVIew);
+
+// SimpleTarget also now defaults to SIZE_ORIGINAL:
+Glide.with(context)
+    .load(myUrl)
+    .into(new SimpleTarget<GlideDrawable>() {
+        @Override
+        public void onResourceReady(GlideDrawable drawable, GlideAnimation animation) {
+            ...
+        }
+    });
+```
+- Improved ListPreloader API, including an interface allowing different sizes per position thanks to @DavidWiesner (#273)
+- [ALPHA] AppWidget and Notification `Target` implementations thanks to @pavlospt (#242):
+
+``` java
+AppWidgetTarget widgetTarget = 
+        new AppWidgetTarget(context, remoteViews, R.id.view_id, 300, 400, R.id.widget_id);
+
+Glide.with(context)
+    .asBitmap()
+    .load(myUrl)
+    .into(widgetTarget);
+```
+- Override values are passed through to thumbnails (#236).
+- Automatically call trim/clear memory based on ComponentCallbacks (9063f6c077afb443311b952e832d3963e9cbaa66).
+
+## Build/Infrastructure
+- Updated to Robolectric 2.4 thanks to @TWiStErRob (#249).
+- Updated to Android gradle plugin 1.0+ (ba32d32fdaee007b14d3aa8dba42aa7c422a1649).
+- Added Intellij files for easier development (e34df4494ad091e546bb0889d6839e1fc1fd0f2c)
+
+## Bugs
+
+### Performance
+- Fixed needlessly copying Bitmaps decoded from data without an EXIF orientation tag (#270).
+- Freed thumbnails eagerly when full loads finish (#237).
+- Fixed a strict mode violation initializing the disk cache on Lollipop (#298).
+- Fixed a NetworkOnMainThread exception in the OkHttp integration library (#257)
+- Calculate sample size correctly thanks to @jisung (#288)
+
+### Rendering
+- Worked around a framework issue in KitKat and Lollipop causing certain types of Bitmaps to render old data (#301).
+- Fixed large BMPs failing to render (#283).
+- Fixed decode failure for images with minimal EXIF segments (#286).
+- Fixed a bug causing shared color filters (#276).
+
+### Other
+- Fixed a crash when the Glide singleton is instantiated on a background thread (#295).
+- Fixed a crash when completing loads started or cancelled other loads (#303).
+- Fixed skipMemoryCache not always skipping the memory cache (#258).
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/877022/assets,https://api.github.com/repos/bumptech/glide/releases/877022,master,https://api.github.com/repos/bumptech/glide/tarball/v3.5.0,https://github.com/bumptech/glide/releases/tag/v3.5.0,https://api.github.com/repos/bumptech/glide/zipball/v3.5.0,v3.5.0,False,False
+685161,2014-11-07T16:28:33Z,2014-11-07T17:20:30Z,Glide 3.4.0,"Glide 3.4 is an incremental release containing a number of new features and bugfixes. Animated GIFs were a significant focus of this release. We've substantially increased the number of GIFs that can be decoded successfully by our GifDecoder and fixed a variety of smaller issues with rendering and in our decoding pipeline in older versions of Android.
+
+You can also see a complete list of issues in the corresponding [milestone](https://github.com/bumptech/glide/issues?q=milestone%3A3.4+is%3Aclosed).
+
+## Features
+- Allow RequestBuilders to be re-used for multiple loads by introducing the `.from()` and `.clone()` APIs. These APIs allow users to set options on a request builder once, pass the builder to their adapters, and then start multiple loads with the single builder (#182).
+
+``` java
+// In your Activity/Fragment
+@Override
+public void onCreate(Bundle savedInstanceState) {
+    DrawableRequestBuilder requestBuilder = 
+        Glide.with(this)
+           .from(String.class)
+           .placeholder(R.drawable.spinner)
+           .centerCrop()
+           .crossFade();
+    mAdapter = new MyAdapter(requestBuilder);
+}
+
+// In your Adapter
+@Override
+public View getView(int position, View convertView, ViewGroupParent parent) {
+    ...
+   mRequestBuilder.load(myUrls.get(position)).into(convertView);
+}
+```
+- Add a method to GlideBuilder to set a global decode format (#177), see the [configuration wiki](https://github.com/bumptech/glide/wiki/Configuration#bitmap-format-new-in-glide-34). 
+
+``` java
+Glide.setup(new GlideBuilder(context)
+    .setDecodeFormat(DecodeFormat.ALWAYS_ARGB_8888));
+```
+- Add a `.preload()` API to allow preloading media into memory (#169).
+
+``` java
+Glide.with(fragment)
+    .load(url)
+    .preload(width, height);
+```
+- Add a `.signature()` API to allow users to easily mix in additional data to cache keys, giving users more control over cache invalidation (#178, #179), see the [cache invalidation wiki](https://github.com/bumptech/glide/wiki/Caching-and-Cache-Invalidation#signatures-coming-soon-in-glide-34).
+
+``` java
+Glide.with(fragment)
+    .load(url)
+    .signature(new StringSignature(""Version1""))
+    .into(view);
+```
+- Add a `Glide.preFillBitmapPool()` API to allow pre-filling the BitmapPool to avoid jank from allocations after app startup (#93).
+
+``` java
+Glide.get(context)
+    .preFillBitmapPool(new PreFillType.Builder(mySize));
+```
+- Allow recursive calls to `thumbnail()` to load an arbitrary number of different sized thumbnails for a single Target (#149).
+
+``` java
+Glide.with(fragment)
+    .load(myUrl)
+    .thumbnail(Glide.with(fragment)
+        .load(myUrl)
+        .override(200, 200)
+        .thumbnail(Glide.with(fragment)
+           .load(myUrl)
+           .override(50, 50)))
+    .into(myView);
+```
+- Allow `thumbnail()` to load model and data types that are different than those of the parent (#107).
+- Transformations are now only applied once and no longer have to be idempotent (#112).
+
+## Build/Infrastructure
+- PMD/Findbugs (#164)
+- Jacoco/Coveralls with 85% test coverage (34f797ba79d3dbb59765c6a1d03fda6d8751e300).
+- Standard import order (f7a6d65cf7c1a41908dd48e0dab68ee5b881387e).
+
+## Bugs
+
+### Performance
+- Avoid allocating large byte arrays in `BufferedInputStream` (#225).
+- Use downsampled image size when obtaining Bitmaps from the pool (#224).
+
+### GIFs
+- Avoid a crash causing race decoding multiple frames with the same GifDecoder (#212).
+- Always use `ARGB_8888` to prevent null GIF frames on some versions of Android that don’t support `ARGB_4444` (#216).
+- Fix partially decoded GIF frames (appears as grey or transparent noise in frames) (#207, #204).
+- Set a default frame delay for GIFs which do not specify a frame delay, or specify an overly short frame delay (#205).
+- More robust GIF decoding logic, including a fix for decoding only the first few rows of certain GIFs (#203).
+- Allow fade in/cross fade animations by ensuring that the first frame of GIFs is decoded before the GIF is returned (#159).
+- Fix GIFs always appearing transparent pre KitKat (#199).
+
+### Memory
+- Fix a memory leak when Glide is first called in an Activity (#210).
+
+### Transformations
+- Fix underdraw in `FitCenter` causing noise along the sides of certain images (#195).
+- Maintain transparency during bitmap transformations (#156).
+
+### Caching
+- Fixed Drawables being cached only be integer resource id which can change and/or overlap after subsequent compilations (#172).
+
+### Uris
+- Fix failure to detect certain types of file Uris (#161).
+
+### Other
+- Fix concurrency bugs resulting in incorrect assertions being thrown when loads were started on multiple threads (#191, #181).
+- Fix `BitmapRequestBuilder` not setting the decode format on the cache decoder when `format()` is called (#187).
+- Fix an assertion in `ViewTarget` related to restarting requests (#167). 
+- Fix `Glide.with()` throwing pre Honeycomb when given non-support Activities (#158).
+- Avoid using Closeable interface when loading ParcelFileDescriptors on 4.1.1 or earlier (#157).
+- Fix an NPE in `Bitmap#getAllocationByteCount()` due to a framework bug in the initial release of KitKat (#148).
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/685161/assets,https://api.github.com/repos/bumptech/glide/releases/685161,master,https://api.github.com/repos/bumptech/glide/tarball/v3.4.0,https://github.com/bumptech/glide/releases/tag/v3.4.0,https://api.github.com/repos/bumptech/glide/zipball/v3.4.0,v3.4.0,False,False
+556696,2014-09-14T22:55:17Z,2014-09-14T23:17:32Z,3.3.1 release,"A bugfix release containing fixes for a number of bugs, a new sample app, and some code cleanup.
+
+Bugfixes
+
+Exceptions:
+- Fixes for double checked locking in singleton initialization: #115 
+- Recursive entry to executePendingTransactions IllegalStateException: #117
+- Allow parsing of GIFs without Graphic Control Extensions before each frame: #134 
+- Fixed restarting cancelled requests in onResume and/or connection changes: #128 
+
+Drawing issues:
+- Images disappearing after calls to `setAlpha()` or `setColorFilter()`: #118 
+- Fixed images sometimes appearing skewed on Android 4.1.x: #129 
+- Fixed transparent bitmaps sometimes being drawn on top of old content when re-using bitmaps: #131 
+
+Network issues:
+- Failing to follow http -> https redirects using the default HttpUrlFetcher: #119 
+- Failing to load images at urls that use accent marks or special characters: #133 
+- Better error handling for SocketTimeOutExceptions while decoding images using the default HttpUrlFetcher: #126 
+
+Features/Cleanup
+
+Thanks to @TWiStErRob we've also:
+- Added SVG sample app demonstrating how to load custom resources with Glide (incubating feature).
+- Eliminated unused interfaces when loading custom resource types.
+- Cleaned up and reduced some duplication across the codebase.
+- Cleaned up a variety of test assertions.
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/556696/assets,https://api.github.com/repos/bumptech/glide/releases/556696,master,https://api.github.com/repos/bumptech/glide/tarball/v3.3.1,https://github.com/bumptech/glide/releases/tag/v3.3.1,https://api.github.com/repos/bumptech/glide/zipball/v3.3.1,v3.3.1,False,False
+528675,2014-09-02T00:11:26Z,2014-09-02T00:36:43Z,3.3.0 Release,"First release of the 3.3.0 branch. 
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/528675/assets,https://api.github.com/repos/bumptech/glide/releases/528675,master,https://api.github.com/repos/bumptech/glide/tarball/v3.3.0,https://github.com/bumptech/glide/releases/tag/v3.3.0,https://api.github.com/repos/bumptech/glide/zipball/v3.3.0,v3.3.0,False,False
+383643,2014-06-19T14:35:28Z,2014-06-19T14:38:31Z,2.0.5 Release,"Fixes an issue where view dimensions weren't measured quickly enough causing images to fail to load.
+Fixes an issue where loads for invalid Uris would throw exceptions instead of failing. 
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/383643/assets,https://api.github.com/repos/bumptech/glide/releases/383643,master,https://api.github.com/repos/bumptech/glide/tarball/v2.0.5,https://github.com/bumptech/glide/releases/tag/v2.0.5,https://api.github.com/repos/bumptech/glide/zipball/v2.0.5,v2.0.5,False,False
+375773,2014-06-15T19:22:24Z,2014-06-15T19:30:09Z,2.0.4 Release,"Allow null models (urls etc.) by canceling previous loads and showing the placeholder (if set).
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/375773/assets,https://api.github.com/repos/bumptech/glide/releases/375773,master,https://api.github.com/repos/bumptech/glide/tarball/v2.0.4,https://github.com/bumptech/glide/releases/tag/v2.0.4,https://api.github.com/repos/bumptech/glide/zipball/v2.0.4,v2.0.4,False,False
+272841,2014-04-15T14:21:17Z,2014-04-15T14:28:37Z,v3.1.0a,,https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/272841/assets,https://api.github.com/repos/bumptech/glide/releases/272841,master,https://api.github.com/repos/bumptech/glide/tarball/v3.1.0a,https://github.com/bumptech/glide/releases/tag/v3.1.0a,https://api.github.com/repos/bumptech/glide/zipball/v3.1.0a,v3.1.0a,False,True
+272049,2014-04-15T01:57:43Z,2014-04-15T02:12:05Z,2.0.3,"Incremental release:
+
+Improved bitmap pool performance, particularly on newer devices.
+More efficient fit center transformations
+Better quality image transformations.
+Various small bugfixes.
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/272049/assets,https://api.github.com/repos/bumptech/glide/releases/272049,master,https://api.github.com/repos/bumptech/glide/tarball/v2.0.3,https://github.com/bumptech/glide/releases/tag/v2.0.3,https://api.github.com/repos/bumptech/glide/zipball/v2.0.3,v2.0.3,False,False
+206667,2014-03-02T23:08:38Z,2014-03-02T23:26:15Z,v2.0.2,"Incremental release with a variety of bugfixes and small features including:
+
+A class for preloading images when using ListView
+Support for reconfigurable bitmaps in KitKat
+Improved image quality for transparent images
+Support for onTrimMemory callbacks
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/206667/assets,https://api.github.com/repos/bumptech/glide/releases/206667,master,https://api.github.com/repos/bumptech/glide/tarball/v2.0.2,https://github.com/bumptech/glide/releases/tag/v2.0.2,https://api.github.com/repos/bumptech/glide/zipball/v2.0.2,v2.0.2,False,False
+39397,2013-09-05T19:31:04Z,2013-09-05T19:36:28Z,2.0.1,"Fix defaulting to not using a disk cache
+Fix throwing an IllegalArgumentException when setting an error drawable
+Disable logging by default (accessible via Log.DEBUG)
+Fix loads into targets other than image views failing silently due to weak references
+Fix an IllegalArgumentException loading certain pngs
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/39397/assets,https://api.github.com/repos/bumptech/glide/releases/39397,master,https://api.github.com/repos/bumptech/glide/tarball/v2.0.1,https://github.com/bumptech/glide/releases/tag/v2.0.1,https://api.github.com/repos/bumptech/glide/zipball/v2.0.1,v2.0.1,False,False
+33927,2013-08-27T17:51:59Z,2013-08-27T18:13:25Z,2.0 release,"The first stable release of Glide.
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/33927/assets,https://api.github.com/repos/bumptech/glide/releases/33927,master,https://api.github.com/repos/bumptech/glide/tarball/v2.0.0,https://github.com/bumptech/glide/releases/tag/v2.0.0,https://api.github.com/repos/bumptech/glide/zipball/v2.0.0,v2.0.0,False,False
+23465,2013-08-08T21:31:12Z,2013-08-08T22:16:45Z,2.0 Alpha,"Pre release for v2, should have a stable api at this point, though package names may change.
+
+glide.jar includes Glide and a recent version of Volley. You can also download glide-minus-volley.jar if you don't plan on using Volley or want to use a different version of Volley.
+",https://api.github.com/users/sjudd,1627211,sjudd,https://api.github.com/repos/bumptech/glide/releases/23465/assets,https://api.github.com/repos/bumptech/glide/releases/23465,master,https://api.github.com/repos/bumptech/glide/tarball/v2.0-alpha,https://github.com/bumptech/glide/releases/tag/v2.0-alpha,https://api.github.com/repos/bumptech/glide/zipball/v2.0-alpha,v2.0-alpha,False,True

@@ -1,0 +1,1182 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7383564,2017-08-14T13:30:26Z,2017-08-14T14:01:58Z,Version v0.91,"# Version v0.91 - Bugfix release
+
+As a follow up from [v0.90](https://github.com/baldurk/renderdoc/releases/tag/v0.91), this includes an important bugfix that unfortunately wasn't caught in release testing.
+
+It primarily affects D3D captures with shader source embedded (compiled with `D3D11COMPILE_DEBUG` or the appropriate fxc switch) although it could affect GL/Vulkan captures in some circumstances. When debugging or sometimes when opening the shader with source files available, there was a crash due to code not being updated for the UI layout changes to cope with the GCN disassembly feature that was added.
+
+There are no other changes or bugfixes from v0.90, so you can refer to the [v0.90 release notes](https://github.com/baldurk/renderdoc/releases/tag/v0.91) for more information about the changes since v0.34.",https://api.github.com/users/baldurk,661798,baldurk,https://api.github.com/repos/baldurk/renderdoc/releases/7383564/assets,https://api.github.com/repos/baldurk/renderdoc/releases/7383564,v0.x,https://api.github.com/repos/baldurk/renderdoc/tarball/v0.91,https://github.com/baldurk/renderdoc/releases/tag/v0.91,https://api.github.com/repos/baldurk/renderdoc/zipball/v0.91,v0.91,False,False
+7289045,2017-08-04T18:26:36Z,2017-08-04T18:44:55Z,Version v0.90,"### Note: [v0.91](https://github.com/baldurk/renderdoc/releases/tag/v0.91) contains an important bugfix on top of v0.90
+
+At the end of June, [RenderDoc passed a milestone](https://renderdoc.org/renderdoc-history.html) of 5 years of development since the very first commit.
+
+Now this release marks another milestone, although in some respects it's arbitrary. The versions so far from v0.18 up to v0.34 have continued in the same family as the original  internal builds marked alpha1 and alpha2 up to alpha17 right before the first public release of v0.18.
+
+It's time to mark the end of the v0.x series of releases. v0.90 is the last planned release in this current v0.x series. The next planned release will at last be v1.0 and will bring with it a number of changes that have been discussed in release notes past.
+
+With this comes a new approach to branching on the github repository. The `master` branch is being retired, and instead it will continue on as [`v0.x`](https://github.com/baldurk/renderdoc/tree/v0.x). This will continue to be a reliable branch to work from for anyone compiling from source themselves, and any bugs that are reported in the coming months will where possible be fixed on this branch. However it will see no new feature development and PRs will not be accepted against it, leaving it 'soft locked'. This branch will continue to exist until v1.0 is released, at which point it will also be retired.
+
+At the same time there is a new branch [`v1.x`](https://github.com/baldurk/renderdoc/tree/v1.x) where future looking development happens. Especially in the near future, expect this branch to change a lot as I start making large-scale changes for v1.0.
+
+The [nightly builds](https://renderdoc.org/builds) will be made from both branches, to serve both people who want to test new bugfixes on `v0.x` as well as anyone who is brave enough to try the new development in `v1.x`.
+
+Any feedback as always can be sent to me via [twitter](https://twitter.com/baldurk), [email](mailto:baldurk@baldurk.org) or on [#renderdoc on freenode](https://kiwiirc.com/client/irc.freenode.net/#renderdoc).
+
+With that said, let's get into what v0.90 brings!
+
+# Version v0.90
+
+Binaries for this release are up on the [downloads page](https://renderdoc.org/builds) for Windows and x64 linux as a binary tarball.
+
+# Qt UI improvements
+
+Since the Qt UI is (currently) only used on linux, I'm separating it out from the other features/improvements so that those on windows can skip down to the relevant notes.
+
+* A fairly large overhaul/customisation of the docking system leads to a much improve UI, with drop indicators and previous, as well as removing the timer-switching based targets. For more information see the fork at [https://github.com/baldurk/toolwindowmanager](https://github.com/baldurk/toolwindowmanager).
+* Improvements to theme handling in a few places in the UI, to better respect what the theme is rendering. E.g. this means light-on-dark themes should look much more natural.
+* Switch to a new icon set that is high-dpi friendly.
+* Initial implementation of the timeline bar available in the C# UI. This implementation doesn't heuristically try to scale to make all labels visible, instead it scales based purely on event IDs as a horizontal axis.
+* Add default copy/paste handlers in most of the UI.
+* Event browser columns are properly resizeable and re-orderable, and also configurable (so you can enable/disable draw ID or duration columns).
+* Improved the sizing of sections in treeviews particularly in the pipeline state views, so that it's less extreme and balances free space more evenly between sections.
+* Tooltips over resources in pipeline state views that show states now appear immediately.
+* Add syntax highlighting for preprocessor commands in HLSL/GLSL
+* Draw gridlines in treeviews.
+* Implemented CSV export in constant buffer previewer.
+* The mesh view's dock layout is persisted between sessions.
+* When running python scripts from the command line, print output or exceptions to Qt's logger.
+* Added purely opaque handling of `QWidget` pointers in the python scripting if pyside2 isn't available, so that you can still create and dock built-in windows.
+* A custom tooltip displays for elided data in RDTreeViews to show the full data on hover.
+* Fix a crash if the event browser is opened after capture is already open.
+* Fixed duration summing incorrectly in the event browser.
+* Fixed python handling for cross-thread operations to the render thread, around thread-safety and exception rethrowing.
+* Fixed a Scintilla bug that caused mousetracking to be lost when an editor is hidden. See [upstream bug](https://sourceforge.net/p/scintilla/bugs/1948/).
+* Fix an issue that menus could fail to appear if they aren't visible immediately after calling popup().
+
+# Features/Improvements
+
+* Added GCN ISA decompilation and display. This is supported for all APIs but has some provisos. More information is available [in the wiki](https://github.com/baldurk/renderdoc/wiki/GCN-ISA).
+* Add some optimisations to the D3D11 back-end that should improve the idle overhead (when renderdoc is injected but not actively capturing). See #660 for more discussion.
+* Replay markers and object names in each API where possible, and add a new 'replay loop' mode to make it easier to [trace renderdoc captures with RGP](https://github.com/baldurk/renderdoc/wiki/Making-RGP-Traces-from-RenderDoc-captures).
+* Handle OpSource and OpSourceContinued instructions in SPIR-V, allowing embedded source to be properly displayed as with D3D bytecode blobs.
+* Add support for capturing the first 'initial' frame in GL, from the start of the first attribs-based context create to the next present.
+* Add support for fetching vulkan mesh output when the output variables are structures (potentially with nesting).
+* Set original IDs in the per-drawcall output variables, for use in python scripting.
+* Support buffers in the GL extensions providing interop with directx.
+* When multiple captures are created manually in a single frame, prevent trampling over the first one with subsequent ones.
+* Process filter for injecting into applications is now case insensitive.
+* Add support for new Vulkan KHR external memory extensions, as well as VK_KHR_get_memory_requirements2 & dedicated_allocation.
+* Don't look at IP address to see if a connection is local or not. This allows SSH port forwarding from local to remote machines and connecting to 'localhost' as a remote host.
+* Backend support added for AMD performance counters. Although not exposed in the UI yet, these counters are available for query through the python API.
+* Better handling for vulkan resolve attachments - displaying them in the UI properly as additional thumbnails, and fixing a few bugs with those attachments in render pass processing
+* Add support for passing `__uuidof(ID3D12Device1)` when calling `D3D12CreateDevice`.
+* Add some build-time cmake options for specifying the qmake command, and SWIG tarball location.
+* When 'ref all resources' is enabled on D3D12, don't actively track descriptors. This can save potentially a lot of time.
+* vkCmdWaitEvents is now treated properly as a GPU-side command and displayed in-line with other GPU commands.
+* For clear calls the target of the clear is shown instead of the currently bound target, in cases where this might be different (ie. when the target is passed purely as a parameter to the clear call, not as implicit state).
+
+# Bugfixes
+
+* Fix a [known issue](https://github.com/baldurk/renderdoc/issues/650) with v0.34 where on certain windows 10 versions a GL capture had a high chance to end up being empty.
+* Fix a mismatch in enums between the C# UI and C++ core module, leading to some blend modes being incorrectly reported.
+* Fix some cases where samplers could be mistaken for texture resources especially on D3D11, which could lead to mis-naming thumbnails.
+* Fix a crash on intel mesa where calling XOpenDisplay multiple times would lead to driver issues. Thanks to @jljusten for tracking down this fix. For more information see [this bug on freedesktop.org](https://bugs.freedesktop.org/show_bug.cgi?id=99831).
+* Fix a crash on vulkan where more physical devices were available during capture than are available on replay.
+* Fixed some refcount leaks that would cause some D3D11 captures to stay largely in memory when closed.
+* Fix a potential divide by zero for 1-control point patchlist topologies.
+* Fix the implementation of round_z in D3D - this needs to apply `ceil` if the input is negative, or `floor` if positive. Previously it was applying `floor(x < 0.0f ? x + 0.5f : x)`.
+* Fix some handling of slice offsets for 3D textures - in high slice count 3D textures there could be some sampling that would go between slices or end up off-by-one.
+* Fix a double delete with descriptor set layouts when immutable samplers are used.
+* Fix invalid memory index types being reported in memory requirements.
+* Fix a case where GL programs using libepoxy would fail to hook because glXGetProcAddress wasn't reflexive (wouldn't return itself when queried for itself).
+* When showing the whole pass in the mesh viewer, show the correct number of instances for each draw.
+* Partly speculative bugfix for a pixel history crash when using deferred command lists.
+* Fix problems where not enough data is passed to an indirect draw call and we read garbage on the CPU.
+* Fix a crash when naming or tagging VkSurfaceKHR.
+* Workaround to applications that use DXGI refcounts incorrectly, to leak objects instead of crashing.
+* Export glXWaitX as a pass-through so that applications needing it can find it with dlsym.
+* Fix a bug where buffer usage was based on the last binding, and could be broken if a buffer is temporarily bound to COPY_READ_BUFFER for DSA style access. Instead examine the use of the buffer across the capture and use this to calculate the usage.
+* Fix an extremely dubious problem from IronPython, where if you install a version >= 2.7.5 then it adds a *global* redirect that affects all programs including renderdoc, to point to 2.7.5. In the case of renderdoc, it's not found since only 2.7.4 is shipped.
+* Handle vulkan descriptor set layout compatibility, and sets becoming invalidated if a new layout is bound, to avoid trying to bind a (now-invalid) descriptor set that might not be needed.
+* Fix D3D12 crash where a Map() that doesn't write any data on an upload heap would lead to a crash creating an empty buffer on replay.
+* Fix a D3D12 crash trying to apply graphics pipeline state to a compute or copy command list.
+* Fix a D3D12 crash where a command allocator would be in use when a data upload was needed.
+* Fix use of 'ref all resources' on D3D12.
+* Fix a potential D3D12 problem when submitting on two different queues, by synchronising between the submissions.
+* Allow descriptor set writes to be missing references to objects silently, as this is harmless if the descriptor set is not otherwise used.
+* Fix a potential crash naming an actively-recording command buffer in vulkan.
+* Fix for new compilation warnings on GCC about case fallthrough.
+* Fix broken captures where the compressor used a 32-bit counter to count the uncompressed size and would wrap around at 4GB. There is still a potential problem if the compressed size becomes 64-bit.
+* Fix the global hook shim referring to some removed functions, and so not properly setting capture options or target capture file.
+* Fix a vulkan crash if multiple devices were created on an instance, leading to the wrong device being used on replay.
+* Fix a case in GL where glBufferData would NULL dereference on uncreated internal data.
+* Fixed a bug creating programs in a GL frame that's being captured.
+* Fixed a crash where temporary events are created for use in command buffers and the code would delete them too early and try to re-use them after deletion.
+* Fixed accidentally exposed statically linked symbols when statically linking libstdc++ into librenderdoc in the distributed binary builds.
+* When closing a capture that contains callstacks release handles to the symbol files so they can be recreated, instead of holding onto them forever.
+* Fix GL uniform arrays not properly copying all data.",https://api.github.com/users/baldurk,661798,baldurk,https://api.github.com/repos/baldurk/renderdoc/releases/7289045/assets,https://api.github.com/repos/baldurk/renderdoc/releases/7289045,v0.x,https://api.github.com/repos/baldurk/renderdoc/tarball/v0.90,https://github.com/baldurk/renderdoc/releases/tag/v0.90,https://api.github.com/repos/baldurk/renderdoc/zipball/v0.90,v0.90,False,False
+6444793,2017-05-19T15:24:43Z,2017-05-19T16:24:58Z,Version v0.34,"The past few months things have been quiet as I'm working towards the goal of a 1.0 version release. That means you shouldn't get your hopes up for anything shiny and new in this release! There has been work in the background doing refactoring and some under-the hood improvements, and this version still brings plenty of bugfixes.
+
+Also as things converge towards a 1.0, please take a moment to read the following two documents if they are important to you:
+
+* [Analytics](https://gist.github.com/baldurk/0ff36fc90434c85d0c61b4156c5d77ca)
+* [Revamped Crash Reporter](https://gist.github.com/baldurk/4c0899bd9b909983b2e3ab7b42cf91e0)
+
+Since privacy is very important to me I want to make sure I hear any concerns anyone might have on these topics as soon as possible. A little while ago I gauged general reactions to these ideas in principle and they seemed positive - insomuch as very few people were starkly opposed to these changes happening - so now I've written details for everyone to check. For some people they will always want to opt-out of any such options which is perfectly fine.
+
+Any feedback on these can be left as comments on those pages, or sent to me via [twitter](https://twitter.com/baldurk), [email](mailto:baldurk@baldurk.org) or on [#renderdoc on freenode](https://kiwiirc.com/client/irc.freenode.net/#renderdoc).
+
+# Version v0.34
+
+Binaries for this release are up on the [downloads page](https://renderdoc.org/builds) for Windows and x64 linux as a binary tarball.
+
+For anyone building from source now, note that VS2015 is now required to build on windows. VS2010 was retired with a heavy heart a couple of months ago.
+
+To anyone packaging renderdoc for linux, there have been some changes to the build requirements to support building python integration in. There have also been improvements to version tagging, so pay attention to the `BUILD_VERSION_*` cmake variables, and also take a look at `renderdoc/api/replay/version.h`.
+
+# Features/Improvements
+
+* The Qt UI now supports full python integration, and there's a fully documented and deliberately designed python API available for the internals. Also if PySide2 is available at build-time, there's cross-integration with Qt so you can create new UI panels and widgets from python and have them integrate into the windowing system as well.
+* Many other smaller incremental improvements to the Qt UI.
+* Vulkan captures will now do simple remapping of physical devices. If the capture system and replay system both contain two physical devices (for example Intel IGPU and Nvidia DGPU) and the order changes between capture and replay, the closest matching device will be used for each. This also means if you capture on a system with only an NV card and replay on a system with AMD and NV cards, the NV card will be explicitly selected. This should reduce some annoying crashes between capture and replay on the same system, but vulkan captures are still not generally portable between differing systems unless the hardware and driver are similar enough.
+* Further improvements to lower-end support on GL. In particular more code that was unnecessarily relying on EXT_dsa was removed or emulated.
+* Add support for KHX experimental external sharing extensions `KHX_external_memory*`, `VK_KHX_external_semaphore*`.
+* Add a potential workaround for slow-down or lockups in the UI. This wasn't seen consistently but it seems primarily on OpenGL captures the UI's mousemove events could come in faster than the underlying system could pick texture values for example. This lead to a backlog in queued events and lead to the UI being laggy - or locking up if a synchronous event happened like changing drawcall. Now high-frequency events like texture picks on mouse move are allowed to pre-empt and remove any queued events, so the queue will never be more than one event behind and can quickly catch up once the mouse stops moving.
+* Changed version number tagging - particularly for linux build. Instead of packing an ""-official"" suffix onto the git hash, we now configure several variables independently to store the git commit hash, distribution name, distribution-specific version, and contact URL for the distribution package.
+* Added vulkan hardware counters by @victor-moya.
+* Improvements to handling of VS output/GS output. The output buffer is no longer a fixed size but now resizes up to whatever size is needed, and GS output is fetched individually for each instance. This fixes a couple of bugs where the VS/GS output would be corrupt for instances after 0 due to an incorrect per-instance stride calculation.
+* Apply a fudge-factor to the non-contractual refcount on the D3D12 backbuffer, to try to match the runtime's behaviour.
+* When launching a new process from the UI open a little infinite progress bar if it's going to take a while instead of locking up the program.
+* Fetch the renderpass state in vulkan even if no pipeline is bound - this allows previewing a renderpass when the `vkCmdBeginRenderPass` event is selected.
+* Unset the renderdoc vulkan capture layer when replaying. This prevents problem if the env var was accidentally left set when running the replay program.
+* Added a `floateleven` specifier in the buffer viewer for unpacking R11G11B10 data.
+* Improved copy-paste support from tree or list views. Ctrl-A will now 'select all', and the results will be sorted in-order before being copied.
+* Added an option to completely disable the fake event markers that are added to captures with no markers.
+* Added a --python command line option to renderdocui to run a python script from the command line completely automated.
+* Add support for saving Depth24 textures in GL to HDR/EXR formats, and saving double formatted data.
+* Add a python function to return the ID of the texture debug overlay's resource ID.
+* On GL cache the results of fetching a particular mip level. Because all array slices are together in a mip level in GL, this could lead to extreme memory allocation overhead when fetching each slice individually.
+* Add a call to XInitThreads on linux in replay applications to ensure nvidia driver optimisations can work without crashing, and a warning about the 378 series where these will crash unless disabled by an environment variable.
+* When naming command buffers in vulkan, make sure to propagate the name to all baked command buffers.
+
+# Bugfixes
+
+* Fix an regression on linux that could cause UI panels not to draw, due to a fix being lost in a bad merge.
+* Update the windows hooking code to handle the same dll filename being loaded from multiple places, and so having unique module entries. This commonly manifested as any application using AMD's extensions crashing on replay - since the AMD extensions weren't properly force-disabled on capture as atidxx64.dll was loaded twice.
+* Fix a crash on D3D12 if the program was captured as 32-bit and is then replayed in a 64-bit UI.
+* Remove code that ignored SIGCHLD signals, since Qt needs them internally to function. This will cause every process launched by RenderDoc to become a zombie process until qrenderdoc closes.
+* Add missing handling of VK_FORMAT_A8B8G8R8_*_PACK32.
+* Remove direct-mode display vulkan extensions when replaying as they aren't used.
+* Correct some parsing of /proc/self/maps - device numbers are in hex not decimal.
+* Fetch pipeline state after replaying drawcall, not before, so we pick up the state consistently (mostly only applies to mutable data in the state like hidden atomic counter values).
+* Handle disassembling unknown extension-set operations in SPIR-V without crashing. Also add support for AMD/NV extension operations.
+* Only serialise Vulkan queue indices if the sharing mode is CONCURRENT.
+* Fix calculation of compressed texture size per-mip to avoid over-allocation.
+* Stopped the python shell incorrectly complaining about missing libraries.
+* Experimental fix for an unknown crash disassembling SPDB chunks.
+* Fix crash with coherent vulkan maps if a not-mapped memory handle was unmapped again.
+* Fixes for handling use of VAO 0 (the default VAO).
+* Handle errors in glCreateShaderProgramv by returning immediately instead of trying to wrap a '0' program.
+* Fix off-by-one event IDs in runtime generated debug messages.
+* Fix DrawInstanced setting baseVertex instead of vertexOffset property.
+* When patching D3D12 pipeline state objects, ensure samplemask and sampledesc are initialised properly as they might not have been in the original.
+* Fix an out-of-range error when picking vertices in the GS output which is expanded to more vertices than existed in VS input/VS output.
+* Apply the correct image usage to vulkan swapchains instead of just our own, so that e.g. STORAGE_BIT is replayed correctly.
+* Fix a mistaken output merger validation condition - depth-read-only DSVs where the texture only contains depth can be bound if an SRV is already bound. Previously we were only handling the case for textures with depth and stencil and depth-read-only.
+* CUDA dlls are no longer hooked to allow capturing applications that use CUDA.
+* On Vulkan when creating images during replay we add any usage bits we might have needed for the image on capture, to ensure memory requirements are compatible. We don't need to do this though for images that aren't part of the capture itself. This fixes an issue with the intel vulkan mesa driver where it doesn't support storage multisample images.
+* SPIR-V reflection should list all outputs from pixel shaders as system values containing colour, even if they're not annotated explicitly.
+* Fix the calculation of slices for displaying 3D textures on D3D12.
+* Fix a copy-paste error that would replay `vkCmdDrawIndexedIndirect` as `vkCmdDrawIndirect`
+* Fixed element size not being set for D3D11 structured buffer UAVs when bound to the OM instead of CS.
+* Fixed a possible state-vector trash when resizing swapchains that could show up as incorrect state.
+* Fix an incorrect sample mask being used when fetching shader output values in pixel history.
+* On D3D11 fix OM UAVs not being shown as used if a stage other than pixel shader uses them.
+* Fixed vulkan secondary command buffers not taking a reference to inherited framebuffer and renderpass.
+* Fix a crash on sparse buffer serialisation where a structure was being trashed with incorrect data.
+* Handle vulkan physical devices without the `depthClamp` capability.
+* On Vulkan removed a leak of semaphores when replaying.
+* Fixed handling of small sparse buffers in vulkan that might need to be rounded up to larger memory requirements.
+* Made sure that shader search paths for separate binary info are always available even if the user isn't using SetPrivateData to specify the relative path for a shader.
+* Changed shader search paths to be stored publicly so they are reflected into the xml file.
+* Fixed a refcounting problem on D3D11, where resources that were released after being recorded onto a deferred device context but before being executed onto the immediate device context would not be kept alive.
+* Fixed a case where Vulkan MSAA textures that haven't been touched and need only be cleared instead of having data restored, would crash on replay trying to copy data that didn't exist.
+* Fixed some cases where the code didn't handle strip restart indices properly.
+* Clamp the 'maximum row count' value in the raw buffer viewer to 0.
+* Fix a D3D12 crash where the number of descriptors in a range was unbounded.
+* Fix an issue editing shaders on GL where fragdata bindings being copied from the previous shader program to the edited shader program would return duplicate bindings (multiple variables bound to the same slot) and needed to be ignored.
+* Fixes to size calculation on compressed array textures on GL.
+* On GL we serialise out program attrib and fragdata bindings. In normal execution the program sets these explicitly in the shader or in code so it works out, but if the program uses the undefined default values and reflects to change its calls, then replaying on a different machine with different undefined values could break things. Now we always serialise out the program state and apply it.
+* Fix the highlighting of matching GL attributes and vertex buffers in the GL pipeline state view.
+* Fix a crash if the filesystem watcher looking for modifications to custom shaders fired after the texture viewer was closed.
+* Fix a crash with a progress bar value going outside of 0.0-1.0.
+* Processes that were created by the user as `CREATE_SUSPENDED` are no longer resumed inadvertently.
+* Work around an intel driver bug ironically triggered by driver bug checks at startup.
+* Fix a mistake where we would change the currently bound VAO when replaying a glEnableVertexAttrib or glDisableVertexAttrib call.
+* On top of the above, we also save and restore the VAO state explicitly because nvidia's driver has the same exact bug!
+* When uploading the GL font texture, make sure to reset the pixel unpack state to default/tightly packed in case the application changed it.
+* Fix GL VAOs not replaying properly if double attributes were used.
+* Fix handling of empty structs in SPIR-V disassembly.
+* Fix a crash shader debugging if an index into an immediate constant buffer was negative and caused the bounds check to overflow.
+* Change the ctrl-left and ctrl-right shortcut to move to previous/next drawcall so that it doesn't override the existing shortcut in textboxes to move between words.
+* Fix some configuration being trashed when restoring ID3DDeviceContextState, that would lead to inaccurate reference counting and a crash if a debug message was generated.
+* Stop an out-of-bounds array access checking for samplers in a non-sampled load operations.
+* Fix handling of InstanceDataStepRate = 0 for instanced vertex inputs in D3D11, treating it as all values being identical.
+* Add an ignore to hooking CoreMessaging.dll - it causes a bizarre crash in PeekMessage if hooked.
+* Fix vulkan indirect draw functions not advancing the parameter pointer when parsing each individual draw, leading to all draws looking identical in the mesh viewer etc.
+* Slightly increased the timeout waiting for linux processes to start and open a port for target control connections. This avoids an error like ""failed to launch X"" when X actually launched just fine.
+* Fix several flipped states where a cross was shown instead of a tick in the GL pipeline viewer.
+* Don't let linux applications delete the shared log while it's still open in another program (like the replay UI).
+* Make sure to align elements in an array to float4 boundaries in constant buffers when fetching structured data. This still allows variables to sit after the array in a shared packed float4.
+* On D3D11 fix a potential crash reading out-of-bounds when trying to update more vertices than are available in the drawcall, if the buffer was resized to be larger by a previous draw. Now we only upload to a subset of the buffer.
+* On linux don't print to stdout/stderr with log messages in captured programs, since this can interfere with child processes like if you run a script which then calls dirname or pwd.
+",https://api.github.com/users/baldurk,661798,baldurk,https://api.github.com/repos/baldurk/renderdoc/releases/6444793/assets,https://api.github.com/repos/baldurk/renderdoc/releases/6444793,master,https://api.github.com/repos/baldurk/renderdoc/tarball/v0.34,https://github.com/baldurk/renderdoc/releases/tag/v0.34,https://api.github.com/repos/baldurk/renderdoc/zipball/v0.34,v0.34,False,False
+5551604,2017-02-23T14:57:51Z,2017-02-23T17:33:39Z,Version v0.33,"Just in time for GDC, here's the latest RenderDoc release! The main focus in this release has been greatly improved support for linux and GL, but there's hopefully something here for everyone.
+
+At the same time, I've made public a new [homepage for RenderDoc](https://renderdoc.org/) with an easy to find link to the latest version, as well as news and any articles I write that might be interesting. If you're looking to link to RenderDoc, then that's the URL to use - https://renderdoc.org/
+
+As always if you run into any problems or have suggestions then you can [file an issue on github](https://github.com/baldurk/renderdoc/issues/new) or [contact me](mailto:baldurk@baldurk.org).
+
+# Version v0.33
+
+Binaries for this release are up on the [downloads page](https://renderdoc.org/builds) for Windows and x64 linux as a binary tarball.
+
+The Qt UI on linux is missing python support as I'm planning to design & document a proper python API for interop with renderdoc, but otherwise everything should pretty much be working. There's an [issue on github](https://github.com/baldurk/renderdoc/issues/494) tracking remaining polish tasks and things like that.
+
+Work will continue on the Qt UI to get this polish complete so that it's at the same level of quality as the windows UI, and once it's at that level then the Qt UI will be rolled out across all platforms.
+
+Also on the GL front, RenderDoc no longer requires hardware GL 4.3 support and EXT_direct_state_access/ARB_buffer_storage to replay (although that does mean some features will be disabled if they rely on functionality that isn't available). Instead it requires just 3.2 and a handful of extensions:
+- GL_ARB_vertex_attrib_binding
+- GL_ARB_program_interface_query
+- GL_ARB_shading_language_420pack
+- GL_ARB_separate_shader_objects
+- GL_ARB_explicit_attrib_location
+- GL_ARB_sampler_objects
+
+Largely these don't require actual hardware support, and any decent GL implementation will support them in software regardless of the hardware. This means you can use RenderDoc on the software mesa implementation without requiring the latest drivers:
+
+![image](https://cloud.githubusercontent.com/assets/661798/23218388/0db74122-f914-11e6-8340-863ce220f022.png)
+
+![image](https://cloud.githubusercontent.com/assets/661798/23219040/e298d1e8-f915-11e6-879b-5700c6ef7639.png)
+
+# Features/Improvements
+- The Linux Qt UI is now comparable to the windows UI in feature set, and stable enough for everyday use.
+- As mentioned above the GL support will now work correctly on any recent mesa (I tested against ~10.5 or 10.6). This means both fixing bugs in RenderDoc that mesa caught, as well as significantly lowering the requirements from 4.3 + EXT_direct_state_access + ARB_buffer_storage to 3.2 + a few non-hw extensions.
+- Added support for VK_NV_external_memory\* and VK_NV_dedicated_allocation Vulkan extensions, which are needed for VR rendering.
+- New GPU counters are available on D3D11, D3D12 and GL - Primitives processed, shader invocations, rasterizer invocations. These counters are not currently exposed in the API but can be queried through the python shell. Thanks to @victor-moya for these.
+- Add drawcall timings for copy/resolve/blit type operations in vulkan.
+- When shader debugging add functions to run to the next texture operation, or run to the next floating point exception (instruction that generates a NaN/Inf). Thanks to @michaelkvance for this.
+  ![image](https://cloud.githubusercontent.com/assets/661798/23217569/a37b0412-f911-11e6-81ff-f5d48c745e49.png)
+- Include the duration column when exporting data from the event browser.
+- Add a warning for python if the libraries aren't loaded (only relevant for dev builds).
+- When self-hosting RenderDoc (capturing it with itself) some new tool menu items appear in the UI to start/stop captures. There are also now some marker regions added during replay.
+- Add some verification for GL buffers being bound, so that invalid buffer names won't crash immediately.
+- Add support for the Vulkan extension VK_AMD_negative_viewport_height
+- Add support for Vulkan extensions released in 1.0.39: VK_KHR_get_physical_device_properties2, VK_KHR_maintenance1, VK_EXT_direct_mode_display, VK_EXT_acquire_xlib_display, VK_EXT_display_surface_counter, VK_EXT_shader_subgroup_ballot, VK_EXT_shader_subgroup_vote, VK_EXT_swapchain_colorspace, and VK_KHR_shader_draw_parameters.
+- When the global hook is active, prevent closing the program to avoid leaving a stale hook active.
+- Add Map() buffer overwrite handling for OpenGL, using [tinyfiledialogs](https://sourceforge.net/projects/tinyfiledialogs/) for cross-platform messageboxes.
+- When shader debugging, don't replay the capture commands at all. This means that when the shader debug happens it contains the same data as was visible in the capture before debugging, which can be different if there's non-deterministic behaviour like append/consume or atomics.
+- Added a new option to hide any marker regions which only contain ""API Calls"" placeholders and not real drawcalls, for example if there are only queries inside the marker region.
+- In the capture connection window, you can rename the label on captures.
+  ![image](https://cloud.githubusercontent.com/assets/661798/23260521/20afb6d6-f9ca-11e6-99bc-1063e9fc65e4.png)
+- When a GL buffer contains padding, the struct definition reflected out will include dummy padding elements.
+- When replaying D3D12 upload heap buffers, allocate them on a default heap instead if they're large. This prevents extreme slowdown when copying data to them as it must be memcpy'd instead of uploaded to the GPU and copied there.
+- Added multi-instance picking, so if you are rendering multiple instances at once you can pick a vertex from any of them and the corresponding instance will be activated.
+- Support for yet another new marker format for D3D, this time PIX3 for D3D12 only. Thanks to @tiago-rodrigues.
+- Eliminate a performance cliff that could happen if a vulkan resource with a large number of subresources (e.g. a cubemap array with lots of mips) was split apart for the purposes of processing barriers, and then never recombined again during replay producing a lot of redundant barriers.
+- When copy-pasting a quoted path into the capture dialog, the quotes are removed.
+- Callstack entries that don't have any matching symbols will now be something like `module.dll+0x0ff5` instead of `0x627ddff5`.
+- Added `$ORIGIN/../lib/` to rpath for renderdoccmd and qrenderdoc, and similar change to setting `LD_LIBRARY_PATH` when capturing, so that the file structure in linux tarballs will work as-is.
+- If we see `SwapBuffers()` being called a lot with no context active, add a log message about the problem.
+- Added support for depth & stencil overlays on cubemap, array and renderbuffer targets.
+- Add handling for InstanceStepRate values above 1 in vertex debugging.
+
+# Bugfixes
+- Fix a bug that would cause an instant crash loading any D3D12 capture on nvidia, due to an API requirement that's undocumented, unexplained and not mentioned by validation checking.
+- Fixed a long-standing edge-case refcounting bug that could lead to pure virtual function calls or other funkiness while binding resources due to D3D hazard tracking. The explanation for this bug and the fix is kind of interesting but too long, so you can read more details in the [first commit](https://github.com/baldurk/renderdoc/commit/9d6acd1d00da6333e387e3178daf5c44fbb4bb86) that revealed the bug and [the second commit](https://github.com/baldurk/renderdoc/commit/801f47a31ae97fd891d8242b7265f9ab7e97efd9) that actually fixed it.
+- Work around an nvidia driver bug where D3D11_USAGE_IMMUTABLE buffers wouldn't apply an offset properly when calling CopySubresourceRegion. This could manifest a few ways, most often by incorrect values fetched for shader debugging, but also in the buffer viewer if a byte/row offset was specified.
+- Fix hooking child processes when `CreateProcess` was imported from an [API set](https://msdn.microsoft.com/en-us/library/windows/desktop/hh802935%28v=vs.85%29.aspx). This could affect functions like `execve` which did that internally.
+- Fixed a case where you had a 64-bit RenderDoc that ran a 32-bit process which then launched a 64-bit process (e.g a 32-bit launcher for a 64-bit game). Only going from higher bitness to lower bitness was supported previously.
+- Added a fallback case for if D3D12 versioned root signature functions aren't available, which can depend on your OS build version even if you have D3D12.
+- Implement missing QueryInterface for `IDXGISwapChain4`.
+- Fix capture on DirectComposition swapchains, by forcing a fake HWND value.
+- Handle non-NULL terminated strings in D3D11's SetPrivateData.
+- Implement a workaround for executing programs on apple where environ can't be modified, search `PATH` manually and call `execve`.
+- Support re-compilation and re-linking of programs in GL during capture.
+- Correct the value used for base vertex when fetching post-VS data on GL.
+- Mark a couple of GL draws as instanced that weren't properly flagged.
+- Ensure that GL persistent maps are always intercepted, and don't make GL maps persistent on replay.
+- Check that programs exist in a GL capture when setting uniforms.
+- Fix sRGB calculation when applying 'fake' gamma curve to texture data.
+- glVertexArrayElementBuffer behaves weirdly with respect to GL_ELEMENT_ARRAY_BUFFER_BINDING, so we always emulate it with a non-DSA version
+- Fix GLSL shader patching with comments on a preprocessor line.
+- Fix a crash with Vulkan descriptors referring to deleted buffers with invalid IDs.
+- Fix GL texture overlays rendering with multisampled textures.
+- When copying attrib bindings between GL programs, re-link the program afterwards.
+- Fix a crash trying to render the quad overdraw overlay on a 1x1 texture.
+- Fix a crash with the options in the context menu on the pixel context panel when no capture is loaded.
+- Prevent some crashes with the buffer viewer if it was closed while background work was happening, or if it was initialised too early and got some inconsistent state.
+- Fix a D3D12 crash if a capture is empty enough to have no initial states.
+- Fix a crash when a texture overlay is enabled and a subpass boundary is selected.
+- Stop counting drawcall timings twice if there's a `SetMarker` type marker immediately before the draw.
+- Fix a D3D12 crash if `RTsSingleHandleToDescriptorRange` is used to set 0 render targets.
+- Fix timers in D3D12 re-using the same allocator for multiple recording command lists.
+- Ignore any calls in D3D12 to set a root constant with a GPU virtual address of 0. This probably isn't valid but it seems to work so it may be legal but undocumented behaviour.
+- Mark buffers as dirty when they are cleared before a frame capture, instead of leaving uninitialised data.
+- Fix handling of bitwise shift operations in shader debugging, which can either be scalar (all components in the source vector shifted by one value) or component-wise.
+- Don't try to initialise Vulkan features that aren't supported by the device, including creating MS <-> Array copy shaders.
+- Fixed an edge case with the pixel history that would fail if only one event could possibly have written to the target, but it included some overdraw that required multiple results.
+- When displaying pixel values in the texture viewer, apply the type hint (ie. if a typeless texture is being viewed as UINT).
+- Fix editing compute shaders on Vulkan to create the correct pipeline type.
+- Remove VK_LAYER_LUNARG_monitor during replay as it's quite buggy and will try to modify the title of any window presented to, which can lead to thread deadlocks if presentation doesn't happen on the UI thread.
+- When creating a dummy GL context on linux use a pbuffer, as we must have some drawable to make a context current.
+- Fix D3D12 crash if a 0 GPU virtual address is bound to a vertex buffer. I don't know if this is legal or not, but it seems to work so I allow it.
+- Fix mesh picking not working with reverse-perspective cameras.
+- Fix a case if the environment data is malformed and a line doesn't have an '=' character.
+- Fix saving BGRA textures to HDR or EXR missing an endian swap.
+- Fix a case in the pixel history where running a history on a D16 or D32 texture would fail.
+- When creating direct-display surfaces in Vulkan, give them a fake window handle so that they can be captured properly.
+- In shader editing, do a case-insensitive search for include files.
+- Fix a very stupid bug where decoding hex digits from a string accidentally dropped the top bit.
+- Fixed a crash when trying to replay a vkCmdExecuteCommands call alone.
+- Addressed a potential problem with vulkan captures that would fail to replay due to memory requirements changing between capture and replay with added usage flags.
+- Add some missing locking around GL context activation/creation/deletion functions.
+- Store KHR_debug object labels internally rather than relying on the driver which may not work correctly.
+- Fix a crash if a non-zero number of rects was passed to `ID3D11DeviceContext::ClearView` due to the wrong count being used on replay.
+- Fix a problem on linux where Qt widgets wouldn't paint properly due to a call to glXCreateWindow.
+- Fix a potential crash on linux where a mapped pointer returned null after using `glBindBufferBase` instead of `glBindBuffer`.
+- Fixed a pixel shader debugging issue where re-generated inputs would be repacked by the compiler and so no longer match the vertex shader.
+- Fixed drawcall timings and some overlays handling with GL's multidraw functions.
+- Fix incorrect shader debug values returned from ld_raw / ld_structured due to component clamping being applied wrongly.
+- A very hacky fix for internal D3D runtime code calling into a function using the wrong interface, when the interface is not available via QueryInterface.
+- On D3D12 we need to add some descriptors of our own to descriptor heaps, because the API is limited and only allows binding one heap. Any time we need to patch a pipeline state object to use our own descriptors during replay we have to reserve our own descriptors in the heaps the application is using. Unfortunately if the app requests a heap of maximum size, reserving more will fail creation, so we have to clamp and just hope that our descriptors won't stomp over the application's.
+",https://api.github.com/users/baldurk,661798,baldurk,https://api.github.com/repos/baldurk/renderdoc/releases/5551604/assets,https://api.github.com/repos/baldurk/renderdoc/releases/5551604,master,https://api.github.com/repos/baldurk/renderdoc/tarball/v0.33,https://github.com/baldurk/renderdoc/releases/tag/v0.33,https://api.github.com/repos/baldurk/renderdoc/zipball/v0.33,v0.33,False,False
+4796603,2016-11-30T16:14:56Z,2016-12-02T19:26:37Z,Version v0.32,"Time for another RenderDoc release! This time coming with support for D3D12.
+
+With the survey a few months ago it was very clear that a lot of people were looking for D3D12 support, and the back-end in RenderDoc is now ready for prime-time. I've tested it on every D3D12 program I can lay hands on, so if you run into any issues then do [file a bug about it](https://github.com/baldurk/renderdoc/issues/new).
+
+# Version v0.32
+
+Binaries for this release are up on the [downloads page](https://renderdoc.org/builds) for Windows and x64 linux as a binary tarball.
+
+The D3D12 support comes with a few provisos - it currently doesn't support multiple GPUs (i.e. NodeMask must be 0 everywhere), and it doesn't support tiled/reserved resources. This functionality will be filled in in the future, but given the high complexity to relatively low usage, it's prioritised appropriately.
+
+Likewise shader debugging and pixel history is currently not yet implemented for D3D12, but all other RenderDoc features should be working. Again file a bug with anything that seems broken!
+
+Aside from D3D12 there are a bunch of bugfixes and a few cool new features like a triangle size overlay which you can use to diagnose missing LODs or other super dense meshes.
+
+Looking ahead to future versions, there's a refactored serialisation system coming in the pipeline which will enable a bunch of really cool new features. The downside is that it will break capture backwards compatibility. I'll give more details in future, but it's possible that v0.33 may be the last version that supports captures made on current versions.
+
+Also, the linux build this time comes with a very early preview of qrenderdoc, the Qt UI. It is very much work in progress, many things are not yet implemented or buggy, but if you feel like trying it out then it's there. This will be the UI on windows eventually too, but only once it has reached feature and quality parity with the existing winforms UI.
+
+# Features/Improvements
+- Added beta D3D12 support! This should now be usable for day-to-day use, and has been tested on all the D3D12 things I could get my hands on, including a number of D3D12 games.
+  
+  It's listed as beta primarily because it hasn't yet had widespread testing. Note also that some features are not yet implemented on D3D12, notably shader debugging and pixel history.
+- Vertex picking is improved, thanks to @Velro. The mesh viewer now does a ray-cast per triangle and picks the closest vertex to the cursor on the best matching triangle, instead of just picking the closest vertex anywhere.
+- New triangle size overlay, showing a heat value for the size of a triangle. Any triangle above 4x4 pixels in area is the coolest value, and then 'heat' increases exponentially to triangles that are 1/16th a pixel in area.
+  
+  ![image](https://cloud.githubusercontent.com/assets/661798/20762713/97ca9c4e-b727-11e6-8ece-41054eb5cc29.png)
+- Improved the accuracy of shader debugging in a number of cases by running transcendental functions on the GPU to precisely emulate the floating point accuracy of the current GPU. `sin`, `cos`, and others should now match the results from the real GPU and avoid slight ULP variances which could be amplified (e.g. by multiplying the result with a huge number for a `rand()`).
+- Early support for D3D9 overlay. Not all D3D9 programs will get an overlay yet, but where possible an overlay will display showing clearly that the API is unsupported. Work is ongoing in a [separate fork](https://github.com/moradin/renderdoc).
+- Improved the 'inject into process' UI. Added a window title column, column sorting, fixed the missing refresh button and added a find-as-you-type filter.
+  
+  ![image](https://cloud.githubusercontent.com/assets/661798/20761828/96e3a814-b724-11e6-85dd-d5031c761139.png)
+  
+  I still strongly recommend using the normal launch-to-capture workflow wherever possible, as injecting only works when the process hasn't used any target APIs, and has other drawbacks. It is useful in a small minority of cases.
+- Process injection now supports environment variable changes.
+- Added some error messages and detection if an invalid object is passed into GL functions. In general renderdoc doesn't do API validation, but some slight bullet-proofing will catch low hanging fruit problems.
+- If a launched process dies during startup, a more friendly/obvious error is printed to the logfile.
+- The replay no longer creates a debug context when replaying a GL capture.
+- Added support for an external SPIR-V disassembler tool, which can be configured to generate compilable glsl from SPIR-V directly, if the original source isn't available or isn't glsl.
+- Some slight improvements to the enumeration of remote hosts.
+- Implemented debug output muting on GL.
+- Detect and suppress any drawcalls that happen outside of render passes in Vulkan. Previously this would crash the program, but now the drawcall is skipped and an error message is added.
+- Display whether a DSV is depth or stencil read-only in D3D11 pipeline state.
+- Added support for remapping texture formats across APIs. This is useful in particular for e.g. Android replay with an ASTC texture that can't be natively displayed on a Windows UI, so it needs to be internally remapped to a format that can be displayed.
+- Added a tool menu option to start the Android remote server.
+- Support hooking libraries loaded with `RTLD_DEEPBIND` on linux.
+- Improved compression quality and size on capture thumbnails, and added a preview panel to the capture connection. E.g. this allows easy checking if the frame you just captured shows the bug you were after or not.
+  
+  ![image](https://cloud.githubusercontent.com/assets/661798/20763555/d112954e-b72a-11e6-8053-b9885d93899b.png)
+- Min/max and histogram calculation now use custom visualisation shaders as their inputs instead of the real texture values.
+- Improved debug logging. All processes launched from a single instance of the UI now log to the same file - using appropriate OS mechanisms to ensure logs are distinct. This means the Help -> View Diagnostic Log File menu option is more useful.
+- Temporary files are now stored in a subdirectory - `$TEMP/RenderDoc` instead of spraying out in the root `$TEMP` folder
+- Added previous/next buttons to the event browser. These also have global shortcut keys ctrl-left/ctrl-right which work anywhere.
+- Added experimental support for WGL_NV_dx_interop to use DX textures in GL.
+- Exported the full GLX function set, to comply with ABI requirements for libGL.so.
+- In addition, added exports for unsupported GL1.0-1.2 deprecated functions, to allow a program to query for them and receive a valid function pointer. Note they aren't implemented, so it would still not work to call them.
+- Added wrapping for DXGI 1.5 and improved DXGI wrapping to have better compatibility with programs querying interfaces back and forward.
+- Multiple fixes and improvements to support capturing Direct2D in all known cases. This one is a bit funky, and DXGI is a complete mess of an API, so if you find a case that breaks then please report it as it may still be possible to support it.
+- Added easy support for self-hosting - ie. capturing RenderDoc's replay program with RenderDoc, and then debugging the replay.
+- Added a hover popup over tree views (e.g. the event browser) to show the full text of a line that is truncated for space
+  
+  ![image](https://cloud.githubusercontent.com/assets/661798/20763498/8bafd8ea-b72a-11e6-8786-5800cef21d00.png)
+- Added the ability to discard the alpha channel when saving to TGA/PNG, even though the format supports it.
+- Added support for multisampled image initial states in Vulkan, so that the data from previous frames is saved and restored. This also allows the display of multisampled images over a remote host connection.
+- Added a backdoor UUID - `{3FC4E618-3F70-452A-8B8F-A73ACCB58E3D}` - which returns the real unwrapped `ID3D11InfoQueue` from the D3D11 device. This allows custom filtering of messages, but you must be very careful not to use this to query for other interfaces as they will be returned unwrapped. Likewise any messages filtered out will not be retrieved or saved by RenderDoc's built-in API validation tracking. The debug layer must still be enabled via the capture options.
+- When serialising GL memory barriers, display the bitfield values as strings instead of a hex number.
+- Sort tree list values before copy-pasting, as the selection is stored by default in the order they were selected (possibly reversed).
+- Don't accumulate ResolveSubresource calls over time if we can't deduplicate them, but instead just mark the resource as dirty.
+
+# Bugfixes
+- Fixed a crash that could happen if `GetProcAddress` was called for either itself or `LoadLibrary`, commonly happening in .NET programs that used P/Invoke for either function.
+- Fixes for the display and saving of 3D textures, in particular for at mip levels above 0.
+- Allowed hooking of delay-loaded ordinal imports. Mostly applicable for delay-loaded d3d12.dll.
+- Fixed the wrong operand being used in some sample operations - particularly comparison operations.
+- The arrow key nudge-by-1-pixel in the texture viewer accounts for mip level instead of requiring 2^n presses to move a texel in a mip.
+- Ampersands in event names no longer try to become shortcuts.
+- Calculation of uniform buffer sizes is fixed for arrays/structs in SPIR-V.
+- Fixed the `RENDERDOC_TEMP` override on linux not working properly.
+- Fixed cases where a buffer that's modified mid-frame in GL would not correctly restore its contents at the start of the frame, or where it could have the incorrect contents at the start of the frame if it's not modified before use.
+- Forced 'viewed' textures to have initial contents saved out, as there's no good way for the underlying texture to know if it was modified through a texture view or not.
+- Fixed event IDs from error messages being incorrect.
+- Fixed a case where internal tracking of vulkan image layouts could leak out into a barrier with an invalid state.
+- Fixed a crash that could happen when saving a texture in GL with a custom visualisation shader.
+- Fix a crash when switching back to a local context with connection windows open.
+- Hide any win32 errors from our internal code by calling GetLastError/SetLastError around our code inside the hooked LoadLibrary and GetProcAddress calls.
+- Fixed some broken memory walking code when unwrapping multiple vulkan queue submissions in one call.
+- Fixed some floating point exceptions that could happen as a result of trying to print buffer data as floats during serialisation.
+- Several bugfixes to callstack gathering - better support for dynamically loaded modules at runtime, handling over 2KB of ignored PDB paths, and more relaxed searching for symbols using DIA, checking for PublicSymbol type after trying Function type.
+- Fixed some serialisation bugs when using remote capture/replay between 64-bit and 32-bit.
+- Fixed a missing initialisation of shadow pointers in GL for persistent buffer maps.
+- Fixed the statistics viewer trying to access a file locally, even if it's being replayed remotely.
+- Fixed replaying of indirect drawcalls on vulkan.
+- Properly unwrap vulkan objects inside data structures for VK_EXT_debug_marker set name/set tag functions.
+- Fixed handling of unpack/pack state on GL, which wasn't properly ensuring the unpack state was nop'd out when replaying.
+- Handle render buffers when saving textures or viewing them across a remote host connection.
+- Fixed an oscillation in the errors and warnings window if the size was just right to continually add/remove a scrollbar.
+- When selecting the final flip/present call, choose the destination as our current texture if we don't have anything better to display. This fixes the backbuffer not being shown by default when loading a UE4 capture, for example, as it is unbound at the end of the frame.
+- Work around application bugs that call WSACleanup without first calling WSAStartup and destroying RenderDoc's internal sockets. This happened notably with GTA 5.
+- Fixed a crash if an element was selected in the remote host manager that wasn't a remote host (e.g. an application running on a remote host), and refresh was clicked.
+- Removed some leaking resources that could cause the whole D3D device to stay alive and leak a significant amount of memory each time a capture is loaded.
+- Fixed processing for glsl style `mat4` square matrices in buffer formats.
+- Fixed a crash when saving a constant buffer to CSV if the file I/O failed.
+- Removed a possible deadlock against the loader lock when applying library hooks on windows.
+- Fixed multiple problems when debugging a `SampleBias` instruction, using the wrong sampler and potentially corrupting subsequent sample instructions.
+- Fixed colour luminance calculation when displaying event marker colours.
+- Allow querying for `IDXGISurface` in the swapchain's `GetBuffer` call. This is ambiguous, and so we assume the 'native' format type will be used.
+- Fixed a crash when VK_ATTACHMENT_UNUSED is specified for color or input attachments in a Vulkan render pass.
+- Remove unique objects layer when replaying in vulkan in case it's not present on replay (and because we don't need/want it).
+- Corrected handling of basevertex when picking vertices.
+- Take the opengl global lock inside SwapBuffers and Start/EndFrameCapture to ensure we don't have threading problems when recording commands at the same time as trying to start or stop a frame capture.
+- Fixed a crash when trying to show the find all dialog in the shader viewer if it was already visible.
+- Fixed a crash when fetching post-VS data in vulkan if the vertex ID wasn't declared as a signed 32-bit integer.
+",https://api.github.com/users/baldurk,661798,baldurk,https://api.github.com/repos/baldurk/renderdoc/releases/4796603/assets,https://api.github.com/repos/baldurk/renderdoc/releases/4796603,master,https://api.github.com/repos/baldurk/renderdoc/tarball/v0.32,https://github.com/baldurk/renderdoc/releases/tag/v0.32,https://api.github.com/repos/baldurk/renderdoc/zipball/v0.32,v0.32,False,False
+4106992,2016-09-13T14:07:57Z,2016-09-13T17:17:03Z,Version v0.31,"The results from last month's survey [are now up](https://renderdoc.org/survey) for anyone interested to see the aggregated results! There are definitely some interesting conclusions to be drawn, and the effects of any change in direction will start to appear in the coming months.
+
+As a result of the survey responses, I will be creating a detailed proposal for both anonymous telemetry and an expanded crash reporter. These will be posted as a request for comments to allow for any tweaking and also a more concrete idea for people to raise specific objections against. As mentioned in the survey, these will still be easily opt-outable and respectful of user privacy.
+
+Thank you once more to everyone who filled this out, I am very appreciative of the time taken to give so many responses, and I hope the results are interesting to you!
+
+# Version v0.31
+
+The downloads of this release are now up on the [builds page](https://renderdoc.org/builds) including new linux binaries. These are x64 and might not work for everyone, although hopefully they should have wide compatibility. Right now I've not set up .deb/.rpm packages although that might come in future.
+
+The primary focus of this release is a stepping stone towards further platform compatibility. Although RenderDoc has technically had support for network capture and replay for a while, this release sees a significant polish and tweaking applied to make the process as smooth and easy as possible. While obviously not as powerful as a native UI on non-windows platforms, this will help those targeting those platforms from a windows development machine.
+
+If you're interested in debugging on linux from windows, this release also comes with linux binaries (although of course you can build your own from source) and documentation/instructions on how to do that. As I mentioned, this is an intermediate step - the next being a native Qt UI for non-windows platforms.
+
+There are a couple of small backwards-compatible breaking changes in this version. If you have captures made on older versions of RenderDoc that use deferred command lists in D3D11 and were using the `RestoreDeferredContextState == TRUE` parameter to `ID3D11DeviceContext::FinishCommandList` this will no longer replay correctly so results may diverge. You will have to capture again with v0.31 for it to work. Otherwise old captures should continue to work.
+
+Also the python shell core object is now exposed as `pyrenderdoc`, to make room for `renderdoc` mapping as a python module to the internal `renderdoc` C# namespace, allowing creation and referencing of C# types much more easily.
+
+If you run into any problems or have suggestions for improvements, please [file an issue](https://github.com/baldurk/renderdoc/issues/new) or [contact](mailto:baldurk@baldurk.org) [me](https://twitter.com/baldurk) directly to let me know! I'm always happy to help out with whatever I can.
+
+# Features/Improvements
+- Retooled the workflow and software support for network capture and replay. The [documentation available](https://renderdoc.org/docs/how/how_network_capture_replay.html) gives all the details of how to set up and use this feature, and there's also a short [video tutorial](https://youtu.be/6_Bg06oe22I) showing the simple steps visually.
+  
+  ![image](https://cloud.githubusercontent.com/assets/661798/18468380/f44e61d8-79a3-11e6-9cb6-ce2bee808da6.png)
+  
+  ![image](https://cloud.githubusercontent.com/assets/661798/18469729/87f45528-79a9-11e6-949e-a9bcd9712b1a.png)
+- Captures now include a coarse machine identifier (such as operating system, CPU architecture and bitness). This is used to prompt users to replay remotely.
+  
+  ![image](https://cloud.githubusercontent.com/assets/661798/18468303/a89fef9a-79a3-11e6-97d3-5c1538b16eb5.png)
+- Added a 'TDR' style timeout to shader debugging. After 100,000 cycles the debugging will prompt the user to abort as this is likely an infinite or very long running loop. If you hit this limit with working shaders, let me know!
+- Heavily refactored handling of deferred contexts in D3D11. Previously there was a lot of ugly code to try and handle replaying separately on the immediate context and on a particular deferred context, now deferred commands are simply flattened into the immediate context at execute time.
+  ![image](https://cloud.githubusercontent.com/assets/661798/18468163/01b388cc-79a3-11e6-83ed-21237ad65b57.png)
+  
+  Please report any bugs you run into with handling of deferred contexts, as I have precious few real test cases to verify that everything is working.
+- On vulkan, debug output is now muted by default to prevent applications from firing on false positive validation layer warnings or errors that are added by the capturing.
+- Report only a single queue in the single family in Vulkan (previous releases would still report multiple queues available).
+- Update notes for new versions are now formatted as RTF to allow links/bold/headers.
+- When compiling for linux, support for xlib/xcb optional and can be compiled out to remove any reference to those libraries.
+- Added the ability to specify environment variable modifications when launching a program - operations supported are 'set', 'append' and 'prepend', with append/prepend optionally supporting `;` and `:` separators.
+  
+  ![image](https://cloud.githubusercontent.com/assets/661798/18468224/39308048-79a3-11e6-9a87-25cfdbe1a774.png)
+- Added VK_KHR_display support on Vulkan for direct framebuffer access.
+- Added an option in the settings window to specify a default folder for saving captures.
+- Improved proxying behaviour on GL, to handle BGRA and various some other non-uniform texture formats.
+- On linux `renderdoccmd version` will print which windowing and rendering APIs were included at compile time.
+- `renderdoccmd` on linux now will detect if the vulkan layer is registered properly and prompt the user to register it or fix the situation.
+- Shaders can now be saved to disk from the pipeline state. This is most useful for retrieving binary shaders from D3D11/Vulkan for external examination, on OpenGL it concatenates all source files together.
+- The drawcall column on the Event Browser now shows a range of drawcalls, the same as EID, for marker regions.
+  
+  ![image](https://cloud.githubusercontent.com/assets/661798/18468320/bb39e76e-79a3-11e6-99a0-ca6e59d0c2f5.png)
+- Serialise and display parameters to IDXGISwapChain::Present.
+- Add F3/shift-F3 for searching forward and backwards in event browser.
+
+# Bugfixes
+- Fixed a bug that hit a number of people in v0.30 - if multiple mesh viewers were open in the default window layout, the docking toolkit I use would crash on opening.
+- Fixed a common cause of crashes on AMD, if using the DX extensions this would cause a driver crash on replay. Now the DX extensions will be hooked and returned as unavailable/failing to initialise.
+- Fix loading of EXR files, and improve error messages when failing to load images (don't refer to them confusingly as 'logfiles').
+- Save EXR images in ABGR channel order which seems more compatible with viewers.
+- Fix an incorrect saturate on D3D11's fake gamma curve, causing slight clamp of white pixels.
+- Fix a potential crash if GetProcAddress failed on a function that we would in theory be able to hook.
+- Fixed multisampled renderbuffers in GL not displaying correctly.
+- Stopped a leaking capture where `glBindSamplers` would be recorded even when not mid-frame.
+- Fixed a few cases of invalid GL use in edge-cases.
+- Corrected recording of 'VAO 0' to properly reference the buffers bound to it.
+- Fix pixel highlight boxes being off by one in the pixel context view.
+- Fixed an odd interface-casting bug that lead to `ID3D11DeviceContext::GetDevice` returning an invalid pointer.
+- Several improvements for control colours under high contrast themes.
+- Fix potential crash if selecting a non-drawcall with empty items enabled in the pipeline state view.
+- Make sure buffer view clamping to 200k max rows, even if a view specifies more than that.
+- Fixed handling of matching source with blank lines when the shader was compiled with old (SPDB) D3D debug format.
+- Speculative fixes for some crashes in texture viewer, by clamping previously selected mip/slice.
+- Fix for reconstructing constant buffer sizes without reflection data.
+- Fix an erroneous failure to capture if a GL frame contained no commands whatsoever.
+- Fixed network capture/replay between mismatched 32-bit and 64-bit executables.
+- Fix a crash when reading off the end of a buffer on D3D11, instead of clamping.
+- Fixed incorrect socket error handling on linux not looking for EAGAIN and EINPROGRESS.
+- Fix incorrect calls of select() on linux.
+- Add a search for a matching X visual ID when creating GLX window.
+- Fix a crash if a barrier event happens not within a drawcall.
+- Fixed vulkan debug texture rendering (used for display or saving texture data) being clipped to 4k accidentally.
+- Some fixes to handling of texture views without trying to copy or save their contents.
+- Fix a crash with vulkan shader edit & replace.
+- Fix a crash in vulkan pipeline state export to html.
+- Fix a possible case where the GL in-application overlay wouldn't render text properly.
+- Fixed inconsistent y-flipping of textures for GL. It's still an inevitable mess, but slightly less of one now.
+- Handle SOSetTargets() being called with a NULL list of buffers and non-zero buffer count, which is apparently valid and means each buffer is NULL.
+- Fixes to cubemap rendering on GL not properly restoring FBO attachments as the right face. Also at the same time fixed some issues with array slices being bound to FBO attachments.
+- On D3D11 only include matching mip/slice events in pixel history, and get the right before and after pixel values.
+- Fixed handling of byte address buffers - name them properly, and detect them when reconstructing stripped reflection info.
+- Handle a crash if `StaticExports.GetVersionString()` is not present when detecting mismatched UI and dll versions.
+- Fixed handling of implicit render-pass image transitions between (and into/out of) subpasses.
+- Export more GLX functions just as dummy pass-through to handle libraries like glfw that query for a lot from our library, expecting it to be libGL.so.
+- Fix some crashes/mismatches between `Window`s and `GLXWindow`s.
+- Fix cases where a NULL array wasn't handled in GL multi-bind functions.
+- Remove a 500ms sleep that was doing nothing in the global hook shim dll.
+- Fixed a case where Unmap() data could get lost in certain circumstances.
+- Output from the python shell now automatically scrolls to the bottom.
+",https://api.github.com/users/baldurk,661798,baldurk,https://api.github.com/repos/baldurk/renderdoc/releases/4106992/assets,https://api.github.com/repos/baldurk/renderdoc/releases/4106992,master,https://api.github.com/repos/baldurk/renderdoc/tarball/v0.31,https://github.com/baldurk/renderdoc/releases/tag/v0.31,https://api.github.com/repos/baldurk/renderdoc/zipball/v0.31,v0.31,False,False
+3785913,2016-08-01T12:56:21Z,2016-08-01T16:40:38Z,Version v0.30,"**NOTE: There's a crash with certain saved UI layouts, if you had multiple mesh views open at once. If v0.30 crashes whenever you open it, delete `%APPDATA%\renderdoc\DefaultLayout.config`**
+
+I started working on RenderDoc in 2012 as a hobby project just working in my spare time. Now since June this year I've been contracting with Valve to focus full-time on RenderDoc, allowing significantly more work and improvement on the tool. I'm thankful to everyone who has helped me get here as I'm very privileged to be in this position.
+
+In order to make sure that I do the best work I can and focus on what is important to people using the tool, I have put together a short survey to find out who is using the tool and why, as well as gather opinion on ways I'd like to improve the tool with better crash reporting and anonymous telemetry.
+
+### ~~Please take a few minutes to fill out [this anonymous survey](https://renderdoc.org/survey)~~
+
+### The survey is now complete! The results [are now available](https://renderdoc.org/survey)
+
+It will make a big difference to understand the answers to these questions so please fill it out. There's no personal information or login required, and all of the questions are optional. If you have any questions or concerns about the survey or anything else RenderDoc related, feel free to [email me](mailto:baldurk@baldurk.org) at any time and I'll be glad to help.
+
+# Version v0.30
+
+As always downloads of this release are now up on the [builds page](https://renderdoc.org/builds).
+
+Note that I've decided to retire the beta builds, since for the last several versions they have simply been in lockstep with the stable builds. They may return in a different form in future, but for now I've removed them from the page as they have no historical interest (compared to nightly builds at least), and the <1% of users on beta versions will be automatically prompted to update to the latest stable version if they don't do so manually.
+
+This release brings a bunch of improved functionality to Vulkan, as well as smaller features and bug-fixes across the board including something that's been on the backburner for a while - display of view formats of typeless resources and view parameters like a sub-range of mips or slices. I'm not entirely sure if this implementation is ideal, so please give me feedback on what you think of it!
+
+The in-application API has been updated to `v1.1.0`. Following semantic versioning this adds new functionality in a backwards compatible way - specifically the returned pointer to a function table contains an extra entry on the end, and since it's not caller allocated it is safely backwards compatible with `v1.0.x` code.
+
+If you run into any problems, please [open an issue](https://github.com/baldurk/renderdoc/issues/new) or [contact](mailto:baldurk@baldurk.org) [me](https://twitter.com/baldurk) to let me know - I can't fix what I don't know about!
+
+# Features/Improvements
+- When a bound resource doesn't just bind the whole resource but a sub-set, or if the resource is bound as a different type than it actually is (format casting, or if the resource itself is typeless and _always_ cast), this is highlighted in the pipeline state and a tooltip shows the difference.
+  ![image](https://cloud.githubusercontent.com/assets/661798/17292129/28cf6b88-57e8-11e6-9e93-01f7cd9400ed.png)
+  ![image](https://cloud.githubusercontent.com/assets/661798/17292376/ee5ed1da-57e9-11e6-8610-50ce075f0c19.png)
+- The source code has now been formatted by a .clang-format file to make for easier contributions (ie. without me nitpicking style problems).
+- Added Vulkan support for immutable samplers
+- Added Vulkan support for stepping through both multidraw (drawindirect with drawcount > 1) and secondary command buffers.
+- Implement saving multisampled textures to disk in Vulkan.
+- Added support for SPIR-V specialization constants.
+- Implemented mesh picking for Vulkan.
+- Implemented custom display shaders, and shader edit-and-replace for Vulkan.
+- On vulkan, image initial states are kept as buffers in CPU memory to reduce the device memory requirements and lessen the chances of out of memory errors (necessary for capturing DOOM).
+- For the moment on Vulkan, pretend to report only the single most capable queue and suppress the others, so that applications don't use multiple queues (also necessary for DOOM).
+- Added pipeline export to HTML for GL.
+- ""Create Debug Device"" capture option has been renamed to ""API Validation"" since it makes more sense cross-API.
+- Return dummy/stub interface for `ID3D11Debug` the same as for `ID3D11InfoQueue`
+- Added a button to zoom to 100% so that pixels are 1:1.
+- The 'attach to running instance' dialog now shows running programs much faster rather than checking and waiting on the timeout for all possible programs before showing anything.
+- Dragging an executable into the window anywhere will now pop it into the capture dialog, instead of trying to open it and complaining it's not a recognised capture log.
+- Supported marker colours in the UI, which is used by the D3D11 and Vulkan marker extensions. This can be disabled in the options if e.g. your code passes only one colour for all markers (opaque and transparent black are ignored if all markers have the same colour).
+  ![image](https://cloud.githubusercontent.com/assets/661798/17290915/252604f8-57e1-11e6-9a17-03e25bb9b00c.png)
+- Added a mode to show all instances in a draw in the mesh output. Also adjusted the colouring between current instance, other instances, and previous draws to make it clear which mesh is which and avoid changing colours when viewing a single draw or viewing multiple.
+- Add copy-paste support from shader debugger registers.
+- Added support (largely untested though due to lack of samples!) for newer D3D11 (11.3 and 11.4) and DXGI (1.4 and 1.5) versions. If you run into bugs with this please let me know as there is little code using it, but at least this should allow proper capturing without crashes.
+- The buffer viewer should now save its internal layout, so if you rearrange the 3D preview or data panels, it will remember that.
+- Marker regions in the event viewer are now display the range of events they cover, not just the last one.
+  ![image](https://cloud.githubusercontent.com/assets/661798/17289356/a6a2530e-57d9-11e6-920c-a9023149700f.png)
+- For the [separate unstripped shader debug info](https://renderdoc.org/docs/getting_started/faq.html#unstripped-shader-info) feature added in v0.28, allow relative paths to be matched up to search paths in the UI.
+- Likewise this feature now supports lz4 compressing blobs, since they are often primarily text (containing source code) so they compress well.
+- [The documentation](https://renderdoc.org/docs) is now generated through reStructuredText and sphinx - thanks @Anteru!
+- Added text file export of the entire event tree, to more easily batch-process.
+- Image barriers are now displayed in the timeline bar, as well as in the resource usage drop-downs. The current image state is shown in a tooltip in the pipeline state view.
+- Show the required size of a constant buffer vs the provided size, and highlight any that don't provide enough data.
+- Better display of multisample count, byte/structured buffer type, and image swizzles in pipeline state.
+- SNORM textures now display in the range `[-1, 1]` instead of `[0, 1]` by default.
+- Added support for importing by ordinal on windows, which is needed for D3D12 hooking.
+- Add a menu item to jump from a given pixel history event directly to the matching primitive.
+  ![image](https://cloud.githubusercontent.com/assets/661798/17292075/e2c80690-57e7-11e6-9bd2-40f0748ea6a5.png)
+- The `renderdoccmd` command line program has been revamped to have a more friendly and intuitive interface, and more useful options for e.g. launching programs specifying capture options or a working directory.
+- Improved underlying technical work behind remote replay and capture, and running on linux in general. The UX still needs work though.
+- Tweaked logging output to stdout/stderr not to include such long line prefixes.
+- Added a SIGINT handler to linux to shut down the remote replay host cleanly.
+- Added a feature to capture N successive frames. This won't necessarily help in some cases where bugs are timing related, as the frames will run very slow during capture. However it can be useful if it's known that a bug happens every second frame or so.
+- Improved float formatting when in exponential notation, as previously it could print a lot of unnecessary trailing 0s.
+- Add a small popup in the TextureViewer to go to a particular pixel. It's accessible in the toolbar, or via `CTRL-G`
+  ![image](https://cloud.githubusercontent.com/assets/661798/17291981/58cd7a9c-57e7-11e6-8f8a-63324a91bf37.png)
+- The buffer viewer (mesh or raw buffer view) will now try to size columns to fit likely content.
+- When using per-texture settings (the default option), then the visualisation type (RGBA vs RGBM vs custom) and selected custom shader is also saved per-texture.
+- Custom visualisation shaders are provided the selected slice as well as the selected sample from the UI. On GL, they are now also provided with `[0, 1]` UVs for convenience.
+
+# Bugfixes
+- Fix an error where an update could fail if the `renderdoc.dll` module was injected into a program while the update process is on-going. This would commonly happen if the UI was launched from a program like the Unity or Unreal editor, and then the update was found. It left the UI and core module on inconsistent versions, which lead to crashes/bad behaviour.
+- Fixed a long-standing bug where a Win32Exception could be thrown creating some handles. I still don't know what the problem is or why the fix works, but this seems to be corrected now by simply forcing handles to create at creation time instead of lazily.
+- Several fixes for pixel history on D3D11 - a bug causing all events after the first failed pixel to be dropped, show failures due to sample masking, don't show shader output if there is no pixel shader bound.
+- Fix cases where D3D11 shader debugging could become incorrect by not accounting for diverging and converging code flow. The debugging of pixel quads now should correctly sync up after divergent control flow to ensure subsequent derivatives are correct.
+- Several smaller fixes for shader debugging on D3D11: byte address buffer loads and stores, StructuredBuffer.GetDimensions returned nonsense, shift operations always shifting by first component instead of component-wise, the firstbit opcodes not using BitScan correctly.
+- Fix an edge case where exes with 'renderdoc' in the filename wouldn't be hooked.
+- Fix being able to undo the initial entry of text into a shader editor.
+- Fixed a Vulkan crash with a vertex buffer stride of 0.
+- Fix various Vulkan validation problems/illegal behaviour.
+- Fix for Vulkan memory maps not being correctly recorded if an offset is specified.
+- Fix a case where selecting an instance would break viewing other draws.
+- Fix handling of `glCreate*`d GL buffers that aren't explicitly bound to a type.
+- Fix a crash when vertex picking if no mesh data is present (e.g. empty inputs).
+- Fixed handling of stencil-only images on Vulkan.
+- Fixed implementation of Discard on D3D11.
+- Added support for the D3D11 workaround for UpdateSubresource on software command lists.
+- Fixed some incorrect handling of texture buffers on GL.
+- Fixed handling of integer formats on buffer clear functions in GL.
+- Correctly capture a D3D11 deferred context that is created mid-way through a capturing frame.
+- Fixed some bugs to do with calling UpdateSubresource on a new resource in the middle of a capturing frame.
+- Fix tracking of read-write conflicts in D3D11 at subresource granularity, which allows classic 'mip generation' style rendering where draws read from one mip and write into the next.
+- Add a heuristic to avoid crashing if vulkan swapchains fail to create intermittently.
+- Fix a SPIR-V disassembly crash with double-index of matrices (e.g. `myMatrix[x][y]`).
+- Remove top-most windows, we only want windows that are on top of the rest of the RenderDoc UI, e.g. the crash reporter should not be top-most.
+- When an instanced drawcall has 0 instances, skip it entirely from the PostVS rather than showing some data incorrectly.
+- Fix incorrect sRGB handling on clear colours.
+- Depth and stencil overlays should show as completely green if there is no depth/stencil buffer bound to test against.
+- Show sample mask and blend factor even if the NULL blend state was set (these are set independently).
+- Fixed handling of vulkan descriptor set updates where a large array applies to multiple consecutive descriptors of the same type.
+- Fix a crash on Win32 in vkQueueSubmit if wait semaphores are specified (the wrong value size was used - 64-bit vs pointer-sized).
+- Fixed many issues to with rendering to or displaying mips of textures: for GL or with Y flip enabled texel co-ordinates were incorrect, pixel context size wasn't consistent between mips, compute dispatches didn't show the bound mip level properly, locked textures didn't keep their mip consistently, custom shaders weren't rendered at the selected mip level.
+- Improved handling of applications using VAO 0, which isn't valid in core profile but is quite common in otherwise core code so we support it as a concession.
+- Fix a number of issues found by valgrind and add a `valgrind.supp` file for future use.
+- Fix applications that use OpenCL on nvidia, which calls wglGetProcAddress with magic strings to fetch internal functions.
+- Fix compute resources not being properly shown on vulkan.
+- Change internal sRGB curve to the proper piece-wise sRGB function instead of using the `pow(2.2f)` approximation.
+- Add missing handling of USCALED/SSCALED texture formats.
+- Fix a crash when hitting page-down in an empty tree list.
+- Fixed register renaming in shader viewer going wrong for column-major matrices.
+- Fix printing of stencil refs and masks in GL as hexadecimal.
+- Fix calculation of mesh bounding boxes when dealing with formats that aren't simple float or unorm typed.
+- Fix a crash when an invalid path is specified in the Vulkan layer registry key.
+- Suppress GL debug messages when trying to make separable programs, so as not to fill the log with 'false positive' errors that are then handled.
+",https://api.github.com/users/baldurk,661798,baldurk,https://api.github.com/repos/baldurk/renderdoc/releases/3785913/assets,https://api.github.com/repos/baldurk/renderdoc/releases/3785913,master,https://api.github.com/repos/baldurk/renderdoc/tarball/v0.30,https://github.com/baldurk/renderdoc/releases/tag/v0.30,https://api.github.com/repos/baldurk/renderdoc/zipball/v0.30,v0.30,False,False
+3180709,2016-05-08T17:06:47Z,2016-05-08T18:01:42Z,Version v0.29,"Binary downloads of this release are now up on the [builds page](https://renderdoc.org/builds).
+
+# Version v0.29
+
+Since v0.28 was released a couple of weeks ago, a bug or two cropped up that were just on the border of being serious enough to warrant an urgent bugfix release. To that end v0.29 is a small release primarily aimed at patching those up as a number of people were running into at least one on v0.28 - a fatal error that happened when inspecting a D3D11 compute dispatch that used a structured buffer UAV.
+
+It also brings with it support for the newly release VK_EXT_debug_marker extension for Vulkan, which allows common API debug functionality like naming objects and marking off regions of commands for hierarchical browsing.
+
+There are a few other changes, so even if you're not hitting bugs in v0.28 it's worth updating. As always please get in touch if you run into any problems or have comments or suggestions to improve the tool!
+
+## Features/Improvements
+- Support for VK_EXT_debug_marker in Vulkan.
+- Added support for the 'create debug device' capture option in Vulkan. This will force-enable the validation layers, and display any debug messages recorded for the events and API calls in a frame.
+- Object labels in GL applied to shaders, programs and pipelines will be displayed in the pipeline state view.
+- When saving textures, updating the file type dropdown will change the filename (if present) to match the extension, and vice-versa when editing the filename box if the extension is changed it will update the file type dropdown.
+- Some improvements to the new statistics pane added in v0.28.
+
+## Bugfixes
+- Fix a fatal error that happened when inspecting a D3D11 compute dispatch that used a structured buffer UAV.
+- Fixed a bug where a failed call to wglCreateContextAttribs (e.g. if requesting a higher version than is supported) would cause subsequent calls not to be hooked.
+- Fixed a mistaken offset calculation when fetching constant buffer data into shader debugging on D3D11.
+- Fix a divide by zero error if average framerate isn't yet calculated by first Present().
+- When capturing manually without a swapchain, ensure that each capture has a frame number incrementing from 1, instead of all being frame 0.
+- Fix a case where the profile mask could be missed when parsing the attribs list when creating a context in GL.
+- Fix input layouts not being marked referenced when bound to the render state - causes them not to be included if they are bound at the start of the frame, but not bound _in_ the frame.
+- Handle VK_WHOLE_SIZE being passed as the memory range size in vkFlushMappedMemoryRanges
+- Filter out unsupported Vulkan extensions before the application sees them.
+- Don't replay with the Vulkan validation layers enabled even if the application enabled them.
+- Ensure the WSI extensions are requested when replaying a Vulkan log even if the application didn't use WSI.
+- Fix some erroneous warnings about descriptor sets not being bound when referenced by a shader.
+",https://api.github.com/users/baldurk,661798,baldurk,https://api.github.com/repos/baldurk/renderdoc/releases/3180709/assets,https://api.github.com/repos/baldurk/renderdoc/releases/3180709,master,https://api.github.com/repos/baldurk/renderdoc/tarball/v0.29,https://github.com/baldurk/renderdoc/releases/tag/v0.29,https://api.github.com/repos/baldurk/renderdoc/zipball/v0.29,v0.29,False,False
+3095559,2016-04-25T21:40:31Z,2016-04-25T23:50:33Z,Version v0.28,"Binary downloads of this release are now up on the [builds page](https://renderdoc.org/builds).
+
+# Version v0.28
+
+This release is mostly a collection of bugfixes from the last few months - a large number are Vulkan related, but some are from crash uploads and other bug reports. There are a few new features though!
+
+For those who compile the code or are interested in development there have been some behind the scenes improvements - things like better organisation of build configurations, a new assert macro, extra warning levels enabled and the removal of the crash when no debugger is present if a non-release build fails an assert or hits an error message. If you're curious try building the code and have a poke around - that's the beauty of open source after all!
+
+## Features/Improvements
+- A button on the texture viewer to open the texture contents in the buffer viewer for custom raw formatting and inspect. Be careful not to make too many columns (you might be tempted to create texture_width columns) as the .NET control crashes hard :cry:.
+- Support for separate unstripped shader debug info - thanks to Arne Schober!
+  - This allows a workaround for shaders needing embedded debug info but normal builds not wanting that disk size overhead. Instead you can compile the shaders in debug, save the unstripped blobs somewhere on disk, and then annotate the stripped blob with a file path. Then RenderDoc will know to find the unstripped blobs from elsewhere.
+  - You can also specify the file path at runtime with SetPrivateData. For more information see the docs!
+- .cap files can be opened via file->open and drag & drop.
+- A new button to abort the running of a python script.
+- When buffer viewers are opened from an API's pipeline state, any offset or length from the views is applied to the initial layout.
+- A new experimental statistics view - thanks to Michael Vance!
+  - Adds a new pane with rudimentary API surface area statistics, such as draw call counts, resource sets, sampler & constant buffer updates, etc.
+  - This functionality is currently only supported on DX11.
+  - Information is currently presented in a primitive text-based view, but we plan to move to a proper set of UI primitives in the future.
+  - API coverage is incomplete but covers the majority of the pipeline.
+  - Future work will be centered around completing API coverage, enhancing detection of redundancy, proper UI support, and automation of capture and export of API statistics.
+- Input layouts now pick up names set with SetPrivateData.
+- The pan is kept consistent for textures with an integer multiple of dimensions. So when you're looking at a downsample chain that goes from 256x256 to 128x128 to 64x64, you won't have to re-zoom and re-pan when switching between these textures.
+
+## General Bugfixes
+- The installer now packages and runs the appropriate VS2010 redistributable in case you don't already have it.
+- When y-flip was enabled, texture pixel picking co-ordinates were off by one.
+- Fixed some depth textures not displaying as depth and instead just as if they were red-green.
+- When editing and replacing shaders, the pipeline state instantly refreshes, instead of needing you to manually select another drawcall then back to the first.
+- An OpenGL performance regression is fixed - push/pop debug labels were spamming out debug messages to the log file and tanking framerate.
+- When saving logs they're immediately added to the recent files list.
+- Fixed a bug that caused calling glUseProgramStages mid-frame for different stages to not replay correctly.
+- D3D11 input layouts are now dependency tracked instead of all being included in the replay
+- Fixes for calling glBindTexture with ID 0 - on replay the texture would not be correctly unbound.
+- Fixes for separablee shader patching.
+- In the API view glSamplerParameter and similar enum parameters now display as strings.
+- Fix for glShaderSoruce being passed multiple negative lengths - thanks to @olvaffe!
+- Treat baseVertex correctly as signed instead of unsigned, fixing crashes when it was negative
+- Fixes for some OpenGL context creation failures and broken attrib list parsing.
+- Some OpenGL shader compile fixes for intel.
+- Fix for EXT_depth_bounds_test not being available.
+- Some D3D11 constant buffer packing fixes.
+- Fix to allow capturing oculus programs - D3D11 fix to QueryInterface() of IUnknown - thanks to Jamie Hayes!
+- Reduce stack size in log function - previously it was allocating 4kb of stack which could cause pressure on threads with small stacks.
+- Fix an OpenGL crash when using custom shaders in the texture view.
+- A speculative OpenGL fix for a crash when functions like glTextureImage2D was called with no texture bound.
+- Fix a crash copy-pasting in the UI with nothing selected in the pipeline view.
+- Fix a failure when saving really low resolution images as JPG.
+- Several fixes for saving 2-component textures.
+- Minor fixes for quad overdraw ramp decoding on extreme overdraw amounts (>= 64).
+
+## Vulkan Bugfixes
+- Fix a crash when passing `oldSwapchain` to swapchain creation - typically on resize.
+- Fix a random crash exposed by changes in the post-release loader versions around physical device enumeration.
+- Fix the vulkan nag message on the capture screen not working properly with RenderDoc installs on UNC paths.
+- Fixes for sparse descriptor sets where not all bindings are used contiguously.
+- Reduced compute workgroup size for running on older cards with lower limits.
+- Support for an implicit memory unmap before free.
+- Fix a crash if swapchains are created with invisible windows.
+- Some protection against invalid/misconfigured code.
+- Fixes for 32-bit - it just plain didn't work before!
+- Improvements to the API view to show flags/masks as strings.
+- Fix for `vkCmdDispatch` calls not working when stepping through a frame.
+- Many more code validity improvements.
+- Many improvements and fixes to SPIR-V reflection and disassembly.
+",https://api.github.com/users/baldurk,661798,baldurk,https://api.github.com/repos/baldurk/renderdoc/releases/3095559/assets,https://api.github.com/repos/baldurk/renderdoc/releases/3095559,master,https://api.github.com/repos/baldurk/renderdoc/tarball/v0.28,https://github.com/baldurk/renderdoc/releases/tag/v0.28,https://api.github.com/repos/baldurk/renderdoc/zipball/v0.28,v0.28,False,False
+2593774,2016-02-10T19:26:52Z,2016-02-16T14:02:32Z,Version v0.27,"Binary downloads of this release are now up on the [builds page](https://renderdoc.org/builds).
+
+# Version v0.27
+
+It's been about 12 months since I posted that I was adding OpenGL support - and that was 1 year after RenderDoc's release. It's fitting then that just a little before RenderDoc's 2 year anniversary I can happily reveal support for the recently released Vulkan 1.0 API. I've been working since last september on including Vulkan support in RenderDoc at the same time as the launch of the API.
+
+This is the reason why development has been quiet on github recently, as most work was happening behind the scenes. There are some other features and improvements in this release as well, so check the notes below to see them all.
+
+The RenderDoc installer is also shipped in the Vulkan SDK - this is absolutely identical to what you download above or build from code here, just repackaged seamlessly into the SDK.
+
+Side note: The in-application API was bumped to 1.0.1 for a minor bugfix. Going by [semantic versioning](http://semver.org/), this is a backwards-compatible change so any code loading 1.0.0 will get 1.0.1 and everything will work.
+
+## Features/Improvements
+- Vulkan 1.0 support!
+- Added a warning if D3D11.1 calls are captured and the replay is not able to run them.
+- If SetResourceName is called on the same resource many times, we de-duplicate and only serialise the last.
+- When viewing a _really_ massive buffer the UI could have trouble displaying enough rows. Instead, we clamp the row count to 200,000 and display a warning to view other sections with the row/byte offset.
+- Support added for displaying and picking S8 textures on GL.
+- GL errors are cleared after operations that might potentially generate them (such as RenderDoc's fetch/apply state vector).
+- GL hooks are added for wglSwapBuffers, wglSwapLayerBuffers and wglSwapMultipleBuffers.
+- When viewing an image rather than a capture, added a retry when reloading the file on change, in case the change is detected while the file is still locked by another program.
+- Picking vertices in the mesh viewer will enable synchronisation between the input and output views.
+- Buffer viewer elements that are NaN/Inf will display properly.
+- Images saved with only one channel visible are saved as greyscale instead.
+- If a custom shader is used to view a texture, then the results of that custom visualisation will be displayed, rather than the source texture.
+- Viewport/scissor overlay should now hopefully be clearer to see.
+- Added support for reverse-z projection matrices in mesh viewer unprojection
+- When StartFrameCapture() is called from the API, if there is a window identified (i.e. it's not just NULL, NULL) then make that window active.
+- The texture viewer input thumbnails now show inputs from all shader stages, not just pixel shader.
+
+## Bugfixes
+- Fixed a crash if an update check was ongoing when the main window was closed.
+- Fixed a common crash on shutdown when closing D3D11 captures that began happening, due to a mismanaged refcount on ID3D11DeviceContext.
+- Fix GL crash with glMultiDrawElements.
+- Fix some incorrect GL state setting.
+- Fix IsFrameCapturing API to return true for captures triggered with TriggerCapture().
+- Add mutex around destruction code that could be run on multiple threads at the same time.
+- Possible fix for crash on linux depending on global initialisation order.
+- Fix an edge-case with wglShareLists by avoiding creating any internal GL data for overlay rendering until the last possible minute in SwapBuffers.
+- Stop an erroneous warning firing while shader debugging.
+- Fix find-in-files not properly clearing previous results.
+- Fix a GL crash if buffer orphaning isn't properly detected.
+- Remove queries to GL_TEXTURE_COMPRESSED and decide for ourselves based on the internal format.
+- Improve handling of difficult GL context juggling between threads when capturing.
+- Fixed a case where compute debugging would incorrectly complain that the thread index was out of bounds.
+- When glUseProgramStages is called mid-frame, we now correctly replay it instead of caching it incorrectly.
+- When depth or stencil test is disabled, the overlay now shows all-green instead of what would have happened.
+- Added an overlay 'clear before draw/pass' that shows only the results of the selection on the current RT.
+- Fixed an overly-strict check for compatibility between IA bytecode and VS bytecode input signature.
+- When modifying GLSL, we now handle whitespace better around #version and other directives
+- Changed the shortcut for File -> Exit as it was clashing with File -> Recent Capture Settings
+- Fixed pixel history on depth-stencil targets from going badly wrong.
+- When saving a log, change the window title from the temporary filename.
+- Fixed texture viewer scrollbars being inconsistent and annoying, which caused them not to map properly to the full range of scrolling.
+- Fixed a crash if a find dialog is open when the shader window closes
+- Fixed a possible failure in the version updater when it goes to restart the program.
+- Always return typed component format for images, fixes a potential problem saving e.g. EXR images from typeless formatted textures.
+- Fix a case on GL where FBO attachments of a specific mip wouldn't properly be restored on replay.
+",https://api.github.com/users/baldurk,661798,baldurk,https://api.github.com/repos/baldurk/renderdoc/releases/2593774/assets,https://api.github.com/repos/baldurk/renderdoc/releases/2593774,master,https://api.github.com/repos/baldurk/renderdoc/tarball/v0.27,https://github.com/baldurk/renderdoc/releases/tag/v0.27,https://api.github.com/repos/baldurk/renderdoc/zipball/v0.27,v0.27,False,False
+1869798,2015-09-25T19:09:12Z,2015-09-25T19:53:40Z,Version v0.26,"As always, you can find binary downloads of this release on the [builds page](https://renderdoc.org/builds).
+
+# Version v0.26
+
+This is a smaller release but there are a couple of key features included. The main one is that the serialised capture format has changed. The new format should be more flexible and extensible for adding new features (to come in a later release), and it also has built-in compression, so that capture files are smaller on disk with minimal overhead for loading and saving. 
+
+This version will be backwards compatible, such that logfiles from older versions (back to v0.20) will load. Captures made in v0.26 will not load in older versions. In the future these old logfiles will not work, but hopefully after this there should be no need to make a backwards-compatible breaking change.
+
+In this version there is a new stable RenderDoc application API, which is designed to be forwards and backwards compatible and is strongly supported. If you were integrating RenderDoc before you will need to update your code before it will work with v0.26.
+
+# Features
+- Updated capture file format, to compress the captured data, and support addition of arbitrary data - more details to follow in a future release.
+- Added stable in-application API. See the [renderdoc_app.h](https://github.com/baldurk/renderdoc/blob/master/renderdoc/api/app/renderdoc_app.h) file - included in all binary distributions.
+- Added a new application updater, that will automatically download and install new versions when detected at the click of a button.
+- IronPython standard library embedding now just distributes a .zip file rather than trying to compile into a .NET dll assembly. This means importing the standard library should be much more reliable.
+- Empty viewports are now highlighted more obviously in the pipeline state view
+- Compute UAV slots now use shader variable name where available.
+- Copy, dispatch and resolve calls now show the relevant inputs and outputs, rather than the current graphics bindings.
+- Add support for some new GL ARB extensions
+- Improved support for many shader source files when debugging - on the left hand side of the shader panel there is now a list of all source files, that you can click to quickly jump to those files. In addition, ctrl-shift-f will open a 'find in all files' window.
+- Shader disassembly now happens lazily, which should mean improvements to log loading and shader creation during capture.
+- Added more fallbacks for detecting position input elements in the mesh view, and made sure that no matter what at least some element will be selected.
+- GL captures should now not be susceptible to results from later in the capture 'leaking' backwards into earlier in the capture, if e.g. a texture is written and read from without ever being cleared at the start of the frame.
+- GL function names in the event browser have been tidied up to be more readable - now only counts and important parameters are displayed, the topology, index width, offsets etc are not displayed.
+- Added a tips dialog, that is accessible via Help -> Show Tips. The tips are also [linkable online](https://renderdoc.org/tips/1)
+
+# Bugfixes
+- Fixed an unfortunate crash that snuck into 0.25, where viewing DDS files caused a 100% crash.
+- Fixed a crash trying to pick a vertex in a drawcall with no vertices.
+- Fixed some cases where function pointers on GL could be called without being verified as present properly.
+- Updated checks for GL on replay - ARB_buffer_storage is required as well as 4.3 + EXT_direct_state_access.
+- Fixed an edge case crash handling nested drawcall markers.
+- Fixed crashes where bad mesh data (inf, NaN, etc) would cause a crash when calculating the bounding box.
+- Fixed a race condition where C++ to C# marshalling could fight on multiple threads.
+- Handle invalid filename characters in shader filenames from debug info
+- Corrected bounds checking of ld_structured_indexable
+- Changed imm_atomic_consume used in ConsumeStructuredBuffers to do a prefix instead of postfix decrement.
+- Corrected behaviour where if a cwd-relative pathname was passed to the in-application API for where to store captures, the UI would not be able to locate it.
+- Create any parent directories in the path specified for captures to be stored.
+- Fixed GL to not crash when RenderDoc is injected after GL has been initialised and used - instead RenderDoc will do nothing and capture nothing, which is consistent with D3D11 behaviour.
+- Fix an incorrect serialise of glCompressedTex_Image3D_() calls
+- Make sure to render GL overlay to the backbuffer.
+- Handle unsized formats better in GL texture calls.
+- Speculative workaround for nvidia driver crash
+- Fix case where a geometry shader with streamout would fail to create if numStrides == 0
+- Fix for a marshalling crash if struct field order wasn't returned in layout order
+- Several crash report bug fixes and speculative fixes.
+- Fixed a case where loading of DDS files failed due to a flag bit being set
+- If a machine doing a renderdoc capture has no D3D11 runtime installed, fall back to using d3dcompiler from the renderdoc installation.
+- Call SetLastError(0) after renderdoc WGL functions to avoid leaking out error codes that shouldn't be there.
+- Protect against crashes or bad behaviour if FinishCommandList is called on an immediate context.
+",https://api.github.com/users/baldurk,661798,baldurk,https://api.github.com/repos/baldurk/renderdoc/releases/1869798/assets,https://api.github.com/repos/baldurk/renderdoc/releases/1869798,master,https://api.github.com/repos/baldurk/renderdoc/tarball/v0.26,https://github.com/baldurk/renderdoc/releases/tag/v0.26,https://api.github.com/repos/baldurk/renderdoc/zipball/v0.26,v0.26,False,False
+1556444,2015-07-19T11:47:41Z,2015-07-19T16:22:47Z,Version v0.25,"Binary zips and installers for this release (and others) can be found on the [builds page](https://renderdoc.org/builds). Both stable and beta builds are up to date with this release, but beta builds can be updated more regularly. You can choose which type of release you want to install and receive updates for.
+
+# Version v0.25
+
+This version brings some new features, tweaks to existing functionality and the bugfixes that have happened since v0.24. As always feel free to get in touch with me or post an issue here on github if you encounter a problem, or if you have feedback or a feature request.
+
+Highlights include multiple OpenGL frame capture and dependency tracking, bookmarked events in the replay UI, improvements to the mesh preview window and iteration on pixel history and shader debugging for further accuracy.
+
+OpenGL captures will not be backwards compatible as work has continued on that front, but D3D11 captures are backwards compatible with captures from previous versions.
+
+In the source tree there's progress being made on OpenGL functionality and Linux support - glslang is now compiled into the distribution for compiling GLSL to SPIR-V. It's currently disabled in release builds but this will ultimately be used to support shader debugging on OpenGL. Likewise there is a Qt UI currently being built that will eventually be supported on Linux with the same functionality as the current .NET UI. Potentially in future the .NET UI will be retired, if the Qt version ever reaches parity.
+
+# Features
+- You can now make bookmarks in the event browser. Clicking on the bookmark button or `Ctrl-B` will add a new bookmark at the current event. Then you can either click on the shortcut buttons in the bookmark toolbar, or anywhere in the program you can press `Ctrl-1` through `Ctrl-0` to jump to the first 10 bookmarks.
+- This allows rapid jumping between interesting drawcalls, particularly useful if you are comparing two drawcalls back and forth.
+- ![screenshot 2015-07-19 135749](https://cloud.githubusercontent.com/assets/661798/8765774/29429bfc-2e1e-11e5-89f6-1958fab6c1b5.png)
+- OpenGL applications can now capture many frames without needing to restart the application.
+- OpenGL captures now do proper dependency tracking, which means that like D3D11 logs only the resources needed for the captured frame are included in the capture file, not all resources that are live at that point.
+- Several improvements to the pixel history view, which will now show fragments that shader clip in a list of several drawing in one drawcall. You can also run the pixel history on a particular mip or array slice in cases where rendering happens to only one.
+- A bunch of improvements to the user experience in the mesh preview window.
+  - The window now uses 4x MSAA by default (since there's barely any pixel work going on, this hopefully should not be a significant performance hit for anyone).
+  - The arcball controls are now improved and are based around the bounding box calculated and rendered for each mesh component.
+  - You can right click on the mesh to 'pick' vertices and select them in the raw data tables. Note that for when you have several vertices that have the same position but different UVs or normals, the first will be selected.
+- ![image](https://cloud.githubusercontent.com/assets/661798/8765808/6823415e-2e1f-11e5-984b-a72f4000d15b.png)
+- The log loading progress bar should hopefully now be a bit more representative rather than remaining mostly static and jumping several times.
+- Textures can now be zoomed up to 25600%
+- Constant buffer data can now be exported to a CSV file
+- The [RenderDoc in-application API file](https://github.com/baldurk/renderdoc/blob/v0.25/renderdoc/api/app/renderdoc_app.h) has been simplified to remove typedefs and STL include, and a couple of new API convenience functions were added.
+- When single-stepping in a shader debugger, if a register tooltip is open it will now live-update instead of becoming stale.
+- Views of resources in D3D11 now have their lifetimes tracked separately. Previously if a resource continually had views created and released they would all be stored and replayed, causing slight overhead on capture and potentially significant slowdown on loading the capture.
+- Registers and constants are now highlighted in the register windows when selected in the disassembly view.
+- ![screenshot 2015-07-19 150155](https://cloud.githubusercontent.com/assets/661798/8765968/1fc810e4-2e27-11e5-8d18-b64efd947580.png)
+- `Ctrl-F3` and `Ctrl-Shift-F3` will search for the currently selected word in shader editors.
+- If pixel debugging fails, instead of popping up a dialog saying that the current drawcall doesn't write to that pixel, instead launch the pixel history.
+- When RenderDoc is displaying an image, if the image is changed on the filesystem the data will be reloaded and displayed with the pan and zoom otherwise staying identical. Note that if the image dimensions or format change the results might be unexpected.
+
+# Bugfixes
+- Fix QueryInterface for IRenderDoc_uuid returning the wrong pointer and causing problems on Release() (thanks @zao). Also the proper `ID3D11Device*` pointer is now used for identifying a window, it was wrongly casted.
+- When editing shaders, #include file searching is case insensitive.
+- If cbuffers have identical names, use the order to identify which one is which
+- Fixed a case where the currently active window being removed would mean no window is active.
+- Fixed pixel history on a depth-stencil texture not working properly.
+- Fixed a case where unpack state was inconsistent on loading GL texture data.
+- When an array of shader resources overlaps with a single shader resource in terms of register binding, the single shader resource has priority.
+- Fixed serialising GL program uniforms incorrectly
+- Report ARB_direct_state_access as a supported texture
+- Handle Luminance/Alpha texture formats in `glTexStorage` functions (kind of crazy that someone would do that, but not hard to support).
+- Hide extra refcounts on D3D11 resources for being bound to the pipeline from the user, as some naughty code would rely on the undefined refcounts and error message.
+- Register renaming for constants now supports arrays properly and structure heirarchies better.
+- Fixed a copy-paste mistake on GL that would cause an undesired dependency on ARB_direct_state_access
+- Right-clicking on auto-fit will re-fit whenever the texture selection changes, even if the event stays the same.
+- A variety of crash fixes both real and speculative from uploaded crash reports.
+- Using the arrow keys to nudge the selected pixel now works when the pixel context view is in focus as well as when the main texture view is in focus.
+- Fixed a memory leak that could happen with buffer orphaning using glBufferData
+- Fixed D3DCompiler register packing insanity when using arrays of float or float2 interpolators.
+- Fixed a case where NaNs in a texture's alpha would cause the texture to display incorrectly even when the alpha channel should not be visible.
+- When changing a value in the range control and deselecting the change is now committed rather than being left at a misleading value.
+- Fixed buffers as resources showing up as 'unbound' instead of using a default image and displaying their name.
+",https://api.github.com/users/baldurk,661798,baldurk,https://api.github.com/repos/baldurk/renderdoc/releases/1556444/assets,https://api.github.com/repos/baldurk/renderdoc/releases/1556444,master,https://api.github.com/repos/baldurk/renderdoc/tarball/v0.25,https://github.com/baldurk/renderdoc/releases/tag/v0.25,https://api.github.com/repos/baldurk/renderdoc/zipball/v0.25,v0.25,False,False
+1247398,2015-04-28T11:42:50Z,2015-05-02T12:38:51Z,Version v0.24,"Binary zips and installers for this release (and others) can be found on the [builds page](https://renderdoc.org/builds). Both stable and beta builds are up to date with this release, but beta builds will be updated more regularly. You can choose which type of release you want to install and receive updates for.
+
+# Version v0.24
+
+This release is by and large a collection of bugfixes both from crash reports that people sent in and other bugs that have been reported. There's not much new functionality as I was busy for most of April moving country for my new job.
+
+OpenGL captures are not backwards compatible and old captures will not load in this version - once GL support is fully completed this will not happen so often. D3D11 captures are backwards compatible, and old captures will open in v0.24.
+
+# Features
+- OpenGL contexts that aren't created via CreateContextAttribs will now be disallowed for capturing, as they are very likely to be pre-3.2. RenderDoc will use super-old fixed function GL to display the text overlay, so that even 2.0 or older contexts will work. Contexts created via CreateContextAttribs will be captured, regardless of whether they are compatibility or core profile, to allow more programs to use RenderDoc. This is a bit dubious as RenderDoc still only supports core profile OpenGL, but hopefully this line in the sand will prevent most old programs will allowing through few incompatible programs. (sort of a feature!)
+- A few places in the UI now use a monospaced font, such as mesh output and constant buffer viewer. There is a new option in the general category to display all data everywhere (such as pipeline state viewer, event browser, etc) in a monospaced font.
+- GL draw elements calls will now support passing indices as a direct memory pointer, as a concession to old GL code. Note that all vertex data must still be in vertex buffers in a VAO, direct memory pointers are not supported here.
+- Resources are now tracked by usage in OpenGL, so the timeline bar will correctly indicate reads and writes per resource, as well as the thumbnail right-click menus in the texture viewer.
+- RenderDoc should now handle having multiple APIs alive in a program, which in this case means GL and D3D11. Cycling between active windows will cycle between all APIs alive.
+- Added in-API ways to detect RenderDoc. GL via [this extension](https://renderdoc.org/debug_tool.txt) and D3D11 via querying the device for UUID A7AA6116-9C8D-4BBA-9083-B4D816B71B78.
+
+# Bugfixes
+- GL cubemap and array textures weren't properly showing the slice or face for mips above level 0.
+- When invalid indices like 0xcccccccc or 0xbaadf00d etc were used (probably by accident - but this is a debugger after all) for the Post VS mesh data we would stream-out all indices between the minimum e.g. 0 and that value, even if only a small subset were used. This caused out of memory and driver crashes. Instead we now only stream-out the indices used.
+- Fixed a crash when debugging such an invalid index.
+- Fixed a crash if vertex instance rate is 0 for instanced data (which is valid - the first element is used for every vertex).
+- Copy, Resolve and GenerateMips calls will now show up with draw calls in the event browser, to make it more clear where these events happen in the frame.
+- Fixed a crash if the constant buffer viewer is still open when a log is closed.
+- Fixed a crash if for some reason a shader debug trace comes back with no states.
+- Crash fix with CopySubresourceRegion if a box is specified.
+- Fix depth render target being larger than the colour render targets in D3D11 (was detected as invalid, but D3D11 allows this).
+- Fix from @vvuk - Present1() was using the wrong DXGI interface.
+- Fix a crash introduced in previous version, where SetPredication(NULL) would not be replayed and predicates would be left bound - which caused driver crashes.
+- Fixed some crashes if an index buffer wasn't multiple of 4 bytes, and fixed GL unsigned byte indices.
+- Fixed a couple of problems with the ""remove empty marker groups"" option - a crash if a marker group has an empty group as a child, and fixed calculating timings completely screwing up the drawcall list.
+- ld_structured was incorrectly looking at only UAVs to calculate its stride, instead it should check for the matching resource.
+- A few DX bytecode instructions assign to a scalar destination from a vector source, and these needed a fixup in the debugging to properly handle swizzles.
+- Fixed some crashes and problems with shader editing when the source has multiple files with #includes
+- With the SPDB debug chunk (which is produced by new d3dcompiler versions) #defines that are specified on the command line or to D3DCompile are now used when editing, to recompile the shader.
+- Executing python scripts that Invoke onto the render thread will now catch any python exceptions that are thrown on that thread, instead of crashing with an uncaught exception.
+- Shader debugging variable tooltips now show hex as well as int and float, and the register windows now show the tooltips as well as the source window.
+- Fixed some crashes if ctrl-c is pressed without a log loaded, and added copy-paste handlers to the GL pipeline state view.
+- Fixed a crash with the GL text overlay in-program, if the string is formatted very long and/or the glMap fails.
+- When redeclaring gl_in and gl_out in a GL shader only one of the redeclarations would be added, this is fixed.
+- Fixed shader debugging 'run to' command checking instruction number against trace length - which could be different whenever flow control occurs.
+- Outputting matrices from a shader in GL will now be listed correctly in the mesh output.
+- Clamped mips in textures without mips (but that aren't created immutable) to correctly bind when calculating min/max or histogram.
+- ID3D11Debug interface is wrapped, so that querying for ID3D11InfoQueue via it will return our dummy info queue.
+- The disassembly source window has a custom right-click menu now with relevant controls.
+- Temporary captures from a program connection window are kept around for longer even when saving them to a file. This prevents captures from being lost if a user saves them, then deletes the saved capture, and wants to save the capture again.
+- Fix a crash if an invalid filename is passed to D3DCompile as the source filename.
+- Fixed mesh preview window for geometry & tessellation output.
+- MultiDraw drawcalls now correctly create a nested section in timeline bar.
+- Fixed a crash if glUseProgramStages is called with program=0 to unbind.
+- Fixed an edge case where RenderDoc would incorrectly cause a program to run out of D3D11 state objects by caching them aggressively, if the program creates many temporary objects that are all unique.
+",https://api.github.com/users/baldurk,661798,baldurk,https://api.github.com/repos/baldurk/renderdoc/releases/1247398/assets,https://api.github.com/repos/baldurk/renderdoc/releases/1247398,master,https://api.github.com/repos/baldurk/renderdoc/tarball/v0.24,https://github.com/baldurk/renderdoc/releases/tag/v0.24,https://api.github.com/repos/baldurk/renderdoc/zipball/v0.24,v0.24,False,False
+1007542,2015-03-03T13:23:27Z,2015-03-03T13:43:31Z,Version v0.23 - Bugfix release,"# Version v0.23 - Bugfix release
+
+**Long story short: use v0.23 instead of v0.22, it is almost the same but with a very important bugfix included.**
+Builds are available [in the usual place](https://renderdoc.org/builds), both stable and beta updates.
+
+Shortly after v0.22 was released I received a serious bug report that unfortunately hadn't been caught by my testing. It affects any D3D11 application that uses MSAA and can easily cause driver crashes when capturing, so the only realistic option is to make this new release with the bugfix included.
+
+This release is almost identical to v0.22 so for new features & improvements I refer to [those release notes](https://github.com/baldurk/renderdoc/releases/tag/v0.22). This release is primarily to include the [fix for the above crash bug](https://github.com/baldurk/renderdoc/commit/e2f7afc3a25b6e6f8ba9a0898280d12f8de49c79), and a few other fixes for bugs that were either recently reported over the weekend, or were found while verifying that v0.23 is more solid.
+",https://api.github.com/users/baldurk,661798,baldurk,https://api.github.com/repos/baldurk/renderdoc/releases/1007542/assets,https://api.github.com/repos/baldurk/renderdoc/releases/1007542,master,https://api.github.com/repos/baldurk/renderdoc/tarball/v0.23,https://github.com/baldurk/renderdoc/releases/tag/v0.23,https://api.github.com/repos/baldurk/renderdoc/zipball/v0.23,v0.23,False,False
+995341,2015-02-27T14:10:49Z,2015-02-27T15:52:44Z,Version v0.22,"**NOTE: A crash bug with D3D11 & MSAA has been found in v0.22. It's recommended that you instead use [v0.23](https://github.com/baldurk/renderdoc/releases/tag/v0.23) with the fix included.**
+
+Binary zips and installers for this release (and others) can be found on the [builds page](https://renderdoc.org/builds). Both stable and beta builds are up to date with this release, but beta builds will be updated more regularly. You can choose which type of release you want to install and receive updates for.
+
+# Version v0.22
+
+Almost exactly 1 year ago from the time this release was posted, RenderDoc was first released to the public. Initially the source code was not included, that came a few months later in early May 2014.
+
+RenderDoc was a hobby project that I had worked on entirely in my spare time for about 18 months, and I had no idea of what kind of reaction to expect. The positive feedback and hearing how the tool has proven useful to people finding and fixing bugs has been very rewarding, and I really appreciate everyone who has taken the time to try it out, use it, as well as to everyone who has given feedback, reported bugs or [contributed to the repository](https://github.com/baldurk/renderdoc/graphs/contributors).
+
+RenderDoc has come a long way in the last year, and I know that it has a lot farther to go in many respects. I'm looking forward to seeing where it goes in the future, but I wanted to take this opportunity to thank everyone!
+
+# OpenGL Support
+
+The big push for release v0.22 has been OpenGL support. While it's not quite at feature parity with D3D11 (and there's no linux UI - yet!) it's definitely at a place where I would encourage everyone to use it in anger and give feedback. I've tested it across many modern GL projects and titles between windows and linux and while it still has work to do, it's in a good shape. Please let me know how you get on with it!
+
+RenderDoc supports OpenGL core profile 3.2-4.5 inclusive, which means it has full support for modern GL techniques like persistent mapped buffers, MultiDrawIndirect, and everything in Core OpenGL 4.5.
+
+![multidraw](https://cloud.githubusercontent.com/assets/661798/6414651/daf846ce-be90-11e4-9c46-c49852abcec3.png)
+![azdo](https://cloud.githubusercontent.com/assets/661798/6414653/ddf8f5f8-be90-11e4-8df7-97848b01911d.png)
+
+**Note:** Only _core_ profile 3.2-4.5 is supported. This means that any old codebases using older versions of GL or the compatibility profile functionality may not capture and replay. For more details on the exact limitations and requirements at the moment check out the [wiki page](https://github.com/baldurk/renderdoc/wiki/OpenGL).
+
+I'd like to give particular thanks to [Matías N. Goldberg](https://twitter.com/matiasgoldberg), who tested RenderDoc's early OpenGL support on [Ogre3D's 2.1](http://www.ogre3d.org/2015/02/09/ogre-2-1-now-publicly-available-previously-dubbed-azdo-branch) modern GL branch. Thank you for your endless patience while I fixed all the broken stuff! :smile:
+
+# API Changes
+
+While it's not a particularly stable and solid API just yet, RenderDoc does export some functions for use with applications that want to integrate RenderDoc more tightly into their codebases. This is just a warning to those of you who are using this API that there have been some changes since v0.21, and you should be careful to make sure you update properly. I'd recommend always checking `RENDERDOC_GetAPIVersion` matches `RENDERDOC_API_VERSION` as this will allow me to bump the version on any breaking API changes. In future when the API is more finalised and 'official', this should not happen often.
+
+In particular this time, the CaptureOptions structure has changed a little, and `wchar_t *` strings are now expected to be `char *` UTF-8 strings.
+
+# Highlighted Features
+
+I've listed just the highlighted new features. There have been many bugfixes and smaller improvements as well, but I am too lazy to list them all - if you're curious check out the [issues](https://github.com/baldurk/renderdoc/issues) or [changes](https://github.com/baldurk/renderdoc/compare/v0.21...v0.22).
+- RenderDoc can now act as a simple image viewer. This is a difficult feature to make obvious, but you can now load images as you would logfiles - either via file -> open, or just dragging into the viewer. The texture viewer controls work as normal. RenderDoc supports .dds, .hdr, .exr, .bmp, .jpg, .png, .tga, .gif, and .psd, and the dds file support should include any DXGI format and any number of slices, cubemap faces or mips - things traditional image viewers have a harder time with. The save tool has also been updated to save .exr files.
+  ![imageview](https://cloud.githubusercontent.com/assets/661798/6414817/5cbc89ee-be92-11e4-8a24-389b01c2c809.png)
+- The mesh preview window has had several improvements. Selecting instances in an instanced drawcall should now behave correctly in all circumstances, and choosing how the 3D preview will display is much more flexible. You can now right click on any column headers on input or output to choose which one will be used as position data for rendering, and which will be used as 'secondary' data, to optionally be displayed as a solid colour in the preview.
+  ![mesh1](https://cloud.githubusercontent.com/assets/661798/6414855/ab5ca12e-be92-11e4-926b-e2b7ab25b3c7.png)
+  ![mesh2](https://cloud.githubusercontent.com/assets/661798/6414856/ac3bb99a-be92-11e4-8543-440f8eaf28b1.png)
+- When using the pixel history feature, MSAA targets are now fully supported and the sample debugged will be the sample you are currently viewing (if you're viewing the average resolved image, any sample will be chosen). Also when a pixel is overdrawn by several fragments in a single drawcall, you can now select the fragment you want to debug and right click on it to see the result from that fragment, even if it's later overwritten.
+  ![pixhist](https://cloud.githubusercontent.com/assets/661798/6414783/153c4ff0-be92-11e4-959b-7a76479885e7.png)
+- There is now a very rough and early python scripting interface. You can open either an interactive shell or run a script (loaded from disk or edited live), and there is a simple python object that allows access to most of the raw data and control that renderdoc offers, so you can see all textures in the log, browse the drawcalls, cause the UI to jump to a drawcall or view a texture, etc.
+  ![pythonshell](https://cloud.githubusercontent.com/assets/661798/6414852/a3e4eac8-be92-11e4-8b5e-41402d77a085.png)
+- Most overlays now support MSAA targets, so you can see sample-accurate depth-test results etc.
+- Most UI windows now have copy-paste handlers, so e.g. in the constant buffer window you can select any number of constants and hit ctrl-c to copy them to the clipboard.
+- The D3D11 pipeline state can also now export the entire state to HTML ([example exported pipeline](https://jsfiddle.net/bLdem5Ld/embedded/result/)) - this can be useful for comparing between two logs or two events to see if anything has changed.
+- When capturing an application that spawns child processes (such as a launcher application), the UI in the  connection dialog has been improved. It will now show each child process that exists and give you the option to open a new connection to that process instead of the one originally launched. Also if a process only has one child when it exits, the connection will automatically transfer to the child process, in the assumption that it is the one you wish to trace.
+- It is now possible to activate a 'global process hook'. Read the documentation before using this feature as it can be dangerous to use without understanding. It will automatically insert a tiny dll into every new process started on the system, and when the target process that you want to inject is launched, this tiny dll will load renderdoc. This can be useful in extreme cases to capture programs that are launched indirectly or via pipes from another launcher process.
+- When capturing you can now enable an option to verify Map() overruns. This will activate in the captured frame, and insert a marker value at the end of each Map(). If the marker value is modified a message box will appear letting you know and giving you the option to breakpoint in the debugger to trace the problem.
+- While in the application, captured frames now 'decay' from the overlay after a certain length of time. If you're trying to capture some particular frame glitch and you end up with a lot of frame captures that didn't hit it, then this keeps the overlay from having a massive long list of captured frames.
+- Although largely untested since it's very rarely used in the real world, RenderDoc should now support DXGI 1.2/1.3 and DX11.2. The exception being tiled resources in DX11.2 as I couldn't find a single sample or example code that used them - if you have anything let me know so that I can write support against a real program.
+- The pipeline view has had a few tweaks to make better use of space - in particular rarely used sections like UAVs and shader linkage on D3D11 will vanish if there is nothing bound, to make room for the other sections. Also when moving between drawcalls if at all possible the pipeline view will try to avoid scrolling, so that you can more easily compare higher slots between two drawcalls.
+- When running on a system that doesn't have Feature Level 11 hardware, RenderDoc will now fall back to WARP software rendering rather than failing to replay. While slow, for simple cases this might mean it is still usable.
+- When shader debugging, hovering over a register in the disassembly will now show a tooltip with all three possible interpretations of the register. This is mostly useful if a register has mixed float and int data and you want to see them both quickly without needing to form complex watch expressions.
+  ![reghover](https://cloud.githubusercontent.com/assets/661798/6414757/e1a0df9e-be91-11e4-8d23-fd27c61bdfb5.png)
+- The texture viewer has had a few tweaks. The visible channels and mip/slice selections are now stored per-texture by default. You can revert this behaviour in the options menu if you wish, but this means that if a given texture has useful data in the alpha channel, you don't have to keep toggling the channels if you are moving between it and another texture that you wish to view RGB. The status bar now also includes normalised UV co-ordinates, and has been changed to fixed width font and padded text as much as possible to reduce the churn you get when moving the mouse over a texture.
+",https://api.github.com/users/baldurk,661798,baldurk,https://api.github.com/repos/baldurk/renderdoc/releases/995341/assets,https://api.github.com/repos/baldurk/renderdoc/releases/995341,master,https://api.github.com/repos/baldurk/renderdoc/tarball/v0.22,https://github.com/baldurk/renderdoc/releases/tag/v0.22,https://api.github.com/repos/baldurk/renderdoc/zipball/v0.22,v0.22,False,False
+579075,2014-09-24T12:45:29Z,2014-09-24T14:25:07Z,Version v0.21,"Binary zips and installers for this release (and others) can be found on the [builds page](https://renderdoc.org/builds). Both stable and beta builds are up to date with this release, but beta builds will be updated more regularly. You can choose which type of release you want to install and receive updates for. 
+
+Below are the visible changes since v0.20. There have also been a bunch of internal changes like lots of work to OpenGL and linux support (still lots to do, but progressing well), so if that interests you keep an eye on the changes here on github :smile:
+
+Other than many bugfixes some highlights include support for the missing common shader debugging operations, pixel history, a quad overdraw overlay, and a revamped save texture function.
+
+As a side note, for users of Unreal Engine 4 there is a [plugin for it](https://forums.unrealengine.com/showthread.php?42123-New-plugin-Shader-debugging-made-easy-with-RenderDoc-for-UE4) that was written by [Temaran](https://github.com/Temaran/UE4RenderDocPlugin), which integrates RenderDoc closely into the engine.
+
+## Bugfixes
+- When 'debug device' was selected, if any debug messages were saved to the log there was a crash reading the log.
+- Shader bytecode reading is more robust when undocumented data is encountered (See #54) 
+- Shader viewer didn't display line numbers for files with > 1000 lines (See #57)
+- Fix Shader debugging always using pixel shader resources & samplers (See #59, #75)
+- Fix views of the backbuffer failing if their format was specified as DXGI_FORMAT_UNKNOWN (Part of #53)
+- Default options weren't properly set on capture, this together with #61 fixed other part of #53 
+- As a follow up, prevent crash closing logs with #61 (it might still break in other ways though).
+- Fix for crash-reported exceptions thrown while reading from/writing to config files.
+- Possible fix for reported crash after failing to inject into a process
+- Shader debugging fix for circumstances where sampling parameters are long (See #64)
+- Fix a crash if UpdateSubresource is called on a resource otherwise not referenced in a frame.
+- Fix deferred command list executes not showing children
+- Fix for case where multiple executes of the same command list were not handled correctly
+- Possible fix for reported crash with invalid Rect inside dockpanelsuite code.
+- If a constant buffer has no reflection data available, the buffer viewer is opened (See #60)
+- When reading matrices from constant buffer data, respect padding of each row/column to a vec4 (See #69)
+- Skip anything but the first geometry shader output stream (partially addressing #27)
+- Handle streamout declarations with NULL semantic name - specifies a gap (See #55)
+- Fix a case where EndEvent marker calls right before the final Present() would be lost.
+- Fix an incorrect use of std::map operator[] that would add invalid entries and possibly cause a crash.
+- Address inconsistent use of culture formatting, with numbers potentially formatted as ""0,0"" but a list of numbers as ""X,Y,Z,W"". Given lack of localisation, instead we now always use UK English culture (See #72)
+- Fix not being able to launch a process for capture on 32bit windows - it was mis-identified as a 64bit process (See #66)
+- Fix 'how did this ever work' style bug, where matrix copies would copy the size of the whole matrix for each row (and overwrite their array bounds)
+- Changed to IAT hooking from mhook trampoline hooking, for better compatibility with some dlls mhook couldn't rewrite (such as 64bit opengl32.dll)
+- Workaround for internal compiler error in D3DCompiler_43.dll when pixel debugging by avoiding flow control, also now bundle D3DCompiler_47.dll with installation to help avoid this happening again (See #81)
+- Change behaviour when 'allow fullscreen' is off to be more compatible with applications, even if it involves less consistency (See #80)
+- Fix initial contents not being applied before first internal log-readthrough, which lead to incorrect values being fetched when decoding Indirect() draw/dispatch calls.
+- When shader debugging, helper pixels continue to run without having any side-effects, to ensure gradients are correct.
+- Fixed a crash on log close when replaying over the network on a remote host
+- Fixed a crash in shader disassembly when debug info is present and an input file is completely empty.
+- Better display of struct types in constant buffer previewer
+- Speculative fix for a crash enumerating log viewers while loading a log (See #77)
+- Fix texture histogram not properly respecting channels - it was only ever reading from Red rather than whatever combination of channels you had selected.
+
+## Improvements/features/additions
+- Added support for arrays in the buffer viewer (#56) and hex-formatted values as `xint`, `xshort` and `xbyte`
+- Added a bit visualisation to shader debugger, e.g. `r0.x,b` will display 32-bit binary visualisation (Thanks Kamuyuq - #71)
+- Pixel co-ordinates displayed in status bar on the texture viewer are clamped to the dimensions of the texture (See #68)
+- Add ability to show checkerboard/solid coloured background even when not displaying alpha to make texture boundaries clearer (See #69)
+- Add toggle for by-convention gamma 'correction' of linear data (See #58)
+- Added a faint hint text to the working directory box, indicating that the working directory will be guessed from the executable.
+- Support for setting a friendly name via SetPrivateData() on shaders
+- Added a button to flip textures vertically, mostly useful for systems that render upside down until a final flip
+- Sample selection added to the texture viewer, to allow choosing which sample to show (or a resolved image) when viewing a multisampled texture (See #79)
+- The constant buffer previewer now allows you to set a custom format for when reflection information isn't available, the same as the buffer format viewer.
+- Implemented several missing pieces of functionality in shader debugging:
+  - Indexable temp registers x0[] etc, commonly generated for sampling kernels or other dynamically-indexed set of constants (See #73)
+  - Groupshared memory, in compute shaders, and atomic opcodes interacting with uavs or groupshared.
+  - Support for texture UAVs
+  - `gather4*` opcodes (Thanks valeriog-crytek - #75)
+  - `samplepos`, `sampleinfo`, `lod` opcodes
+  - New double type opcodes from D3D11.1
+  - SV_Coverage and SV_PrimitiveID semantics (See #74)
+- Added a pixel history view. Launched from the texture viewer next to the debug button, the history shows all pixel modifications of the selected pixel since the start of the frame on the current texture.
+- ![Pixel history in action](https://cloud.githubusercontent.com/assets/661798/4387399/38789e3c-43dc-11e4-9b76-67ae325ee950.png)
+  - For each event that modified the target it shows whether or not it successfully wrote at least one fragment, or whether a test e.g. depth test failed. You can then expand it to see each fragment that wrote.
+  - UAV modifications are simply listed as before/after values since by definition there isn't a 1:1 correspondence with which pixels wrote to a given texel.
+  - While the pixel history window is selected, the timeline bar shows modification events instead of texture usage.
+  - Failed events can be hidden, optionally.
+- Added an overlay 'quad overdraw' which shows [overdraw on a per-2x2 quad basis](http://blog.selfshadow.com/2012/11/12/counting-quads/). Thanks to Stephen Hill [@self_shadow](https://twitter.com/self_shadow)) for the idea and implementation.
+- ![Quad overdraw - comparison with and without depth prepass](https://cloud.githubusercontent.com/assets/661798/4387553/4b379904-43de-11e4-9a3c-86509a9cf61c.png)
+- Save texture functionality has been completely revamped.
+  - Textures can now be saved to several forms - DDS, PNG, JPG, TGA, BMP, and HDR (radiance)
+  - DDS will attempt to preserve the original texture as much as possible - saving out depth/array slices, mips and preserving the original format.
+  - For other formats you can select how you want to map down the texture - selecting mips, exporting only one slice or multiple, mapping HDR images to 0-255 LDR.
+  - ![Revamped save dialog](https://cloud.githubusercontent.com/assets/661798/4385946/dbfe392a-43ca-11e4-9a3c-6ca307e80082.png)
+  - Slices of a depth texture can be saved in a grid
+  - ![Slices saved as grid](https://cloud.githubusercontent.com/assets/661798/4386080/74a0da24-43cc-11e4-999d-e8a74daa6e35.jpg)
+  - Cubemaps can also be saved in a cross pattern
+  - ![Cubemap saved as cross](https://cloud.githubusercontent.com/assets/661798/4385918/99161c4a-43ca-11e4-8d3b-077ef167094f.jpg)
+",https://api.github.com/users/baldurk,661798,baldurk,https://api.github.com/repos/baldurk/renderdoc/releases/579075/assets,https://api.github.com/repos/baldurk/renderdoc/releases/579075,master,https://api.github.com/repos/baldurk/renderdoc/tarball/v0.21,https://github.com/baldurk/renderdoc/releases/tag/v0.21,https://api.github.com/repos/baldurk/renderdoc/zipball/v0.21,v0.21,False,False
+513509,2014-08-25T17:49:32Z,2014-08-25T18:05:10Z,Release Version v0.20,"## Bugfixes
+- I vastly improved the handling of line number information coming out of SPDB chunks in shaders. This means better inlining of HLSL when building with newer FXC versions. ([#32](https://github.com/baldurk/renderdoc/issues/32))
+- When using #line directives I do a much better job of finding the correct source if it's available, and then using that source to inline HLSL. If the original file is attached to the shader debug chunk, it will be preprocessed to fill out the 'fake' files specified by #line directives. ([#31](https://github.com/baldurk/renderdoc/issues/31))
+- Loading layouts could still cause a crash with a race in the mesh viewer if a very large set of geometry was being viewed ([#14](https://github.com/baldurk/renderdoc/issues/14)) 
+- When seeking through a logfile to find the start of a frame capture and skipping chunks, if the buffer window reallocated during reading a chunk this wasn't handled. Lead to a rare crash loading a logfile, more likely the smaller the log is. ([#38](https://github.com/baldurk/renderdoc/issues/38)) 
+- Typeless multisampled textures now have their initial contents saved when detected necessary. ([#43](https://github.com/baldurk/renderdoc/issues/43))
+- In rare cases - I'm not sure what triggered it - when enumerating DLLs in the target process renderdoc would be returned as RENDERDOC.DLL, and so the code would fail to find it. DLL searching is now case-insensitive. ([#25](https://github.com/baldurk/renderdoc/issues/25))
+- Opening a new texture viewer window while a log is open would cause a crash. ([#35](https://github.com/baldurk/renderdoc/issues/35))
+- If a deferred command list had a marker as its very first event, this would cause a crash when loading the log. ([#33](https://github.com/baldurk/renderdoc/issues/33))
+- When creating multiple blend states with equivalent but different descriptors (e.g. blending disabled but different functions), these would be created as unique states and serialised out as unique states, but upon reading the descriptors would be the same and cause overlaps and likely crashes. ([#44](https://github.com/baldurk/renderdoc/issues/44))
+- Fix a crash if no input vertices are selected and you click to debug the vertex shader.
+- Fix a crash when there is no mesh data and synced scrolling is enabled.
+- Return the correct contents for structured buffers vs. static resource typed buffers.
+- Range-check DstSubresource value, so that a too-high value passed in doesn't cause an immediate crash.
+- Fix the shader viewer looking in the wrong place for UAVs when displaying the register bindings.
+- List the different streams on the output signature of geometry shaders.
+- Fix a crash where a drawcall referencing invalid indices would cause RenderDoc to try and allocate way too much space and fall over.
+- Fix the display of D16 depth buffers.
+- Fixed the implementation of float compares in shader debugging that were using integer compares.
+- If no markers are present in the log and RenderDoc automatically fills out some defaults, the last draw (usually Present()) would get lost.
+- Logs now serialise strings as UTF-8 instead of windows wchar_t, to make logs portable between platforms
+- Fixed a crash changing the show disabled/show empty toggles in the texture viewer if no log is loaded
+
+## Improvements/features/additions
+- It's very early days, but I've put in a skeletal framework of OpenGL support. e.g. You can now capture the 'bumpmapping' superbible 6 sample on windows or linux, and replay it on windows and inspect basic things. ([#47](https://github.com/baldurk/renderdoc/issues/47))
+- To support the above, the C++/CLI wrapper DLL was removed in favour of direct P/Invoke from C#.
+- There's an option in the settings window that lets you choose where temporary logs are saved, in case %TEMP% is an inconvenient location. ([#40](https://github.com/baldurk/renderdoc/issues/40))
+- Temporary log filenames no longer append _ for each subsequent capture, they format the filename with the frame number. ([#39](https://github.com/baldurk/renderdoc/issues/39))
+- Applications that rely on the specific refcounts of backbuffer resources when resizing (I saw this in UE4 at least) will now have the same values reported with and without renderdoc. ([#41](https://github.com/baldurk/renderdoc/issues/41))
+- When editing a shader that doesn't have debug information embedded (so no HLSL) the generated stub shader will now include textures, buffers, samplers and constant buffers. ([#13](https://github.com/baldurk/renderdoc/issues/13))
+- While debugging a pixel shader, any discard/clip operations will visibly stop immediately on the instruction, rather than the highlight jumping to the end of the program. ([#45](https://github.com/baldurk/renderdoc/issues/45))
+- There were many problems with the resinfo assembly instruction (equivalent of GetDimensions in HLSL) ([#36](https://github.com/baldurk/renderdoc/issues/36))
+- Implemented a few more shader debugging instructions, including the double instructions and ld_raw/ld_uav_typed.
+- Float formatter is now used for unorm/snorm type values in the mesh viewer (ie. if they're intended to be _shown_ as floats, even if the source data isn't floating point)
+",https://api.github.com/users/baldurk,661798,baldurk,https://api.github.com/repos/baldurk/renderdoc/releases/513509/assets,https://api.github.com/repos/baldurk/renderdoc/releases/513509,v0.x,https://api.github.com/repos/baldurk/renderdoc/tarball/v0.20,https://github.com/baldurk/renderdoc/releases/tag/v0.20,https://api.github.com/repos/baldurk/renderdoc/zipball/v0.20,v0.20,False,False

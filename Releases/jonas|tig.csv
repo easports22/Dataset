@@ -1,0 +1,2012 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7943365,2017-09-29T15:14:57Z,2017-09-29T15:19:06Z,,"Release notes
+-------------
+Incompatibilities:
+
+ - The `width` setting on the `status`, `text` and `commit-title` columns was
+   never applied and has been removed. (GH #617)
+
+Improvements:
+
+ - Improve load performance by throttling screen updates. (GH #622, #629)
+ - Speed up graph rendering. (GH #638)
+ - Enable scroll optimizations for Terminal.app and iTerm2. (GH #637)
+ - Improve the test suite portability to not depend on GNU sed. (GH #609, #614)
+ - Make build reproducible. (https://reproducible-builds.org/) (GH #613)
+ - Enable binding to more symbolic keys and keys with control modifier:
+   `F13`-`F19`, `ShiftLeft`, `ShiftRight`, `ShiftDel`, `ShiftHome`, `ShiftEnd`,
+   `ShiftTab`, `Ctrl-C`, `Ctrl-V`, `Ctrl-S`, and `Ctrl-@`. (GH #314, #619, #642)
+ - Persist readline history to `~/.tig_history` or `$XDG_DATA_HOME/tig/history`.
+   Use `history-size` to control the number of entries to save. (GH #620, #713,
+   #714, #718)
+ - Preload last search from persistent history. (GH #630)
+ - Add `view-close-no-quit` action, unbound by default. (GH #607)
+ - Add `mouse-wheel-cursor` option (off by default) when set to true causes
+   wheel actions to prefer moving the cursor instead of scrolling. (GH #608)
+ - Add `truncation-delimiter` option, set to `~` by default. (GH #646)
+ - Add `-q` parameter to `source` for ""source-if-present"". (GH #612)
+ - Add `:echo` prompt command to display text in the status bar. (GH #626, #636)
+ - Make `diff-highlight` colors configurable. (GH #625, #633)
+ - Let Ctrl-C exit Y/N dialog, menu prompts and the file finder. (GH #632, #648)
+ - Hide cursor unless at textual prompt. (GH #643)
+ - Expand tilde ('~') in `:script` paths. (GH #674)
+ - Show single-line output of external command in status bar. (GH #200, #557,
+   #678)
+ - Disable the graph when `--no-merges` is passed. (GH #687) 
+ - Print backtraces on segfault in debug mode.
+ - Ignore script lines starting with `#` (comment). (GH #705)
+ - Complete `repo:*` variables when readline is enabled. (GH #702)
+ - Incorporate XTerm's `wcwidth.c` to find Unicode widths. (GH #691)
+
+Bug fixes:
+
+ - Fix graph display issues. (GH #419, #638)
+ - Fix and improve rendering of Unicode characters. (GH #330, #621, #644, #682)
+ - Handle hyphenated directory names when listing content. (GH #602)
+ - Do not jump to next match when cancelling the search prompt. (GH #627)
+ - Fix clearing of the status line after `Ctrl-C`. (GH #623, #649)
+ - Fix handling of width on line-number and trimmed width of 1. (GH #617)
+ - Set cursor position when not updating prompt contents. (GH #647)
+ - Erase status line at exit time for users without altscreen-capable terminals.
+   (GH #589)
+ - Fix unexpected keys when restoring from suspend (`Ctrl-Z`). (GH #232)
+ - contrib/vim.tigrc: Also bind G in the main as a workaround for limitations of
+   the `none` action. (GH #594, #599)
+ - Only override `blame-options` when commands are given and fix parsing of
+   `-C`. (GH #597)
+ - Fix diff name discovery to better handle prefixes.
+ - Interpret button5 as wheel-down. (GH #321, #606)
+ - Fix `back` / `parent` in tree view. (GH #641)
+ - Fix memory corruption in `concat_argv` and file finder. (GH #634, #655)
+ - Fix reading from stdin for `tig show`.
+ - Document problem of outdated system-wide `tigrc` files in Homebrew. (GH #598)
+ - Repaint the display when toggling `line-graphics`. (GH #527)
+ - Fix custom date formatting support longer strings. (GH #522)
+ - Don't segfault on "":exec"" irregular args. (GH #686)
+ - Fix segfault when calling htab_empty. (GH #663, #745)
+
+Change summary
+--------------
+The diffstat and log summary for changes made in this release.
+
+```
+ .bookignore                                   |  16 +
+ .gitignore                                    |   1 +
+ .travis.yml                                   |   1 +
+ INSTALL.adoc                                  |  26 +-
+ Makefile                                      |  42 +-
+ NEWS.adoc                                     |  69 +-
+ README.adoc                                   |   2 +-
+ book.md                                       |   2 +
+ compat/compat.h                               |  15 +
+ compat/hashtab.h                              |   4 +-
+ compat/wcwidth.c                              | 709 ++++++++++++++++++
+ compat/wcwidth.h                              |  47 ++
+ compat/wordexp.c                              |  60 ++
+ config.make.in                                |   1 +
+ configure.ac                                  |   3 +-
+ contrib/config.make                           |   3 +
+ contrib/config.make-CYGWIN_NT-6.1             |   2 +-
+ contrib/config.make-Darwin                    |   1 +
+ contrib/tig-completion.bash                   |   6 +-
+ contrib/vim.tigrc                             |   4 +-
+ doc/manual.adoc                               |  37 +-
+ doc/tig.1.adoc                                |  24 +-
+ doc/tigrc.5.adoc                              | 120 ++-
+ include/tig/display.h                         |   8 +-
+ include/tig/io.h                              |   8 +-
+ include/tig/keys.h                            |   9 +
+ include/tig/line.h                            |  36 +-
+ include/tig/options.h                         |   8 +-
+ include/tig/prompt.h                          |   1 +
+ include/tig/request.h                         |   5 +-
+ include/tig/tig.h                             |   6 +
+ include/tig/util.h                            |   2 +
+ src/argv.c                                    |  12 +-
+ src/blame.c                                   |  28 +-
+ src/blob.c                                    |   2 +-
+ src/diff.c                                    |  27 +-
+ src/display.c                                 | 195 ++++-
+ src/draw.c                                    |  17 +-
+ src/graph-v2.c                                | 193 ++++-
+ src/grep.c                                    |   4 +-
+ src/io.c                                      |  50 +-
+ src/keys.c                                    |  24 +-
+ src/line.c                                    |  15 +-
+ src/main.c                                    |   2 +-
+ src/options.c                                 |  46 +-
+ src/prompt.c                                  | 188 ++++-
+ src/refdb.c                                   |   3 +
+ src/search.c                                  |   4 +-
+ src/status.c                                  |   4 +-
+ src/string.c                                  |  45 +-
+ src/tig.c                                     |  71 +-
+ src/tree.c                                    |   4 +-
+ src/ui.c                                      |  10 +-
+ src/util.c                                    |   2 +-
+ src/view.c                                    |  39 +-
+ test/README.adoc                              |  10 +
+ test/diff/diff-context-test                   |   4 +-
+ test/diff/diff-highlight-color-test           |   2 +-
+ test/diff/diff-stat-split-test                |  51 ++
+ test/diff/diff-stat-test                      | 106 ++-
+ test/diff/diff-stdin-test                     |  84 +++
+ test/graph/00-simple-test                     |  10 -
+ test/graph/06-extra-bars-test                 |  14 +-
+ test/graph/10-shorter-merge-than-branch-test  |   2 +-
+ test/graph/11-new-branch-in-middle-test       |   6 +-
+ test/graph/15-many-merges-test                |  31 +-
+ test/graph/17-more-merges-test                |   4 +-
+ test/graph/18-tig-test                        |  12 -
+ test/graph/20-tig-all-long-test               |   4 +-
+ test/graph/gh-490-heap-buffer-overflow-test   |   4 +-
+ .../graph/regression/horizontal-artifact-test |  41 +
+ .../regression/horizontal-bar-wrong-2-test    |  41 +
+ test/help/all-keybindings-test                |   1 +
+ test/help/all-keybindings-test.expected       | 238 +++---
+ test/help/default-test                        |  10 +-
+ test/help/user-command-test                   |  10 +-
+ test/main/all-arg-test                        |   2 +-
+ test/main/branch-var-test                     |   6 +-
+ test/main/commit-title-overflow-test          |   4 +-
+ test/main/date-test                           |  34 +
+ test/main/emoji-test                          |  74 ++
+ test/main/filter-args-test                    |  10 +-
+ test/main/graph-argument-test                 |   4 +-
+ test/main/jump-ends-test                      |  54 ++
+ test/main/no-matching-commmits-test           |   2 +-
+ test/main/no-merges-test                      |  33 +
+ test/main/refresh-periodic-test               |   2 +-
+ test/main/refresh-test                        |   2 +-
+ test/main/show-changes-after-rename-test      |   4 +-
+ test/main/view-split-test                     |   6 +-
+ test/prompt/exec-test                         |  42 ++
+ test/refs/branch-var-test                     |   7 +-
+ test/refs/replace-test                        |  12 +-
+ test/refs/start-on-line-test                  |   2 +-
+ test/regressions/github-390-test              |   2 +-
+ test/script/comment-test                      |  23 +
+ test/script/default-test                      |  21 +-
+ test/stage/gh-410-test                        |   4 +-
+ test/stage/split-chunk-test                   |   2 +-
+ test/stash/start-on-line-test                 |   2 +-
+ test/status/file-name-test                    |   6 +-
+ test/status/on-branch-test                    |  18 +-
+ test/status/on-branch-tracking-info-test      |  20 +-
+ test/status/refresh-test                      |   2 +-
+ test/status/repo-var-test                     |  17 +-
+ test/tigrc/builtin-save-test                  |  16 +
+ test/tigrc/command-value-long-test            |  58 ++
+ test/tigrc/contrib-tigrc-test                 |   4 +-
+ test/tigrc/parse-test                         |  15 +-
+ test/tigrc/save-option-test                   |   9 +-
+ test/tigrc/source-test                        | 116 +++
+ test/tigrc/tigrc-manpage-examples-test        |  14 +-
+ test/tigrc/truncation-test                    | 213 ++++++
+ test/tigrc/width-test                         | 504 +++++++++++++
+ test/tigrc/xdg-config-home-test               |   6 +-
+ test/tools/libgit.sh                          |  18 +-
+ test/tools/libtest.sh                         | 392 ++++++----
+ test/tools/setup-conflict.sh                  |   4 +-
+ test/tools/show-results.sh                    |  23 +-
+ test/tools/valgrind-Darwin.supp               |   9 +
+ test/tree/chdir-test                          | 197 +++++
+ test/tree/file-name-test                      | 111 +++
+ tigrc                                         |  36 +-
+ tools/aspell.dict                             |  24 +-
+ tools/ax_lib_readline.m4                      |  12 +-
+ acinclude.m4 => tools/iconv.m4                |   0
+ tools/make-builtin-config.sh                  |   2 +-
+ tools/release.sh                              |   2 +-
+ 128 files changed, 4356 insertions(+), 794 deletions(-)
+
+     1	Andreas Stieger
+     1	Dan Wendorf
+     1	Edgar Hipp
+     1	Greg Hewgill
+    35	Jonas Fonseca
+     2	Marc Aldorasi
+     1	Ramsay Jones
+   112	Roland Walker
+    11	Sven Wegener
+     1	kiryph
+```",https://api.github.com/users/jonas,8417,jonas,https://api.github.com/repos/jonas/tig/releases/7943365/assets,https://api.github.com/repos/jonas/tig/releases/7943365,master,https://api.github.com/repos/jonas/tig/tarball/tig-2.3.0,https://github.com/jonas/tig/releases/tag/tig-2.3.0,https://api.github.com/repos/jonas/tig/zipball/tig-2.3.0,tig-2.3.0,False,False
+6300578,2017-05-06T14:36:47Z,2017-05-06T14:41:40Z,,"Upgrade instructions:
+
+ - The `status-untracked-dirs` option was renamed to
+   `status-show-untracked-dirs` to match the new `status-show-untracked-files`
+   option.
+
+Improvements:
+
+ - Use `diff-options` when preparing the diff in the stage view to make the diff
+   state configurable. (GH #545)
+ - Add 'status-show-untracked-files' option mirroring Git's
+   'status.showUntrackedFiles' to toggle display of untracked files.  in the
+   status view. On by default. (GH #562)
+ - Update `ax_with_curses.m4` and use `pkg-config` to detect. (GH #546)
+ - Add `tig-pick` script for using Tig as a commit picker. (GH #575, #580)
+ - Add ""smart case"" option ('set ignore-case = smart-case') to ignore case when
+   the search string is lower-case only. (GH #320, #579)
+
+Bug fixes:
+
+ - Fix author ident cache being keyed by email only. (GH #424, #526, #547)
+ - Fix periodic refresh mode to properly detect ref changes. (GH #430, #591)
+ - Add workaround for detecting failure to start the diff-highlight process.
+ - Show diffs in the stash view when `set mailmap = true`. (GH #556)
+ - Fix parsing of git-log revision arguments, such as `--exclude=...` in
+   conjunction with `--all`. (GH #555)
+ - Fix diff stat parsing for binary copies.
+ - Fix crash when resizing terminal while search is in progress. (GH #515, #550)
+ - Fix argument filtering to pass more arguments through to Git.
+ - Check for termcap support in split tinfo libs. (GH #568, #585)
+
+Change summary
+--------------
+The diffstat and log summary for changes made in this release.
+
+```
+ INSTALL.adoc                         |  10 +-
+ Makefile                             |   2 +-
+ NEWS.adoc                            |  44 ++++++++-
+ README.adoc                          |   2 +-
+ book.md                              |   2 +-
+ config.make.in                       |   2 +-
+ configure.ac                         |   2 +-
+ contrib/tig-pick                     |  48 +++++++++
+ doc/manual.adoc                      |   5 +-
+ doc/screenshots.md                   |  11 ---
+ doc/tig.1.adoc                       |   2 +-
+ doc/tigrc.5.adoc                     |  15 ++-
+ include/tig/argv.h                   |   1 +
+ include/tig/diff.h                   |   4 +-
+ include/tig/git.h                    |   4 +-
+ include/tig/options.h                |   5 +-
+ include/tig/types.h                  |  12 ++-
+ include/tig/util.h                   |   1 +
+ include/tig/view.h                   |   4 +-
+ src/argv.c                           |   4 +-
+ src/blame.c                          |  29 +++---
+ src/blob.c                           |  16 ++-
+ src/diff.c                           |  56 ++++++-----
+ src/display.c                        |   8 +-
+ src/draw.c                           |   2 +-
+ src/grep.c                           |   4 +-
+ src/help.c                           |   9 +-
+ src/io.c                             |   8 +-
+ src/log.c                            |   2 +-
+ src/main.c                           |  16 +--
+ src/options.c                        |  72 +++++++++-----
+ src/pager.c                          |  10 +-
+ src/parse.c                          |  14 ++-
+ src/refs.c                           |  21 ++--
+ src/search.c                         |  16 ++-
+ src/stage.c                          |  44 ++++-----
+ src/stash.c                          |   6 +-
+ src/status.c                         |  40 +++++---
+ src/tig.c                            |  30 +++---
+ src/tree.c                           |  10 +-
+ src/util.c                           |   6 +-
+ src/view.c                           |  25 ++---
+ src/watch.c                          |   2 +-
+ test/diff/diff-highlight-test        |  38 ++++++-
+ test/files/repo-authornamechange.tgz | Bin 0 -> 7557 bytes
+ test/main/author-name-change-test    |  27 +++++
+ test/main/filter-args-test           |  74 ++++++++++++++
+ test/main/refresh-periodic-test      |  74 ++++++++++++++
+ test/main/search-test                |  22 +++++
+ test/status/untracked-files-test     |  27 +++++
+ test/tigrc/compat-error-test         |   5 +-
+ tigrc                                |   6 +-
+ tools/aspell.dict                    |   9 +-
+ tools/ax_lib_readline.m4             |  16 ++-
+ tools/ax_require_defined.m4          |  37 +++++++
+ tools/ax_with_curses.m4              | 142 +++++++++++++++++++--------
+ 56 files changed, 822 insertions(+), 281 deletions(-)
+
+    22  Jonas Fonseca
+     3  Mina Naguib
+     1  Justin Lecher
+     1  Konrad Gräfe
+     1  Lukas Holecek
+     1  Thomas Koutcher
+     1  Benjamin Reitzammer
+     1  Tim Harder
+     1  Delyan Angelov
+```",https://api.github.com/users/jonas,8417,jonas,https://api.github.com/repos/jonas/tig/releases/6300578/assets,https://api.github.com/repos/jonas/tig/releases/6300578,master,https://api.github.com/repos/jonas/tig/tarball/tig-2.2.2,https://github.com/jonas/tig/releases/tag/tig-2.2.2,https://api.github.com/repos/jonas/tig/zipball/tig-2.2.2,tig-2.2.2,False,False
+4683001,2016-11-17T03:31:04Z,2016-11-17T03:36:52Z,tig-2.2.1,"Tarballs should now be downloaded from GitHub. Either go to
+https://github.com/jonas/tig/releases or use the following pattern:
+
+```
+https://github.com/jonas/tig/releases/download/tig-VERSION/tig-VERSION.tar.gz
+```
+
+MD5 checksums can be found at:
+
+```
+https://github.com/jonas/tig/releases/download/tig-VERSION/tig-VERSION.tar.gz.md5
+```
+
+Similarly, the home page is now also on GitHub at https://jonas.github.io/tig/.
+A big thanks to Simon L. B. Nielsen for generously hosting Tig on nitro.dk!
+
+Improvements:
+- Support Git's 'diff-highlight' program when `diff-highlight` is set to either
+  true or the path of the script to use for post-processing.
+- Add navigation between merge commits. (GH #525)
+- Add 'A' as a binding to apply a stash without dropping it.
+- Bind 'Ctrl-D' and 'Ctrl-U' to half-page movements by default.
+- manual: Mention how to change default Up/Down behavior in diff view.
+
+Bug fixes
+- Reorganize checking of libraries for termcap functions.
+- Fix `:goto <id>` error message.
+
+## Change summary
+
+The diffstat and log summary for changes made in this release.
+
+```
+ .gitignore                               |   2 +
+ INSTALL.adoc                             |  10 +-
+ Makefile                                 |  11 +-
+ NEWS.adoc                                |  30 +++
+ README.adoc                              |  19 +-
+ book.json                                |  22 ++
+ book.md                                  |   8 +
+ contrib/tig.spec.in                      |   4 +-
+ doc/manual.adoc                          |   6 +-
+ doc/screenshots.md                       |  11 +
+ doc/tig.1.adoc                           |   2 +-
+ doc/tigrc.5.adoc                         |   8 +
+ include/tig/argv.h                       |   4 +-
+ include/tig/diff.h                       |   4 +
+ include/tig/graph.h                      |   1 +
+ include/tig/io.h                         |   3 +-
+ include/tig/line.h                       |  11 +-
+ include/tig/options.h                    |   1 +
+ include/tig/request.h                    |   2 +
+ include/tig/search.h                     |   1 +
+ include/tig/string.h                     |   3 +-
+ src/argv.c                               |  31 ++-
+ src/diff.c                               | 121 +++++++--
+ src/display.c                            |   6 +-
+ src/graph-v1.c                           |   7 +
+ src/graph-v2.c                           |   7 +
+ src/io.c                                 |  25 +-
+ src/line.c                               |   6 +
+ src/main.c                               |   6 +
+ src/options.c                            |  12 +
+ src/parse.c                              |   4 +-
+ src/search.c                             |  62 +++++
+ src/stage.c                              |  15 +-
+ src/string.c                             |  17 +-
+ src/tig.c                                |   5 +
+ src/view.c                               |   2 +-
+ test/blame/default-test                  | 190 ++++++-------
+ test/blame/revargs-test                  |  86 +++---
+ test/blame/start-on-line-test            |  56 ++--
+ test/blob/wrap-lines-test                |  40 +--
+ test/diff/diff-context-test              | 270 +++++++++----------
+ test/diff/diff-highlight-color-test      |  60 +++++
+ test/diff/diff-highlight-test            |  91 +++++++
+ test/diff/diff-stat-test                 |  56 ++--
+ test/diff/editor-test                    | 232 ++++++++--------
+ test/diff/start-on-line-test             |  54 ++--
+ test/diff/wrap-lines-test                |  44 +--
+ test/graph/00-simple-test                |   8 +-
+ test/graph/15-many-merges-test           |  26 +-
+ test/graph/18-tig-test                   |   8 +-
+ test/graph/19-tig-all-test               |   4 +-
+ test/grep/default-test                   | 242 ++++++++---------
+ test/grep/editor-test                    |  30 +--
+ test/grep/start-on-line-test             |  52 ++--
+ test/help/all-keybindings-test           | 120 +--------
+ test/help/all-keybindings-test.expected  | 119 +++++++++
+ test/help/default-test                   | 174 ++++++------
+ test/help/user-command-test              |  58 ++--
+ test/log/diff-stat-test                  | 112 ++++----
+ test/log/pretty-format-test              | 144 +++++-----
+ test/log/start-on-line-test              |  56 ++--
+ test/log/submodule-test                  | 180 ++++++-------
+ test/main/all-arg-test                   |  52 ++--
+ test/main/boundary-test                  |  28 +-
+ test/main/branch-var-test                |  28 +-
+ test/main/commit-order-edge-case-test    |  32 +--
+ test/main/commit-title-overflow-test     |  98 +++----
+ test/main/date-test                      | 192 +++++++-------
+ test/main/default-test                   | 164 ++++++------
+ test/main/escape-control-characters-test |  36 +--
+ test/main/goto-test                      |  96 +++----
+ test/main/graph-argument-test            |  48 ++--
+ test/main/mailmap-test                   |  52 ++--
+ test/main/main-options-test              |  28 +-
+ test/main/merge-test                     |  16 +-
+ test/main/pretty-raw-test                |  28 +-
+ test/main/refresh-test                   |  42 +--
+ test/main/search-test                    | 196 +++++++-------
+ test/main/show-changes-after-rename-test |   4 +-
+ test/main/show-changes-test              | 246 ++++++++---------
+ test/main/start-on-line-test             |  34 +--
+ test/main/stdin-test                     |  28 +-
+ test/main/submodule-test                 | 176 ++++++------
+ test/main/update-unstaged-changes-test   |  12 +-
+ test/main/view-split-test                | 112 ++++----
+ test/refs/branch-checkout-test           |  42 +--
+ test/refs/branch-var-test                |  36 +--
+ test/refs/default-test                   |  64 ++---
+ test/refs/refresh-test                   |  96 +++----
+ test/refs/replace-test                   |  62 ++---
+ test/refs/start-on-line-test             |  34 +--
+ test/refs/worktree-test                  |  14 +-
+ test/regressions/github-390-test         |   4 +-
+ test/regressions/github-434-test         | 166 ++++++------
+ test/stage/default-test                  | 324 +++++++++++------------
+ test/stage/gh-410-test                   |  60 ++---
+ test/stage/split-chunk-test              | 132 ++++-----
+ test/stash/start-on-line-test            |  56 ++--
+ test/status/file-name-test               | 104 ++++----
+ test/status/file-var-test                |  56 ++--
+ test/status/on-branch-test               | 126 ++++-----
+ test/status/on-branch-tracking-info-test |  66 ++---
+ test/status/refresh-test                 | 286 ++++++++++----------
+ test/status/start-on-line-test           |  56 ++--
+ test/status/untracked-files-test         |  80 +++---
+ test/status/worktree-test                |  12 +-
+ test/tigrc/env-vars-test                 |  10 +-
+ test/tigrc/parse-test                    |  56 ++--
+ test/tigrc/quote-test                    |   8 +-
+ test/tigrc/view-column-test              |  28 +-
+ test/tigrc/xdg-config-home-test          |   5 +-
+ test/tools/libtest.sh                    |  38 ++-
+ test/tree/default-test                   | 194 +++++++-------
+ tigrc                                    |   9 +-
+ tools/aspell.dict                        |   6 +-
+ tools/ax_lib_readline.m4                 |  16 +-
+ tools/release.sh                         |   1 +
+ tools/update-release-docs.sh             |  53 ----
+ 118 files changed, 3765 insertions(+), 3284 deletions(-)
+
+    22  Jonas Fonseca
+     1  Frank Fesevur
+     1  Jelte Fennema
+     1  Jeremy Lin
+     1  Parker Coates
+     1  Philipp Gesang
+     1  Ramsay Jones
+     1  David Lin
+     1  lightside
+```
+",https://api.github.com/users/jonas,8417,jonas,https://api.github.com/repos/jonas/tig/releases/4683001/assets,https://api.github.com/repos/jonas/tig/releases/4683001,master,https://api.github.com/repos/jonas/tig/tarball/tig-2.2.1,https://github.com/jonas/tig/releases/tag/tig-2.2.1,https://api.github.com/repos/jonas/tig/zipball/tig-2.2.1,tig-2.2.1,False,False
+3861943,2016-08-11T02:38:25Z,2016-08-11T03:08:24Z,,"This is the 35th release of Tig. It brings several search
+improvements such as highlighting and wrap around, and machinery for future
+support of typeahead search. This release also gives more choice over how the
+user configuration file is loaded either at built-time or at runtime through
+support of the XDG basedir spec. Among fixes several segfaults and invalid
+reads have been addressed and the tests are now run with Valgrind and
+AddressSanitizer by Travis on each push. There are several breaking changes so
+ensure you read the section on incompatibilities in the release notes before
+upgrading.
+
+It's crazy to think that Tig has happily browsed Git repos for more than 10
+years! Thanks to everybody who contributed and made that possible. Looking
+forward to the next 10 years ...
+
+## Release notes
+
+Incompatibilities:
+- Note that all user-defined commands are now executed at the repository root
+  instead of whatever subdirectory Tig was started in. (GH #412)
+- Remove `cmdline-args` option to avoid problems where setting it in `~/.tigrc`
+  potentially breaks other views due to its ""context-sensitive"" nature, where
+  a `git-log` option maybe cause `git-grep` to fail. (GH #431)
+
+Improvements:
+- Use .mailmap to show canonical name and email addresses, off by default.
+  Add `set mailmap = yes` to `~/.tigrc` to enable. (GH #411)
+- Highlight search results, configurable via `search-result` color. (GH #493)
+- Wrap around when searching, configurable via `wrap-search` setting.
+- Populate `%(file)` with file names from diff stat. (GH #404)
+- `tig --merge` implies `--boundary` similar to gitk.
+- Expose repository variables to external commands, e.g. `%(repo:head)` gives the
+  branch name of the current HEAD and `%(repo:cdup)` for the repo root path.
+- Add `make uninstall`. (GH #417)
+- Add ZSH completion file (based on Bash completion) (GH #433)
+- Expose the text of the currently selected line as the %(text) (GH #457)
+- Allow users to specify rev arguments to blame (GH #439)
+- Update OSX make config to find brew installed ncurses
+- Add sample git-flow keybinding (GH #421)
+- Add chocolate theme (GH #432)
+- Show stash diffs. (GH #328)
+- Make user tigrc location configurable. (GH #479)
+- Compact relative date display mode. (GH #331)
+- Add date column option controlling whether to show local date.
+- Move to parent commit in the main view. (GH #388)
+- Add `:goto <rev>` prompt command to go to a `git-rev-parse`d revision, e.g.
+  `:goto some/branch` or `:goto %(commit)^2`.
+- Respect the XDG standard for configuration files. (GH #513)
+- Show tracking information in `tig status` (GH #504)
+- Resolve diff paths when `diff.noprefix` is true. (GH #487, #488)
+- Support for custom `strftime(3)` date formats, e.g.:
+  
+  set main-view-date = custom
+  set main-view-date-format = ""%Y-%m-%d""
+
+Bug fixes:
+- Prevent staged rename from displaying unstaged changes (GH #472, #491)
+- Fix corrupt chunk header during staging of single lines. (GH #410)
+- Fix out of bounds read in graph-v2 module. (GH #402)
+- Add currently checked out branch to `%(branch)`. (GH #416)
+- Size diff stats correctly for split views.
+- Fix `git-worktree` support by using `git-show-ref`. (GH #437)
+- Add currently checked out branch to `%(branch)` (GH #416)
+- Fix segfault when hitting return in empty file search (GH #464)
+- Remove separator on horizontal split when switching from vertical split
+- Do not expand `--all` when parsing `%(revargs)` (GH #442, #462)
+- Fix exit when the main view is reloaded due to option toggling. (GH #470)
+- Expand all whitespace and control characters to spaces. (GH #485)
+- Restore ability to unbind a default keybinding with `none`. (GH #483)
+- Fix blob view to honor the `wrap-lines` setting.
+
+## Change summary
+
+The diffstat and log summary for changes made in this release.
+
+```
+ .mailmap                                      |   3 +
+ .travis.yml                                   |  36 +-
+ INSTALL.adoc                                  |  15 +
+ Makefile                                      |  29 +-
+ NEWS.adoc                                     |  65 ++-
+ autogen.sh                                    |   4 +-
+ contrib/chocolate.theme.tigrc                 |  16 +
+ contrib/config.make-Darwin                    |  15 +-
+ contrib/git-flow.tigrc                        |  49 +++
+ contrib/tig-completion.zsh                    |  21 +
+ contrib/tig.spec.in                           |   2 +-
+ contrib/vim.tigrc                             |   3 +
+ doc/manual.adoc                               |  29 +-
+ doc/tig.1.adoc                                |   9 +-
+ doc/tigrc.5.adoc                              |  40 +-
+ include/tig/argv.h                            |   3 +-
+ include/tig/display.h                         |   6 +
+ include/tig/git.h                             |   4 -
+ include/tig/io.h                              |  14 +-
+ include/tig/keys.h                            |   2 +-
+ include/tig/line.h                            |   4 +-
+ include/tig/main.h                            |   2 +-
+ include/tig/options.h                         |  20 +-
+ include/tig/pager.h                           |   2 +-
+ include/tig/prompt.h                          |   3 +-
+ include/tig/refdb.h                           |   6 +-
+ include/tig/repo.h                            |  27 +-
+ include/tig/search.h                          |  25 ++
+ include/tig/string.h                          |   7 +-
+ include/tig/tig.h                             |   7 +
+ include/tig/types.h                           |   4 +-
+ include/tig/util.h                            |  29 +-
+ include/tig/view.h                            |  60 ++-
+ src/argv.c                                    | 102 +++--
+ src/blame.c                                   |  80 ++--
+ src/blob.c                                    |  12 +-
+ src/diff.c                                    | 208 ++++++++--
+ src/display.c                                 | 171 ++++----
+ src/draw.c                                    | 243 ++++++-----
+ src/graph-v1.c                                |  28 +-
+ src/graph-v2.c                                |  42 +-
+ src/grep.c                                    |  26 +-
+ src/help.c                                    |  49 +--
+ src/io.c                                      |  76 ++--
+ src/keys.c                                    | 108 +++--
+ src/line.c                                    |   4 +-
+ src/log.c                                     |  28 +-
+ src/main.c                                    | 107 ++---
+ src/options.c                                 | 185 ++++++---
+ src/pager.c                                   |  34 +-
+ src/parse.c                                   |  39 +-
+ src/prompt.c                                  |  77 ++--
+ src/refdb.c                                   |  67 +--
+ src/refs.c                                    |  38 +-
+ src/repo.c                                    |  27 +-
+ src/request.c                                 |   6 +-
+ src/search.c                                  | 189 +++++++++
+ src/stage.c                                   | 126 +++---
+ src/stash.c                                   |  43 +-
+ src/status.c                                  | 153 +++++--
+ src/string.c                                  |  32 +-
+ src/tig.c                                     |  96 +++--
+ src/tree.c                                    |  40 +-
+ src/types.c                                   |   6 +-
+ src/ui.c                                      |  22 +-
+ src/util.c                                    | 156 +++++--
+ src/view.c                                    | 392 +++++++++---------
+ src/watch.c                                   |  10 +-
+ test/README.adoc                              |   6 +-
+ test/blame/revargs-test                       |  82 ++++
+ test/blob/wrap-lines-test                     |  54 +++
+ test/diff/diff-stat-test                      |  51 +++
+ test/diff/editor-test                         | 199 ++++++++-
+ test/diff/wrap-lines-test                     |  51 +++
+ test/files/refs-repo.tgz                      | Bin 0 -> 8013 bytes
+ test/files/repo-one.tgz                       | Bin 0 -> 6722 bytes
+ test/files/repo-two.tgz                       | Bin 0 -> 10985 bytes
+ test/graph/gh-490-heap-buffer-overflow-test   |  18 +
+ .../graph/gh-490-heap-buffer-overflow-test.gz | Bin 0 -> 336885 bytes
+ test/help/user-command-test                   |  59 +++
+ test/log/diff-stat-test                       |  86 ++++
+ test/log/pretty-format-test                   |   3 +-
+ test/log/submodule-test                       |  18 +-
+ test/main/all-arg-test                        |  63 +++
+ test/main/boundary-test                       |   2 -
+ test/main/branch-var-test                     |  54 +++
+ test/main/date-test                           | 207 +++++++++
+ test/main/date-test.in                        | 201 +++++++++
+ test/main/escape-control-characters-test      |  33 ++
+ test/main/escape-control-characters-test.in   | Bin 0 -> 1725 bytes
+ test/main/goto-test                           | 103 +++++
+ test/main/mailmap-test                        |  65 +++
+ test/main/merge-test                          |  33 ++
+ test/main/refresh-test                        |   2 -
+ test/main/show-changes-after-rename-test      |  32 ++
+ test/main/show-changes-test                   |  26 +-
+ test/main/submodule-test                      |  28 +-
+ test/main/unbind-default-quit-key-test        |  31 ++
+ test/main/update-unstaged-changes-test        |   2 -
+ test/main/util.sh                             |  17 +-
+ test/refs/branch-var-test                     |  59 +++
+ test/refs/default-test                        |  53 +--
+ test/refs/refresh-test                        |  56 +--
+ test/refs/replace-test                        |   1 -
+ test/refs/util.sh                             |  13 -
+ test/refs/worktree-test                       |  33 ++
+ test/regressions/github-434-test              | 123 ++++++
+ test/stage/default-test                       |   4 +-
+ test/stage/gh-410-test                        |  73 ++++
+ test/stage/split-chunk-test                   |  96 +++++
+ test/status/file-name-test                    |   8 +-
+ test/status/file-var-test                     |  59 +++
+ test/status/on-branch-test                    |  32 +-
+ test/status/on-branch-tracking-info-test      | 105 +++++
+ test/status/refresh-test                      |  22 +-
+ test/status/repo-var-test                     |  21 +
+ test/status/start-on-line-test                |   2 +-
+ test/status/untracked-files-test              |   4 +-
+ test/status/worktree-test                     |  32 ++
+ test/tigrc/compat-error-test                  |  16 +-
+ test/tigrc/view-column-test                   |   7 +-
+ test/tigrc/xdg-config-home-test               |  31 ++
+ test/tools/libgit.sh                          | 149 +------
+ test/tools/libtest.sh                         | 198 +++++++--
+ test/tools/show-results.sh                    |  10 +-
+ test/tools/test-graph.c                       |   4 +-
+ tigrc                                         |   9 +-
+ tools/aspell.dict                             |  14 +-
+ tools/doc-gen.c                               |  12 +-
+ tools/uninstall.sh                            |  35 ++
+ 130 files changed, 4781 insertions(+), 1609 deletions(-)
+
+     2  Adam Strzelecki
+     1  Alexander Campbell
+     1  Bostjan Skufca
+     1  Daniel Hahler
+     1  Edgar HIPP
+     3  Eric Sunshine
+     1  Harish Lall
+     1  Jeff King
+     3  Jeremy Cowgar
+    84  Jonas Fonseca
+     1  Kentaro Wada
+     1  Laurent Arnoud
+     1  Mantas Mikulėnas
+     2  Michael J Gruber
+     1  Murilo Opsfelder Araujo
+     1  Olof-Joachim Frahm
+     1  Reuben D'Netto
+     2  Richard Burke
+     2  Sven Wegener
+     4  Vivien Didelot
+     1  Wolfgang Reissnegger
+     1  ideal
+     1  samiraguiar
+```
+",https://api.github.com/users/jonas,8417,jonas,https://api.github.com/repos/jonas/tig/releases/3861943/assets,https://api.github.com/repos/jonas/tig/releases/3861943,master,https://api.github.com/repos/jonas/tig/tarball/tig-2.2,https://github.com/jonas/tig/releases/tag/tig-2.2,https://api.github.com/repos/jonas/tig/zipball/tig-2.2,tig-2.2,False,False
+3084554,2012-05-10T13:05:07Z,2016-04-23T21:29:50Z,,"Version 1.0 of tig is now available. This release brings many smaller tweaks and improvements as well as a number of fixes and compatibility changes to work with the newer versions of git. See the release notes below for a detailed list of changes.
+
+Note that the master repository has been moved to:
+
+```
+git://github.com/jonas/tig.git.
+```
+
+So if you were tracking the old master repository, please update your .git/config or run:
+
+```
+$ git remote set-url origin git://github.com/jonas/tig.git
+```
+
+## Release notes
+
+The master repository is git://github.com/jonas/tig.git, and the old
+master repository (http://jonas.nitro.dk/tig/tig.git) will be retired.
+
+Improvements:
+- Use git-log(1)s default commit ordering. The old behavior can be
+  restored by adding `set commit-order = topo` to ~/.tigrc.
+- Support staging of single lines. Bound to '1' default. (GH #21)
+- Use +<lineno> to open the initial view at an arbitrary line. (GH #20)
+- Add show-notes ~/.tigrc option. Notes are displayed by default.
+- Support jumping to specific SHAs in the main view.
+- Decorate replaced commits.
+- Display line numbers in main view.
+- Colorize binary diff stats. (GH #17)
+- Custom colorization of lines matching a string prefix (GH #16).
+  Example configuration: color ""Reported-by:"" green default
+- Use git's color settings for the main, status and diff views.
+  Put `set read-git-colors = no` in ~/.tigrc to disable.
+- Handle editor options with multiple arguments. (GH #12)
+- Show filename when running tig blame with copy detection. (GH #19)
+- Use 'source <path>' command to load additional files from ~/.tigrc
+- User-defined commands prefixed with ' <at> ' are run with no console
+  output, e.g.
+  
+  bind generic 3 ! <at> rm sys$command
+- Make display of space changes togglable in the diff and stage view.
+  Bound to 'W' by default.
+- Use per-file encoding specified in gitattributes(5) for blobs and
+  unstaged files.
+- Obsolete commit-encoding option and pass --encoding=UTF-8 to revision
+  commands.
+- Main view: show uncommitted changes as staged/unstaged commits.
+  Can be disabled by putting `set show-changes = no` in ~/.tigrc.
+- Add %(prompt) external command variable, which will prompt for the
+  argument value.
+- Log information about git commands when the TIG_TRACE environment
+  variable is set. Example: `TIG_TRACE=/tmp/tig.log tig`
+- Branch view: Show the title of the last commit.
+- Increase the author auto-abbreviation threshold to 10. (GH #49)
+- For old commits show number of years in relative dates. (GH #50)
+
+Bug fixes:
+- Fix navigation behavior when going from branch to main view. (GH #38)
+- Fix segfault when sorting the tree view by author name.
+- Fix diff stat navigation for unmodified files with stat changes.
+- Show branches/refs which names are a substring of the current branch.
+- Stage view: fix off-by-one error when jumping to a file in a diff
+  with only one file.
+- Fix diff-header colorization. (GH #15)
+
+## Change summary
+
+The diffstat and log summary for changes made in this release.
+
+```
+ BUGS                        |    6 +-
+ INSTALL                     |    5 +-
+ Makefile                    |   29 +-
+ NEWS                        |   56 +
+ SITES                       |    4 +-
+ TODO                        |   41 -
+ VERSION                     |    1 -
+ asciidoc.conf               |    3 +
+ contrib/aspell.dict         |   17 +-
+ contrib/release.sh          |    4 +-
+ contrib/tig-completion.bash |    4 +-
+ contrib/tig.spec.in         |    2 +-
+ contrib/tigrc               |    1 -
+ git.h                       |   55 +
+ io.c                        |  167 +++-
+ io.h                        |   14 +-
+ manual.txt                  |   13 +-
+ refs.c                      |  242 ++++
+ refs.h                      |   41 +
+ tig.1.txt                   |   15 +-
+ tig.c                       | 2514 ++++++++++++++++++++++-------------
+ tig.h                       |  107 ++-
+ tigmanual.7.txt             |    2 +-
+ tigrc.5.txt                 |   99 ++-
+ 24 files changed, 2368 insertions(+), 1074 deletions(-)
+
+     4  Giuseppe Bilotta
+     6  Heiko Schlichting
+   108  Jonas Fonseca
+     3  Jonathan Neuschäfer
+     1  Kumar Appaiah
+     1  Michael J Gruber
+     1  P. Sadik
+     1  Pierre Habouzit
+     1  Robert Clausecker
+     1  Romain Francoise
+     9  Thomas Sibley
+     1  Vivien Didelot
+     2  zomfg
+```
+",https://api.github.com/users/jonas,8417,jonas,https://api.github.com/repos/jonas/tig/releases/3084554/assets,https://api.github.com/repos/jonas/tig/releases/3084554,master,https://api.github.com/repos/jonas/tig/tarball/tig-1.0,https://github.com/jonas/tig/releases/tag/tig-1.0,https://api.github.com/repos/jonas/tig/zipball/tig-1.0,tig-1.0,False,False
+3084549,2012-10-12T12:51:13Z,2016-04-23T21:28:34Z,,"I've release tig version 1.1 with a bunch of improvements and bug fixes. Note that tig no longer uses move/copy detection by default to work better on large repository. See the release notes below on how to restore the old behavior.
+
+## Release notes
+
+Incompatibilities:
+- Disable diff move/copy detection by default, boosting diff
+  performance on larger projects. Use git config 'diff.renames' option
+  (git-wide) to set your preferred behavior. Environment variable
+  TIG_DIFF_OPTS can be used to restore the old behavior.
+- Values set for author-width and filename-width will result in widths
+  one character bigger than previously.
+
+Improvements:
+- Typing a text in the prompt will be interpreted as a tig command.
+  Prefixing the command with a '!' will execute this system command in
+  an external pager. Entering a single key will execute the
+  corresponding key binding.
+- Basic support for wrapping long line in pager, diff, and stage views.
+  Enable using: `set wrap-lines = yes`. (GH #2)
+- User-defined commands prefixed with a '?' means prompt before
+  execution. Example: `bind main B !?git rebase -i %(commit)`.
+- User-defined commands prefixed with a '<' means exit after execution.
+  Example: `bind main C !<git commit`. (GH #66)
+- User-defined commands are executed unquoted to support shell commands.
+  Example: `bind generic I ! <at> sh -c ""echo -n %(commit) | xclip -selection c""`.
+  (GH #65)
+- Configure case-insensitive searches using: `set ignore-case = yes`.
+- Add ""deleted mode"" line type for better diff coloring.
+- Open editor when requesting edit action from within a file diff.
+- Update AX_WITH_CURSES to build under Cygwin.
+- Improve tigrc(5) documentation. (Debian #682766)
+- Allow to build on Mac OS 10.7 without the configure script. (GH #25)
+- Add option to split the view vertically instead of horizontally.
+  Example: `set vertical-split = yes'. (GH #76)
+- Add 'show-id' and 'id-width' options to configure the display of
+  commit IDs in the main view and ID width in the blame view. (GH #77)
+- Allow to override git-based encoding to UTF-8 by setting
+  'i18n.commitencoding' or 'gui.encoding'.
+- Improve autobuild support to track generated files and work with
+  autoreconf 2.61.
+- Commit IDs are read from stdin when --stdin is given; works for main
+  and diff view, e.g. `tig --no-walk --stdin < cherry-picks.txt`.
+- Add option to disable focusing of the child view when it's opened.
+  Disable using: `set focus-child = no`. (GH #83)
+- Allow to open blob related with added content in a diff. (GH #91)
+
+Bug fixes:
+- Fix commit graph regression when a path spec is specified. (GH #53)
+- Main view: only show staged/unstaged changes for the current branch.
+- Support submodules created with current version of git. (GH #54)
+- Fix diff status message for file diffs with no content changes.
+- Fix parent blaming when tig is launched in subdirectory. (GH #70)
+- Do not show deleted branch when reloading the branch view.
+
+## Change summary
+
+The diffstat and log summary for changes made in this release.
+
+```
+ .gitignore                     |    2 +
+ INSTALL                        |    8 +
+ Makefile                       |   35 +-
+ NEWS                           |   57 ++-
+ autogen.sh                     |   22 +
+ config.make.in                 |   12 +-
+ configure.ac                   |   13 +-
+ contrib/announcement.sh        |    2 +-
+ contrib/aspell.dict            |  338 ++++++------
+ contrib/ax_with_curses.m4      |  544 ++++++++++++++++---
+ contrib/config.make-Darwin     |    3 +
+ contrib/tig.spec.in            |    4 +
+ contrib/update-release-docs.sh |   53 ++
+ git.h                          |   36 +-
+ io.c                           |   64 ++-
+ io.h                           |    9 +-
+ manual.txt                     |   47 +-
+ refs.c                         |    2 +-
+ test-graph.c                   |    2 +-
+ tig.1.txt                      |    3 +-
+ tig.c                          |  960 +++++++++++++++++++++++---------
+ tig.h                          |   51 ++-
+ tigrc.5.txt                    |  142 ++++-
+ 23 files changed, 1806 insertions(+), 603 deletions(-)
+
+     1  Beat Bolli
+     1  Donald Chai
+     1  Douglas Livingstone
+     1  Hugo Schmitt
+     1  Jiri Jaburek
+    43  Jonas Fonseca
+     2  Petr Uzel
+     2  Rich Healey
+     1  Ryan Schlesinger
+     8  Samuel Bronson
+     3  Valentin Haenel
+     1  Victor Foitzik
+     7  Vivien Didelot
+     1  Štěpán Němec
+```
+",https://api.github.com/users/jonas,8417,jonas,https://api.github.com/repos/jonas/tig/releases/3084549/assets,https://api.github.com/repos/jonas/tig/releases/3084549,master,https://api.github.com/repos/jonas/tig/tarball/tig-1.1,https://github.com/jonas/tig/releases/tag/tig-1.1,https://api.github.com/repos/jonas/tig/zipball/tig-1.1,tig-1.1,False,False
+3084545,2013-08-10T14:26:34Z,2016-04-23T21:27:42Z,,"It's been almost a year since the last release of tig, so here is a much needed update. It brings a lot of cool new features, such as the ability to jump directly from diff to the corresponding line in the changed file, a stash view, improvements to the log view, plus a bunch of bug fixes.
+
+On behalf of everyone who contributed to this release, please enjoy.
+
+## Release notes
+- Tig now has its own tag on Stack Overflow, where users are invited to
+  ask questions: http://stackoverflow.com/questions/tagged/tig
+
+Improvements:
+- Make tig prompt commands bindable to keys. For example:
+  `bind diff F :set diff-options = --full-diff`. (GH #69, #116)
+- Add a diff-options setting for specifying default diff options.
+  Example: `set diff-options = --patience`. (GH #116)
+- Options in diff-options and blame-options matching tig browsing state
+  variables are replaced.
+- Show diff stats as wide as the terminal. (GH #109)
+- Show line numbers in the branch view. (GH #135)
+- Add toggles for showing author email or email user names. (GH #115)
+- Open editor at the selected line by prefixing the file argument with
+  `+<lineno>`. Tested in vi, vim, emacs, nano, gedit, geany. Disable
+  by adding `set editor-line-number = no` to ~/.tigrc. (GH #118, #119)
+- Add toggle-files to control whether to show full commit diff or only
+  the diff concerning the currently selected file, e.g. for blame.
+- Optionally highlight exceeding characters in long commit titles.
+  The default title max width is 50 characters. Customize using:
+  `set title-overflow = 50` (GH #125)
+- Add +ESC key bindings. Example: `bind generic ^[v move-page-up` (GH #120)
+- Create temporary files in TMPDIR, TEMP, or TMP before defaulting to /tmp.
+- Reenable `tig log` as a subcommand. (GH #146)
+- Enable tilde expansion in ~/.tigrc ""source"" commands. (GH #168)
+- Introduce the stash view, bound to the 'y' keybinding. (GH #169, #174)
+
+Bug fixes:
+- Fix blame and status to work in directories starting with a dot. (GH #172)
+- Reload current branch name when reloading the status view. (GH #93)
+- Fix compile errors on old Solaris. (GH #97)
+- Reload HEAD info when reloading the stage view. (GH #104, #93)
+- Fix disappearing branch labels after external commands. (GH #148)
+- Fix diff view display for staged/unstaged changes when using 'd'.
+- Fix display of status messages when toggling view options. (GH #111)
+- Fix illegal memory access. (GH #98)
+- Fix display of all branches label in repos with short branch names.
+- Fix rendering glitch for branch names.
+- Do not apply diff styling to untracked files in the stage view. (GH #153)
+- Fix tree indentation for entries containing combining characters. (GH #170)
+- Ignore unrepresentable characters when transliterating text for rendering.
+- Transliterate text to output encoding before trimming it to avoid
+  misalignment. (GH #86)
+- Introduce a more natural context-sensitive log display. (GH #155)
+
+## Change summary
+
+The diffstat and log summary for changes made in this release.
+
+```
+ BUGS                        |    3 +-
+ Makefile                    |   32 +-
+ NEWS                        |   51 ++
+ SITES                       |    1 +
+ autogen.sh                  |    2 +-
+ compat/compat.h             |   44 ++
+ compat/mkstemps.c           |  152 +++++
+ compat/setenv.c             |  186 ++++++
+ config.make.in              |    4 +
+ configure.ac                |   13 +-
+ contrib/aspell.dict         |    3 +-
+ contrib/config.make-Darwin  |    1 +
+ contrib/header.h            |   12 +
+ contrib/tig-completion.bash |    2 +-
+ contrib/tig.spec.in         |    4 +
+ git.h                       |    4 +-
+ graph.c                     |   10 +-
+ graph.h                     |    5 +-
+ io.c                        |   42 +-
+ io.h                        |    7 +-
+ manual.txt                  |   34 +-
+ refs.c                      |   12 +-
+ refs.h                      |    5 +-
+ test-graph.c                |   24 +-
+ tig.1.txt                   |   18 +-
+ tig.c                       | 1124 +++++++++++++++++++++++++----------
+ tig.h                       |   32 +-
+ tigrc.5.txt                 |   69 ++-
+ 28 files changed, 1509 insertions(+), 387 deletions(-)
+
+     1  Aaron Franks
+     1  Beat Bolli
+     1  Dominik Vogt
+     2  Drew Northup
+     3  IWASAKI Yudai
+     1  Joakim Sernbrant
+    61  Jonas Fonseca
+     1  Julian Langschaedel
+     4  Kumar Appaiah
+     1  Menghan Zheng
+     1  Michael Grünewald
+     1  Rafael Laboissiere
+     1  Romain Francoise
+     2  Sven Wegener
+    10  Thomas Sibley
+     1  Tristan Matthews
+     8  Vivien Didelot
+     1  lvzhandong
+```
+",https://api.github.com/users/jonas,8417,jonas,https://api.github.com/repos/jonas/tig/releases/3084545/assets,https://api.github.com/repos/jonas/tig/releases/3084545,master,https://api.github.com/repos/jonas/tig/tarball/tig-1.2,https://github.com/jonas/tig/releases/tag/tig-1.2,https://api.github.com/repos/jonas/tig/zipball/tig-1.2,tig-1.2,False,False
+3084543,2013-08-24T14:42:16Z,2016-04-23T21:26:32Z,,"Due to a bug in the handling of submodules, here is a new release of Tig. In addition to the bug fix, this new version reduces memory usage and startup time of the main view and shows the blob size in the tree view.
+
+Note to packagers: the manual and manpage documentation files now live inside the doc/ directory and and have .asciidoc as the extension. The SITES file has been removed as its content has been merged into README.
+
+## Release notes
+
+Incompatibilities:
+- Move manual and man pages to doc/ directory and rename AsciiDoc files
+  to have .asciidoc as the extension to make them render on GitHub.
+
+Improvements:
+- Show blob sizes in the tree view either as bytes or using binary unit
+  prefixes. Example: `set show-file-size = units`. (GH #163)
+- Reduce main view memory usage and startup time, especially when revision
+  graph rendering is disabled. (GH #160)
+
+Bug fixes:
+- Fix submodule-related setup to check for non-zero return value from
+  setenv(). (GH #188)
+
+## Change summary
+
+The diffstat and log summary for changes made in this release.
+
+```
+ .gitignore                     |   18 +-
+ BUGS                           |    4 +-
+ INSTALL                        |   92 +++--
+ Makefile                       |   76 ++--
+ NEWS                           |   62 ++-
+ README                         |   28 +-
+ SITES                          |    7 -
+ asciidoc.conf                  |   65 ---
+ contrib/announcement.sh        |   11 +-
+ contrib/aspell.dict            |   18 +-
+ contrib/config.make            |   16 +
+ contrib/config.make-Darwin     |    5 +
+ contrib/tig.spec.in            |    6 +-
+ contrib/update-release-docs.sh |    6 +-
+ doc/asciidoc.conf              |   65 +++
+ doc/manual.asciidoc            |  606 +++++++++++++++++++++++++
+ doc/tig.1.asciidoc             |  195 ++++++++
+ doc/tigmanual.7.asciidoc       |   20 +
+ doc/tigrc.5.asciidoc           |  757 ++++++++++++++++++++++++++++++++
+ manual.txt                     |  604 -------------------------
+ tig.1.txt                      |  176 --------
+ tig.c                          |  333 +++++++++++----
+ tigmanual.7.txt                |   20 -
+ tigrc.5.txt                    |  736 -------------------------------
+ 24 files changed, 2119 insertions(+), 1807 deletions(-)
+
+Dan Church (1):
+      Fix man page install
+
+Jonas Fonseca (19):
+      Move documentation to doc directory
+      Rework README to include the list of online resources
+      Fix submodule-related setup to properly check setenv return value
+      Fix path to sysconfdir-based gitconfig in tig(1)
+      Fix HTML doc installation
+      Ignore *.swp files and restrict to only ignore top-level config.make
+      Add work-around for building manpages with Homebrew-based xmlto
+      Improve the installation instructions
+      Show blob sizes in the tree view
+      Ignore generated HTML files in the whole tree
+      Dynamically allocate commit titles to reduce memory usage
+      Postpone ref list lookup to the draw phase
+      Bypass all graph calls and memory allocations when the graph is disabled
+      Free graph symbols when reloading the main view
+      Remove the dont_free line struct flag in favor of custom help_done
+      Fix regression that skipped commits with no messages
+      Simplify the install goal and rename $(PROGS) to $(EXE)
+      Use capitalized Git and Tig when talking about the systems in general
+      tig-1.2.1
+```
+",https://api.github.com/users/jonas,8417,jonas,https://api.github.com/repos/jonas/tig/releases/3084543/assets,https://api.github.com/repos/jonas/tig/releases/3084543,master,https://api.github.com/repos/jonas/tig/tarball/tig-1.2.1,https://github.com/jonas/tig/releases/tag/tig-1.2.1,https://api.github.com/repos/jonas/tig/zipball/tig-1.2.1,tig-1.2.1,False,False
+3084536,2014-04-30T12:17:54Z,2016-04-23T21:24:31Z,,"Here's a small bugfix release to fix some _blush_ last minute changes.
+
+## Release notes
+
+Bug fixes:
+- Fix compilation in watch.c.
+- Fix parsing of key bindings mapped to '^' and '<'. (GH #280, #282)
+
+## Change summary
+
+The diffstat and log summary for changes made in this release.
+
+```
+ Makefile    |  2 +-
+ NEWS.adoc   |  8 ++++++++
+ src/keys.c  | 10 ++++++++--
+ src/watch.c |  2 +-
+ 4 files changed, 18 insertions(+), 4 deletions(-)
+
+Avinash (1):
+      Prevent throwing errors if single '^'(circumflex) is used in config
+
+Jeff King (1):
+      Fix compilation error in watch.c
+
+Jonas Fonseca (2):
+      Improve pretty printing of ',' in the help view
+      tig-2.0.1
+
+Yasuharu Ozaki (1):
+      fix <LessThan> binding support
+```
+",https://api.github.com/users/jonas,8417,jonas,https://api.github.com/repos/jonas/tig/releases/3084536/assets,https://api.github.com/repos/jonas/tig/releases/3084536,master,https://api.github.com/repos/jonas/tig/tarball/tig-2.0.1,https://github.com/jonas/tig/releases/tag/tig-2.0.1,https://api.github.com/repos/jonas/tig/zipball/tig-2.0.1,tig-2.0.1,False,False
+3084532,2014-05-09T02:01:09Z,2016-04-23T21:23:54Z,,"Here's another bug fix release that addresses an issue with loading the refs, main and grep views when `gui.encoding` was set, a build failure on OS X 10.6 as well as a few other bugs reported since 2.0.1.
+
+## Release notes
+
+Improvements:
+- Use git-status for diffing the index.
+- Group toggle options together in the help view.
+
+Bug fixes:
+- Fix refs, main and grep loading when 'gui.encoding' is set. (GH #287)
+- Ignore 'gui.encoding' and 'i18n.commitencoding' when set to 'UTF-8'.
+- Add work-around for missing strndup() on Mac OS X v10.6. (GH #286)
+- Fix spurious abbreviation of author names. (GH #288)
+- Don't show empty action groups in the help view.
+
+## Change summary
+
+The diffstat and log summary for changes made in this release.
+
+```
+ Makefile            |  7 ++++-
+ NEWS.adoc           | 16 ++++++++++
+ compat/compat.h     |  6 ++++
+ compat/strndup.c    | 54 +++++++++++++++++++++++++++++++++
+ config.make.in      |  1 +
+ configure.ac        |  1 +
+ doc/tigrc.5.adoc    | 67 +++++++++++++++++++++-------------------
+ include/tig/io.h    | 11 +++++--
+ include/tig/main.h  |  2 +-
+ include/tig/pager.h |  2 +-
+ include/tig/repo.h  |  9 ++++--
+ include/tig/view.h  |  2 +-
+ src/argv.c          |  8 ++---
+ src/blame.c         | 27 +++++++++--------
+ src/blob.c          |  6 ++--
+ src/diff.c          | 14 ++++-----
+ src/draw.c          |  4 +--
+ src/grep.c          | 12 ++++----
+ src/help.c          | 20 ++++++++----
+ src/io.c            | 74 +++++++++++++++++++++++++--------------------
+ src/keys.c          | 33 ++++++++++++--------
+ src/log.c           |  6 ++--
+ src/main.c          | 18 ++++++-----
+ src/options.c       |  4 ++-
+ src/pager.c         |  6 ++--
+ src/prompt.c        |  4 ++-
+ src/refs.c          | 12 ++++----
+ src/repo.c          | 46 +++++++++++++++++-----------
+ src/stage.c         | 10 +++---
+ src/status.c        | 16 +++++-----
+ src/tree.c          | 22 +++++++-------
+ src/view.c          | 17 ++++++-----
+ src/watch.c         |  7 +++--
+ test/test-graph.c   |  6 ++--
+ tools/aspell.dict   | 12 ++++----
+ tools/release.sh    |  2 +-
+ 36 files changed, 354 insertions(+), 210 deletions(-)
+
+Jonas Fonseca (16):
+      Fix auto-abbreviation of author names
+      Improve display of commas and spaces in the help view
+      Rewrite index diffing to use git-status
+      Group option toggle bindings together in the help view
+      Never show any actions for a hidden keymap
+      Fix infinite loop when parsing view columns
+      Use buffer when reading data using io_get()
+      Use buffer for reading view data
+      Ignore 'gui.encoding' and 'i18n.commitencoding' when set to 'UTF-8'
+      Only use the delimiter character for trimmed and unscrollable text
+      Improve warning for obsolete view UI options
+      Improve documentation of view settings in tigrc(5)
+      Move cursor to the first line when :0 is entered
+      Fix documentation of author width option
+      Fix release script to work for patch versions
+      tig-2.0.2
+
+Vivien Didelot (2):
+      compat: add proper work-around for missing strndup
+      argv: revert part of a3079e2
+```
+",https://api.github.com/users/jonas,8417,jonas,https://api.github.com/repos/jonas/tig/releases/3084532/assets,https://api.github.com/repos/jonas/tig/releases/3084532,master,https://api.github.com/repos/jonas/tig/tarball/tig-2.0.2,https://github.com/jonas/tig/releases/tag/tig-2.0.2,https://api.github.com/repos/jonas/tig/zipball/tig-2.0.2,tig-2.0.2,False,False
+3084531,2014-08-29T01:17:26Z,2016-04-23T21:22:47Z,,"I am very happy to announce that another bug fix release of Tig is now available. Among the most prominent fixes are readline completion and refreshing of view after returning from commands when refresh-mode is set to after-command. This release also improves testing so that Tig now has an actual test suite, which although being far from complete has already help to ensure more consistency and avoid regressions. For a complete list of fixes and improvements see the release notes below.
+
+With this maintainance release out of the way I plan to merge some of the experimental features such as support for key combos that didn't get finalized for the 2.0 release.
+
+## Release notes
+
+Improvement:
+- Add `:save-display <file>` prompt command to save the current display.
+- Add `:script <file>` prompt command for scripting the Tig UI.
+- Add test framework and convert existing tests to use it.
+- Add command-line option for starting in refs view: `tig refs`. (GH #309)
+- Make blame commit ID colors stable across reloads. (GH #303)
+- Increase blame ID and graph rendering color palette to 14 colors.
+- New setting 'split-view-width' controls the width for vertical splits. It
+  takes the width of the right-most view either as a number or a percentage.
+- Expose settings holding command line argument lists: `file-args`, `rev-args`,
+  and `cmdline-args`. They are mainly intended for testing purposes but also
+  allows to change the filtering arguments dynamically. (GH #306)
+- Add `log-options` setting for specifying default log view options.
+  Example: `set log-options = --pretty=fuller`.
+- Use option specific view flags to reload view after `:set` commands.
+
+Bug fixes:
+- Refresh the current view when returning from an external command and
+  `refresh-mode=after-command`. (GH #289)
+- Fix readline completion.
+- Fix '/' to `find-next` when readline support is enabled. (GH #302)
+- Fix readline prompt to correctly handle UTF-8 characters.
+- Add warnings for more obsolete actions and colors.
+- Fix passing of commit IDS via stdin to the main view.
+- Fix commit title overflow drawing for multibyte text. (GH #307)
+- Fix installation directory permissions.
+- Handle binary files matches reported by git-grep.
+- Toggling of ""args""-typed options without any arguments will clear the current
+  arguments. Example: `:toggle blame-options`.
+- Detect custom `pretty.format` settings that break the log view and fallback
+  to use the `medium` format. (GH #225)
+- Fix invocation of git-diff for the blame view's line tracking. (GH #316)
+- Fix blame completion of directory names. (GH #317)
+- Fix display of conflicts in the main view when 'show-changes' is enabled.
+- Fix off-by-one error when displaying line numbers in the grep view.
+- When showing the commit graph ensure that either topo, date or author-date
+  commit order is used. (Debian #757692) (GH #238)
+
+## Change summary
+
+The diffstat and log summary for changes made in this release.
+
+```
+ .gitignore                                    |     3 +-
+ .travis.yml                                   |     4 +-
+ Makefile                                      |    30 +-
+ NEWS.adoc                                     |    43 +
+ contrib/tig-completion.bash                   |    38 +-
+ doc/manual.adoc                               |     2 +-
+ doc/tig.1.adoc                                |    19 +
+ doc/tigrc.5.adoc                              |    74 +-
+ include/tig/display.h                         |    18 +-
+ include/tig/graph.h                           |     2 +-
+ include/tig/io.h                              |     4 +-
+ include/tig/keys.h                            |     1 +
+ include/tig/line.h                            |     7 +
+ include/tig/options.h                         |    15 +-
+ include/tig/prompt.h                          |     8 +
+ include/tig/refdb.h                           |     1 +
+ include/tig/watch.h                           |     2 +-
+ src/argv.c                                    |    22 +-
+ src/blame.c                                   |    16 +-
+ src/diff.c                                    |     4 +-
+ src/display.c                                 |   206 +-
+ src/draw.c                                    |    56 +-
+ src/grep.c                                    |    36 +-
+ src/keys.c                                    |     1 -
+ src/line.c                                    |     7 +
+ src/log.c                                     |     4 +-
+ src/main.c                                    |    27 +-
+ src/options.c                                 |    66 +-
+ src/parse.c                                   |     1 -
+ src/prompt.c                                  |   106 +-
+ src/refdb.c                                   |     7 +-
+ src/refs.c                                    |     2 +-
+ src/repo.c                                    |     3 +-
+ src/status.c                                  |     2 +-
+ src/tig.c                                     |    42 +-
+ src/view.c                                    |   109 +-
+ src/watch.c                                   |    33 +-
+ test/README.adoc                              |    39 +
+ test/blame/default-test                       |   125 +
+ test/builtin-config.sh                        |    18 -
+ test/files/scala-js-benchmarks.tgz            |   Bin 0 -> 91452 bytes
+ .../simple.in => graph/00-simple-test}        |    17 +
+ test/graph/01-merge-from-left-test            |    26 +
+ test/graph/02-duplicate-parent-test           |    38 +
+ test/graph/03-octo-merge-test                 |    26 +
+ test/graph/04-missing-bar-test                |    32 +
+ test/graph/05-extra-pipe-test                 |    29 +
+ .../06-extra-bars-test}                       |   125 +
+ test/graph/07-multi-collapse-test             |    35 +
+ test/graph/08-multi-collapse-2-test           |    38 +
+ test/graph/09-parallel-siblings-test          |    38 +
+ test/graph/10-shorter-merge-than-branch-test  |    44 +
+ test/graph/11-new-branch-in-middle-test       |    38 +
+ test/graph/12-cross-over-collapse-test        |    38 +
+ ...branches-with-different-middle-branch-test |    41 +
+ .../14-long-collapse-line-test}               |    51 +
+ .../15-many-merges-test}                      |    31 +
+ .../16_changes.in => graph/16-changes-test}   |    15 +
+ .../more.out => graph/17-more-merges-test}    |    83 +
+ .../tig.in => graph/18-tig-test}              |    19 +
+ .../tig-all.in => graph/19-tig-all-test}      |    47 +-
+ .../20-tig-all-long-test}                     |   604 +-
+ test/graph/20-tig-all-long-test.in            |   Bin 0 -> 262208 bytes
+ test/grep/default-test                        |   249 +
+ test/log/pretty-format-test                   |   123 +
+ test/log/submodule-test                       |   127 +
+ test/main/commit-order-edge-case-test         |    47 +
+ test/main/commit-order-edge-case-test.tgz     |   Bin 0 -> 2728 bytes
+ test/main/commit-title-overflow-test          |   114 +
+ test/main/default-test                        |   144 +
+ test/main/pretty-raw-test                     |    38 +
+ test/main/refresh-test                        |    98 +
+ test/main/search-test                         |   160 +
+ test/main/show-changes-test                   |   151 +
+ test/main/stdin-test                          |    38 +
+ test/main/submodule-test                      |   130 +
+ test/main/util.sh                             |    16 +
+ test/main/view-split-test                     |   110 +
+ test/refs/branch-checkout-test                |   106 +
+ test/refs/default-test                        |    60 +
+ test/refs/util.sh                             |    13 +
+ test/script/default-test                      |    40 +
+ test/status/file-name-test                    |   122 +
+ test/status/refresh-test                      |   251 +
+ .../10_shorter_merge_than_branch.in           |    22 -
+ .../10_shorter_merge_than_branch.out          |    11 -
+ .../11_new_branch_in_middle.in                |    18 -
+ .../11_new_branch_in_middle.out               |     9 -
+ .../12_cross_over_collapse.in                 |    18 -
+ .../12_cross_over_collapse.out                |     9 -
+ ...l_branches_with_different_middle_branch.in |    20 -
+ ..._branches_with_different_middle_branch.out |    10 -
+ .../14_long_collapse_line.in                  |    40 -
+ test/test-graph-samples/16_changes.out        |     4 -
+ test/test-graph-samples/1_merge_from_left.in  |    10 -
+ test/test-graph-samples/1_merge_from_left.out |     5 -
+ test/test-graph-samples/2_duplicate_parent.in |    18 -
+ .../test-graph-samples/2_duplicate_parent.out |     9 -
+ test/test-graph-samples/3_octo_merge.in       |    10 -
+ test/test-graph-samples/3_octo_merge.out      |     5 -
+ test/test-graph-samples/4_missing_bar.in      |    14 -
+ test/test-graph-samples/4_missing_bar.out     |     7 -
+ test/test-graph-samples/5_extra_pipe.in       |    12 -
+ test/test-graph-samples/5_extra_pipe.out      |     6 -
+ test/test-graph-samples/6_extra_bars.in       |   115 -
+ test/test-graph-samples/7_multi_collapse.in   |    16 -
+ test/test-graph-samples/7_multi_collapse.out  |     8 -
+ test/test-graph-samples/8_multi_collapse_2.in |    18 -
+ .../test-graph-samples/8_multi_collapse_2.out |     9 -
+ .../test-graph-samples/9_parallel_siblings.in |    18 -
+ .../9_parallel_siblings.out                   |     9 -
+ test/test-graph-samples/many_merges.out       |    20 -
+ test/test-graph-samples/more.in               |    72 -
+ test/test-graph-samples/simple.out            |     6 -
+ test/test-graph-samples/tig-all-long.in       | 14986 ----------------
+ test/test-graph-samples/tig-all.out           |    35 -
+ test/test-graph-samples/tig.out               |     8 -
+ test/tigrc/builtin-error-test                 |    12 +
+ test/tigrc/compat-error-test                  |   125 +
+ test/tigrc/env-vars-test                      |    39 +
+ test/tigrc/parse-test                         |   125 +
+ test/tigrc/tigrc-manpage-examples-test        |    49 +
+ test/tools/libgit.sh                          |   242 +
+ test/tools/libtest.sh                         |   228 +
+ test/tools/setup-conflict.sh                  |    22 +
+ test/tools/show-results.sh                    |    34 +
+ test/{ => tools}/test-graph.c                 |    36 +-
+ test/tree/default-test                        |   165 +
+ test/unit-test-graph.sh                       |    19 -
+ tigrc                                         |    12 +-
+ tools/aspell.dict                             |    11 +-
+ tools/install.sh                              |     2 +-
+ tools/release.sh                              |     7 +-
+ 133 files changed, 5456 insertions(+), 16004 deletions(-)
+
+     1 Alexander Myltsev
+     3 John Keeping
+    64 Jonas Fonseca
+     1 Olof-Joachim Frahm
+     1 Sven Wegener
+     2 Vivien Didelot
+     1 hamaco
+```
+",https://api.github.com/users/jonas,8417,jonas,https://api.github.com/repos/jonas/tig/releases/3084531/assets,https://api.github.com/repos/jonas/tig/releases/3084531,master,https://api.github.com/repos/jonas/tig/tarball/tig-2.0.3,https://github.com/jonas/tig/releases/tag/tig-2.0.3,https://api.github.com/repos/jonas/tig/zipball/tig-2.0.3,tig-2.0.3,False,False
+3084524,2015-03-11T03:29:46Z,2016-04-23T21:20:13Z,,"I just released version 2.1 of Tig which brings a lot of improvements to speed
+up usage in large repositories such as the Linux kernel repo (see improvements
+related to #310, #324, #350, and #368). Else this release brings minor
+improvements across the board plus a fair amount of bug fixes. See below for
+more details.
+
+## Release notes
+
+Improvements:
+- Improve C99 compliance so Tig compiles with the native compilers on
+  Solaris (SunStudio cc) and AIX (xlc). (GH #380)
+- Add move-half-page-up and move-half-page-down actions. (GH #323)
+- Preserve the cursor position when changing the diff context.
+- Show 'Unstaged changes' above 'Staged changes' in the main view. (GH #383)
+- Add `:exec <flags><args...>` prompt command to execute commands.
+- Add shorthand for changing the view settings of a single column,
+  eg. `set main-view-author = short`. (GH #318)
+- Show better diff context info in the stage view.
+- Add `%(lineno)` state variable. (GH #304)
+- Use hash table to speed up refs lookup. (GH #350)
+- Show the file path in the blob view when available.
+- Use `set commit-order = default` to use Git's default commit order, even when
+  the commit graph is enabled. The option will turn off automatic enabling of
+  `--topo-order` when the graph is shown in the main view. (GH #310, #324)
+- Speed up the diff view in large repos by loading git-describe info after the
+  diff content has been read. (GH #324)
+- Add the old graph rendering as an option. (GH #310, #324)
+- Add `main-options` setting for specifying default main view options.
+  Example: `set main-options = --max-count=1000`. (GH #368)
+- See `contrib/large-repo.tigrc` for settings that will help to speed up Tig in
+  large repos. (GH #368)
+- Add `:save-options <file>` prompt command to save config to file. (GH #315)
+
+Bug fixes:
+- Update manual to reflect default keybinding changes. (GH #325)
+- Fix graph support for `--first-parent`. (GH #326)
+- Fix off-by-one error when opening editor from the grep view.
+- Fix status on-branch information.
+- Fix main view to handle the case when git-log doesn't find any commits.
+- Fix corner case when parsing diff chunk when lines information is missing.
+- Ensure main view changes commits are shown right before the current HEAD.
+- Fix rendering of boundary commits.
+- Fix compilation with GNU Make 3.80 by removing `$(abspath)`. (GH #362)
+- Fix config parsing to support shell-like quoting in user-defined command,
+  e.g. `bind generic <Ctrl-f> :!git log -G""%(prompt Prompt: )""` (GH #371)
+- Make diff meta information colors more consistent with Git. (GH #375)
+- Fix segfault when updating changes in a maximized stage view opened via the
+  main view. (GH #376)
+- Handle line number configs where the interval is not specified. (GH #378)
+- Fix display of error messages during startup. (GH #385)
+- Show untracked files outside the current directory like git-status. (GH #230)
+
+## Change summary
+
+The diffstat and log summary for changes made in this release.
+
+```
+ INSTALL.adoc                           |    8 +
+ Makefile                               |   25 +-
+ NEWS.adoc                              |   51 +-
+ README.adoc                            |    3 +-
+ contrib/config.make-CYGWIN_NT-6.1      |    5 +-
+ contrib/config.make-Darwin             |   10 +-
+ contrib/large-repo.tigrc               |   20 +
+ doc/manual.adoc                        |   41 +-
+ doc/tigrc.5.adoc                       |   77 +-
+ include/tig/argv.h                     |   36 +-
+ include/tig/blame.h                    |    2 +-
+ include/tig/blob.h                     |    2 +-
+ include/tig/diff.h                     |    9 +-
+ include/tig/display.h                  |    5 +-
+ include/tig/draw.h                     |    4 +-
+ include/tig/git.h                      |   16 +-
+ include/tig/graph.h                    |   87 +-
+ include/tig/grep.h                     |    2 +-
+ include/tig/help.h                     |    2 +-
+ include/tig/io.h                       |    3 +-
+ include/tig/keys.h                     |   21 +-
+ include/tig/line.h                     |    7 +-
+ include/tig/log.h                      |    2 +-
+ include/tig/main.h                     |    8 +-
+ include/tig/map.h                      |   63 ++
+ include/tig/options.h                  |   47 +-
+ include/tig/pager.h                    |    2 +-
+ include/tig/parse.h                    |    2 +-
+ include/tig/prompt.h                   |    3 +-
+ include/tig/refdb.h                    |   28 +-
+ include/tig/refs.h                     |    2 +-
+ include/tig/repo.h                     |    4 +-
+ include/tig/request.h                  |   10 +-
+ include/tig/stage.h                    |    2 +-
+ include/tig/stash.h                    |    2 +-
+ include/tig/status.h                   |    2 +-
+ include/tig/string.h                   |   10 +-
+ include/tig/tig.h                      |    5 +-
+ include/tig/tree.h                     |    2 +-
+ include/tig/types.h                    |   21 +-
+ include/tig/util.h                     |    4 +-
+ include/tig/view.h                     |   13 +-
+ include/tig/watch.h                    |    2 +-
+ src/argv.c                             |  203 +++--
+ src/blame.c                            |   16 +-
+ src/blob.c                             |   28 +-
+ src/diff.c                             |  111 ++-
+ src/display.c                          |   40 +-
+ src/draw.c                             |   73 +-
+ src/graph-v1.c                         |  504 +++++++++++
+ src/graph-v2.c                         | 1117 ++++++++++++++++++++++++
+ src/graph.c                            |  989 +--------------------
+ src/grep.c                             |    9 +-
+ src/help.c                             |  121 +--
+ src/io.c                               |   24 +-
+ src/keys.c                             |  211 ++++-
+ src/line.c                             |   17 +-
+ src/log.c                              |    2 +-
+ src/main.c                             |  162 ++--
+ src/map.c                              |  122 +++
+ src/options.c                          |  364 ++++++--
+ src/pager.c                            |   42 +-
+ src/parse.c                            |  112 +--
+ src/prompt.c                           |  182 ++--
+ src/refdb.c                            |  308 ++++---
+ src/refs.c                             |   15 +-
+ src/repo.c                             |   36 +-
+ src/request.c                          |    2 +-
+ src/stage.c                            |   39 +-
+ src/stash.c                            |    2 +-
+ src/status.c                           |   47 +-
+ src/string.c                           |    2 +-
+ src/tig.c                              |   61 +-
+ src/tree.c                             |    2 +-
+ src/types.c                            |   10 +-
+ src/util.c                             |    2 +-
+ src/view.c                             |  271 +++++-
+ src/watch.c                            |    4 +-
+ test/README.adoc                       |    7 +-
+ test/blame/default-test                |   42 +-
+ test/blame/start-on-line-test          |   50 ++
+ test/diff/diff-context-test            |  213 +++++
+ test/diff/editor-test                  |   61 ++
+ test/diff/start-on-line-test           |   45 +
+ test/grep/default-test                 |    8 +-
+ test/grep/editor-test                  |   50 ++
+ test/grep/start-on-line-test           |   50 ++
+ test/help/all-keybindings-test         |  129 +++
+ test/help/default-test                 |  117 +++
+ test/log/pretty-format-test            |    3 +-
+ test/log/start-on-line-test            |   44 +
+ test/log/submodule-test                |    7 +-
+ test/main/boundary-test                |   37 +
+ test/main/commit-order-edge-case-test  |    1 -
+ test/main/commit-title-overflow-test   |    5 +-
+ test/main/default-test                 |    2 +-
+ test/main/graph-argument-test          |   68 ++
+ test/main/main-options-test            |   38 +
+ test/main/no-matching-commmits-test    |   25 +
+ test/main/refresh-test                 |   27 +-
+ test/main/search-test                  |    1 -
+ test/main/show-changes-test            |   45 +-
+ test/main/start-on-line-test           |   48 +
+ test/main/submodule-test               |    5 +-
+ test/main/update-unstaged-changes-test |   42 +
+ test/main/util.sh                      |    2 +-
+ test/main/view-split-test              |   35 +-
+ test/refs/branch-checkout-test         |   77 +-
+ test/refs/default-test                 |   38 +-
+ test/refs/refresh-test                 |  104 +++
+ test/refs/replace-test                 |   80 ++
+ test/refs/start-on-line-test           |   50 ++
+ test/regressions/github-370-test       |   18 +
+ test/script/default-test               |    4 +-
+ test/stage/default-test                |  245 ++++++
+ test/stash/start-on-line-test          |   57 ++
+ test/status/file-name-test             |    3 +-
+ test/status/on-branch-test             |  179 ++++
+ test/status/refresh-test               |   29 +-
+ test/status/start-on-line-test         |   45 +
+ test/status/untracked-files-test       |   79 ++
+ test/tigrc/builtin-error-test          |    2 +-
+ test/tigrc/compat-error-test           |    2 +-
+ test/tigrc/contrib-tigrc-test          |   26 +
+ test/tigrc/env-vars-test               |    2 +-
+ test/tigrc/parse-test                  |   16 +-
+ test/tigrc/quote-test                  |   63 ++
+ test/tigrc/save-option-test            |   29 +
+ test/tigrc/tigrc-manpage-examples-test |    2 +-
+ test/tigrc/view-column-test            |   64 ++
+ test/tools/libgit.sh                   |    7 +-
+ test/tools/libtest.sh                  |  200 ++++-
+ test/tools/setup-conflict.sh           |   14 +-
+ test/tools/test-graph.c                |   46 +-
+ test/tree/default-test                 |    2 +-
+ tigrc                                  |   22 +-
+ tools/aspell.dict                      |   10 +-
+ tools/doc-gen.c                        |    2 +-
+ tools/header.h                         |    2 +-
+ 139 files changed, 6381 insertions(+), 2265 deletions(-)
+
+     1 Aaron Lindsay
+     6 Charles Bailey
+     1 Islam Azab
+     5 Jeff King
+   108 Jonas Fonseca
+     1 Peter Dave Hello
+     1 The Gitter Badger
+     1 Tom Greuter
+```
+",https://api.github.com/users/jonas,8417,jonas,https://api.github.com/repos/jonas/tig/releases/3084524/assets,https://api.github.com/repos/jonas/tig/releases/3084524,master,https://api.github.com/repos/jonas/tig/tarball/tig-2.1,https://github.com/jonas/tig/releases/tag/tig-2.1,https://api.github.com/repos/jonas/tig/zipball/tig-2.1,tig-2.1,False,False
+3084521,2015-04-09T00:18:45Z,2016-04-23T21:18:49Z,,"This release fixes a couple of regressions that broke rendering of references
+in the main view and usage of the stage view. It also adds support for key
+combos which was originally planed for 2.1 (see contrib/vim.tigrc for an
+example). Finally, files (or blobs) can now be searched using the new
+GitHub-inspired file finder (press 'f' to launch it).
+
+## Release notes
+
+Improvements:
+- Add support for key combos. (GH #67)
+- See `contrib/vim.tigrc` for Vim-like keybindings. (GH #273, #351)
+- Add GitHub inspired file finder to search for and open any file. (GH #342)
+- Add `search` keymap for navigation file finder search results.
+
+Bug fixes:
+- Fix display of multiple references per commit. (GH #390, #391)
+- Sync the prompt's cursor position with readline's internal position. (#396)
+- Keep unstaged changes view open after an staging command. (#399)
+
+## Change summary
+
+The diffstat and log summary for changes made in this release.
+
+```
+ .gitignore                       |   3 +
+ COPYING                          |  39 ++--
+ Makefile                         |  45 ++++-
+ NEWS.adoc                        |  16 ++
+ README.adoc                      |   2 +-
+ config.make.in                   |   5 +-
+ configure.ac                     |   5 +
+ contrib/vim.tigrc                |  73 ++++++++
+ doc/tigrc.5.adoc                 |   3 +-
+ include/tig/blob.h               |   7 +-
+ include/tig/display.h            |   2 +-
+ include/tig/keys.h               |  10 +-
+ include/tig/main.h               |   2 +
+ include/tig/prompt.h             |   1 +
+ include/tig/ui.h                 |  20 ++
+ src/blob.c                       |  29 ++-
+ src/display.c                    |  19 +-
+ src/keys.c                       |  56 ++++--
+ src/main.c                       |  20 ++
+ src/options.c                    |   2 +-
+ src/prompt.c                     |  25 +--
+ src/refdb.c                      |  21 ++-
+ src/stage.c                      |  22 +--
+ src/status.c                     |   2 +
+ src/tig.c                        |  58 ++++--
+ src/ui.c                         | 304 +++++++++++++++++++++++++++++++
+ test/help/all-keybindings-test   |  10 +-
+ test/help/default-test           |  14 +-
+ test/main/graph-argument-test    |  28 +--
+ test/main/show-changes-test      |  24 +++
+ test/main/start-on-line-test     |  42 ++---
+ test/main/view-split-test        |  18 +-
+ test/regressions/github-390-test |  41 +++++
+ test/status/file-name-test       |   8 +-
+ test/tigrc/compat-error-test     |   2 -
+ test/tigrc/parse-test            |   4 +-
+ tigrc                            |   7 +
+ tools/aspell.dict                |  12 +-
+ tools/gcov.m4                    |  94 ++++++++++
+ 39 files changed, 912 insertions(+), 183 deletions(-)
+
+Alexander Sulfrian (1):
+      Fix insertion/ordering of refs in refs_by_id map.
+
+Andreas Stieger (1):
+      Update FSF address in COPYING
+
+Jonas Fonseca (12):
+      Remove Gitweb link in favour of Gitter
+      Integrate coverage reporting for the test suite
+      Experimental support for key combos
+      Fix user-action prompt display regression
+      Add key_to_value helper to extract the ncurses key value
+      Add GitHub inspired file finder to search for and open any file
+      Fix regression test to exec git-tag in background
+      Fix display saving to account for variable length UTF-8 characters
+      When redrawing the readline prompt also update the cursor position
+      Keep unstaged changes view open after an staging command
+      Add search keymap with keys for navigating search results
+      tig-2.1.1
+
+Ramsay Jones (1):
+      Fix segmentation Fault on 32-bit
+
+Vivien Didelot (1):
+      contrib: complete Vim-like bindings
+```
+",https://api.github.com/users/jonas,8417,jonas,https://api.github.com/repos/jonas/tig/releases/3084521/assets,https://api.github.com/repos/jonas/tig/releases/3084521,master,https://api.github.com/repos/jonas/tig/tarball/tig-2.1.1,https://github.com/jonas/tig/releases/tag/tig-2.1.1,https://api.github.com/repos/jonas/tig/zipball/tig-2.1.1,tig-2.1.1,False,False
+3084516,2014-04-30T04:20:06Z,2016-04-23T21:17:24Z,,"A little over 8 years ago the first version of Tig was released. To celebrate the many years with this cursed Git interface, here is a fresh new installment. Version 2.0 of Tig brings several configuration improvements, some of which unfortunately also breaks backwards compatibility with respect to the configuration file. Among view related changes, the branch view has been renamed to the refs view and now also shows tags, the log view now highlights diff stats and supports --graph, and the new grep view allows to quickly jump between matching files. This release also adds mouse support, improvements to the graph rendering, and readline support in the prompt. Please read the release notes below for more information and upgrade instructions.
+
+Thanks to everybody who contributed to this release.
+
+## Release notes
+
+Note to packagers:
+- Add `.adoc` extension to AsciiDoc files so they show correctly on GitHub.
+  This includes `README`, `INSTALL`, and `NEWS` and files in `doc/` directory.
+- `BUGS` file has been merged into `README.adoc`.
+- Default keybindings have been moved to a system-level `tigrc` file, which is
+  installed to ${sysconfdir} by default. The content of the `tigrc` file is
+  included inside the binary as a fall-back. Pass `NO_BUILTIN_TIGRC=y` to not
+  include the system `tigrc` content and reduce the size of the binary.
+- The example `contrib/tigrc` file (made obsolete by `tigrc`) has been removed.
+- Source files have been moved to `src` and `include` and `tig.c` was split up.
+- Build output is less verbose by default; use `make V=1` for old output.
+
+Incompatibilities:
+- In preparation for key combo support, key mappings for symbolic keys (e.g.
+  `Up` and `Down`) must now start with `<` and end with `>`, e.g. `<Up>` and
+  `<Down>`. Furthermore, escape key combos must now use `<Esc>key` instead of
+  `^[key`, and control key mappings must now use `<Ctrl-key>` instead of
+  `^key`.
+- Only use 'diff-options' for the diff view and introduce '%(cmdlineargs)' to
+  hold non-file and non-revision flags passed on the command line. Affects all
+  user-defined commands that expect '%(diffargs)' to hold both 'diff-options'
+  arguments and those passed on the command line. (GH #228)
+- Remove built-in keybinding for `git gc`. Add the following line to `~/.tigrc`
+  to restore it: `bind generic G ?git gc`.
+- To support view specific colors, '.' can no longer be used interchangeably
+  with '-' and '_' in settings names and in particular color names.
+- Replace 'stage-next' action with prompt command using a predefined search
+  (see below) and add binding (`<at>` by default) to also work in the diff view.
+- Most view display options must now be set via the new `*-view` options in
+  tigrc. Existing options are no longer recognized, but a warning is shown.
+- Remap default bindings to have more consistent convention: use lower-case
+  keys primarily for view switching and non-destructive actions, use upper-case
+  keys for view-specific actions including user-defined commands. To preserve
+  old default key bindings see `contrib/bindings-v1.x.tigrc`. (GH #257)
+
+Improvements:
+- Add mouse support: scroll view, click line to move cursor, double click line
+  (or click again) to ""Enter"" cursor line, e.g. open commit diff. Disabled by
+  default, since it makes text selection less intuitive. If you enable this
+  remember to hold down Shift (or Option on Mac) when selecting text.
+- Rewrite and improve the rendering of the commit graph. (GH #144, #46)
+- Add completion and history support to the prompt via readline. (GH #185)
+- Options can be configured and toggled individually for each view. Use the new
+  view settings to configure the order and display options for each view
+  columns. See system tigrc and tigrc(5) for examples. (GH #89, #222)
+- Add grep view as a front-end to git-grep(1): `tig grep -p strchr`. From
+  within Tig, the key for switching or grepping is bound to 'g' by default.
+- Rename 'branch' view to 'refs' view and show tags. (GH #134)
+- Add main view pager mode that reads git-log's '--pretty=raw' data
+  from stdin, e.g. `git reflog --pretty=raw | tig --pretty=raw`.
+- Add support for `--graph` and highlight diff stats in the log view.
+- Add default command bindings: `!` to delete branch, `!` to drop stash.
+- Add 'stage-split-chunk' action for splitting chunks in the stage view.
+  Bound to '\' by default. (GH #107)
+- Add 'back' action bound to '<' by default, which will return the blame view
+  to the previous revision and line after moving e.g. to the parent. (GH #124)
+- Auto-refresh views based on watched repository changes. Configure by setting
+  `refresh-mode` to 'manual', 'auto', 'after-command', or 'periodic'. (GH #190)
+- All default settings are in well-documented system `tigrc`.
+- Add `:toggle` prompt command to manipulate options using keybindings. For
+  example: `bind diff D :toggle diff-options --patience --notes`. (GH #69)
+- Add a new ""auto"" value for the 'vertical-split' option to let Tig choose the
+  split orientation (this is the new default behavior). Can be toggled.
+- Make it possible to toggle the display of files in untracked directories.
+- Allow Tig to be started with no default configuration by specifying an
+  alternative system `tigrc` file, e.g.: `TIGRC_SYSTEM=~/.tigrc.safe tig`. Set
+  `TIGRC_SYSTEM` to the empty string to use built-in configuration instead of
+- Key mappings can contain UTF-8 multibyte unicode keys.
+- Warn about conflicting keybindings using Ctrl, e.g. `<Ctrl-f>` and
+  `<Ctrl-F>`. (GH #218)
+- Extend key bindings for prompt commands (ie. `bind <keymap> <key> :<prompt>`)
+  to support predefined searches, eg.: `bind stage 2 :?^ <at>  <at>`.
+- Git color mappings can be configured in tigrc.
+- More informative configuration error messages.
+- Make reference label formatting configurable, for example:
+  `set reference-format = (branch) <tags> remote`. (GH #201)
+- Adjust author width and other view columns automatically. (GH #49)
+- Support view specific colors: `color stage.diff-add yellow default`.
+- Copy `-S`, `-G` and `--grep=` pattern to search buffer so 'find-next' and
+  'find-prev' work as expected.
+- Optionally specify custom prompt for `%(prompt)` in shell commands, e.g.
+  `bind main B ?git checkout -b ""%(prompt Enter new branch name: )""`.
+- Add `%(remote)` and `%(tag)` symbols to complement `%(branch)`.
+- User-defined commands can now be prefixed with any of the supported flags,
+  e.g. `?git checkout -b %(branch)`.
+- Open editor at line number for combined diffs e.g. diffs of unmerged files.
+- Add build configuration for Cygwin (OS name: CYGWIN_NT-6.1). (GH #92)
+- Document the Git commands supported by the pager mode.  (GH #1)
+  system `tigrc` configuration. (GH #235)
+
+Bug fixes:
+- Fix stash diff display when reloading the stash view after a deleting.
+- Set the commit reference when opening the blame view from the blob view.
+- Correctly identify and highlight the remote branch tracked by HEAD.
+- Pass --no-color after user defined arguments to ensure that colors do not
+  break the output parsing. (GH #191)
+- Close stdin when pager mode is not supported.
+- Show newly created branches in the main view. (GH #196)
+- File with 0 changes breaks diffstat highlighting (GH #215)
+- Update %(branch) variable in the main view. (GH #223)
+- Disable graph rendering when either of `--reverse`, `-S`, `-G`, and `--grep`
+  are passed to the main view. (GH #127)
+- Only refresh views that support it.
+- Fix author and date annotation of renamed entries in the tree view.
+- Fix use of unsafe methods in the signal handler. (GH #245)
+- Fix rendering in non-UTF8 terminals.
+- Fix stage-update-line by rewriting the diff chunk containing the line instead
+  of using `--unidiff-zero` and a diff context of zero. (GH #130)
+- Fix status-update to work for untracked directories. (GH #236)
+- Don't pass log parameters given on the command line to the diff view.
+
+## Change summary
+
+The diffstat and log summary for changes made in this release.
+
+```
+ .gitignore                                         |   26 +-
+ .travis.yml                                        |   18 +
+ BUGS                                               |    8 -
+ INSTALL => INSTALL.adoc                            |   15 +-
+ Makefile                                           |  241 +-
+ NEWS => NEWS.adoc                                  |  118 +
+ README                                             |   24 -
+ README.adoc                                        |   40 +
+ autogen.sh                                         |    8 +-
+ compat/ansidecl.h                                  |  313 +
+ compat/compat.h                                    |    3 +-
+ compat/hashtab.c                                   | 1001 +
+ compat/hashtab.h                                   |  209 +
+ compat/mkstemps.c                                  |    2 +-
+ compat/setenv.c                                    |    2 +-
+ config.make.in                                     |    3 +-
+ configure.ac                                       |   10 +-
+ contrib/bindings-v1.x.tigrc                        |   23 +
+ contrib/config.make                                |   11 +-
+ contrib/config.make-CYGWIN_NT-6.1                  |   19 +
+ contrib/config.make-Darwin                         |    8 +
+ contrib/tig-completion.bash                        |    9 +-
+ contrib/tig.spec.in                                |   10 +-
+ contrib/tigrc                                      |   76 -
+ doc/{manual.asciidoc => manual.adoc}               |   30 +-
+ doc/{tig.1.asciidoc => tig.1.adoc}                 |  107 +-
+ doc/{tigmanual.7.asciidoc => tigmanual.7.adoc}     |    2 +-
+ doc/tigrc.5.adoc                                   |  963 +
+ doc/tigrc.5.asciidoc                               |  757 -
+ graph.c                                            |  412 -
+ include/tig/argv.h                                 |   73 +
+ contrib/header.h => include/tig/blame.h            |   18 +-
+ contrib/header.h => include/tig/blob.h             |   18 +-
+ include/tig/diff.h                                 |   43 +
+ include/tig/display.h                              |   62 +
+ include/tig/draw.h                                 |   45 +
+ git.h => include/tig/git.h                         |   26 +-
+ graph.h => include/tig/graph.h                     |   41 +-
+ contrib/header.h => include/tig/grep.h             |   13 +-
+ contrib/header.h => include/tig/help.h             |   18 +-
+ io.h => include/tig/io.h                           |   46 +-
+ include/tig/keys.h                                 |   84 +
+ include/tig/line.h                                 |  130 +
+ contrib/header.h => include/tig/log.h              |   18 +-
+ include/tig/main.h                                 |   56 +
+ include/tig/options.h                              |  194 +
+ include/tig/pager.h                                |   34 +
+ include/tig/parse.h                                |   67 +
+ include/tig/prompt.h                               |   47 +
+ refs.h => include/tig/refdb.h                      |   36 +-
+ contrib/header.h => include/tig/refs.h             |   18 +-
+ include/tig/repo.h                                 |   37 +
+ include/tig/request.h                              |  116 +
+ contrib/header.h => include/tig/stage.h            |   16 +-
+ contrib/header.h => include/tig/stash.h            |   18 +-
+ include/tig/status.h                               |   53 +
+ include/tig/string.h                               |  123 +
+ include/tig/tig.h                                  |  151 +
+ include/tig/tree.h                                 |   30 +
+ include/tig/types.h                                |  165 +
+ include/tig/util.h                                 |  126 +
+ include/tig/view.h                                 |  356 +
+ include/tig/watch.h                                |   58 +
+ refs.c                                             |  250 -
+ src/argv.c                                         |  487 +
+ src/blame.c                                        |  518 +
+ src/blob.c                                         |  133 +
+ src/diff.c                                         |  440 +
+ src/display.c                                      |  527 +
+ src/draw.c                                         |  661 +
+ src/graph.c                                        |  999 +
+ src/grep.c                                         |  263 +
+ src/help.c                                         |  301 +
+ io.c => src/io.c                                   |  373 +-
+ src/keys.c                                         |  438 +
+ src/line.c                                         |  208 +
+ src/log.c                                          |  156 +
+ src/main.c                                         |  514 +
+ src/options.c                                      | 1067 +
+ src/pager.c                                        |  233 +
+ src/parse.c                                        |  330 +
+ src/prompt.c                                       |  892 +
+ src/refdb.c                                        |  398 +
+ src/refs.c                                         |  202 +
+ src/repo.c                                         |  136 +
+ src/request.c                                      |   69 +
+ src/stage.c                                        |  562 +
+ src/stash.c                                        |   57 +
+ src/status.c                                       |  748 +
+ src/string.c                                       |  372 +
+ src/tig.c                                          |  735 +
+ src/tree.c                                         |  486 +
+ src/types.c                                        |  116 +
+ src/util.c                                         |  325 +
+ src/view.c                                         | 1488 ++
+ src/watch.c                                        |  276 +
+ test/builtin-config.sh                             |   18 +
+ .../10_shorter_merge_than_branch.in                |   22 +
+ .../10_shorter_merge_than_branch.out               |   11 +
+ test/test-graph-samples/11_new_branch_in_middle.in |   18 +
+ .../test-graph-samples/11_new_branch_in_middle.out |    9 +
+ test/test-graph-samples/12_cross_over_collapse.in  |   18 +
+ test/test-graph-samples/12_cross_over_collapse.out |    9 +
+ ...rallel_branches_with_different_middle_branch.in |   20 +
+ ...allel_branches_with_different_middle_branch.out |   10 +
+ test/test-graph-samples/14_long_collapse_line.in   |   40 +
+ test/test-graph-samples/14_long_collapse_line.out  |   20 +
+ test/test-graph-samples/16_changes.in              |    8 +
+ test/test-graph-samples/16_changes.out             |    4 +
+ test/test-graph-samples/1_merge_from_left.in       |   10 +
+ test/test-graph-samples/1_merge_from_left.out      |    5 +
+ test/test-graph-samples/2_duplicate_parent.in      |   18 +
+ test/test-graph-samples/2_duplicate_parent.out     |    9 +
+ test/test-graph-samples/3_octo_merge.in            |   10 +
+ test/test-graph-samples/3_octo_merge.out           |    5 +
+ test/test-graph-samples/4_missing_bar.in           |   14 +
+ test/test-graph-samples/4_missing_bar.out          |    7 +
+ test/test-graph-samples/5_extra_pipe.in            |   12 +
+ test/test-graph-samples/5_extra_pipe.out           |    6 +
+ test/test-graph-samples/6_extra_bars.in            |  115 +
+ test/test-graph-samples/6_extra_bars.out           |   57 +
+ test/test-graph-samples/7_multi_collapse.in        |   16 +
+ test/test-graph-samples/7_multi_collapse.out       |    8 +
+ test/test-graph-samples/8_multi_collapse_2.in      |   18 +
+ test/test-graph-samples/8_multi_collapse_2.out     |    9 +
+ test/test-graph-samples/9_parallel_siblings.in     |   18 +
+ test/test-graph-samples/9_parallel_siblings.out    |    9 +
+ test/test-graph-samples/many_merges.in             |   65 +
+ test/test-graph-samples/many_merges.out            |   20 +
+ test/test-graph-samples/more.in                    |   72 +
+ test/test-graph-samples/more.out                   |   36 +
+ test/test-graph-samples/simple.in                  |   22 +
+ test/test-graph-samples/simple.out                 |    6 +
+ test/test-graph-samples/tig-all-long.in            |14986 ++++++++++++
+ test/test-graph-samples/tig-all-long.out           | 1517 ++
+ test/test-graph-samples/tig-all.in                 |  286 +
+ test/test-graph-samples/tig-all.out                |   35 +
+ test/test-graph-samples/tig.in                     |   28 +
+ test/test-graph-samples/tig.out                    |    8 +
+ test-graph.c => test/test-graph.c                  |   23 +-
+ test/unit-test-graph.sh                            |   19 +
+ tig.c                                              | 9043 -------
+ tig.h                                              |  622 -
+ tigrc                                              |  386 +
+ {contrib => tools}/announcement.sh                 |    8 +-
+ {contrib => tools}/aspell.dict                     |   16 +-
+ tools/ax_lib_readline.m4                           |  223 +
+ {contrib => tools}/ax_with_curses.m4               |    0
+ tools/doc-gen.c                                    |   84 +
+ {contrib => tools}/header.h                        |    2 +-
+ tools/install.sh                                   |   49 +
+ tools/make-builtin-config.sh                       |   40 +
+ {contrib => tools}/release.sh                      |   11 +-
+ {contrib => tools}/update-release-docs.sh          |    2 +-
+ 154 files changed, 38086 insertions(+), 11640 deletions(-)
+```
+
+```
+ 1 Andreas Schlick
+ 1 Beat Bolli
+ 1 Benjamin Bergman
+ 1 Ciro Santilli
+ 1 Dmitry Malikov
+ 1 Ed Bruck
+ 3 Jeff King
+```
+
+   399 Jonas Fonseca
+     3 Kumar Appaiah
+     1 LCD 47
+     1 Lau Ching Jun
+     1 Michael Barlow
+     1 Oliver Chang
+     1 Pat Tullmann
+     4 Sven Wegener
+     3 Vivien Didelot
+     1 hasufell
+",https://api.github.com/users/jonas,8417,jonas,https://api.github.com/repos/jonas/tig/releases/3084516/assets,https://api.github.com/repos/jonas/tig/releases/3084516,master,https://api.github.com/repos/jonas/tig/tarball/tig-2.0,https://github.com/jonas/tig/releases/tag/tig-2.0,https://api.github.com/repos/jonas/tig/zipball/tig-2.0,tig-2.0,False,False

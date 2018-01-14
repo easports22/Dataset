@@ -1,0 +1,2760 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7747222,2017-09-14T17:21:33Z,2017-09-14T17:23:32Z,"1.7.0: JSX tweaks, Pragma, TypeScript and CSS fixes","![image](https://cloud.githubusercontent.com/assets/311752/24736977/385d81c8-1a40-11e7-8adc-c4c879ba6c31.png)
+
+This release features some bugfixes and tweaks around JSX, TypeScript, CSS, and JavaScript formatting, as well as a couple new features.
+
+# Highlights
+
+## JSX Changes
+
+We received a lot of community feedback about the changes we made to JSX formatting in the 1.6.0 release, and have made changes to bring formatting closer to community standards and expectations.
+
+In 1.6.0, we added a second style for ternaries (conditional expressions, `a ? b : c`), based on a format popular in the community where parentheses are used to demarcate JSX content:
+
+```jsx
+const DinnerOptions = ({ willEatMeat, willEatEggs, willEatVegetables }) => (
+  <div>
+    <div>Let's get some dinner...</div>
+    {willEatMeat ? (
+      <FullMenu />
+    ) : willEatEggs ? (
+      <VegetarianMenu />
+    ) : willEatVegetables ? (
+      <VeganMenu />
+    ) : (
+      <BackupMenu />
+    )}
+  </div>
+);
+```
+
+Before this was added, prettier only formatted ternaries with one consistent style:
+```jsx
+willEatMeat
+  ? ""Full Menu""
+  : willEatEggs
+    ? ""Vegetarian Menu""
+    : willEatVegetables ? ""Vegan Menu"" : ""Backup Menu"";
+```
+
+In 1.6.0, we used the following heuristic to decide when to use the new ""JSX mode ternaries"":
+```
+We should print a ternary using JSX mode if:
+  * The ternary contains some JSX in it
+  OR
+  * The ternary appears inside of some JSX
+```
+
+However, this heuristic caused some [unexpected formatting](https://github.com/prettier/prettier/issues/2729):
+![Github Diff showing a ternary containing internationalization strings appearing inside a JSX element being converted to use JSX-mode style ternaries](https://user-images.githubusercontent.com/254562/29985901-08597db0-8f2f-11e7-8c6e-0e922fc394bf.png)
+
+So, in 1.7.0, we have revised our heuristic to just be:
+```
+We should print a ternary using JSX mode if:
+  * The ternary contains some JSX in it
+```
+
+We hope that this change will result in fewer surprising ternaries.
+
+A big thanks goes out to @duailibe who implemented this change in addition to several other JSX-related formatting issues that were reported.
+
+## CSS Letter Case Consistency
+
+We spent some time this release polishing our CSS formatting, and as part of that, @lydell [did some work to normalize letter case](https://github.com/prettier/prettier/issues/2653). 
+
+So now, almost everything in CSS will print using `lower case`.
+
+```css
+/* Before */
+DIV.Foo {
+  HEIGHT: 12PX;
+}
+
+/* After */
+div.Foo {
+  height: 12px;
+}
+```
+
+Don't worry, though – Prettier won't touch your `$scss-variables`, `@less-variables`, or `FunctionNames()`. Preprocess on!
+
+## Pragma Support
+
+There is a new option called `--require-pragma` (`requirePragma` via the API) which will change prettier's behavior so that it only reformats a file if it has a special ""pragma"" comment at the top of it, that looks like this:
+
+```js
+/**
+ * @prettier
+ */
+```
+
+or
+
+```js
+/**
+ * @format
+ */
+```
+
+This was @ajhyndman's idea and it was implemented by @wbinnssmith.
+
+# Other Changes
+
+## TypeScript
+
+There was a bug in Prettier 1.6.1 where an error would be thrown while parsing any TypeScript using the `never` type, for example:
+```ts
+Observable.empty<never>();
+```
+
+Also, Prettier 1.6.1 was incorrectly removing the `declare` keyword from `enum` declarations in `*.d.ts` files:
+```ts
+// In
+declare const enum Foo {}
+
+// Out
+const enum Foo {}
+```
+
+Both of these issues have been fixed. Thanks to @JamesHenry and @existentialism for these fixes which support our TypeScript community!
+
+## Configuration
+
+### Configurable Config Precedence
+There is a new CLI option `--config-precedence` which configures how prettier should prioritize config sources. Valid values are:
+
+**`cli-override`** (default) - CLI options take precedence over config file
+
+**`file-override`** - Config file take precedence over CLI options
+
+**`prefer-file`** - If a config file is found will evaluate it and ignore other CLI options. If no config file is found CLI options will evaluate as normal.
+
+This option adds support to editor integrations where users define their default configuration but want to respect project specific configuration.
+
+### `prettier.resolveConfig.sync`
+
+Previously, there was no way via the API to resolve configuration for a source file synchronously. Thanks to [some new additions to `cosmiconfig`](https://github.com/davidtheclark/cosmiconfig/pull/78) by @sudo-suhas, @ikatyang was able to add support for this to the prettier API.
+
+## PRs merged in this release
+
+* [**Update README.md**](https://github.com/prettier/prettier/pull/2690) by @ikatyang
+* [**Fix config file finding when using stdin**](https://github.com/prettier/prettier/pull/2692) by @lydell
+* [**docs(readme): add and sort cli options**](https://github.com/prettier/prettier/pull/2700) by @levithomason
+* [**Add Transloadit as a user**](https://github.com/prettier/prettier/pull/2706) by @kvz
+* [**Ensure parens around LogicalExpression inside ExperimentalSpreadProperty**](https://github.com/prettier/prettier/pull/2710) by @existentialism
+* [**Fix printing declare modifier for TS enum**](https://github.com/prettier/prettier/pull/2711) by @existentialism
+* [**Handle +/- before numbers in CSS**](https://github.com/prettier/prettier/pull/2713) by @xtian
+* [**Add Tradeshift as a user**](https://github.com/prettier/prettier/pull/2719) by @sampi
+* [**feat(resolve-config): add `.sync()` method**](https://github.com/prettier/prettier/pull/2722) by @ikatyang
+* [**refactor(bin): use `resolveConfigFile.sync()`**](https://github.com/prettier/prettier/pull/2728) by @ikatyang
+* [**refactor(cli): separate files and make it pure as possible**](https://github.com/prettier/prettier/pull/2730) by @ikatyang
+* [**Fix cosmiconfig dependency branch**](https://github.com/prettier/prettier/pull/2731) by @josephfrazier
+* [**Upgrade chalk to v2.1.0**](https://github.com/prettier/prettier/pull/2732) by @josephfrazier
+* [**Add CLI option '--config-precedence'**](https://github.com/prettier/prettier/pull/2733) by @mitermayer
+* [**Normalize CSS case**](https://github.com/prettier/prettier/pull/2736) by @lydell
+* [**Make run-external-typescript-tests.js cross-platform**](https://github.com/prettier/prettier/pull/2737) by @lydell
+* [**test(integration): add more tests**](https://github.com/prettier/prettier/pull/2738) by @ikatyang
+* [**chore(deps): remove devDependency `cross-spawn`**](https://github.com/prettier/prettier/pull/2739) by @ikatyang
+* [**Ignore some things in coverage**](https://github.com/prettier/prettier/pull/2741) by @lydell
+* [**Generalize run-external-typescript-tests.js**](https://github.com/prettier/prettier/pull/2742) by @lydell
+* [**Improve lint-staged setup example by adding more filetypes**](https://github.com/prettier/prettier/pull/2746) by @MoOx
+* [**fixes dynamic imports**](https://github.com/prettier/prettier/pull/2748) by @rkurbatov
+* [**Refactor error handling**](https://github.com/prettier/prettier/pull/2750) by @azz
+* [**chore(github): add issue template**](https://github.com/prettier/prettier/pull/2755) by @ikatyang
+* [**Fix: TypeScript never keyword (fixes #2718)**](https://github.com/prettier/prettier/pull/2756) by @JamesHenry
+* [**Group last argument if it's an empty object with a comment**](https://github.com/prettier/prettier/pull/2758) by @duailibe
+* [**Use `files:` over `types:` in pre-commit configuration**](https://github.com/prettier/prettier/pull/2759) by @asottile
+* [**refactor(runPrettier): reduce duplicate code**](https://github.com/prettier/prettier/pull/2764) by @ikatyang
+* [**Change when to print ternaries in JSX mode**](https://github.com/prettier/prettier/pull/2768) by @duailibe
+* [**Fix chained logical expressions with objects/array/etc inlined**](https://github.com/prettier/prettier/pull/2770) by @duailibe
+* [**Add option to require @prettier or @format pragma**](https://github.com/prettier/prettier/pull/2772) by @wbinnssmith
+* [**chore(build): update ISSUE_TEMPLATE.md before publish**](https://github.com/prettier/prettier/pull/2776) by @ikatyang
+* [**Fix break on conditional expressions inside return**](https://github.com/prettier/prettier/pull/2779) by @duailibe
+* [**Support graphql(schema, `query`)**](https://github.com/prettier/prettier/pull/2781) by @azz
+* [**fix(prettierignore): support absolute filename**](https://github.com/prettier/prettier/pull/2783) by @ambar
+* [**Keep conditional expressions in one line on method chains**](https://github.com/prettier/prettier/pull/2784) by @duailibe
+* [**fix(build): update ISSUE_TEMPLATE using regex `?:` instead of `?!`**](https://github.com/prettier/prettier/pull/2785) by @ikatyang
+* [**Break closing paren of ConditionalExpression in member chains**](https://github.com/prettier/prettier/pull/2786) by @duailibe
+* [**fix webstorm integration guide**](https://github.com/prettier/prettier/pull/2796) by @xsburg
+
+## Issues resolved in this release
+
+* [**Document missing CLI options**](https://github.com/prettier/prettier/issues/2698) reported by @levithomason
+* [**Formatting of Spread Properties differs between Babylon and TypeScript**](https://github.com/prettier/prettier/issues/2708) reported by @mariusschulz
+* [**Removal of the `declare` modifier from `enum`**](https://github.com/prettier/prettier/issues/2709) reported by @mariusschulz
+* [**Decimal formatting doesn't get all decimals in a rule.**](https://github.com/prettier/prettier/issues/2712) reported by @itsgreggreg
+* [**Use resolveConfigFile.sync in the CLI**](https://github.com/prettier/prettier/issues/2726) reported by @azz
+* [**CSS: Normalize case (lower vs upper) on stuff**](https://github.com/prettier/prettier/issues/2653) reported by @lydell
+* [**Dynamic import with webpackChunkName comment fails**](https://github.com/prettier/prettier/issues/1489) reported by @pbomb
+* [**Typescript: never as type parameter causes error: unknown type: undefined**](https://github.com/prettier/prettier/issues/2718) reported by @hccampos
+* [**commented object values**](https://github.com/prettier/prettier/issues/2617) reported by @sylvainbaronnet
+* [**Configuring pre-commit for jsx, Typescript, tsx**](https://github.com/prettier/prettier/issues/2745) reported by @reywright
+* [**JSX ternaries include parens**](https://github.com/prettier/prettier/issues/2729) reported by @jasonLaster
+* [**Chained Short Circuit Conditionals in JSX**](https://github.com/prettier/prettier/issues/2714) reported by @brycehill
+* [**Support @prettier pragma comment**](https://github.com/prettier/prettier/issues/2397) reported by @ajhyndman
+* [**No indentation after breaking return statement**](https://github.com/prettier/prettier/issues/2777) reported by @jwbay
+* [**Support graphql() fn and so make 2nd arg prettier**](https://github.com/prettier/prettier/issues/2780) reported by @brikou
+* [**prettierignore: cannot use absolute filename**](https://github.com/prettier/prettier/issues/2782) reported by @ambar
+* [**Weird Javascript format**](https://github.com/prettier/prettier/issues/2775) reported by @maxime1992
+
+---
+
+Thank you to everyone who contributed to this release, be it through issue creation, code contribution, code review, or general commenting and feedback. Prettier is a community-run project and is able to continue to exist thanks to people like you. Thank you!
+",https://api.github.com/users/suchipi,1341513,suchipi,https://api.github.com/repos/prettier/prettier/releases/7747222/assets,https://api.github.com/repos/prettier/prettier/releases/7747222,master,https://api.github.com/repos/prettier/prettier/tarball/1.7.0,https://github.com/prettier/prettier/releases/tag/1.7.0,https://api.github.com/repos/prettier/prettier/zipball/1.7.0,1.7.0,False,False
+7526093,2017-08-28T16:04:42Z,2017-08-28T16:03:57Z,"1.6.0: Config File, JSX","![image](https://cloud.githubusercontent.com/assets/311752/24736977/385d81c8-1a40-11e7-8adc-c4c879ba6c31.png)
+
+I want to give a special shout out to @azz who has been maintaining the repository and implementing a bunch of the changes in this release as I had less time to devote to prettier due to vacation and switching team :)
+
+# Highlights
+
+## Configuration
+
+### Implement cosmiconfig for workspace configuration (#2434) by @azz
+
+Since the very first release of prettier, people have asked for a `.prettierrc` file. We've been trying to have as few options as possible and tried to avoid being one more `.dotfile` that you have to have when starting a new project.
+
+But, the truth is, we need to have some way to configure prettier that can be kept in sync with all the integrations. By not having one, we pushed the problem to them and saw a bunch of incompatible ways of handling the problem. So now, it's handled by prettier itself.
+
+```js
+// .prettierrc
+{
+  ""trailingComma"": ""es5"",
+  ""singleQuote"": true
+}
+```
+
+For more information on configuration file support, see the [README](https://github.com/prettier/prettier/blob/master/README.md#configuration-file).
+
+### Support .prettierignore files (#2412) by @evilebottnawi 
+
+Along with telling what configuration to use, you can write a file `.prettierignore` to tell which files not to convert.
+
+```
+# .prettierignore
+dist/
+package.json
+```
+
+## JSX
+
+### Improve JSX Formatting (#2398) by @suchipi 
+
+The last big friction point from people trying to adopt prettier was around how JSX was being printed. We went through all the issues that were raised and made a bunch of changes:
+
+- Arrow Function Expressions returning JSX will now add parens when the JSX breaks
+
+```js
+// Before
+const Component = props =>
+  <div>
+    Hello {props.name}!
+  </div>;
+
+// After
+const Component = props => (
+  <div>
+    Hello {props.name}!
+  </div>
+);
+```
+
+- Conditional expressions within (or containing) JSX are formatted in a different way using parenthesis
+
+```js
+// Before
+<div>
+  {props.isVisible
+    ? <BaseForm
+        url=""/auth/google""
+        method=""GET""
+      />
+    : <Placeholder />}
+</div>;
+
+// After
+<div>
+  {props.isVisible ? (
+    <BaseForm
+      url=""/auth/google""
+      method=""GET""
+    />
+  ) : (
+    <Placeholder />
+  )}
+</div>
+```
+
+- JSX in logical expressions (|| or &&) is always wrapped in parens when the JSX breaks
+
+```js
+// Before
+<div>
+  {props.isVisible &&
+    <BaseForm
+      url=""/auth/google""
+      method=""GET""
+    />}
+</div>;
+
+// After
+<div>
+  {props.isVisible && (
+    <BaseForm
+      url=""/auth/google""
+      method=""GET""
+    />
+  )}
+</div>
+```
+
+Hopefully this is going to be more in line with how the majority of the community is writing JSX and we can have prettier be used in more place ;)
+
+### Inline single expressions in JSX (#2442) by @karl
+
+With JSX, we started by respecting a lot of line breaks that were in the original source. This had the advantage of doing fewer changes to your codebase but chipped away the value of a consistent pretty printer as the same semantic code could be written in two ways.
+
+During each new release we've tightened this and made decisions around how to always print a piece of code. The latest of those is what happens if there's a single child in a JSX object, we're now always going to inline it.
+
+```js
+// Before
+return (
+  <div>
+    {this.props.test}
+  </div>
+);
+return <div>{this.props.test}</div>;
+
+// After
+return <div>{this.props.test}</div>;
+return <div>{this.props.test}</div>;
+```
+
+### Ensure there is a line break after leading JSX white space (#2348) by @karl
+
+Leading JSX empty spaces are now on their own line. It looked weird to have them before a tag as it ""indented"" it differently compared to the rest.
+
+```js
+// Before
+<span className=""d1"">
+  {' '}<a
+    href=""https://github.schibsted.io/finn/troika""
+    className=""link""
+  />
+</span>
+
+// After
+<span className=""d1"">
+  {' '}
+  <a
+    href=""https://github.schibsted.io/finn/troika""
+    className=""link""
+  />
+</span>
+```
+
+# Other Changes
+
+## JSON
+
+### Use babylon.parseExpression for JSON (#2476) by @josephfrazier 
+
+We used to use a strict JSON parser that would throw if there was a comment or a trailing comma. This was inconvenient as many JSON files in practice are parsed using JavaScript or json5 that are not as strict. Now, we have relaxed this and are using the JavaScript parser to parse and print JSON. This means that comments will be maintained if there were some.
+
+Note that this is purely additive, if your original file was JSON compliant, it will keep printing a valid JSON.
+
+```js
+// Before
+Syntax error
+
+// After
+{ /* some comment */ ""a"": 1 }
+```
+
+## JavaScript
+
+### Print 3 or more chained calls on multiple lines (#2673) by @azz
+
+This was a longstanding issue with the way we print long member chains. Prettier would try and cram all but the final callback onto one line, which reduced the readability. The solution we landed on was to always break over multiple lines if there are three or more function calls in a method chain.
+
+```js
+// Before
+Promise.resolve(0).catch(function(err) {}).then(function(res) {
+  //
+});
+
+// After
+Promise.resolve(0)
+  .catch(function(err) {})
+  .then(function(res) {
+    // 
+  });
+```
+
+### Add more supervisory parens (#2423) by @azz
+
+Parenthesis are a hot topic because they are not part of the AST, so prettier ignores all the ones you are putting and re-creating them from scratch. We went through all the things that people reported and came up with a few edge cases that were very confusing when comparisons were chained and `%` was mixed with `*` or `/`.
+
+One thing that we are not changing is the fact that we remove extra parenthesis around combinations of basic arithmetic operators: `+-*/`.
+
+```js
+// Before
+x !== y === z;
+x * y % z;
+
+// After
+(x !== y) === z;
+(x * y) % z;
+```
+
+### Implement prettier-ignore inside JSX (#2487) by @azz
+
+It's useful to be able to ignore pieces of JSX, it's now possible to add a comment inside of a JSX expression to ignore the formatting of the next element.
+
+```js
+// Before
+<Component>
+  {/*prettier-ignore*/}
+  <span ugly format="""" />
+</Component>
+
+// Before
+<Component>
+  {/*prettier-ignore*/}
+  <span     ugly  format=''   />
+</Component>
+```
+
+### Do not swallow prettier-ignore comments (#2664)
+
+In order to support some edge cases, in the internals, we have the ability to avoid printing comments in a generic way and print them in the call site instead. It turns out that when we used `prettier-ignore`, we didn't print the comments at all! This is now fixed.
+
+```js
+// Before
+push(
+  <td> :)
+  </td>,
+);
+
+// After
+push(
+  // prettier-ignore
+  <td> :)
+  </td>,
+);
+```
+
+### Fix indentation of a do-while condition (#2359) by @jsnajdr 
+
+It took 6 months for someone to report that do-while were broken when the while condition is multi-line, it confirms my hunch that this construct is not widely used in practice.
+
+```js
+// Before
+do {} while (
+  someVeryLongFunc(
+  someVeryLongArgA,
+  someVeryLongArgB,
+  someVeryLongArgC
+)
+);
+
+// After
+do {} while (
+  someVeryLongFunc(
+    someVeryLongArgA,
+    someVeryLongArgB,
+    someVeryLongArgC
+  )
+);
+```
+
+### Break sequence expressions (#2388) by @bakkot 
+
+Another underused feature of JavaScript is sequence expressions. We used to do a bad job at printing them when they would go multi-line, this has been corrected :)
+
+```js
+// Before
+(a = b ? c : ""lllllllllllllllllllllll""), (a = b
+  ? c
+  : ""lllllllllllllllllllllll""), (a = b ? c : ""lllllllllllllllllllllll""), (a = b
+  ? c
+  : ""lllllllllllllllllllllll""), (a = b ? c : ""lllllllllllllllllllllll"");
+
+// After
+(a = b ? c : 'lllllllllllllllllllllll'),
+  (a = b ? c : 'lllllllllllllllllllllll'),
+  (a = b ? c : 'lllllllllllllllllllllll'),
+  (a = b ? c : 'lllllllllllllllllllllll'),
+  (a = b ? c : 'lllllllllllllllllllllll')
+```
+
+### Trim trailing whitespace from comments (#2494) by @azz
+
+We took the stance with prettier to remove all the trailing whitespaces. We used to not touch comments because it's user generated, but that doesn't mean that they should have whitespace :)
+
+```js
+// Before
+// There is some space here ->______________
+
+// After
+// There is some space here ->
+```
+
+### Fix interleaved comments in class decorators (#2660, #2661)
+
+Our handling for comments inside of the class declaration was very naive, we would just move all the comments to the top. We now are more precise and respect the comments that are interleaved inside of decorators and around `extends`.
+
+```js
+// Before
+// A
+// B
+// C
+@Foo()
+@Bar()
+class Bar {}
+
+// After
+// A
+@Foo()
+// B
+@Bar()
+// C
+class Bar {}
+```
+
+### Improve bind expression formatting (#2493) by @azz
+
+Bind expressions are being discussed at TC39 and we figured we could print it with prettier. We used to be very naive about it and just chain it. Now, we use the same logic as we have for method chaining with the `.` operator for it. We also fixed some edge cases where it would output invalid code.
+
+```js
+// Before
+observable::filter(data => data.someTest)::throttle(() =>
+  interval(10)::take(1)::takeUntil(observable::filter(data => someOtherTest))
+)::map(someFunction);
+
+// After
+observable
+  ::filter(data => data.someTest)
+  ::throttle(() =>
+    interval(10)::take(1)::takeUntil(observable::filter(data => someOtherTest))
+  )
+  ::map(someFunction);
+```
+
+### Add support for printing optional catch binding (#2570) by @existentialism 
+
+It's being discussed at TC39 to be able to make the argument of a `catch(e)` optional. Let's make sure we can support it in prettier if people use it.
+
+```js
+// Before
+Syntax error
+
+// After
+try {} catch {}
+```
+
+### Add support for printing optional chaining syntax (#2572) by @azz
+
+Another new proposal being discussed at TC39 is an optional chaining syntax. This is currently a [stage 1 proposal](https://github.com/tc39/proposal-optional-chaining), so the syntax may change at any time.
+
+```js
+obj?.prop       // optional static property access
+obj?.[expr]     // optional dynamic property access
+func?.(...args) // optional function or method call
+```
+
+### Handle Closure Compiler type cast syntax correctly (#2484) by @yangsu 
+
+Comments are tricky to get right, but especially when they have meaning based on where they are positioned. We're now special casing the way we deal with comments used as type cast for Closure Compiler such that they keep having the same semantics.
+
+```js
+// Before
+let assignment /** @type {string} */ = getValue();
+
+// After
+let assignment = /** @type {string} */ (getValue());
+```
+
+### Inline first computed property lookup in member chain (#2670) by @azz
+
+It looks kind of odd to have a computed property lookup on the next line, so we added a special case to inline it.
+
+```js
+// Before
+data
+  [key]('foo')
+  .then(() => console.log('bar'))
+  .catch(() => console.log('baz'));
+
+// After
+data[key]('foo')
+  .then(() => console.log('bar'))
+  .catch(() => console.log('baz'));
+```
+
+## Flow
+
+### Support opaque types and export star (#2543, #2542) by @existentialism 
+
+The flow team introduced two very exciting features under a new syntax. We now support them in prettier. I've personally been waiting for [opaque types](https://medium.com/flow-type/hiding-implementation-details-with-flows-new-opaque-type-aliases-feature-40e188c2a3f9) for a veerrryyyy long time!
+
+```js
+// Before
+Syntax error
+
+// After
+opaque type ID = string;
+export type * from ""module"";
+```
+
+### Strip away unnecessary quotes in keys in type objects and interfaces (#2643) by @jackyho112
+
+We've been doing this on JavaScript objects since the early days of prettier but forgot to apply the same thing to Flow and TypeScript types.
+
+```js
+// Before
+type A = {
+  ""string"": ""A"";
+}
+
+// After
+type A = {
+  string: ""A"";
+}
+```
+
+### Print TypeParameter even when unary function type (#2406) by @danwang
+
+Oopsy, we were dropping the generic in this very specific case.
+
+```js
+// Before
+type myFunction = A => B;
+
+// After
+type myFunction = <T>(A) => B;
+```
+
+### Keep parens around FunctionTypeAnnotation inside ArrayTypeAnnotation (#2561) by @azz
+
+Parenthesis... someday we'll get all of them fixed :)
+
+```js
+// Before
+const actionArray: () => void[] = [];
+
+// After
+const actionArray: (() => void)[] = [];
+```
+
+## TypeScript
+
+### Support TypeScript 2.5 RC (#2672) by @azz
+
+[TypeScript 2.5 RC](https://blogs.msdn.microsoft.com/typescript/2017/08/17/announcing-typescript-2-5-rc/) was recently announced, allowing you to use the upcoming ""optional catch binding"" syntax in TypeScript, too. :tada:
+
+### Don't add namespace keyword to global declaration (#2329) by @azz
+
+```js
+// Before
+namespace global {
+  export namespace JSX {  }
+}
+
+// After
+global {
+  export namespace JSX {}
+}
+```
+
+### Fix <this.Component /> (#2472) by @backus 
+
+Thanks to the untyped and permissive nature of JavaScript, we've been able to concat undefined to a string and get some interesting code as a result. Now fixed for this case :)
+
+```js
+// Before
+<undefined.Author />
+
+// After
+<this.Author />
+```
+
+### Allow type assertions to hug (#2439) by @azz
+
+We want to make sure that all the special cases that we added for JavaScript and Flow also work for TypeScript constructs. In this case, objects should also hug if they are wrapped in a `as` operator.
+
+```js
+// Before
+const state = JSON.stringify(
+  {
+    next: window.location.href,
+    nonce,
+  } as State
+);
+
+// After
+const state = JSON.stringify({
+  next: window.location.href,
+  nonce,
+} as State);
+```
+
+### Remove parens for type assertions in binary expressions (#2419) by @azz
+
+Most of the time we add parenthesis for correctness but in this case, we added them for nothing, so we can just get rid of them and have a cleaner code :)
+
+```js
+// Before
+(<x>a) || {};
+
+// After
+<x>a || {};
+```
+
+### Print parens around type assertion as LHS in assignment (#2525) by @azz
+
+Yet another case of missing parenthesis. Thankfully we're getting very few of them nowadays and they are for extremely rare edge cases.
+
+```js
+// Before
+foo.bar as Baz = [bar];
+
+// After
+(foo.bar as Baz) = [bar];
+```
+
+### Print declare for TSInterfaceDeclaration (#2574) by @existentialism 
+
+The `declare` keyword doesn't do anything for `interface` so we never put it there. However, it felt weird if you were in a declaration file and seeing everything have `declare` before it except for interfaces. So now we reprint `declare` if it was there in the first place.
+
+```js
+// Before
+interface Dictionary<T> {
+  [index: string]: T
+}
+
+// After
+declare interface Dictionary<T> {
+  [index: string]: T
+}
+```
+
+
+## CSS
+
+### Normalize quotes in CSS (#2624) by @lydell 
+
+In order to get a first version of CSS to ship, we kept string quotes as is. We are now respecting the `singleQuote` option of prettier. The difficulty here was to make sure that we output correct code for all the crazy escapes, unicode characters, emoji, special rules like charset which only work with double quotes...
+
+```css
+// Before
+div {
+  content: ""abc"";
+}
+
+// After
+div {
+  content: 'abc';
+}
+```
+
+### Normalize numbers in CSS (#2627) by @lydell 
+
+Another place where we can reuse the logic we've done for JavaScript to improve CSS printing.
+
+```css
+// Before
+border: 1px solid rgba(0., 0.0, .0, .3);
+
+// After
+border: 1px solid rgba(0, 0, 0, 0.3);
+```
+
+### Quote unquoted CSS attribute values in selectors (#2644) by @lydell 
+
+I can never quite remember the rules behind quotes around attributes so we're now always putting quotes there. 
+
+```js
+// Before
+a[id=test] {}
+
+// After
+a[id=""test""] {}
+```
+
+### Add support for css keyword (#2337) by @zanza00 
+
+```js
+// Before
+const header = css`.top-bar {background: black;margin: 0;position: fixed;}`
+
+// After
+const header = css`
+  .top-bar {
+    background: black;
+    margin: 0;
+    position: fixed;
+  }
+`;
+```
+
+### Support styled-components with existing component (#2552, #2619) by @azz
+
+styled-components has a lot of different variants for tagging template literals as CSS. It's not ideal that we've got to encode all those ways inside of prettier but since we started, might as well do it for real. 
+
+```js
+styled(ExistingComponent)`
+  css: property;
+`;
+
+styled.button.attr({})`
+  border: rebeccapurple;
+`;
+```
+
+### Trim whitespace in descendant combinator (#2411) by @azz
+
+The CSS parsers we use do not give us a 100% semantic tree: in many occasions they bail and just give us what is being entered. It's up to us to make sure we clean this up while maintaining correctness. In this case, we just printed spaces between selectors as is but we know it's correct to always replace it by a single space.
+
+```js
+// Before
+.hello
+
+            .how-you-doin {
+  height: 42;
+}
+
+// After
+.hello .how-you-doin {
+  height: 42;
+}
+```
+
+### Strip BOM before parsing (#2373) by @azz 
+
+I still have nightmares from dealing with [BOM](https://en.wikipedia.org/wiki/Byte_order_mark) in a previous life. Thankfully, in 2017 it's no longer a big issue as most tooling is now aware of it. Thanks @azz for fixing an edge cases related to CSS parsing.
+
+```js
+// Before
+[BOM]/* Block comment *
+html {
+  content: ""#{1}"";  
+}
+```
+```css
+// After
+[BOM]/* Block comment */
+html {
+  content: ""#{1}"";  
+}
+```
+
+
+## GraphQL
+
+### Add support for range-formatting GraphQL (#2319) by @josephfrazier 
+
+If you tried to use the range formatting feature in a GraphQL file, it would throw an exception, now it properly worked again and only reformats the piece you selected.
+
+### Add `.gql` file extension to be parsed as GraphQL (#2357) by @rrdelaney 
+
+At Facebook, we use `.graphql` extension but it looks like it's common to have `.gql` as well, doesn't cost a lot to support it in the heuristic that figures out what parser to use.
+
+## CLI
+
+### Support multiple patterns with ignore pattern (#2356) by @evilebottnawi 
+
+It was already possible to have multiple glob patterns but they would be additive, with this change, you can add a glob pattern to ignore some files. It should be very handy to ignore folders that are deeply nested.
+
+```js
+prettier --write '{**/*,*}.{js,jsx,json}' '!vendor/**'
+```
+
+### Make --list-different to work with --stdin (#2393) by @josephfrazier 
+
+This is a handy way of knowing if prettier would print a piece of code in a different way. We already had all the concepts in place, we just needed to wire them up correctly.
+
+```js
+$ echo 'call ( ) ;' | prettier --list-different
+(stdin)
+$ echo $?
+1
+```
+
+",https://api.github.com/users/vjeux,197597,vjeux,https://api.github.com/repos/prettier/prettier/releases/7526093/assets,https://api.github.com/repos/prettier/prettier/releases/7526093,master,https://api.github.com/repos/prettier/prettier/tarball/1.6.0,https://github.com/prettier/prettier/releases/tag/1.6.0,https://api.github.com/repos/prettier/prettier/zipball/1.6.0,1.6.0,False,False
+6828958,2017-06-27T17:09:59Z,2017-06-27T17:12:13Z,"1.5.0: GraphQL, CSS-in-JS & JSON","![image](https://cloud.githubusercontent.com/assets/311752/24736977/385d81c8-1a40-11e7-8adc-c4c879ba6c31.png)
+
+This is the release I've been waiting for a very long time: one that has only minimal changes to JavaScript! 
+
+For the past 6 months, we kept doing changes to various aspects of printing JavaScript, with the hope that one day we would get to a stable place. No automated tool is going to print perfect code for all the possible edge cases. The goal is to find a good place where when people report code that is printed in a funny way, we can't make it better without making other pieces of code look worse, introduce behavior that's very hard to understand for humans and doesn't introduce some disproportionate complexity to the codebase.
+
+We're not 100% there yet, but we're closer than ever!
+
+Now that JavaScript needs for support is trending down, it's an opportunity to support other languages that front-end developers are working on and want formatted. We've introduced TypeScript and CSS in the last release and are doing a batch of fixes for them in this release. We're also adding support for new languages: GraphQL queries, embedding CSS-in-JS and JSON are now available in prettier!
+
+### Blog Post: [Adding a new layout strategy to Prettier](https://medium.com/geckoboard-under-the-hood/adding-a-new-layout-strategy-to-prettier-8d33084c0f99) by @karl
+
+Prettier is not only a useful tool but it's also a really cool piece of technology. @karl spent a bunch of time improving JSX support and in the process implemented a new primitive to prettier: `fill`. He wrote a very interesting blog post [Adding a new layout strategy to Prettier](https://medium.com/geckoboard-under-the-hood/adding-a-new-layout-strategy-to-prettier-8d33084c0f99) that I highly recommend reading if you're interested in how prettier is working behind the scenes.
+
+## GraphQL
+
+Thanks to @stubailo, @jnwng, @tgriesser and @azz, prettier now supports printing GraphQL queries!
+
+It works for `.graphql` files and within JavaScipt templates that start with `graphql`, `graphql.experimental` and `gql` in order to work with [Relay](https://facebook.github.io/relay/) and [Apollo](https://www.apollodata.com/).
+
+```js
+ReactDOM.render(
+  <QueryRenderer
+    query={graphql`
+      query appQuery {
+        viewer {
+          ...TodoApp_viewer
+        }
+      }
+    `}
+    // ...
+  />,
+  mountNode
+);
+```
+
+Note that it only supports the open source syntax of GraphQL, therefore doesn't work with Relay Classic, it only works with Relay Modern.
+
+## CSS-in-JS
+
+If you are using [styled-components](https://github.com/styled-components/styled-components) or [styled-jsx](https://github.com/zeit/styled-jsx), prettier will now reformat the CSS inside of your template expressions. Thanks to @pomber for the awesome work!
+
+```js
+const EqualDivider = styled.div`
+  margin: 0.5rem;
+  padding: 1rem;
+  background: papayawhip;
+  > * {
+    flex: 1;
+    &:not(:first-child) {
+      ${props => (props.vertical ? ""margin-top"" : ""margin-left"")}: 1rem;
+    }
+  }
+`;
+```
+
+## JSON
+
+This was pretty straightforward to implement but nonetheless very useful. Thanks to @josephfrazier for doing it :)
+
+```js
+{
+  ""name"": ""prettier"",
+  ""version"": ""1.5.0"",
+  ""description"": ""Prettier is an opinionated JavaScript formatter"",
+  ""bin"": {
+    ""prettier"": ""./bin/prettier.js""
+  }
+}
+```
+
+## CSS
+
+I'm really excited because we only put a few days to build the initial CSS support and it has worked surprisingly well. This release brings a handful of important improvements to CSS but nothing that required big changes.
+
+### CSS: Every selector is now printed in its own line (#2047) by @yuchi
+
+The biggest unknown when printing CSS was how to deal with multiple selectors. The initial approach we took was to use the 80 columns rule where we would only split if it was bigger than that. Many people reported that they were using another strategy for this: always break after a `,`. It turns out that many popular codebases are using this approach and it feels good as you can see the structure of the selectors when layed out on-top of each others.
+
+```js
+// Before
+.clusterPlannerDialog input[type=""text""], .clusterPlannerDialog .uiTypeahead {
+
+// After
+.clusterPlannerDialog input[type=""text""],
+.clusterPlannerDialog .uiTypeahead {
+```
+
+### CSS: lowercase hex colors (#2203) by @azz
+
+The concept of code formatting has blurry boundaries. The core aspect of it is around whitespaces but some things like single vs double quotes and semi-colons are usually bundled with it. With prettier on JavaScript, we also lightly reformat strings by removing extra `\` and normalize numbers. For CSS, we need to do a similar interpretation of where the boundary ends. For colors, we decided to turn all the letters into lowercase and stop there. Turning rgb() into hex or 6 hex into 3 hex is out of scope.
+
+```js
+// Before
+.foo {
+  color: #AAA;
+  -o-color: #fabcd3;
+  -ms-color: #AABBCC;
+}
+
+// After
+.foo {
+  color: #aa;
+  -o-color: #fabcd3;
+  -ms-color: #aabbcc;
+}
+```
+
+### CSS: Use fill for CSS values (#2224)
+
+The new fill primitive turned out to be very useful for CSS. For long values, instead of breaking and putting a `\n` before every element, we can instead only put a `\n` when it goes over the limit. It leads to much better looking code.
+
+```js
+// Before
+border-left:
+  1px
+  solid
+  mix($warningBackgroundColors, $warningBorderColors, 50%);
+
+// After
+border-left: 1px solid
+  mix($warningBackgroundColors, $warningBorderColors, 50%);
+```
+
+### CSS: Allow long media rules to break (#2219)
+
+This is another small fix in the journey of properly supporting a new language. We now encode the ability to break on long `@media` rules.
+
+```js
+// Before
+@media all and (-webkit-min-device-pixel-ratio: 1.5), all and (-o-min-device-pixel-ratio: 3/2), all and (min--moz-device-pixel-ratio: 1.5), all and (min-device-pixel-ratio: 1.5) {
+}
+
+// After
+@media all and (-webkit-min-device-pixel-ratio: 1.5),
+  all and (-o-min-device-pixel-ratio: 3/2),
+  all and (min--moz-device-pixel-ratio: 1.5),
+  all and (min-device-pixel-ratio: 1.5) {
+}
+```
+
+### CSS: Print @else on same line as } (#2088) by @azz
+
+Less and Scss are turning into real programming languages :) Step by step, we're starting to print all their constructs in the same way as JavaScript. This time, it's the `else` placement.
+
+```js
+// Before
+@if $media == phonePortrait {
+  $k: .15625;
+}
+@else if $media == tabletPortrait {
+  $k: .065106;
+}
+
+// After
+@if $media == phonePortrait {
+  $k: .15625;
+} @else if $media == tabletPortrait {
+  $k: .065106;
+}
+```
+
+### CSS: implement prettier-ignore (#2089) by @azz
+
+While we want prettier to format the entire codebase, there are times where we ""know better"" and want an escape hatch. This is where the `prettier-ignore` comment comes in. It wasn't working for CSS but that was an oversight, now it is implemented :)
+
+```js
+// Before
+foo {
+  /* prettier-ignore */
+  thing: foo;
+  -ms-thing: foo;
+}
+
+// After
+foo {
+  /* prettier-ignore */
+  thing:     foo;
+  -ms-thing: foo;
+}
+```
+
+### CSS: Fix css-modules composes breaking with long line width (#2190) by @tdeekens
+
+In order to be fast, many ""packagers"" do not parse files in order to extract dependencies but instead use a crude regex. This is a reason why we don't break long `require()` calls and it happens to also affect CSS Modules. If you add new lines in the `composes` field, it doesn't recognize it anymore. So we're no longer breaking it there, even if it goes over 80 columns.
+
+```js
+// Before
+.reference {
+  composes: 
+    selector 
+    from
+    ""a/long/file/path/exceeding/the/maximum/length/forcing/a/line-wrap/file.css"";
+}
+
+// After
+.reference {
+  composes: selector from ""a/long/file/path/exceeding/the/maximum/length/forcing/a/line-wrap/file.css"";
+}
+```
+
+### CSS: First try scss when there's an @import with comma (#2225)
+
+We made a decision to have only a single high level ""parser"" for CSS, SCSS and Less even though we are using `postcss-less` and `postcss-scss` under the hood. We use a regex to figure out which parser to try first and fallback to the other one if a syntax error is thrown. Unfortunately, for certain features, the first (incorrect) parser doesn't throw and instead skips some elements. So, we need to beef up the regex to make sure we are right for the early detection.
+
+Thankfully, this hack is working well in practice. If we find a lot more edge cases, we'll likely want to do the right thing(tm) and split them into two parsers.
+
+```js
+// Before
+@import ""text-shadow"";
+
+// After
+@import ""rounded-corners"", ""text-shadow"";
+```
+
+## TypeScript
+
+TypeScript support is now solid, all the changes for this release are small edge cases.
+
+### TypeScript: print arrow function type params on same line as params (#2101) by @azz
+
+The core algorithm of prettier is to expand a group if all the elements do not fit. It works really well in practice for most of JavaScript but there's one case it doesn't handle very well is when there are two groups side by side, in this case: `<Generics>(Arguments)`. We have to carefully create groups such that arguments expand first as this is generally what people expect.
+
+```js
+// Before
+export const forwardS = R.curry(<
+  V,
+  T
+>(prop: string, reducer: ReducerFunction<V, T>, value: V, state: {[name: string]: T}) =>
+  R.assoc(prop, reducer(value, state[prop]), state)
+);
+
+// After
+export const forwardS = R.curry(
+  <V, T>(
+    prop: string,
+    reducer: ReducerFunction<V, T>,
+    value: V,
+    state: { [name: string]: T }
+  ) => R.assoc(prop, reducer(value, state[prop]), state)
+);
+```
+
+### TypeScript: keep parens around with yield/await non-null assertion (#2149) by @azz
+
+For better or worse, we decided to manually handle adding parenthesis. So when a new operator is introduced, we need to make sure that we add correct parenthesis when nested with any other combination of operators. In this case, we missed await inside of TypeScript `!`.
+
+```js
+// Before
+const bar = await foo(false)!;
+
+// After
+const bar = (await foo(false))!;
+```
+
+### TypeScript: Print {} in import if it's in the source (#2150) by @azz
+
+We use typescript-eslint-parser project that translates TypeScript AST into estree AST in order for prettier to print it. From time to time we're going to find edge cases that it doesn't handle yet. In this case, it didn't give a way to tell that there's an empty `{}`, which apparently is important for TypeScript. Thankfully, the team is very responsive and they fixed it after we put a workaround inside of prettier.
+
+```js
+// Before
+import from ""@types/googlemaps"";
+
+// After
+import {} from ""@types/googlemaps"";
+```
+
+### TypeScript: Always break interfaces onto multiple lines (#2161) by @azz
+
+The code that implements `interface` is shared with the code that prints `object`s, which contains a rule to keep them expanded if there's a `\n` inside. But, this is not the intended behavior for interfaces. We always want to expand, like we do for classes, even if it fits 80 columns.
+
+```js
+// Before
+interface FooBar { [id: string]: number; }
+
+// After
+interface FooBar {
+  [id: string]: number;
+}
+```
+
+### TypeScript: Fix extra semicolon in ambient typescript declaration emit (#2167) by @azz
+
+`no-semi` and `semi` are often requested but on the prettier team we're one step ahead and implemented `two-semi` for you! Just kidding, it was a bug and is now fixed ;)
+
+```js
+// Before
+declare module ""classnames"" {
+  export default function classnames(
+    ...inputs: (string | number | false | object | undefined)[]
+  ): string;;
+}
+
+// After
+declare module ""classnames"" {
+  export default function classnames(
+    ...inputs: (string | number | false | object | undefined)[]
+  ): string;
+}
+```
+
+### TypeScript: group function params in call/construct signatures (#2169) by @azz
+
+Adding a comment before a method used to take into account the comment length and would often expand the method when it wasn't expected. Thankfully, it was a simple fix, just wrap the output in a `group`.
+
+```js
+// Before
+interface TimerConstructor {
+  // Line-splitting comment
+  new (
+    interval: number,
+    callback: (handler: Timer) => void
+  ): Timer;
+}
+
+interface TimerConstructor {
+  // Line-splitting comment
+  new (interval: number, callback: (handler: Timer) => void): Timer;
+}
+```
+
+### TypeScript: Upgrade tsep (#2183) by @azz
+
+This bug was very annoying if you ran into it: anytime you formatted the code, it would add one more `_` to the object key!
+
+```js
+// Before
+obj = {                                                                               
+  __: 42
+  ___: 42
+};
+
+// After
+obj = {                                                                               
+  _: 42
+  __: 42
+};
+```
+
+
+### TypeScript: break on multiple interface extends (#2085) by @azz
+
+Unlike in JavaScript, TypeScript lets you extend multiple classes at once. It turns out that people use this feature and prettier now does a better job at printing it.
+
+```js
+// Before
+export interface ThirdVeryLongAndBoringInterfaceName extends AVeryLongAndBoringInterfaceName, AnotherVeryLongAndBoringInterfaceName, AThirdVeryLongAndBoringInterfaceName {}
+
+// After
+export interface ThirdVeryLongAndBoringInterfaceName
+  extends AVeryLongAndBoringInterfaceName,
+    AnotherVeryLongAndBoringInterfaceName,
+    AThirdVeryLongAndBoringInterfaceName {}
+```
+
+
+### TypeScript: handle ObjectPattern instead of ObjectExpression inside BinaryExpression (#2238) by @azz
+
+This one isn't very interesting, it's an edge case that's not properly handled in the TypeScript -> estree conversion.
+
+```js
+// Before
+call(c => { bla: 1 }) || [];
+
+// After
+call(c => ({ bla: 1 })) || [];
+```
+
+
+### Preserve lines after directives (#2070)
+
+By supporting TypeScript, prettier is now being used in a lot of Angular codebases which exercises edge cases that were not properly handled. In this case, we didn't preserve empty lines after directives inside of a function.
+
+```js
+// Before
+export default class {
+  constructor($log, $uibModal) {
+    ""ngInject"";
+    Object.assign(this, { $log, $uibModal });
+
+// After
+export default class {
+  constructor($log, $uibModal) {
+    ""ngInject"";
+
+    Object.assign(this, { $log, $uibModal });
+```
+
+
+## JavaScript
+
+This release is very light in terms of JavaScript changes, which is awesome. We're starting to see the light at the end of the tunnel and get towards a great pretty printer. We're never going to get to a 100% perfect automatic pretty printer. The goal is that for every issue we get, there are no clear ways to improve the way it is printed without regressing other pieces.
+
+### Allow JSX lines to be recombined (#1831) by @karl
+
+The goal of prettier is to have a consistent way to format your code: given an AST, we always print the same way. In two places we had to compromise and read the original format: JSX and Objects. With this change, we're no longer relying on the original input for JSX with text inside. This lets us reflow text inside of JSX. 
+
+```js
+// Before
+const Abc = () => {
+  return (
+    <div>
+      Please state your
+      {"" ""}
+      <b>name</b>
+      {"" ""}
+      and
+      {"" ""}
+      <b>occupation</b>
+      {"" ""}
+      for the board of directors.
+    </div>
+  );
+};
+
+// After
+const Abc = () => {
+  return (
+    <div>
+      Please state your <b>name</b> and <b>occupation</b> for the board of
+      directors.
+    </div>
+  );
+}
+```
+
+### Break on non-literal computed member expression (#2087) by @azz
+
+Printing member chains is the most complicated piece of prettier and we keep finding small tweaks we can do to make it a better experience.
+
+```js
+// Before
+nock(/test/)
+  .matchHeader(""Accept"", ""application/json"")[httpMethodNock(method)](""/foo"")
+  .reply(200, {
+    foo: ""bar"",
+  });
+
+// After
+nock(/test/)
+  .matchHeader(""Accept"", ""application/json"")
+  [httpMethodNock(method)](""/foo"")
+  .reply(200, {
+    foo: ""bar"",
+  });
+```
+
+### Indent first variable in one-var scenario (#2095) by @azz
+
+Up until recently we haven't done much to support printing multiple variables in a single declaration as the most common practice is to do one variable declaration per variable. For single declarations, we don't want to indent it, but it turns out that we do when there are other ones afterwards, otherwise it looks weird.
+
+```js
+// Before
+var templateTagsMapping = {
+ '%{itemIndex}': 'index',
+ '%{itemContentMetaTextViews}': 'views'
+},
+  separator = '<span class=""item__content__meta__separator"">•</span>';
+
+// After
+var templateTagsMapping = {
+   '%{itemIndex}': 'index',
+   '%{itemContentMetaTextViews}': 'views'
+  },
+  separator = '<span class=""item__content__meta__separator"">•</span>';
+```
+
+### Allow break with both default named import (#2096) by @azz
+
+This one is an unfortunate regression from 1.4 where we inlined import that only contained a single element. Turns out the definition of a single element allowed a single type and a single element. This is now corrected!
+
+```js
+// Before
+import transformRouterContext, { type TransformedContextRouter } from '../../helpers/transformRouterContext';
+
+// After
+import transformRouterContext, { 
+  type TransformedContextRouter 
+} from '../../helpers/transformRouterContext';
+```
+
+### Turn allowImportExportEverywhere on (#2207) by @zimme 
+
+The goal of prettier is to format code people write in practice, so we enable loose/experimental modes for all the parsers we support. Babylon allows you to write import within a function, which is not part of the standard, but it doesn't cost us much to allow it.
+
+```js
+// Before
+ParseError
+
+// After
+function f() {
+  import x from 'x';
+}
+```
+
+### Support inline template for new calls (#2222)
+
+We keep adding features for function calls and have to backport them to new calls as they have a different AST node type but in practice we want to treat them the same. This fix refactored the two so that they are going through the same call site, so hopefully should prevent more from sneaking in.
+
+```js
+// Before
+new Error(
+  formatErrorMessage`
+    This a really bad error.
+    Which has more than one line.
+  `
+);
+
+// After
+new Error(formatErrorMessage`
+  This a really bad error.
+  Which has more than one line.
+`);
+```
+
+### Don't indent + in object value (#2227)
+
+When we switched to using the same heuristic for assignment (`a = b`) for objects (`{a: b}`), we forgot to fix the indentation. Now it's fixed.
+
+```js
+// Before
+var abc = {
+  thing:
+    ""asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"" +
+      ""asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"" +
+      ""asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"",
+}
+
+// After
+var abc = {
+  thing:
+    ""asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"" +
+    ""asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"" +
+    ""asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"",
+}
+```
+
+### Handle conditions inside of a ternary (#2228)
+
+Prettier already had a special case when the expression was a conditional but it didn't apply when the conditional was the left part of a ternary. Now it does.
+
+```js
+// Before
+room = room.map((row, rowIndex) =>
+  row.map(
+    (col, colIndex) =>
+      rowIndex === 0 ||
+        colIndex === 0 ||
+        rowIndex === height ||
+        colIndex === width
+        ? 1
+        : 0
+  )
+);
+
+// After
+room = room.map((row, rowIndex) =>
+  row.map(
+    (col, colIndex) =>
+      rowIndex === 0 ||
+      colIndex === 0 ||
+      rowIndex === height ||
+      colIndex === width
+        ? 1
+        : 0
+  )
+);
+```
+
+### Add caching for printing (#2259)
+
+With the 1.0 release, we fixed a bug in the printing that introduced an exponential behavior. We've been able to mitigate the biggest issue such that reasonable code didn't time out, but it wasn't completely fixed it. By adding a caching layer at the right spot, we should now be in the clear.
+
+This should make printing the IR of prettier using prettier in debug mode no longer time out.
+
+```js
+// Before
+...times out...
+
+// After
+someObject.someFunction().then(function () {
+    return someObject.someFunction().then(function () {
+        return someObject.someFunction().then(function () {
+            return someObject.someFunction().then(function () {
+                return someObject.someFunction().then(function () {
+                    return someObject.someFunction().then(function () {
+                        return someObject.someFunction().then(function () {
+                            return someObject.someFunction().then(function () {
+                                return someObject.someFunction().then(function () {
+                                    anotherFunction();
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+});
+```
+
+### Fix variance location (#2261)
+
+We refactored the code that prints modifiers when we introduced TypeScript support and accidentally moved around the variance (`+`) part before `static` which is not valid in Flow. This is now fixed.
+
+```js
+// Before
+class Route {
+  +static param: T;
+}
+
+// After
+class Route {
+  static +param: T;
+}
+```
+
+## Miscellaneous
+
+### Various fixes for range and cursor tracking (#2266, #2248, #2250, #2136) by @CiGit and @josephfrazier 
+
+Both those features were introduced in the last release and we discovered a bunch of issues when actually using them in production. A bunch of them got fixed, if you see more, please report them!",https://api.github.com/users/vjeux,197597,vjeux,https://api.github.com/repos/prettier/prettier/releases/6828958/assets,https://api.github.com/repos/prettier/prettier/releases/6828958,master,https://api.github.com/repos/prettier/prettier/tarball/1.5.0,https://github.com/prettier/prettier/releases/tag/1.5.0,https://api.github.com/repos/prettier/prettier/zipball/1.5.0,1.5.0,False,False
+6525851,2017-06-02T15:55:04Z,2017-06-02T15:56:34Z,1.4.0: TypeScript and CSS support,"[![prettier-revolution-conf](https://cloud.githubusercontent.com/assets/197597/26732495/9f1101b6-476c-11e7-8d19-56a17e2080c5.png)](https://revolutionconf.com/talk/a-prettier-printer)
+
+
+# TypeScript Support
+
+This is the most requested feature for prettier. With 1.4.0, you can now use prettier to format your `.ts` and `.tsx` files!
+
+The way prettier works is by using those project to generate an AST representation of the code and print it. Both babylon (the parser that powers babel) and flow are producing an AST approximately following the [estree](https://github.com/estree/estree) format for the JavaScript parts and then have special nodes for Flow-specific ones.
+
+TypeScript, the same way as Flow, introduces special nodes for the syntax it introduces. Unfortunately, it doesn't follow the estree format for the rest of the JavaScript language. This puts us in a rough spot with prettier as we would have to essentially completely fork it in order to print TypeScript.
+
+This incompatibility with the AST is not a new problem and another project struggled with it: ESLint. Because the AST is different, none of the ESLint rules are working. Fortunately for us, @JamesHenry and @soda0289 wrote a project called [typescript-eslint-parser](https://github.com/eslint/typescript-eslint-parser) which takes a TypeScript AST and convert it to an estree one, just what we need for prettier!
+
+After that project got setup inside of prettier, @azz, @despairblue and @Pajn implemented all the TypeScript-specific nodes and ensured that the 13k tests of the TypeScript test suite are correctly passing. This was a huge undertaking and it is finally ready to be used :)
+
+We tested prettier on the biggest TypeScript projects we could find on GitHub to ensure that it prints correct code. We haven't spent a lot of time trying to optimize the way code is formatted yet, so if you see something strange, please raise an issue!
+
+# CSS, Less and SCSS Support
+
+While TypeScript is the most requested feature from open source, CSS is the biggest one from Facebook engineers. Once you are used to pretty print your code in one language, you want to do it everywhere!
+
+It turns out that CSS is a much smaller language than JavaScript and supporting it only took a few days. We are using [postcss](https://github.com/postcss/postcss) by @ai as the underlying parser which is able to parse CSS, Less and SCSS. We also depend on [postcss-values-parser](https://github.com/shellscape/postcss-values-parser), [postcss-selector-parser](https://github.com/postcss/postcss-selector-parser) by @ben-eb  [postcss-media-query-parser](https://github.com/dryoma/postcss-media-query-parser) by @dryoma.
+
+Unfortunately, postcss right now doesn't parse Sass nor Stylus. We'd be happy to support them if someone is willing to do the work of printing them.
+
+Note that prettier is currently just formatting the code, it does not respect any options yet such as `singleQuote` nor is doing any color or number normalization like we do for JavaScript.
+
+# Editor Integration
+
+The first phase of the project was to make prettier output correct and good looking code. Now that it's in a good shape, we can spend time on making the integrations better. We just introduced support for two great features: maintain cursor position and being able to format a range instead of the entire file.
+
+Note that we just landed the support inside of prettier itself, none of the editor integrations are using it yet. Also, we haven't really tried them out in practice so we're likely going to have to fix rough edges with them!
+
+### Add `cursorOffset` option for cursor translation (#1637) by @josephfrazier
+
+Right now, we let editors figure out where the cursor should be, which they do an okay job at. But since we are printing the code, we can give the correct position!
+
+### Add `--range-start/end` options to format only parts of the input (#1609) by @josephfrazier
+
+This one is a very often requested feature. Right now prettier only formats the entire file. Now it is possible to format a range.
+
+The way it works is by going up through the AST in order to find the closest statement. This way you don't need to select exactly the right range that is valid. You can just drag in the rough place where the code you want to reformat it, and it's going to!
+
+### Adding filepath option in order to enable filetype inference (#1835) by @mitermayer 
+
+Since we are now formatting CSS and TypeScript, it is not convenient to have to specify the parser for every file. You can now pass the filepath of the file you are working on and prettier will read the extension and figure out the right parser to use.
+
+# Highlights
+
+### Wrap text content inside of JSX (#1120, #1671, #1827, #1829) by @karl 
+
+The biggest remaining issue that people have with prettier when printing JSX is when it is used when printing text. The behavior of prettier used to add an ugly `{"" ""}` before and if a line was too long, just leave it alone. Now we treat each word as a token and are able to make it flow correctly.
+
+This is an awesome piece of work by @karl as not only did he implement the feature, but also introduced a new primitive inside of prettier in order to print a sequence of elements and break as soon as one hits the edge.
+
+```js
+// Before
+<div>
+  Please state your
+  {"" ""}
+  <b>name</b>
+  {"" ""}
+  and
+  {"" ""}
+  <b>occupation</b>
+  {"" ""}
+  for the board of directors.
+</div>
+
+// After
+<div>
+  Please state your <b>name</b> and <b>occupation</b> for the board of
+  directors.
+</div>
+```
+
+### Remove parenthesis for JSX inside of arrow functions (#1733) by @xixixao 
+
+People writing functional components are going to be happy about this one. We no longer put parens for arrow functions that return JSX.
+
+```js
+// Before
+const render1 = ({ styles }) => (
+  <div style={styles}>
+      Keep the wrapping parens. Put each key on its own line.
+  </div>
+);
+
+// After
+const render1 = ({ styles }) =>
+  <div style={styles}>
+      Keep the wrapping parens. Put each key on its own line.
+  </div>;
+```
+
+### Improve template literal printing (#1664, #1714) by @josephfrazier 
+
+Template literal printing has always caused prettier a lot of difficulties. With 1.3.0 we massively improved the situation and with this release, I believe that we handle all the common situations in a good way.
+
+In order to workaround issues, we added an utility that removes empty lines from the output, but it yielded some really weird results sometimes, this is now gone. Another tweak we've done is instead of indenting when `${` starts, we indent where the line that contains `${` starts.
+
+Let us know if you still have issues with how template literals output after this release!
+
+```js
+// Before
+const Bar = styled.div`
+  color: ${props => (props.highlight.length > 0 ? palette([
+                 'text',
+                 'dark',
+                 'tertiary'
+               ])(props) : palette([
+                 'text',
+                 'dark',
+                 'primary'
+               ])(props))} !important;
+`
+
+// After
+const Bar = styled.div`
+  color: ${props =>
+    props.highlight.length > 0
+      ? palette([""text"", ""dark"", ""tertiary""])(props)
+      : palette([""text"", ""dark"", ""primary""])(props)} !important;
+`
+```
+
+### Use the same breaking rules for assignment and object values (#1721)
+
+We have a lot of fine-tuned logic for how to break things after assignment (eg `a = ...`). We are now using the same one for object values. This should help for multi-line boolean logic, or big conditionals. This is also a good example of how we can create a consistent printer.
+
+```js
+// Before
+const o = {
+  somethingThatsAReallyLongPropName: this.props.cardType ===
+    AwesomizerCardEnum.SEEFIRST,
+};
+
+// After
+const o = {
+  somethingThatsAReallyLongPropName:
+    this.props.cardType === AwesomizerCardEnum.SEEFIRST,
+};
+```
+
+### Indent conditions inside of !() (#1731)
+
+There's been a steady stream of people complaining about the way it was rendered and was put on the list of things that are probably hard to do, will check later. It turned out to be super easy, so here you go!
+
+```js
+// Before
+const anyTestFailures = !(aggregatedResults.numFailedTests === 0 &&
+  aggregatedResults.numRuntimeErrorTestSuites === 0);
+
+// After
+const anyTestFailures = !(
+  aggregatedResults.numFailedTests === 0 &&
+  aggregatedResults.numRuntimeErrorTestSuites === 0
+);
+```
+
+
+# Formatting Fixes
+
+### Put loop bodies on the same line when possible (#1498)
+
+We were already doing this for if statements, we should be consistent and also do it for loops.
+
+```js
+// Before
+for (a in b)
+  var c = {};
+
+// After
+for (a in b) var c = {};
+```
+
+### Fix empty line with flow union (#1511) by @existentialism
+
+We shouldn't indent things twice ;)
+
+```js
+// Before
+type Foo = Promise<
+
+    | { ok: true, bar: string, baz: SomeOtherLongType }
+    | { ok: false, bar: SomeOtherLongType }
+>;
+
+// After
+type Foo = Promise<
+  { ok: true, bar: string, baz: SomeOtherLongType } | 
+  { ok: false, bar: SomeOtherLongType }
+>;
+```
+
+### Do not put parens for single argument with end of line comment (#1518)
+
+The detection code for whether an arrow function should be written without parenthesis just checked if there was a comment, but instead we only want comments that are inline like `(/* comment */ num)`, not end of line comments.
+
+```js
+// Before
+KEYPAD_NUMBERS.map((num) => ( // Buttons 0-9
+  <div />
+));
+
+KEYPAD_NUMBERS.map(num => ( // Buttons 0-9
+  <div />
+));
+```
+
+### Do not indent nested ternaries (#1822)
+
+This avoids making it seems like it is indented by 4 characters instead of two. The downside is that if the condition is multi-line it's not going to be properly aligned, but I feel it's a better trade-offs. If you are doing nested ternaries, you usually have small conditions.
+
+```js
+// Before
+aaaaaaaaaaaaaaa
+  ? bbbbbbbbbbbbbbbbbb
+  : ccccccccccccccc
+      ? ddddddddddddddd
+      : eeeeeeeeeeeeeee ? fffffffffffffff : gggggggggggggggg;
+
+// After
+aaaaaaaaaaaaaaa
+  ? bbbbbbbbbbbbbbbbbb
+  : ccccccccccccccc
+    ? ddddddddddddddd
+    : eeeeeeeeeeeeeee ? fffffffffffffff : gggggggggggggggg;
+```
+
+### Inline chained conditionals inside of jsx attribute (#1519)
+
+We don't need to use the indentation to disambiguate another block as nothing can come after.
+
+```js
+// Before
+<div
+  src={
+    !isEnabled &&
+      diffUpdateMessageInput != null &&
+      this.state.isUpdateMessageEmpty
+  }
+/>;
+
+// After
+<div
+  src={
+    !isEnabled &&
+    diffUpdateMessageInput != null &&
+    this.state.isUpdateMessageEmpty
+  }
+/>;
+```
+
+### Unescape unnecessarily escaped characters in strings (#1575) by @josephfrazier 
+
+We are already trying to cleanup strings in various ways, this is another small addition that's going to remove `\` that are not needed.
+
+```js
+// Before
+a = 'hol\a';
+
+// After
+a = 'hola';
+```
+
+### Fix boolean for empty objects (#1590) by @dmitrika 
+
+We want to inline objects inside of a boolean expression as it looks weird to have `{` on its own line. But it turns out that it leads to weird behaviors for empty objects. So we keep them on their own line if they are empty.
+
+```js
+const x = firstItemWithAVeryLongNameThatKeepsGoing ||
+secondItemWithALongNameAsWell || {};
+
+// After
+const x = 
+  firstItemWithAVeryLongNameThatKeepsGoing ||
+  secondItemWithALongNameAsWell || 
+  {};
+```
+
+### Remove Parens from SequenceExpressions in ForStatements (#1597) by @k15a 
+
+It is common to assign multiple values inside of a for loop, now we don't add parenthesis anymore.
+
+```js
+// Before
+for ((i = 0), (len = arr.length); i < len; i++) {
+
+// After
+for (i = 0, len = arr.length; i < len; i++) {
+```
+
+### Do not inline arrow when argument has a leading comment (#1660)
+
+If you put block comments inside of arrow functions, we no longer mess everything up!
+
+```js
+// Before
+export const bem = block => /**
+   * @param {String} [element] - the BEM Element within that block; if undefined, selects the block itself.
+   */
+element => /**
+     * @param {?String} [modifier] - the BEM Modifier for the Block or Element; if undefined, selects the Block or Element unmodified.
+     */
+modifier =>
+
+// After
+export const bem = block =>
+  /**
+   * @param {String} [element] - the BEM Element within that block; if undefined, selects the block itself.
+   */
+  element =>
+    /**
+     * @param {?String} [modifier] - the BEM Modifier for the Block or Element; if undefined, selects the Block or Element unmodified.
+     */
+    modifier =>
+```
+
+### Fix last comments of imports (#1677)
+
+Another place where we have to do special logic for comments!
+
+```js
+// Before
+import {
+  ExecutionResult,
+  DocumentNode,
+  /* tslint:disable */
+  SelectionSetNode,
+} /* tslint:enable */ from 'graphql';
+
+// After
+import {
+  DocumentNode,
+  /* tslint:disable */
+  SelectionSetNode,
+  /* tslint:enable */
+} from 'graphql';
+```
+
+### Handle comments in member chain (#1686, #1691)
+
+We handled some placements before and kept adding places where they could appear, now we switch to a more general approach. Hopefully those issues shouldn't crop up in the future anymore.
+
+```js
+// Before
+const configModel = this.baseConfigurationService.getCache().consolidated // global/default values (do NOT modify)
+  .merge(this.cachedWorkspaceConfig);
+
+// After
+const configModel = this.baseConfigurationService
+  .getCache()
+  .consolidated // global/default values (do NOT modify)
+  .merge(this.cachedWorkspaceConfig);
+```
+
+### Use expandLast for nested arrow functions (#1720)
+
+```js
+// Before
+f(action => next =>
+    next(action));
+
+// After
+f(action => next =>
+    next(action),
+);
+```
+
+### Put JSX comments inside of the parenthesis (#1712)
+
+This mostly affects Facebook engineers where we automatically add `$FlowFixMe` when pushing a new version of flow. Now it no longer messes up those comments.
+
+```js
+// Before
+const aDiv = /* $FlowFixMe */
+(
+  <div className=""foo"">
+    Foo bar
+  </div>
+);
+
+// After
+const aDiv = (
+  /* $FlowFixMe */
+  <div className=""foo"">
+    Foo bar
+  </div>
+);
+```
+
+### Force \n for multiple variable declarations (#1723)
+
+This one has been very often requested. We used to only break multiple variable declarations if the line was > 80 columns. Now we do it regardless if there's at least one with an assignment.
+
+```js
+// Before
+var numberValue1 = 1, numberValue2 = 2;
+
+// After
+var numberValue1 = 1,
+ numberValue2 = 2;
+```
+
+### Inline | null and | void (#1734)
+
+The expanded version of flow union looks good when they are many objects but if it's used for nullability, the it looks very weird. We're now inlining `| null` and `| void`.
+
+```js
+// Before
+interface RelayProps {
+  articles:
+    | Array<
+      | {
+        __id: string,
+      }
+      | null
+    >
+    | null
+}
+
+// After
+interface RelayProps {
+  articles: Array<{
+    __id: string,
+  } | null> | null,
+}
+```
+
+### Break on implements instead of extends (#1730)
+
+We no longer break on `extends`. This should make classes with extends that can break look less wonky.
+
+```js
+// Before
+class MyContractSelectionWidget
+  extends React.Component<
+    void,
+    MyContractSelectionWidgetPropsType,
+    void
+  > {
+  method() {}
+}
+
+// After
+class MyContractSelectionWidget extends React.Component<
+  void,
+  MyContractSelectionWidgetPropsType,
+  void
+> {
+  method() {}
+}
+```
+
+### Inline single import (#1729)
+
+The same way we don't break long `require` calls, we no longer break `import` statements if there is only a single thing being imported.
+
+```js
+// Before
+import somethingSuperLongsomethingSuperLong
+  from ""somethingSuperLongsomethingSuperLongsomethingSuperLong"";
+
+// After
+import somethingSuperLongsomethingSuperLong from ""somethingSuperLongsomethingSuperLongsomethingSuperLong"";
+```
+
+### Add the ability for SequenceExpression to break (#1749)
+
+Did you know that if none of your code were statements, you could use `()` instead of `{}` and `,` instead of `;`? Now you do. Some people exploit this fact when returning things from arrow functions. This is not recommended but it's easy to support in prettier so might as well ¯\_(ツ)_/¯
+
+```js
+// Before
+const f = (argument1, argument2, argument3) =>
+  (doSomethingWithArgument(argument1), doSomethingWithArgument(
+    argument2
+  ), argument1);
+
+// After
+const f = (argument1, argument2, argument3) => (
+  doSomethingWithArgument(argument1),
+  doSomethingWithArgument(argument2),
+  argument1
+);
+```
+
+### Don't force line break in empty loop bodies (#1815)
+
+Loops with empty body no longer have their `{}` split into two lines.
+
+```js
+// Before
+while (true) {
+}
+
+// After
+while (true) {}
+```
+
+
+### Preserve empty lines between switch cases with comments (#1708)
+
+```js
+// Before
+switch (true) {
+  case true:
+  // Good luck getting here
+  case false:
+}
+
+// After
+switch (true) {
+  case true:
+    
+  // Good luck getting here
+  case false:
+}
+```
+
+# Correctness
+
+### Remove ast-types (#1743, #1744, #1745, #1746, #1747)
+
+We used to find where to put comments by traversing the AST using the definition from ast-types. This occasionally caused issues when some field wasn't declared, we wouldn't find the node and either print comments in an incorrect location or throw an error. It turns out that we don't need to keep this mapping and can just traverse the objects and if a node has a `type` field, then it's a node.
+
+```js
+// Before
+Error: did not recognize object of type ""ObjectTypeSpreadProperty""
+
+// After
+type X = {...Y/**/};
+type X = {/**/...Y};
+```
+
+### Preserve unusual unicode whitespace (#1658, #1165) by @karl and @yamafaktory 
+
+If you were adding invisible characters inside of JSX text, we would replace them by regular spaces. I don't know why anyone would ever want to do that, but now we print it back as is!
+
+### Don't let trailing template literal comments escape (#1580, #1713, #1598, #1713) by @josephfrazier and @k15a 
+
+We used to have some pretty complicated (and not working well) code to handle comments inside of template literals. We introduced a really nice solution for JSX `{}` expressions. The idea is to introduce a boundary before the end of the `}` and if we still have unprinted comments, then flush them all at once, put a \n and print the `}`. We are now using this logic for template literals :)
+
+```js
+// Before
+`${0} // comment`;
+
+// After
+`${
+0
+// comment
+}`;
+```
+
+### Parenthesize await correctly (#1513, #1595, #1593) by @bakkot and @existentialism 
+
+We don't have an automated way to put parenthesis, we instead specify all the possible combinations of nodes and when they should or shouldn't have parenthesis. So there's likely a long tail of unusual combinations that are still remaining. In this case, we made `await` handling a lot more robust by both adding parenthesis where they are needed and removing them when they are not.
+
+```js
+// Before
+(await spellcheck) && spellcheck.setChecking(false);
+new A((await x));
+
+// After
+await (spellcheck && spellcheck.setChecking(false));
+new A(await x);
+```
+
+### Preserve getter/setter info on flow ObjectTypeProperty (#1585) by @josephfrazier 
+
+Another long tail option that we haven't got right!
+
+```js
+// Before
+type T = { method: () => void };
+
+// After
+type T = { get method(): void }
+```
+
+### Add parenthesis for single arg types with generics (#1814)
+
+Another case of sneaky parenthesis that we didn't properly add!
+
+```js
+// Before
+type ExtractType = <A>B<C> => D
+
+// After
+type ExtractType = <A>(B<C>) => D
+```
+
+### Fall back to non-strict mode in babylon (#1587, #1608) by @josephfrazier 
+
+We want prettier to be able to parse all the JavaScript out there. For babylon parser, we have to chose whether a file is using strict mode or not. We opted in to use strict mode by default as most files parse that way. But if you have octal literals like `0775`, it would not even parse. Now if it fails to parse in strict mode, we're going to try again in non-strict. We also allow `return` outside of a function as it's valid in node files.
+
+```js
+// Before
+SyntaxError
+
+// After
+return 0775;
+```
+
+# CLI
+
+### Allow `--write` to be used with `--list-different` (#1633)
+
+This is useful to combine the two if you are writing a commit hook to tell the user what actually changed in a single command.
+
+### Ignore node_modules when running prettier from CLI (#1683) by @thymikee
+
+It's very easy to run prettier over the `node_modules/` folder by mistake which is something you almost never want to. So now we disable it by default and add a `--with-node-modules` option if you really want to.
+
+### Traverse dot files for glob (#1844) by @jhgg 
+
+We enabled the option to go through .dotfiles in the glob parsing library we are using. This means that writing `*` will now catch `.eslintrc`.",https://api.github.com/users/vjeux,197597,vjeux,https://api.github.com/repos/prettier/prettier/releases/6525851/assets,https://api.github.com/repos/prettier/prettier/releases/6525851,master,https://api.github.com/repos/prettier/prettier/tarball/1.4.0,https://github.com/prettier/prettier/releases/tag/1.4.0,https://api.github.com/repos/prettier/prettier/zipball/1.4.0,1.4.0,False,False
+6525845,2017-04-13T16:28:42Z,2017-05-28T03:53:47Z,,See http://jlongster.com/prettier-1.0,https://api.github.com/users/vjeux,197597,vjeux,https://api.github.com/repos/prettier/prettier/releases/6525845/assets,https://api.github.com/repos/prettier/prettier/releases/6525845,master,https://api.github.com/repos/prettier/prettier/tarball/1.0.0,https://github.com/prettier/prettier/releases/tag/1.0.0,https://api.github.com/repos/prettier/prettier/zipball/1.0.0,1.0.0,False,False
+6235656,2017-05-02T20:15:15Z,2017-05-02T22:32:18Z,1.3.0,"## Facebook Adoption Update
+
+The reason why I (@vjeux) embarked on this journey working on prettier has always been to get the entire Facebook codebase converted over. I would like to give an update on how it is going and what is the process to get there.
+
+The first projects to adopt prettier were Jest, React and immutable-js. Those are small codebases in the order of hundreds of files that have their own infrastructure. There are a handful of people working on them full time.
+
+Then, Oculus and Nuclide converted their codebase over. The scale is bigger with a few thousands of files and tens of full time contributors but looks pretty similar to the first projects. The conversions went in one big codemod and that's it.
+
+Now, the entire Facebook codebase is way bigger than this and it's not feasible to just convert everything in one go and to convince everyone that their entire codebase is going to be reformatted under their feet. So we need to find a more incremental approach.
+
+### Scaling adoption
+
+Running prettier on a piece of code is a pretty expensive operation, it makes your pull request look bad because of a lot of unrelated changes and it causes merge conflicts for all the outstanding pull requests. So **once a file has been formatted, you should do everything to make sure it remains formatted**.
+
+- When pretty-printing a file, add `@format` to the first block comment like `@flow`.
+- Have a lint rule with autofix that checks if the file is correctly pretty printed when `@format` is present.
+  - When running Nuclide, it's going to show as an inline warning and have a fix button.
+  - When sending a pull request, it's going to show the lint failing with a [Yn] prompt that you can just press enter.
+- Update the default code templates to add `@format` to the header.
+- When you run code formatting via cmd-shift-c inside of Nuclide, automatically insert the `@format` header.
+- Disable all the stylistic rules like max-len when `@format` is in the header.
+- Have script to run prettier through an entire folder with everything configured as a one line operation.
+- Have a good guide to help people that want to convert their codebase over with instructions and best practices.
+- When pushing a new release of prettier, also run it through all the files with `@format` in order to avoid getting warnings afterwards.
+- Add tracking for the number of files with `@format` over time.
+
+We finally got all those things wired up 1.5 weeks ago and the reception has been insane. Many people from various teams converted their codebase to prettier on their own. As of today, 15% of Facebook codebase has been converted over!
+
+<center><img src=""https://cloud.githubusercontent.com/assets/197597/25565785/ed4abca4-2d82-11e7-9c26-380733444543.png"" width=""250"" /></center>
+
+When I started working on prettier, I had a hunch that people were hungry for tools to solve formatting. But I had no idea that once the tooling was in place, people would rush to convert their codebase over! This is great confirmation that this project is useful to people and not just a gimmicky tool.
+
+## TypeScript Support Progress
+
+@despairblue, @azz and @JamesHenry have been hard at work around getting TypeScript supported by prettier as it's the top requested feature. 2000 out of 11000 files in the TypeScript test suite are not yet properly printed. You can follow progress on https://github.com/prettier/prettier/issues/1480 and do not hesitate to help out!
+
+## Flow
+
+### Add trailing commas on flow generics (#1381)
+
+The `--trailing-comma=all` option is supposed to add trailing commas everywhere possible, but as an oversight we forgot to do it for flow generics.
+
+```js
+// Before
+type Errors = Immutable.Map<
+  Ahohohhohohohohohohohohohohooh,
+  Fbt | Immutable.Map<ErrorIndex, Fbt>
+>;
+
+// After
+type Errors = Immutable.Map<
+  Ahohohhohohohohohohohohohohooh,
+  Fbt | Immutable.Map<ErrorIndex, Fbt>,
+>;
+```
+
+### Inline nullable in flow generics (#1426)
+
+The phase after printing things correctly is to tweak the output to make it closer to the way people write code in practice. Inlining optional flow types is a small thing that makes a difference.
+
+```js
+// Before
+type Cursor = Promise<
+  ?{
+    newCursor?: number,
+    formatted: string,
+  }
+>;
+
+// After
+type Cursor = Promise<?{
+  newCursor?: number,
+  formatted: string,
+}>;
+```
+
+### Allow flow declarations to break on StringLiteralTypeAnnotations (#1437)
+
+We can always find more places to add breaks when things don't fit 80 columns. This time it's around declaring a type as a constant string.
+
+```js
+// Before
+export type AdamPlacementValidationSingleErrorKey = 'SOME_FANCY_TARGETS.GLOBAL_TARGET';
+
+// After
+export type AdamPlacementValidationSingleErrorKey =
+  'SOME_FANCY_TARGETS.GLOBAL_TARGET';
+```
+
+
+### Add space around `=` for flow generics default arguments (#1476)
+
+Another example of small thing where we can improve the display of flow code. For function default arguments we put a space around `=` but didn't around flow generics.
+
+```js
+// Before
+class PolyDefault<T=string> {}
+
+// After
+class PolyDefault<T = string> {}
+```
+
+### Don't break for unparenthesised single argument flow function (#1452)
+
+I'm trying to figure out something to write here, but ... it just looks weird!
+
+```js
+// Before
+const selectorByPath:
+  Path
+ => SomethingSelector<
+  SomethingUEditorContextType,
+  SomethingUEditorContextType,
+  SomethingBulkValue<string>
+> = memoizeWithArgs(/* ... */)
+
+// After
+const selectorByPath: Path => SomethingSelector<
+  SomethingUEditorContextType,
+  SomethingUEditorContextType,
+  SomethingBulkValue<string>
+> = memoizeWithArgs(/* ... */);
+```
+
+### Fix optional flow parenthesis (#1357)
+
+We were a bit too lenient around parenthesis for optional flow types. In one case in the entire Facebook codebase, it generated code with different semantics. As part of this fix, we hardened the list of types that can be written without parenthesis.
+
+```js
+// Before
+type X = ?(number, number) => number => void;
+
+// After
+type X = (?(number, number) => number) => void;
+```
+
+### Skip trailing commas with FlowShorthandWithOneArg (#1364)
+
+It is a parse error to add a trailing comma without parenthesis for arguments of arrow function types. We found one case in Facebook codebase when this happened, it's a very rare occurrence.
+
+```js
+// Before
+type IdeConnectionFactory =
+  child_process$ChildProcess,
+  => FlowIDEConnection = defaultIDEConnectionFactory;
+
+// After
+type IdeConnectionFactory =
+  child_process$ChildProcess
+  => FlowIDEConnection = defaultIDEConnectionFactory;
+```
+
+### Reorder flow object props (#1451)
+
+This one is an example where the way the AST is structured is not our favor. Instead of having a list of elements inside of a type, the AST is structured in a way where normal keys and array keys each have their own group. In order to restore the initial order, we're now reading from the original source :(
+
+```js
+// Before
+type Foo = {
+  [key: string]: void,
+  alpha: ""hello"",
+  beta: 10
+};
+
+// After
+type Foo = {
+  alpha: 'hello',
+  [key: string]: void,
+  beta: 10
+}
+```
+
+## Template Literal
+
+### Proper indentation for template literals (#1385)
+
+A long standing issue with template literals and prettier is around the indentation of code inside of `${}`. It used to be the indentation of the backtick but turned out to give poor results. Instead people tend to use the indent of the `${`. We changed this behavior and it magically made GraphQL queries look pretty!
+
+```js
+// Before
+Relay.createContainer({
+  nodes: ({ solution_type, time_frame }) => Relay.QL`
+    fragment {
+      __typename
+      ${OptimalSolutionsSection.getFragment(""node"", {
+    solution_type,
+    time_frame
+  })}
+    }
+  `
+})
+```
+```js
+// After
+Relay.createContainer({
+  nodes: ({ solution_type, time_frame }) => Relay.QL`
+    fragment {
+      __typename
+      ${OptimalSolutionsSection.getFragment(""node"", {
+        solution_type,
+        time_frame
+      })}
+    }
+  `
+})
+```
+
+### Do not indent calls with a single template literal argument (#873)
+
+Template literals are very hard to deal with for a pretty printer because the spaces inside are meaningful so you can't re-indent them. We didn't know what to do for a call with a single template literal so we didn't do anything, but we kept receiving reports of people saying that prettier indented it the wrong way, so we are now inlining them. Fingers crossed it is going to cover most use cases.
+
+```js
+// Before
+insertRule(
+  `*, *:before, *:after {
+    box-sizing: inherit;
+  }`
+);
+
+// After
+insertRule(`*, *:before, *:after {
+  box-sizing: inherit;
+}`);
+```
+
+### Fix windows line ending on template literals (#1439)
+
+We manipulate line endings in a lot of places in prettier and took great care of handling both `\n` and `\r\n` except for template literals where we forgot. Now this is fixed!
+
+```js
+// Before
+const aLongString = `
+
+Line 1
+
+Line 2
+
+Line 3
+
+`;
+
+// After
+const aLongString = `
+Line 1
+Line 2
+Line 3
+`;
+```
+
+### Inline template literals as arrow body (#1485)
+
+We already inline template literals that are tagged (eg ``graphql`query` ``) but didn't for plain template literals. For the anecdote, it turns out the code was supposed to support it but it was using `TemplateElement` instead of `TemplateLiteral` :(
+
+```js
+// Before
+const inlineStore = preloadedState =>
+  `
+  <script>
+    window.preloadedState = ${JSON.stringify(preloadedState).replace(/</g, '\\u003c')}
+  </script>
+`
+
+// After
+const inlineStore = preloadedState => `
+  <script>
+    window.preloadedState = ${JSON.stringify(preloadedState).replace(/</g, '\\u003c')}
+  </script>
+`
+```
+
+## Ternaries
+
+### Add parenthesis for unusual nested ternaries (#1386)
+
+While working on printing nested ternaries, everyone focused on the ones with the shape of an if then else `cond1 ? elem1_if : cond2 ? elem2_if : elem_else` which is the most common. But, if you move some `?` and `:` around you can have another pattern. It looks almost the same but has a different meaning. In order to reduce confusion, we're adding parenthesis around the uncommon form.
+
+```js
+// Before
+cond1 ? cond2 ? elem2_if : elem2_else : elem1_else
+
+// After
+cond1 ? (cond2 ? elem2_if : elem2_else) : elem1_else
+```
+
+### Only add parenthesis on ternaries inside of arrow functions if doesn't break (#1450)
+
+There's an eslint rule [`no-confusing-arrows`](http://eslint.org/docs/rules/no-confusing-arrow) which suggests adding parenthesis for ternaries in arrow functions without brackets. The following two pieces of code are confusing:
+
+```js
+var x = a => 1 ? 2 : 3;
+var x = a <= 1 ? 2 : 3;
+```
+
+It makes sense when code is in one line, but when it is split into multiple lines, the parenthesis are unnecessary given the indentation, so we now only put them when they serve their disambiguation purpose.
+
+```js
+// Before
+var x = a => (1 ? 2 : 3);
+var x = a =>
+  (1
+    ? 2
+    : 3);
+
+// After
+var x = a => (1 ? 2 : 3);
+var x = a =>
+  1
+    ? 2
+    : 3;
+```
+
+## General JavaScript Improvements
+
+### Inline function declaration with single arg as object (#1173)
+
+This one was often requested for React Stateless Functional Components (SFC). If you make use of a lot of them, it's likely going to be a big change for you.
+
+```js
+// Before
+const X = (
+  props: {
+    a: boolean,
+  },
+) => <div />;
+
+// After
+const X = (props: {
+  a: boolean,
+}) => <div />;
+```
+
+
+### Break inline object first in function arguments (#1453)
+
+One thing we discovered early on is that people usually break the arguments of the function before breaking the return type. Unfortunately, the code responsible to inline single destructuring argument broke that assumption and it introduced bad looking code like this example. The good news is that it enables us to turn on inlining for single arguments that are typed with an object.
+
+```js
+// Before
+class X {
+  async onDidInsertSuggestion({editor, triggerPosition, suggestion}): Promise<
+    void
+  > {
+  }
+}
+
+// After
+class X {
+  async onDidInsertSuggestion({
+    editor,
+    triggerPosition,
+    suggestion
+  }): Promise<void> {
+  }
+}
+```
+
+### Don't break on empty arrays and objects (#1440)
+
+This one has been a long standing issue and is an easy fix, but was an invaluable tool: whenever someone reported that `[]` or `{}` would break, we were able to fix the example by fixing something else. So it was a great way to surface edge cases. Fortunately, this vein has now ran out and all the recent examples just look bad with no other reason than the fact that they are breaking. So it's time to finally do it!
+
+```js
+// Before
+const a = someVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeLong.Expression || [
+];
+
+// After
+const a = someVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeLong.Expression || [];
+```
+
+### Do not break on [0] (#1441)
+
+We have a lot of issues where code breaks in array access when it doesn't look good. We don't yet have a good generic solution for it, but we can add a specific fix a common situation: `[0]`.
+
+```js
+// Before
+queryThenMutateDOM(() => {
+  title = SomeThing.call(root, ""someLongStringThatPushesThisTextReall"")[
+    0
+  ];
+});
+
+// After
+queryThenMutateDOM(() => {
+  title = SomeThing.call(
+    root,
+    ""someLongStringThatPushesThisTextReall"",
+  )[0];
+});
+```
+
+
+### Indent do while condition  (#1373)
+
+We were not using the correct indentation logic for do-while condition but someone noticed, now we do!
+
+```js
+// Before
+do {}
+while (someVeryLongStringA && someVeryLongStringB && someVeryLongStringC && someVeryLongStringD);
+
+// After
+do {}
+while (
+  someVeryLongStringA &&
+  someVeryLongStringB &&
+  someVeryLongStringC &&
+  someVeryLongStringD
+);
+```
+
+### Preserve inline comment as last argument (#1390)
+
+We forgot to add one case in the comment detection code when they appear last for JSX attributes and function arguments which made them go after the closing. In the case of JSX, it generated code that had a different meaning. Fortunately, since we don't usually commit commented out code it didn't affect production code, but it is not a good experience while coding.
+
+```js
+// Before
+const x = (
+  <div
+    attr1={1}>
+//   attr3={3}
+    {children}
+  </div>
+);
+
+// After
+const x = (
+  <div
+    attr1={1}
+//   attr3={3}
+  >
+    {children}
+  </div>
+);
+```
+
+### Break class expression returned by arrow call (#1464)
+
+In 1.0, we made class be inline inside of arrow functions. It turns out that it doesn't work great when the class is non trivial, so we are reverting this change. We're trying really hard to avoid making trashy decisions like this where the style changes back and forth, but we allow ourselves to do it sometimes to fix mistakes!
+
+```js
+// Before
+export default (ViewComponent: Function, ContainerComponent: Function) => class
+  extends React.Component {
+  static propTypes = {};
+};
+
+// After
+export default (ViewComponent: Function, ContainerComponent: Function) =>
+  class extends React.Component {
+    static propTypes = {};
+  };
+```
+
+### Fix empty line in block with EmptyStatement (#1375)
+
+This one was found by fuzzing. You're unlikely going to hit this in real code but it's good to know it is fixed!
+
+```js
+// Input
+if (a) {
+  b;
+
+
+  ;
+}
+
+// Before
+if (a) {
+  b;
+
+}
+
+// After
+if (a) {
+  b;
+}
+```
+",https://api.github.com/users/vjeux,197597,vjeux,https://api.github.com/repos/prettier/prettier/releases/6235656/assets,https://api.github.com/repos/prettier/prettier/releases/6235656,master,https://api.github.com/repos/prettier/prettier/tarball/1.3.0,https://github.com/prettier/prettier/releases/tag/1.3.0,https://api.github.com/repos/prettier/prettier/zipball/1.3.0,1.3.0,False,False
+6126387,2017-04-19T18:01:44Z,2017-04-19T18:36:46Z,1.2.0,"1.0 is not the end of prettier, we're going to continue to work on the long tail of formatting issues in order to make it an awesome JavaScript code formatter. You should expect minor version releases like this one to change small things and edge cases but nothing major or controversial.
+
+## Format
+
+### Do not print the sub-tree when using prettier-ignore (#1286)
+### Bail when traversing === groups (#1294)
+
+A regression was introduced in 1.0 where deeply nested functions like this would trigger an exponential behavior and no longer complete in a reasonable time. We introduced a mitigation such that it's not instant but at least completes in a reasonable amount of time.
+
+```js
+someObject.someFunction().then(function () {
+    return someObject.someFunction().then(function () {
+        return someObject.someFunction().then(function () {
+            return someObject.someFunction().then(function () {
+                return someObject.someFunction().then(function () {
+                });
+            });
+        });
+    });
+});
+```
+
+### Break if () if conditional inside breaks (#1344)
+
+prettier was sometimes breaking inside of an if condition as it didn't fit 80 columns but would print all the conditions in a single line. This was very weird looking. Now if the if break, prettier will also break the conditions.
+
+```js
+// Before
+if (
+  this.hasPlugin(""dynamicImports"") && this.lookahead().type === tt.parenLeft
+) {
+
+// After
+if (
+  this.hasPlugin(""dynamicImports"") &&
+  this.lookahead().type === tt.parenLeft
+) {
+```
+
+### Avoid breaking arguments for last arg expansion (#1305)
+
+A long-standing issue around last argument expansion and complex arguments has been fixed, it no longer looks crazy bad.
+
+```js
+// Before
+manageChildren: jest.fn(function manageChildren(parentTag, moveFromIndices = [
+], moveToIndices = [], addChildReactTags = [], addAtIndices = [
+], removeAtIndices = []) {
+
+// After
+manageChildren: jest.fn(function manageChildren(
+  parentTag,
+  moveFromIndices = [],
+  moveToIndices = [],
+  addChildReactTags = [],
+  addAtIndices = [],
+  removeAtIndices = []
+) {
+```
+
+### Add parentheses for assignment as body of arrow (#1326)
+
+We're fine tuning when to add parenthesis in order to improve understanding of the code. This time, we're adding it to assignment inside of arrow functions. Please open up issues if you think that there should be parenthesis and prettier doesn't put them.
+
+```js
+// Before
+() => foo = bar + 2;
+
+// After
+() => (foo = bar + 2);
+```
+
+### Improve regex printing (#1341)
+
+Flow and Babylon were inconsistent in how they printed escapes and flags. Now the escapes are untouched compared to the original ones and the flags are sorted.
+
+```js
+// Before
+/[\/]\/\u0aBc/mgi;
+
+// After
+/[/]\/\u0aBc/gim;
+```
+
+### Fix arrow function parenthesis with comments in flow (#1339)
+
+With the Flow parser, prettier didn't add parenthesis for single argument functions with a comment.
+
+```js
+// Before
+call(/*object*/ row => {});
+
+// After
+call((/*object*/ row) => {});
+```
+
+### Don't inline paren at right of arguments (#1345)
+
+We incorrectly put a comment at the right of arguments inside of the argument list.
+
+```js
+// Before
+f(/* ... */) {}
+
+// After
+f() /* ... */ {}
+```
+
+### Fix template literal comments (#1296)
+
+Comments inside of template literals would crash in some conditions and be inserted in the wrong `${}`, no more :)
+
+```js
+// Before
+stdin: TypeError: Cannot read property 'comments' of undefined
+
+// After
+`
+(?:${escapeChar}[\\S\\s]|(?:(?!${// Using `XRegExp.union` safely rewrites backreferences in `left` and `right`.
+// Intentionally not passing `basicFlags` to `XRegExp.union` since any syntax
+// transformation resulting from those flags was already applied to `left` and
+// `right` when they were passed through the XRegExp constructor above.
+XRegExp.union([left, right], '', {conjunction: 'or'}).source})[^${escapeChar}])+)+
+`
+```
+
+### Fix isPreviousLineEmpty on Windows (#1263)
+
+Empty lines were not properly preserved for switch case on windows.
+
+```js
+// Before
+switch (a) {
+  case x:
+
+  case y:
+    call();
+}
+
+// After
+switch (a) {
+  case x:
+  case y:
+    call();
+}
+```
+
+
+## CLI
+
+### Skip globbing filenames with node-glob when the filename is not a glob (#1307)
+
+If you run `prettier file.js` and `file.js` doesn't exist, it's going to throw an exception instead of silently doing nothing.
+
+### Write out change CLI changes synchronously (#1292)
+
+There was a race condition when you did ctrl-c to stop the process where it could delete files. Now we write files synchronously so it doesn't anymore.
+
+",https://api.github.com/users/vjeux,197597,vjeux,https://api.github.com/repos/prettier/prettier/releases/6126387/assets,https://api.github.com/repos/prettier/prettier/releases/6126387,master,https://api.github.com/repos/prettier/prettier/tarball/1.2.0,https://github.com/prettier/prettier/releases/tag/1.2.0,https://api.github.com/repos/prettier/prettier/zipball/1.2.0,1.2.0,False,False

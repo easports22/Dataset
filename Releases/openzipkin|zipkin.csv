@@ -1,0 +1,822 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8074652,2017-10-10T15:01:23Z,2017-10-11T08:27:41Z,Zipkin 2.2,"Zipkin 2.2 focuses on operations, allowing proxy-mounting the UI and bundles a Prometheus Grafana dashboard
+
+@stepanv modified the zipkin UI such that it can work behind reverse proxies which choose a different path prefix than '/zipkin'. If you'd like to try zipkin under a different path, Stepan wrote docs showing how to [setup apache http](https://github.com/openzipkin/zipkin/tree/master/zipkin-ui#apache-http-as-a-zipkin-reverse-proxy).
+
+Previously, zipkin had both spring and prometheus metrics exporters. Through hard work from @abesto and @kristofa, we now have a comprehensive example setup including a [Zipkin+Prometheus Grafana dashboard](http://grafana.com/dashboards/1598). To try it out, use our [docker-compose example](https://github.com/openzipkin/docker-zipkin#prometheus), which starts everything for you. Once that's done, you can start viewing the health of your tracing system, including how many messages are dropped.
+
+Here's an example, which you'd see at `http://192.168.99.100:3000/dashboard/db/zipkin-prometheus?refresh=5s&orgId=1&from=now-5m&to=now` if using docker-machine:
+
+<img width=""1000"" alt=""screen shot 2017-10-11 at 4 26 51 pm"" src=""https://user-images.githubusercontent.com/64215/31429581-08490502-aea1-11e7-8c6c-a2b9e85cf090.png"">
+
+### Other notes
+* our docker JVM has been upgraded to 1.8.0_144 from 1.8.0_131
+* the zipkin-server no longer writes log messages about drop messages at warning level as it can fill up disk. Enable debug logging to see the cause of drops
+* elasticsearch storage will now drop on backlog as opposed to backing up, as the latter led to out-of-memory crashes under load surges.
+
+Finally, please join us on [gitter](https://gitter.im/openzipkin/zipkin) if you have any questions or feedback about Zipkin 2.2
+
+
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/8074652/assets,https://api.github.com/repos/openzipkin/zipkin/releases/8074652,master,https://api.github.com/repos/openzipkin/zipkin/tarball/2.2.0,https://github.com/openzipkin/zipkin/releases/tag/2.2.0,https://api.github.com/repos/openzipkin/zipkin/zipball/2.2.0,2.2.0,False,False
+7972181,2017-10-02T04:52:17Z,2017-10-03T00:48:40Z,Zipkin 2.1,"Thanks to @shakuzen, zipkin 2.1 adds RabbitMQ to the available span transports.
+
+RabbitMQ has been requested many times, though we only started formally [tracking it this year](https://github.com/openzipkin/zipkin/issues/1614). A lot of interest grew from [spring-cloud-sleuth](https://github.com/spring-cloud/spring-cloud-sleuth) which supported a custom RabbitMQ transport. Starting with Zipkin 2.1, RabbitMQ support is built-in to zipkin-server (though custom deployments can remove it).
+
+Using this is easy, just set `RABBIT_ADDRESSES` to a comma-separated list of rabbit hosts.. if playing around, you can use localhost:
+```bash
+$ RABBIT_ADDRESSES=localhost java -jar zipkin.jar
+```
+More documentation is available [here](https://github.com/openzipkin/zipkin/blob/master/zipkin-collector/rabbitmq/README.md).
+
+Once a server is running applications send spans to rabbit, specifically to the queue/routing key associated with zipkin (defaults to ""zipkin""). You can post a test trace using normal CLI while you wait for [tracers](http://zipkin.io/pages/existing_instrumentations.html) to support RabbitMQ transport.
+```bash
+$ echo '[{""traceId"":""9032b04972e475c5"",""id"":""9032b04972e475c5"",""kind"":""SERVER"",""name"":""get"",""timestamp"":1505990621526000,""duration"":612898,""localEndpoint"":{""serviceName"":""brave-webmvc-example"",""ipv4"":""192.168.1.113""},""remoteEndpoint"":{""serviceName"":"""",""ipv4"":""127.0.0.1"",""port"":60149},""tags"":{""error"":""500 Internal Server Error"",""http.path"":""/a""}}]' > sample-spans.json
+$ rabbitmqadmin publish exchange=amq.default routing_key=zipkin < sample-spans.json
+```
+
+Many thanks to @shakuzen for driving this feature. There's a lot more work than just coding when we add a new default feature. Evenings and weekend time from Tommy are gratefully received.
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/7972181/assets,https://api.github.com/repos/openzipkin/zipkin/releases/7972181,master,https://api.github.com/repos/openzipkin/zipkin/tarball/2.1.0,https://github.com/openzipkin/zipkin/releases/tag/2.1.0,https://api.github.com/repos/openzipkin/zipkin/zipball/2.1.0,2.1.0,False,False
+7726360,2017-09-12T11:56:05Z,2017-09-12T16:58:37Z,Zipkin 2,"In version 1.31, we introduced our [v2 http api](http://zipkin.io/zipkin-api/#/), availing dramatically simplified data types. Zipkin 2 is the effort to move all infrastructure towards that model, while still remaining backwards compatible.
+
+## What's new?
+The [core java library](https://github.com/openzipkin/zipkin#core-library) (under the package zipkin2) has model, codec and storage types. This includes a bounded in-memory storage component used in test environments.
+
+The following artifacts are new and can coexist with previous ones.
+* `io.zipkin.zipkin2:zipkin:2.0.0` < core library
+* `io.zipkin.zipkin2:zipkin-storage-elasticsearch:2.0.0` < first v2 native storage driver
+
+Note: If you are using `io.zipkin.java:zipkin` and `io.zipkin.zipkin2:zipkin`, use version 2.0.0 (or later) for both as we still maintain the old libraries.
+
+## What's next?
+There are a few storage implementations in-flight and some may port to the new libraries. Next, we will add a v2 native transport library and work on a Spring Boot 2 based server. Expect incremental progress along the way. Please join us on [gitter](https://gitter.im/openzipkin/zipkin) if you have ideas!
+
+## The server itself is still the same
+Note: if you are only using or configuring Zipkin, there's little impact. Zipkin server hasn't changed, you just upgrade it. If you have java tracing setup, read the below. Otherwise, you are done unless you want extra details.
+
+## Changing java applications to use Zipkin v2 format
+Java applications often use the [zipkin-reporter](https://github.com/openzipkin/zipkin-reporter-java) project directly or indirectly to send data to Zipkin collectors. Our version 2 json format is smaller and measurably more efficient.
+
+Once you've upgraded your Zipkin servers, opt-into the version 2 format like this:
+Ex:
+```diff
+   /** Configuration for how to send spans to Zipkin */
+   @Bean Sender sender() {
+-    return OkHttpSender.create(""http://your_host:9411/api/v1/spans"");
++    return OkHttpSender.json(""http://your_host:9411/api/v2/spans"");
+   }
+ 
+   /** Configuration for how to buffer spans into messages for Zipkin */
+-  @Bean Reporter<Span> reporter() {
+-    return AsyncReporter.builder(sender()).build();
++  @Bean Reporter<Span> spanReporter() {
++    return AsyncReporter.v2(sender()).build();
+   }
+```
+
+If you are using [Brave](https://github.com/openzipkin/brave) directly, you can stick the v2 reporter here:
+```diff
+     return Tracing.newBuilder()
+-        .reporter(reporter()).build();
++        .spanReporter(spanReporter())
+```
+
+If you are using [Spring XML](https://github.com/openzipkin/brave/tree/master/spring-beans), the related change looks like this:
+```diff
+-  <bean id=""sender"" class=""zipkin.reporter.okhttp3.OkHttpSender"" factory-method=""create""
++  <bean id=""sender"" class=""zipkin.reporter.okhttp3.OkHttpSender"" factory-method=""json""
+       destroy-method=""close"">
+-    <constructor-arg type=""String"" value=""http://localhost:9411/api/v1/spans""/>
++    <constructor-arg type=""String"" value=""http://localhost:9411/api/v2/spans""/>
+   </bean>
+ 
+   <bean id=""tracing"" class=""brave.spring.beans.TracingFactoryBean"">
+     <property name=""reporter"">
+       <bean class=""brave.spring.beans.AsyncReporterFactoryBean"">
++        <property name=""encoder"" value=""JSON_V2""/>
+```
+
+## What's new in the Zipkin v2 library
+
+Zipkin v2 libraries are under the `zipkin2` java package and the `io.zipkin.zipkin2` maven group ID. The core library has a few changes, which mostly cleanup or pare down features we had before. Here are some highlights:
+
+### Span now uses validated strings as opposed to parsed objects
+Our new json encoder is 2x as fast as prior due to factors including a validation approach. For example, before we used the java long type to represent a 64-bit ID and a 32-bit integer to represent an ipv4 address. Most of the time, IDs are and IPs are transmitted and stored as strings. This resulted in needless expensive conversions. By switching to this, using other serialization libraries is easier, too, as you don't need custom type converters.
+
+Ex.
+```diff
+-  Endpoint.builder().serviceName(""tweetie"").ipv4(192 << 24 | 168 << 16 | 1).build());
++  Endpoint.newBuilder().serviceName(""tweetie"").ip(""192.168.0.1"").build());
+```
+
+protip: if you have an old endpoint, you can do `endpoint.toV2()` on it!
+
+### Span now uses auto-value instead of public final fields
+We originally had public final fields for our model types (borrowing from square wire style). This has a slight glitch which is that data transformations can't use method references (as fields aren't methods!). This is cleaned up now.
+
+```diff
+-    assertThat(spans).extracting(s -> s.duration)
++    assertThat(spans).extracting(Span::duration)
+```
+
+### Asynchronous operations are now cancelable
+Most will not make custom Zipkin servers, but those making storage or transport plugins have a cleaner api.
+
+Borrowing heavily from Square Retrofit and OkHttp, Zipkin storage interfaces return a Call object, which represents a single unit of work, such as storing spans. This provides means to either synchronously invoke the command, pass a callback, or compose with your favorite library. Unlike before, calls are cancelable.
+
+For example, before, if you wanted to write integration tests that synchronously invoke storage, you'd need to play callback games. These are gone.
+
+```diff
+-    CallbackCaptor<Void> callback = new CallbackCaptor<>();
+-    storage().asyncSpanConsumer().accept(spans, callback);
+-    callback.get();
++   storage.spanConsumer().accept(spans).execute();
+```
+
+As an implementor, the whole thing is simpler especially combined with validated string IDs
+```diff
+-  @Override public void getTrace(long traceIdHigh, long traceIdLow, Callback<List<Span>>) {
+-    String traceIdHex = Util.toLowerHex(traceIdHigh, traceIdLow);
++  @Override public Call<List<Span>> getTrace(String traceId) {
+```
+
+### (json) Codec libraries are cleaned up
+We've introduced `SpanBytesEncoder` and `SpanBytesDecoder` instead of the catch-all `Codec` type from v1. When writing zipkin-reporter, we noticed that almost all applications do not need decode logic (as they simply serialize and send out of process). For those writing data to Zipkin, we can serialize either the old format or the new with `SpanBytesEncoder.JSON_V1` or `SpanBytesEncoder.JSON_V2` accordingly. It is important to note that writing v1 format does not require a version 1.X jar in your classpath.",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/7726360/assets,https://api.github.com/repos/openzipkin/zipkin/releases/7726360,master,https://api.github.com/repos/openzipkin/zipkin/tarball/2.0.0,https://github.com/openzipkin/zipkin/releases/tag/2.0.0,https://api.github.com/repos/openzipkin/zipkin/zipball/2.0.0,2.0.0,False,False
+7397123,2017-08-14T06:04:39Z,2017-08-15T13:22:56Z,Zipkin 1.30,"Zipkin 1.30 accepts a new simplified json format on all major transports including http, Kafka, SQS, Kinesis, Azure Event Hub and Google Stackdriver.
+
+The primary goal of this format is making Zipkin data easier to understand and simpler for folks to write. A dozen folks in Zipkin have vetted ideas on this format for over a year. We took it seriously because we don't want to bother you with a format unless it will last years. Thanks especially to @bplotnick @basvanbeek and @mansu for donating time recently towards vetting final details.
+
+Here's an example curl command that uploads json representing a server operation:
+```bash
+# make epoch seconds epoch microseconds, because.. microservices!
+$ date +%s123456
+1502677917123456
+$ curl -s localhost:9411/api/v2/spans -H'Content-Type: application/json' -d'[{
+  ""traceId"": ""86154a4ba6e91387"",
+  ""id"": ""86154a4ba6e91387"",
+  ""kind"": ""SERVER"",
+  ""name"": ""get"",
+  ""timestamp"": 1502677917123456,
+  ""duration"": 207000,
+  ""localEndpoint"": {
+    ""serviceName"": ""hamster-wheel"",
+    ""ipv4"": ""113.210.108.10""
+  },
+  ""remoteEndpoint"": {
+    ""ipv4"": ""77.12.22.11""
+  },
+  ""tags"": {
+    ""http.path"": ""/api/hamsters"",
+    ""http.status_code"": ""302""
+  }
+}]'
+```
+
+The above says a lot with a little: the server's identifier in discovery (hamster-wheel), the http route and the client IP (likely from X-Forwarded-For or similar). This request took 207ms in the server and resulted in a redirect.
+
+We released collector-side ahead of client/reporter-side, so that folks can roll-out version upgrades ahead of demand. That said, there are already work in progress using this, like [census](https://github.com/census-instrumentation/opencensus-python/pull/16) and @flier's [c/c++ tracer](https://github.com/flier/zipkin-cpp) so update to the most recent patch release as soon as you can!
+
+If you are interested more in this format, check out the newly [polished OpenApi spec](http://zipkin.io/zipkin-api/#/default/post_spans), or a [go client example](https://github.com/openzipkin/zipkin-api-example/tree/master/go) compiled from it (thx @devinsba). If you have further questions, hop on https://gitter.im/openzipkin/zipkin
+
+Next releases will formalize more including ""zipkin2"" java types for those who need it. That said, one nice thing about the new format is that it is easy enough for normal json tools to manage. Regardless, keep eyes open for more and thanks for the interest.
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/7397123/assets,https://api.github.com/repos/openzipkin/zipkin/releases/7397123,master,https://api.github.com/repos/openzipkin/zipkin/tarball/release-1.30.3,https://github.com/openzipkin/zipkin/releases/tag/release-1.30.3,https://api.github.com/repos/openzipkin/zipkin/zipball/release-1.30.3,release-1.30.3,False,False
+7302339,2017-08-06T14:58:05Z,2017-08-07T09:32:20Z,Zipkin 1.29,"Zipkin 1.29 models messaging spans, shows errors in the service graph and supports Elasticsearch 6
+
+## Message tracing
+Producing and consuming messages from a broker, such as RabbitMQ or Kafka, is similar but different than one-way RPC. For example, one message can have multiple consumers, and many times the producer of the message can't know if this will be the case. Also, and particularly in Kafka, consuming a message is often completely decoupled from processing of it, and consumption may happen in bulk.
+
+Through community discussion, notably advice from @bogdandrutu from Census, we reached this conclusion for message tracing with Zipkin:
+
+* Messaging consumers should always be a child span of the producing span (and not a linked trace)
+  * If using B3, this means `X-B3-SpanId` is the parent of the consumer span
+* ""ms"" and ""mr"" annotate message send and receive events
+  * [span2 format](https://github.com/openzipkin/zipkin/issues/1644) replaces these with Span.Kind.PRODUCER, CONSUMER
+* If producer and consumer spans include duration, it should only reflect local batching delay
+  * time spent processing a message should be in a different child span
+
+There are diagrams of how instrumentation work with this model on the [website](http://zipkin.io/pages/instrumenting.html). You can also look at @ImFlog's [Kafka 0.11 tracing work in progress](https://github.com/openzipkin/brave/pull/467). If you have more questions or want to share your work, contact us on [gitter](https://gitter.im/openzipkin/zipkin).
+
+## Visualizing error count between services
+
+Thanks to @hfgbarrigas' initial work, and lots of review support by @shakuzen,
+we now have errorCount on dependency links, indicating how many of callCount
+between services were in error.
+
+MySQL users who want this need to add the `error_count` column:
+```sql
+alter table zipkin_dependencies add `error_count` BIGINT
+```
+
+The UI is relatively simple, coloring the line yellow when 50% or more calls are in error, and red when 75%. These rates can be [overridden or disabled with configuration](https://github.com/openzipkin/zipkin/blob/master/zipkin-server/README.md#configuration-for-the-ui).
+
+Example link detail screen
+<img width=""622"" alt=""screen shot 2017-07-28 at 6 25 44 pm"" src=""https://user-images.githubusercontent.com/64215/28713698-cad45a3c-73c2-11e7-9062-3d6dfa7674e2.png"">
+
+Example of when >50% of calls are in error
+<img width=""425"" alt=""screen shot 2017-07-28 at 6 25 35 pm"" src=""https://user-images.githubusercontent.com/64215/28713715-e06f0fe0-73c2-11e7-8a3e-a3e21bc9d09a.png"">
+
+Example of when >75% of calls are in error
+<img width=""419"" alt=""screen shot 2017-07-28 at 6 25 08 pm"" src=""https://user-images.githubusercontent.com/64215/28713728-eb65efcc-73c2-11e7-83fa-81ee704b9a72.png"">
+
+Trace instrumentation's contract is easy: add the ""error"" tag, for example on http 500. When aggregating links, the value of the ""error"" tag isn't important. Please update to latest versions of instrumentation if you don't see errors, yet. For example, [zipkin-ruby](https://github.com/openzipkin/zipkin-ruby) recently support this thanks to @jcarres-mdsol.
+
+## Elasticsearch 6
+Currently, Elasticsearch uses one index for all types: spans, dependencies (and a special service name index). Elasticsearch 6 no longer supports multiple types per index. Instead we write separate indexes for span and dependency links when Elasticsearch 6 is detected. Incidentally, we also use the new [span2 json format](https://github.com/openzipkin/zipkin/issues/1644), which is simplified and more efficient.
+
+The next version will support the same single-type indexing with Elasticsearch 2.4+. If you can't wait that long, look at #1674 for the experimental flag you can use today.
+
+Thanks to @anuraaga @ImFlog @xeraa and @jcarres-mdsol for advice and support leading to this feature. The next release will thank those who test it!",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/7302339/assets,https://api.github.com/repos/openzipkin/zipkin/releases/7302339,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.29.2,https://github.com/openzipkin/zipkin/releases/tag/1.29.2,https://api.github.com/repos/openzipkin/zipkin/zipball/1.29.2,1.29.2,False,False
+6946524,2017-07-06T01:51:22Z,2017-07-06T06:15:37Z,Zipkin 1.28,"Zipkin 1.28 bounds the in-memory storage component
+
+Since the rewrite, we've always had a way to start zipkin without any storage service dependency. This is great for running examples, unit tests, or ad-hoc tests. It wasn't good for tests in more persistent environments like Kubernetes as eventually the memory would blow up and we'd recommend people to use something else. It also wasn't good for short tests that take a lot of traffic for the same reason.
+
+Initially, we were hesitant to add features that might end up as people accidentally going prod with our in-memory storage. However, many people asked about this, usually after something blew-up in test: We realized bounding the memory provider was indeed worthwhile. Thanks to hard work and tuning by @joel-airspring, the default server now starts and won't likely blow up if you send a lot of traffic to it.
+
+So, now you can play around and zipkin will just drop old traces to make room for new ones.
+
+```bash
+# run with self-tracing enabled, so each api hit is traces, and max-spans set lower than 500000 spans (default)
+$ SELF_TRACING_ENABLED=true java -Dzipkin.storage.mem.max-spans=500 -jar ./zipkin-server/target/zipkin-server-*exec.jar
+# in another window, do this for a while
+$ while true; do curl -s localhost:9411/api/v1/services;done
+# then, check to see the span count is less than or equal to what you set it to: <=500
+$ curl -s localhost:9411/api/v1/traces?limit=1000000|jq '.[]|.[]|.id'|wc -l
+```
+
+Please note this option can likely break under certain types of load, so please don't consider the in-memory provider production-grade, or on a path to be the latest data grid! If you are interested in an in-memory storage option for production, you might consider upvoting [Hazelcast](https://github.com/openzipkin/zipkin/issues/1632), noting you want it to work embedded.",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/6946524/assets,https://api.github.com/repos/openzipkin/zipkin/releases/6946524,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.28.0,https://github.com/openzipkin/zipkin/releases/tag/1.28.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.28.0,1.28.0,False,False
+6889768,2017-06-29T20:03:55Z,2017-06-30T08:41:36Z,Zipkin 1.27,"Zipkin 1.27 moves the UI under the path /zipkin, allows listening on multiple Kafka topics and improves Cassandra 3 support.
+
+The Zipkin UI was formerly served from an unmodified server as the base path. We've had folks ask for a year in various ways to have this under a subpath instead. We decided to move the UI under /zipkin as it matched most users' requirements and was easiest for our single-page app to route. Thanks to @eirslett @danielkwinsor and @neilstevenson for help with implementation and testing.
+
+We recently added Kafka 0.10 support. This version includes the ability to listen on multiple topics, something you might do if you have environments where spans come from different sources. Thanks to @danielkwinsor for implementation and @dgrabows for review, we now support this by simply comma-delimiting the topic. Note: there are some gotchas if you are considering migrating from Kafka 0.8 to 0.10. Thanks to @fedj for noting [something you might run into](https://github.com/openzipkin/zipkin/tree/master/zipkin-autoconfigure/collector-kafka10#migration-from-kafka--081).
+
+Some of you may using the experimental ""cassandra3"" storage type. We had a serious glitch @llinder found where blocking could occur on a query depending on the count of results retuned. Not only did Lance fix the glitch, but also added [testcontainers](https://www.testcontainers.org/) to ensure clean, docker-based integration tests run on every PR.
+
+Finally, Zipkin 1.27 fixes a number of broken windows. Thanks @NithinMadhavanpillai for adding a test to help us fix a bad data bug parsing dependencies, @fgcui1204 for finding out why service names sometimes cut off in the UI, @ImFlog for backfilling docs about how ports can be specified in cassandra and @joel-airspring for fixing a few distracting glitches in our build.",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/6889768/assets,https://api.github.com/repos/openzipkin/zipkin/releases/6889768,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.27.0,https://github.com/openzipkin/zipkin/releases/tag/1.27.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.27.0,1.27.0,False,False
+6424756,2017-05-17T09:29:35Z,2017-05-18T05:27:39Z,Zipkin 1.26,"Thanks to @dgrabows, Zipkin 1.26 now supports Kafka 0.10. Notably, this allows you to run without a ZooKeeper dependency. (Recent versions of Kafka no longer require consumers to connect to ZooKeeper)
+
+Our docker image will automatically use this, if the variable `KAFKA_BOOTSTRAP_SERVERS` is set instead of `KAFKA_ZOOKEEPER`. An example docker setup is available [here](https://github.com/openzipkin/docker-zipkin#kafka).
+
+While you do not need to upgrade your instrumented apps, you can choose to opt-in by using libraries such as our [kafka10 sender](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22zipkin-sender-kafka10%22).
+
+Thanks again for the comprehensive work by @dgrabows and review feedback by @StephenWithPH",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/6424756/assets,https://api.github.com/repos/openzipkin/zipkin/releases/6424756,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.26.0,https://github.com/openzipkin/zipkin/releases/tag/1.26.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.26.0,1.26.0,False,False
+6401245,2017-05-16T09:40:59Z,2017-05-16T12:56:37Z,Zipkin 1.25,"Zipkin 1.25 lets you to disable the query api when deploying collector-only services. It also lets you log http requests sent to Elasticsearch. Finally, it fixes a bug where a non-default MySQL schema would fail health checks.
+
+### Disabling the UI and Query api for collector-only servers
+@sirtyro's security team wants collectors deployed separately, in a way that reduces exposure if  compromised. You can now disable the api and UI by setting QUERY_ENABLED=false. Thanks to @shakuzen for help implementing this.
+
+### Understanding Zipkin's requests to Elasticsearch
+Reflecting on a troubleshooting session with @ezraroi, we could have used more data to understand why an Elasticsearch index template was missing. This would have saved us time. You can now set `ES_HTTP_LOGGING=BASIC` to see what traffic is sent from zipkin to Elasticsearch. Other options include `HEADER` and `BODY`. Thanks to OkHttp for the underlying interceptor that does this.
+
+### Fixed health check when you have a non-default MySQL schema
+@zhanglc stumbled upon a bug where the health check misreported a service unhealthy if it had a non-default schema. This is now fixed.",https://api.github.com/users/fedj,9842366,fedj,https://api.github.com/repos/openzipkin/zipkin/releases/6401245/assets,https://api.github.com/repos/openzipkin/zipkin/releases/6401245,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.25.0,https://github.com/openzipkin/zipkin/releases/tag/1.25.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.25.0,1.25.0,False,False
+6298923,2017-05-04T02:04:26Z,2017-05-06T03:26:45Z,Zipkin 1.24,"Zipkin 1.24 enables search by binary annotation (aka tag) key. It also adds a helper for those parsing IP addresses. Finally, it fixes a bug where server-side service names weren't indexed.
+
+## Search by binary annotation (aka tag) key
+
+Before, you could only search by exact key=value match on binary annotations (aka tags).
+Thanks to @kellabyte for noticing we can gain a lot of value by allowing search on tag
+key.  Ex ""error"" search now returns any traces that include an error, regardless of the
+message. 
+
+This change is now in, and here's the impact:
+* Cassandra will index a bit more: once per unique service/tag key
+* Elasticsearch now does two nested queries when looking for a key
+* MySQL now considers all annotation rows when looking for a key
+
+
+## Helps tracers be more safe about IP Addresses
+
+Before, tracers including Brave and Finagle blindly assumed addresses
+and strings were IPv4. While that's usually the case, it can lead to
+very late problems, such as runtime exceptions.
+
+Zipkin 1.24 adds a utility to encourage safe parsing practice of potentially
+null inputs. This re-uses code from guava (without adding a dependency),
+avoiding troublesome IP from name service lookups.
+
+Ex. if your input is an `HttpServletRequest`, the following is safe:
+```java
+if (!builder.parseIp(input.getHeader(""X-Forwarded-For""))) {
+  builder.parseIp(input.getRemoteAddr());
+}
+```
+
+## Fixed mid-tier service name indexing
+@garyd203 stumbled upon a bug where we weren't indexing mid-tier service names.
+Basically, you couldn't search for a service that wasn't itself a client of something else.
+Surprisingly, this affected all data stores. Lots of thanks to Gary for writing the test,
+which made implementation a breeze.",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/6298923/assets,https://api.github.com/repos/openzipkin/zipkin/releases/6298923,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.24.0,https://github.com/openzipkin/zipkin/releases/tag/1.24.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.24.0,1.24.0,False,False
+6156368,2017-04-22T05:04:43Z,2017-04-22T10:43:00Z,Zipkin 1.23,"Zipkin 1.23 improves Elasticsearch performance and simplifies image assembly
+
+## Elasticsearch performance
+
+The zipkin UI has drop-downs for service and span name. These queries can become troublesome as the data set grows. Particularly in Elasticsearch, we had poor performance because nested terms queries are expensive. We now pre-index a ""servicespan"" type which flattens the query, making it far more performant. You have no action to take except to upgrade. Thanks especially to @semyonslepov and @devinsba for rolling this out to production and verifying this improves things.
+
+## Simplified image assembly
+
+Besides normal advantages of updating, Spring Boot 1.5 cleaned up an integration pattern we use for plugging in azure and aws support into our stock server. These layered docker images are [easier to understand and simpler now](https://github.com/openzipkin/docker-zipkin-aws/pull/4/files). Thanks to @dsyer for championing our cause upstream.
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/6156368/assets,https://api.github.com/repos/openzipkin/zipkin/releases/6156368,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.23.2,https://github.com/openzipkin/zipkin/releases/tag/1.23.2,https://api.github.com/repos/openzipkin/zipkin/zipball/1.23.2,1.23.2,False,False
+5979612,2017-04-04T07:47:48Z,2017-04-05T04:22:09Z,Zipkin 1.22,"Zipkin 1.22 disables the Scribe collector and removes the Elasticsearch native transport. It also includes some bug fixes and new knobs. Many thanks to our new contributors for help on this release.
+
+### Scribe disabled by default (#1540)
+
+Scribe (thrift RPC listening port 9410) was the original span transport. Most sites stopped using it after we added http and Kafka support (and more recently AWS and Azure collectors). Meanwhile, people have been confused about port 9410, accidentally sending http traffic to it. Moreover, those wanting a single-port for zipkin were thwarted by this. Starting with Zipkin 1.22, we disable scribe by default, which means zipkin only listens on port 9411. Those who want to turn on scribe must set `SCRIBE_ENABLED=true`.
+
+### Elasticsearch native transport dropped (#1547)
+
+Most tools in the Elasticsearch world use HTTP as means to insert or query data. Before, we supported storage commands via the http transport (port 9200) or the native transport (port 9300). Polling users, we found no resistance to removing the native transport. By removing this, we deleted 3.6K lines of code and simplified the dependencies of the project, allowing for easier maintenance moving forward. To reduce impact, if you have configuration pointing to port 9300, the server will attempt to use 9200 instead.
+
+### Elasticsearch X-Pack (formerly Shield) security (#1548)
+
+A number of users requested the ability to authenticate connections to secured Elasticsearch sites (which use X-Pack, formerly Shield, security). @StephenWithPH championed this issue, and @NithinMadhavanpillai implemented it (as his first pull request!). Thanks to these folks, you can now set `ES_USERNAME` and `ES_PASSWORD` accordingly.
+
+### Zipkin UI sort order is now preserved (#1543)
+
+Another lingering nag we had was that when people selected a sort order in the UI, that order wasn't preserved in follow-up queries. You can imagine this was annoying. @joel-airspring picked this up off the backlog and implemented a fix to the problem (first pull request to Zipkin!). Less mouse clicks are thanks to him!
+
+### Other small fixes
+
+* multi-line tags (binary annotations) are now properly rendered in the UI #1549
+* search result screen now includes the correct count of spans per trace #1550
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/5979612/assets,https://api.github.com/repos/openzipkin/zipkin/releases/5979612,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.22.0,https://github.com/openzipkin/zipkin/releases/tag/1.22.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.22.0,1.22.0,False,False
+5347297,2017-02-02T02:51:45Z,2017-02-03T01:29:04Z,Zipkin 1.20,"Zipkin 1.20 focuses on Elasticsearch
+
+There are two main changes:
+
+@ImFlog added a new parameter which helps when you can't use hyphenated date format
+- `ES_DATE_SEPARATOR`: The separator used when generating dates in index.
+                     Defaults to '-' so the queried index look like `zipkin-yyyy-DD-mm`.
+                     Could for example be changed to '.' to give `zipkin-yyyy.MM.dd`
+
+### Moving to http for communication between Zipkin and Elasticsearch
+
+We also decoupled elasticsearch from the [transport protocol](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-transport.html#modules-transport). Those using the server won't see
+impact as it is transparent.
+
+_Those not yet using http should switch as soon as possible as we won't support
+the transport protocol going forward_ (#1511).
+
+If you are using Amazon or the [zipkin-dependencies](https://github.com/openzipkin/zipkin-dependencies#elasticsearch-storage) spark job, you are unaffected
+as they always used http.
+
+If you are using Elasticsearch with zipkin-server, you'd transition like below:
+
+``` bash
+# this implicitly uses the transport protocol
+$ STORAGE_TYPE=elasticsearch ES_HOSTS=1.2.3.4:9300,5.6.7.8:9300 ...
+# change to this, for the http protocol
+$ STORAGE_TYPE=elasticsearch ES_HOSTS=http://1.2.3.4:9200,http://5.6.7.8:9200 ...
+```
+
+If you are using Zipkin's Elasticsearch storage library directly, you'd transition like below:
+
+``` java
+// this implicitly uses the transport protocol
+es = ElasticsearchStorage.builder()
+            .index(""my_custom_prefix"").build();
+// change to this, for the http protocol
+es = ElasticsearchHttpStorage.builder()
+            .index(""my_custom_prefix"").build();
+```
+
+Note that `ElasticsearchHttpStorage` works with Elasticsearch 2.x+ and only has library dependencies on OkHttp, Moshi, and Zipkin itself. Unlike its predecessor `ElasticsearchStorage`, you aren't pinned to a specific ES or Guava library version. (#1431)
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/5347297/assets,https://api.github.com/repos/openzipkin/zipkin/releases/5347297,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.20.0,https://github.com/openzipkin/zipkin/releases/tag/1.20.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.20.0,1.20.0,False,False
+5052911,2017-01-02T15:37:50Z,2017-01-03T02:06:13Z,Zipkin 1.19,"Zipkin 1.19 includes UI and server improvements and controls in-flight requests to Elasticsearch
+
+Our first release of the new year includes code from a couple Zipkin newcomers: Jakub and Nomy
+- @jakubhava beautified the UI when json is used as a tag (aka binary annotation) value (#1458)
+- @naoman fixed span merge logic (#1443) and an edge case in very large tags (#1451)
+
+We're also lucky that Chris and Jeanneret continue to fix issues for the rest of us
+- @fedj solved a couple hard-to-diagnose errors
+  - Annotation-qualified cassandra queries weren't returning results (#1461)
+  - Clock-skew adjustment didn't kick in when a client received a response before the server sent it (#1465)
+- @cburroughs continues to pare down the UI issue backlog
+  - You can now see the json behind a search request (handy when debugging) (#1448)
+  - Escapes javascript so that it isn't executed when embedded in span data (#1447)
+
+We also have a new feature for Elasticsearch users (those using http to connect)
+Before, we limited in-flight http connections per Elasticsearch host to 5. This is now 64 and can be adjusted by the `ES_MAX_REQUESTS` variable. (#1450)
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/5052911/assets,https://api.github.com/repos/openzipkin/zipkin/releases/5052911,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.19.0,https://github.com/openzipkin/zipkin/releases/tag/1.19.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.19.0,1.19.0,False,False
+4964100,2016-12-19T09:18:49Z,2016-12-20T03:37:26Z,Zipkin 1.18,"Zipkin 1.18 includes a number of UI fixes and exposes arbitrary Kafka configuration
+
+Thanks to @cburroughs, many Zipkin UI glitches are addressed, including the ability to escape out of dialog boxes and fix the default trace view to Expand All services. Chris also reduced its minified size from 2.2 MiB to 821KiB, which will improve load performance and also reduce bandwidth usage.
+
+Also notable in 1.18 is Kafka configuration. You can now override any Kafka consumer property using `zipkin.collector.kafka.overrides` as a CLI argument or system property.
+
+For example, to override ""overrides.auto.offset.reset"", you can set a prefixed system property:
+
+``` bash
+$ KAFKA_ZOOKEEPER=127.0.0.1:2181 java -Dzipkin.collector.kafka.overrides.auto.offset.reset=largest -jar zipkin.jar
+```
+
+Thanks to our volunteers for continued improvements, and to our users for improvement suggestions.
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/4964100/assets,https://api.github.com/repos/openzipkin/zipkin/releases/4964100,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.18.0,https://github.com/openzipkin/zipkin/releases/tag/1.18.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.18.0,1.18.0,False,False
+4675527,2016-11-15T23:56:57Z,2016-11-16T14:04:52Z,Zipkin 1.16,"Zipkin 1.16 includes support for Elasticsearch 5, as well some useful features from new contributors.
+- @ys added SSL support for Cassandra, accessed via the `CASSANDRA_USE_SSL` variable
+- @cburroughs made our json parser lenient with regards to IPv4 mapped addresses in json
+- All docker images are bumped to JRE 1.8.0_112
+- `elasticsearch-http` storage type now supports Elasticsearch 5...
+
+Some expressed interest in the new [ingest pipeline](https://www.elastic.co/guide/en/elasticsearch/reference/master/pipeline.html) feature of ES 5. In the context of Zipkin, pipelines affect spans after they are collected, but before they are indexed. For example, pipelines could correct service names, delete sensitive information, or derive lookup keys. In some cases, this feature obviates the need for a custom zipkin build.
+
+For example, the following pipeline adds a timestamp of when a span got to elasticsearch. You could use that to plot reporting lag. Since the pipeline below is named zipkin, you'd set `ES_PIPELINE=zipkin` to enable it.
+
+``` bash
+$ curl -X PUT -s your_elasticsearch_node:9200/_ingest/pipeline/zipkin -d '{
+  ""description"" : ""add es_timestamp"",
+  ""processors"" : [
+    {
+      ""set"" : {
+        ""field"": ""es_timestamp"",
+        ""value"": ""{{_ingest.timestamp}}""
+      }
+    }
+  ]
+}'
+```
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/4675527/assets,https://api.github.com/repos/openzipkin/zipkin/releases/4675527,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.16.0,https://github.com/openzipkin/zipkin/releases/tag/1.16.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.16.0,1.16.0,False,False
+4642466,2016-11-12T08:16:14Z,2016-11-12T10:24:39Z,Zipkin 1.15,"Zipkin 1.15 completes the transition to support 128-bit trace IDs, notably considering high resolution ids when querying and grouping traces.
+
+Regular zipkin usage is unimpacted as this is all behind the scenes. However, the below details will be interesting to some and particularly of note during any transition from 64-128 bit trace IDs.
+
+## 128-bit trace IDs
+
+Zipkin supports 64 and 128-bit trace identifiers, typically serialized
+as 16 or 32 character hex strings. By default, spans reported to zipkin
+with the same trace ID will be considered in the same trace.
+
+For example, `463ac35c9f6413ad48485a3953bb6124` is a 128-bit trace ID,
+while `48485a3953bb6124` is a 64-bit one.
+
+Note: Span (or parent) IDs within a trace are 64-bit regardless of the
+length or value of their trace ID.
+
+### Migrating from 64 to 128-bit trace IDs
+
+Unless you only issue 128-bit traces when all applications support them,
+the process of updating applications from 64 to 128-bit trace IDs results
+in a mixed state. This mixed state is mitigated by the setting
+`STRICT_TRACE_ID=false`, explained below. Once a migration is complete,
+remove the setting `STRICT_TRACE_ID=false` or set it to true.
+
+Here are a few trace IDs the help what happens during this setting.
+- Trace ID A: 463ac35c9f6413ad48485a3953bb6124
+- Trace ID B: 48485a3953bb6124
+- Trace ID C: 463ac35c9f6413adf1a48a8cff464e0e
+- Trace ID D: 463ac35c9f6413ad
+
+In a 64-bit environment, trace IDs will look like B or D above. When an
+application upgrades to 128-bit instrumentation and decides to create a
+128-bit trace, its trace IDs will look like A or C above.
+
+Applications who aren't yet 128-bit capable typically only retain the
+right-most 16 characters of the trace ID. When this happens, the same
+trace could be reported as trace ID A or trace ID B.
+
+By default, Zipkin will think these are different trace IDs, as they are
+different strings. During a transition from 64-128 bit trace IDs, spans
+would appear split across two IDs. For example, it might start as trace
+ID A, but the next hop might truncate it to trace ID B. This would render
+the system unusable for applications performing upgrades.
+
+One way to address this problem is to not use 128-bit trace IDs until
+all applications support them. This prevents a mixed scenario at the cost
+of coordination. Another way is to set `STRICT_TRACE_ID=false`.
+
+When `STRICT_TRACE_ID=false`, only the right-most 16 of a 32 character
+trace ID are considered when grouping or retrieving traces. This setting
+should only be applied when transitioning from 64 to 128-bit trace IDs
+and removed once the transition is complete.
+
+See https://github.com/openzipkin/b3-propagation/issues/6 for the status
+of known open source libraries on 128-bit trace identifiers.
+
+### Cassandra
+
+There's no impact to the `cassandra` (Cassandra 2.x) schema. The experimental `cassandra3` schema has changed and needs to be recreated.
+
+### Elasticsearch
+
+When `STRICT_TRACE_ID=false`, the indexing template will be less efficient as it tokenizes trace IDs. Don't set `STRICT_TRACE_ID=false` unless you really need to.
+
+### MySQL
+
+There are no schema changes since last versions, but you'll likely want to add indexes in consideration of 128bit trace IDs.
+
+```
+ALTER TABLE zipkin_spans ADD INDEX(`trace_id_high`, `trace_id`, `id`);
+ALTER TABLE zipkin_spans ADD INDEX(`trace_id_high`, `trace_id`);
+ALTER TABLE zipkin_annotations ADD INDEX(`trace_id_high`, `trace_id`, `span_id`);
+ALTER TABLE zipkin_annotations ADD INDEX(`trace_id_high`, `trace_id`);
+```
+
+### Java Api
+
+The `STRICT_TRACE_ID` variable above corresponds to `zipkin.storage.StorageComponent.Builder.strictTraceId`. Those using storage components directly will want to set this to false under similar circumstances to those described above.
+
+We've added methods to `SpanStore`, in support of high-resolution gets. Traces with 64-bit ids are retrieved by simply passing 0 as traceIdHigh.
+
+``` java
+  @Nullable
+  List<Span> getTrace(long traceIdHigh, long traceIdLow);
+
+  @Nullable
+  List<Span> getRawTrace(long traceIdHigh, long traceIdLow);
+```
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/4642466/assets,https://api.github.com/repos/openzipkin/zipkin/releases/4642466,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.15.0,https://github.com/openzipkin/zipkin/releases/tag/1.15.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.15.0,1.15.0,False,False
+4508519,2016-11-05T10:06:48Z,2016-10-28T09:32:44Z,Zipkin 1.14,"### Zipkin 1.14 introduces support for 128-bit trace identifiers
+
+Most zipkin sites store traces for a limited amount of time (like 2 days) and also trace a small percentage of operations (via sampling). For these reasons and also those of simplicity, 64-bit trace identifiers have been the norm since zipkin started over 4 years ago.
+
+Starting with Zipkin 1.14, 128-bit trace identifiers are also supported. This can be useful in sites that have very large traffic volume, persist traces forever, or are re-using externally generated 128-bit IDs as trace IDs. You can also use 128-bit trace ids to interop with other 128-bit systems such as [Google Stackdriver Trace](https://cloud.google.com/trace/). Note: span IDs within a trace are still 64-bit.
+
+When 128-bit trace ids are propagated, they will be twice as long as before. For example, the `X-B3-TraceId` header will hold a 32-character value like `163ac35c9f6413ad48485a3953bb6124`. Prior to Zipkin 1.14, we updated all major tracing libraries to silently truncate long trace ids to 64-bit. With the example noted, its 64-bit counterpart would be `48485a3953bb6124`. For the foreseeable future, you will be able to lookup a trace by either its 128-bit or 64-bit ID. This allows you to upgrade your instrumentation and environment in steps.
+
+Should you want to use 128-bit tracing today, you'll need to update to latest Zipkin, and if using MySQL, issue the following DDL update:
+
+``` sql
+ALTER TABLE zipkin_spans ADD `trace_id_high` BIGINT NOT NULL DEFAULT 0;
+ALTER TABLE zipkin_annotations ADD `trace_id_high` BIGINT NOT NULL DEFAULT 0;
+ALTER TABLE zipkin_spans
+   DROP INDEX trace_id,
+   ADD UNIQUE KEY(`trace_id_high`, `trace_id`, `id`) COMMENT 'ignore insert on duplicate';
+ALTER TABLE zipkin_annotations
+   DROP INDEX trace_id,
+   ADD UNIQUE KEY(`trace_id_high`, `trace_id`, `span_id`, `a_key`, `a_timestamp`) COMMENT 'Ignore insert on duplicate';
+```
+
+Next, you'll need to use a library that supports generating 128-bit ids. The first two to support this are [zipkin-go-opentracing v0.2](https://github.com/openzipkin/zipkin-go-opentracing/blob/6e96c18f20b1a9b604d7033d8bf6403f33f1d684/examples/cli_with_2_services/cli/main.go#L37) and [Brave (java) v3.5](https://github.com/openzipkin/brave/tree/master/brave-core#128-bit-trace-ids). The supporting change in thrift is a new [trace_id_high field](https://github.com/openzipkin/zipkin-api/blob/master/thrift/zipkinCore.thrift#L461).
+
+If you have any further questions on this feature, reach out to us on gitter: https://gitter.im/openzipkin/zipkin
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/4508519/assets,https://api.github.com/repos/openzipkin/zipkin/releases/4508519,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.14.4,https://github.com/openzipkin/zipkin/releases/tag/1.14.4,https://api.github.com/repos/openzipkin/zipkin/zipball/1.14.4,1.14.4,False,False
+4305616,2016-10-04T16:42:24Z,2016-10-05T03:14:27Z,Zipkin 1.13,"Zipkin 1.13 most notably refines our Elasticsearch code. It is now easier for us to tune as self-tracing is built-in.
+
+For example, let's say I created a domain in Amazon's Elasticsearch service named 'zipkin'. As I'm doing testing, I'll run [our Docker image](https://github.com/openzipkin/docker-zipkin#elasticsearch-service-on-amazon) and share my AWS credentials with it.
+
+``` bash
+$ docker run -d -p 9411:9411 \
+  -e SELF_TRACING_ENABLED=true \
+  -e STORAGE_TYPE=elasticsearch -e ES_AWS_DOMAIN=zipkin \
+  -v $HOME/.aws:/root/.aws:ro \
+  openzipkin/zipkin
+```
+
+Once zipkin starts up, `SELF_TRACING_ENABLED=true` indicates that it should trace each api request. As I click in the UI, more traces appear under the service `zipkin-server`. Here's one which shows the overall latency of a request (from my laptop to amazon), for a zipkin trace search.
+
+<img width=""946"" alt=""screen shot 2016-10-05 at 11 09 19 am"" src=""https://cloud.githubusercontent.com/assets/64215/19099790/352b78e0-8aec-11e6-8136-b7c2bc914962.png"">
+
+With tools like this, we can use Zipkin to improve zipkin.
+
+The Elasticsearch experience was created by @anuraaga and extended to Amazon by @sethp-jive. The tracing functionality is thanks to our [Brave OkHttp interceptor](https://github.com/openzipkin/brave/tree/master/brave-okhttp) initially written by @tburch. Watch for more news as we head towards Elasticsearch 5 compatibility.
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/4305616/assets,https://api.github.com/repos/openzipkin/zipkin/releases/4305616,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.13.0,https://github.com/openzipkin/zipkin/releases/tag/1.13.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.13.0,1.13.0,False,False
+4104679,2016-09-12T11:19:00Z,2016-09-12T12:37:10Z,Zipkin 1.11,"Zipkin 1.11 allows you to see instrumented clients in the dependency view. It also fixes a search collision problem.
+
+Before, the dependency view (ex `http://your_host:9411/dependency`) presented a server-centric diagram. This worked well enough as traces usually start at the first server. Especially with new projects like [zipkin-js](https://github.com/openzipkin/zipkin-js), client-originated traces are becoming more common. For example, the trace could start in your web browser instead of on a server. Zipkin's dependency linker is now trained to look for client send annotations in the root span, and if present, add them to the far-left of the dependency graph. Thanks to @rogeralsing for reporting.
+
+<img width=""599"" alt=""screen shot 2016-09-12 at 6 11 38 pm"" src=""https://cloud.githubusercontent.com/assets/64215/18435750/99031e6c-7927-11e6-9efb-b8824567cada.png"">
+
+We also fixed a search bug where a query like `http.method=GET` matched against any service in a trace as opposed to the service specified in the UI. This affected all storage types except cassandra and is now fixed.
+
+Note: While seemingly simple, this smoked out a latent problem in our [Elasticsearch indexing template](https://github.com/openzipkin/zipkin/blob/1.11.0/zipkin-storage/elasticsearch/src/main/resources/zipkin/storage/elasticsearch/zipkin_template.json). Please [re-index](https://www.elastic.co/guide/en/elasticsearch/guide/current/reindex.html) at your earliest convenience, or drop the index and let Zipkin recreate it.
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/4104679/assets,https://api.github.com/repos/openzipkin/zipkin/releases/4104679,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.11.0,https://github.com/openzipkin/zipkin/releases/tag/1.11.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.11.0,1.11.0,False,False
+4104589,2016-09-10T00:57:57Z,2016-09-12T12:24:32Z,Zipkin 1.10,"Zipkin 1.10 addresses a couple long-term problems relating to span timestamp and duration.
+
+Firstly, we no longer attempt to support duration queries on the ""cassandra"" storage type. Cassandra 2.2+ doesn't support SASI indexing, and trying to work around that resulted in a feature most couldn't use. @michaelsembwever from The Last Pickle has a more sustainable solution in mind that uses Cassandra 3.8+. Please look for announcements on the experimental cassandra3 storage type.
+
+Next is something that applies to all storage types. When trace instrumentation don't record Span.timestamp and duration, the Zipkin server tries to guess by looking at annotations. Previously, when we guessed wrong, the trace would render strangely. We now guess much more conservatively so as to avoid this.
+
+Here's the impact:
+- Span duration is no longer derived by collectors, as it is often wrong. Duration queries won't work unless traces reported to zipkin include duration.
+- Span timestamp is derived only when needed, usually to support indexing
+- Span timestamp and duration are still backfilled at query time, as otherwise the UI wouldn't work.
+
+Note: The Span.timestamp and duration fields were added a year ago, but many tracers still don't record them. We hope our documentation on how to record timestamp and duration will help ease the task of updating them. If you use a tracer that doesn't yet record Span.timestamp and duration, please raise an issue or PR to the corresponding repository so that it is eventually fixed.
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/4104589/assets,https://api.github.com/repos/openzipkin/zipkin/releases/4104589,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.10.0,https://github.com/openzipkin/zipkin/releases/tag/1.10.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.10.0,1.10.0,False,False
+4095353,2016-09-10T00:39:43Z,2016-09-10T03:27:59Z,Zipkin 1.10,"Zipkin 1.10 addresses a couple long-term problems relating to span timestamp and duration.
+
+Firstly, we no longer attempt to support duration queries on the ""cassandra"" storage type. Cassandra 2.2+ doesn't support [SASI indexing](https://docs.datastax.com/en/cql/3.3/cql/cql_using/useSASIIndexConcept.html), and trying to work around that resulted in a feature most couldn't use. @michaelsembwever from [The Last Pickle](http://thelastpickle.com/) has a more sustainable solution in mind that uses Cassandra 3.8+. Please look for announcements on the experimental [cassandra3](https://github.com/openzipkin/zipkin/tree/master/zipkin-storage/cassandra3) storage type.
+
+Next is something that applies to all storage types. When trace instrumentation don't record Span.timestamp and duration, the Zipkin server tries to guess by looking at annotations. Previously, when we guessed wrong, the trace would render strangely. We now guess much more conservatively so as to avoid this.
+
+Here's the impact:
+- Span duration is no longer derived by collectors, as it is often wrong. Duration queries won't work unless traces reported to zipkin include duration.
+- Span timestamp is derived only when needed, usually to support indexing
+- Span timestamp and duration are still backfilled at query time, as otherwise the UI wouldn't work.
+
+Note:  The Span.timestamp and duration fields were added a year ago, but many tracers still don't record them. We hope our [documentation on how to record timestamp and duration](http://zipkin.io/pages/instrumenting.html) will help ease the task of updating them. If you use a tracer that doesn't yet record Span.timestamp and duration, please raise an issue or PR to the corresponding repository so that it is eventually fixed.
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/4095353/assets,https://api.github.com/repos/openzipkin/zipkin/releases/4095353,master,https://api.github.com/repos/openzipkin/zipkin/tarball/release-1.10.0,https://github.com/openzipkin/zipkin/releases/tag/release-1.10.0,https://api.github.com/repos/openzipkin/zipkin/zipball/release-1.10.0,release-1.10.0,False,False
+4014248,2016-08-30T23:39:24Z,2016-08-31T02:06:22Z,Zipkin 1.8,"Zipkin 1.8 is a library change focused on encoding performance. If you are instrumenting apps and use Zipkin's Codec, you'll want to upgrade.
+
+Span encoding has been completely rewritten in order to get common-case overhead in microsecond or less range.
+
+Zipkin 1.7 Codec.writeSpan() vs libthrift (pace car)
+
+```
+CodecBenchmarks.writeClientSpan_json_zipkin       avgt   15  17.131 ± 0.446  us/op
+CodecBenchmarks.writeClientSpan_thrift_libthrift  avgt   15   1.952 ± 0.043  us/op
+CodecBenchmarks.writeClientSpan_thrift_zipkin     avgt   15   0.996 ± 0.021  us/op
+CodecBenchmarks.writeLocalSpan_json_zipkin        avgt   15  10.124 ± 0.177  us/op
+CodecBenchmarks.writeLocalSpan_thrift_libthrift   avgt   15   1.168 ± 0.016  us/op
+CodecBenchmarks.writeLocalSpan_thrift_zipkin      avgt   15   0.593 ± 0.010  us/op
+CodecBenchmarks.writeRpcSpan_json_zipkin          avgt   15  43.495 ± 1.086  us/op
+CodecBenchmarks.writeRpcSpan_thrift_libthrift     avgt   15   4.878 ± 0.046  us/op
+CodecBenchmarks.writeRpcSpan_thrift_zipkin        avgt   15   2.666 ± 0.018  us/op
+CodecBenchmarks.writeRpcV6Span_json_zipkin        avgt   15  49.759 ± 0.867  us/op
+CodecBenchmarks.writeRpcV6Span_thrift_libthrift   avgt   15   5.390 ± 0.073  us/op
+CodecBenchmarks.writeRpcV6Span_thrift_zipkin      avgt   15   3.147 ± 0.026  us/op
+```
+
+Zipkin 1.8 Codec.writeSpan() vs libthrift (pace car)
+
+```
+CodecBenchmarks.writeClientSpan_json_zipkin       avgt   15   1.445 ± 0.036  us/op
+CodecBenchmarks.writeClientSpan_thrift_libthrift  avgt   15   1.951 ± 0.014  us/op
+CodecBenchmarks.writeClientSpan_thrift_zipkin     avgt   15   0.433 ± 0.011  us/op
+CodecBenchmarks.writeLocalSpan_json_zipkin        avgt   15   0.813 ± 0.010  us/op
+CodecBenchmarks.writeLocalSpan_thrift_libthrift   avgt   15   1.191 ± 0.016  us/op
+CodecBenchmarks.writeLocalSpan_thrift_zipkin      avgt   15   0.268 ± 0.004  us/op
+CodecBenchmarks.writeRpcSpan_json_zipkin          avgt   15   3.606 ± 0.068  us/op
+CodecBenchmarks.writeRpcSpan_thrift_libthrift     avgt   15   5.134 ± 0.081  us/op
+CodecBenchmarks.writeRpcSpan_thrift_zipkin        avgt   15   1.384 ± 0.078  us/op
+CodecBenchmarks.writeRpcV6Span_json_zipkin        avgt   15   3.912 ± 0.115  us/op
+CodecBenchmarks.writeRpcV6Span_thrift_libthrift   avgt   15   5.488 ± 0.098  us/op
+CodecBenchmarks.writeRpcV6Span_thrift_zipkin      avgt   15   1.323 ± 0.014  us/op
+```
+
+### Why encoding speed matters
+
+Applications that report to Zipkin typically record timing information and metadata on the calling thread. After the operation completes, this is encoded into a Span and scheduled to go out of process, usually via http or Kafka. When the encoding overhead is measurable, it can confuse timing information, particularly when operations are in single-digit or less milliseconds.
+
+For example, if a local operation takes 400us, and your encoding overhead is 40us, there will be a 10% gap between the end of one span and the start of the next. This will notably skew the duration of the parent, particularly if there are a lot of spans like this. When encoding overhead in single-digit microseconds or less, this problem is less noticeable.
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/4014248/assets,https://api.github.com/repos/openzipkin/zipkin/releases/4014248,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.8.0,https://github.com/openzipkin/zipkin/releases/tag/1.8.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.8.0,1.8.0,False,False
+3916870,2016-08-18T13:01:43Z,2016-08-18T13:32:54Z,Zipkin 1.7,"Zipkin 1.7 has a lot to offer, thanks to users for telling us what they'd like.
+
+@dragontree101 wanted to be able to know which version of zipkin his server was running. @shakuzen landed the /info endpoint, which prints out something like this:
+
+``` json
+{
+  ""zipkin"": {
+    ""version"": ""1.7.0""
+  }
+}
+```
+
+@mikewrighton wants to run zipkin-ui from a different host than zipkin-server. @hyleung spiked a new variable you can use to control [cross-origin policy](https://github.com/openzipkin/zipkin/tree/master/zipkin-server#cors-cross-origin-resource-sharing). For example, you can export `ZIPKIN_QUERY_ALLOWED_ORIGINS=http://foo.bar.com`, if you are the lucky owner of foo.bar.com!
+
+@dan-tr uses Zipkin with Elasticsearch, but found our microsecond timestamps didn't work out-of-box with Kibana. He suggested we add a field `timestamp_millis`, and we did! because it was a smart idea.
+
+@ivansenic works on an APM called [inspectIT](https://github.com/inspectIT/inspectIT). He rightly noted there's still a ton of Java 6 VMs out there that need to be traceable by Java agents. Now, zipkin.jar is an agent-friendly, 152k jar full of Java 6 bytecode (still with no dependencies!).
+
+We're occasionally asked where javadocs are published. Thanks to @abesto's automation expertise, historical javadocs can now be found here http://zipkin.io/zipkin/
+
+Finally, we're looking for incremental and compatible ways to improve zipkin's model, particularly for asynchronous activity (like tracing Kafka). If you are interested in steering us, please comment on..
+- [Multiple parents aka Linked traces](https://github.com/openzipkin/zipkin/issues/1244)
+- [The Messaging Span](https://github.com/openzipkin/zipkin/issues/1243)
+
+Thanks for keeping with us,
+OpenZipkin
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/3916870/assets,https://api.github.com/repos/openzipkin/zipkin/releases/3916870,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.7.0,https://github.com/openzipkin/zipkin/releases/tag/1.7.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.7.0,1.7.0,False,False
+3779858,2016-07-31T20:22:18Z,2016-07-31T21:07:33Z,Zipkin 1.6,"Zipkin 1.6 server has been updated to use [Spring Boot 1.4](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-1.4-Release-Notes).
+
+We've also corrected default values around the UI, which should lead to better search performance. Most notably, startTs defaults to 1 hour back instead of 7 days back. #1212 
+- Note: You can reset the lookback value to whatever you like. For example, you might set `JAVA_OPTS=""-Dzipkin.ui.default-lookback=86400000""` for 1 day. Settings like this are documented in the [README](https://github.com/openzipkin/zipkin/tree/master/zipkin-server#configuration-for-the-ui)
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/3779858/assets,https://api.github.com/repos/openzipkin/zipkin/releases/3779858,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.6.0,https://github.com/openzipkin/zipkin/releases/tag/1.6.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.6.0,1.6.0,False,False
+3723595,2016-07-21T10:37:20Z,2016-07-23T03:21:16Z,Zipkin 1.5,"Zipkin 1.5 is all about the dependency view in the UI.
+
+Many of you may have seen the dependency tab, and never any data in it. This would be the case if you were running Cassandra or Elasticsearch.
+
+![screen shot 2016-07-23 at 10 58 21 am](https://cloud.githubusercontent.com/assets/64215/17075405/e72ea2e0-50c4-11e6-8a9f-a3f833be84c5.png)
+
+What you should have seen is a diagram showing the relative amount of calls between services, something like this (except with your services present!):
+
+![screen shot 2016-07-23 at 11 05 24 am](https://cloud.githubusercontent.com/assets/64215/17075421/65aaf786-50c5-11e6-8903-824399cea491.png)
+
+Zipkin 1.5 includes support to populate the data under this screen for _all_ storage options (mysql, cassandra and elasticsearch).
+
+The job that produces this data is called [zipkin-dependencies](https://github.com/openzipkin/zipkin-dependencies). Zipkin Dependencies aggregates links between services into a daily bucket. This means you should run it daily, like a batch job (eventhough underneath it is spark). In fact, our docker image includes [cron setup](https://github.com/openzipkin/docker-zipkin/blob/master/docker-compose.yml#L46) to do that for you!
+
+For example, here's a run against a small cassandra DB using spark standalone (default):
+
+``` bash
+$ STORAGE_TYPE=cassandra CASSANDRA_CONTACT_POINTS=192.168.99.100 java -jar zipkin-dependencies.jar
+Running Dependencies job for 2016-07-23: 1469232000000000 ≤ Span.timestamp 1469318399999999
+11:05:09.653 [main] WARN  o.a.hadoop.util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+11:05:09.706 [main] WARN  org.apache.spark.util.Utils - Your hostname, acole resolves to a loopback address: 127.0.0.1; using 192.168.1.10 instead (on interface en0)
+11:05:09.706 [main] WARN  org.apache.spark.util.Utils - Set SPARK_LOCAL_IP if you need to bind to another address
+11:05:11.078 [main] WARN  com.datastax.driver.core.NettyUtil - Found Netty's native epoll transport, but not running on linux-based operating system. Using NIO instead.
+Saved with day=2016-07-23
+Dependencies: [{""parent"":""brave-resteasy-example"",""child"":""brave-resteasy-example"",""callCount"":1}, {""parent"":""zipkin-server"",""child"":""cassandra"",""callCount"":14}]
+```
+
+### Upgrading
+
+If you are using cassandra or elasticsearch, you should upgrade to zipkin 1.5, but there's no schema-related change required.
+
+If you are using mysql, you'll need to add a new table for this to work. Here's a copy/paste of the [DDL](https://github.com/openzipkin/zipkin/blob/master/zipkin-storage/mysql/src/main/resources/mysql.sql) for your convenience.
+
+``` sql
+CREATE TABLE IF NOT EXISTS zipkin_dependencies (
+  `day` DATE NOT NULL,
+  `parent` VARCHAR(255) NOT NULL,
+  `child` VARCHAR(255) NOT NULL,
+  `call_count` BIGINT
+) ENGINE=InnoDB ROW_FORMAT=COMPRESSED;
+
+ALTER TABLE zipkin_dependencies ADD UNIQUE KEY(`day`, `parent`, `child`);
+```
+
+### Credits
+
+The spark job was originally written by @yurishkuro, based on a hadoop job originally written by @eirslett years ago. IOTW, the job itself isn't new, rather the accessibility of it. Before, it only worked with cassandra and wasn't published to maven central or integrated with docker. Now, it should be easy for anyone to include this functionality into their deployment.
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/3723595/assets,https://api.github.com/repos/openzipkin/zipkin/releases/3723595,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.5.0,https://github.com/openzipkin/zipkin/releases/tag/1.5.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.5.0,1.5.0,False,False
+3645074,2016-07-13T04:53:13Z,2016-07-13T07:17:12Z,Zipkin 1.4,"Zipkin 1.4 most notably includes the ability to store and show IPv6 addresses associated with services.
+
+### Endpoint.ipv6
+
+Zipkin span data can now include an ipv6 address of an Endpoint, binary encoded in thrift or text-encoded in json. If using MySQL, you need to add a column to store this. No action is needed in Cassandra or Elasticsearch. See #1178
+
+### Operational Improvements
+- Adds `SCRIBE_ENABLED`: set to false to disable scribe
+- Adds `SELF_TRACING_SAMPLE_RATE`: set to a low value like 0.001 to safely self-trace production
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/3645074/assets,https://api.github.com/repos/openzipkin/zipkin/releases/3645074,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.4.0,https://github.com/openzipkin/zipkin/releases/tag/1.4.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.4.0,1.4.0,False,False
+3623363,2016-07-10T01:38:06Z,2016-07-10T08:11:40Z,Zipkin 1.3,"Zipkin 1.3 includes highlighting of spans in error state and improvements to the Cassandra storage component.
+
+## Error annotations
+
+Inspired by recent work in OpenTracing, we've added a new annotation [""error""](https://github.com/openzipkin/zipkin-api/blob/master/thrift/zipkinCore.thrift#L218). When an annotation value, this indicates when a potentially transient error occurred. When a binary annotation key, the value is a human readable message associated with a error resulting in a failed span. See #1140 for details.
+
+Thanks to @virtuald the UI acts according to these rules, highlighting degraded spans yellow, and failed ones red.
+
+![trace](https://cloud.githubusercontent.com/assets/567900/16543257/8fdc06f8-4099-11e6-9ba5-580c0eafc0d3.png)
+Instrumentation (like Brave, zipkin-tracer etc) need to change to support this. Please help if you have time!
+
+## Span.timestamp, duration 0 coerce to null
+
+We've noticed some instrumentation log invalid timestamp and duration of 0, when they meant to log null. Timestamp or duration of 0 microseconds are invalid or don't explain latency. We now coerce these 0s to null. For cases where a sub-microsecond span duration occurred, you should round up to 1. See #1155 and #1176 
+
+## Elasticsearch daily bucket fix
+
+We found and fixed a concurrency bug that could put spans into the wrong daily buckets. See #1175
+
+## Cassandra
+
+### Schema bug fix
+
+We found a bug where traces against the same service in the same millisecond weren't indexed. This affects indexes only (trace data itself wasn't lost). For example, you might find a trace that exists in cassandra, but you can't query it using the api.
+
+Specifically, the following indexes now have `trace_id` added to their PRIMARY_KEY definitions.
+- service_span_name_index
+- service_name_index
+- annotations_index
+
+There's no automatic data migration available. The most straight-forward way to address this in an existing cluster is to drop the following indexes and restart a zipkin server (which will recreate them as long as `CASSANDRA_ENSURE_SCHEMA=true`). You can also update the indexes manually based on the [schema](https://github.com/openzipkin/zipkin/blob/master/zipkin-storage/cassandra/src/main/resources/cassandra-schema-cql3.txt)
+
+### Tuning
+
+We've done a lot of work tuning the amount of data written to indexes on a per-span basis. Those using Cassandra should see a significant drop in index size due to reasons documented in the [tuning section of the README](https://github.com/openzipkin/zipkin/tree/master/zipkin-storage/cassandra#tuning).
+
+### Query logging
+
+Those supporting zipkin may need to debug query latency. We now use the [QueryLogger](http://docs.datastax.com/en/developer/java-driver/3.0/supplemental/manual/logging/#logging-query-latencies) which is enabled when the log category ""com.datastax.driver.core.QueryLogger"" is at debug or trace level. Trace level includes bound values. See #1156
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/3623363/assets,https://api.github.com/repos/openzipkin/zipkin/releases/3623363,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.3.0,https://github.com/openzipkin/zipkin/releases/tag/1.3.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.3.0,1.3.0,False,False
+3546404,2016-06-29T04:53:44Z,2016-06-29T05:52:34Z,Zipkin 1.2,"Zipkin 1.2.1 includes Prometheus metrics and Elasticsearch bug fixes.
+
+[Prometheus metrics](https://github.com/openzipkin/zipkin/tree/1.2.1/zipkin-autoconfigure/metrics-prometheus) are enabled by default, under the `/prometheus` endpoint.
+
+Many thanks to [Kristian](https://github.com/klette) from [Iterate](https://www.iterate.no/) for developing this feature!
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/3546404/assets,https://api.github.com/repos/openzipkin/zipkin/releases/3546404,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.2.1,https://github.com/openzipkin/zipkin/releases/tag/1.2.1,https://api.github.com/repos/openzipkin/zipkin/zipball/1.2.1,1.2.1,False,False
+3490391,2016-06-21T11:27:25Z,2016-06-21T14:35:06Z,1.1.5,"This is a patch release that fixes a bug where json received with optional fields set to `null` failed to parse. You should update to this patch, particularly if your apps are using the zipkin ruby gem.
+
+See #1136 for details 
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/3490391/assets,https://api.github.com/repos/openzipkin/zipkin/releases/3490391,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.1.5,https://github.com/openzipkin/zipkin/releases/tag/1.1.5,https://api.github.com/repos/openzipkin/zipkin/zipball/1.1.5,1.1.5,False,False
+3372628,2016-06-04T02:49:11Z,2016-06-04T03:21:38Z,Zipkin 1.1.4,"This is a patch release that fixes a bug where `CASSANDRA_ENSURE_SCHEMA` didn't work when the keyspace was absent. See #1128 for details 
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/3372628/assets,https://api.github.com/repos/openzipkin/zipkin/releases/3372628,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.1.4,https://github.com/openzipkin/zipkin/releases/tag/1.1.4,https://api.github.com/repos/openzipkin/zipkin/zipball/1.1.4,1.1.4,False,False
+3366334,2016-05-25T13:37:22Z,2016-06-03T10:07:13Z,Zipkin 1.0,"Many of you noticed we've been working on a new dependency-light codebase for Zipkin.
+
+Over the last 10 months we've gone beyond feature parity with the previous server, and reduced moving parts until zipkin could be deployable as a single process. The new codebase also includes new features like Elasticsearch and better metrics.
+
+Those already using zipkin should know zipkin-java is schema, api, and environment variable compatible with the old servers. We took great care to ensure it is a drop-in.
+
+Those worried about being first to the fire will be interested in the fact that this code has been in development for 10 months and used in production already by companies like Bouyant, LINE.me and anyone using Spring Cloud Sleuth.
+",https://api.github.com/users/adriancole,64215,adriancole,https://api.github.com/repos/openzipkin/zipkin/releases/3366334/assets,https://api.github.com/repos/openzipkin/zipkin/releases/3366334,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.0.0,https://github.com/openzipkin/zipkin/releases/tag/1.0.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.0.0,1.0.0,False,False
+34087,2016-06-01T13:11:18Z,2013-08-27T22:47:14Z,Zipkin 1.1.0,"Zipkin 1.1 most notably offers improvements in the UI and the Cassandra storage component.
+
+### Zipkin UI
+
+Thanks to @virtuald, the Zipkin UI now includes a JSON button! This allows you to see the json behind a trace diagram, something quite useful in support. For example, when people report problems in Zipkin, we often ask for json and this feature makes that easier.
+
+<img width=""975"" alt=""json button"" src=""https://cloud.githubusercontent.com/assets/64215/15710828/49f1c4f2-283e-11e6-9eed-d5ddff474476.png"">
+
+@virtuald also improved error handling dramatically. Before, Zipkin wouldn't show server errors, so you'd have to use the javascript console to troubleshoot problems. Now, errors will show in pink boxes.
+
+<img width=""939"" alt=""pink boxes"" src=""https://cloud.githubusercontent.com/assets/64215/15710811/31773f2e-283e-11e6-9aa0-da6f5d3ad87a.png"">
+
+### Cassandra Storage
+
+Thanks to @michaelsembwever, the Cassandra schema now includes default ttls. These obviate the explicit ttls we were programmatically adding when storing each span. Those using `CASSANDRA_ENSURE_SCHEMA`(default) will automatically update into this. Those manually controlling the schema should run [cassandra-schema-cql3-upgrade-1.txt](https://github.com/openzipkin/zipkin-java/blob/1.1.0/zipkin-storage/cassandra/src/main/resources/cassandra-schema-cql3-upgrade-1.txt) before Zipkin 2.0 is released (unplanned).
+
+### Throttled retries when storage is down
+
+Zipkin can start when storage is unavailable. The health check will report as unavailable until it is. Before, any activation of storage would re-attempt to connect. This has been throttled to no more than once per second to avoid thrashing the network or process with retry attempts.
+",https://api.github.com/users/bmdhacks,1010987,bmdhacks,https://api.github.com/repos/openzipkin/zipkin/releases/34087/assets,https://api.github.com/repos/openzipkin/zipkin/releases/34087,master,https://api.github.com/repos/openzipkin/zipkin/tarball/1.1.0,https://github.com/openzipkin/zipkin/releases/tag/1.1.0,https://api.github.com/repos/openzipkin/zipkin/zipball/1.1.0,1.1.0,False,False

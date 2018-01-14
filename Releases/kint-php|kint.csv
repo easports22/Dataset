@@ -1,0 +1,128 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7657734,2017-09-06T17:46:03Z,2017-09-06T18:13:00Z,2.2,"* Bugfixes
+* Added special access paths for some magic methods
+* Sort methods by line number after hierarchy
+* Sort properties with strnatcasecmp instead of strcmp
+* Added blacklist to ToString plugin, add SimpleXMLElement by default
+* Removed the value representation from unknown types
+* Removed object property reflection
+* Made some parser plugins opt-in:
+    * Binary
+    * Serialize
+    * DOMNode/DOMIterator
+* Renderers can now alter parser plugins before parsing
+    * The text-based renderers now disable all the plugins they don't use ahead of time
+* Added special access paths for more magic methods like `__toString`
+* Dropped automated testing of PHP 5.2
+    * 5.2 will be dropped when TravisCI drops it in april
+    * 5.1 and 5.2 are still technically supported, but since (hopefully) no-one uses those any huge bugs will be fixed on an as-reported basis.
+* Added Kint::dumpArray to allow you to supply your own object seeds (Names and access paths) along with an array of data. Useful for integrating with other systems.
+    * This allows correct access paths for Kint::trace()",https://api.github.com/users/jnvsor,5260644,jnvsor,https://api.github.com/repos/kint-php/kint/releases/7657734/assets,https://api.github.com/repos/kint-php/kint/releases/7657734,master,https://api.github.com/repos/kint-php/kint/tarball/2.2,https://github.com/kint-php/kint/releases/tag/2.2,https://api.github.com/repos/kint-php/kint/zipball/2.2,2.2,False,False
+6917655,2017-07-03T20:08:05Z,2017-07-03T21:02:02Z,2.1.2,"Most of this release is bugfixes, but there are a few notable changes.
+
+* Disabled the binary, DOMNode, DOMIterator, and Serialize plugins. They're still there but you have to opt-in now. For reasons behind these choices see #244 
+* Max depth has been lowered to 6. Because Kint currently supplies much more information than v1 did it's also a bit slower. This is compounded by the constantly increasing interdependent hierarchies in use in modern PHP systems. Because the access paths are a thing in Kint 2 it's very easy to run a second dump to get deeper in, so this will barely make a dent for usability, but lowering the depth limit one level typically cuts runtime in 3!
+* There is now a `parserPlugins` method on the `Kint_Renderer` which can alter or supply a list of plugins for the parser to be initialized with. A whitelist on the text renderer makes use of this by disabling most of the plugins so text, cli, and plain dumps are fast.
+* Dropped reference detection support below 5.2.1. This had been causing infinite loops since alpha2 and no-one noticed. */me clumsily foreshadows impending PHP version requirement bump*",https://api.github.com/users/jnvsor,5260644,jnvsor,https://api.github.com/repos/kint-php/kint/releases/6917655/assets,https://api.github.com/repos/kint-php/kint/releases/6917655,master,https://api.github.com/repos/kint-php/kint/tarball/2.1.2,https://github.com/kint-php/kint/releases/tag/2.1.2,https://api.github.com/repos/kint-php/kint/zipball/2.1.2,2.1.2,False,False
+6776563,2017-06-20T18:21:30Z,2017-06-20T18:34:02Z,2.1.1,"* Bugfixed accidental write to input variables in Closure plugin
+
+  **This is a serious bug** and the reason for the emergency patch release.
+  This bug may affect operation of caller code in a default Kint 2.0+ installation.
+  Please upgrade at your earliest convenience.
+* Removed value representation from unknown types
+* Stricter parsing and testing for ""Impossible index"" variables
+* Updated nodejs to use a lockfile",https://api.github.com/users/jnvsor,5260644,jnvsor,https://api.github.com/repos/kint-php/kint/releases/6776563/assets,https://api.github.com/repos/kint-php/kint/releases/6776563,master,https://api.github.com/repos/kint-php/kint/tarball/2.1.1,https://github.com/kint-php/kint/releases/tag/2.1.1,https://api.github.com/repos/kint-php/kint/zipball/2.1.1,2.1.1,False,False
+6376448,2017-05-13T17:24:30Z,2017-05-13T20:26:53Z,2.1,"* Bugfixes
+    * Missing ""Inherited from"" in docstrings
+    * Renderers: Get return status from settings, not directly from modifiers
+    * Sourceparser would explode on 5.1 and 5.2 (Since no-one brought that up it means we have pleasantly few people using those old versions)
+    * Fixed a bug in certain browsers where tripleclick select all would add 4 spaces of indentation for some reason.
+    * Fix bug in complex string parsing (""${var}"" would add an extra indentation level, causing the var name/access path to go on until the end of the containing block)
+    * Make the shorthand (`d(1);`) show a backtrace to the same depth as `Kint::trace()`
+    * PHPUnit failed to check for certain error levels in certain circumstances
+    * Fixed a bug in the way the trace plugin validated traces. (Let's just say it was completely wrong)
+* Added unit tests
+    * Kint class
+    * Kint_Parser_Trace plugin (Also used independently by helper for minitrace etc)
+    * Kint_Object_Representation
+    * Kint_Object
+    * Kint_Object_Blob
+    * And tweaks to parser, sourceparser tests
+* Representation names now contain digits when automatically transferred from labels
+* Added .gitattributes to clean up distributed archives and stop compiled files from messing up the diff view.
+* Character encodings now work slightly different
+    * ASCII and UTF-8 are the only ones enabled by default now (Should be a bit of a performance boost)
+    * Some investigation has lead me to believe that `mb_detect_encoding` only practically supports
+        * ASCII
+        * UTF-8
+        * SJIS
+        * EUC-JP
+    * Windows-1252 is using some custom validation if mb_detect_encoding fails, since just about any byte is valid in 1252
+    * Accordingly, the Binary plugin will always trigger if the string is not UTF-8 or ASCII
+* Blacklist '/' and '.' for FsPath plugin (Since those strings are likely to show up often)
+* Moved string escaping into renderers
+    * Deprecates `Kint_Object_Blob::escape` and `Kint_Renderer_Rich_Plugin::renderLockedHeader`, to be removed in next major version.
+* Added Exception plugin (Shows message in bar)
+* Added DateTime plugin (Shows value in bar)
+* Added links to PHP documentation for internal functions and methods
+* *Massive* performance improvement to the sourceparser. The base call time of Kint was a bit slow on very large files
+* Source code is gzcompressed in the built files, then gzuncompressed and evalled at runtime. This brings the file size down to under 40kb",https://api.github.com/users/jnvsor,5260644,jnvsor,https://api.github.com/repos/kint-php/kint/releases/6376448/assets,https://api.github.com/repos/kint-php/kint/releases/6376448,master,https://api.github.com/repos/kint-php/kint/tarball/2.1,https://github.com/kint-php/kint/releases/tag/2.1,https://api.github.com/repos/kint-php/kint/zipball/2.1,2.1,False,False
+6157112,2017-04-22T13:41:40Z,2017-04-22T15:12:17Z,2.0,"Hooray! After more than 18 months and more than 230 commits, Kint 2.0 is here!
+
+This is a ground-up rewrite of most of the Kint functionality. There are a *lot* of new features, so I'll summarize the big differences from 1.1:
+
+* Access paths - Automatically see the code you need to get somewhere deep in the hierarchy
+* Frontend usability tweaks - Clicking on the `[+]` once will only unfold one level. Keyboard and mouse control can be used at the same time
+* Single file distribution: All of Kint in a single file. Download and include and you're done
+* Much better plugability: You can alter pretty much all of Kint's behaviour without touching the Kint source code
+* Blacklist plugin: *Skip overweight classes to make Kint dumps faster*
+* Lots of bugfixes
+* Cleaner code
+* Unit tests
+* Can be used as a library
+* Easier build process",https://api.github.com/users/jnvsor,5260644,jnvsor,https://api.github.com/repos/kint-php/kint/releases/6157112/assets,https://api.github.com/repos/kint-php/kint/releases/6157112,master,https://api.github.com/repos/kint-php/kint/tarball/2.0,https://github.com/kint-php/kint/releases/tag/2.0,https://api.github.com/repos/kint-php/kint/zipball/2.0,2.0,False,False
+6155942,2017-04-21T19:07:55Z,2017-04-22T07:28:42Z,2.0 release candidate 1,"* Smaller single file generation
+* Obfuscated openInNewWindow to stop malicious actors (Like anti-virus) from injecting html halfway through our JS",https://api.github.com/users/jnvsor,5260644,jnvsor,https://api.github.com/repos/kint-php/kint/releases/6155942/assets,https://api.github.com/repos/kint-php/kint/releases/6155942,master,https://api.github.com/repos/kint-php/kint/tarball/2.0-rc1,https://github.com/kint-php/kint/releases/tag/2.0-rc1,https://api.github.com/repos/kint-php/kint/zipball/2.0-rc1,2.0-rc1,False,False
+6128146,2017-04-19T20:41:48Z,2017-04-19T21:15:55Z,2.0 beta 2,"* Adds single-file compilation! Now you can just download a single file and include it and hurray you're up and running!
+    * Separate files for separate themes",https://api.github.com/users/jnvsor,5260644,jnvsor,https://api.github.com/repos/kint-php/kint/releases/6128146/assets,https://api.github.com/repos/kint-php/kint/releases/6128146,master,https://api.github.com/repos/kint-php/kint/tarball/2.0-beta2,https://github.com/kint-php/kint/releases/tag/2.0-beta2,https://api.github.com/repos/kint-php/kint/zipball/2.0-beta2,2.0-beta2,False,True
+6090364,2017-04-15T19:43:36Z,2017-04-15T19:55:07Z,2.0 beta 1,"* Renderer properties are protected not private to make renderer extending easier
+* A few bugfixes
+* A new source code parser that's a bit more robust than the `preg_match` black magic. Allows for access paths when the source file can't be parsed too
+* Since I don't plan on making any more large structural changes, this is the first beta release of 2.0. Breaking changes may still occur, but infrequently.",https://api.github.com/users/jnvsor,5260644,jnvsor,https://api.github.com/repos/kint-php/kint/releases/6090364/assets,https://api.github.com/repos/kint-php/kint/releases/6090364,master,https://api.github.com/repos/kint-php/kint/tarball/2.0-beta1,https://github.com/kint-php/kint/releases/tag/2.0-beta1,https://api.github.com/repos/kint-php/kint/zipball/2.0-beta1,2.0-beta1,False,True
+6080327,2017-04-13T18:37:51Z,2017-04-14T06:04:50Z,2.0 alpha 5,"* Composer setting `extra.kint.disable-helper-functions` allows conflicting packages and the root composer.json to disable the helper functions and use Kint purely as a library
+* A few bugfixes",https://api.github.com/users/jnvsor,5260644,jnvsor,https://api.github.com/repos/kint-php/kint/releases/6080327/assets,https://api.github.com/repos/kint-php/kint/releases/6080327,master,https://api.github.com/repos/kint-php/kint/tarball/2.0-alpha5,https://github.com/kint-php/kint/releases/tag/2.0-alpha5,https://api.github.com/repos/kint-php/kint/zipball/2.0-alpha5,2.0-alpha5,False,True
+6025885,2017-04-09T19:33:29Z,2017-04-09T19:40:24Z,2.0 alpha 4,"* Update NPM dependencies and mark it private to stop whining about repository info
+* Added build status to readme
+* Lots of bugfixes
+* Added PHPUnit and full testing of `Kint_Parser`
+* Improved performance in the rich renderer by caching method headers
+* Added `Kint_Parser_Blacklist::$shallow_blacklist` to blacklist objects except when they're dumped directly
+* 2.x is now the master branch. The 1.1+ versions are in the 1.x branch",https://api.github.com/users/jnvsor,5260644,jnvsor,https://api.github.com/repos/kint-php/kint/releases/6025885/assets,https://api.github.com/repos/kint-php/kint/releases/6025885,master,https://api.github.com/repos/kint-php/kint/tarball/2.0-alpha4,https://github.com/kint-php/kint/releases/tag/2.0-alpha4,https://api.github.com/repos/kint-php/kint/zipball/2.0-alpha4,2.0-alpha4,False,True
+5942116,2017-03-30T18:25:23Z,2017-03-31T21:37:19Z,2.0 alpha 3,"* Bugfixes
+* ToString plugin
+* Wrap plugins in a try-catch so that third party plugins don't leave user data in an unclean state if they explode",https://api.github.com/users/jnvsor,5260644,jnvsor,https://api.github.com/repos/kint-php/kint/releases/5942116/assets,https://api.github.com/repos/kint-php/kint/releases/5942116,master,https://api.github.com/repos/kint-php/kint/tarball/2.0-alpha3,https://github.com/kint-php/kint/releases/tag/2.0-alpha3,https://api.github.com/repos/kint-php/kint/zipball/2.0-alpha3,2.0-alpha3,False,True
+5872593,2017-03-26T19:13:45Z,2017-03-26T19:50:01Z,2.0 alpha 2,"* TravisCI support (Have to wait on @raveren to enable it on the repo, using one connected to my fork manually for the time being)
+* `[+]` icon now only opens one level by default. It seems like it was too hard to learn to click just about anywhere else so now it behaves like the rest of the bar. To open all descendants, doubleclick on the icon. To open all kint dumps on the page, tripleclick on the icon.
+* Text renderer: Added option to render without decorations
+* Rewrite parser plugin system. Now instead of a big static array full of classnames, the parser takes plugin instances through a method making it far better architecture. I also added a few mandatory methods to the plugins themselves to indicate which data types and parse stages they should use. This made for a huge performance boost and simplified some code (Removes the `Kint_Parser_Plugin::parseChildren()` method since the new methods achieve the same with less overhead)
+* Now detects and displays references (With the exception of the toplevel objects)
+* Now provides correct access paths for numeric string indexes in arrays, and integer properties in objects (Though these are read-only since PHP does some trippy stuff with them on assign)
+* Various bugfixes",https://api.github.com/users/jnvsor,5260644,jnvsor,https://api.github.com/repos/kint-php/kint/releases/5872593/assets,https://api.github.com/repos/kint-php/kint/releases/5872593,master,https://api.github.com/repos/kint-php/kint/tarball/2.0-alpha2,https://github.com/kint-php/kint/releases/tag/2.0-alpha2,https://api.github.com/repos/kint-php/kint/zipball/2.0-alpha2,2.0-alpha2,False,True
+5692520,2017-02-12T22:47:59Z,2017-03-09T17:06:43Z,2.0 alpha 1,"This is the first alpha for the rewrite of Kint into 2.0. It's nearly 200 commits and a year and a half of work, but as the tag says: Alpha.
+
+Feedback welcome - breaking API change suggestions should be accepted until beta at least",https://api.github.com/users/jnvsor,5260644,jnvsor,https://api.github.com/repos/kint-php/kint/releases/5692520/assets,https://api.github.com/repos/kint-php/kint/releases/5692520,master,https://api.github.com/repos/kint-php/kint/tarball/2.0-alpha1,https://github.com/kint-php/kint/releases/tag/2.0-alpha1,https://api.github.com/repos/kint-php/kint/zipball/2.0-alpha1,2.0-alpha1,False,True
+5692481,2017-01-15T14:23:43Z,2017-03-09T17:04:23Z,1.1,This is the release that's been put off for 2 years. It should be superseded by 2.0 in the foreseeable future,https://api.github.com/users/jnvsor,5260644,jnvsor,https://api.github.com/repos/kint-php/kint/releases/5692481/assets,https://api.github.com/repos/kint-php/kint/releases/5692481,master,https://api.github.com/repos/kint-php/kint/tarball/1.1,https://github.com/kint-php/kint/releases/tag/1.1,https://api.github.com/repos/kint-php/kint/zipball/1.1,1.1,False,False
+1822001,2015-09-16T14:09:00Z,2015-09-16T14:19:58Z,Version 1.0.10,"Maintenance release - squashed some bugs yo
+",https://api.github.com/users/raveren,364220,raveren,https://api.github.com/repos/kint-php/kint/releases/1822001/assets,https://api.github.com/repos/kint-php/kint/releases/1822001,master,https://api.github.com/repos/kint-php/kint/tarball/1.0.10,https://github.com/kint-php/kint/releases/tag/1.0.10,https://api.github.com/repos/kint-php/kint/zipball/1.0.10,1.0.10,False,False
+1487926,2015-07-02T11:06:58Z,2015-07-02T11:10:31Z,Version 1.0.6,"Tabular display indices are now parsed as values (very convenient for array(timestamp => array) data)
+Added `Kint::$charEncodings` back mainly for Russian speakers (see config.default.php)
+misc fixes & improvements
+",https://api.github.com/users/raveren,364220,raveren,https://api.github.com/repos/kint-php/kint/releases/1487926/assets,https://api.github.com/repos/kint-php/kint/releases/1487926,master,https://api.github.com/repos/kint-php/kint/tarball/1.0.6,https://github.com/kint-php/kint/releases/tag/1.0.6,https://api.github.com/repos/kint-php/kint/zipball/1.0.6,1.0.6,False,False
+1372090,2015-06-03T14:54:00Z,2015-06-03T14:58:31Z,Version 1.0.2,"Squashed two ugly bugs, can't be thankful enough for the quality feedback I receive.
+
+Thanks to @JakeFalcor and @GMartigny.
+",https://api.github.com/users/raveren,364220,raveren,https://api.github.com/repos/kint-php/kint/releases/1372090/assets,https://api.github.com/repos/kint-php/kint/releases/1372090,master,https://api.github.com/repos/kint-php/kint/tarball/1.0.2,https://github.com/kint-php/kint/releases/tag/1.0.2,https://api.github.com/repos/kint-php/kint/zipball/1.0.2,1.0.2,False,False
+1322221,2015-05-21T11:54:05Z,2015-05-21T11:56:23Z,Version 1.0.0,"Two years of continued development for this version brought hundreds of improvements and minor features.
+",https://api.github.com/users/raveren,364220,raveren,https://api.github.com/repos/kint-php/kint/releases/1322221/assets,https://api.github.com/repos/kint-php/kint/releases/1322221,master,https://api.github.com/repos/kint-php/kint/tarball/1.0.0,https://github.com/kint-php/kint/releases/tag/1.0.0,https://api.github.com/repos/kint-php/kint/zipball/1.0.0,1.0.0,False,False
+483475,2014-08-11T11:44:51Z,2014-08-11T12:12:56Z,,,https://api.github.com/users/raveren,364220,raveren,https://api.github.com/repos/kint-php/kint/releases/483475/assets,https://api.github.com/repos/kint-php/kint/releases/483475,master,https://api.github.com/repos/kint-php/kint/tarball/v0.9.1,https://github.com/kint-php/kint/releases/tag/v0.9.1,https://api.github.com/repos/kint-php/kint/zipball/v0.9.1,v0.9.1,False,False
+25303,2013-08-12T22:48:48Z,2013-08-12T22:57:14Z,Stable version,,https://api.github.com/users/raveren,364220,raveren,https://api.github.com/repos/kint-php/kint/releases/25303/assets,https://api.github.com/repos/kint-php/kint/releases/25303,master,https://api.github.com/repos/kint-php/kint/tarball/v0.9,https://github.com/kint-php/kint/releases/tag/v0.9,https://api.github.com/repos/kint-php/kint/zipball/v0.9,v0.9,False,False

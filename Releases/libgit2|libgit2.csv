@@ -1,0 +1,2757 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+6759752,2017-06-14T11:31:20Z,2017-06-19T15:16:32Z,libgit2 v0.26.0,"This is the first release of the v0.26 series, ""Aufschub"". The changelog follows.
+
+### Changes or improvements
+
+* Support for opening, creating and modifying worktrees.
+
+* We can now detect SHA1 collisions resulting from the SHAttered attack. These
+  checks can be enabled at build time via `-DUSE_SHA1DC`.
+
+* Fix for missing implementation of `git_merge_driver_source` getters.
+
+* Fix for installed pkg-config file being broken when the prefix contains
+  spaces.
+
+* We now detect when the hashsum of on-disk objects does not match their
+  expected hashsum.
+
+* We now support open-ended ranges (e.g. ""master.."", ""...master"") in our
+  revision range parsing code.
+
+* We now correctly compute ignores with leading ""/"" in subdirectories.
+
+* We now optionally call `fsync` on loose objects, packfiles and their indexes,
+  loose references and packed reference files.
+
+* We can now build against OpenSSL v1.1 and against LibreSSL.
+
+* `GIT_MERGE_OPTIONS_INIT` now includes a setting to perform rename detection.
+  This aligns this structure with the default by `git_merge` and
+  `git_merge_trees` when `NULL` was provided for the options.
+
+* Improvements for reading index v4 files.
+
+* Perform additional retries for filesystem operations on Windows when files
+  are temporarily locked by other processes.
+
+### API additions
+
+* New family of functions to handle worktrees:
+
+    * `git_worktree_list()` lets you look up worktrees for a repository.
+    * `git_worktree_lookup()` lets you get a specific worktree.
+    * `git_worktree_open_from_repository()` lets you get the associated worktree of a repository.
+    * `git_worktree_add` lets you create new worktrees.
+    * `git_worktree_prune` lets you remove worktrees from disk.
+    * `git_worktree_lock()` and `git_worktree_unlock()` let you lock and unlock a worktree, respectively.
+    * `git_repository_open_from_worktree()` lets you open a repository via
+    * `git_repository_head_for_worktree()` lets you get the current `HEAD` for a
+      linked worktree.
+    * `git_repository_head_detached_for_worktree()` lets you check whether a
+      linked worktree is in detached HEAD mode.
+
+* `git_repository_item_path()` lets you retrieve paths for various repository
+  files.
+
+* `git_repository_commondir()` lets you retrieve the common directory of a
+  repository.
+
+* `git_branch_is_checked_out()` allows you to check whether a branch is checked
+  out in a repository or any of its worktrees.
+
+* `git_repository_submodule_cache_all()` and
+  `git_repository_submodule_cache_clear()` functions allow you to prime or clear
+  the submodule cache of a repository.
+
+* You can disable strict hash verifications via the
+  `GIT_OPT_ENABLE_STRICT_HASH_VERIFICATION` option with `git_libgit2_opts()`.
+
+* You can enable us calling `fsync` for various files inside the "".git""
+  directory by setting the `GIT_OPT_ENABLE_FSYNC_GITDIR` option with
+  `git_libgit2_opts()`.
+
+* You can now enable ""offset deltas"" when creating packfiles and negotiating
+  packfiles with a remote server by setting `GIT_OPT_ENABLE_OFS_DELTA` option
+  with `GIT_libgit2_opts()`.
+
+* You can now set the default share mode on Windows for opening files using
+  `GIT_OPT_SET_WINDOWS_SHAREMODE` option with `git_libgit2_opts()`.
+  You can query the current share mode with `GIT_OPT_GET_WINDOWS_SHAREMODE`.
+
+* `git_transport_smart_proxy_options()` enables you to get the proxy options for
+  smart transports.
+
+* The `GIT_FILTER_INIT` macro and the `git_filter_init` function are provided
+  to initialize a `git_filter` structure.
+
+### Breaking API changes
+
+* `clone_checkout_strategy` has been removed from
+  `git_submodule_update_option`. The checkout strategy used to clone will
+  be the same strategy specified in `checkout_opts`.",https://api.github.com/users/ethomson,1130014,ethomson,https://api.github.com/repos/libgit2/libgit2/releases/6759752/assets,https://api.github.com/repos/libgit2/libgit2/releases/6759752,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.26.0,https://github.com/libgit2/libgit2/releases/tag/v0.26.0,https://api.github.com/repos/libgit2/libgit2/zipball/v0.26.0,v0.26.0,False,False
+6709274,2017-06-14T11:31:20Z,2017-06-14T11:35:02Z,libgit2 v0.26.0 RC2,"This is the second release candidate for libgit2 v0.25.0.
+
+This release contains a few fixes for issues that were discovered after the last release candidate or where deemed important and non-intrusive enough for a release candidate.
+
+### API additions
+
+* The `GIT_FILTER_INIT` macro and the `git_filter_init` function are provided
+  to initialize a `git_filter` structure.
+",https://api.github.com/users/ethomson,1130014,ethomson,https://api.github.com/repos/libgit2/libgit2/releases/6709274/assets,https://api.github.com/repos/libgit2/libgit2/releases/6709274,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.26.0-rc2,https://github.com/libgit2/libgit2/releases/tag/v0.26.0-rc2,https://api.github.com/repos/libgit2/libgit2/zipball/v0.26.0-rc2,v0.26.0-rc2,False,True
+6673488,2017-06-11T11:32:00Z,2017-06-11T11:34:58Z,libgit2 v0.26.0 RC1,"This is the first release candidate of libgit2 v0.26.0.
+
+Notable changes since v0.25:
+
+### Changes or improvements
+
+* Support for opening, creating and modifying worktrees.
+
+* We can now detect SHA1 collisions resulting from the SHAttered attack. These
+  checks can be enabled at build time via `-DUSE_SHA1DC`.
+
+* Fix for missing implementation of `git_merge_driver_source` getters.
+
+* Fix for installed pkg-config file being broken when the prefix contains
+  spaces.
+
+* We now detect when the hashsum of on-disk objects does not match their
+  expected hashsum.
+
+* We now support open-ended ranges (e.g. ""master.."", ""...master"") in our
+  revision range parsing code.
+
+* We now correctly compute ignores with leading ""/"" in subdirectories.
+
+* We now optionally call `fsync` on loose objects, packfiles and their indexes,
+  loose references and packed reference files.
+
+* We can now build against OpenSSL v1.1 and against LibreSSL.
+
+* `GIT_MERGE_OPTIONS_INIT` now includes a setting to perform rename detection.
+  This aligns this structure with the default by `git_merge` and
+  `git_merge_trees` when `NULL` was provided for the options.
+
+* Improvements for reading index v4 files.
+
+* Perform additional retries for filesystem operations on Windows when files
+  are temporarily locked by other processes.
+
+### API additions
+
+* New family of functions to handle worktrees:
+
+    * `git_worktree_list()` lets you look up worktrees for a repository.
+    * `git_worktree_lookup()` lets you get a specific worktree.
+    * `git_worktree_open_from_repository()` lets you get the associated worktree
+      of a repository.
+      a worktree.
+    * `git_worktree_add` lets you create new worktrees.
+    * `git_worktree_prune` lets you remove worktrees from disk.
+    * `git_worktree_lock()` and `git_worktree_unlock()` let you lock
+      respectively unlock a worktree.
+    * `git_repository_open_from_worktree()` lets you open a repository via
+    * `git_repository_head_for_worktree()` lets you get the current `HEAD` for a
+      linked worktree.
+    * `git_repository_head_detached_for_worktree()` lets you check whether a
+      linked worktree is in detached HEAD mode.
+
+* `git_repository_item_path()` lets you retrieve paths for various repository
+  files.
+
+* `git_repository_commondir()` lets you retrieve the common directory of a
+  repository.
+
+* `git_branch_is_checked_out()` allows you to check whether a branch is checked
+  out in a repository or any of its worktrees.
+
+* `git_repository_submodule_cache_all()` and
+  `git_repository_submodule_cache_clear()` functions allow you to prime or clear
+  the submodule cache of a repository.
+
+* You can disable strict hash verifications via the
+  `GIT_OPT_ENABLE_STRICT_HASH_VERIFICATION` option with `git_libgit2_opts()`.
+
+* You can enable us calling `fsync` for various files inside the "".git""
+  directory by setting the `GIT_OPT_ENABLE_FSYNC_GITDIR` option with
+  `git_libgit2_opts()`.
+
+* You can now enable ""offset deltas"" when creating packfiles and negotiating
+  packfiles with a remote server by setting `GIT_OPT_ENABLE_OFS_DELTA` option
+  with `GIT_libgit2_opts()`.
+
+* You can now set the default share mode on Windows for opening files using
+  `GIT_OPT_SET_WINDOWS_SHAREMODE` option with `git_libgit2_opts()`.
+  You can query the current share mode with `GIT_OPT_GET_WINDOWS_SHAREMODE`.
+
+* `git_transport_smart_proxy_options()' enables you to get the proxy options for
+  smart transports.
+
+### Breaking API changes
+
+* `clone_checkout_strategy` has been removed from
+  `git_submodule_update_option`. The checkout strategy used to clone will
+  be the same strategy specified in `checkout_opts`.",https://api.github.com/users/ethomson,1130014,ethomson,https://api.github.com/repos/libgit2/libgit2/releases/6673488/assets,https://api.github.com/repos/libgit2/libgit2/releases/6673488,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.26.0-rc1,https://github.com/libgit2/libgit2/releases/tag/v0.26.0-rc1,https://api.github.com/repos/libgit2/libgit2/zipball/v0.26.0-rc1,v0.26.0-rc1,False,True
+5109291,2017-01-09T20:26:45Z,2017-01-09T20:37:25Z,libgit2 v0.25.1,"This is a security release fixing two issues. The first one performs extra sanitization for some edge cases in the Git Smart Protocol which can lead to attempting to parse outside of the buffer.
+
+The second fix affects the certificate check callback. It provides a valid parameter to indicate whether the native cryptographic library considered the certificate to be correct. This parameter is always 1/true before this fix leading to a possible MITM.
+
+This does not affect you if you do not use the custom certificate callback or if you do not take this value into account. This does affect you if you use pygit2 or git2go regardless of whether you specify a certificate check callback.
+
+A list of commits since the last release follows
+
+```
+2ac57aa89 https: don't test that RC4 is invalid
+3829ba2e7 http: correct the expected error for RC4
+a5cf255b4 Bump version to 0.25.1
+2fdef641f smart_pkt: treat empty packet lines as error
+66e3774d2 smart_pkt: verify packet length exceeds PKT_LEN_SIZE
+98d66240e http: perform 'badssl' check also via certificate callback
+9a64e62f0 http: check certificate validity before clobbering the error variable
+```
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/5109291/assets,https://api.github.com/repos/libgit2/libgit2/releases/5109291,maint/v0.25,https://api.github.com/repos/libgit2/libgit2/tarball/v0.25.1,https://github.com/libgit2/libgit2/releases/tag/v0.25.1,https://api.github.com/repos/libgit2/libgit2/zipball/v0.25.1,v0.25.1,False,False
+5109252,2017-01-09T20:26:28Z,2017-01-09T20:33:52Z,libgit2 v0.24.6,"This is a security release fixing two issues.  The first one performs extra sanitization for some edge cases in the Git Smart Protocol which can lead to attempting to parse outside of the buffer.
+
+The second fix affects the certificate check callback. It provides a `valid` parameter to indicate whether the native cryptographic library considered the certificate to be correct. This parameter is always `1`/`true` before this fix leading to a possible MITM.
+
+This does not affect you if you do not use the custom certificate callback or if you do not take this value into account. This does affect you if you use pygit2 or git2go regardless of whether you specify a certificate check callback.
+
+A list of commits since the last release follows
+
+```
+45a2ee3f4 https: don't test that RC4 is invalid
+d3cb8f64c http: correct the expected error for RC4
+2b9298bfe Bump version to 0.24.6
+84d30d569 smart_pkt: treat empty packet lines as error
+4ac39c76c smart_pkt: verify packet length exceeds PKT_LEN_SIZE
+ca5319566 http: perform 'badssl' check also via certificate callback
+b5c6a1b40 http: check certificate validity before clobbering the error variable
+```
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/5109252/assets,https://api.github.com/repos/libgit2/libgit2/releases/5109252,maint/v0.24,https://api.github.com/repos/libgit2/libgit2/tarball/v0.24.6,https://github.com/libgit2/libgit2/releases/tag/v0.24.6,https://api.github.com/repos/libgit2/libgit2/zipball/v0.24.6,v0.24.6,False,False
+5000527,2016-12-20T19:14:20Z,2016-12-23T14:23:58Z,libgit2 v0.25.0,"This is the first release of the v0.25 series, ""Rutschgefahr"". The changelog follows.
+
+### Changes or improvements
+- Fix repository discovery with `git_repository_discover` and
+  `git_repository_open_ext` to match git's handling of a ceiling
+  directory at the current directory. git only checks ceiling
+  directories when its search ascends to a parent directory.  A ceiling
+  directory matching the starting directory will not prevent git from
+  finding a repository in the starting directory or a parent directory.
+- Do not fail when deleting remotes in the presence of broken
+  global configs which contain branches.
+- Support for reading and writing git index v4 files
+- Improve the performance of the revwalk and bring us closer to git's code.
+- The reference db has improved support for concurrency and returns `GIT_ELOCKED`
+  when an operation could not be performed due to locking.
+- Nanosecond resolution is now activated by default, following git's change to
+  do this.
+- We now restrict the set of ciphers we let OpenSSL use by default.
+- Users can now register their own merge drivers for use with `.gitattributes`.
+  The library also gained built-in support for the union merge driver.
+- The default for creating references is now to validate that the object does
+  exist.
+- Add `git_proxy_options` which is used by the different networking
+  implementations to let the caller specify the proxy settings instead of
+  relying on the environment variables.
+
+### API additions
+- You can now get the user-agent used by libgit2 using the
+  `GIT_OPT_GET_USER_AGENT` option with `git_libgit2_opts()`.
+  It is the counterpart to `GIT_OPT_SET_USER_AGENT`.
+- The `GIT_OPT_SET_SSL_CIPHERS` option for `git_libgit2_opts()` lets you specify
+  a custom list of ciphers to use for OpenSSL.
+- `git_commit_create_buffer()` creates a commit and writes it into a
+  user-provided buffer instead of writing it into the object db. Combine it with
+  `git_commit_create_with_signature()` in order to create a commit with a
+  cryptographic signature.
+- `git_blob_create_fromstream()` and
+  `git_blob_create_fromstream_commit()` allow you to create a blob by
+  writing into a stream. Useful when you do not know the final size or
+  want to copy the contents from another stream.
+- New flags for `git_repository_open_ext`:
+  - `GIT_REPOSITORY_OPEN_NO_DOTGIT` - Do not check for a repository by
+    appending `/.git` to the `start_path`; only open the repository if
+    `start_path` itself points to the git directory.
+  - `GIT_REPOSITORY_OPEN_FROM_ENV` - Find and open a git repository,
+    respecting the environment variables used by the git command-line
+    tools. If set, `git_repository_open_ext` will ignore the other
+    flags and the `ceiling_dirs` argument, and will allow a NULL
+    `path` to use `GIT_DIR` or search from the current directory. The
+    search for a repository will respect `$GIT_CEILING_DIRECTORIES`
+    and `$GIT_DISCOVERY_ACROSS_FILESYSTEM`.  The opened repository
+    will respect `$GIT_INDEX_FILE`, `$GIT_NAMESPACE`,
+    `$GIT_OBJECT_DIRECTORY`, and `$GIT_ALTERNATE_OBJECT_DIRECTORIES`.
+    In the future, this flag will also cause `git_repository_open_ext`
+    to respect `$GIT_WORK_TREE` and `$GIT_COMMON_DIR`; currently,
+    `git_repository_open_ext` with this flag will error out if either
+    `$GIT_WORK_TREE` or `$GIT_COMMON_DIR` is set.
+- `git_diff_from_buffer()` can create a `git_diff` object from the contents
+  of a git-style patch file.
+- `git_index_version()` and `git_index_set_version()` to get and set
+  the index version
+- `git_odb_expand_ids()` lets you check for the existence of multiple
+  objects at once.
+- The new `git_blob_dup()`, `git_commit_dup()`, `git_tag_dup()` and
+  `git_tree_dup()` functions provide type-specific wrappers for
+  `git_object_dup()` to reduce noise and increase type safety for callers.
+- `git_reference_dup()` lets you duplicate a reference to aid in ownership
+  management and cleanup.
+- `git_signature_from_buffer()` lets you create a signature from a string in the
+  format that appear in objects.
+- `git_tree_create_updated()` lets you create a tree based on another one
+  together with a list of updates. For the covered update cases, it's more
+  efficient than the `git_index` route.
+- `git_apply_patch()` applies hunks from a `git_patch` to a buffer.
+- `git_diff_to_buf()` lets you print an entire diff directory to a buffer,
+  similar to how `git_patch_to_buf()` works.
+- `git_proxy_init_options()` is added to initialize a `git_proxy_options`
+  structure at run-time.
+- `git_merge_driver_register()`, `git_merge_driver_unregister()` let you
+  register and unregister a custom merge driver to be used when `.gitattributes`
+  specifies it.
+- `git_merge_driver_lookup()` can be used to look up a merge driver by name.
+- `git_merge_driver_source_repo()`, `git_merge_driver_source_ancestor()`,
+  `git_merge_driver_source_ours()`, `git_merge_driver_source_theirs()`,
+  `git_merge_driver_source_file_options()` added as accessors to
+  `git_merge_driver_source`.
+
+### API removals
+- `git_blob_create_fromchunks()` has been removed in favour of
+  `git_blob_create_fromstream()`.
+
+### Breaking API changes
+- `git_packbuilder_object_count` and `git_packbuilder_written` now
+  return a `size_t` instead of a `uint32_t` for more thorough
+  compatibility with the rest of the library.
+- `git_packbuiler_progress` now provides explicitly sized `uint32_t`
+  values instead of `unsigned int`.
+- `git_diff_file` now includes an `id_abbrev` field that reflects the
+  number of nibbles set in the `id` field.
+- `git_odb_backend` now has a `freshen` function pointer.  This optional
+  function pointer is similar to the `exists` function, but it will update
+  a last-used marker.  For filesystem-based object databases, this updates
+  the timestamp of the file containing the object, to indicate ""freshness"".
+  If this is `NULL`, then it will not be called and the `exists` function
+  will be used instead.
+- `git_remote_connect()` now accepts proxy options.
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/5000527/assets,https://api.github.com/repos/libgit2/libgit2/releases/5000527,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.25.0,https://github.com/libgit2/libgit2/releases/tag/v0.25.0,https://api.github.com/repos/libgit2/libgit2/zipball/v0.25.0,v0.25.0,False,False
+4978390,2016-12-20T19:14:20Z,2016-12-21T11:02:31Z,libgit2 v0.25.0 RC2,"This is the second release candidate for libgit2 v0.25.0.
+
+This release contains a few fixes for issues that were discovered after the last release candidate or where deemed important and non-intrusive enough for a release candidate.
+
+There have been no changes to the release notes/changelog from the last release candidate.
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/4978390/assets,https://api.github.com/repos/libgit2/libgit2/releases/4978390,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.25.0-rc2,https://github.com/libgit2/libgit2/releases/tag/v0.25.0-rc2,https://api.github.com/repos/libgit2/libgit2/zipball/v0.25.0-rc2,v0.25.0-rc2,False,True
+4947563,2016-12-17T10:47:29Z,2016-12-17T10:52:11Z,libgit2 v0.24.5 Maintenance Release,"This release adds support for building against OpenSSL 1.1 releases which introduced API changes. All users are encouraged to upgrade. This release replaces the mis-tagged v0.24.4.
+
+```
+65d24fd7d Add support for OpenSSL 1.1.0 for BIO filter
+```
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/4947563/assets,https://api.github.com/repos/libgit2/libgit2/releases/4947563,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.24.5,https://github.com/libgit2/libgit2/releases/tag/v0.24.5,https://api.github.com/repos/libgit2/libgit2/zipball/v0.24.5,v0.24.5,False,False
+4679396,2016-11-15T18:04:18Z,2016-11-16T19:40:07Z,libgit2 v0.25.0 RC1,"This is the first release candidate for libgit2 v0.25.0.
+
+The changelog with notable changes since v0.24 follows.
+
+### Changes or improvements
+- Fix repository discovery with `git_repository_discover` and
+  `git_repository_open_ext` to match git's handling of a ceiling
+  directory at the current directory. git only checks ceiling
+  directories when its search ascends to a parent directory.  A ceiling
+  directory matching the starting directory will not prevent git from
+  finding a repository in the starting directory or a parent directory.
+- Do not fail when deleting remotes in the presence of broken
+  global configs which contain branches.
+- Support for reading and writing git index v4 files
+- Improve the performance of the revwalk and bring us closer to git's code.
+- The reference db has improved support for concurrency and returns `GIT_ELOCKED`
+  when an operation could not be performed due to locking.
+- Nanosecond resolution is now activated by default, following git's change to
+  do this.
+- We now restrict the set of ciphers we let OpenSSL use by default.
+- Users can now register their own merge drivers for use with `.gitattributes`.
+  The library also gained built-in support for the union merge driver.
+- The default for creating references is now to validate that the object does
+  exist.
+- Add `git_proxy_options` which is used by the different networking
+  implementations to let the caller specify the proxy settings instead of
+  relying on the environment variables.
+
+### API additions
+- You can now get the user-agent used by libgit2 using the
+  `GIT_OPT_GET_USER_AGENT` option with `git_libgit2_opts()`.
+  It is the counterpart to `GIT_OPT_SET_USER_AGENT`.
+- The `GIT_OPT_SET_SSL_CIPHERS` option for `git_libgit2_opts()` lets you specify
+  a custom list of ciphers to use for OpenSSL.
+- `git_commit_create_buffer()` creates a commit and writes it into a
+  user-provided buffer instead of writing it into the object db. Combine it with
+  `git_commit_create_with_signature()` in order to create a commit with a
+  cryptographic signature.
+- `git_blob_create_fromstream()` and
+  `git_blob_create_fromstream_commit()` allow you to create a blob by
+  writing into a stream. Useful when you do not know the final size or
+  want to copy the contents from another stream.
+- New flags for `git_repository_open_ext`:
+  - `GIT_REPOSITORY_OPEN_NO_DOTGIT` - Do not check for a repository by
+    appending `/.git` to the `start_path`; only open the repository if
+    `start_path` itself points to the git directory.
+  - `GIT_REPOSITORY_OPEN_FROM_ENV` - Find and open a git repository,
+    respecting the environment variables used by the git command-line
+    tools. If set, `git_repository_open_ext` will ignore the other
+    flags and the `ceiling_dirs` argument, and will allow a NULL
+    `path` to use `GIT_DIR` or search from the current directory. The
+    search for a repository will respect `$GIT_CEILING_DIRECTORIES`
+    and `$GIT_DISCOVERY_ACROSS_FILESYSTEM`.  The opened repository
+    will respect `$GIT_INDEX_FILE`, `$GIT_NAMESPACE`,
+    `$GIT_OBJECT_DIRECTORY`, and `$GIT_ALTERNATE_OBJECT_DIRECTORIES`.
+    In the future, this flag will also cause `git_repository_open_ext`
+    to respect `$GIT_WORK_TREE` and `$GIT_COMMON_DIR`; currently,
+    `git_repository_open_ext` with this flag will error out if either
+    `$GIT_WORK_TREE` or `$GIT_COMMON_DIR` is set.
+- `git_diff_from_buffer()` can create a `git_diff` object from the contents
+  of a git-style patch file.
+- `git_index_version()` and `git_index_set_version()` to get and set
+  the index version
+- `git_odb_expand_ids()` lets you check for the existence of multiple
+  objects at once.
+- The new `git_blob_dup()`, `git_commit_dup()`, `git_tag_dup()` and
+  `git_tree_dup()` functions provide type-specific wrappers for
+  `git_object_dup()` to reduce noise and increase type safety for callers.
+- `git_reference_dup()` lets you duplicate a reference to aid in ownership
+  management and cleanup.
+- `git_signature_from_buffer()` lets you create a signature from a string in the
+  format that appear in objects.
+- `git_tree_create_updated()` lets you create a tree based on another one
+  together with a list of updates. For the covered update cases, it's more
+  efficient than the `git_index` route.
+- `git_apply_patch()` applies hunks from a `git_patch` to a buffer.
+- `git_diff_to_buf()` lets you print an entire diff directory to a buffer,
+  similar to how `git_patch_to_buf()` works.
+- `git_proxy_init_options()` is added to initialize a `git_proxy_options`
+  structure at run-time.
+- `git_merge_driver_register()`, `git_merge_driver_unregister()` let you
+  register and unregister a custom merge driver to be used when `.gitattributes`
+  specifies it.
+- `git_merge_driver_lookup()` can be used to look up a merge driver by name.
+- `git_merge_driver_source_repo()`, `git_merge_driver_source_ancestor()`,
+  `git_merge_driver_source_ours()`, `git_merge_driver_source_theirs()`,
+  `git_merge_driver_source_file_options()` added as accessors to
+  `git_merge_driver_source`.
+
+### API removals
+- `git_blob_create_fromchunks()` has been removed in favour of
+  `git_blob_create_fromstream()`.
+
+### Breaking API changes
+- `git_packbuilder_object_count` and `git_packbuilder_written` now
+  return a `size_t` instead of a `uint32_t` for more thorough
+  compatibility with the rest of the library.
+- `git_packbuiler_progress` now provides explicitly sized `uint32_t`
+  values instead of `unsigned int`.
+- `git_diff_file` now includes an `id_abbrev` field that reflects the
+  number of nibbles set in the `id` field.
+- `git_odb_backend` now has a `freshen` function pointer.  This optional
+  function pointer is similar to the `exists` function, but it will update
+  a last-used marker.  For filesystem-based object databases, this updates
+  the timestamp of the file containing the object, to indicate ""freshness"".
+  If this is `NULL`, then it will not be called and the `exists` function
+  will be used instead.
+- `git_remote_connect()` now accepts proxy options.
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/4679396/assets,https://api.github.com/repos/libgit2/libgit2/releases/4679396,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.25.0-rc1,https://github.com/libgit2/libgit2/releases/tag/v0.25.0-rc1,https://api.github.com/repos/libgit2/libgit2/zipball/v0.25.0-rc1,v0.25.0-rc1,False,True
+4557587,2016-11-03T10:53:23Z,2016-11-03T11:03:04Z,libgit2 v0.24.3 Maintenance Release,"The following security fixes have been backported to this maintenance release, which fix CVE-2016-8568 and CVE-2016-8569. All users of the library are encouraged to update.
+
+```
+821042b commit: always initialize commit message
+dfc2c71 tree: validate filename and OID length when parsing object
+```
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/4557587/assets,https://api.github.com/repos/libgit2/libgit2/releases/4557587,maint/v0.24,https://api.github.com/repos/libgit2/libgit2/tarball/v0.24.3,https://github.com/libgit2/libgit2/releases/tag/v0.24.3,https://api.github.com/repos/libgit2/libgit2/zipball/v0.24.3,v0.24.3,False,False
+4290709,2016-10-02T11:20:35Z,2016-10-03T16:12:42Z,libgit2 v0.24.2 Maintenance Release,"The following fixes have been backported to this maintenance release. All users of the library are encouraged to update.
+
+```
+adfece0 array: fix search for empty arrays
+5a9d850 odb: only provide the empty tree
+ed5299a odb: actually insert the empty blob in tests
+886bd6a mwindow: init mwindow files in git_libgit2_init
+edf420f cmake: add curl library path
+e499b13 git_checkout_tree options fix
+12b73ff transports: http: reset `connected` flag when re-connecting transport
+0dea429 ignore: allow unignoring basenames in subdirectories
+8f342c6 stransport: do not use `git_stream_free` on uninitialized stransport
+9aee7bc stransport: make internal functions static
+b64722f SecureTransport: handle NULL trust on success
+1fafead sysdir: use the standard `init` pattern
+85adddd refspec: do not set empty rhs for fetch refspecs
+d711165 repository: don't cast to `int` for no reason
+9894c7d remote: Handle missing config values when deleting a remote
+49188d2 blame: do not decrement commit refcount in make_origin
+1edbfa1 Fixed bug while parsing INT64_MIN
+a200dc9 Fix repository discovery with ceiling_dirs at current directory
+c7a0336 cmake: do not use -fPIC for MSYS2
+cc43d18 README: update ""Getting Help"" section
+ce124fc README: improve contributing paragraph
+90ec160 README: disambiguate what to distribute source of
+bb582f0 threads: add platform-independent thread initialization function
+5d03db8 win32: rename pthread.{c,h} to thread.{c,h}
+961bdbd threads: remove now-useless typedefs
+2aa5c6f threads: remove unused function pthread_num_processors_np
+68343f2 threads: split up OS-dependent rwlock code
+fabd477 threads: split up OS-dependent thread-condition code
+1b82531 threads: remove unused function pthread_cond_broadcast
+40b243b threads: split up OS-dependent mutex code
+fc2b97d threads: split up OS-dependent thread code
+286e7db fix error message SHA truncation in git_odb__error_notfound()
+4c06f3e HTTP authentication scheme name is case insensitive.
+ac44d35 checkout: use empty baseline when no index
+a574d84 documentation: improve docs for `checkout_head`
+27008e8 fetch: Fixed spurious update callback for existing tags.
+d1fb89d global: clean up crt only after freeing tls data
+6e0d473 tests: fix memory leaks in checkout::typechange
+246d25b index: fix NULL pointer access in index_remove_entry
+1a70960 transports: smart: fix potential invalid memory dereferences
+11408f0 index_read_index: invalidate new paths in tree cache
+8be4968 test: ensure we can round-trip a written tree
+80745b1 index_read_index: set flags for path_len correctly
+e755f79 index_read_index: differentiate on mode
+e6a0a85 index_read_index: reset error correctly
+6c133a7 round-trip trees through index_read_index
+feea284 win32: clean up unused warnings in DllMain
+efadf28 filebuf: fix uninitialized warning
+bcef008 cleanup: unused warning
+68227c4 Update CMakeLists.txt
+85ef6ec Ignore submodules when checking for merge conflicts in the workdir.
+70681ff checkout: handle dirty submodules correctly
+26917fd test: Fix stat() test to mask out unwanted bits
+488937c CMakeLists: Add libnetwork for Haiku
+78b5702 Fix comment for GIT_FILEMODE_LINK
+849a1a4 Fix unused variable 'message' warning
+cf0396a delta-apply: fix sign extension
+1fb8a95 odb_loose: fix undefined behavior when computing size
+f627e19 checkout: set ignorecase=0 when config lookup fails
+66633e8 odb: avoid inflating the full delta to read the header
+fc2ef51 index: fix memory leak on error case
+1aacaa3 cmake: include threading libraries in pkg-config
+b726c53 Fix return value of openssl_read (infinite loop)
+16541b8 tag: ignore extra header fields
+```
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/4290709/assets,https://api.github.com/repos/libgit2/libgit2/releases/4290709,maint/v0.24,https://api.github.com/repos/libgit2/libgit2/tarball/v0.24.2,https://github.com/libgit2/libgit2/releases/tag/v0.24.2,https://api.github.com/repos/libgit2/libgit2/zipball/v0.24.2,v0.24.2,False,False
+3001992,2016-04-11T22:18:17Z,2016-04-12T13:21:22Z,libgit2 v0.24.1 Maintenance Release,"The following fixes have been backported to this maintenance release. All users of the library are encouraged to update.
+
+```
+2f2575c Updating http parser to accept a `+` in the schema
+ff8e3f0 Handle git+ssh:// and ssh+git:// protocols support
+fa8b1a8 Adding spec coverage for ssh+git and git+ssh protocols
+429155d Updating change to http_parser to reflect PR for nodejs/http-parser
+e44f658 Removing #define for SSH_PREFIX_COUNT and using ARRAY_SIZE instead
+b8dc15f Adding test cases that actually test the functionality of the new transport
+4a93a7f Tabs
+8ec3d88 Avoid subtraction overflow in git_indexer_commit
+e3862c9 Buffer sideband packet data
+cdded63 Remove duplicated calls to git_mwindow_close
+eb09ead odb: improved not found error messages
+9ee498e Only buffer if necessary.
+4ebf745 mwindow: free unused windows if we fail to mmap
+ffb1f41 describe: handle error code returned by git_pqueue_insert
+e39ad74 config_file: handle missing quotation marks in section header
+0370dae Check for __CLANG_INTTYPES_H
+faf823d tests: transport: fix memory leaks with registering transports
+fa4b93a backport git_oid__cpy_prefix
+d0780b8 object: avoid call of memset with ouf of bounds pointer
+e114bba index: assert required OID are non-NULL
+1a16e8b pack-objects: fix memory leak on overflow
+d96c063 submodule: avoid passing NULL pointers to strncmp
+851c51a diff_tform: fix potential NULL pointer access
+0b357e2 coverity: report errors when uploading tarball
+8d3ee96 refdb_fs: fail if refcache returns NULL pointer
+dd78d7d blame_git: handle error returned by `git_commit_parent`
+f17ed63 blame: handle error when resoling HEAD in normalize_options
+18c4ae7 filebuf: handle write error in `lock_file`
+89e7604 config_cache: check return value of `git_config__lookup_entry`
+c1ec732 Setup better defaults for OpenSSL ciphers
+4e91020 Start error string with lower case character
+cdde081 Use general cl_git_fail because the error is generic
+f587f38 CMake: do not overwrite but only append to CMAKE_C_FLAGS_DEBUG
+9a668ab Option ""LIBGIT2_PREFIX"" to set the CMAKE's TARGET_PROPERTIES PREFIX
+d8fcafb Split the page size from the mmap alignment
+e97d2d7 commit: fix extraction of single-line signatures
+a1cf264 win32: free thread-local data on thread exit
+c86a65b config: don't special-case multivars that don't exist yet
+3ec0f2e xdiff/xprepare: use the XDF_DIFF_ALG() macro to access flag bits
+56da07c xdiff/xprepare: fix a memory leak
+fe1f477 Add a no-op size_t typedef for the doc parser
+ab062a3 tests: fix core/stream test when built with openssl off
+3e2e824 refs: provide a more general error message for dwim
+ba52879 reset: use real ids for the tests
+b6130fe refs::create: strict object creation on by default
+e8d5df9 config: show we write a spurious duplicated section header
+a13c1ec config: don't write section header if we're in it
+21d8832 config::write::repeated: init our buffer
+1778908 ignore: don't use realpath to canonicalize path
+26f2cef tree: re-use the id and filename in the odb object
+13ebf7b tree: store the entries in a growable array
+af753ab tree: drop the now-unnecessary entries vector
+1d59c85 status: update test to include valid OID
+5cc7a5c tests: skip the unreadable file tests as root
+2c1bc36 Plug a few leaks
+6a35e74 leaks: fix some leaks in the tests
+ccfacb8 leaks: call `xdl_free_classifier`
+8edadbf index::racy: force racy entry
+```
+",https://api.github.com/users/ethomson,1130014,ethomson,https://api.github.com/repos/libgit2/libgit2/releases/3001992/assets,https://api.github.com/repos/libgit2/libgit2/releases/3001992,maint/v0.24,https://api.github.com/repos/libgit2/libgit2/tarball/v0.24.1,https://github.com/libgit2/libgit2/releases/tag/v0.24.1,https://api.github.com/repos/libgit2/libgit2/zipball/v0.24.1,v0.24.1,False,False
+2742934,2016-03-04T13:50:23Z,2016-03-04T15:02:29Z,libgit2 v0.24.0,"This is the first release of the v0.24 series, ""Aufbewahrungspflicht"". The changelog follows.
+
+## v0.24
+
+### Changes or improvements
+- Custom filters can now be registered with wildcard attributes, for
+  example `filter=*`.  Consumers should examine the attributes parameter
+  of the `check` function for details.
+- Symlinks are now followed when locking a file, which can be
+  necessary when multiple worktrees share a base repository.
+- You can now set your own user-agent to be sent for HTTP requests by
+  using the `GIT_OPT_SET_USER_AGENT` with `git_libgit2_opts()`.
+- You can set custom HTTP header fields to be sent along with requests
+  by passing them in the fetch and push options.
+- Tree objects are now assumed to be sorted. If a tree is not
+  correctly formed, it will give bad results. This is the git approach
+  and cuts a significant amount of time when reading the trees.
+- Filter registration is now protected against concurrent
+  registration.
+- Filenames which are not valid on Windows in an index no longer cause
+  to fail to parse it on that OS.
+- Rebases can now be performed purely in-memory, without touching the
+  repository's workdir.
+- When adding objects to the index, or when creating new tree or commit
+  objects, the inputs are validated to ensure that the dependent objects
+  exist and are of the correct type.  This object validation can be
+  disabled with the GIT_OPT_ENABLE_STRICT_OBJECT_CREATION option.
+- The WinHTTP transport's handling of bad credentials now behaves like
+  the others, asking for credentials again.
+
+### API additions
+- `git_config_lock()` has been added, which allow for
+  transactional/atomic complex updates to the configuration, removing
+  the opportunity for concurrent operations and not committing any
+  changes until the unlock.
+- `git_diff_options` added a new callback `progress_cb` to report on the
+  progress of the diff as files are being compared. The documentation of
+  the existing callback `notify_cb` was updated to reflect that it only
+  gets called when new deltas are added to the diff.
+- `git_fetch_options` and `git_push_options` have gained a `custom_headers`
+  field to set the extra HTTP header fields to send.
+- `git_stream_register_tls()` lets you register a callback to be used
+  as the constructor for a TLS stream instead of the libgit2 built-in
+  one.
+- `git_commit_header_field()` allows you to look up a specific header
+  field in a commit.
+- `git_commit_extract_signature()` extracts the signature from a
+  commit and gives you both the signature and the signed data so you
+  can verify it.
+
+### API removals
+- No APIs were removed in this version.
+
+### Breaking API changes
+- The `git_merge_tree_flag_t` is now `git_merge_flag_t`.  Subsequently,
+  its members are no longer prefixed with `GIT_MERGE_TREE_FLAG` but are
+  now prefixed with `GIT_MERGE_FLAG`, and the `tree_flags` field of the
+  `git_merge_options` structure is now named `flags`.
+- The `git_merge_file_flags_t` enum is now `git_merge_file_flag_t` for
+  consistency with other enum type names.
+- `git_cert` descendent types now have a proper `parent` member
+- It is the responsibility of the refdb backend to decide what to do
+  with the reflog on ref deletion. The file-based backend must delete
+  it, a database-backed one may wish to archive it.
+- `git_config_backend` has gained two entries. `lock` and `unlock`
+  with which to implement the transactional/atomic semantics for the
+  configuration backend.
+- `git_index_add` and `git_index_conflict_add()` will now use the case
+  as provided by the caller on case insensitive systems.  Previous
+  versions would keep the case as it existed in the index.  This does
+  not affect the higher-level `git_index_add_bypath` or
+  `git_index_add_frombuffer` functions.
+- The `notify_payload` field of `git_diff_options` was renamed to `payload`
+  to reflect that it's also the payload for the new progress callback.
+- The `git_config_level_t` enum has gained a higher-priority value
+  `GIT_CONFIG_LEVEL_PROGRAMDATA` which represent a rough Windows equivalent
+  to the system level configuration.
+- `git_rebase_init()` not also takes a merge options.
+- The index no longer performs locking itself. This is not something
+  users of the library should have been relying on as it's not part of
+  the concurrency guarantees.
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/2742934/assets,https://api.github.com/repos/libgit2/libgit2/releases/2742934,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.24.0,https://github.com/libgit2/libgit2/releases/tag/v0.24.0,https://api.github.com/repos/libgit2/libgit2/zipball/v0.24.0,v0.24.0,False,False
+2657938,2016-02-19T15:23:14Z,2016-02-22T10:27:57Z,libgit2 v0.24.0 RC1,"This is the first release candidate for libgit2 v0.24.0.
+
+The changelog follows
+
+### Changes or improvements
+- Custom filters can now be registered with wildcard attributes, for
+  example `filter=*`.  Consumers should examine the attributes parameter
+  of the `check` function for details.
+- Symlinks are now followed when locking a file, which can be
+  necessary when multiple worktrees share a base repository.
+- You can now set your own user-agent to be sent for HTTP requests by
+  using the `GIT_OPT_SET_USER_AGENT` with `git_libgit2_opts()`.
+- You can set custom HTTP header fields to be sent along with requests
+  by passing them in the fetch and push options.
+- Tree objects are now assumed to be sorted. If a tree is not
+  correctly formed, it will give bad results. This is the git approach
+  and cuts a significant amount of time when reading the trees.
+- Filter registration is now protected against concurrent
+  registration.
+- Filenames which are not valid on Windows in an index no longer cause
+  to fail to parse it on that OS.
+- Rebases can now be performed purely in-memory, without touching the
+  repository's workdir.
+
+### API additions
+- `git_config_lock()` has been added, which allow for
+  transactional/atomic complex updates to the configuration, removing
+  the opportunity for concurrent operations and not committing any
+  changes until the unlock.
+- `git_diff_options` added a new callback `progress_cb` to report on the
+  progress of the diff as files are being compared. The documentation of
+  the existing callback `notify_cb` was updated to reflect that it only
+  gets called when new deltas are added to the diff.
+- `git_fetch_options` and `git_push_options` have gained a `custom_headers`
+  field to set the extra HTTP header fields to send.
+- `git_stream_register_tls()` lets you register a callback to be used
+  as the constructor for a TLS stream instead of the libgit2 built-in
+  one.
+- `git_commit_header_field()` allows you to look up a specific header
+  field in a commit.
+- `git_commit_extract_signature()` extracts the signature from a
+  commit and gives you both the signature and the signed data so you
+  can verify it.
+
+### API removals
+- There were no API removals in this release.
+
+### Breaking API changes
+- The `git_merge_tree_flag_t` is now `git_merge_flag_t`.  Subsequently,
+  its members are no longer prefixed with `GIT_MERGE_TREE_FLAG` but are
+  now prefixed with `GIT_MERGE_FLAG`, and the `tree_flags` field of the
+  `git_merge_options` structure is now named `flags`.
+- The `git_merge_file_flags_t` enum is now `git_merge_file_flag_t` for
+  consistency with other enum type names.
+- `git_cert` descendent types now have a proper `parent` member
+- It is the responsibility of the refdb backend to decide what to do
+  with the reflog on ref deletion. The file-based backend must delete
+  it, a database-backed one may wish to archive it.
+- `git_config_backend` has gained two entries. `lock` and `unlock`
+  with which to implement the transactional/atomic semantics for the
+  configuration backend.
+- `git_index_add` and `git_index_conflict_add()` will now use the case
+  as provided by the caller on case insensitive systems.  Previous
+  versions would keep the case as it existed in the index.  This does
+  not affect the higher-level `git_index_add_bypath` or
+  `git_index_add_frombuffer` functions.
+- The `notify_payload` field of `git_diff_options` was renamed to `payload`
+  to reflect that it's also the payload for the new progress callback.
+- The `git_config_level_t` enum has gained a higher-priority value
+  `GIT_CONFIG_LEVEL_PROGRAMDATA` which represent a rough Windows equivalent
+  to the system level configuration.
+- `git_rebase_init()` not also takes a merge options.
+- The index no longer performs locking itself. This is not something
+  users of the library should have been relying on as it's not part of
+  the concurrency guarantees.
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/2657938/assets,https://api.github.com/repos/libgit2/libgit2/releases/2657938,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.24.0-rc1,https://github.com/libgit2/libgit2/releases/tag/v0.24.0-rc1,https://api.github.com/repos/libgit2/libgit2/zipball/v0.24.0-rc1,v0.24.0-rc1,False,True
+2114483,2015-11-12T11:32:42Z,2015-11-12T19:21:42Z,libgit2 v0.23.4 Maintenance Release,"The following fixes have been backported to this maintenance release. All users of the library are encouraged to update.
+
+```
+dab55be Fix warnings and a leak
+5b6b774 Add test case
+ed4eeeb merge-base: Style
+0740382 merge-base: Do not read parents from the root
+5b6af2c merge-base: Remove redundant merge bases
+faa3c89 Fix build for custom transport users
+50225df git: put NULL check at the top
+9a212bf git: accept NULL as argument to its stream free
+c615d29 Prevent segfault when parsing a reflog with oid parse error
+6bac384 reuc: Be smarter when inserting new REUC entries
+0e077d7 Fix docs typo geterr_clear -> giterr_clear
+8f5f1a1 xdiff: reference util.h in parent directory
+ba7da35 diff: ignore nsecs when diffing
+1073061 index: test that we round-trip nsecs
+5e26142 inttypes.h is built-in header file since MSVC 2013
+afed770 win32: add c linkage guard around inttypes.h inclusion
+abdbfef signature: Strip crud just like Git does
+aef9724 odb: Prioritize alternate backends
+18ff20f odb: Be smarter when refreshing backends
+486270d revwalk: make commit list use 64 bits for time
+47e4b74 CMake: be more explicit with python errors
+66956c5 qsort_r/qsort_s: detect their support
+cd76828 p_futimes: support using futimens when available
+08a2a93 openssl: don't try to teardown an unconnected SSL context
+7dd5128 win32::longpath: don't print path
+6aed945 Fix binary diffs
+1a1d575 win32: test checkout msg on long path err
+80b4536 win32: propogate filename too long errors
+1ffa073 repository: only reserve repo dirs in the workdir
+1568dea pkg-config: fix directory references in libgit2.pc
+ad8e8fa win32: return EACCES in `p_lstat`
+59ac224 checkout: overwrite files with differing modes
+097c5bc checkout::tree tests: don't use hardcoded mode
+d73bf24 checkout::tree tests: don't use static buffer
+9ae94bc Check that checkout preserves filemode in working directory.
+9247114 Check that an executable in index is not an executable after checkout.
+d1a7d0e Removing memory leak in mempack's free
+7e53d83 Fixing dangling pointers in git_mempack_reset
+d960fb3 added a single line of additional error reporting from libssh2 when failing to retrieve the list of authentication methods
+c1dabd1 filebuf: follow symlinks when creating a lock file
+```
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/2114483/assets,https://api.github.com/repos/libgit2/libgit2/releases/2114483,maint/v0.23,https://api.github.com/repos/libgit2/libgit2/tarball/v0.23.4,https://github.com/libgit2/libgit2/releases/tag/v0.23.4,https://api.github.com/repos/libgit2/libgit2/zipball/v0.23.4,v0.23.4,False,False
+1912171,2015-10-05T21:37:22Z,2015-10-05T21:38:12Z,libgit2 v0.23.3 Maintenance Release,"The following (critical) fixes have been backported to this maintenance release. All users of the library are encouraged to update.
+- aa951ba Update version to 0.23.3
+- 173d5aa blame: guard xdiff calls for large files
+- 327eddf diff: don't feed large files to xdiff
+- 8f168e8 merge_file: treat large files as binary
+- 5045868 xdiff: convert size variables to size_t
+- f362a1b GITERR_CHECK_ALLOC_ADDn: multi-arg adders
+",https://api.github.com/users/ethomson,1130014,ethomson,https://api.github.com/repos/libgit2/libgit2/releases/1912171/assets,https://api.github.com/repos/libgit2/libgit2/releases/1912171,maint/v0.23,https://api.github.com/repos/libgit2/libgit2/tarball/v0.23.3,https://github.com/libgit2/libgit2/releases/tag/v0.23.3,https://api.github.com/repos/libgit2/libgit2/zipball/v0.23.3,v0.23.3,False,False
+1772861,2015-09-05T14:48:42Z,2015-09-05T23:35:15Z,libgit2 v0.23.2 Maintenance Release,"The following fixes have been backported to this maintenance release. All users of the library are encouraged to update.
+
+```
+bad51c5 config: correct documentation for non-existent config file
+ac1c157 Escape @ in doc comment
+a6a9cf0 COPYING: include winhttp definition copyright
+1b00061 CMake: fall back to OpenSSL on older OS X
+c2549ee diff: don't error out on an invalid regex
+d994cfc http: propagate the credentials callback's error code
+5470fd6 Fix bug in git_smart__push: push_transfer_progress cb is never called
+7a21504 remote: don't confuse tag auto-follow rules with refspec matching
+40abdc6 curl: use the most secure auth method for the proxy
+9f334ba Forcing libssh2 lib location
+d72914d Merge pull request #3359 from nodegit/maint/v0.23-duplicate-basename-fix
+2cb4b65 Fix duplicate basenames to support older VS
+```
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/1772861/assets,https://api.github.com/repos/libgit2/libgit2/releases/1772861,maint/v0.23,https://api.github.com/repos/libgit2/libgit2/tarball/v0.23.2,https://github.com/libgit2/libgit2/releases/tag/v0.23.2,https://api.github.com/repos/libgit2/libgit2/zipball/v0.23.2,v0.23.2,False,False
+1621917,2015-08-03T18:07:35Z,2015-08-03T18:13:52Z,libgit2 v0.23.1 Maintenance Release,"The following fixes have been backported to this maintenance release. All users of the library are encouraged to update.
+
+```
+16cee5d Stage an unregistered submodule in _add_bypath()
+62a273c filebuf: remove lockfile upon rename errors
+adb8f8d filebuf: failing test for leaving the lockfile when failing to rename
+e874f3c Increase required version of cmake to 2.8
+7483e08 Handle ssh:// and git:// urls containing a '~' character.
+a299d0a Remove extra semicolon outside of a function
+e5a7724 Cherry-pick PR #3332: Resolve documentation warnings
+a91dff8 case-insensitive check for WWW-Authenticate header
+c5d4317 iterator: adjust unreadable-dir test to new behaviour
+a4ded36 iterator: skip over errors in diriter init
+ac1a5e2 Make libgit2 work on Windows Vista again
+555b351 Document git_fetch_options struct and fix typo.
+2563101 Fix macro redefinition warning
+55bc135 submodule: normalize slashes in resolve_url
+a89a756 submodule: add failing test for backslash in url
+38dc994 Fix #3094 - improve use of portable size_t/ssize_t format specifiers.
+34ff34f filter: make sure to close the stream even on error
+678c4aa index: allow add_bypath to update submodules
+aafaa49 blob: fail to create a blob from a dir with EDIRECTORY
+7624b91 errors: add EDIRECTORY
+e48dd86 submodule: lookup the submodule by path if available
+1207b8f submdule: reproduce double-reporting of a submodule in foreach
+f2dc6b7 khash: add eol so picky compilers stop warning
+a4743de xdiff: cleanup some warnings
+75d0b81 xdiff: upgrade to core git 2.4.5
+ba6b288 revert: correct test that added trailing newline
+9ff89ea merge_files: don't add trailing newlines
+f574039 Fix undefined reference with old versions of openssl
+```
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/1621917/assets,https://api.github.com/repos/libgit2/libgit2/releases/1621917,maint/v0.23,https://api.github.com/repos/libgit2/libgit2/tarball/v0.23.1,https://github.com/libgit2/libgit2/releases/tag/v0.23.1,https://api.github.com/repos/libgit2/libgit2/zipball/v0.23.1,v0.23.1,False,False
+1500083,2015-07-06T14:23:44Z,2015-07-06T14:25:00Z,,"This is the first release of the v0.23 series, ""Entschuldigung"", with many fixes and new features since v0.22.
+
+The largest changes are to the handling of remotes and submodules. We no longer treat them as ORM-like objects, but model the way the Git configuration is updated more closely. These objects now keep their state as of the lookup/refresh time and they're not shared across lookups.
+
+The changelog follows.
+
+### Changes or improvements
+- Patience and minimal diff drivers can now be used for merges.
+- Merges can now ignore whitespace changes.
+- Updated binary identification in CRLF filtering to avoid false positives in
+  UTF-8 files.
+- Rename and copy detection is enabled for small files.
+- Checkout can now handle an initial checkout of a repository, making
+  `GIT_CHECKOUT_SAFE_CREATE` unnecessary for users of clone.
+- The signature parameter in the ref-modifying functions has been
+  removed. Use `git_repository_set_ident()` and
+  `git_repository_ident()` to override the signature to be used.
+- The local transport now auto-scales the number of threads to use
+  when creating the packfile instead of sticking to one.
+- Reference renaming now uses the right id for the old value.
+- The annotated version of branch creation, HEAD detaching and reset
+  allow for specifying the expression from the user to be put into the
+  reflog.
+- `git_rebase_commit` now returns `GIT_EUNMERGED` when you attempt to
+  commit with unstaged changes.
+- On Mac OS X, we now use SecureTransport to provide the cryptographic
+  support for HTTPS connections insead of OpenSSL.
+- Checkout can now accept an index for the baseline computations via the
+  `baseline_index` member.
+- The configuration for fetching is no longer stored inside the
+  `git_remote` struct but has been moved to a `git_fetch_options`. The
+  remote functions now take these options or the callbacks instead of
+  setting them beforehand.
+- `git_submodule` instances are no longer cached or shared across
+  lookup. Each submodule represents the configuration at the time of
+  loading.
+- The index now uses diffs for `add_all()` and `update_all()` which
+  gives it a speed boost and closer semantics to git.
+- The ssh transport now reports the stderr output from the server as
+  the error message, which allows you to get the ""repository not
+  found"" messages.
+- `git_index_conflict_add()` will remove staged entries that exist for
+  conflicted paths.
+- The flags for a `git_diff_file` will now have the `GIT_DIFF_FLAG_EXISTS`
+  bit set when a file exists on that side of the diff.  This is useful
+  for understanding whether a side of the diff exists in the presence of
+  a conflict.
+- The constructor for a write-stream into the odb now takes
+  `git_off_t` instead of `size_t` for the size of the blob, which
+  allows putting large files into the odb on 32-bit systems.
+- The remote's push and pull URLs now honor the url.$URL.insteadOf
+  configuration. This allows modifying URL prefixes to a custom
+  value via gitconfig.
+- `git_diff_foreach`, `git_diff_blobs`, `git_diff_blob_to_buffer`,
+  and `git_diff_buffers` now accept a new binary callback of type
+  `git_diff_binary_cb` that includes the binary diff information.
+- The race condition mitigations described in `racy-git.txt` have been
+  implemented.
+- If libcurl is installed, we will use it to connect to HTTP(S)
+  servers.
+
+### API additions
+- The `git_merge_options` gained a `file_flags` member.
+- Parsing and retrieving a configuration value as a path is exposed
+  via `git_config_parse_path()` and `git_config_get_path()`
+  respectively.
+- `git_repository_set_ident()` and `git_repository_ident()` serve to
+  set and query which identity will be used when writing to the
+  reflog.
+- `git_config_entry_free()` frees a config entry.
+- `git_config_get_string_buf()` provides a way to safely retrieve a
+  string from a non-snapshot configuration.
+- `git_annotated_commit_from_revspec()` allows to get an annotated
+  commit from an extended sha synatx string.
+- `git_repository_set_head_detached_from_annotated()`,
+  `git_branch_create_from_annotated()` and
+  `git_reset_from_annotated()` allow for the caller to provide an
+  annotated commit through which they can control what expression is
+  put into the reflog as the source/target.
+- `git_index_add_frombuffer()` can now create a blob from memory
+  buffer and add it to the index which is attached to a repository.
+- The structure `git_fetch_options` has been added to determine the
+  runtime configuration for fetching, such as callbacks, pruning and
+  autotag behaviour. It has the runtime initializer
+  `git_fetch_init_options()`.
+- The enum `git_fetch_prune_t` has been added, letting you specify the
+  pruning behaviour for a fetch.
+- A push operation will notify the caller of what updates it indends
+  to perform on the remote, which provides similar information to
+  git's pre-push hook.
+- `git_stash_apply()` can now apply a stashed state from the stash list,
+  placing the data into the working directory and index.
+- `git_stash_pop()` will apply a stashed state (like `git_stash_apply()`)
+  but will remove the stashed state after a successful application.
+- A new error code `GIT_EEOF` indicates an early EOF from the
+  server. This typically indicates an error with the URL or
+  configuration of the server, and tools can use this to show messages
+  about failing to communicate with the server.
+- A new error code `GIT_EINVALID` indicates that an argument to a
+  function is invalid, or an invalid operation was requested.
+- `git_diff_index_to_workdir()` and `git_diff_tree_to_index()` will now
+  produce deltas of type `GIT_DELTA_CONFLICTED` to indicate that the index
+  side of the delta is a conflict.
+- The `git_status` family of functions will now produce status of type
+  `GIT_STATUS_CONFLICTED` to indicate that a conflict exists for that file
+  in the index.
+- `git_index_entry_is_conflict()` is a utility function to determine if
+  a given index entry has a non-zero stage entry, indicating that it is
+  one side of a conflict.
+- It is now possible to pass a keypair via a buffer instead of a
+  path. For this, `GIT_CREDTYPE_SSH_MEMORY` and
+  `git_cred_ssh_key_memory_new()` have been added.
+- `git_filter_list_contains` will indicate whether a particular
+  filter will be run in the given filter list.
+- `git_commit_header_field()` has been added, which allows retrieving
+  the contents of an arbitrary header field.
+- `git_submodule_set_branch()` allows to set the configured branch for
+  a submodule.
+
+### API removals
+- `git_remote_save()` and `git_remote_clear_refspecs()` have been
+  removed. Remote's configuration is changed via the configuration
+  directly or through a convenience function which performs changes to
+  the configuration directly.
+- `git_remote_set_callbacks()`, `git_remote_get_callbacks()` and
+  `git_remote_set_transport()` have been removed and the remote no
+  longer stores this configuration.
+- `git_remote_set_fetch_refpecs()` and
+  `git_remote_set_push_refspecs()` have been removed. There is no
+  longer a way to set the base refspecs at run-time.
+- `git_submodule_save()` has been removed. The submodules are no
+  longer configured via the objects.
+- `git_submodule_reload_all()` has been removed as we no longer cache
+  submodules.
+
+### Breaking API changes
+- `git_smart_subtransport_cb` now has a `param` parameter.
+- The `git_merge_options` structure member `flags` has been renamed
+  to `tree_flags`.
+- The `git_merge_file_options` structure member `flags` is now
+  an unsigned int. It was previously a `git_merge_file_flags_t`.
+- `GIT_CHECKOUT_SAFE_CREATE` has been removed.  Most users will generally
+  be able to switch to `GIT_CHECKOUT_SAFE`, but if you require missing
+  file handling during checkout, you may now use `GIT_CHECKOUT_SAFE |
+  GIT_CHECKOUT_RECREATE_MISSING`.
+- The `git_clone_options` and `git_submodule_update_options`
+  structures no longer have a `signature` field.
+- The following functions have removed the signature and/or log message
+  parameters in favour of git-emulating ones.
+  - `git_branch_create()`, `git_branch_move()`
+  - `git_rebase_init()`, `git_rebase_abort()`
+  - `git_reference_symbolic_create_matching()`,
+    `git_reference_symbolic_create()`, `git_reference_create()`,
+    `git_reference_create_matching()`,
+    `git_reference_symbolic_set_target()`,
+    `git_reference_set_target()`, `git_reference_rename()`
+  - `git_remote_update_tips()`, `git_remote_fetch()`, `git_remote_push()`
+  - `git_repository_set_head()`,
+    `git_repository_set_head_detached()`,
+    `git_repository_detach_head()`
+  - `git_reset()`
+- `git_config_get_entry()` now gives back a ref-counted
+  `git_config_entry`. You must free it when you no longer need it.
+- `git_config_get_string()` will return an error if used on a
+  non-snapshot configuration, as there can be no guarantee that the
+  returned pointer is valid.
+- `git_note_default_ref()` now uses a `git_buf` to return the string,
+  as the string is otherwise not guaranteed to stay allocated.
+- `git_rebase_operation_current()` will return `GIT_REBASE_NO_OPERATION`
+  if it is called immediately after creating a rebase session but before
+  you have applied the first patch.
+- `git_rebase_options` now contains a `git_checkout_options` struct
+  that will be used for functions that modify the working directory,
+  namely `git_checkout_init`, `git_checkout_next` and
+  `git_checkout_abort`.  As a result, `git_rebase_open` now also takes
+  a `git_rebase_options` and only the `git_rebase_init` and
+  `git_rebase_open` functions take a `git_rebase_options`, where they
+  will persist the options to subsequent `git_rebase` calls.
+- The `git_clone_options` struct now has fetch options in a
+  `fetch_opts` field instead of remote callbacks in
+  `remote_callbacks`.
+- The remote callbacks has gained a new member `push_negotiation`
+  which gets called before sending the update commands to the server.
+- The following functions no longer act on a remote instance but
+  change the repository's configuration. Their signatures have changed
+  accordingly:
+  - `git_remote_set_url()`, `git_remote_seturl()`
+  - `git_remote_add_fetch()`, `git_remote_add_push()` and
+  - `git_remote_set_autotag()`
+- `git_remote_connect()` and `git_remote_prune()` now take a pointer
+  to the callbacks.
+- `git_remote_fetch()` and `git_remote_download()` now take a pointer
+  to fetch options which determine the runtime configuration.
+- The `git_remote_autotag_option_t` values have been changed. It has
+  gained a `_UNSPECIFIED` default value to specify no override for the
+  configured setting.
+- `git_remote_update_tips()` now takes a pointer to the callbacks as
+  well as a boolean whether to write `FETCH_HEAD` and the autotag
+  setting.
+- `git_remote_create_anonymous()` no longer takes a fetch refspec as
+  url-only remotes cannot have configured refspecs.
+- The `git_submodule_update_options` struct now has fetch options in
+  the `fetch_opts` field instead of callbacks in the
+  `remote_callbacks` field.
+- The following functions no longer act on a submodule instance but
+  change the repository's configuration. Their signatures have changed
+  accordingly:
+  - `git_submodule_set_url()`, `git_submodule_set_ignore()`,
+    `git_submodule_set_update()`,
+    `git_submodule_set_fetch_recurse_submodules()`.
+- `git_submodule_status()` no longer takes a submodule instance but a
+  repsitory, a submodule name and an ignore setting.
+- The `push` function in the `git_transport` interface now takes a
+  pointer to the remote callbacks.
+- The `git_index_entry` struct's fields' types have been changed to
+  more accurately reflect what is in fact stored in the
+  index. Specifically, time and file size are 32 bits intead of 64, as
+  these values are truncated.
+- `GIT_EMERGECONFLICT` is now `GIT_ECONFLICT`, which more accurately
+  describes the nature of the error.
+- It is no longer allowed to call `git_buf_grow()` on buffers
+  borrowing the memory they point to.
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/1500083/assets,https://api.github.com/repos/libgit2/libgit2/releases/1500083,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.23.0,https://github.com/libgit2/libgit2/releases/tag/v0.23.0,https://api.github.com/repos/libgit2/libgit2/zipball/v0.23.0,v0.23.0,False,False
+1492883,2015-07-03T14:29:32Z,2015-07-03T15:00:57Z,libgit2 v0.23.0 RC2,"This is the second (and likely final) release candidate for libgit2 v0.23. It contains a couple of bug fixes and a lot fewer warnings.
+
+There is one new entry in the changelog, which was missing from RC1:
+- `git_submodule_reload_all()` has been removed as we no longer cache submodules.
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/1492883/assets,https://api.github.com/repos/libgit2/libgit2/releases/1492883,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.23.0-rc2,https://github.com/libgit2/libgit2/releases/tag/v0.23.0-rc2,https://api.github.com/repos/libgit2/libgit2/zipball/v0.23.0-rc2,v0.23.0-rc2,False,True
+1472908,2015-06-29T13:02:19Z,2015-06-29T13:08:10Z,libgit2 v0.23.0 RC1,"This is the first release candidate for libgit2 v0.23.
+
+There have been large changes to how we handle the configuration of remotes and submodules. We don't try to treat them like ORM objects, but they represent the configuration at the time of loading, which brings them closer to how we handle other objects like references, where the setting on-disk might change at any time.
+
+ The changelog follows:
+
+### Changes or improvements
+- Patience and minimal diff drivers can now be used for merges.
+- Merges can now ignore whitespace changes.
+- Updated binary identification in CRLF filtering to avoid false positives in
+  UTF-8 files.
+- Rename and copy detection is enabled for small files.
+- Checkout can now handle an initial checkout of a repository, making
+  `GIT_CHECKOUT_SAFE_CREATE` unnecessary for users of clone.
+- The signature parameter in the ref-modifying functions has been
+  removed. Use `git_repository_set_ident()` and
+  `git_repository_ident()` to override the signature to be used.
+- The local transport now auto-scales the number of threads to use
+  when creating the packfile instead of sticking to one.
+- Reference renaming now uses the right id for the old value.
+- The annotated version of branch creation, HEAD detaching and reset
+  allow for specifying the expression from the user to be put into the
+  reflog.
+- `git_rebase_commit` now returns `GIT_EUNMERGED` when you attempt to
+  commit with unstaged changes.
+- On Mac OS X, we now use SecureTransport to provide the cryptographic
+  support for HTTPS connections insead of OpenSSL.
+- Checkout can now accept an index for the baseline computations via the
+  `baseline_index` member.
+- The configuration for fetching is no longer stored inside the
+  `git_remote` struct but has been moved to a `git_fetch_options`. The
+  remote functions now take these options or the callbacks instead of
+  setting them beforehand.
+- `git_submodule` instances are no longer cached or shared across
+  lookup. Each submodule represents the configuration at the time of
+  loading.
+- The index now uses diffs for `add_all()` and `update_all()` which
+  gives it a speed boost and closer semantics to git.
+- The ssh transport now reports the stderr output from the server as
+  the error message, which allows you to get the ""repository not
+  found"" messages.
+- `git_index_conflict_add()` will remove staged entries that exist for
+  conflicted paths.
+- The flags for a `git_diff_file` will now have the `GIT_DIFF_FLAG_EXISTS`
+  bit set when a file exists on that side of the diff.  This is useful
+  for understanding whether a side of the diff exists in the presence of
+  a conflict.
+- The constructor for a write-stream into the odb now takes
+  `git_off_t` instead of `size_t` for the size of the blob, which
+  allows putting large files into the odb on 32-bit systems.
+- The remote's push and pull URLs now honor the url.$URL.insteadOf
+  configuration. This allows modifying URL prefixes to a custom
+  value via gitconfig.
+- `git_diff_foreach`, `git_diff_blobs`, `git_diff_blob_to_buffer`,
+  and `git_diff_buffers` now accept a new binary callback of type
+  `git_diff_binary_cb` that includes the binary diff information.
+- The race condition mitigations described in `racy-git.txt` have been
+  implemented.
+- If libcurl is installed, we will use it to connect to HTTP(S)
+  servers.
+
+### API additions
+- The `git_merge_options` gained a `file_flags` member.
+- Parsing and retrieving a configuration value as a path is exposed
+  via `git_config_parse_path()` and `git_config_get_path()`
+  respectively.
+- `git_repository_set_ident()` and `git_repository_ident()` serve to
+  set and query which identity will be used when writing to the
+  reflog.
+- `git_config_entry_free()` frees a config entry.
+- `git_config_get_string_buf()` provides a way to safely retrieve a
+  string from a non-snapshot configuration.
+- `git_annotated_commit_from_revspec()` allows to get an annotated
+  commit from an extended sha synatx string.
+- `git_repository_set_head_detached_from_annotated()`,
+  `git_branch_create_from_annotated()` and
+  `git_reset_from_annotated()` allow for the caller to provide an
+  annotated commit through which they can control what expression is
+  put into the reflog as the source/target.
+- `git_index_add_frombuffer()` can now create a blob from memory
+  buffer and add it to the index which is attached to a repository.
+- The structure `git_fetch_options` has been added to determine the
+  runtime configuration for fetching, such as callbacks, pruning and
+  autotag behaviour. It has the runtime initializer
+  `git_fetch_init_options()`.
+- The enum `git_fetch_prune_t` has been added, letting you specify the
+  pruning behaviour for a fetch.
+- A push operation will notify the caller of what updates it indends
+  to perform on the remote, which provides similar information to
+  git's pre-push hook.
+- `git_stash_apply()` can now apply a stashed state from the stash list,
+  placing the data into the working directory and index.
+- `git_stash_pop()` will apply a stashed state (like `git_stash_apply()`)
+  but will remove the stashed state after a successful application.
+- A new error code `GIT_EEOF` indicates an early EOF from the
+  server. This typically indicates an error with the URL or
+  configuration of the server, and tools can use this to show messages
+  about failing to communicate with the server.
+- A new error code `GIT_EINVALID` indicates that an argument to a
+  function is invalid, or an invalid operation was requested.
+- `git_diff_index_to_workdir()` and `git_diff_tree_to_index()` will now
+  produce deltas of type `GIT_DELTA_CONFLICTED` to indicate that the index
+  side of the delta is a conflict.
+- The `git_status` family of functions will now produce status of type
+  `GIT_STATUS_CONFLICTED` to indicate that a conflict exists for that file
+  in the index.
+- `git_index_entry_is_conflict()` is a utility function to determine if
+  a given index entry has a non-zero stage entry, indicating that it is
+  one side of a conflict.
+- It is now possible to pass a keypair via a buffer instead of a
+  path. For this, `GIT_CREDTYPE_SSH_MEMORY` and
+  `git_cred_ssh_key_memory_new()` have been added.
+- `git_filter_list_contains` will indicate whether a particular
+  filter will be run in the given filter list.
+- `git_commit_header_field()` has been added, which allows retrieving
+  the contents of an arbitrary header field.
+- `git_submodule_set_branch()` allows to set the configured branch for
+  a submodule.
+
+### API removals
+- `git_remote_save()` and `git_remote_clear_refspecs()` have been
+  removed. Remote's configuration is changed via the configuration
+  directly or through a convenience function which performs changes to
+  the configuration directly.
+- `git_remote_set_callbacks()`, `git_remote_get_callbacks()` and
+  `git_remote_set_transport()` have been removed and the remote no
+  longer stores this configuration.
+- `git_remote_set_fetch_refpecs()` and
+  `git_remote_set_push_refspecs()` have been removed. There is no
+  longer a way to set the base refspecs at run-time.
+- `git_submodule_save()` has been removed. The submodules are no
+  longer configured via the objects.
+
+### Breaking API changes
+- `git_smart_subtransport_cb` now has a `param` parameter.
+- The `git_merge_options` structure member `flags` has been renamed
+  to `tree_flags`.
+- The `git_merge_file_options` structure member `flags` is now
+  an unsigned int. It was previously a `git_merge_file_flags_t`.
+- `GIT_CHECKOUT_SAFE_CREATE` has been removed.  Most users will generally
+  be able to switch to `GIT_CHECKOUT_SAFE`, but if you require missing
+  file handling during checkout, you may now use `GIT_CHECKOUT_SAFE |
+  GIT_CHECKOUT_RECREATE_MISSING`.
+- The `git_clone_options` and `git_submodule_update_options`
+  structures no longer have a `signature` field.
+- The following functions have removed the signature and/or log message
+  parameters in favour of git-emulating ones.
+  - `git_branch_create()`, `git_branch_move()`
+  - `git_rebase_init()`, `git_rebase_abort()`
+  - `git_reference_symbolic_create_matching()`,
+    `git_reference_symbolic_create()`, `git_reference_create()`,
+    `git_reference_create_matching()`,
+    `git_reference_symbolic_set_target()`,
+    `git_reference_set_target()`, `git_reference_rename()`
+  - `git_remote_update_tips()`, `git_remote_fetch()`, `git_remote_push()`
+  - `git_repository_set_head()`,
+    `git_repository_set_head_detached()`,
+    `git_repository_detach_head()`
+  - `git_reset()`
+- `git_config_get_entry()` now gives back a ref-counted
+  `git_config_entry`. You must free it when you no longer need it.
+- `git_config_get_string()` will return an error if used on a
+  non-snapshot configuration, as there can be no guarantee that the
+  returned pointer is valid.
+- `git_note_default_ref()` now uses a `git_buf` to return the string,
+  as the string is otherwise not guaranteed to stay allocated.
+- `git_rebase_operation_current()` will return `GIT_REBASE_NO_OPERATION`
+  if it is called immediately after creating a rebase session but before
+  you have applied the first patch.
+- `git_rebase_options` now contains a `git_checkout_options` struct
+  that will be used for functions that modify the working directory,
+  namely `git_checkout_init`, `git_checkout_next` and
+  `git_checkout_abort`.  As a result, `git_rebase_open` now also takes
+  a `git_rebase_options` and only the `git_rebase_init` and
+  `git_rebase_open` functions take a `git_rebase_options`, where they
+  will persist the options to subsequent `git_rebase` calls.
+- The `git_clone_options` struct now has fetch options in a
+  `fetch_opts` field instead of remote callbacks in
+  `remote_callbacks`.
+- The remote callbacks has gained a new member `push_negotiation`
+  which gets called before sending the update commands to the server.
+- The following functions no longer act on a remote instance but
+  change the repository's configuration. Their signatures have changed
+  accordingly:
+  - `git_remote_set_url()`, `git_remote_seturl()`
+  - `git_remote_add_fetch()`, `git_remote_add_push()` and
+  - `git_remote_set_autotag()`
+- `git_remote_connect()` and `git_remote_prune()` now take a pointer
+  to the callbacks.
+- `git_remote_fetch()` and `git_remote_download()` now take a pointer
+  to fetch options which determine the runtime configuration.
+- The `git_remote_autotag_option_t` values have been changed. It has
+  gained a `_UNSPECIFIED` default value to specify no override for the
+  configured setting.
+- `git_remote_update_tips()` now takes a pointer to the callbacks as
+  well as a boolean whether to write `FETCH_HEAD` and the autotag
+  setting.
+- `git_remote_create_anonymous()` no longer takes a fetch refspec as
+  url-only remotes cannot have configured refspecs.
+- The `git_submodule_update_options` struct now has fetch options in
+  the `fetch_opts` field instead of callbacks in the
+  `remote_callbacks` field.
+- The following functions no longer act on a submodule instance but
+  change the repository's configuration. Their signatures have changed
+  accordingly:
+  - `git_submodule_set_url()`, `git_submodule_set_ignore()`,
+    `git_submodule_set_update()`,
+    `git_submodule_set_fetch_recurse_submodules()`.
+- `git_submodule_status()` no longer takes a submodule instance but a
+  repsitory, a submodule name and an ignore setting.
+- The `push` function in the `git_transport` interface now takes a
+  pointer to the remote callbacks.
+- The `git_index_entry` struct's fields' types have been changed to
+  more accurately reflect what is in fact stored in the
+  index. Specifically, time and file size are 32 bits intead of 64, as
+  these values are truncated.
+- `GIT_EMERGECONFLICT` is now `GIT_ECONFLICT`, which more accurately
+  describes the nature of the error.
+- It is no longer allowed to call `git_buf_grow()` on buffers
+  borrowing the memory they point to.
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/1472908/assets,https://api.github.com/repos/libgit2/libgit2/releases/1472908,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.23.0-rc1,https://github.com/libgit2/libgit2/releases/tag/v0.23.0-rc1,https://api.github.com/repos/libgit2/libgit2/zipball/v0.23.0-rc1,v0.23.0-rc1,False,True
+1451636,2015-06-23T13:33:48Z,2015-06-23T17:30:37Z,libgit2 v0.22.3 Maintenance Release,"The following fixes have been backported to this maintenance release. All users of the library are encouraged to update.
+- b832377 blob: don't recomment using git_buf_grow
+- 9ac8fb4 path: error out if the callback returns an error
+- 0b4e8ab indexer: use lseek to extend the packfile
+- b494e76 clone: fall back to copying when linking does not work
+- fd8b7cf Fix ident replacement to match Git behavior
+- c066d72 indexer: avoid loading already existent bases
+- 76af4ff indexer: don't look for the index we're creating
+- 6ba8a33 refspec: make sure matching refspecs have src, dst and input strings
+- c62ab5f Call the openssl API to be able to work with SNI servers.
+- 1fcdcb4 ssh: read from stderr if stdout is empty
+- c760654 fileops: set an error on write error for file copy
+- 9e74954 fileops: set an error message if we fail to link a file
+- 899716b path: don't let direach overwrite the callback's error message
+- ff19d60 Include git2/transaction.h
+- 9108d13 Don't include headers on windows that aren't available
+- 98f1b3c Attributes: don't match files for folders
+- 822af03 Do not call regfree() on an empty regex that is not successfully created by regcomp
+- 1c01006 Fix wrong format string in git_reflog_drop() error message
+- b67bc36 attr_file: fix subdirectory attr case.
+- 657ddf9 ignore: fix negative ignores without wildcards.
+- 7661fa1 Fix checking of return value for regcomp.
+- 702ac40 revwalk: don't insert uninteresting commits into the queue
+- 98e484b revwalk: detect when we're out of interesting commits
+- 04162eb Fix git_checkout_tree() to do index filemodes correctly on Windows.
+- 7dc1b1c Make sure to also update delta->nfiles when merging diffs
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/1451636/assets,https://api.github.com/repos/libgit2/libgit2/releases/1451636,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.22.3,https://github.com/libgit2/libgit2/releases/tag/v0.22.3,https://api.github.com/repos/libgit2/libgit2/zipball/v0.22.3,v0.22.3,False,False
+1085793,2015-03-24T16:10:45Z,2015-03-24T18:00:35Z,libgit2 v0.22.2 Maintenance Release,"The following fixes have been backported to this maintenance release. All users of the library are encouraged to update.
+
+```
+1f25fe9 checkout: report correct invalid path
+8633dd9 win32: further cleanups for 8.3 disabling
+93be89c win32: cleanup 8.3 disabled tests
+728a013 Fix test failures when 8.3 is disabled
+1f726d0 git: make sure to close the network stream
+3e163b6 checkout: free last created directory
+3440c20 Initialize refs vector in git_remote_update_tips().
+dcf6c0c Lower case the include directive of windows header
+1dd5e28 http: do not try to use the cert callback on unencrypted streams
+dd243fe indexer: set an error message on duplicate objects in pack
+3a1dc42 Put back the number of expected references to 6 from the test repo
+cf688ff Fixed active refspecs not reset by git_remote_upload()
+7a5682f http: enforce the credential types
+f008aeb branch: do capture the error code
+283f31a git_branch_delete() should ignore errors from non-existing reflogs
+aa409d5 Fix Mac build without OpenSSL
+d884d1c Fix race in git_packfile_unpack.
+277d647 Reinit `reader` pointer after reading included config file
+3bdcea8 Check rebase options version on public entry points
+7d8e4e3 mkdir: respect the root path
+69455bc stat: don't remove trailing '/' from root on win32
+7aee248 repo: ensure we can create repo at filesystem root
+aa926fb Fix branch creation when branch name matches namespace of previously deleted branch
+31ea8db Clarified git_repository_is_empty() documentation
+ed64a1b Add libssh2's library and include directories.
+5c3e01d Ensure the diff hunk callback is specified before trying to dereference it
+fe61bb6 Ensure git_index_entry is not NULL before trying to free it
+ae0cfac openssl: Add all required includes for AF_INET6 and in6_addr.
+4738a33 Fixed git_repository_set_bare() not setting ""core.bare"" correctly
+d0db408 Make sure sys/repository.h includes the required headers
+eefe2e8 Fixed typo in git_repository_reinit_filesystem() documentation
+8693335 Make binary detection work similar to vanilla git
+d95c949 Include ws2tcpip.h in order to get in6_addr
+e1314dd Include openssl headers last
+09c2477 Fixed error when including git2/include/sys/stream.h
+bd0a551 pathspec: do not try to dereference NULL
+1ce9ea3 checkout tests: cleanup realpath impl on Win32
+f9df7b6 checkout tests: emulate p_realpath poorly on Win32
+8d65523 checkout: remove files before writing new ones
+b295294 checkout: drop newline in error message
+99367df checkout tests: nasty symlinks
+9f1c873 checkout: don't recreate previous directory
+1ca7fa9 git_path_join_unrooted: return base len
+bd0e881 checkout: introduce git_checkout_perfdata
+```
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/1085793/assets,https://api.github.com/repos/libgit2/libgit2/releases/1085793,maint/v0.22,https://api.github.com/repos/libgit2/libgit2/tarball/v0.22.2,https://github.com/libgit2/libgit2/releases/tag/v0.22.2,https://api.github.com/repos/libgit2/libgit2/zipball/v0.22.2,v0.22.2,False,False
+869370,2015-01-16T23:56:05Z,2015-01-20T23:30:20Z,libgit2 v0.21.5 Maintenance Release,"The following (critical) fixes have been backported to this maintenance release.
+All users of the library are encouraged to update.
+- af769f4 checkout: introduce git_checkout_perfdata
+- fc478d2 git_path_join_unrooted: return base len
+- 629a579 checkout: don't recreate previous directory
+- dd3c53f checkout tests: nasty symlinks
+- 186177a checkout: drop newline in error message
+- 7268a5a checkout: remove files before writing new ones
+- e517b62 checkout tests: emulate p_realpath poorly on Win32
+- 9a8753d checkout tests: cleanup realpath impl on Win32
+- 8433078 Introduce test for checkout case-changing rename
+- d853fb9 Always checkout with case sensitive iterator
+",https://api.github.com/users/ethomson,1130014,ethomson,https://api.github.com/repos/libgit2/libgit2/releases/869370/assets,https://api.github.com/repos/libgit2/libgit2/releases/869370,maint/v0.21,https://api.github.com/repos/libgit2/libgit2/tarball/v0.21.5,https://github.com/libgit2/libgit2/releases/tag/v0.21.5,https://api.github.com/repos/libgit2/libgit2/zipball/v0.21.5,v0.21.5,False,False
+869367,2015-01-16T23:39:35Z,2015-01-20T23:30:26Z,libgit2 v0.22.1 Maintenance Release,"The following (critical) fixes have been backported to this maintenance release.
+All users of the library are encouraged to update.
+- bd0e881 checkout: introduce git_checkout_perfdata
+- 1ca7fa9 git_path_join_unrooted: return base len
+- 9f1c873 checkout: don't recreate previous directory
+- 99367df checkout tests: nasty symlinks
+- b295294 checkout: drop newline in error message
+- 8d65523 checkout: remove files before writing new ones
+- f9df7b6 checkout tests: emulate p_realpath poorly on Win32
+- 1ce9ea3 checkout tests: cleanup realpath impl on Win32
+",https://api.github.com/users/ethomson,1130014,ethomson,https://api.github.com/repos/libgit2/libgit2/releases/869367/assets,https://api.github.com/repos/libgit2/libgit2/releases/869367,maint/v0.22,https://api.github.com/repos/libgit2/libgit2/tarball/v0.22.1,https://github.com/libgit2/libgit2/releases/tag/v0.22.1,https://api.github.com/repos/libgit2/libgit2/zipball/v0.22.1,v0.22.1,False,False
+848405,2015-01-12T07:59:46Z,2015-01-13T18:21:37Z,libgit2 v0.22,"This is the first release of the v0.22 series, ""Las Canteras"", with many fixes and new features since v0.21. The changelog follows.
+
+### Changes or improvements
+- `git_signature_new()` now requires a non-empty email address.
+- Use CommonCrypto libraries for SHA-1 calculation on Mac OS X.
+- Disable SSL compression and SSLv2 and SSLv3 ciphers in favor of TLSv1
+  in OpenSSL.
+- The fetch behavior of remotes with autotag set to `GIT_REMOTE_DOWNLOAD_TAGS_ALL`
+  has been changed to match git 1.9.0 and later. In this mode, libgit2 now
+  fetches all tags in addition to whatever else needs to be fetched.
+- `git_checkout()` now handles case-changing renames correctly on
+  case-insensitive filesystems; for example renaming ""readme"" to ""README"".
+- The search for libssh2 is now done via pkg-config instead of a
+  custom search of a few directories.
+- Add support for core.protectHFS and core.protectNTFS. Add more
+  validation for filenames which we write such as references.
+- The local transport now generates textual progress output like
+  git-upload-pack does (""counting objects"").
+- `git_checkout_index()` can now check out an in-memory index that is not
+  necessarily the repository's index, so you may check out an index
+  that was produced by git_merge and friends while retaining the cached
+  information.
+- Remove the default timeout for receiving / sending data over HTTP using
+  the WinHTTP transport layer.
+- Add SPNEGO (Kerberos) authentication using GSSAPI on Unix systems.
+- Provide built-in objects for the empty blob (e69de29) and empty
+  tree (4b825dc) objects.
+- The index' tree cache is now filled upon read-tree and write-tree
+  and the cache is written to disk.
+- LF -> CRLF filter refuses to handle mixed-EOL files
+- LF -> CRLF filter now runs when \* text = auto (with Git for Windows 1.9.4)
+- File unlocks are atomic again via rename. Read-only files on Windows are
+  made read-write if necessary.
+- Share open packfiles across repositories to share descriptors and mmaps.
+- Use a map for the treebuilder, making insertion O(1)
+- The build system now accepts an option EMBED_SSH_PATH which when set
+  tells it to include a copy of libssh2 at the given location. This is
+  enabled for MSVC.
+- Add support for refspecs with the asterisk in the middle of a
+  pattern.
+- Fetching now performs opportunistic updates. To achieve this, we
+  introduce a difference between active and passive refspecs, which
+  make `git_remote_download()` and `git_remote_fetch()` to take a list of
+  resfpecs to be the active list, similarly to how git fetch accepts a
+  list on the command-line.
+- The THREADSAFE option to build libgit2 with threading support has
+  been flipped to be on by default.
+- The remote object has learnt to prune remote-tracking branches. If
+  the remote is configured to do so, this will happen via
+  `git_remote_fetch()`. You can also call `git_remote_prune()` after
+  connecting or fetching to perform the prune.
+
+### API additions
+- Introduce `git_buf_text_is_binary()` and `git_buf_text_contains_nul()` for
+  consumers to perform binary detection on a git_buf.
+- `git_branch_upstream_remote()` has been introduced to provide the
+  branch.<name>.remote configuration value.
+- Introduce `git_describe_commit()` and `git_describe_workdir()` to provide
+  a description of the current commit (and working tree, respectively)
+  based on the nearest tag or reference
+- Introduce `git_merge_bases()` and the `git_oidarray` type to expose all
+  merge bases between two commits.
+- Introduce `git_merge_bases_many()` to expose all merge bases between
+  multiple commits.
+- Introduce rebase functionality (using the merge algorithm only).
+  Introduce `git_rebase_init()` to begin a new rebase session,
+  `git_rebase_open()` to open an in-progress rebase session,
+  `git_rebase_commit()` to commit the current rebase operation,
+  `git_rebase_next()` to apply the next rebase operation,
+  `git_rebase_abort()` to abort an in-progress rebase and `git_rebase_finish()`
+  to complete a rebase operation.
+- Introduce `git_note_author()` and `git_note_committer()` to get the author
+  and committer information on a `git_note`, respectively.
+- A factory function for ssh has been added which allows to change the
+  path of the programs to execute for receive-pack and upload-pack on
+  the server, `git_transport_ssh_with_paths()`.
+- The ssh transport supports asking the remote host for accepted
+  credential types as well as multiple challeges using a single
+  connection. This requires to know which username you want to connect
+  as, so this introduces the USERNAME credential type which the ssh
+  transport will use to ask for the username.
+- The `GIT_EPEEL` error code has been introduced when we cannot peel a tag
+  to the requested object type; if the given object otherwise cannot be
+  peeled, `GIT_EINVALIDSPEC` is returned.
+- Introduce `GIT_REPOSITORY_INIT_RELATIVE_GITLINK` to use relative paths
+  when writing gitlinks, as is used by git core for submodules.
+- `git_remote_prune()` has been added. See above for description.
+- Introduce reference transactions, which allow multiple references to
+  be locked at the same time and updates be queued. This also allows
+  us to safely update a reflog with arbitrary contents, as we need to
+  do for stash.
+
+### API removals
+- `git_remote_supported_url()` and `git_remote_is_valid_url()` have been
+  removed as they have become essentially useless with rsync-style ssh paths.
+- `git_clone_into()` and `git_clone_local_into()` have been removed from the
+  public API in favour of `git_clone callbacks`.
+- The option to ignore certificate errors via `git_remote_cert_check()`
+  is no longer present. Instead, `git_remote_callbacks` has gained a new
+  entry which lets the user perform their own certificate checks.
+
+### Breaking API changes
+- `git_cherry_pick()` is now `git_cherrypick()`.
+- The `git_submodule_update()` function was renamed to
+  `git_submodule_update_strategy()`. `git_submodule_update()` is now used to
+  provide functionalty similar to ""git submodule update"".
+- `git_treebuilder_create()` was renamed to `git_treebuilder_new()` to better
+  reflect it being a constructor rather than something which writes to
+  disk.
+- `git_treebuilder_new()` (was `git_treebuilder_create()`) now takes a
+  repository so that it can query repository configuration.
+  Subsequently, `git_treebuilder_write()` no longer takes a repository.
+- `git_threads_init()` and `git_threads_shutdown()` have been renamed to
+  `git_libgit2_init()` and `git_libgit2_shutdown()` to better explain what
+  their purpose is, as it's grown to be more than just about threads.
+- `git_libgit2_init()` and `git_libgit2_shutdown()` now return the number of
+  initializations of the library, so consumers may schedule work on the
+  first initialization.
+- The `git_transport_register()` function no longer takes a priority and takes
+  a URL scheme name (eg ""http"") instead of a prefix like ""http://""
+- `git_index_name_entrycount()` and `git_index_reuc_entrycount()` now
+  return size_t instead of unsigned int.
+- The `context_lines` and `interhunk_lines` fields in `git_diff`_options are
+  now `uint32_t` instead of `uint16_t`. This allows to set them to `UINT_MAX`,
+  in effect asking for ""infinite"" context e.g. to iterate over all the
+  unmodified lines of a diff.
+- `git_status_file()` now takes an exact path. Use `git_status_list_new()` if
+  pathspec searching is needed.
+- `git_note_create()` has changed the position of the notes reference
+  name to match `git_note_remove()`.
+- Rename `git_remote_load()` to `git_remote_lookup()` to bring it in line
+  with the rest of the lookup functions.
+- `git_remote_rename()` now takes the repository and the remote's
+  current name. Accepting a remote indicates we want to change it,
+  which we only did partially. It is much clearer if we accept a name
+  and no loaded objects are changed.
+- `git_remote_delete()` now accepts the repository and the remote's name
+  instead of a loaded remote.
+- `git_merge_head` is now `git_annotated_commit`, to better reflect its usage
+  for multiple functions (including rebase)
+- The `git_clone_options` struct no longer provides the `ignore_cert_errors` or
+  `remote_name` members for remote customization.
+  
+  Instead, the `git_clone_options` struct has two new members, `remote_cb` and
+  `remote_cb_payload`, which allow the caller to completely override the remote
+  creation process. If needed, the caller can use this callback to give their
+  remote a name other than the default (origin) or disable cert checking.
+  
+  The `remote_callbacks` member has been preserved for convenience, although it
+  is not used when a remote creation callback is supplied.
+- The `git_clone`_options struct now provides `repository_cb` and
+  `repository_cb_payload` to allow the user to create a repository with
+  custom options.
+- The `git_push` struct to perform a push has been replaced with
+  `git_remote_upload()`. The refspecs and options are passed as a
+  function argument. `git_push_update_tips()` is now also
+  `git_remote_update_tips()` and the callbacks are in the same struct as
+  the rest.
+- The `git_remote_set_transport()` function now sets a transport factory function,
+  rather than a pre-existing transport instance.
+- The `git_transport` structure definition has moved into the sys/transport.h
+  file.
+- libgit2 no longer automatically sets the OpenSSL locking
+  functions. This is not something which we can know to do. A
+  last-resort convenience function is provided in sys/openssl.h,
+  `git_openssl_set_locking()` which can be used to set the locking.
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/848405/assets,https://api.github.com/repos/libgit2/libgit2/releases/848405,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.22.0,https://github.com/libgit2/libgit2/releases/tag/v0.22.0,https://api.github.com/repos/libgit2/libgit2/zipball/v0.22.0,v0.22.0,False,False
+848399,2015-01-09T11:42:26Z,2015-01-13T18:21:34Z,libgit2 v0.21.4 Maintenance Release,"The following fixes have been backported to this maintenance release. All users of the library are encouraged to update. This will be the last release in the v0.21 series.
+- bce9484 Fix assert when receiving uncommon sideband packet
+- 4f2d272 ignore: don't leak rules into higher directories
+- 8fce79b ignore: match git's rule negation rules
+- f888185 ignore: adjust test for negating inside a dir
+- 8de0f1e Merge pull request #2770 from tkelman/patch-1
+- b38fe6f Fix build of tests with mingw
+- 4058f1c Fix ming32 compilation
+- 04da236 Fix public header on sys/refs.h
+- dc39d23 Plug possible leak in the openssl locks
+- 3a2c60e ssl: clear the OpenSSL locking function
+- 9c04635 Fix segmentation fault observed on OpenBSD/sparc64
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/848399/assets,https://api.github.com/repos/libgit2/libgit2/releases/848399,maint/v0.21,https://api.github.com/repos/libgit2/libgit2/tarball/v0.21.4,https://github.com/libgit2/libgit2/releases/tag/v0.21.4,https://api.github.com/repos/libgit2/libgit2/zipball/v0.21.4,v0.21.4,False,False
+839506,2015-01-09T23:49:20Z,2015-01-09T23:56:03Z,libgit2 v0.22.0 RC2,"This is the second release candidate for libgit2 v0.22.0. There's been a couple of memory fixes since the first candidate, but nothing major. The release seems to be shaping up nicely.
+
+The changelog follows
+
+### Changes or improvements
+- `git_signature_new()` now requires a non-empty email address.
+- Use CommonCrypto libraries for SHA-1 calculation on Mac OS X.
+- Disable SSL compression and SSLv2 and SSLv3 ciphers in favor of TLSv1
+  in OpenSSL.
+- The fetch behavior of remotes with autotag set to `GIT_REMOTE_DOWNLOAD_TAGS_ALL`
+  has been changed to match git 1.9.0 and later. In this mode, libgit2 now
+  fetches all tags in addition to whatever else needs to be fetched.
+- `git_checkout()` now handles case-changing renames correctly on
+  case-insensitive filesystems; for example renaming ""readme"" to ""README"".
+- The search for libssh2 is now done via pkg-config instead of a
+  custom search of a few directories.
+- Add support for core.protectHFS and core.protectNTFS. Add more
+  validation for filenames which we write such as references.
+- The local transport now generates textual progress output like
+  git-upload-pack does (""counting objects"").
+- `git_checkout_index()` can now check out an in-memory index that is not
+  necessarily the repository's index, so you may check out an index
+  that was produced by git_merge and friends while retaining the cached
+  information.
+- Remove the default timeout for receiving / sending data over HTTP using
+  the WinHTTP transport layer.
+- Add SPNEGO (Kerberos) authentication using GSSAPI on Unix systems.
+- Provide built-in objects for the empty blob (e69de29) and empty
+  tree (4b825dc) objects.
+- The index' tree cache is now filled upon read-tree and write-tree
+  and the cache is written to disk.
+- LF -> CRLF filter refuses to handle mixed-EOL files
+- LF -> CRLF filter now runs when \* text = auto (with Git for Windows 1.9.4)
+- File unlocks are atomic again via rename. Read-only files on Windows are
+  made read-write if necessary.
+- Share open packfiles across repositories to share descriptors and mmaps.
+- Use a map for the treebuilder, making insertion O(1)
+- The build system now accepts an option EMBED_SSH_PATH which when set
+  tells it to include a copy of libssh2 at the given location. This is
+  enabled for MSVC.
+- Add support for refspecs with the asterisk in the middle of a
+  pattern.
+- Fetching now performs opportunistic updates. To achieve this, we
+  introduce a difference between active and passive refspecs, which
+  make `git_remote_download()` and `git_remote_fetch()` to take a list of
+  resfpecs to be the active list, similarly to how git fetch accepts a
+  list on the command-line.
+- The THREADSAFE option to build libgit2 with threading support has
+  been flipped to be on by default.
+- The remote object has learnt to prune remote-tracking branches. If
+  the remote is configured to do so, this will happen via
+  `git_remote_fetch()`. You can also call `git_remote_prune()` after
+  connecting or fetching to perform the prune.
+
+### API additions
+- Introduce `git_buf_text_is_binary()` and `git_buf_text_contains_nul()` for
+  consumers to perform binary detection on a git_buf.
+- `git_branch_upstream_remote()` has been introduced to provide the
+  branch.<name>.remote configuration value.
+- Introduce `git_describe_commit()` and `git_describe_workdir()` to provide
+  a description of the current commit (and working tree, respectively)
+  based on the nearest tag or reference
+- Introduce `git_merge_bases()` and the `git_oidarray` type to expose all
+  merge bases between two commits.
+- Introduce `git_merge_bases_many()` to expose all merge bases between
+  multiple commits.
+- Introduce rebase functionality (using the merge algorithm only).
+  Introduce `git_rebase_init()` to begin a new rebase session,
+  `git_rebase_open()` to open an in-progress rebase session,
+  `git_rebase_commit()` to commit the current rebase operation,
+  `git_rebase_next()` to apply the next rebase operation,
+  `git_rebase_abort()` to abort an in-progress rebase and `git_rebase_finish()`
+  to complete a rebase operation.
+- Introduce `git_note_author()` and `git_note_committer()` to get the author
+  and committer information on a `git_note`, respectively.
+- A factory function for ssh has been added which allows to change the
+  path of the programs to execute for receive-pack and upload-pack on
+  the server, `git_transport_ssh_with_paths()`.
+- The ssh transport supports asking the remote host for accepted
+  credential types as well as multiple challeges using a single
+  connection. This requires to know which username you want to connect
+  as, so this introduces the USERNAME credential type which the ssh
+  transport will use to ask for the username.
+- The `GIT_EPEEL` error code has been introduced when we cannot peel a tag
+  to the requested object type; if the given object otherwise cannot be
+  peeled, `GIT_EINVALIDSPEC` is returned.
+- Introduce `GIT_REPOSITORY_INIT_RELATIVE_GITLINK` to use relative paths
+  when writing gitlinks, as is used by git core for submodules.
+- `git_remote_prune()` has been added. See above for description.
+- Introduce reference transactions, which allow multiple references to
+  be locked at the same time and updates be queued. This also allows
+  us to safely update a reflog with arbitrary contents, as we need to
+  do for stash.
+
+### API removals
+- `git_remote_supported_url()` and `git_remote_is_valid_url()` have been
+  removed as they have become essentially useless with rsync-style ssh paths.
+- `git_clone_into()` and `git_clone_local_into()` have been removed from the
+  public API in favour of `git_clone callbacks`.
+- The option to ignore certificate errors via `git_remote_cert_check()`
+  is no longer present. Instead, `git_remote_callbacks` has gained a new
+  entry which lets the user perform their own certificate checks.
+
+### Breaking API changes
+- `git_cherry_pick()` is now `git_cherrypick()`.
+- The `git_submodule_update()` function was renamed to
+  `git_submodule_update_strategy()`. `git_submodule_update()` is now used to
+  provide functionalty similar to ""git submodule update"".
+- `git_treebuilder_create()` was renamed to `git_treebuilder_new()` to better
+  reflect it being a constructor rather than something which writes to
+  disk.
+- `git_treebuilder_new()` (was `git_treebuilder_create()`) now takes a
+  repository so that it can query repository configuration.
+  Subsequently, `git_treebuilder_write()` no longer takes a repository.
+- `git_threads_init()` and `git_threads_shutdown()` have been renamed to
+  `git_libgit2_init()` and `git_libgit2_shutdown()` to better explain what
+  their purpose is, as it's grown to be more than just about threads.
+- `git_libgit2_init()` and `git_libgit2_shutdown()` now return the number of
+  initializations of the library, so consumers may schedule work on the
+  first initialization.
+- The `git_transport_register()` function no longer takes a priority and takes
+  a URL scheme name (eg ""http"") instead of a prefix like ""http://""
+- `git_index_name_entrycount()` and `git_index_reuc_entrycount()` now
+  return size_t instead of unsigned int.
+- The `context_lines` and `interhunk_lines` fields in `git_diff`_options are
+  now `uint32_t` instead of `uint16_t`. This allows to set them to `UINT_MAX`,
+  in effect asking for ""infinite"" context e.g. to iterate over all the
+  unmodified lines of a diff.
+- `git_status_file()` now takes an exact path. Use `git_status_list_new()` if
+  pathspec searching is needed.
+- `git_note_create()` has changed the position of the notes reference
+  name to match `git_note_remove()`.
+- Rename `git_remote_load()` to `git_remote_lookup()` to bring it in line
+  with the rest of the lookup functions.
+- `git_remote_rename()` now takes the repository and the remote's
+  current name. Accepting a remote indicates we want to change it,
+  which we only did partially. It is much clearer if we accept a name
+  and no loaded objects are changed.
+- `git_remote_delete()` now accepts the repository and the remote's name
+  instead of a loaded remote.
+- `git_merge_head` is now `git_annotated_commit`, to better reflect its usage
+  for multiple functions (including rebase)
+- The `git_clone_options` struct no longer provides the `ignore_cert_errors` or
+  `remote_name` members for remote customization.
+  
+  Instead, the `git_clone_options` struct has two new members, `remote_cb` and
+  `remote_cb_payload`, which allow the caller to completely override the remote
+  creation process. If needed, the caller can use this callback to give their
+  remote a name other than the default (origin) or disable cert checking.
+  
+  The `remote_callbacks` member has been preserved for convenience, although it
+  is not used when a remote creation callback is supplied.
+- The `git_clone`_options struct now provides `repository_cb` and
+  `repository_cb_payload` to allow the user to create a repository with
+  custom options.
+- The `git_push` struct to perform a push has been replaced with
+  `git_remote_upload()`. The refspecs and options are passed as a
+  function argument. `git_push_update_tips()` is now also
+  `git_remote_update_tips()` and the callbacks are in the same struct as
+  the rest.
+- The `git_remote_set_transport()` function now sets a transport factory function,
+  rather than a pre-existing transport instance.
+- The `git_transport` structure definition has moved into the sys/transport.h
+  file.
+- libgit2 no longer automatically sets the OpenSSL locking
+  functions. This is not something which we can know to do. A
+  last-resort convenience function is provided in sys/openssl.h,
+  `git_openssl_set_locking()` which can be used to set the locking.
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/839506/assets,https://api.github.com/repos/libgit2/libgit2/releases/839506,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.22.0-rc2,https://github.com/libgit2/libgit2/releases/tag/v0.22.0-rc2,https://api.github.com/repos/libgit2/libgit2/zipball/v0.22.0-rc2,v0.22.0-rc2,False,True
+825930,2015-01-05T21:34:26Z,2015-01-05T21:45:31Z,libgit2 v0.22.0 RC1,"This is the first release candidate for libgit2 v0.22. From now on until the release we will only accept bugfixes for master.
+
+Quite a few APIs have changed, but it seems that the rate is slowing down, even when there's so long between releases. The changelog follows
+- File unlocks are atomic again via rename. Read-only files on Windows are
+  made read-write if necessary.
+- Share open packfiles across repositories to share descriptors and mmaps.
+- Use a map for the treebuilder, making insertion O(1)
+- Introduce reference transactions, which allow multiple references to
+  be locked at the same time and updates be queued. This also allows
+  us to safely update a reflog with arbitrary contents, as we need to
+  do for stash.
+- The index' tree cache is now filled upon read-tree and write-tree
+  and the cache is written to disk.
+- LF -> CRLF filter refuses to handle mixed-EOL files
+- LF -> CRLF filter now runs when \* text = auto (with Git for Windows 1.9.4)
+- The git_transport structure definition has moved into the sys/transport.h
+  file.
+- The ssh transport supports asking the remote host for accepted
+  credential types as well as multiple challeges using a single
+  connection. This requires to know which username you want to connect
+  as, so this introduces the USERNAME credential type which the ssh
+  transport will use to ask for the username.
+- The build system now accepts an option EMBED_SSH_PATH which when set
+  tells it to include a copy of libssh2 at the given location. This is
+  enabled for MSVC.
+- libgit2 no longer automatically sets the OpenSSL locking
+  functions. This is not something which we can know to do. A
+  last-resort convenience function is provided in sys/openssl.h,
+  git_openssl_set_locking() which can be used to set the locking.
+- The git_transport_register function no longer takes a priority and takes
+  a URL scheme name (eg ""http"") instead of a prefix like ""http://""
+- The git_remote_set_transport function now sets a transport factory function,
+  rather than a pre-existing transport instance.
+- A factory function for ssh has been added which allows to change the
+  path of the programs to execute for receive-pack and upload-pack on
+  the server, git_transport_ssh_with_paths.
+- git_remote_rename() now takes the repository and the remote's
+  current name. Accepting a remote indicates we want to change it,
+  which we only did partially. It is much clearer if we accept a name
+  and no loaded objects are changed.
+- git_remote_delete() now accepts the repository and the remote's name
+  instead of a loaded remote.
+- git_remote_supported_url() has been removed as it has become
+  essentially useless with rsync-style ssh paths.
+- The git_clone_options struct no longer provides the ignore_cert_errors or
+  remote_name members for remote customization.
+  
+  Instead, the git_clone_options struct has two new members, remote_cb and
+  remote_cb_payload, which allow the caller to completely override the remote
+  creation process. If needed, the caller can use this callback to give their
+  remote a name other than the default (origin) or disable cert checking.
+  
+  The remote_callbacks member has been preserved for convenience, although it
+  is not used when a remote creation callback is supplied.
+- The git_clone_options struct now provides repository_cb and
+  repository_cb_payload to allow the user to create a repository with
+  custom options.
+- The option to ignore certificate errors via git_remote_cert_check()
+  is no longer present. Instead, git_remote_callbacks has gained a new
+  entry which lets the user perform their own certificate checks.
+- git_clone_into and git_clone_local_into have been removed from the
+  public API in favour of git_clone callbacks
+- Add support for refspecs with the asterisk in the middle of a
+  pattern.
+- Fetching now performs opportunistic updates. To achieve this, we
+  introduce a difference between active and passive refspecs, which
+  make git_remote_download and git_remote_fetch to take a list of
+  resfpecs to be the active list, similarly to how git fetch accepts a
+  list on the command-line.
+- Rename git_remote_load() to git_remote_lookup() to bring it in line
+  with the rest of the lookup functions.
+- The git_push struct to perform a push has been replaced with
+  git_remote_upload(). The refspecs and options are passed as a
+  function argument. git_push_update_tips() is now also
+  git_remote_update_tips() and the callbacks are in the same struct as
+  the rest.
+- Introduce git_merge_bases() and the git_oidarray type to expose all
+  merge bases between two commits.
+- Introduce git_merge_bases_many() to expose all merge bases between
+  multiple commits.
+- git_merge_head is now git_annotated_commit, to better reflect its usage
+  for multiple functions (including rebase)
+- Introduce rebase functionality (using the merge algorithm only).
+  Introduce git_rebase_init() to begin a new rebase session,
+  git_rebase_open() to open an in-progress rebase session,
+  git_rebase_commit() to commit the current rebase operation,
+  git_rebase_next() to apply the next rebase operation,
+  git_rebase_abort() to abort an in-progress rebase and git_rebase_finish()
+  to complete a rebase operation.
+- Introduce git_note_author() and git_note_committer() to get the author
+  and committer information on a git_note, respectively.
+- git_note_create() has changed the position of the notes reference
+  name to match git_note_remove().
+- The THREADSAFE option to build libgit2 with threading support has
+  been flipped to be on by default.
+- The context_lines and interhunk_lines fields in git_diff_options are
+  now uint32_t instead of uint16_t. This allows to set them to UINT_MAX,
+  in effect asking for ""infinite"" context e.g. to iterate over all the
+  unmodified lines of a diff.
+- git_status_file now takes an exact path. Use git_status_list_new if
+  pathspec searching is needed.
+- The fetch behavior of remotes with autotag set to GIT_REMOTE_DOWNLOAD_TAGS_ALL
+  has been changed to match git 1.9.0 and later. In this mode, libgit2 now
+  fetches all tags in addition to whatever else needs to be fetched.
+- The remote object has learnt to prune remote-tracking branches. If
+  the remote is configured to do so, this will happen via
+  git_remote_fetch(). You can also call git_remote_prune() after
+  connecting or fetching to perform the prune.
+- git_threads_init() and git_threads_shutdown() have been renamed to
+  git_libgit2_init() and git_libgit2_shutdown() to better explain what
+  their purpose is, as it's grown to be more than just about threads.
+- git_libgit2_init() and git_libgit2_shutdown() now return the number of
+  initializations of the library, so consumers may schedule work on the
+  first initialization.
+- git_treebuilder_new (was git_treebuilder_create) now takes a
+  repository so that it can query repository configuration.
+  Subsequently, git_treebuilder_write no longer takes a repository.
+- git_treebuilder_create was renamed to git_treebuilder_new to better
+  reflect it being a constructor rather than something which writes to
+  disk.
+- git_checkout now handles case-changing renames correctly on
+  case-insensitive filesystems; for example renaming ""readme"" to ""README"".
+- git_index_name_entrycount() and git_index_reuc_entrycount() now
+  return size_t instead of unsigned int.
+- The search for libssh2 is now done via pkg-config instead of a
+  custom search of a few directories.
+- Add support for core.protectHFS and core.protectNTFS. Add more
+  validation for filenames which we write such as references.
+- The local transport now generates textual progress output like
+  git-upload-pack does (""counting objects"").
+- The git_submodule_update function was renamed to
+  git_submodule_update_strategy. git_submodule_update is now used to
+  provide functionalty similar to ""git submodule update"".
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/825930/assets,https://api.github.com/repos/libgit2/libgit2/releases/825930,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.22.0-rc1,https://github.com/libgit2/libgit2/releases/tag/v0.22.0-rc1,https://api.github.com/repos/libgit2/libgit2/zipball/v0.22.0-rc1,v0.22.0-rc1,False,True
+795922,2014-12-18T19:18:28Z,2014-12-18T21:13:14Z,libgit2 v0.21.3 Maintenance Release,"The following (critical) fixes have been backported to this maintenance release. All users of the library are encouraged to update.
+- e476e7b index tests: test capitalization before mkdir
+- 90fad07 Plug leaks
+- 188ca62 Create miscapitialised dirs for case-sensitive filesystems
+- 88c8abf Bump version to 0.21.3
+- 2b37e33 Introduce core.protectHFS and core.protectNTFS
+- 581368f path: Use UTF8 iteration for HFS chars
+- 4320180 checkout: disallow bad paths on HFS
+- 8e7a957 reference_create: validate loose names
+- 9686c6b checkout: disallow bad paths on win32
+- 12db885 index: Check for valid paths before creating an index entry
+- 928429c tree: Check for `.git` with case insensitivy
+- 09361df win32: use NT-prefixed ""\?\"" paths
+- b5ee184 clar: wide character comparisons
+- c7e785b tests: use p_ instead of posix func directly
+",https://api.github.com/users/ethomson,1130014,ethomson,https://api.github.com/repos/libgit2/libgit2/releases/795922/assets,https://api.github.com/repos/libgit2/libgit2/releases/795922,hf/021_patch,https://api.github.com/repos/libgit2/libgit2/tarball/v0.21.3,https://github.com/libgit2/libgit2/releases/tag/v0.21.3,https://api.github.com/repos/libgit2/libgit2/zipball/v0.21.3,v0.21.3,False,False
+656731,2014-10-27T00:18:13Z,2014-10-27T16:27:39Z,libgit2 v0.21.2 Maintenance Release,"The following (critical) fixes have been backported to this maintenance release. All users of the library are encouraged to update.
+- 4af08d9 Bump version to 0.21.2
+- cc71348 global: clean up openssl_locks on shutdown
+- cb93013 config test: clean up memory leak
+- f4cb227 travis ci: build maint branches and development'
+- 5595287 Fixed memory leak in git_tag_delete()
+- 7881bab Patch from @carlosmn to refresh the parent config before snapshotting.
+- 1ebb8e9 Change the length of the file so that the change is picked up.
+- acbfce9 Add a test to make sure a new snapshot has the new value.
+- 635ba11 is_empty_dir (wi32): cope with empty mount points
+- b2fa95a p_lstat win32: don't canonicalize volume mounts
+- 01a1be3 Don't copy buffer in checkout unless needed
+- 46ef5a7 Ensure filters (i.e. CRLF) are applied when checking out conflict content
+- 6e41c27 Introduce failing test for conflict filtering in index
+- d055f4e repository_head_unborn: clear error when HEAD is unborn
+- 5757c02 ssl: dump the SSL ciphers in favour of TLS
+- 0571362 Silence unused return value warning
+- c02c530 Ensure patch is initialized to zero, otherwise, the allocated flag may be set
+- 6004658 Silence uninitialized warning
+- b933465 Fixed odb foreach test failure for big-endian 64-bit
+- 8a89bda Fixed merge REUC test for big-endian 64-bit
+- e8b6f55 The raw index buffer content is not guaranteed to be aligned
+- 55f72c1 Ensure pool data is aligned on an 8 byte boundary
+- f975fe9 Introduce GIT_ALIGN
+- 2f83bfc git_filter: dup the filter name
+- 68fce7f config: Fix multiple trailing spaces before comments not completely trimmed
+- a97157af When auto follow tags, FETCH_HEAD should list only newly followed tags
+- e023545 global: free the error message when exiting a thread
+- b593577 Correctly handle getaddrinfo return result
+- ba5cef0 Recurse ignored directories when stashing
+- 80ddaec Include git2/odb_backend.h in git2.h
+- c12bc32 Remove local unused index_repo variable
+- 9a8126e Only check for workdir conflicts if the index has merged files
+- edb2b83 Added test case to illustrate bogus conflicts detected if no files were merged, and untracked 
+- c93d1eb ssh: store error message immediately after a failed agent call
+- ebee4d5 pack: return the correct final offset
+- b401dc9 git_remote_ls() should return an error if the transport is not available
+- 7d729d0 http: make sure we can consume the data we request
+- ea97190 config: a multiline var can start immediately
+",https://api.github.com/users/carlosmn,335443,carlosmn,https://api.github.com/repos/libgit2/libgit2/releases/656731/assets,https://api.github.com/repos/libgit2/libgit2/releases/656731,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.21.2,https://github.com/libgit2/libgit2/releases/tag/v0.21.2,https://api.github.com/repos/libgit2/libgit2/zipball/v0.21.2,v0.21.2,False,False
+470867,2014-08-05T00:09:37Z,2014-08-05T00:12:52Z,libgit2 v0.21.1 Maintenance Release,"The following (critical) fixes have been backported to this maintenance release. All users of the library are encouraged to update.
+- b4d00c1 array: mark the array to grow as volatile
+- f3f9dc0 revwalk: remove preallocation of the uninteresting commits
+- 440a87a Add unit test to test add section without lf at EOF
+- 190fe07 Make sure \n is at the end of config file before a new section is written
+- ace6567 Properly report failure when expanding a packfile
+- f8b4093 refspec: support asterisks in the middle of a pattern
+- 0aa6b7e refspec: short-circuit non-pattern refspecs on transform
+- 18cf389 Include libssh2.h before git2.h (transport.h)
+- dbcb751 Fix git_cred_ssh_interactive_callback signature
+- 0e59463 netops: error out on url without a path
+- 12dcc6e ssh: libssh2_channel_write() behaves like send()
+- 38ddf22 Round up pool alloc sizes for alignment
+- 63ee946 ssh: always declare the libssh2 types
+- aa1b62b ssh: create the right callback signature based on build options
+- 1d43005 ssl: init only once without threads
+- 5838338 Merge pull request #2494 from libgit2/cmn/treebuilder-set-attribute
+- b692568 treebuilder: set the attributes before sorting and inserting
+",https://api.github.com/users/vmg,42793,vmg,https://api.github.com/repos/libgit2/libgit2/releases/470867/assets,https://api.github.com/repos/libgit2/libgit2/releases/470867,maint/v0.21,https://api.github.com/repos/libgit2/libgit2/tarball/v0.21.1,https://github.com/libgit2/libgit2/releases/tag/v0.21.1,https://api.github.com/repos/libgit2/libgit2/zipball/v0.21.1,v0.21.1,False,False
+385652,2014-06-20T12:42:16Z,2014-06-20T12:44:23Z,libgit2 v0.21.0,"Final release of 0.21.0 after two release candidates. Go get it.
+
+Changed since last version:
+- **Top-level Improvements**
+  - **We've dropped support for Windows XP**. We're evil like that.
+  - Added a new config snapshotting API to fix race issues when different applications (e.g. Git and a libgit2 client) access the same repository simultaneously.
+  - Added reflog support to all APIs that could alter a reference. These APIs gained two new parameters: `const git_signature *signature` and `const char *log_message` to control what is written to the reflog. Passing NULL for these values will use defaults from the user's configuration.
+  - Avoided race conditions when updating references. Any function that alters a reference will check if the underlying reference data has been changed since libgit2 looked up the data and cancel the operation with error `GIT_EMODIFIED` if the reference has been changed.
+  - Converted all APIs that output string data to use `git_buf` objects for the return value. Previously these would typically take a pointer to an output buffer and a size, and generate an error if the output buffer was not large enough.
+  - Added standard `git_<object>_init_options` functions to initialize options structures when static initialization is not possible, and renamed options structures to standard `git_<object>_options` (replacing `_opts` suffix used in some places)
+  - Improved use of `const` on pointers in many APIs (which may affect some bindings).
+  - Replaced use of `oid` with simply `id` for references to `git_oid` value.s
+  - Previously, when a callback function returned an error value (i.e. non-zero), libgit2 converted it to `GIT_EUSER` for the parent function's return value. Now, libgit2 tries to pass through the callback's return value all the way back to the caller.  To disambiguate between an error generated by the callback vs. an error generated internally by libgit2, a callback can still explicitly return the `GIT_EUSER` value -- libgit2 will never use that error code for errors that it raises.
+  - All inline functions were eliminated from the public libgit2 API
+  - Removed all Apache licensed code from library
+  - CRLF handling is much improved in the platforms where it matters (Windows)
+- **Attributes**
+  - Improved compatability with core Git for filename patterns including support for `**` matches
+  - Cache validation improvements
+  - Faster attribute checks
+- **Blame**
+  - Added `GIT_BLAME_FIRST_PARENT` to simplify search
+- **Clone**
+  - Local clones are now supported. Rejoice!
+- **Checkout**
+  - Added ability to write out conflict data using either MERGE or DIFF3 style
+  - Improved support for `core.autocrlf` and `core.safecrlf`
+  - Improved handling of empty and ignored directories (impacts `git_reset` APIs, too)
+- **Cherry Pick**
+  - Completely new API
+  - New API: `git_cherry_pick_commit` generates a new `git_index *` with result
+  - New API: `git_cherry_pick` updates existing index and working directory
+- **Commit**
+  - Faster commit parsing
+  - New API: `git_commit_summary` returns first paragraph of commit message with whitespace trimmed and squashed
+  - New API: `git_commit_amend` creates a new commit that is a clone of an existing commit with selected fields overwritten
+  - New API: `git_commit_create_from_callback` allows creating a new commit using a callback to provide parent information (in `include/git2/sys/commit.h`)
+  - When given a reference to update, `git_commit_create` now checks that the first parent is the current value of said reference and checks that the old value of the reference is correct when updating it.
+  - The comment character can now be specified when parsing commit messages.
+- **Diff**
+  - Faster diffs due to reduced calculation of SHAs for unknown files on disk
+  - Added flag `GIT_DIFF_UPDATE_INDEX` to optionally update the index stat cache while performing index-to-workdir diffs. This can yield performance improvements when doing repeated diffs (or status checks)
+  - Added support for builtin diff drivers that is compatible (and derived from) core Git (e.g. setting attribute ""*.html diff=html"" will now change diff output in libgit2, whereas previously the ""html"" diff driver was not internally defined)
+  - `git_diff_find_similar` will now fall back to the `diff.renames` config setting if no explicit options are passed in
+  - `git_diff_find_similar` gained `GIT_DIFF_FIND_REMOVE_UNMODIFIED` flag to remove `GIT_DELTA_UNMODIFIED` records from a diff after rename detection is done. This allows you to generate a diff that includes UNMODIFIED records (so they can be considered as possible sources for `COPIED` files) and then remove unused ones from the final diff.
+  - New API: `git_diff_buffers` runs diff on two in-memory buffers
+  - New API: `git_diff_get_stats` creates `git_diff_stats` to emulate `--stat`, `--numstat`, and `--shortstat` output
+  - New API: `git_diff_stats_free` to free `git_diff_stats` object
+  - New API: `git_diff_stats_to_buf` outputs `git_diff_stats` in formats like Git
+  - New APIs: `git_diff_stats_files_changed`, `git_diff_stats_insertions`, and `git_diff_stats_deletions` are accessors for `git_diff_stats` object
+  - New API: `git_diff_format_email` to generate an email patch (in a `git_buf`) from a `git_diff` using `git_diff_format_email_options` settings
+  - New API: `git_diff_commit_as_email` to generate an email-ready patch from a `git_commit`
+  - New API: `git_diff_print_callback__to_buf` helper function for use with `git_diff_print` and `git_patch_print` to accumulate output into a `git_buf *` (in `include/git2/sys/diff.h`)
+  - New API: `git_diff_print_callback__to_file_handle` helper function for use with `git_diff_print` and `git_patch_print` to send output to a `FILE *` (in `include/git2/sys/diff.h`)
+  - New API: `git_diff_get_perfdata` gets low-level performance data for a `git_diff` (in `include/git2/sys/diff.h`)
+- **Errors**
+  - New error code: `GIT_EMODIFIED` returned when a reference-modifying operation finds that the underlying reference was changed underneath the libgit2 call
+- **Graph**
+  - New API: `git_graph_descendant_of` checks if one commit is the descendant of another
+- **Ignores**
+  - Lots of bug fixes
+  - Improved compatability with core Git for filename patterns including support for `**` matches
+  - Cache validation improvements
+- **Index**
+  - The index no longer allows tree and blob path collisions.
+- **Mempack**
+  - Completely new API (in `include/git2/sys/mempack.h`)
+  - Custom ODB backend to pack objects in memory
+- **Merge**
+  - Major changes to how the Merge APIs work
+  - `git_merge` previously produced a new commit, now stages a new commit, including writing conflicts to the index and working tree; has new function signature.
+  - New API: `git_merge_analysis` checks if an array of merge heads can be merged, fast-forwarded, are up-to-date, or otherwise
+  - New API: `git_merge_base_octopus` finds a merge base for an octopus merge
+  - New API: `git_merge_head_id` returns the commit id that a `git_merge_head` object refers to
+  - New API: `git_merge_commits` merges two commits and generates new index representing merge result
+  - New API: `git_merge_file` merges two files in memory, producing a `git_merge_file_result` object
+  - New API: `git_merge_file_from_index` merges two index entries in memory, producing a `git_merge_file_result` object
+  - New API: `git_merge_file_result_free` frees an `git_merge_file_result` object
+- **Object**
+  - New API: `git_object_short_id` returns unambiguous abbreviated ID string for object
+- **ODB**
+  - New API: `git_odb_exists_prefix` checks for existence of object by partial `git_oid`
+- **Pack**
+  - New API: `git_packbuilder_write_buf` writes packfile to `git_buf *` in memory
+  - Delta resolution now happens iteratively instead of recursively, so no more stack overflows.
+  - Deflate buffer usage is now more efficient
+- **Patch**
+  - New API: `git_patch_from_buffers` creates `git_patch` object from the diff of two in-memory buffers
+  - Added support for deflated binary patches.
+- **References**
+  - New API: `git_reference_create_matching` safely creates a direct reference to update from an expected old `const git_oid *` value
+  - New API: `git_reference_symbolic_create_matching` safely creates a symbolic reference to update from an expected old `const char *` value
+  - New API: `git_reference_remove` removes a reference by name
+  - New API: `git_reference_ensure_log` makes sure there is a log file for a reference
+  - New API: `git_reference_is_note` checks if reference lives in `refs/notes` namespace
+- **Remotes**
+  - New API: `git_remote_dup` copies an existing remote (except for callback functions)
+  - New API: `git_remote_get_callbacks` gets callbacks struct from existing remote
+- **Revert**
+  - Completely new API
+  - New API: `git_revert_commit` generates new `git_index` with result of reverting commit
+  - New API: `git_revert` reverts commit in working directory
+- **Revwalk**
+  - APIs that previous tooks commits or references to commits can now take a ""committish"" (i.e. tags will be peeled to reach a commit)
+  - `git_revwalk_{push,hide}_glob` now ignores a reference if it is not a commitish instead of erroring out.
+  - New API: `git_revwalk_add_hide_cb` enables callback to make decisions about hiding commits during a revwalk
+- **Status**
+  - Faster status due to reduced calculation of SHAs for unknown files on disk
+  - Added flag `GIT_STATUS_OPT_UPDATE_INDEX` to optionally update the index stat cache while performing status. This can yield performance improvements when doing repeated status checks.
+  - New API: `git_status_list_get_perfdata` gets low-level performance data for a `git_status_list` (in `include/git2/sys/diff.h`)
+- **Submodules**
+  - `git_submodule` objects are now reference counted and must be used with `git_submodule_free` when done
+  - Submodules will now automatically refresh if the underlying data changes; explicit reloading is rarely required
+  - New API: `git_submodule_resolve_url` resolves relative URLs using parent repository
+  - New API: `git_submodule_branch` gets the branch for the submodule
+  - `git_submodule_fetch_recurse` now uses a new `git_submodule_recurse_t` type that includes a `GIT_SUBMODULE_RECURSE_ONDEMAND` value (as well as `NO` and `YES`) instead just true or false
+- **Transport**
+  - New credential option `GIT_CREDTYPE_SSH_INTERACTIVE` with `git_cred_ssh_interactive` type and `git_cred_sss_interactive_callback` callback type
+  - New API: `git_cred_ssh_interactive_new` to create a `git_cred *` for keyboard-interactive credentials
+  - New API: `git_cred_ssh_key_from_agent` to create a `git_cred *` by querying an ssh-agent
+  - On Windows: support for NTLM/Kerberos auth
+- **Build & Portability Improvements**
+  - More precise flag setting for controlling build warnings
+  - Much better threading support in Windows
+  - Better support for Android
+  - Better support for Solaris
+  - Better support for FreeBSD
+  - Iconv support can now be enabled in non-Mac OS X platforms, if you're weird like that.
+  - On Windows: better support for reparse points, better path handling, added automatic retries on some file operations
+- **BREAKING CHANGES TO EXISTING APIS** (Highlighted to make life easier for binding authors)
+  - Changes from non-const to const pointers are not included in this list
+  - Any place where a binding was explicitly looking for `GIT_EUSER` will have to revisited because libgit2 no longer converts callback return values into `GIT_EUSER` for you
+  - `git_blame_buffer` takes a `size_t buffer_len` where it used to take a `uint32_t buffer_len`
+  - `git_branch_create` added `const git_signature *` and `const char *log_message` params
+  - `git_branch_move` added `const git_signature *` and `const char *log_message` params
+  - `git_branch_upstream_name` now outputs name to a `git_buf *`
+  - `git_branch_remote_name` now outputs name to a `git_buf *`
+  - `git_checkout_opts` struct was renamed to `git_checkout_options` and added an `ancestor_label` field (in the middle of the struct!)
+  - `git_clone_options` gained a `git_signature *signature` field used for reflog updates and the type of the existing `checkout_opts` field was changed from `git_checkout_opts` to `git_checkout_options`
+  - `git_clone_into` changed type of `co_opts` to `const git_checkout_options *` and added `const git_signature *signature` param
+  - `git_commit_create` changed type of `parent_count` from `int` to `size_t`
+  - `git_commit_create_v` changed type of `parent_count` from `int` to `size_t`
+  - `git_commit_create_from_ids` changed type of `parent_count` from `int` to `size_t`
+  - `git_cap_t` type and `GIT_CAP_...` values renamed to `git_feature_t` and `GIT_FEATURE_...`
+  - `git_libgit2_capabilities` renamed to `git_libgit2_features` (for checking compile options at run time)
+  - The `git_libgit2_opts` parameters to `GIT_OPT_GET_SEARCH_PATH` and `GIT_OPT_GET_TEMPLATE_PATH` were changes to take a `git_buf *` instead of `char *` and `size_t` pair
+  - `git_config_find_global` now outputs path to a `git_buf *`
+  - `git_config_find_xdg` now outputs path to a `git_buf *`
+  - `git_config_find_system` now outputs path to a `git_buf *`
+  - `git_cred_ssh_custom` struct changed type of `sign_callback` field to `git_cred_sign_callback`
+  - `git_cred_ssh_custom` struct renamed `sign_data` field to `payload`
+  - `GIT_DIFF_FLAG_VALID_OID` flag on diff files renamed to `GIT_DIFF_FLAG_VALID_ID`
+  - `git_diff_file` field `oid` renamed to `id`
+  - `git_diff_options` field `oid_abbrev` renamed to `id_abbrev`
+  - `git_diff_options_init` API renamed to `git_diff_init_options` as part of standardization
+  - In `git_index_entry`, the `oid` field was renamed to `id` and the `path` field changed from a `char *` to a `const char *`
+  - `git_indexcap_t` changed its underlying type from unsigned to signed
+  - `git_index_caps` returns an `int` instead of an `unsigned int`
+  - `git_index_set_caps` takes an `int caps` instead of `unsigned int caps`
+  - `git_index_clear` now returns an error code where before it was a `void` function (it can return an error if another thread is using index data and a memory allocation fails while preserving data for deferred deletion)
+  - `git_index_conflict_cleanup` now returns an error code where before it was a `void` function (see `git_index_clear` for explanation)
+  - `git_indexer_new` changed type of `progress_cb` to `git_transfer_progress_cb`
+  - `git_merge_automerge_flags` renamed to `git_merge_file_favor_t` and `GIT_MERGE_AUTOMERGE_...` renamed to `GIT_MERGE_FILE_FAVOR_...` (with additional changes to specific values)
+  - `git_merge_tree_opts` renamed to `git_merge_options` with `automerge_flags` field replaced with `file_favor`
+  - `git_merge_opts` removed (in favor of passing explicit `git_checkout_options` to updated `git_merge` function)
+  - `git_merge_head_from_oid` renamed to `git_merge_head_from_id`
+  - `git_merge_trees` takes `const git_merge_options *` instead of `const git_merge_tree_opts *`
+  - `git_merge` is essentially a different function with different parameters and a different effect
+  - `git_merge_result` type removed
+  - `git_merge_result_is_uptodate` removed (use `git_merge_analysis` instead)
+  - `git_merge_result_is_fastforward` removed (use `git_merge_analysis` instead)
+  - `git_merge_result_fastforward_oid` removed
+  - `git_merge_result_free` removed
+  - `git_message_prettify` now outputs message to a `git_buf *`
+  - `git_note_oid` renamed to `git_note_id`
+  - `git_odb_write_pack` changed type of `progress_cb` to `git_transfer_progress_cb`
+  - `git_odb_backend` struct added `exists_prefix` callback
+  - `git_odb_backend` struct `writepack` callback changed type of `progress_cb` to `git_transfer_progress_cb`
+  - `git_oid_equal` is no longer an inline function
+  - `git_packbuilder_write` changed type of `progress_cb` to `git_transfer_progress_cb`
+  - `git_patch_to_str` replaced with `git_patch_to_buf` which writes to `git_buf *` instead of allocating a string
+  - `git_push_update_tips` added `const git_signature *` and `const char *log_message` params
+  - `git_refdb_backend` struct `write` callback added `const git_signature *`, `const char *log_message`, `const git_oid *old_id`, and `const char *old_target` params
+  - `git_refdb_backend` struct `rename` callback added `const git_signature *` and `const char *log_message` params
+  - `git_refdb_backend` struct `del` callback added `const git_oid *old_id` and `const char *old_target` params
+  - `git_refdb_backend` struct added `has_log` callback
+  - `git_refdb_backend` struct added `ensure_log` callback
+  - `git_reflog_append_to` removed - reflog writing moved into individual ref updating functions
+  - `git_reference_create` added `const git_signature *` and `const char *log_message` params
+  - `git_reference_symbolic_create` added `const git_signature *` and `const char *log_message` params
+  - `git_reference_set_target` added `const git_signature *` and `const char *log_message` params
+  - `git_reference_symbolic_set_target` added `const git_signature *` and `const char *log_message` params
+  - `git_reference_rename` added `const git_signature *` and `const char *log_message` params
+  - `git_reference_has_log` now takes a `git_repository *` and `const char *` instead of a `git_reference *~
+  - `git_refspec_transform` now outputs spec to a `git_buf *`
+  - `git_refspec_rtransform` now outputs spec to a `git_buf *`
+  - `git_remote_create_inmemory` replaced with `git_remote_create_anonymous` with the order of the `url` and `fetch` parameters switched
+  - `git_remote_update_tips` added `const git_signature *` and `const char *log_message` params
+  - `git_remote_fetch` added `const git_signature *` and `const char *log_message` params
+  - In `git_remote_callbacks` struct, `progress` callback was renamed `sideband_progress` and type changed to `git_transport_message_cb`, `credentials` callback type changed to `git_cred_acquire_cb`, `transfer_progress` type changed to `git_transfer_progress_cb`
+  - `git_repository_discover` now outputs to a `git_buf *`
+  - `git_repository_message` now outputs to a `git_buf *`
+  - `git_repository_merge_cleanup` renamed to `git_repository_state_cleanup`
+  - `git_repository_set_head` added `const git_signature *` and `const char *log_message` params
+  - `git_repository_set_head_detached` added `const git_signature *` and `const char *log_message` params
+  - `git_repository_detach_head` added `const git_signature *` and `const char *log_message` params
+  - `git_reset` added `const git_signature *` and `const char *log_message` params
+  - `git_signature_dup` now returns an error code and allocates the new signature via an output param
+  - The object returned from `git_submodule_lookup` must now have `git_submodule_free` called it when you are done with it (i.e. it is reference counted now)
+  - `git_submodule_fetch_recurse_submodules` returns a `git_submodule_recurse_t` instead of an `int`
+  - `git_submodule_set_fetch_recurse_submodules` takes a `git_submodule_recurse_t` instead of an `int`
+  - `git_submodule_reload` takes a new `force` flag to override up-to-date checks
+  - `git_submodule_reload_all` takes a new `force` flag to override up-to-date checks
+  - `git_transfer_progress_callback` type was renamed to `git_transfer_progress_cb`
+  - `git_transport` struct `download_pack` callback changed type of `progress_cb` to `git_transfer_progress_cb`
+  - `git_tree_entry_byoid` renamed to `git_tree_entry_byid`
+  - `git_tree_entry_dup` now returns an error code and allocates the new `git_tree_entry` via an output param
+",https://api.github.com/users/vmg,42793,vmg,https://api.github.com/repos/libgit2/libgit2/releases/385652/assets,https://api.github.com/repos/libgit2/libgit2/releases/385652,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.21.0,https://github.com/libgit2/libgit2/releases/tag/v0.21.0,https://api.github.com/repos/libgit2/libgit2/zipball/v0.21.0,v0.21.0,False,False
+378787,2014-06-16T09:11:40Z,2014-06-17T10:00:39Z,libgit2 v0.21.0-rc2,"RC2 for this thing, because we had to get in a few last-minute fixes. I'll tag the final release tomorrow, hopefully.
+
+Here are the current release notes, which I've updated to the best of my ability:
+- **Top-level Improvements**
+  - **We've dropped support for Windows XP**. We're evil like that.
+  - Added a new config snapshotting API to fix race issues when different applications (e.g. Git and a libgit2 client) access the same repository simultaneously.
+  - Added reflog support to all APIs that could alter a reference. These APIs gained two new parameters: `const git_signature *signature` and `const char *log_message` to control what is written to the reflog. Passing NULL for these values will use defaults from the user's configuration.
+  - Avoided race conditions when updating references. Any function that alters a reference will check if the underlying reference data has been changed since libgit2 looked up the data and cancel the operation with error `GIT_EMODIFIED` if the reference has been changed.
+  - Converted all APIs that output string data to use `git_buf` objects for the return value. Previously these would typically take a pointer to an output buffer and a size, and generate an error if the output buffer was not large enough.
+  - Added standard `git_<object>_init_options` functions to initialize options structures when static initialization is not possible, and renamed options structures to standard `git_<object>_options` (replacing `_opts` suffix used in some places)
+  - Improved use of `const` on pointers in many APIs (which may affect some bindings).
+  - Replaced use of `oid` with simply `id` for references to `git_oid` value.s
+  - Previously, when a callback function returned an error value (i.e. non-zero), libgit2 converted it to `GIT_EUSER` for the parent function's return value. Now, libgit2 tries to pass through the callback's return value all the way back to the caller.  To disambiguate between an error generated by the callback vs. an error generated internally by libgit2, a callback can still explicitly return the `GIT_EUSER` value -- libgit2 will never use that error code for errors that it raises.
+  - All inline functions were eliminated from the public libgit2 API
+  - Removed all Apache licensed code from library
+  - CRLF handling is much improved in the platforms where it matters (Windows)
+- **Attributes**
+  - Improved compatability with core Git for filename patterns including support for `**` matches
+  - Cache validation improvements
+  - Faster attribute checks
+- **Blame**
+  - Added `GIT_BLAME_FIRST_PARENT` to simplify search
+- **Clone**
+  - Local clones are now supported. Rejoice!
+- **Checkout**
+  - Added ability to write out conflict data using either MERGE or DIFF3 style
+  - Improved support for `core.autocrlf` and `core.safecrlf`
+  - Improved handling of empty and ignored directories (impacts `git_reset` APIs, too)
+- **Cherry Pick**
+  - Completely new API
+  - New API: `git_cherry_pick_commit` generates a new `git_index *` with result
+  - New API: `git_cherry_pick` updates existing index and working directory
+- **Commit**
+  - Faster commit parsing
+  - New API: `git_commit_summary` returns first paragraph of commit message with whitespace trimmed and squashed
+  - New API: `git_commit_amend` creates a new commit that is a clone of an existing commit with selected fields overwritten
+  - New API: `git_commit_create_from_callback` allows creating a new commit using a callback to provide parent information (in `include/git2/sys/commit.h`)
+  - When given a reference to update, `git_commit_create` now checks that the first parent is the current value of said reference and checks that the old value of the reference is correct when updating it.
+  - The comment character can now be specified when parsing commit messages.
+- **Diff**
+  - Faster diffs due to reduced calculation of SHAs for unknown files on disk
+  - Added flag `GIT_DIFF_UPDATE_INDEX` to optionally update the index stat cache while performing index-to-workdir diffs. This can yield performance improvements when doing repeated diffs (or status checks)
+  - Added support for builtin diff drivers that is compatible (and derived from) core Git (e.g. setting attribute ""*.html diff=html"" will now change diff output in libgit2, whereas previously the ""html"" diff driver was not internally defined)
+  - `git_diff_find_similar` will now fall back to the `diff.renames` config setting if no explicit options are passed in
+  - `git_diff_find_similar` gained `GIT_DIFF_FIND_REMOVE_UNMODIFIED` flag to remove `GIT_DELTA_UNMODIFIED` records from a diff after rename detection is done. This allows you to generate a diff that includes UNMODIFIED records (so they can be considered as possible sources for `COPIED` files) and then remove unused ones from the final diff.
+  - New API: `git_diff_buffers` runs diff on two in-memory buffers
+  - New API: `git_diff_get_stats` creates `git_diff_stats` to emulate `--stat`, `--numstat`, and `--shortstat` output
+  - New API: `git_diff_stats_free` to free `git_diff_stats` object
+  - New API: `git_diff_stats_to_buf` outputs `git_diff_stats` in formats like Git
+  - New APIs: `git_diff_stats_files_changed`, `git_diff_stats_insertions`, and `git_diff_stats_deletions` are accessors for `git_diff_stats` object
+  - New API: `git_diff_format_email` to generate an email patch (in a `git_buf`) from a `git_diff` using `git_diff_format_email_options` settings
+  - New API: `git_diff_commit_as_email` to generate an email-ready patch from a `git_commit`
+  - New API: `git_diff_print_callback__to_buf` helper function for use with `git_diff_print` and `git_patch_print` to accumulate output into a `git_buf *` (in `include/git2/sys/diff.h`)
+  - New API: `git_diff_print_callback__to_file_handle` helper function for use with `git_diff_print` and `git_patch_print` to send output to a `FILE *` (in `include/git2/sys/diff.h`)
+  - New API: `git_diff_get_perfdata` gets low-level performance data for a `git_diff` (in `include/git2/sys/diff.h`)
+- **Errors**
+  - New error code: `GIT_EMODIFIED` returned when a reference-modifying operation finds that the underlying reference was changed underneath the libgit2 call
+- **Graph**
+  - New API: `git_graph_descendant_of` checks if one commit is the descendant of another
+- **Ignores**
+  - Lots of bug fixes
+  - Improved compatability with core Git for filename patterns including support for `**` matches
+  - Cache validation improvements
+- **Index**
+  - The index no longer allows tree and blob path collisions.
+- **Mempack**
+  - Completely new API (in `include/git2/sys/mempack.h`)
+  - Custom ODB backend to pack objects in memory
+- **Merge**
+  - Major changes to how the Merge APIs work
+  - `git_merge` previously produced a new commit, now stages a new commit, including writing conflicts to the index and working tree; has new function signature.
+  - New API: `git_merge_analysis` checks if an array of merge heads can be merged, fast-forwarded, are up-to-date, or otherwise
+  - New API: `git_merge_base_octopus` finds a merge base for an octopus merge
+  - New API: `git_merge_head_id` returns the commit id that a `git_merge_head` object refers to
+  - New API: `git_merge_commits` merges two commits and generates new index representing merge result
+  - New API: `git_merge_file` merges two files in memory, producing a `git_merge_file_result` object
+  - New API: `git_merge_file_from_index` merges two index entries in memory, producing a `git_merge_file_result` object
+  - New API: `git_merge_file_result_free` frees an `git_merge_file_result` object
+- **Object**
+  - New API: `git_object_short_id` returns unambiguous abbreviated ID string for object
+- **ODB**
+  - New API: `git_odb_exists_prefix` checks for existence of object by partial `git_oid`
+- **Pack**
+  - New API: `git_packbuilder_write_buf` writes packfile to `git_buf *` in memory
+  - Delta resolution now happens iteratively instead of recursively, so no more stack overflows.
+  - Deflate buffer usage is now more efficient
+- **Patch**
+  - New API: `git_patch_from_buffers` creates `git_patch` object from the diff of two in-memory buffers
+  - Added support for deflated binary patches.
+- **References**
+  - New API: `git_reference_create_matching` safely creates a direct reference to update from an expected old `const git_oid *` value
+  - New API: `git_reference_symbolic_create_matching` safely creates a symbolic reference to update from an expected old `const char *` value
+  - New API: `git_reference_remove` removes a reference by name
+  - New API: `git_reference_ensure_log` makes sure there is a log file for a reference
+  - New API: `git_reference_is_note` checks if reference lives in `refs/notes` namespace
+- **Remotes**
+  - New API: `git_remote_dup` copies an existing remote (except for callback functions)
+  - New API: `git_remote_get_callbacks` gets callbacks struct from existing remote
+- **Revert**
+  - Completely new API
+  - New API: `git_revert_commit` generates new `git_index` with result of reverting commit
+  - New API: `git_revert` reverts commit in working directory
+- **Revwalk**
+  - APIs that previous tooks commits or references to commits can now take a ""committish"" (i.e. tags will be peeled to reach a commit)
+  - `git_revwalk_{push,hide}_glob` now ignores a reference if it is not a commitish instead of erroring out.
+  - New API: `git_revwalk_add_hide_cb` enables callback to make decisions about hiding commits during a revwalk
+- **Status**
+  - Faster status due to reduced calculation of SHAs for unknown files on disk
+  - Added flag `GIT_STATUS_OPT_UPDATE_INDEX` to optionally update the index stat cache while performing status. This can yield performance improvements when doing repeated status checks.
+  - New API: `git_status_list_get_perfdata` gets low-level performance data for a `git_status_list` (in `include/git2/sys/diff.h`)
+- **Submodules**
+  - `git_submodule` objects are now reference counted and must be used with `git_submodule_free` when done
+  - Submodules will now automatically refresh if the underlying data changes; explicit reloading is rarely required
+  - New API: `git_submodule_resolve_url` resolves relative URLs using parent repository
+  - New API: `git_submodule_branch` gets the branch for the submodule
+  - `git_submodule_fetch_recurse` now uses a new `git_submodule_recurse_t` type that includes a `GIT_SUBMODULE_RECURSE_ONDEMAND` value (as well as `NO` and `YES`) instead just true or false
+- **Transport**
+  - New credential option `GIT_CREDTYPE_SSH_INTERACTIVE` with `git_cred_ssh_interactive` type and `git_cred_sss_interactive_callback` callback type
+  - New API: `git_cred_ssh_interactive_new` to create a `git_cred *` for keyboard-interactive credentials
+  - New API: `git_cred_ssh_key_from_agent` to create a `git_cred *` by querying an ssh-agent
+  - On Windows: support for NTLM/Kerberos auth
+- **Build & Portability Improvements**
+  - More precise flag setting for controlling build warnings
+  - Much better threading support in Windows
+  - Better support for Android
+  - Better support for Solaris
+  - Better support for FreeBSD
+  - Iconv support can now be enabled in non-Mac OS X platforms, if you're weird like that.
+  - On Windows: better support for reparse points, better path handling, added automatic retries on some file operations
+- **BREAKING CHANGES TO EXISTING APIS** (Highlighted to make life easier for binding authors)
+  - Changes from non-const to const pointers are not included in this list
+  - Any place where a binding was explicitly looking for `GIT_EUSER` will have to revisited because libgit2 no longer converts callback return values into `GIT_EUSER` for you
+  - `git_blame_buffer` takes a `size_t buffer_len` where it used to take a `uint32_t buffer_len`
+  - `git_branch_create` added `const git_signature *` and `const char *log_message` params
+  - `git_branch_move` added `const git_signature *` and `const char *log_message` params
+  - `git_branch_upstream_name` now outputs name to a `git_buf *`
+  - `git_branch_remote_name` now outputs name to a `git_buf *`
+  - `git_checkout_opts` struct was renamed to `git_checkout_options` and added an `ancestor_label` field (in the middle of the struct!)
+  - `git_clone_options` gained a `git_signature *signature` field used for reflog updates and the type of the existing `checkout_opts` field was changed from `git_checkout_opts` to `git_checkout_options`
+  - `git_clone_into` changed type of `co_opts` to `const git_checkout_options *` and added `const git_signature *signature` param
+  - `git_commit_create` changed type of `parent_count` from `int` to `size_t`
+  - `git_commit_create_v` changed type of `parent_count` from `int` to `size_t`
+  - `git_commit_create_from_ids` changed type of `parent_count` from `int` to `size_t`
+  - `git_cap_t` type and `GIT_CAP_...` values renamed to `git_feature_t` and `GIT_FEATURE_...`
+  - `git_libgit2_capabilities` renamed to `git_libgit2_features` (for checking compile options at run time)
+  - The `git_libgit2_opts` parameters to `GIT_OPT_GET_SEARCH_PATH` and `GIT_OPT_GET_TEMPLATE_PATH` were changes to take a `git_buf *` instead of `char *` and `size_t` pair
+  - `git_config_find_global` now outputs path to a `git_buf *`
+  - `git_config_find_xdg` now outputs path to a `git_buf *`
+  - `git_config_find_system` now outputs path to a `git_buf *`
+  - `git_cred_ssh_custom` struct changed type of `sign_callback` field to `git_cred_sign_callback`
+  - `git_cred_ssh_custom` struct renamed `sign_data` field to `payload`
+  - `GIT_DIFF_FLAG_VALID_OID` flag on diff files renamed to `GIT_DIFF_FLAG_VALID_ID`
+  - `git_diff_file` field `oid` renamed to `id`
+  - `git_diff_options` field `oid_abbrev` renamed to `id_abbrev`
+  - `git_diff_options_init` API renamed to `git_diff_init_options` as part of standardization
+  - In `git_index_entry`, the `oid` field was renamed to `id` and the `path` field changed from a `char *` to a `const char *`
+  - `git_indexcap_t` changed its underlying type from unsigned to signed
+  - `git_index_caps` returns an `int` instead of an `unsigned int`
+  - `git_index_set_caps` takes an `int caps` instead of `unsigned int caps`
+  - `git_index_clear` now returns an error code where before it was a `void` function (it can return an error if another thread is using index data and a memory allocation fails while preserving data for deferred deletion)
+  - `git_index_conflict_cleanup` now returns an error code where before it was a `void` function (see `git_index_clear` for explanation)
+  - `git_indexer_new` changed type of `progress_cb` to `git_transfer_progress_cb`
+  - `git_merge_automerge_flags` renamed to `git_merge_file_favor_t` and `GIT_MERGE_AUTOMERGE_...` renamed to `GIT_MERGE_FILE_FAVOR_...` (with additional changes to specific values)
+  - `git_merge_tree_opts` renamed to `git_merge_options` with `automerge_flags` field replaced with `file_favor`
+  - `git_merge_opts` removed (in favor of passing explicit `git_checkout_options` to updated `git_merge` function)
+  - `git_merge_head_from_oid` renamed to `git_merge_head_from_id`
+  - `git_merge_trees` takes `const git_merge_options *` instead of `const git_merge_tree_opts *`
+  - `git_merge` is essentially a different function with different parameters and a different effect
+  - `git_merge_result` type removed
+  - `git_merge_result_is_uptodate` removed (use `git_merge_analysis` instead)
+  - `git_merge_result_is_fastforward` removed (use `git_merge_analysis` instead)
+  - `git_merge_result_fastforward_oid` removed
+  - `git_merge_result_free` removed
+  - `git_message_prettify` now outputs message to a `git_buf *`
+  - `git_note_oid` renamed to `git_note_id`
+  - `git_odb_write_pack` changed type of `progress_cb` to `git_transfer_progress_cb`
+  - `git_odb_backend` struct added `exists_prefix` callback
+  - `git_odb_backend` struct `writepack` callback changed type of `progress_cb` to `git_transfer_progress_cb`
+  - `git_oid_equal` is no longer an inline function
+  - `git_packbuilder_write` changed type of `progress_cb` to `git_transfer_progress_cb`
+  - `git_patch_to_str` replaced with `git_patch_to_buf` which writes to `git_buf *` instead of allocating a string
+  - `git_push_update_tips` added `const git_signature *` and `const char *log_message` params
+  - `git_refdb_backend` struct `write` callback added `const git_signature *`, `const char *log_message`, `const git_oid *old_id`, and `const char *old_target` params
+  - `git_refdb_backend` struct `rename` callback added `const git_signature *` and `const char *log_message` params
+  - `git_refdb_backend` struct `del` callback added `const git_oid *old_id` and `const char *old_target` params
+  - `git_refdb_backend` struct added `has_log` callback
+  - `git_refdb_backend` struct added `ensure_log` callback
+  - `git_reflog_append_to` removed - reflog writing moved into individual ref updating functions
+  - `git_reference_create` added `const git_signature *` and `const char *log_message` params
+  - `git_reference_symbolic_create` added `const git_signature *` and `const char *log_message` params
+  - `git_reference_set_target` added `const git_signature *` and `const char *log_message` params
+  - `git_reference_symbolic_set_target` added `const git_signature *` and `const char *log_message` params
+  - `git_reference_rename` added `const git_signature *` and `const char *log_message` params
+  - `git_reference_has_log` now takes a `git_repository *` and `const char *` instead of a `git_reference *~
+  - `git_refspec_transform` now outputs spec to a `git_buf *`
+  - `git_refspec_rtransform` now outputs spec to a `git_buf *`
+  - `git_remote_create_inmemory` replaced with `git_remote_create_anonymous` with the order of the `url` and `fetch` parameters switched
+  - `git_remote_update_tips` added `const git_signature *` and `const char *log_message` params
+  - `git_remote_fetch` added `const git_signature *` and `const char *log_message` params
+  - In `git_remote_callbacks` struct, `progress` callback was renamed `sideband_progress` and type changed to `git_transport_message_cb`, `credentials` callback type changed to `git_cred_acquire_cb`, `transfer_progress` type changed to `git_transfer_progress_cb`
+  - `git_repository_discover` now outputs to a `git_buf *`
+  - `git_repository_message` now outputs to a `git_buf *`
+  - `git_repository_merge_cleanup` renamed to `git_repository_state_cleanup`
+  - `git_repository_set_head` added `const git_signature *` and `const char *log_message` params
+  - `git_repository_set_head_detached` added `const git_signature *` and `const char *log_message` params
+  - `git_repository_detach_head` added `const git_signature *` and `const char *log_message` params
+  - `git_reset` added `const git_signature *` and `const char *log_message` params
+  - `git_signature_dup` now returns an error code and allocates the new signature via an output param
+  - The object returned from `git_submodule_lookup` must now have `git_submodule_free` called it when you are done with it (i.e. it is reference counted now)
+  - `git_submodule_fetch_recurse_submodules` returns a `git_submodule_recurse_t` instead of an `int`
+  - `git_submodule_set_fetch_recurse_submodules` takes a `git_submodule_recurse_t` instead of an `int`
+  - `git_submodule_reload` takes a new `force` flag to override up-to-date checks
+  - `git_submodule_reload_all` takes a new `force` flag to override up-to-date checks
+  - `git_transfer_progress_callback` type was renamed to `git_transfer_progress_cb`
+  - `git_transport` struct `download_pack` callback changed type of `progress_cb` to `git_transfer_progress_cb`
+  - `git_tree_entry_byoid` renamed to `git_tree_entry_byid`
+  - `git_tree_entry_dup` now returns an error code and allocates the new `git_tree_entry` via an output param
+",https://api.github.com/users/vmg,42793,vmg,https://api.github.com/repos/libgit2/libgit2/releases/378787/assets,https://api.github.com/repos/libgit2/libgit2/releases/378787,development,https://api.github.com/repos/libgit2/libgit2/tarball/v0.21.0-rc2,https://github.com/libgit2/libgit2/releases/tag/v0.21.0-rc2,https://api.github.com/repos/libgit2/libgit2/zipball/v0.21.0-rc2,v0.21.0-rc2,False,True
+363159,2014-06-08T14:44:32Z,2014-06-08T16:40:23Z,libgit2 v0.21.0 RC1,"Hello and welcome to a release candidate for libgit2. This is something new for us because we've never tagged a RC before but:
+1. We haven't shipped a release in a long ass time
+2. The current tip of development is not as stable as I'd like it to be
+
+Hence, a release candidate. The tip of development will be frozen to bugfixes only until we tag the final version. Please play with it and make sure we're good.
+
+Here are the current release notes, which I've updated to the best of my ability:
+- **Top-level Improvements**
+  - **We've dropped support for Windows XP**. We're evil like that.
+  - Added a new config snapshotting API to fix race issues when different applications (e.g. Git and a libgit2 client) access the same repository simultaneously.
+  - Added reflog support to all APIs that could alter a reference. These APIs gained two new parameters: `const git_signature *signature` and `const char *log_message` to control what is written to the reflog. Passing NULL for these values will use defaults from the user's configuration.
+  - Avoided race conditions when updating references. Any function that alters a reference will check if the underlying reference data has been changed since libgit2 looked up the data and cancel the operation with error `GIT_EMODIFIED` if the reference has been changed.
+  - Converted all APIs that output string data to use `git_buf` objects for the return value. Previously these would typically take a pointer to an output buffer and a size, and generate an error if the output buffer was not large enough.
+  - Added standard `git_<object>_init_options` functions to initialize options structures when static initialization is not possible, and renamed options structures to standard `git_<object>_options` (replacing `_opts` suffix used in some places)
+  - Improved use of `const` on pointers in many APIs (which may affect some bindings).
+  - Replaced use of `oid` with simply `id` for references to `git_oid` value.s
+  - Previously, when a callback function returned an error value (i.e. non-zero), libgit2 converted it to `GIT_EUSER` for the parent function's return value. Now, libgit2 tries to pass through the callback's return value all the way back to the caller.  To disambiguate between an error generated by the callback vs. an error generated internally by libgit2, a callback can still explicitly return the `GIT_EUSER` value -- libgit2 will never use that error code for errors that it raises.
+  - All inline functions were eliminated from the public libgit2 API
+  - Removed all Apache licensed code from library
+  - CRLF handling is much improved in the platforms where it matters (Windows)
+- **Attributes**
+  - Improved compatability with core Git for filename patterns including support for `**` matches
+  - Cache validation improvements
+  - Faster attribute checks
+- **Blame**
+  - Added `GIT_BLAME_FIRST_PARENT` to simplify search
+- **Clone**
+  - Local clones are now supported. Rejoice!
+- **Checkout**
+  - Added ability to write out conflict data using either MERGE or DIFF3 style
+  - Improved support for `core.autocrlf` and `core.safecrlf`
+  - Improved handling of empty and ignored directories (impacts `git_reset` APIs, too)
+- **Cherry Pick**
+  - Completely new API
+  - New API: `git_cherry_pick_commit` generates a new `git_index *` with result
+  - New API: `git_cherry_pick` updates existing index and working directory
+- **Commit**
+  - Faster commit parsing
+  - New API: `git_commit_summary` returns first paragraph of commit message with whitespace trimmed and squashed
+  - New API: `git_commit_amend` creates a new commit that is a clone of an existing commit with selected fields overwritten
+  - New API: `git_commit_create_from_callback` allows creating a new commit using a callback to provide parent information (in `include/git2/sys/commit.h`)
+  - When given a reference to update, `git_commit_create` now checks that the first parent is the current value of said reference and checks that the old value of the reference is correct when updating it.
+  - The comment character can now be specified when parsing commit messages.
+- **Diff**
+  - Faster diffs due to reduced calculation of SHAs for unknown files on disk
+  - Added flag `GIT_DIFF_UPDATE_INDEX` to optionally update the index stat cache while performing index-to-workdir diffs. This can yield performance improvements when doing repeated diffs (or status checks)
+  - Added support for builtin diff drivers that is compatible (and derived from) core Git (e.g. setting attribute ""*.html diff=html"" will now change diff output in libgit2, whereas previously the ""html"" diff driver was not internally defined)
+  - `git_diff_find_similar` will now fall back to the `diff.renames` config setting if no explicit options are passed in
+  - `git_diff_find_similar` gained `GIT_DIFF_FIND_REMOVE_UNMODIFIED` flag to remove `GIT_DELTA_UNMODIFIED` records from a diff after rename detection is done. This allows you to generate a diff that includes UNMODIFIED records (so they can be considered as possible sources for `COPIED` files) and then remove unused ones from the final diff.
+  - New API: `git_diff_buffers` runs diff on two in-memory buffers
+  - New API: `git_diff_get_stats` creates `git_diff_stats` to emulate `--stat`, `--numstat`, and `--shortstat` output
+  - New API: `git_diff_stats_free` to free `git_diff_stats` object
+  - New API: `git_diff_stats_to_buf` outputs `git_diff_stats` in formats like Git
+  - New APIs: `git_diff_stats_files_changed`, `git_diff_stats_insertions`, and `git_diff_stats_deletions` are accessors for `git_diff_stats` object
+  - New API: `git_diff_format_email` to generate an email patch (in a `git_buf`) from a `git_diff` using `git_diff_format_email_options` settings
+  - New API: `git_diff_commit_as_email` to generate an email-ready patch from a `git_commit`
+  - New API: `git_diff_print_callback__to_buf` helper function for use with `git_diff_print` and `git_patch_print` to accumulate output into a `git_buf *` (in `include/git2/sys/diff.h`)
+  - New API: `git_diff_print_callback__to_file_handle` helper function for use with `git_diff_print` and `git_patch_print` to send output to a `FILE *` (in `include/git2/sys/diff.h`)
+  - New API: `git_diff_get_perfdata` gets low-level performance data for a `git_diff` (in `include/git2/sys/diff.h`)
+- **Errors**
+  - New error code: `GIT_EMODIFIED` returned when a reference-modifying operation finds that the underlying reference was changed underneath the libgit2 call
+- **Graph**
+  - New API: `git_graph_descendant_of` checks if one commit is the descendant of another
+- **Ignores**
+  - Lots of bug fixes
+  - Improved compatability with core Git for filename patterns including support for `**` matches
+  - Cache validation improvements
+- **Index**
+  - The index no longer allows tree and blob path collisions.
+- **Mempack**
+  - Completely new API (in `include/git2/sys/mempack.h`)
+  - Custom ODB backend to pack objects in memory
+- **Merge**
+  - Major changes to how the Merge APIs work
+  - `git_merge` previously produced a new commit, now stages a new commit, including writing conflicts to the index and working tree; has new function signature.
+  - New API: `git_merge_analysis` checks if an array of merge heads can be merged, fast-forwarded, are up-to-date, or otherwise
+  - New API: `git_merge_base_octopus` finds a merge base for an octopus merge
+  - New API: `git_merge_head_id` returns the commit id that a `git_merge_head` object refers to
+  - New API: `git_merge_commits` merges two commits and generates new index representing merge result
+  - New API: `git_merge_file` merges two files in memory, producing a `git_merge_file_result` object
+  - New API: `git_merge_file_from_index` merges two index entries in memory, producing a `git_merge_file_result` object
+  - New API: `git_merge_file_result_free` frees an `git_merge_file_result` object
+- **Object**
+  - New API: `git_object_short_id` returns unambiguous abbreviated ID string for object
+- **ODB**
+  - New API: `git_odb_exists_prefix` checks for existence of object by partial `git_oid`
+- **Pack**
+  - New API: `git_packbuilder_write_buf` writes packfile to `git_buf *` in memory
+  - Delta resolution now happens iteratively instead of recursively, so no more stack overflows.
+  - Deflate buffer usage is now more efficient
+- **Patch**
+  - New API: `git_patch_from_buffers` creates `git_patch` object from the diff of two in-memory buffers
+  - Added support for deflated binary patches.
+- **References**
+  - New API: `git_reference_create_matching` safely creates a direct reference to update from an expected old `const git_oid *` value
+  - New API: `git_reference_symbolic_create_matching` safely creates a symbolic reference to update from an expected old `const char *` value
+  - New API: `git_reference_remove` removes a reference by name
+  - New API: `git_reference_ensure_log` makes sure there is a log file for a reference
+  - New API: `git_reference_is_note` checks if reference lives in `refs/notes` namespace
+- **Remotes**
+  - New API: `git_remote_dup` copies an existing remote (except for callback functions)
+  - New API: `git_remote_get_callbacks` gets callbacks struct from existing remote
+- **Revert**
+  - Completely new API
+  - New API: `git_revert_commit` generates new `git_index` with result of reverting commit
+  - New API: `git_revert` reverts commit in working directory
+- **Revwalk**
+  - APIs that previous tooks commits or references to commits can now take a ""committish"" (i.e. tags will be peeled to reach a commit)
+  - `git_revwalk_{push,hide}_glob` now ignores a reference if it is not a commitish instead of erroring out.
+  - New API: `git_revwalk_add_hide_cb` enables callback to make decisions about hiding commits during a revwalk
+- **Status**
+  - Faster status due to reduced calculation of SHAs for unknown files on disk
+  - Added flag `GIT_STATUS_OPT_UPDATE_INDEX` to optionally update the index stat cache while performing status. This can yield performance improvements when doing repeated status checks.
+  - New API: `git_status_list_get_perfdata` gets low-level performance data for a `git_status_list` (in `include/git2/sys/diff.h`)
+- **Submodules**
+  - `git_submodule` objects are now reference counted and must be used with `git_submodule_free` when done
+  - Submodules will now automatically refresh if the underlying data changes; explicit reloading is rarely required
+  - New API: `git_submodule_resolve_url` resolves relative URLs using parent repository
+  - New API: `git_submodule_branch` gets the branch for the submodule
+  - `git_submodule_fetch_recurse` now uses a new `git_submodule_recurse_t` type that includes a `GIT_SUBMODULE_RECURSE_ONDEMAND` value (as well as `NO` and `YES`) instead just true or false
+- **Transport**
+  - New credential option `GIT_CREDTYPE_SSH_INTERACTIVE` with `git_cred_ssh_interactive` type and `git_cred_sss_interactive_callback` callback type
+  - New API: `git_cred_ssh_interactive_new` to create a `git_cred *` for keyboard-interactive credentials
+  - New API: `git_cred_ssh_key_from_agent` to create a `git_cred *` by querying an ssh-agent
+  - On Windows: support for NTLM/Kerberos auth
+- **Build & Portability Improvements**
+  - More precise flag setting for controlling build warnings
+  - Much better threading support in Windows
+  - Better support for Android
+  - Better support for Solaris
+  - Better support for FreeBSD
+  - Iconv support can now be enabled in non-Mac OS X platforms, if you're weird like that.
+  - On Windows: better support for reparse points, better path handling, added automatic retries on some file operations
+- **BREAKING CHANGES TO EXISTING APIS** (Highlighted to make life easier for binding authors)
+  - Changes from non-const to const pointers are not included in this list
+  - Any place where a binding was explicitly looking for `GIT_EUSER` will have to revisited because libgit2 no longer converts callback return values into `GIT_EUSER` for you
+  - `git_blame_buffer` takes a `size_t buffer_len` where it used to take a `uint32_t buffer_len`
+  - `git_branch_create` added `const git_signature *` and `const char *log_message` params
+  - `git_branch_move` added `const git_signature *` and `const char *log_message` params
+  - `git_branch_upstream_name` now outputs name to a `git_buf *`
+  - `git_branch_remote_name` now outputs name to a `git_buf *`
+  - `git_checkout_opts` struct was renamed to `git_checkout_options` and added an `ancestor_label` field (in the middle of the struct!)
+  - `git_clone_options` gained a `git_signature *signature` field used for reflog updates and the type of the existing `checkout_opts` field was changed from `git_checkout_opts` to `git_checkout_options`
+  - `git_clone_into` changed type of `co_opts` to `const git_checkout_options *` and added `const git_signature *signature` param
+  - `git_commit_create` changed type of `parent_count` from `int` to `size_t`
+  - `git_commit_create_v` changed type of `parent_count` from `int` to `size_t`
+  - `git_commit_create_from_ids` changed type of `parent_count` from `int` to `size_t`
+  - `git_cap_t` type and `GIT_CAP_...` values renamed to `git_feature_t` and `GIT_FEATURE_...`
+  - `git_libgit2_capabilities` renamed to `git_libgit2_features` (for checking compile options at run time)
+  - The `git_libgit2_opts` parameters to `GIT_OPT_GET_SEARCH_PATH` and `GIT_OPT_GET_TEMPLATE_PATH` were changes to take a `git_buf *` instead of `char *` and `size_t` pair
+  - `git_config_find_global` now outputs path to a `git_buf *`
+  - `git_config_find_xdg` now outputs path to a `git_buf *`
+  - `git_config_find_system` now outputs path to a `git_buf *`
+  - `git_cred_ssh_custom` struct changed type of `sign_callback` field to `git_cred_sign_callback`
+  - `git_cred_ssh_custom` struct renamed `sign_data` field to `payload`
+  - `GIT_DIFF_FLAG_VALID_OID` flag on diff files renamed to `GIT_DIFF_FLAG_VALID_ID`
+  - `git_diff_file` field `oid` renamed to `id`
+  - `git_diff_options` field `oid_abbrev` renamed to `id_abbrev`
+  - `git_diff_options_init` API renamed to `git_diff_init_options` as part of standardization
+  - In `git_index_entry`, the `oid` field was renamed to `id` and the `path` field changed from a `char *` to a `const char *`
+  - `git_indexcap_t` changed its underlying type from unsigned to signed
+  - `git_index_caps` returns an `int` instead of an `unsigned int`
+  - `git_index_set_caps` takes an `int caps` instead of `unsigned int caps`
+  - `git_index_clear` now returns an error code where before it was a `void` function (it can return an error if another thread is using index data and a memory allocation fails while preserving data for deferred deletion)
+  - `git_index_conflict_cleanup` now returns an error code where before it was a `void` function (see `git_index_clear` for explanation)
+  - `git_indexer_new` changed type of `progress_cb` to `git_transfer_progress_cb`
+  - `git_merge_automerge_flags` renamed to `git_merge_file_favor_t` and `GIT_MERGE_AUTOMERGE_...` renamed to `GIT_MERGE_FILE_FAVOR_...` (with additional changes to specific values)
+  - `git_merge_tree_opts` renamed to `git_merge_options` with `automerge_flags` field replaced with `file_favor`
+  - `git_merge_opts` removed (in favor of passing explicit `git_checkout_options` to updated `git_merge` function)
+  - `git_merge_head_from_oid` renamed to `git_merge_head_from_id`
+  - `git_merge_trees` takes `const git_merge_options *` instead of `const git_merge_tree_opts *`
+  - `git_merge` is essentially a different function with different parameters and a different effect
+  - `git_merge_result` type removed
+  - `git_merge_result_is_uptodate` removed (use `git_merge_analysis` instead)
+  - `git_merge_result_is_fastforward` removed (use `git_merge_analysis` instead)
+  - `git_merge_result_fastforward_oid` removed
+  - `git_merge_result_free` removed
+  - `git_message_prettify` now outputs message to a `git_buf *`
+  - `git_note_oid` renamed to `git_note_id`
+  - `git_odb_write_pack` changed type of `progress_cb` to `git_transfer_progress_cb`
+  - `git_odb_backend` struct added `exists_prefix` callback
+  - `git_odb_backend` struct `writepack` callback changed type of `progress_cb` to `git_transfer_progress_cb`
+  - `git_oid_equal` is no longer an inline function
+  - `git_packbuilder_write` changed type of `progress_cb` to `git_transfer_progress_cb`
+  - `git_patch_to_str` replaced with `git_patch_to_buf` which writes to `git_buf *` instead of allocating a string
+  - `git_push_update_tips` added `const git_signature *` and `const char *log_message` params
+  - `git_refdb_backend` struct `write` callback added `const git_signature *`, `const char *log_message`, `const git_oid *old_id`, and `const char *old_target` params
+  - `git_refdb_backend` struct `rename` callback added `const git_signature *` and `const char *log_message` params
+  - `git_refdb_backend` struct `del` callback added `const git_oid *old_id` and `const char *old_target` params
+  - `git_refdb_backend` struct added `has_log` callback
+  - `git_refdb_backend` struct added `ensure_log` callback
+  - `git_reflog_append_to` removed - reflog writing moved into individual ref updating functions
+  - `git_reference_create` added `const git_signature *` and `const char *log_message` params
+  - `git_reference_symbolic_create` added `const git_signature *` and `const char *log_message` params
+  - `git_reference_set_target` added `const git_signature *` and `const char *log_message` params
+  - `git_reference_symbolic_set_target` added `const git_signature *` and `const char *log_message` params
+  - `git_reference_rename` added `const git_signature *` and `const char *log_message` params
+  - `git_reference_has_log` now takes a `git_repository *` and `const char *` instead of a `git_reference *~
+  - `git_refspec_transform` now outputs spec to a `git_buf *`
+  - `git_refspec_rtransform` now outputs spec to a `git_buf *`
+  - `git_remote_create_inmemory` replaced with `git_remote_create_anonymous` with the order of the `url` and `fetch` parameters switched
+  - `git_remote_update_tips` added `const git_signature *` and `const char *log_message` params
+  - `git_remote_fetch` added `const git_signature *` and `const char *log_message` params
+  - In `git_remote_callbacks` struct, `progress` callback was renamed `sideband_progress` and type changed to `git_transport_message_cb`, `credentials` callback type changed to `git_cred_acquire_cb`, `transfer_progress` type changed to `git_transfer_progress_cb`
+  - `git_repository_discover` now outputs to a `git_buf *`
+  - `git_repository_message` now outputs to a `git_buf *`
+  - `git_repository_merge_cleanup` renamed to `git_repository_state_cleanup`
+  - `git_repository_set_head` added `const git_signature *` and `const char *log_message` params
+  - `git_repository_set_head_detached` added `const git_signature *` and `const char *log_message` params
+  - `git_repository_detach_head` added `const git_signature *` and `const char *log_message` params
+  - `git_reset` added `const git_signature *` and `const char *log_message` params
+  - `git_signature_dup` now returns an error code and allocates the new signature via an output param
+  - The object returned from `git_submodule_lookup` must now have `git_submodule_free` called it when you are done with it (i.e. it is reference counted now)
+  - `git_submodule_fetch_recurse_submodules` returns a `git_submodule_recurse_t` instead of an `int`
+  - `git_submodule_set_fetch_recurse_submodules` takes a `git_submodule_recurse_t` instead of an `int`
+  - `git_submodule_reload` takes a new `force` flag to override up-to-date checks
+  - `git_submodule_reload_all` takes a new `force` flag to override up-to-date checks
+  - `git_transfer_progress_callback` type was renamed to `git_transfer_progress_cb`
+  - `git_transport` struct `download_pack` callback changed type of `progress_cb` to `git_transfer_progress_cb`
+  - `git_tree_entry_byoid` renamed to `git_tree_entry_byid`
+  - `git_tree_entry_dup` now returns an error code and allocates the new `git_tree_entry` via an output param
+",https://api.github.com/users/vmg,42793,vmg,https://api.github.com/repos/libgit2/libgit2/releases/363159/assets,https://api.github.com/repos/libgit2/libgit2/releases/363159,development,https://api.github.com/repos/libgit2/libgit2/tarball/v0.21.0-rc1,https://github.com/libgit2/libgit2/releases/tag/v0.21.0-rc1,https://api.github.com/repos/libgit2/libgit2/zipball/v0.21.0-rc1,v0.21.0-rc1,False,True
+98567,2013-11-20T11:53:33Z,2013-11-20T12:01:14Z,"libgit2 v0.20.0 ""Anmeldung""","Apologies for the delay. This release is chunky, but you're probably used to chunky releases by now.
+
+Full changelog follows:
+
+### Internal changes
+- Added support for decomposed Unicode paths in Mac OS X
+- Added support for junctions in win32
+- Fixed issues with HTTP redirects in the network stack
+- Performance improvements (as always)
+
+### git2/blame.h
+- added full support for blame operations
+
+### git2/blob.h
+- added `git_blob_filtered_content` to load blobs in memory with their corresponding filters applied
+
+### git2/branch.h
+- added branch iterators as an alternative to the callback-based API
+
+### git2/buffer.h
+- exported the git_buf struct to allow binary buffers to be passed from/to the library. This simplifies several APIs
+
+### git2/checkout.h
+- implemented additional checkout options ('skip unmerged', 'use ours' and 'use theirs')
+
+### git2/clone.h
+- simplified the clone API
+- added new `git_clone_into` to clone into an existing (empty) repository
+
+### git2/commit.h
+- added APIs to access the raw (uncleaned) text of a commit message
+
+### git2/common.h
+- added global options to set the default paths to load templates from
+
+### git2/config.h
+- added multivar iterators
+- added globbing iterator
+- added `git_config_foreach_match` to perform operations on every single var in a config file
+
+### git2/diff.h
+- restructured and simplified the diff API
+
+### git2/filter.h
+- added external APIs to configure and apply custom filters to checked out blobs
+
+### git2/index.h
+- `git_index_read` can now force a reload of the index file even if it hasn't changed on-disk
+
+### git2/indexer.h
+- improved the streaming indexer APIs
+
+### git2/merge.h
+- added support for merge!
+
+### git2/object.h
+- added helper API to lookup a generic object by path
+
+### git2/pack.h
+- added progress callbacks to the packbuilder
+
+### git2/patch.h
+- added support for patch generation as part of the Diff API revamp
+
+### git2/pathspec.h
+- added helper APIs to work with pathspecs and match files in the workdir or diffs
+
+### git2/push.h
+- added progress callbacks to push
+
+### git2/reflog.h
+- changed reflog APIs to work on reference names instead of the references themselves, so they become less racy
+
+### git2/remote.h
+- added support for setting refspecs on remotes, either at creation or on existing ones
+- simplified the remotes API
+
+### git2/revwalk.h
+- add API to simplify parents during a walk
+
+### git2/signature.h
+- add helper to create a signature with the default values for a repository (i.e. the set `user.name` and `user.email` values, and the current time)
+
+### git2/submodules.h
+- improve the status detection for submodules
+
+### git2/sys/
+- exported many new internal APIs, such as pluggabe transport APIs
+
+vmg, out
+",https://api.github.com/users/vmg,42793,vmg,https://api.github.com/repos/libgit2/libgit2/releases/98567/assets,https://api.github.com/repos/libgit2/libgit2/releases/98567,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.20.0,https://github.com/libgit2/libgit2/releases/tag/v0.20.0,https://api.github.com/repos/libgit2/libgit2/zipball/v0.20.0,v0.20.0,False,True
+2828,2013-06-24T22:14:45Z,2013-07-03T16:21:16Z,v0.19.0,"Minor point release! We got a lot of rather large features that we
+wanted to get settled in:
+- New (threadsafe) cache for objects
+- Iterator for Status
+- New Merge APIs
+- SSH support on *NIX
+- Function context on diff
+- Namespaces support
+- Index add/update/remove with wildcard support
+- Iterator for References
+- Fetch and push refspecs for Remotes
+- Rename support in Status
+- New 'sys/` namespace for external headers with low-level APIs
+
+As always, this comes with hundreds of bug fixes and performance
+improvements. We're faster and better than ever. And we haven't broken
+many APIs this time!
+
+Build stuff.
+",https://api.github.com/users/ben,39902,ben,https://api.github.com/repos/libgit2/libgit2/releases/2828/assets,https://api.github.com/repos/libgit2/libgit2/releases/2828,master,https://api.github.com/repos/libgit2/libgit2/tarball/v0.19.0,https://github.com/libgit2/libgit2/releases/tag/v0.19.0,https://api.github.com/repos/libgit2/libgit2/zipball/v0.19.0,v0.19.0,False,True
+2826,2013-04-16T15:46:41Z,2013-07-03T16:19:57Z,"libgit2 0.18.0 ""Big Ben""","This is the last minor release before 1.0preview1.
+
+Highlights of this release include:
+- Branch API
+- Checkout head, index and tree
+- Finished clone support
+- Abstracted reference API to use custom backends
+- Full diff support
+- New (faster) packbuilder
+- Push support
+- New Remotes API
+- Revparse support (single and range commits)
+- Stash support
+- Submodules support
+
+As always, the full changelog is available at http://libgit2.github.com/libgit2/#p/changelog.
+
+Yeah, it's a huge release. Releasing stuff sucks.
+Expect 1.0 and API freeze in less than a month.
+
+Your faithful maintainer,  
+vmg
+",https://api.github.com/users/ben,39902,ben,https://api.github.com/repos/libgit2/libgit2/releases/2826/assets,https://api.github.com/repos/libgit2/libgit2/releases/2826,development,https://api.github.com/repos/libgit2/libgit2/tarball/v0.18.0,https://github.com/libgit2/libgit2/releases/tag/v0.18.0,https://api.github.com/repos/libgit2/libgit2/zipball/v0.18.0,v0.18.0,False,True

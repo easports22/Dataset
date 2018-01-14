@@ -1,0 +1,283 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+7396373,2017-08-15T12:12:18Z,2017-08-15T12:16:57Z,v4.0,"This version adds many bug fixes since the last release and has the following notable new features:
+
+1. Support for building with `dotnet build`. This support requires the .NET Core 2 SDK and will not work with the 1.x SDK. Projects can still target any supported target framework
+2. The build task has been refactored into an MSBuild task, so it should have fewer issues with Mono on macOS",https://api.github.com/users/onovotny,1427284,onovotny,https://api.github.com/repos/paulcbetts/refit/releases/7396373/assets,https://api.github.com/repos/paulcbetts/refit/releases/7396373,master,https://api.github.com/repos/paulcbetts/refit/tarball/v4.0.0,https://github.com/paulcbetts/refit/releases/tag/v4.0.0,https://api.github.com/repos/paulcbetts/refit/zipball/v4.0.0,v4.0.0,False,False
+1859655,2015-09-24T04:38:14Z,2015-09-24T04:40:57Z,Refit 2.4.0,"## [What's New](https://github.com/paulcbetts/refit/compare/2.3.0...2.4.0)
+
+_Release notes soon_
+",https://api.github.com/users/paulcbetts,1396,paulcbetts,https://api.github.com/repos/paulcbetts/refit/releases/1859655/assets,https://api.github.com/repos/paulcbetts/refit/releases/1859655,master,https://api.github.com/repos/paulcbetts/refit/tarball/2.4.0,https://github.com/paulcbetts/refit/releases/tag/2.4.0,https://api.github.com/repos/paulcbetts/refit/zipball/2.4.0,2.4.0,False,False
+1359533,2015-06-01T04:53:54Z,2015-06-01T04:58:17Z,Refit 2.3.0,"## [What's New](https://github.com/paulcbetts/refit/compare/2.2.1...2.3.0)
+
+### Multipart uploads (#146, thanks @mteper)
+
+Methods decorated with `Multipart` attribute will be submitted with multipart content type.
+At this time, multipart methods support the following parameter types:
+- string (parameter name will be used as name and string value as value)
+- byte array
+- Stream
+- FileInfo
+
+For byte array and Stream parameters, use `AttachmentName` parameter attribute to specify the
+name for the attachment. For `FileInfo` parameters, the file name will be used.
+
+``` csharp
+public interface ISomeApi
+{
+    [Multipart]
+    [Post(""/users/{id}/photo"")]
+    Task UploadPhoto(int id, [AttachmentName(""photo.jpg"")] Stream stream);
+}
+```
+
+### New Features
+- HttpContent can now be returned or used as a parameter, and it will be used as the body (#104, thanks @onovotny)
+
+### Bug Fixes
+- Fix bugs around content headers (#139, thanks @bennor) 
+",https://api.github.com/users/paulcbetts,1396,paulcbetts,https://api.github.com/repos/paulcbetts/refit/releases/1359533/assets,https://api.github.com/repos/paulcbetts/refit/releases/1359533,master,https://api.github.com/repos/paulcbetts/refit/tarball/2.3.0,https://github.com/paulcbetts/refit/releases/tag/2.3.0,https://api.github.com/repos/paulcbetts/refit/zipball/2.3.0,2.3.0,False,False
+931258,2015-02-08T23:19:12Z,2015-02-08T23:27:41Z,Refit 2.2.1,"## [What's New](https://github.com/paulcbetts/refit/compare/2.2.0...2.2.1)
+
+Bug Fixes:
+- Add support for the PATCH HTTP method (#115, #119, thanks @cristi-badila)
+- Fix issue where WP8 and PCL in the same project would cause issues (#117, thanks @moswald)
+- Add APIException to the PCL library (#128, thanks @bennor)
+",https://api.github.com/users/paulcbetts,1396,paulcbetts,https://api.github.com/repos/paulcbetts/refit/releases/931258/assets,https://api.github.com/repos/paulcbetts/refit/releases/931258,master,https://api.github.com/repos/paulcbetts/refit/tarball/2.2.1,https://github.com/paulcbetts/refit/releases/tag/2.2.1,https://api.github.com/repos/paulcbetts/refit/zipball/2.2.1,2.2.1,False,False
+822092,2015-01-03T23:38:07Z,2015-01-03T23:41:43Z,Refit 2.2.0,"## [What's New](https://github.com/paulcbetts/refit/compare/2.1.0...2.2.0)
+
+### Refit Serializer Settings
+
+Refit now allows you to control JSON serialization, via passing in a new `RefitSettings` type into `RestService.For<T>`:
+
+``` cs
+var gitHubApi = RestService.For<IGitHubApi>(""https://api.github.com"",
+    new RefitSettings {
+        JsonSerializerSettings = new JsonSerializerSettings {
+            ContractResolver = new SnakeCasePropertyNamesContractResolver()
+        }
+    });
+```
+
+### Diagnostic information (#79, thanks @nekresh)
+
+Refit now prints diagnostic information inside VS when an interface can't be generated
+
+### Bug Fixes
+- Allow spaces after attribute names (#74, thanks @bennor)
+- Fix issues with warnings being thrown (#77 + #81, thanks @ghuntley and @nekresh)
+- Add support for value types in return values (#86, thanks @bennor)
+",https://api.github.com/users/paulcbetts,1396,paulcbetts,https://api.github.com/repos/paulcbetts/refit/releases/822092/assets,https://api.github.com/repos/paulcbetts/refit/releases/822092,master,https://api.github.com/repos/paulcbetts/refit/tarball/2.2.0,https://github.com/paulcbetts/refit/releases/tag/2.2.0,https://api.github.com/repos/paulcbetts/refit/zipball/2.2.0,2.2.0,False,False
+703663,2014-11-14T04:49:11Z,2014-11-14T05:03:46Z,Refit 2.1.0,"## [What's New](https://github.com/paulcbetts/refit/compare/2.0.2...2.1.0)
+
+### Generic Interface Support (#70)
+
+Thanks to @bennor, you can now define generic interfaces that apply to multiple APIs:
+
+``` cs
+public interface IReallyExcitingCrudApi<T, in TKey> where T : class
+{
+    [Post("""")]
+    Task<T> Create([Body] T paylod);
+
+    [Get("""")]
+    Task<List<T>> ReadAll();
+
+    [Get(""/{key}"")]
+    Task<T> ReadOne(TKey key);
+
+    [Put(""/{key}"")]
+    Task Update(TKey key, [Body]T payload);
+
+    [Delete(""/{key}"")]
+    Task Delete(TKey key);
+}
+
+// Later, in another part of town...
+var userApi = RestService.For<IReallyExcitingCrudApi<User, string>>(""http://api.example.com/users""); 
+var adminApi = RestService.For<IReallyExcitingCrudApi<Admin, string>>(""http://api.example.com/admins""); 
+```
+
+### URL Parameter Formatting (#66)
+
+Thanks to @carl-berg, types that are serialized in the URL query string can now define custom formatting, via a new `RefitSettings` class that is optionally passed to `RestService.For`.
+
+### Bug Fixes / Improvements
+- URL parameters are now no longer case-sensitive (#68, thanks @flagbug)
+- Refit Interfaces which were defined in different assemblies than where they were used will now correctly get stubs generated (#67, thanks @bennor)
+- Type aliases will now be recognized in interfaces (#62, thanks @bennor)
+",https://api.github.com/users/paulcbetts,1396,paulcbetts,https://api.github.com/repos/paulcbetts/refit/releases/703663/assets,https://api.github.com/repos/paulcbetts/refit/releases/703663,master,https://api.github.com/repos/paulcbetts/refit/tarball/2.1.0,https://github.com/paulcbetts/refit/releases/tag/2.1.0,https://api.github.com/repos/paulcbetts/refit/zipball/2.1.0,2.1.0,False,False
+623192,2014-10-13T17:38:57Z,2014-10-13T17:48:01Z,Refit 2.0.2,"## [What's New](https://github.com/paulcbetts/refit/compare/2.0.1...2.0.2)
+
+### Support for Windows Store / Windows Phone 8.1 Universal Apps (#59, thanks @bennor)
+
+Because of the compile-time code generation mentioned above, Refit 2.0 now has full support for WinRT (Windows Store) and Windows Phone 8.1 Universal applications too!
+
+### Bug Fixes
+- Handle spaces in project paths (#60, thanks @bennor)
+- Fix some oopses in code generation (#58, thanks @flagbug)
+",https://api.github.com/users/paulcbetts,1396,paulcbetts,https://api.github.com/repos/paulcbetts/refit/releases/623192/assets,https://api.github.com/repos/paulcbetts/refit/releases/623192,master,https://api.github.com/repos/paulcbetts/refit/tarball/2.0.2,https://github.com/paulcbetts/refit/releases/tag/2.0.2,https://api.github.com/repos/paulcbetts/refit/zipball/2.0.2,2.0.2,False,False
+621372,2014-10-13T00:20:39Z,2014-10-13T00:42:41Z,Refit 2.0.1,"## [What's New](https://github.com/paulcbetts/refit/compare/2.0.0...2.0.1)
+
+2.0.1 is an Oops release to fix a PLib packaging issue as well as bump the NuGet package versions. This release also saves some space by removing unnecessary PDBs.
+",https://api.github.com/users/paulcbetts,1396,paulcbetts,https://api.github.com/repos/paulcbetts/refit/releases/621372/assets,https://api.github.com/repos/paulcbetts/refit/releases/621372,master,https://api.github.com/repos/paulcbetts/refit/tarball/2.0.1,https://github.com/paulcbetts/refit/releases/tag/2.0.1,https://api.github.com/repos/paulcbetts/refit/zipball/2.0.1,2.0.1,False,False
+621368,2014-10-12T05:17:59Z,2014-10-13T00:40:29Z,Refit 2.0.0,"## [What's New](https://github.com/paulcbetts/refit/compare/1.3.0...2.0.0)
+
+### Support for Xamarin.iOS (#38)
+
+Refit 2.0 uses a completely different system to generate the backing classes for your interfaces. In Refit 1.0, these classes would be generated at runtime using Castle.Core, which worked on most platforms, but fails on any Ahead-of-Time compiled platform, such as Xamarin.iOS. 
+
+Refit 2.0 instead generates classes at compile-time, by analyzing your app's source files with Roslyn, and generates a new `RefitStubs.cs` file that will be compiled along with your class. As well as enabling Xamarin.iOS support, this class is easily subclassed and extended via partial classes, so customizing individual method behavior is now much easier
+
+### Observables in Refit are now Cold (#56, thanks to @balauru for some of the work)
+
+Observables in Refit 1.x are backed by `AsyncSubject`, meaning that they replay a single result to subscribers, even after the network request ends. In Refit 2.0, Observables now do no work until Subscribed to, and each Subscription will generate a new network request, in line with Retrofit. Observables in Refit 2.0 now also will cancel network operations if the Subscription is disposed, allowing you to efficiently cancel requests if they are no longer needed.
+
+Before:
+
+``` cs
+var observable = someRestService.ReturnsAnObservable();
+var result1 = await observable;
+var result2 = await observable;
+
+// result2 is just a replayed result1, the network request was made when
+// we called ReturnsAnObservable regardless if anyone cared.
+result1 == result2;
+>>> true
+```
+
+After:
+
+``` cs
+// Does nothing
+var observable = someRestService.ReturnsAnObservable();
+
+// Makes a web request
+var result1 = await observable;
+
+// Makes a *different* web request
+var result2 = await observable;
+
+result1 == result2;
+>>> maybe?
+```
+
+### Form Property Aliasing (#55, thanks @bennor)
+
+When POSTing bodies serialized via `BodySerializationMethod.UrlEncoded`, the `AliasAs` tag now also works on properties in the model class:
+
+Before:
+
+``` csharp
+public interface IMeasurementProtocolApi
+{
+    [Post(""/collect"")]
+    Task Collect([Body(BodySerializationMethod.UrlEncoded)] Measurement measurement);
+}
+
+public class Measurement
+{
+    public string t { get; set; } // This isn't even the worst of them
+}
+
+await api.Collect(new Measurement { t = ""what even is t?"" });
+
+```
+
+After:
+
+``` csharp
+// This part doesn't change
+public interface IMeasurementProtocolApi
+{
+    [Post(""/collect"")]
+    Task Collect([Body(BodySerializationMethod.UrlEncoded)] Measurement measurement);
+}
+
+// This stuff does
+public Measurement
+{
+    [AliasAs(""t"")] 
+    public string Type { get; set; }
+}
+
+await api.Collect(new Measurement { Type = ""event"" });
+```
+",https://api.github.com/users/paulcbetts,1396,paulcbetts,https://api.github.com/repos/paulcbetts/refit/releases/621368/assets,https://api.github.com/repos/paulcbetts/refit/releases/621368,master,https://api.github.com/repos/paulcbetts/refit/tarball/2.0.0,https://github.com/paulcbetts/refit/releases/tag/2.0.0,https://api.github.com/repos/paulcbetts/refit/zipball/2.0.0,2.0.0,False,False
+450296,2014-07-25T07:39:21Z,2014-07-25T07:49:23Z,Refit 1.3.0,"## [What's New](https://github.com/paulcbetts/refit/compare/1.2.0...1.3.0)
+
+#### Allow paths in the HttpClient base URL so you don't have to repeat yourself (#40, thanks @balauru!)
+
+``` cs
+    public interface IDummyHttpApi
+    {
+        [Get(""/bar/{id}"")]
+        Task<string> FetchSomeStuff(int id);
+
+        [Get(""/bar/{id}?baz=bamf"")]
+        Task<string> FetchSomeStuffWithHardcodedQueryParameter(int id);
+    }
+
+    RestService.For<IDummyHttpApi>(""http://api.com/foo"")
+```
+
+#### Allow more than one parameter in a given URL segment (#47, thanks @bennor!)
+
+``` cs
+    public interface IDummyHttpApi
+    {
+        [Get(""/bar/{image}/{width}x{height}"")]
+        Task<byte[]> GetImageData(string image, int width, int height);
+    }
+```
+
+#### Allow posting URL-encoded form data in the body (#46, thanks @bennor)
+
+``` cs
+    public interface IDummyHttpApi
+    {
+        [Post(""/foo/bar/{id}"")]
+        IObservable<string> PostSomeUrlEncodedStuff([AliasAs(""id"")] int anId, [Body(BodySerializationMethod.UrlEncoded)] Dictionary<string, string> theData);
+    }
+```
+
+#### Bug fixes
+- Fixes ""Misused header name"" bug when using dynamic headers (#44, thanks @bennor)
+- Add more information about errors if we've got them (#45, thanks @bennor!)
+- Fixes problems related to IObservable replaying results correctly
+",https://api.github.com/users/paulcbetts,1396,paulcbetts,https://api.github.com/repos/paulcbetts/refit/releases/450296/assets,https://api.github.com/repos/paulcbetts/refit/releases/450296,master,https://api.github.com/repos/paulcbetts/refit/tarball/1.3.0,https://github.com/paulcbetts/refit/releases/tag/1.3.0,https://api.github.com/repos/paulcbetts/refit/zipball/1.3.0,1.3.0,False,False
+386378,2014-06-20T18:56:23Z,2014-06-20T19:32:53Z,Refit 1.2.0,"## [What's New](https://github.com/paulcbetts/refit/compare/1.1.0...1.2.0)
+
+### Request Headers
+
+Thanks to @bennor, Refit now supports adding request headers to both individual methods as well as to entire classes via the `[Header]` attribute. Here's an example:
+
+``` cs
+[Headers(""X-Emoji: :rocket:"")]
+public interface IGitHubApi
+{
+    [Get(""/users/list"")]
+    Task<List> GetUsers();
+
+    [Get(""/users/{user}"")]
+    [Headers(""X-Emoji: :smile_cat:"")]
+    Task<User> GetUser(string user);
+
+    [Post(""/users/new"")]
+    [Headers(""X-Emoji: :metal:"")]
+    Task CreateUser([Body] User user, [Header(""X-Emoji"")] string emoji);
+}
+```
+",https://api.github.com/users/paulcbetts,1396,paulcbetts,https://api.github.com/repos/paulcbetts/refit/releases/386378/assets,https://api.github.com/repos/paulcbetts/refit/releases/386378,master,https://api.github.com/repos/paulcbetts/refit/tarball/1.2.0,https://github.com/paulcbetts/refit/releases/tag/1.2.0,https://api.github.com/repos/paulcbetts/refit/zipball/1.2.0,1.2.0,False,False
+300782,2014-05-02T19:19:59Z,2014-05-02T19:25:09Z,Refit 1.1.0,"## [What's New](https://github.com/paulcbetts/refit/compare/1.0.0...1.1.0)
+
+### Methods can return Task
+
+Thanks to @dahlbyk, methods can return `Task` for HTTP requests that don't have a response with any information (i.e. ""DeleteXYZ"" that only signals if it worked or not)
+
+### Bug Fixes
+- Fix a crash on certain method definitions (#21, thanks @vevix)
+",https://api.github.com/users/paulcbetts,1396,paulcbetts,https://api.github.com/repos/paulcbetts/refit/releases/300782/assets,https://api.github.com/repos/paulcbetts/refit/releases/300782,master,https://api.github.com/repos/paulcbetts/refit/tarball/1.1.0,https://github.com/paulcbetts/refit/releases/tag/1.1.0,https://api.github.com/repos/paulcbetts/refit/zipball/1.1.0,1.1.0,False,False
+18382,2013-07-30T21:23:10Z,2013-07-30T21:24:23Z,Refit 1.0.0,"## Refit 1.0.0
+
+Initial Release
+",https://api.github.com/users/paulcbetts,1396,paulcbetts,https://api.github.com/repos/paulcbetts/refit/releases/18382/assets,https://api.github.com/repos/paulcbetts/refit/releases/18382,master,https://api.github.com/repos/paulcbetts/refit/tarball/1.0.0,https://github.com/paulcbetts/refit/releases/tag/1.0.0,https://api.github.com/repos/paulcbetts/refit/zipball/1.0.0,1.0.0,False,False

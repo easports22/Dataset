@@ -1,0 +1,178 @@
+id,created_at,published_at,name,body,author_url,author_id,author_login,assets_url,url,target_commitish,tarball_url,html_url,zipball_url,tag_name,draft,prerelease
+8103068,2017-09-21T20:29:41Z,2017-10-12T22:42:11Z,MSBuild 15.4.8,"This is the version of MSBuild packaged with [Visual Studio 2017 version 15.4.0](https://www.visualstudio.com/en-us/news/releasenotes/vs2017-relnotes#15.4) and [.NET Core 2.0.2](https://github.com/dotnet/cli/releases/tag/v2.0.2).
+## Notes
+
+This release contains only very minor tweaks (#2542, #2494, and #2454) to support improvements in Visual Studio.",https://api.github.com/users/AndyGerlicher,9847849,AndyGerlicher,https://api.github.com/repos/Microsoft/msbuild/releases/8103068/assets,https://api.github.com/repos/Microsoft/msbuild/releases/8103068,master,https://api.github.com/repos/Microsoft/msbuild/tarball/v15.4.8.50001,https://github.com/Microsoft/msbuild/releases/tag/v15.4.8.50001,https://api.github.com/repos/Microsoft/msbuild/zipball/v15.4.8.50001,v15.4.8.50001,False,False
+7386587,2017-07-20T20:51:11Z,2017-08-14T16:23:52Z,MSBuild 15.3.409,"This is the version of MSBuild packaged with [Visual Studio 2017 version 15.3.0](https://www.visualstudio.com/en-us/news/releasenotes/vs2017-relnotes) and [.NET Core 2.0.0](https://github.com/dotnet/core/blob/master/release-notes/2.0/2.0.0.md).
+## What's new
+
+Highlights of this release are:
+* A new BinaryLogger, allowing capturing detailed build information at dramatically lower time and space cost.
+* Support for the .NET Core SDK 2.0.0.
+* API changes to improve the .NET Project System/CPS experience.
+
+## Detailed release notes
+
+### Added
+* Introduce a new BinaryLogger logger (#1747) which can be replayed (#1793).
+* `MSBuildTreatWarningsAsErrors`, `MSBuildWarningsAsErrors`, and `MSBuildWarningsAsMessages` can be set within a project to elevate or suppress warnings (#1928).
+* At high verbosity, log property reassignment during evaluation (#1841).
+* Support for [reference assemblies](https://github.com/dotnet/roslyn/blob/master/docs/features/refout.md) (#2039).
+* Introduce support for SDK resolvers, used to find the .NET Core 2.0 SDK (#2002).
+* Enabled calling `Clean;Build` on multitargeted projects (#1665).
+* The `XMLPeek` and `XMLPoke` tasks are available on .NET Core (#1732).
+* Enabled task factories for .NET Core (#1742).
+* Public APIs for glob logic (#1794).
+* Documentation of the ProjectReference protocol for SDK implementers (#1892).
+* `[MSBuild]::IsOSPlatform()` property function (#2137).
+* `Microsoft.Build.Localization` package contains satellite assemblies for MSBuild (#2106).
+* `ProjectEvaluationStartedEventArgs`, `ProjectEvaluationFinishedEventArgs`, and `ProjectImportedEventArgs` (if the environment variable `MSBUILDLOGIMPORTS=1`) are now raised to loggers (#2135, #2142).
+* Evaluation time for each project is included in the Performance Summary (#2157).
+* `ProjectLoadSettings.IgnoreEmptyImports` can be set when building programmatically to suppress errors caused by missing imports (#2171).
+* MSBuild can be built on RHEL 7 (#1718). Thanks, @omajid!
+* Additional tests enabled for .NET Core (#2013). Thanks, @patros!
+
+### Changed
+* Add default values for AppDesignerFolder property (#1606).
+* Improved IntelliSense for MSBuild in Visual Studio:
+  * Removed internal implementation details from autocomplete (#2130).
+  * Better description for VersionSuffix and VersionPrefix (#1687).
+  * Include Content->CopyToPublishDirectory (#1922). Thanks, @tannergooding!
+  * Autocompletion for `<Project Sdk="""">` (#2048).
+  * Autocompletion for the `Title` property (#2076). Thanks, @tannergooding!
+* `Directory.Build.targets` is included in multitarget projects (#1722).
+* Multitargeted projects execute inner builds in parallel (#1809).
+* `GetAllGlobs` includes more information (#1871).
+* The FileLogger will now create a directory when a nonexistent path is specified (#1970). Thanks, @patros!
+* The `Import` element now supports a semicolon-delimited list of projects (#2014).
+* The logo printed for command-line builds now indicates the runtime MSBuild was compiled for (#2049).
+* Code generated using `WriteCodeFragment` is now marked as auto-generated (#2207). Thanks, @dasMulli!
+
+### Fixed
+* Evaluation-time item `Remove` now correctly removes what was specified (#2162).
+* Don't throw an exception when using String.TrimEnd as a property function (#1635). Thanks, @eerhardt!
+* Prefer executables to directories on PATH in ToolTask (#1535).
+* Improved dependencies for NuGet packages on full framework (#1682).
+* `CoreCompileInputs.cache` will now be cleaned correctly (#1741).
+* Disambiguate `CoreCompileInputs.cache` in shared-output-directory situations (#1783). Thanks, @Nazgul07!
+* Don't emit ANSI color codes to the console when logging through the file logger (#1827).
+* Several potential problems found via static analysis (#1829, #1891, #1918). Thanks, @skhrenov!
+* Fix a crash when parsing Clang/GCC errrors with no text (#1811). Thanks, @chwarr!
+* Correctly return failure in multiproc `/warnaserror` builds (#1864).
+* Expanding a property that refers to an item no longer produces the empty string (#1896).
+* Do not add a Byte Order Mark to a project when saving it (#1904).
+* Preprocessing certain project structures no longer results in a stack overflow (#1909).
+* Reduce torn state when building using the API and specifying `ProjectInstance`s (#1955).
+* Projects in the root of a Unixlike filesystem can now be built (#1954). Thanks, @patros!
+* `Directory.Build.props` and `.targets` are now automatically added to `$(MSBuildAllProjects)` (#2011). Thanks, @dasMulli!
+* Load XamlBuildTask from the correct location from 64-bit MSBuild (#2020).
+* Correct slash direction in item metadata (#2025). Thanks, @radical!
+* Allow programmatic builds of mutated ProjectInstances (#2018).
+* `GenerateResource` no longer fails when given readonly `.txt` resources (#2074).
+* Allow custom localization and packing satellite assemblies (#2084). Thanks, @AArnott!
+* Find the .NET SDK from the correct registry location when using 64-bit MSBuild (#2092).
+* Performance: speed up checking timestamps on files to determine up-to-dateness (#2087).
+* Performance: cache environment variable and directory lookups (#2246).
+* Stop emitting summary information to `ErrorsOnly`/`WarningsOnly` log files (#2110).
+* Allow `ToolTask` arguments to contain quotes escaped with `\""` without assuming it's a path separator (enables Visual Basic) (#2114).
+* Fixed a problem that could allow targets to execute in a project even after it fatally errored (#2133).
+* `MSBuildThisFileDirectory` is preserved after `ReloadFrom(XmlReader)` (#2173).
+* `WinMDExp` supports long commands by using a response file not subject to Win32 command-line length limits (#2177).
+* .NET Core MSBuild now correctly locates task satellite assemblies (#2229).
+* .NET Core MSBuild on Windows no longer fails when a project is in a non-ASCII path (#2231)
+* Avoid misconfiguring third-party crypto providers (#2263). Thanks, @Jinhuafei!
+* Remove spurious errors in the IDE when referencing a .NET Standard 1.x project that hasn't yet been built (#2304). Thanks @dsplaisted!
+* Performance: speed up operations of the form `<I Update=""@(I)"" />` (#2326).
+* Typo and spelling fixes (#1969, #2085, #2089, #2091, #2103). Thanks, @alexxn and @nschonni!
+
+### Removed
+* `ProjectConfigurationsInferredFromUsage` is no longer defined for C#/VB projects (#1879). Thanks, @RaulPerez1!
+
+## Additional thanks
+Thanks to everyone who filed bugs or provided other feedback to us in this timeframe!",https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/7386587/assets,https://api.github.com/repos/Microsoft/msbuild/releases/7386587,vs15.3,https://api.github.com/repos/Microsoft/msbuild/tarball/v15.3.409.57025,https://github.com/Microsoft/msbuild/releases/tag/v15.3.409.57025,https://api.github.com/repos/Microsoft/msbuild/zipball/v15.3.409.57025,v15.3.409.57025,False,False
+7180025,2017-07-14T22:22:54Z,2017-07-26T19:22:14Z,MSBuild 15.3.407,This is the version of MSBuild packaged with [Visual Studio 2017 version 15.3.0 Preview 5](https://www.visualstudio.com/en-us/news/releasenotes/vs2017-preview-relnotes).,https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/7180025/assets,https://api.github.com/repos/Microsoft/msbuild/releases/7180025,master,https://api.github.com/repos/Microsoft/msbuild/tarball/v15.3.407.29267,https://github.com/Microsoft/msbuild/releases/tag/v15.3.407.29267,https://api.github.com/repos/Microsoft/msbuild/zipball/v15.3.407.29267,v15.3.407.29267,False,True
+7047087,2017-06-28T18:03:57Z,2017-07-14T17:43:56Z,MSBuild 15.3.402,This is the version of MSBuild packaged with [Visual Studio 2017 version 15.3.0 Preview 4](https://www.visualstudio.com/en-us/news/releasenotes/vs2017-preview-relnotes#a-id1530arelease-date-july-12-2017---visual-studio-2017-version-1530-preview-4) (build 26621.2).,https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/7047087/assets,https://api.github.com/repos/Microsoft/msbuild/releases/7047087,master,https://api.github.com/repos/Microsoft/msbuild/tarball/v15.3.402.46929,https://github.com/Microsoft/msbuild/releases/tag/v15.3.402.46929,https://api.github.com/repos/Microsoft/msbuild/zipball/v15.3.402.46929,v15.3.402.46929,False,True
+6857215,2017-06-13T15:22:24Z,2017-06-27T23:53:07Z,MSBuild 15.3.388,This is the version of MSBuild packaged with [Visual Studio 2017 version 15.3.0 Preview 3](https://www.visualstudio.com/en-us/news/releasenotes/vs2017-preview-relnotes#a-id1530arelease-date-june-26-2017---visual-studio-2017-version-1530-preview-3) (build 26621.2) and [.NET Core 2.0.0 Preview 2](https://github.com/dotnet/core/blob/master/release-notes/2.0/2.0.0-preview2.md).,https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/6857215/assets,https://api.github.com/repos/Microsoft/msbuild/releases/6857215,master,https://api.github.com/repos/Microsoft/msbuild/tarball/v15.3.388.41745,https://github.com/Microsoft/msbuild/releases/tag/v15.3.388.41745,https://api.github.com/repos/Microsoft/msbuild/zipball/v15.3.388.41745,v15.3.388.41745,False,True
+6664797,2017-06-01T14:33:44Z,2017-06-09T16:51:33Z,MSBuild 15.3.255,This is the version of MSBuild packaged with [Visual Studio 2017 (version 15.3) Preview 2](https://www.visualstudio.com/vs/preview/) (build 26606.0).,https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/6664797/assets,https://api.github.com/repos/Microsoft/msbuild/releases/6664797,master,https://api.github.com/repos/Microsoft/msbuild/tarball/v15.3.255.36604,https://github.com/Microsoft/msbuild/releases/tag/v15.3.255.36604,https://api.github.com/repos/Microsoft/msbuild/zipball/v15.3.255.36604,v15.3.255.36604,False,True
+6343350,2017-05-04T20:31:03Z,2017-05-10T18:42:42Z,MSBuild 15.3.118,This is the version of MSBuild packaged with [Visual Studio 2017 (version 15.3) Preview](https://www.visualstudio.com/vs/preview/) (build 26507.0).,https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/6343350/assets,https://api.github.com/repos/Microsoft/msbuild/releases/6343350,vs15.3-preview,https://api.github.com/repos/Microsoft/msbuild/tarball/v15.3.118.39484,https://github.com/Microsoft/msbuild/releases/tag/v15.3.118.39484,https://api.github.com/repos/Microsoft/msbuild/zipball/v15.3.118.39484,v15.3.118.39484,False,True
+6343329,2017-05-01T22:29:47Z,2017-05-10T18:41:00Z,MSBuild 15.3.117,This is the version of MSBuild packaged with the `dotnet` CLI `2.0.0-preview1-005977` (part of the [.NET Core 2.0 Preview](https://www.microsoft.com/net/core/preview)).,https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/6343329/assets,https://api.github.com/repos/Microsoft/msbuild/releases/6343329,master,https://api.github.com/repos/Microsoft/msbuild/tarball/v15.3.117.23532,https://github.com/Microsoft/msbuild/releases/tag/v15.3.117.23532,https://api.github.com/repos/Microsoft/msbuild/zipball/v15.3.117.23532,v15.3.117.23532,False,True
+6048690,2017-03-14T18:44:43Z,2017-04-11T16:49:04Z,MSBuild 15.1.1012,"This is the version of MSBuild packaged with [Visual Studio 2017 version 15.1](https://blogs.msdn.microsoft.com/visualstudio/2017/04/05/visual-studio-2017-update/) (build 26403.0) and with the `dotnet` CLI 1.0.3.
+
+## Improvements
+
+* Support for the Windows 10 Creators Update SDK (#1672, #1728, #1802, #1840).
+
+## Bug fixes
+
+* restored case insensitivity to references to item names (#1751)
+  * If you had a dependency on the erroneous case-sensitive behavior, this release will revert to that behavior if the environment variable `MSBUILDUSECASESENSITIVEITEMNAMES` is set to `1`. This will be removed in a future release.",https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/6048690/assets,https://api.github.com/repos/Microsoft/msbuild/releases/6048690,vs15.1,https://api.github.com/repos/Microsoft/msbuild/tarball/v15.1.1012.6693,https://github.com/Microsoft/msbuild/releases/tag/v15.1.1012.6693,https://api.github.com/repos/Microsoft/msbuild/zipball/v15.1.1012.6693,v15.1.1012.6693,False,False
+5666055,2017-02-14T21:45:21Z,2017-03-07T16:26:33Z,MSBuild 15.1.548,"This is the version of MSBuild packaged with [Visual Studio 2017](https://blogs.msdn.microsoft.com/visualstudio/2017/03/07/announcing-visual-studio-2017-general-availability-and-more/) (build 26206.00) and with the `dotnet` CLI 1.0.0.
+
+Release notes are available at https://docs.microsoft.com/en-us/visualstudio/msbuild/what-s-new-in-msbuild-15-0.
+
+Installers are available as part of:
+* [Visual Studio 2017](https://www.visualstudio.com/downloads/#vs-2017) (for Windows)
+* [Build Tools for Visual Studio 2017](https://www.visualstudio.com/downloads/#build-tools-for-visual-studio-2017) (for Windows)
+* [.NET Core Sdk](https://www.microsoft.com/net/download/core#/sdk) (for Windows, macOS, and Linux)",https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/5666055/assets,https://api.github.com/repos/Microsoft/msbuild/releases/5666055,vs15-rtw,https://api.github.com/repos/Microsoft/msbuild/tarball/v15.1.548.43366,https://github.com/Microsoft/msbuild/releases/tag/v15.1.548.43366,https://api.github.com/repos/Microsoft/msbuild/zipball/v15.1.548.43366,v15.1.548.43366,False,False
+5387759,2017-02-03T03:02:40Z,2017-02-07T20:48:43Z,MSBuild 15.1.545,"This tag corresponds to the version of MSBuild packaged with the [update to the Visual Studio 2017 Release Candidate](https://blogs.msdn.microsoft.com/visualstudio/2017/02/07/another-update-to-visual-studio-2017-rc/) (build 26206.00) and with the `dotnet` CLI 1.0.0-rc4-004771.
+",https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/5387759/assets,https://api.github.com/repos/Microsoft/msbuild/releases/5387759,7636893361ea61cf35e0e7b8d30c8d478729c89e,https://api.github.com/repos/Microsoft/msbuild/tarball/v15.1.545.13942,https://github.com/Microsoft/msbuild/releases/tag/v15.1.545.13942,https://api.github.com/repos/Microsoft/msbuild/zipball/v15.1.545.13942,v15.1.545.13942,False,True
+5282633,2017-01-13T23:49:55Z,2017-01-27T07:19:50Z,MSBuild 15.1.523,"This tag corresponds to the version of MSBuild packaged with the [update to the Visual Studio 2017 Release Candidate](https://blogs.msdn.microsoft.com/visualstudio/2017/01/26/update-to-visual-studio-2017-release-candidate/) and with the `dotnet` CLI 1.0.0-rc3-004530.
+
+[Known Issues](https://github.com/Microsoft/msbuild/issues?utf8=%E2%9C%93&q=label%3A%22RC3%20Known%20Issues%22%20)
+",https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/5282633/assets,https://api.github.com/repos/Microsoft/msbuild/releases/5282633,master,https://api.github.com/repos/Microsoft/msbuild/tarball/v15.1.523.56541,https://github.com/Microsoft/msbuild/releases/tag/v15.1.523.56541,https://api.github.com/repos/Microsoft/msbuild/zipball/v15.1.523.56541,v15.1.523.56541,False,True
+4922078,2016-12-13T22:49:02Z,2016-12-14T19:28:15Z,Mono Hosted MSBuild 0.03,"This is a mono hosted msbuild that you can use to build the msbuild source code on Linux / OSX.
+
+Zip copied from: https://github.com/radical/msbuild/releases/tag/v0.03
+",https://api.github.com/users/cdmihai,2255729,cdmihai,https://api.github.com/repos/Microsoft/msbuild/releases/4922078/assets,https://api.github.com/repos/Microsoft/msbuild/releases/4922078,xplat,https://api.github.com/repos/Microsoft/msbuild/tarball/mono-hosted-msbuild-v0.03,https://github.com/Microsoft/msbuild/releases/tag/mono-hosted-msbuild-v0.03,https://api.github.com/repos/Microsoft/msbuild/zipball/mono-hosted-msbuild-v0.03,mono-hosted-msbuild-v0.03,False,True
+4907849,2016-12-06T17:16:13Z,2016-12-13T15:54:23Z,MSBuild 15.1.458,This tag corresponds to the version of MSBuild packaged with the [update to the Visual Studio 2017 Release Candidate](https://blogs.msdn.microsoft.com/visualstudio/2016/12/12/updating-visual-studio-2017-release-candidate/) and with the `dotnet` CLI 1.0.0-preview4-004233.,https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/4907849/assets,https://api.github.com/repos/Microsoft/msbuild/releases/4907849,master,https://api.github.com/repos/Microsoft/msbuild/tarball/v15.1.458.808,https://github.com/Microsoft/msbuild/releases/tag/v15.1.458.808,https://api.github.com/repos/Microsoft/msbuild/zipball/v15.1.458.808,v15.1.458.808,False,True
+4678281,2016-11-16T17:37:13Z,2016-11-16T17:52:24Z,MSBuild - Visual Studio 2017 Release Candidate,"This tag corresponds to the version of MSBuild packaged with [Visual Studio 2017 Release Candidate](https://blogs.msdn.microsoft.com/visualstudio/2016/11/16/visual-studio-2017-rc/).
+",https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/4678281/assets,https://api.github.com/repos/Microsoft/msbuild/releases/4678281,master,https://api.github.com/repos/Microsoft/msbuild/tarball/v15.1.371.0,https://github.com/Microsoft/msbuild/releases/tag/v15.1.371.0,https://api.github.com/repos/Microsoft/msbuild/zipball/v15.1.371.0,v15.1.371.0,False,True
+4678222,2016-11-16T17:40:22Z,2016-11-16T17:48:12Z,MSBuild - Dotnet CLI 1.0.0 Preview 3,"This tag corresponds to the version of MSBuild packaged with the `dotnet` CLI 1.0.0-preview3-004056.
+
+It is available [on NuGet.org](http://www.nuget.org/packages/Microsoft.Build.Runtime/15.1.0-preview-000370-00).
+",https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/4678222/assets,https://api.github.com/repos/Microsoft/msbuild/releases/4678222,master,https://api.github.com/repos/Microsoft/msbuild/tarball/v15.1.0-preview-000370-00,https://github.com/Microsoft/msbuild/releases/tag/v15.1.0-preview-000370-00,https://api.github.com/repos/Microsoft/msbuild/zipball/v15.1.0-preview-000370-00,v15.1.0-preview-000370-00,False,True
+4324710,2016-09-21T22:41:42Z,2016-10-06T16:10:55Z,"MSBuild - Visual Studio ""15"" Preview 5","This tag corresponds to the version of MSBuild packaged with [Visual Studio “15” Preview 5](https://blogs.msdn.microsoft.com/visualstudio/2016/10/05/announcing-visual-studio-15-preview-5/).
+",https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/4324710/assets,https://api.github.com/repos/Microsoft/msbuild/releases/4324710,vs15-preview5,https://api.github.com/repos/Microsoft/msbuild/tarball/v15.1.237-preview5+944145c64c,https://github.com/Microsoft/msbuild/releases/tag/v15.1.237-preview5%2B944145c64c,https://api.github.com/repos/Microsoft/msbuild/zipball/v15.1.237-preview5+944145c64c,v15.1.237-preview5+944145c64c,False,True
+4061819,2016-08-04T23:00:21Z,2016-09-06T15:24:28Z,"MSBuild - Visual Studio ""15"" Preview 4","This tag corresponds to the version of MSBuild packaged with [Visual Studio “15” Preview 4](https://blogs.msdn.microsoft.com/visualstudio/2016/08/22/visual-studio-15-preview-4/).
+",https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/4061819/assets,https://api.github.com/repos/Microsoft/msbuild/releases/4061819,vs15-preview4,https://api.github.com/repos/Microsoft/msbuild/tarball/v15.1.114+gc6b59ca505,https://github.com/Microsoft/msbuild/releases/tag/v15.1.114%2Bgc6b59ca505,https://api.github.com/repos/Microsoft/msbuild/zipball/v15.1.114+gc6b59ca505,v15.1.114+gc6b59ca505,False,True
+3572318,2016-07-01T19:53:40Z,2016-07-01T19:59:15Z,MSBuild - Visual Studio 2015 Update 3 (ish),"This tag corresponds to the version of MSBuild packaged with [Visual Studio 2015 Update 3](https://blogs.msdn.microsoft.com/visualstudio/2016/06/27/visual-studio-2015-update-3-and-net-core-1-0-available-now/).
+
+This release is also available via a standalone [Build Tools 2015 Update 3](https://go.microsoft.com/fwlink/?LinkId=615458) installer.
+
+The only change to MSBuild since Update 3 RC was a fix for #705, which was an internal-only change not reflected in the GitHub source.
+
+**Important**: the actual Update 3 release was not produced by compiling the GitHub source at this commit.  It was built from a mirror of MSBuild in the Microsoft-internal VS repository, which was manually synced to contain the changes made here.  These sources are instructive for behavior and understanding purposes, but not suitable for debugging the released binaries.
+",https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/3572318/assets,https://api.github.com/repos/Microsoft/msbuild/releases/3572318,master,https://api.github.com/repos/Microsoft/msbuild/tarball/v14.0.25420.1-ish,https://github.com/Microsoft/msbuild/releases/tag/v14.0.25420.1-ish,https://api.github.com/repos/Microsoft/msbuild/zipball/v14.0.25420.1-ish,v14.0.25420.1-ish,False,False
+3413889,2016-06-09T23:30:56Z,2016-06-09T23:43:11Z,MSBuild - Visual Studio 2015 Update 3 RC (ish),"This tag corresponds to the version of MSBuild packaged with [Visual Studio 2015 Update 3 RC](https://blogs.msdn.microsoft.com/visualstudio/2016/06/07/visual-studio-2015-update-3-rc/).
+
+This release is also available via a standalone [Build Tools 2015 with Update 3 RC](http://go.microsoft.com/fwlink/?LinkId=518023) installer.
+
+**Important**: the actual Update 3 RC release was not produced by compiling the GitHub source at this commit.  It was built from a mirror of MSBuild in the Microsoft-internal VS repository, which was manually synced to contain the changes made here.  These sources are instructive for behavior and understanding purposes, but not suitable for debugging the released binaries.
+",https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/3413889/assets,https://api.github.com/repos/Microsoft/msbuild/releases/3413889,master,https://api.github.com/repos/Microsoft/msbuild/tarball/v14.0.25402.0-ish,https://github.com/Microsoft/msbuild/releases/tag/v14.0.25402.0-ish,https://api.github.com/repos/Microsoft/msbuild/zipball/v14.0.25402.0-ish,v14.0.25402.0-ish,False,True
+3013522,2016-04-11T20:37:51Z,2016-04-13T18:33:42Z,Mono Hosted MSBuild,"This is a mono hosted msbuild that you can use to build the msbuild source code on Linux / OSX.
+",https://api.github.com/users/cdmihai,2255729,cdmihai,https://api.github.com/repos/Microsoft/msbuild/releases/3013522/assets,https://api.github.com/repos/Microsoft/msbuild/releases/3013522,xplat,https://api.github.com/repos/Microsoft/msbuild/tarball/mono-hosted-msbuild-v0.2,https://github.com/Microsoft/msbuild/releases/tag/mono-hosted-msbuild-v0.2,https://api.github.com/repos/Microsoft/msbuild/zipball/mono-hosted-msbuild-v0.2,mono-hosted-msbuild-v0.2,False,True
+2935948,2016-04-01T18:24:16Z,2016-04-01T18:28:43Z,MSBuild - Visual Studio 2015 Update 2 (ish),"This tag corresponds to the version of MSBuild packaged with [Visual Studio 2015 Update 2](https://www.visualstudio.com/news/vs2015-update2-vs).
+
+This release is also available through the standalone [Build Tools 2015 with Update 2](https://www.visualstudio.com/downloads/download-visual-studio-vs#d-build-tools) installer.
+
+**Important**: the actual Update 2 release was not produced by compiling the GitHub source at this commit.  It was built from a mirror of MSBuild in the Microsoft-internal VS repository, which was manually synced to contain the changes made here.  These sources are instructive for behavior and understanding purposes, but not suitable for debugging the released binaries.
+",https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/2935948/assets,https://api.github.com/repos/Microsoft/msbuild/releases/2935948,master,https://api.github.com/repos/Microsoft/msbuild/tarball/v14.0.25123.0-ish,https://github.com/Microsoft/msbuild/releases/tag/v14.0.25123.0-ish,https://api.github.com/repos/Microsoft/msbuild/zipball/v14.0.25123.0-ish,v14.0.25123.0-ish,False,False
+2740163,2016-03-03T22:18:18Z,2016-03-03T22:24:39Z,MSBuild - Visual Studio 2015 Update 2 RC (ish),"This tag corresponds to the version of MSBuild packaged with [Visual Studio 2015 Update 2 RC](https://blogs.msdn.microsoft.com/visualstudio/2016/03/03/visual-studio-2015-update-2-rc/).
+
+New in this release is a standalone [Build Tools 2015 with Update 2 RC](http://go.microsoft.com/fwlink/?LinkId=518023) installer.
+
+**Important**: the actual Update 2 RC release was not produced by compiling the GitHub source at this commit.  It was built from a mirror of MSBuild in the Microsoft-internal VS repository, which was manually synced to contain the changes made here.  These sources are instructive for behavior and understanding purposes, but not suitable for debugging the released binaries.
+",https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/2740163/assets,https://api.github.com/repos/Microsoft/msbuild/releases/2740163,master,https://api.github.com/repos/Microsoft/msbuild/tarball/v14.0.25029.0-ish,https://github.com/Microsoft/msbuild/releases/tag/v14.0.25029.0-ish,https://api.github.com/repos/Microsoft/msbuild/zipball/v14.0.25029.0-ish,v14.0.25029.0-ish,False,True
+2596206,2016-02-11T16:46:04Z,2016-02-11T16:59:01Z,MSBuild - Visual Studio 2015 Update 2 CTP (ish),"This tag corresponds to the version of MSBuild packaged with [Visual Studio 2015 Update 2 CTP](https://blogs.msdn.microsoft.com/visualstudio/2016/02/10/visual-studio-2015-update-2-ctp/).
+
+**Important**: the actual Update 2 CTP release was not produced by compiling the GitHub source at this commit.  It was built from a mirror of MSBuild in the Microsoft-internal VS repository, which was manually synced to contain the changes made here.  These sources are instructive for behavior and understanding purposes, but not suitable for debugging the released binaries.
+",https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/2596206/assets,https://api.github.com/repos/Microsoft/msbuild/releases/2596206,master,https://api.github.com/repos/Microsoft/msbuild/tarball/v14.0.25008.0-ish,https://github.com/Microsoft/msbuild/releases/tag/v14.0.25008.0-ish,https://api.github.com/repos/Microsoft/msbuild/zipball/v14.0.25008.0-ish,v14.0.25008.0-ish,False,True
+2216804,2015-10-09T23:51:02Z,2015-12-01T22:53:39Z,MSBuild - Visual Studio 2015 Update 1 (ish),"This tag corresponds to the version of MSBuild packaged with [Visual Studio 2015 Update 1](https://www.visualstudio.com/en-us/news/vs2015-update1-vs.aspx).
+
+**Important**: the actual Update 1 release was not produced by compiling the GitHub source at this commit.  It was built from a mirror of MSBuild in the Microsoft-internal VS repository, which was manually synced to contain the changes made here.  These sources are instructive for behavior and understanding purposes, but not suitable for debugging the released binaries.
+",https://api.github.com/users/rainersigwald,3347530,rainersigwald,https://api.github.com/repos/Microsoft/msbuild/releases/2216804/assets,https://api.github.com/repos/Microsoft/msbuild/releases/2216804,dev14-update1,https://api.github.com/repos/Microsoft/msbuild/tarball/v14.0.24720.0-ish,https://github.com/Microsoft/msbuild/releases/tag/v14.0.24720.0-ish,https://api.github.com/repos/Microsoft/msbuild/zipball/v14.0.24720.0-ish,v14.0.24720.0-ish,False,False
+2216597,2015-12-01T17:16:28Z,2015-12-01T22:19:26Z,Mono Hosted MSBuild,"This is a mono hosted msbuild that you can use to build the msbuild source code on Linux / OSX.
+
+Example:
+`mono mono-msbuild\bin\Unix\Debug-MONO\MSBuild.exe`
+",https://api.github.com/users/cdmihai,2255729,cdmihai,https://api.github.com/repos/Microsoft/msbuild/releases/2216597/assets,https://api.github.com/repos/Microsoft/msbuild/releases/2216597,xplat,https://api.github.com/repos/Microsoft/msbuild/tarball/mono-hosted-msbuild-v0.1,https://github.com/Microsoft/msbuild/releases/tag/mono-hosted-msbuild-v0.1,https://api.github.com/repos/Microsoft/msbuild/zipball/mono-hosted-msbuild-v0.1,mono-hosted-msbuild-v0.1,False,True
